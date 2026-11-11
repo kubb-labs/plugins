@@ -38,7 +38,8 @@ async function* readLines(stream: EventStreamInput): AsyncGenerator<{ lines: Arr
   }
 }
 
-function parseData<TData>(raw: string): TData {
+function parseData<TData>(raw: string, event: string, rawData?: boolean | Array<string>): TData {
+  if (rawData === true || (rawData && rawData.includes(event))) return raw as TData
   try {
     return JSON.parse(raw) as TData
   } catch {
@@ -52,9 +53,9 @@ type EventStreamInput = ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>
  * Parses a `text/event-stream` body into events, as the WHATWG spec does. Break the loop to cancel the stream.
  */
 export async function* parseEventStream<TData = unknown>(
-  input: EventStreamInput | (Pick<EventStreamOptions, 'maxEventSize' | 'terminator'> & { stream: EventStreamInput; cursor?: Cursor }),
+  input: EventStreamInput | (Pick<EventStreamOptions, 'maxEventSize' | 'terminator' | 'rawData'> & { stream: EventStreamInput; cursor?: Cursor | undefined }),
 ): AsyncGenerator<ServerSentEvent<TData>> {
-  const { stream, maxEventSize = 16 * 1024 * 1024, terminator, cursor = { lastEventId: '' } } = isStreamBody(input) ? { stream: input } : input
+  const { stream, maxEventSize = 16 * 1024 * 1024, terminator, rawData, cursor = { lastEventId: '' } } = isStreamBody(input) ? { stream: input } : input
   const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
   let type = ''
   let data: Array<string> = []
@@ -90,7 +91,7 @@ export async function* parseEventStream<TData = unknown>(
           const raw = data.join('\n')
           if (raw === terminator) return
           yield {
-            data: parseData<TData>(raw),
+            data: parseData<TData>(raw, type || 'message', rawData),
             event: type || 'message',
             ...(cursor.lastEventId ? { id: cursor.lastEventId } : {}),
             ...(retry !== undefined ? { retry } : {}),
@@ -157,7 +158,7 @@ async function* mapEvents(events: AsyncIterable<ServerSentEvent>, transform: (ev
 export const eventStream: MediaType = {
   decode: (response) => response.text(),
   stream: (body, { config, cursor }) => {
-    const events = parseEventStream({ stream: body, maxEventSize: config.maxEventSize, terminator: config.terminator, cursor })
+    const events = parseEventStream({ stream: body, maxEventSize: config.maxEventSize, terminator: config.terminator, rawData: config.rawData, cursor })
     return config.transform ? mapEvents(events, config.transform) : events
   },
 }

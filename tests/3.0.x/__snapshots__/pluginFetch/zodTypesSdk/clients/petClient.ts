@@ -9,7 +9,7 @@ import type { DeletePetOptionsSchemaType, DeletePetResponsesSchemaType } from '.
 import type { FindPetsByStatusOptionsSchemaType, FindPetsByStatusResponsesSchemaType } from '../zod/findPetsByStatusSchema'
 import type { GetPetByIdOptionsSchemaType, GetPetByIdResponsesSchemaType } from '../zod/getPetByIdSchema'
 import type { UploadFileOptionsSchemaType, UploadFileResponsesSchemaType } from '../zod/uploadFileSchema'
-import { createClient, withUnwrap, resolveThrowOnError } from '../.kubb/client'
+import { createClient, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 import { addPetResponseSchema, addPetStatus405Schema } from '../zod/addPetSchema'
 import { deletePetResponseSchema, deletePetStatus400Schema } from '../zod/deletePetSchema'
 import { findPetsByStatusResponseSchema, findPetsByStatusStatus400Schema } from '../zod/findPetsByStatusSchema'
@@ -31,7 +31,7 @@ export class PetClient {
     public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<AddPetResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, contentType, ...config } = options
 
-    return withUnwrap(apiClient<AddPetResponsesSchemaType, ThrowOnError>({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) }, ...config, validator: { response: addPetResponseSchema, error: { 405: addPetStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap(apiClient<AddPetResponsesSchemaType, ThrowOnError>({ method: 'POST', url: '/pet', security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }], contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) }, ...config, validator: { response: addPetResponseSchema, error: { 405: addPetStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -42,7 +42,7 @@ export class PetClient {
     public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<FindPetsByStatusResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, styles: { ...config.styles, query: { status: { explode: true }, ...config.styles?.query } }, validator: { response: findPetsByStatusResponseSchema, error: { 400: findPetsByStatusStatus400Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap(apiClient<FindPetsByStatusResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/pet/findByStatus', security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }], ...config, styles: { ...config.styles, query: { status: { explode: true }, ...config.styles?.query } }, validator: { response: findPetsByStatusResponseSchema, error: { 400: findPetsByStatusStatus400Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -53,7 +53,7 @@ export class PetClient {
     public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<GetPetByIdResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, validator: { response: getPetByIdResponseSchema, error: { 400: getPetByIdStatus400Schema, 404: getPetByIdStatus404Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap(apiClient<GetPetByIdResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/pet/{petId}', security: [securitySchemes.api_key, { ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }], ...config, validator: { response: getPetByIdResponseSchema, error: { 400: getPetByIdStatus400Schema, 404: getPetByIdStatus404Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -64,7 +64,7 @@ export class PetClient {
     public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<DeletePetResponsesSchemaType, ThrowOnError>({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, validator: { response: deletePetResponseSchema, error: { 400: deletePetStatus400Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap(apiClient<DeletePetResponsesSchemaType, ThrowOnError>({ method: 'DELETE', url: '/pet/{petId}', security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }], ...config, validator: { response: deletePetResponseSchema, error: { 400: deletePetStatus400Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -74,6 +74,6 @@ export class PetClient {
     public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<UploadFileResponsesSchemaType, ThrowOnError>({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], contentType: { request: 'application/octet-stream' }, ...config, validator: { response: uploadFileResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap(apiClient<UploadFileResponsesSchemaType, ThrowOnError>({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }], contentType: { request: 'application/octet-stream' }, ...config, validator: { response: uploadFileResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 }

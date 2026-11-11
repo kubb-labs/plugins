@@ -15,6 +15,17 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker, dateParser }).print(node)).toBe(expected)
   })
 
+  test.each([
+    [{ type: 'ipv4' }, 'faker.internet.ipv4()'],
+    [{ type: 'ipv6' }, 'faker.internet.ipv6()'],
+    [{ type: 'string', format: 'jwt' }, 'faker.internet.jwt()'],
+    [{ type: 'string', format: 'duration' }, "'P1D'"],
+    [{ type: 'integer', min: 0, multipleOf: 5 }, 'faker.number.int({ min: 0, multipleOf: 5 })'],
+    [{ type: 'number', multipleOf: 0.5 }, 'faker.number.float({ multipleOf: 0.5 })'],
+  ] as const)('prints %o as a value its zod schema accepts', (schema, expected) => {
+    expect(printerFaker({ resolver: resolverFaker }).print(ast.factory.createSchema(schema))).toBe(expected)
+  })
+
   test.each([false, true])('populates propertyNames enum records (referenced: %s)', (referenced) => {
     const keys = ast.factory.createSchema({ type: 'enum', enumValues: ['x', 'y'] })
     const node = ast.factory.createSchema({
@@ -45,8 +56,21 @@ describe('printerFaker', () => {
     })
 
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Settings' }).print(node)).toBe(
-      "{\n  x: faker.number.int(),\n  'a-b': faker.helpers.arrayElement<NonNullable<Settings>[\"a-b\"]>(['on', 'off']),\n}",
+      "{\n  x: faker.number.int(),\n  'a-b': faker.helpers.arrayElement(['on', 'off'] as Array<NonNullable<Settings>[\"a-b\"]>),\n}",
     )
+  })
+
+  test('reads the items of an array in a union from its array branches only', () => {
+    const item = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'level', schema: ast.factory.createSchema({ type: 'enum', enumValues: ['low'] }) })],
+    })
+    const node = ast.factory.createSchema({
+      type: 'union',
+      members: [ast.factory.createSchema({ type: 'object', properties: [] }), ast.factory.createSchema({ type: 'array', items: [item] })],
+    })
+
+    expect(printerFaker({ resolver: resolverFaker, typeName: 'Body' }).print(node)).toContain('Extract<NonNullable<Body>, ReadonlyArray<unknown>>[number]')
   })
 
   test('falls back to the base string printer from a node override', () => {
@@ -80,10 +104,181 @@ describe('printerFaker', () => {
     `)
   })
 
+  test('mocks the document or the encoding a string holds', () => {
+    const print = (content: ast.StringSchemaNode['content']) =>
+      printerFaker({ resolver: resolverFaker, typeName: 'Pet' }).print(ast.factory.createSchema({ type: 'string', content }))
+    const schema = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+    })
+
+    expect(print({ mediaType: 'application/json', schema })).toMatchInlineSnapshot(`
+      "JSON.stringify({
+        id: faker.number.int(),
+      })"
+    `)
+    expect(print({ mediaType: 'text/html', schema })).toBe('faker.string.alpha()')
+    expect(print({ encoding: 'base64' })).toBe('btoa(faker.string.alpha())')
+    expect(print({ encoding: 'base64url' })).toBe('faker.string.alphanumeric(8)')
+  })
+
+  test.each([
+    ['^A[A-Z0-9]{1,}$', 'faker.helpers.fromRegExp(/^A[A-Z0-9]{1,11}$/)'],
+    ['^\\+[1-9]\\d{1,14}$', 'faker.helpers.fromRegExp(/^[+][1-9][0-9]{1,14}$/)'],
+    // Faker reads a literal `-` only first in a class, and `a\-z` must not become the range `a-z`.
+    ['^[\\w.\\-]+$', 'faker.helpers.fromRegExp(/^[-A-Za-z0-9_.]+$/)'],
+    ['^[^a\\-z]{3}$', 'faker.helpers.fromRegExp(/^[^-az]{3}$/)'],
+    ['^\\s(a|b)$', 'faker.helpers.fromRegExp(/^\\s(a|b)$/)'],
+  ])('rewrites the pattern %s into the grammar faker reads', (pattern, expected) => {
+    expect(printerFaker({ resolver: resolverFaker }).print(ast.factory.createSchema({ type: 'string', pattern }))).toBe(expected)
+  })
+
   test('mocks a string int64 as digits', () => {
     const node = ast.factory.createSchema({ type: 'string', format: 'int64' })
 
     expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"faker.number.bigInt().toString()"`)
+  })
+
+  test('keeps 32-bit and 64-bit integers inside their format and bounds', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+
+    expect(print(ast.factory.createSchema({ type: 'integer', format: 'int32' }))).toBe('faker.number.int({ max: 2147483647 })')
+    expect(print(ast.factory.createSchema({ type: 'integer', format: 'int32', max: 10 }))).toBe('faker.number.int({ max: 10 })')
+    expect(print(ast.factory.createSchema({ type: 'integer', format: 'uint32' }))).toBe('faker.number.int({ max: 4294967295 })')
+    expect(print(ast.factory.createSchema({ type: 'bigint', min: 1, max: 10 }))).toBe('faker.number.bigInt({ min: 1n, max: 10n })')
+    expect(print(ast.factory.createSchema({ type: 'bigint' }))).toBe('faker.number.bigInt()')
+  })
+
+  test('keeps a string and a list near their minimum length, however large the maximum is', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+    const item = ast.factory.createSchema({ type: 'string' })
+
+    expect(print(ast.factory.createSchema({ type: 'string', max: 10_485_760 }))).toBe('faker.string.alpha({ length: { min: 1, max: 100 } })')
+    expect(print(ast.factory.createSchema({ type: 'string', min: 5, max: 8 }))).toBe('faker.string.alpha({ length: { min: 5, max: 8 } })')
+    expect(print(ast.factory.createSchema({ type: 'string', max: 0 }))).toBe('faker.string.alpha({ length: { min: 0, max: 0 } })')
+    expect(print(ast.factory.createSchema({ type: 'string', min: 3 }))).toBe('faker.string.alpha({ length: 3 })')
+    expect(print(ast.factory.createSchema({ type: 'array', items: [item], max: 100_000 }))).toBe(
+      'faker.helpers.multiple(() => (faker.string.alpha()), { count: { min: 0, max: 100 }})',
+    )
+  })
+
+  test('mocks a binary value as a Blob, and leaves a ref back into its own cycle empty', () => {
+    const self = ast.factory.createSchema({ type: 'ref', name: 'Tree', ref: '#/components/schemas/Tree' })
+    const other = ast.factory.createSchema({ type: 'ref', name: 'Leaf', ref: '#/components/schemas/Leaf' })
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker, schemaName: 'Tree', cyclicSchemas: new Set(['Tree', 'Leaf']) }).print(node)
+
+    expect(printerFaker({ resolver: resolverFaker }).print(ast.factory.createSchema({ type: 'blob' }))).toBe('new Blob([faker.string.alpha()])')
+    expect(print(ast.factory.createSchema({ type: 'array', items: [self] }))).toBe('[]')
+    expect(print(ast.factory.createSchema({ type: 'array', items: [other] }))).toBe('[]')
+    expect(print(other)).toBe('undefined as unknown')
+    const object = (required: boolean) =>
+      ast.factory.createSchema({ type: 'object', properties: [ast.factory.createProperty({ name: 'leaf', required, schema: other })] })
+    // A required ref keeps its mock, behind the lazy getter; an optional one closes the cycle.
+    expect(print(object(true))).toContain('const _value = createLeaf()')
+    expect(print(object(false))).toContain('const _value = undefined as unknown')
+  })
+
+  test('picks a discriminated variant outside the cycle, since spreading one inside it never ends', () => {
+    const variant = (name: string) =>
+      ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}` }),
+          ast.factory.createSchema({ type: 'object', properties: [] }),
+        ],
+      })
+    const node = ast.factory.createSchema({ type: 'union', members: [variant('Equal'), variant('And'), variant('Or')] })
+
+    expect(printerFaker({ resolver: resolverFaker, schemaName: 'And', cyclicSchemas: new Set(['And', 'Or']) }).print(node)).toBe(
+      'faker.helpers.arrayElement([{...createEqual(), ...{}}])',
+    )
+  })
+
+  test('keeps integers and floats inside exclusive bounds', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+
+    expect(print(ast.factory.createSchema({ type: 'integer', exclusive: { min: 0, max: 10 } }))).toBe('faker.number.int({ min: 1, max: 9 })')
+    expect(print(ast.factory.createSchema({ type: 'number', exclusive: { min: 0, max: 1 } }))).toBe('faker.number.float({ min: 0, max: 1 })')
+  })
+
+  test('spreads a discriminated union after its sibling base object', () => {
+    const dog = ast.factory.createSchema({ type: 'ref', name: 'Dog', ref: '#/components/schemas/Dog' })
+    const base = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'type', schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+    const node = ast.factory.createSchema({ type: 'intersection', members: [ast.factory.createSchema({ type: 'union', members: [dog] }), base] })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('{...{\n  type: faker.string.alpha(),\n}, ...faker.helpers.arrayElement([createDog()])}')
+  })
+
+  test('spreads a referenced base before the inline object that narrows it', () => {
+    const literal = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'type', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: ['X'] }) })],
+    })
+    const base = ast.factory.createSchema({ type: 'ref', name: 'Base', ref: '#/components/schemas/Base' })
+    const node = ast.factory.createSchema({ type: 'intersection', members: [literal, base] })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe("{...createBase(), ...{\n  type: faker.helpers.arrayElement(['X']),\n}}")
+  })
+
+  test('mocks unique array items within the count limits', () => {
+    const node = ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })], unique: true, min: 1, max: 5 })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe(
+      'faker.helpers.uniqueArray(() => (faker.string.alpha()), faker.number.int({ min: 1, max: 5 }))',
+    )
+  })
+
+  test('keeps an object within its property counts', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+    const string = ast.factory.createSchema({ type: 'string' })
+    const property = (name: string, required = false) => ast.factory.createProperty({ name, required, schema: string })
+
+    expect(print(ast.factory.createSchema({ type: 'object', min: 2, properties: [property('additionalProperty1')], additionalProperties: string }))).toBe(
+      '{\n  additionalProperty1: faker.string.alpha(),\n  additionalProperty2: faker.string.alpha(),\n}',
+    )
+    expect(print(ast.factory.createSchema({ type: 'object', max: 1, properties: [property('a'), property('b', true), property('c')] }))).toBe(
+      '{\n  b: faker.string.alpha(),\n}',
+    )
+  })
+
+  test('keeps a bigint inside exclusive bounds', () => {
+    const node = ast.factory.createSchema({ type: 'bigint', exclusive: { min: 0 } })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('faker.number.bigInt({ min: 1n })')
+  })
+
+  test("fills the other bound when faker's default would contradict a lone one", () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+
+    expect(print(ast.factory.createSchema({ type: 'number', exclusive: { min: 5 } }))).toBe('faker.number.float({ min: 5, max: 105 })')
+    expect(print(ast.factory.createSchema({ type: 'number', exclusive: { max: 0 } }))).toBe('faker.number.float({ min: -100, max: 0 })')
+    expect(print(ast.factory.createSchema({ type: 'integer', exclusive: { max: 0 } }))).toBe('faker.number.int({ min: -101, max: -1 })')
+    expect(print(ast.factory.createSchema({ type: 'number', max: 50 }))).toBe('faker.number.float({ max: 50 })')
+  })
+
+  test('keeps exclusive and filled-in bounds on the multipleOf grid', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+
+    expect(print(ast.factory.createSchema({ type: 'number', exclusive: { min: 0 }, multipleOf: 10 }))).toBe(
+      'faker.number.float({ min: 10, max: 1010, multipleOf: 10 })',
+    )
+    expect(print(ast.factory.createSchema({ type: 'number', min: 0, exclusive: { max: 10 }, multipleOf: 5 }))).toBe(
+      'faker.number.float({ min: 0, max: 5, multipleOf: 5 })',
+    )
+    expect(print(ast.factory.createSchema({ type: 'integer', max: -5, multipleOf: 1000 }))).toBe(
+      'faker.number.int({ min: -100005, max: -5, multipleOf: 1000 })',
+    )
+    expect(print(ast.factory.createSchema({ type: 'number', min: 0.5, multipleOf: 2 }))).toBe('faker.number.float({ min: 0.5, max: 200.5, multipleOf: 2 })')
+  })
+
+  test('prints only whole, safe bigint bounds and a whole multipleOf', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+
+    expect(print(ast.factory.createSchema({ type: 'bigint', min: 0.5, multipleOf: 0.5 }))).toBe('faker.number.bigInt({ min: 1n })')
+    expect(print(ast.factory.createSchema({ type: 'bigint', min: 0, max: 2 ** 63 }))).toBe('faker.number.bigInt({ min: 0n })')
   })
 
   test('mocks a string int32 within the 32-bit range', () => {
@@ -152,7 +347,7 @@ describe('printerFaker', () => {
         typeName: `NonNullable<Address>["identifier"]`,
       }).print(node),
     ).toMatchInlineSnapshot(
-      `"[faker.number.int(), faker.string.alpha(), faker.helpers.arrayElement<NonNullable<NonNullable<Address>["identifier"]>[2]>(['NW', 'NE', 'SW', 'SE'])]"`,
+      `"[faker.number.int(), faker.string.alpha(), faker.helpers.arrayElement(['NW', 'NE', 'SW', 'SE'] as Array<NonNullable<NonNullable<Address>["identifier"]>[2]>)]"`,
     )
   })
 
@@ -276,7 +471,7 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Filter', schemaName: 'Filter' }).print(node)).toMatchInlineSnapshot(
       `
       "faker.helpers.arrayElement([{}, {
-        '+order': faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(['asc', 'desc']),
+        '+order': faker.helpers.arrayElement(['asc', 'desc'] as Array<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>),
       }])"
     `,
     )

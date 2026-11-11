@@ -1,7 +1,18 @@
 import { describe, expect, test, vi } from 'vitest'
-import { type ClientConfig, createClientCore, type EventStreamOptions, type RequestConfig, type ServerSentEvent } from './core.ts'
+import { type ClientConfig, createClientCore as createCore, type EventStreamOptions, type RequestConfig, type ServerSentEvent } from './core.ts'
+import { serializeCookies } from './serializers/cookies.ts'
+import { serializeHeaders } from './serializers/headers.ts'
+import { serializeStyledPath } from './serializers/pathStyles.ts'
+import { serializeStyledQuery } from './serializers/queryStyles.ts'
 import { parseEventStream, parseJsonLines, streamMediaTypes } from './sse.ts'
 import { ParseError, type StandardSchemaValidator } from './standardSchema.ts'
+
+const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: serializeHeaders, cookie: serializeCookies }
+
+// `.kubb/client.ts` registers the serializers of a spec. These tests register all of them.
+function createClientCore<TRequest = unknown, TResponse = unknown>(options: Parameters<typeof createCore<TRequest, TResponse>>[0]) {
+  return createCore<TRequest, TResponse>({ ...options, serializer: { ...serializers, ...options.serializer } })
+}
 
 const encoder = new TextEncoder()
 
@@ -101,6 +112,18 @@ describe('parseEventStream', () => {
     const events = await collect(parseEventStream({ stream: streamOf(['data: {"n":1}\n\n', 'data: hello world\n\n']) }))
 
     expect(events).toStrictEqual([message({ data: { n: 1 } }), message({ data: 'hello world' })])
+  })
+
+  test('keeps every data as text with rawData', async () => {
+    const events = await collect(parseEventStream({ stream: streamOf(['data: hello\n\ndata: 42\n\ndata: true\n\n']), rawData: true }))
+
+    expect(events).toStrictEqual([message({ data: 'hello' }), message({ data: '42' }), message({ data: 'true' })])
+  })
+
+  test('keeps data as text for the named events only', async () => {
+    const events = await collect(parseEventStream({ stream: streamOf(['event: note\ndata: 42\n\nevent: tick\ndata: 42\n\n']), rawData: ['note'] }))
+
+    expect(events.map(({ data }) => data)).toStrictEqual(['42', 42])
   })
 
   test('reassembles an event split across chunks', async () => {
@@ -272,6 +295,14 @@ describe('streamMediaTypes', () => {
     const transform = (event: ServerSentEvent) => ({ ...event, data: { n: event.data } })
     const result = await stream(streamOf(['data: 1\n\n']), { transform, validator: { response: validator } })
     expect(await collect(result)).toStrictEqual([message({ data: { n: 1, checked: true } })])
+  })
+
+  test('passes rawData to the parser, so a string validator sees the text', async () => {
+    const isString: StandardSchemaValidator = {
+      '~standard': { validate: (value) => (typeof value === 'string' ? { value } : { issues: [{ message: 'not a string' }] }) },
+    }
+    const result = await stream(streamOf(['data: hello\n\ndata: 42\n\n']), { rawData: true, validator: { response: isString } })
+    expect(await collect(result)).toStrictEqual([message({ data: 'hello' }), message({ data: '42' })])
   })
 
   test('validates the whole event for the event shape and keeps id and retry', async () => {

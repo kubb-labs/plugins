@@ -236,7 +236,7 @@ Uses `tags: Array<string>`, which reads better for complex elements like `Array<
 
 ### operations
 
-Whether each operation gets its own types file (`AddPetOptions`, `AddPetResponses`, `AddPetStatus200`, `AddPetPath`).
+Whether each operation gets its own types file (`AddPetOptions`, `AddPetResponses`, `AddPetStatus200`, `AddPetPath`). A response that declares `headers` also gets a type for them, such as `ListPetsStatus200Headers`.
 
 |          |                        |
 | -------- | ---------------------- |
@@ -278,6 +278,7 @@ type ResolverTsPatch = {
   }
   response?: {
     status?(node: OperationNode, statusCode: StatusCode): string // → 'ListPetsStatus200'
+    headers?(node: OperationNode, statusCode: StatusCode): string // → 'ListPetsStatus200Headers'
     options?(node: OperationNode): string                        // → 'ListPetsOptions'
     responses?(node: OperationNode): string                      // → 'ListPetsResponses'
     response?(node: OperationNode): string                       // → 'ListPetsResponse'

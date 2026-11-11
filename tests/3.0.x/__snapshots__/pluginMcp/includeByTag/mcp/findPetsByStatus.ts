@@ -15,13 +15,14 @@ import { findPetsByStatus } from '../clients/findPetsByStatus'
 export async function findPetsByStatusHandler({ query }: FindPetsByStatusOptions = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await findPetsByStatus({ query, signal: ctx.mcpReq.signal, throwOnError: true })
 
+  const text = JSON.stringify(res.data, (_key, value) => (typeof value === 'bigint' ? (Number.isSafeInteger(Number(value)) ? Number(value) : String(value)) : value))
   return {
     content: [
       {
         type: 'text',
-        text: JSON.stringify(res.data)
+        text
       }
     ],
-    structuredContent: { data: res.data }
+    structuredContent: { data: text === undefined ? undefined : JSON.parse(text) }
   }
 }

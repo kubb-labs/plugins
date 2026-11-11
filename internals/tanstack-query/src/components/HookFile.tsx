@@ -1,4 +1,4 @@
-import { resolveOperationTypes } from '@internals/client'
+import { getResponseHeadersTypeNames, resolveOperationTypes } from '@internals/client'
 import { operationFileEntry, resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -30,9 +30,23 @@ type ResolvedHookFile = {
   tsResolver: ResolverTs
   contractOp: ClientOperation
   importedTypeNames: Array<string>
+  /** The client's result type the hook names with `returnType: 'full'`. */
+  resultTypeName: 'RequestResult' | 'RequestResultWithHeaders'
   returnType: ReturnTypeOption
   banner: string | null
   footer: string | null
+}
+
+// The resolver is a class instance with private fields, so it is wrapped instead of copied.
+function withoutResponseHeaders(resolver: ResolverTs): ResolverTs {
+  const response = { ...resolver.response, headers: undefined }
+  return new Proxy(resolver, {
+    get(target, key) {
+      if (key === 'response') return response
+      const value = Reflect.get(target, key, target)
+      return typeof value === 'function' ? value.bind(target) : value
+    },
+  })
 }
 
 /**
@@ -53,7 +67,9 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
     })
   }
   const types = resolveOperationTypes(ctx.driver, resolver.pluginName)
-  const tsResolver = types.resolver
+  // A custom client module keeps its two-argument `RequestResult`, so its hooks get no typed headers.
+  const tsResolver = contractOp.typedHeaders ? types.resolver : withoutResponseHeaders(types.resolver)
+  const headerTypeNames = returnType === 'data' ? [] : getResponseHeadersTypeNames({ node, types: tsResolver })
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
   const fileTs = resolveOperationFile({
@@ -67,6 +83,7 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
   const importedTypeNames = [
     tsResolver.response.options(node),
     tsResolver.response.responses(node),
+    ...headerTypeNames,
     ...extraTypeNames,
     ...resolveOperationTypeNames(node, tsResolver, {
       // The joined response alias is unused with the full result, and the printer keeps it as a substring of the responses record name.
@@ -83,6 +100,7 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
     tsResolver,
     contractOp,
     importedTypeNames,
+    resultTypeName: headerTypeNames.length ? 'RequestResultWithHeaders' : 'RequestResult',
     returnType,
     banner: resolver.default.banner(ctx.meta, { output, config, file: fileMeta }),
     footer: resolver.default.footer(ctx.meta, { output, config, file: fileMeta }),
@@ -102,13 +120,13 @@ type HookFileProps = {
  * The `<File>` shell shared by the TanStack hook generators; renders `children` after the imports.
  */
 export function HookFile({ hook, imports, children }: HookFileProps): KubbReactNode {
-  const { file, fileTs, contractOp, importedTypeNames, banner, footer } = hook
+  const { file, fileTs, contractOp, importedTypeNames, resultTypeName, banner, footer } = hook
 
   return (
     <File baseName={file.baseName} path={file.path} meta={file.meta} banner={banner} footer={footer}>
       <File.Import name={[contractOp.name]} root={file.path} path={contractOp.path} />
       <File.Import
-        name={['RequestConfig', 'ResponseErrorConfig', 'RequestResult']}
+        name={['RequestConfig', 'ResponseErrorConfig', resultTypeName]}
         root={contractOp.clientPathIsFile ? file.path : undefined}
         path={contractOp.clientPath}
         isTypeOnly

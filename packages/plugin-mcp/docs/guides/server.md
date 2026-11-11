@@ -27,7 +27,7 @@ export default defineConfig({
 })
 ```
 
-Run `kubb generate`. The plugin writes tool handlers, `server.ts`, `start.ts`, and `.mcp.json`. Each generated handler calls its HTTP operation, forwards the cancellation signal, and throws for non-2xx responses. Tool results include text content and structured response data. `server.ts` registers tools with Zod input and output schemas, and `start.ts` calls its `startServer()` to serve them over stdio.
+Run `kubb generate`. The plugin writes tool handlers, `server.ts`, `start.ts`, and `.mcp.json`. Each generated handler calls its HTTP operation, forwards the cancellation signal, and throws for non-2xx responses. Tool results include text content and structured response data. `server.ts` registers tools with Zod input and output schemas, and `start.ts` calls its `startServer()` to serve them over stdio. Operations that stream their response, such as `text/event-stream` or JSON Lines, get no tool, because a tool returns one JSON result.
 
 ## Start the server
 

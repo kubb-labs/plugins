@@ -47,6 +47,10 @@ export type OperationParamResolver = {
  */
 export type OperationResponseResolver = {
   status(this: Resolver, node: ast.OperationNode, statusCode: ast.StatusCode): string
+  /**
+   * Name of the headers a response declares, such as `ListPetsStatus200Headers`.
+   */
+  headers(this: Resolver, node: ast.OperationNode, statusCode: ast.StatusCode): string
   body(this: Resolver, node: ast.OperationNode): string
   responses(this: Resolver, node: ast.OperationNode): string
   response(this: Resolver, node: ast.OperationNode): string
@@ -101,6 +105,10 @@ export function createOperationResponseResolver(): OperationResponseResolver {
     status(node, statusCode) {
       const name = this.name(`${node.operationId} Status ${statusCode}`)
       return this.resolveName({ key: operationKey(node, 'response', 'status', statusCode), name })
+    },
+    headers(node, statusCode) {
+      const name = this.name(`${node.operationId} Status ${statusCode} Headers`)
+      return this.resolveName({ key: operationKey(node, 'response', 'headers', statusCode), name })
     },
     body(node) {
       const name = this.name(`${node.operationId} Body`)

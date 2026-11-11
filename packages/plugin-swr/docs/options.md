@@ -60,7 +60,7 @@ Shape of the value the generated hooks resolve to.
 ::field-group
 
 :::field{name="'full'"}
-Returns the client's whole `RequestResult` (`{ status, data, error, contentType, request, response }`), so a hook can read the status and the response headers next to `data`. Needs a client plugin whose own `returnType` is `'full'` or `'plain'`; with a client `returnType: 'data'` generation stops with an error.
+Returns the client's whole `RequestResult` (`{ status, data, error, contentType, headers, request, response }`), so a hook can read the status and the response headers next to `data`. Needs a client plugin whose own `returnType` is `'full'` or `'plain'`; with a client `returnType: 'data'` generation stops with an error.
 :::
 
 :::field{name="'data'"}

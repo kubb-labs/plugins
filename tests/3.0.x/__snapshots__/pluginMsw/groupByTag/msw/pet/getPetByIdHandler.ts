@@ -6,7 +6,7 @@
 import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../types/GetPetById'
 import { http, HttpResponse } from 'msw/http'
 
-export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
+export function getPetByIdHandlerResponse200(data?: GetPetByIdResponse) {
   if (typeof data === 'string') return new HttpResponse<string>(data, {
     status: 200,
     headers: {
@@ -14,7 +14,7 @@ export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
     },
   })
 
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -23,13 +23,13 @@ export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
 }
 
 export function getPetByIdHandlerResponse400(data?: GetPetByIdStatus400) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 400,
   })
 }
 
 export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 404,
   })
 }
@@ -38,18 +38,6 @@ export function getPetByIdHandler(data?: GetPetByIdResponse | ((info: Parameters
   return http.get(`${options?.baseURL ?? ''}/pet/:petId`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      if (typeof data === 'string') return new HttpResponse<string>(data, {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/xml'
-        },
-      })
-
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+      return getPetByIdHandlerResponse200(data)
     })
 }

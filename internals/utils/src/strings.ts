@@ -10,7 +10,8 @@
  */
 export function singleQuote(value: string | number | boolean | undefined | null): string {
   if (value === undefined || value === null) return "''"
-  const escaped = String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+  // A raw line break would end the literal.
+  const escaped = String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r')
 
   return `'${escaped}'`
 }

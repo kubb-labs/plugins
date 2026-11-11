@@ -1,5 +1,5 @@
 import { posix } from 'node:path'
-import { toResponseContent } from '@internals/shared'
+import { getSuccessResponses, toResponseContent } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast } from '@kubb/kit'
 import type { ResolverFaker } from './types.ts'
@@ -69,13 +69,16 @@ function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
 }
 
 /**
- * Builds a response schema as a union of all response statuses.
+ * Builds a response schema as a union of the success response statuses, like the `<Operation>Response` type of
+ * `@kubb/plugin-ts`, so the mock never is an error body. Falls back to every response when no success response has a schema.
  * Returns null if no responses are provided, or embeds single simple responses inline.
  */
 export function buildResponseUnionSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
-  const responses = node.responses
+  const withSchema = node.responses
     .map((response) => ({ ...response, content: response.content?.map((entry, _, content) => toResponseContent(entry, content)) }))
     .filter((response) => response.content?.[0]?.schema)
+  const success = getSuccessResponses(withSchema)
+  const responses = success.length > 0 ? success : withSchema
 
   if (!responses.length) {
     return null

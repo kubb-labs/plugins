@@ -96,6 +96,14 @@ export type PrinterTsOptions = {
    */
   description?: string
   /**
+   * `@example` values for the generated type, such as a media type's `examples`. Replaces the schema's own.
+   */
+  examples?: Array<unknown>
+  /**
+   * JSDoc lines put before the schema's own, such as a response's `@summary`.
+   */
+  comments?: Array<string>
+  /**
    * Properties to exclude using `Omit<Type, Keys>`.
    * Forces type alias syntax regardless of `syntaxType` setting.
    */
@@ -122,6 +130,12 @@ export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTs
 type PrinterTs = PrinterTsFactory
 
 type HandlerContext = { transform: (node: ast.SchemaNode) => factory.TsNode | null }
+
+// Adds the `| null` of an OpenAPI 3.0 `nullable: true` set on an array item or union member itself.
+function printNullable(node: ast.SchemaNode, print: (node: ast.SchemaNode) => factory.TsNode | null | undefined): factory.TsNode | null | undefined {
+  const type = print(node)
+  return type && node.nullable ? factory.createUnionDeclaration({ nodes: [type, factory.keywordTypeNodes.null] }) : type
+}
 
 /**
  * Adapts user overrides, which work in strings, to the node-based printer: `this.transform` hands them printed
@@ -263,33 +277,32 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         if (hasStringLiteral && hasPlainString) {
           const memberNodes = members
             .map((m) => {
-              if (isStringType(m)) {
-                return factory.createIntersectionDeclaration({
-                  nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])],
-                })
-              }
+              const print = (node: ast.SchemaNode) =>
+                isStringType(node)
+                  ? factory.createIntersectionDeclaration({ nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])] })
+                  : this.transform(node)
 
-              return this.transform(m)
+              return printNullable(m, print)
             })
             .filter(isNonNullable)
 
           return factory.createUnionDeclaration({ nodes: memberNodes })
         }
 
-        return factory.createUnionDeclaration({ nodes: factory.buildMemberNodes(members, this.transform) })
+        return factory.createUnionDeclaration({ nodes: factory.buildMemberNodes(members, (member) => printNullable(member, this.transform)) })
       },
       intersection(node) {
         return factory.createIntersectionDeclaration({ nodes: factory.buildMemberNodes(node.members, this.transform) })
       },
       array(node) {
-        const itemNodes = mapSchemaItems(node, (item) => this.transform(item))
+        const itemNodes = mapSchemaItems(node, (item) => printNullable(item, this.transform))
           .map(({ output }) => output)
           .filter(isNonNullable)
 
         return factory.createArrayDeclaration({ nodes: itemNodes, arrayType: this.options.arrayType })
       },
       tuple(node) {
-        return factory.buildTupleNode(node, this.transform)
+        return factory.buildTupleNode(node, (item) => printNullable(item, this.transform))
       },
       object(node) {
         const { transform, options } = this
@@ -344,7 +357,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       ...toNodeHandlers(options.nodes),
     },
     print(node) {
-      const { name, syntaxType = 'type', description, keysToOmit } = this.options
+      const { name, syntaxType = 'type', description, examples, comments = [], keysToOmit } = this.options
 
       const transformed = this.transform(node)
       if (!transformed) return null
@@ -374,10 +387,14 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         isExportable: true,
         type: inner,
         syntax: useTypeGeneration ? 'type' : 'interface',
-        comments: buildPropertyJSDocComments({
-          ...meta,
-          description,
-        }),
+        comments: [
+          ...comments,
+          ...buildPropertyJSDocComments({
+            ...meta,
+            description,
+            examples: examples?.length ? examples : meta.examples,
+          }),
+        ],
       })
     },
   }

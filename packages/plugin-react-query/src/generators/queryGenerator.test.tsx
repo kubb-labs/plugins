@@ -103,6 +103,17 @@ const getPetByIdNode = ast.factory.createOperation({
   ],
 })
 
+// An operation of its own: names and response types are memoized per operation.
+const getPetLimitsNode: ast.OperationNode = {
+  ...getPetByIdNode,
+  operationId: 'getPetLimits',
+  path: '/pet/{petId}/limits',
+  responses: getPetByIdNode.responses.map((response) => ({
+    ...response,
+    headers: [ast.factory.createParameter({ name: 'X-Rate-Limit', in: 'header', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+  })),
+}
+
 const findByStatusNode = ast.factory.createOperation({
   operationId: 'findPetsByStatus',
   method: 'GET',
@@ -159,6 +170,13 @@ describe('queryGenerator operation', () => {
     { name: 'pluginClient', node: getPetByIdNode, options: { client: { kind: 'contract', pluginName: 'plugin-client' } } },
     { name: 'getPetByIdReturnTypeFull', node: getPetByIdNode, options: { returnType: 'full' } },
     { name: 'pluginClientReturnTypeFull', node: getPetByIdNode, options: { client: { kind: 'contract', pluginName: 'plugin-client' }, returnType: 'full' } },
+    // Declared response headers are typed on the full result of a generated client. A custom client module keeps untyped headers.
+    { name: 'getPetLimitsReturnTypeFullHeaders', node: getPetLimitsNode, options: { returnType: 'full' } },
+    {
+      name: 'pluginClientReturnTypeFullHeaders',
+      node: getPetLimitsNode,
+      options: { client: { kind: 'contract', pluginName: 'plugin-client' }, returnType: 'full' },
+    },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     {
       name: 'createUsersWithListInputAsQuery',

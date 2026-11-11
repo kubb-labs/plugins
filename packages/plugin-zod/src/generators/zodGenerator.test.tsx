@@ -23,6 +23,11 @@ import { resolverZod } from '../resolvers/resolverZod.ts'
 import type { PluginZod } from '../types.ts'
 import { zodGenerator } from './zodGenerator.tsx'
 
+const batchPartSchema = ast.factory.createSchema({
+  type: 'object',
+  properties: [ast.factory.createProperty({ name: 'message', schema: ast.factory.createSchema({ type: 'string' }) })],
+})
+
 const temporalNodes: PrinterZodNodes = {
   time() {
     return this.options.direction === 'encode'
@@ -363,9 +368,13 @@ describe('zodGenerator — Schema', () => {
     ],
   })
 
-  test('selfRefCycle — directly self-referential schema is annotated z.ZodType', async () => {
+  test.each([
+    [false, 'z.ZodType'],
+    [true, 'z.ZodMiniType'],
+  ])('selfRefCycle — directly self-referential schema with mini: %s is annotated %s', async (mini, annotation) => {
+    const options = { ...defaultOptions, mini }
     const resolver = Resolver.merge(resolverZod)
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver })
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'selfRefCycle' })
     driver.inputNode = ast.factory.createInput({ schemas: [errorDetailsSchema] })
 
@@ -374,12 +383,12 @@ describe('zodGenerator — Schema', () => {
       adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       driver,
       plugin,
-      options: defaultOptions,
+      options,
       resolver,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
-    expect(source).toContain('export const errorDetailsSchema: z.ZodType')
+    expect(source).toContain(`export const errorDetailsSchema: ${annotation} =`)
   })
 
   test.each(
@@ -416,8 +425,10 @@ describe('zodGenerator — Schema', () => {
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
-    expect(source).toContain(required ? 'get baz(): z.ZodArray<typeof fooSchema>' : 'get baz(): z.ZodOptional<z.ZodArray<typeof fooSchema>>')
-    expect(source).toContain('return z.array(fooSchema)')
+    // Only `nullable` on the item itself reaches the array: `optional` and `nullish` belong to a property.
+    const item = 'nullable' in itemModifiers ? 'z.ZodNullable<typeof fooSchema>' : 'typeof fooSchema'
+    expect(source).toContain(required ? `get baz(): z.ZodArray<${item}>` : `get baz(): z.ZodOptional<z.ZodArray<${item}>>`)
+    expect(source).toContain('nullable' in itemModifiers ? 'return z.array(fooSchema.nullable())' : 'return z.array(fooSchema)')
     const directory = await fs.mkdtemp(path.join(path.dirname(fileURLToPath(import.meta.url)), '.nullable-recursive-'))
     try {
       const file = path.join(directory, 'schema.ts')
@@ -782,6 +793,25 @@ describe('zodGenerator — Operation', () => {
       options: { printer: { nodes: temporalNodes } },
     },
     {
+      name: 'multipartMixedItems',
+      // An OpenAPI 3.2 `itemSchema` on `multipart/mixed`, as the adapter emits it: the body is an array of these parts.
+      node: ast.factory.createOperation({
+        operationId: 'postBatch',
+        method: 'POST',
+        path: '/batch',
+        requestBody: {
+          content: [
+            ast.factory.createContent({
+              contentType: 'multipart/mixed',
+              schema: batchPartSchema,
+              stream: { schema: batchPartSchema },
+            }),
+          ],
+        },
+        responses: [ast.factory.createResponse({ statusCode: '204', description: 'ok' })],
+      }),
+    },
+    {
       name: 'multiContentType — GET with json and xml response body',
       node: ast.factory.createOperation({
         operationId: 'getPetById',
@@ -893,6 +923,10 @@ describe('zodGenerator — transformers', () => {
 })
 
 describe('zodGenerator — inferred aliases', () => {
+  test('an inferred type name keeps a status range in lower case', () => {
+    expect(resolverZod.schema.type('listPetsStatus2xxSchema')).toBe('ListPetsStatus2xxSchemaType')
+  })
+
   const slotSchema = ast.factory.createSchema({
     type: ast.schemaTypes.object,
     primitive: ast.schemaTypes.object,
@@ -1355,5 +1389,37 @@ describe('custom imports', () => {
     })
 
     expect(files[0]?.imports.map((imp) => imp.path)).not.toContain('my-codec/zod')
+  })
+
+  test('imports a ref inside a contentSchema or contains, and no ref the printer does not print', async () => {
+    const ref = (name: string) => ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}` })
+    const files = await render(
+      ast.factory.createSchema({
+        type: 'object',
+        name: 'Payment',
+        properties: [
+          ast.factory.createProperty({
+            name: 'lastError',
+            schema: ast.factory.createSchema({ type: 'string', content: { mediaType: 'application/json', schema: ref('PaymentError') } }),
+          }),
+          ast.factory.createProperty({
+            name: 'labels',
+            schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })], contains: { schema: ref('Label') } }),
+          }),
+          ast.factory.createProperty({
+            name: 'tags',
+            // `minContains: 0` checks nothing, so it prints no check and needs no import.
+            schema: ast.factory.createSchema({
+              type: 'array',
+              items: [ast.factory.createSchema({ type: 'string' })],
+              contains: { schema: ref('Tag'), min: 0 },
+            }),
+          }),
+        ],
+      }),
+      {},
+    )
+
+    expect(files[0]?.imports.flatMap((imp) => imp.name)).toEqual(['z', 'labelSchema', 'paymentErrorSchema'])
   })
 })

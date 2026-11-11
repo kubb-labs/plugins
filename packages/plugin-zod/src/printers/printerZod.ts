@@ -5,13 +5,15 @@ import {
   applyModifiers,
   buildObjectShape,
   defaultLiteral,
+  hasInputChecks,
   lengthConstraints,
+  bigintConstraints,
   numberConstraints,
   patternKeySchema,
   printWithOmit,
   shouldCoerce,
 } from '../utils.ts'
-import { buildScalarNodes, buildZodNodes, type ZodDialect } from './zodNodes.ts'
+import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
 /**
  * Partial map of node-type overrides for the Zod printer.
@@ -136,7 +138,11 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
     }
 
     if (schema.type === ast.schemaTypes.object && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
-      return `${member}.strict()`
+      // Input checks print a `z.pipe(…)`, which has no `.strict()`, so its object output is made strict.
+      // A ref with its own `conditionals` around a target with checks is a pipe in a pipe, which stays as it is.
+      const checks = [node, node.schema].filter((entry) => entry && hasInputChecks(entry)).length
+      if (checks === 2) return member
+      return checks ? `z.pipe(${member}.in, ${member}.out.strict())` : `${member}.strict()`
     }
   }
 
@@ -190,7 +196,8 @@ function recursiveGetterType({
     }
     if (schema.type === ast.schemaTypes.array && schema.items?.length === 1) {
       const item = baseType(schema.items[0]!)
-      return item ? `z.ZodArray<${item}>` : undefined
+      if (!item) return undefined
+      return `z.ZodArray<${schema.items[0]!.nullable ? `z.ZodNullable<${item}>` : item}>`
     }
     return undefined
   }
@@ -282,6 +289,7 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
   coercedNumber: (schema) => `z.coerce.number().pipe(${schema})`,
   catchall: (object, value) => `${object}.catchall(${value})`,
   nullable: (value) => `${value}.nullable()`,
+  refine: (value, check) => `${value}.refine(${check})`,
   unique: (array) => `${array}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })`,
   extend: (base, shape) => `${base}.extend(${shape})`,
   intersection: (left, right) => `${left}.and(${right})`,
@@ -291,8 +299,8 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
 
 const scalarNodes: PrinterZodNodes = {
   ...buildScalarNodes(standardDialect),
-  bigint() {
-    return 'z.coerce.bigint()'
+  bigint(node) {
+    return `z.coerce.bigint()${numberConstraints(bigintConstraints(node), 'n')}`
   },
   date(node) {
     if (node.representation !== 'date') return 'z.iso.date()'
@@ -340,7 +348,7 @@ const scalarNodes: PrinterZodNodes = {
  * ```
  */
 export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
-  const nodes: PrinterZodNodes = { ...buildZodNodes(standardDialect, options.cyclicSchemas), ...scalarNodes }
+  const nodes: PrinterZodNodes = withInputChecks({ ...buildZodNodes(standardDialect, options.cyclicSchemas), ...scalarNodes })
 
   return {
     name: 'zod',

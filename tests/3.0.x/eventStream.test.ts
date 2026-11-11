@@ -89,8 +89,19 @@ describe('event stream runtime', () => {
       ).safeBuild()
       expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
 
-      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'core.ts', 'mediaTypes.ts', 'serializers.ts', 'standardSchema.ts'])
-      expect(await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')).not.toContain('streamMediaTypes')
+      // The only form body in petStore is urlencoded.
+      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual([
+        'client.ts',
+        'config.ts',
+        'core.ts',
+        'mediaTypes',
+        'mediaTypes.ts',
+        'serializers',
+        'serializers.ts',
+        'standardSchema.ts',
+      ])
+      expect(await fs.readdir(path.join(output, '.kubb/mediaTypes'))).toStrictEqual(['urlencoded.ts'])
+      expect(await fs.readFile(path.join(output, '.kubb', 'config.ts'), 'utf8')).not.toContain('streamMediaTypes')
     } finally {
       await fs.rm(output, { recursive: true, force: true })
     }
@@ -129,6 +140,11 @@ describe('a response that offers JSON or an event stream', () => {
       const client = await fs.readFile(path.join(output, 'clients', 'listChanges.ts'), 'utf8')
       expect(client).toContain('RequestResult<ListChangesResponses')
       expect(client).toContain("contentType: { response: 'text/event-stream' }")
+
+      // The event stream variant comes back as the unread body, so the record types its `data` as the stream.
+      const types = await fs.readFile(path.join(output, 'types', 'ListChanges.ts'), 'utf8')
+      expect(types).toMatch(/contentType: 'text\/event-stream';?\s+data: ReadableStream<Uint8Array>/)
+      expect(types).toMatch(/contentType: 'application\/json';?\s+data: ListChangesStatus200Json/)
     } finally {
       await fs.rm(output, { recursive: true, force: true })
     }
@@ -204,7 +220,7 @@ describe('OpenAPI 3.2 item schemas', () => {
       const runtime = await fs.readFile(path.join(output, '.kubb', 'sse.ts'), 'utf8')
       expect(runtime).toContain('export const streamMediaTypes')
       const clientRuntime = await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')
-      expect(clientRuntime).toContain('client.setConfig({ mediaTypes: { ...streamMediaTypes } })')
+      expect(await fs.readFile(path.join(output, '.kubb', 'config.ts'), 'utf8')).toContain('mediaTypes: { ...streamMediaTypes }')
       expect(clientRuntime).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
 
       // The runtime validates each item with the response validator, by the event shape the call carries.

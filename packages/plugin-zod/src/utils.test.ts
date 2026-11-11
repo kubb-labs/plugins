@@ -41,6 +41,10 @@ describe('defaultLiteral', () => {
     expect(defaultLiteral(ast.factory.createSchema({ type: 'object', primitive: 'object' }), null)).toBeNull()
   })
 
+  test('a default on a binary schema is dropped, since a Blob has no literal', () => {
+    expect(defaultLiteral(ast.factory.createSchema({ type: 'blob' }), 'data:text/plain;base64,dGVzdDE=')).toBeNull()
+  })
+
   test('a string default on a numeric enum is coerced to the matching member literal', () => {
     const node = ast.factory.createSchema({ type: 'enum', enumValues: [1, 3] })
     expect(defaultLiteral(node, '1')).toBe('1')
@@ -102,7 +106,7 @@ describe('numberConstraints', () => {
   })
 
   test('all constraints combined', () => {
-    expect(numberConstraints({ min: 1, max: 99, exclusiveMinimum: 0, exclusiveMaximum: 100 })).toBe('.min(1).max(99).gt(0).lt(100)')
+    expect(numberConstraints({ min: 1, max: 99, exclusive: { min: 0, max: 100 } })).toBe('.min(1).max(99).gt(0).lt(100)')
   })
 })
 
@@ -122,9 +126,7 @@ describe('numberChecksMini', () => {
   })
 
   test('all constraints combined', () => {
-    expect(numberChecksMini({ min: 1, max: 99, exclusiveMinimum: 0, exclusiveMaximum: 100 })).toBe(
-      '.check(z.minimum(1), z.maximum(99), z.minimum(0, { exclusive: true }), z.maximum(100, { exclusive: true }))',
-    )
+    expect(numberChecksMini({ min: 1, max: 99, exclusive: { min: 0, max: 100 } })).toBe('.check(z.minimum(1), z.maximum(99), z.gt(0), z.lt(100))')
   })
 })
 

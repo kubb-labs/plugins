@@ -273,6 +273,11 @@ describe("typeGenerator — operations: 'inline'", () => {
   })
 })
 
+const batchPartSchema = ast.factory.createSchema({
+  type: 'object',
+  properties: [ast.factory.createProperty({ name: 'message', schema: ast.factory.createSchema({ type: 'string' }) })],
+})
+
 describe('typeGenerator — Operation', () => {
   const operations = [
     {
@@ -510,6 +515,25 @@ describe('typeGenerator — Operation', () => {
             ],
           }),
         ],
+      }),
+    },
+    {
+      name: 'multipartMixedItems',
+      // An OpenAPI 3.2 `itemSchema` on `multipart/mixed`, as the adapter emits it: the body is an array of these parts.
+      node: ast.factory.createOperation({
+        operationId: 'postBatch',
+        method: 'POST',
+        path: '/batch',
+        requestBody: {
+          content: [
+            ast.factory.createContent({
+              contentType: 'multipart/mixed',
+              schema: batchPartSchema,
+              stream: { schema: batchPartSchema },
+            }),
+          ],
+        },
+        responses: [ast.factory.createResponse({ statusCode: '204', description: 'ok' })],
       }),
     },
     {

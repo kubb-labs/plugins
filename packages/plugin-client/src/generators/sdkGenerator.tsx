@@ -1,37 +1,17 @@
 import path from 'node:path'
-import { type OperationTypeNames, type OperationTypeSource, resolveOperationTypes } from '@internals/client'
-import { getEventStream, isEventStream, operationKey, resolveOperationFile } from '@internals/shared'
+import { type OperationTypeSource, resolveOperationTypes } from '@internals/client'
+import { isEventStream } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { ast, camelCase, defineGenerator, Diagnostics } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
-import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
-import { getOperationSecurity, type SecurityRequirement } from '../builders/security.ts'
-import { getOperationBaseURL, type ServerDocument, type ServerOptions } from '../builders/server.ts'
-import { buildValidatorHooks, type ValidatorHooks } from '../builders/validator.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
 import { StreamRuntime } from '../components/StreamRuntime.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
 import type { ContractClientFactory } from '../types.ts'
-
-type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]
-
-type OperationData = {
-  node: ast.OperationNode
-  name: string
-  types: OperationTypeNames
-  typeFile: ast.FileNode
-  zodFile: ast.FileNode | null
-  /**
-   * The operation's validator hooks, computed once and shared by the zod imports, the helper import, and the SDK methods.
-   * `null` without a zod resolver.
-   */
-  validatorHooks: ValidatorHooks | null
-  security?: Array<SecurityRequirement>
-  baseURL?: string
-}
 
 type Controller = {
   name: string
@@ -40,66 +20,22 @@ type Controller = {
   operations: Array<OperationData>
 }
 
-function resolveTypeImportNames(node: ast.OperationNode, types: OperationTypeNames): Array<string> {
-  return [types.response.options(node), types.response.responses(node)]
-}
-
 /**
  * Groups operations into one controller per tag. Operations without a tag fall back to a single
  * `Client`/`ApiClient` controller, matching the resolver's default naming.
  */
-function buildControllers(
-  nodes: ReadonlyArray<ast.OperationNode>,
-  ctx: GeneratorContext,
-  types: OperationTypeSource,
-  validatorEnabled: boolean,
-): Array<Controller> {
-  const { driver, resolver, root } = ctx
-  const { output, group, validator } = ctx.options
-
-  const pluginZod = validatorEnabled ? driver.getPlugin(pluginZodName) : null
-  const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
-  const document = ctx.adapter.document as ServerDocument | null | undefined
-  const server = (ctx.adapter.options as { server?: ServerOptions } | undefined)?.server
-
-  function buildOperationData(node: ast.OperationNode): OperationData {
-    const typeFile = resolveOperationFile({
-      ctx,
-      node,
-      resolver: types.resolver,
-      root,
-      output: types.output ?? output,
-      group: types.group,
-    })
-    const zodFile =
-      zodResolver && pluginZod?.options
-        ? resolveOperationFile({
-            ctx,
-            node,
-            resolver: zodResolver,
-            root,
-            output: pluginZod.options?.output ?? output,
-            group: pluginZod.options?.group ?? undefined,
-          })
-        : null
-
-    const security = getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth })
-    const baseURL = ast.isHttpOperationNode(node) ? getOperationBaseURL({ document, method: node.method, path: node.path, server }) : undefined
-
-    const validatorHooks = zodResolver ? buildValidatorHooks({ node, validator, zodResolver }) : null
-
-    const name = resolver.name(node.operationId)
-    return { node, name: resolver.resolveName({ key: operationKey(node), name }), types, typeFile, zodFile, validatorHooks, security, baseURL }
-  }
+function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: GeneratorContext, types: OperationTypeSource): Array<Controller> {
+  const { resolver, root } = ctx
+  const { output, group } = ctx.options
 
   return nodes.reduce((acc, operationNode) => {
     if (!ast.isHttpOperationNode(operationNode)) return acc
     const tag = operationNode.tags[0]
     const name = tag ? ensureValidVarName(resolver.groupName(tag)) : resolver.className('ApiClient')
     // `group.name` names the folder and file, never the class.
-    const fileName = tag && group?.name ? ensureValidVarName(group.name({ group: camelCase(tag) })) : name
+    const fileName = tag && group ? ensureValidVarName(group.name?.({ group: camelCase(tag) }) ?? camelCase(tag)) : name
     const file = resolver.file({ name: fileName, extname: '.ts', tag, root, output, group: group ?? undefined })
-    const operationData = buildOperationData(operationNode)
+    const operationData = resolveOperationData({ node: operationNode, ctx, types })
     const previous = acc.find((item) => item.file.path === file.path)
 
     if (previous) {
@@ -139,10 +75,10 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
  * is set, a composed root that creates one client and shares it with every tag client. With
  * `sdk.mode: 'flat'` it emits one class named by `sdk.name`, with every operation as a direct method.
  *
- * `sse` is the Server-Sent Events runtime template, copied into `.kubb/sse.ts` only for a document with a
- * `text/event-stream` operation.
+ * `templates` is the folder the optional runtime is copied from: `sse.ts` only for a document that streams, and each
+ * form media type only for a document with a body of that type.
  */
-export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse }: { sse?: string } = {}): Generator<TFactory> {
+export function createSdkGenerator<TFactory extends ContractClientFactory>({ templates }: { templates?: string } = {}): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name: 'sdk',
     renderer: jsxRenderer,
@@ -169,7 +105,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
       const types = resolveOperationTypes(ctx.driver, ctx.plugin.name)
 
       const validatorEnabled = isValidatorEnabled(validator)
-      const controllers = buildControllers(nodes, ctx, types, validatorEnabled)
+      const controllers = buildControllers(nodes, ctx, types)
       const clientPath = path.resolve(root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(root, '.kubb/standardSchema.ts')
 
@@ -179,19 +115,24 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
           file: op.typeFile,
-          names: resolveTypeImportNames(op.node, op.types),
+          names: [op.types.response.options(op.node), op.types.response.responses(op.node), ...op.headerTypeNames],
         }))
         const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = validatorEnabled
-          ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.validatorHooks?.importedZodNames ?? [] }))
+          ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.validatorHooks.importedZodNames }))
           : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, ast.FileNode>() }
-        const shapes = new Set(ops.map((op) => getEventStream(op.node)).filter(Boolean))
-        const hasEventStream = shapes.size > 0
-        const hasResult = ops.some((op) => !isEventStream(op.node))
+        const resultOps = ops.filter((op) => !isEventStream(op.node))
+        const typedHeaders = (op: OperationData) => op.headerTypeNames.length > 0
+        const resultName = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
 
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
             <File.Import
-              name={['createClient', returnType === 'data' ? 'unwrapResult' : 'withUnwrap', 'resolveThrowOnError']}
+              name={[
+                'createClient',
+                returnType === 'data' ? 'unwrapResult' : 'withUnwrap',
+                'resolveThrowOnError',
+                ...(ctx.options.importPath === undefined && ops.some((op) => op.security) ? ['securitySchemes'] : []),
+              ]}
               root={file.path}
               path={clientPath}
             />
@@ -202,8 +143,9 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
                   'ClientInstance',
                   'Options',
                   ...(returnType === 'data' ? [] : ['Unwrappable']),
-                  ...(hasResult ? [returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'] : []),
-                  ...(hasEventStream ? buildEventStreamImports({ returnType, typed: shapes.has('event'), line: shapes.has('line') }) : []),
+                  ...(resultOps.some((op) => !typedHeaders(op)) ? [resultName] : []),
+                  ...(resultOps.some(typedHeaders) ? [`${resultName}WithHeaders`] : []),
+                  ...ops.filter((op) => isEventStream(op.node)).flatMap((op) => buildEventStreamImports({ node: op.node, types: op.types, returnType })),
                 ]),
               )}
               root={file.path}
@@ -222,7 +164,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
                 <File.Import key={filePath} name={Array.from(set)} root={file.path} path={zodFilesByPath.get(filePath)!.path} />
               ))}
 
-            {ops.some((op) => op.validatorHooks?.headers) && <File.Import name={['toHeadersStandardSchema']} root={file.path} path={standardSchemaPath} />}
+            {ops.some((op) => op.validatorHooks.headers) && <File.Import name={['toHeadersStandardSchema']} root={file.path} path={standardSchemaPath} />}
 
             <SdkClient name={className} operations={ops} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
           </File>
@@ -258,7 +200,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
 
       return (
         <>
-          <StreamRuntime nodes={nodes} root={root} sse={sse} baseURL={ctx.options.baseURL} />
+          <StreamRuntime nodes={nodes} root={root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
           {files}
         </>
       )

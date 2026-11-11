@@ -15,7 +15,7 @@ export function createPet<TData extends Partial<Pet> = object>(data?: TData): Om
     code: faker.helpers.fromRegExp(/^[A-Z]{3}$/),
     shipDate: faker.date.anytime().toISOString().substring(0, 10),
     category: createCategory(),
-    status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
+    status: faker.helpers.arrayElement(['available', 'pending', 'sold'] as Array<NonNullable<Pet>['status']>),
   }
   return {
     ...defaultFakeData,

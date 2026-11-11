@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
 import { createClientCore, createLazyClient, getHeader } from './core.ts'
+import { defaultConfig } from './config.ts'
 import * as core from './core.ts'
 
 export * from './core.ts'
@@ -36,24 +37,43 @@ export type Options<TData extends core.DataShape, ThrowOnError extends boolean =
 > & { options?: NativeOptions }
 export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: NativeOptions }
 export type ResolvedRequest = core.ResolvedRequest & { options?: NativeOptions }
-export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestResult<
+export type RequestResult<
   TResponses,
-  ThrowOnError,
-  TRequest,
-  TResponse
->
-export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.UnwrappedResult<
+  ThrowOnError extends boolean = true,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+  THeaders = unknown,
+> = core.RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>
+export type UnwrappedResult<
   TResponses,
-  ThrowOnError,
-  TRequest,
-  TResponse
->
+  ThrowOnError extends boolean = true,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+  THeaders = unknown,
+> = core.UnwrappedResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>
 export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
 export type TransportResult<TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TRequest, TResponse>
 export type DecodedResponse<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.DecodedResponse<TData, TRequest, TResponse>
 export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
+export type StreamResult<
+  TResponses,
+  ThrowOnError extends boolean = true,
+  TEvent = core.ServerSentEvent<core.SuccessOf<TResponses>>,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+  THeaders = unknown,
+> = core.StreamResult<TResponses, ThrowOnError, TEvent, TRequest, TResponse, THeaders>
+export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown> = core.ResponseErrorOf<
+  TResponses,
+  TRequest,
+  TResponse,
+  THeaders
+>
+export const isResponseError = core.isResponseError as <TResponses = unknown, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown>(
+  error: unknown,
+) => error is ResponseErrorOf<TResponses, TRequest, TResponse, THeaders>
 
 function toHeaders(raw: AxiosResponse['headers']): Headers {
   const headers = new Headers()
@@ -128,9 +148,9 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       responseType: request.stream ? 'stream' : 'arraybuffer',
       transformResponse: (data) => data,
-      signal: request.signal,
       validateStatus: () => true,
     }
+    if (request.signal) config.signal = request.signal
 
     // XHR buffers the body and cannot omit same-origin cookies, so a stream or `credentials: 'omit'` uses fetch in the browser.
     const instanceAdapter = instance.defaults?.adapter
@@ -174,6 +194,7 @@ export const defaultTransport: Transport = (request) => createAxiosTransport(get
 /**
  * The client every generated operation uses unless a call passes its own. It is created on first use.
  */
-export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
+export const client: ClientInstance = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
+client.setConfig(defaultConfig)
 
-export const createClient = client.createClient
+export const createClient: ClientInstance['createClient'] = client.createClient

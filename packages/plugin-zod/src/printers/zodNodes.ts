@@ -1,4 +1,4 @@
-import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
+import { jsonContentSchema, mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildList, stringify } from '@internals/utils'
 import { ast, syncSchemaRef } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
@@ -6,14 +6,18 @@ import {
   buildEnum,
   buildLiteral,
   type buildObjectShape,
+  CONTENT_ENCODING_CALLS,
   getMemberConstraint,
+  hasInputChecks,
+  hasKeyCheck,
+  inputChecks,
   integerFormatPattern,
+  jsonContentCheck,
   isClosedKeySchema,
   isObjectComposableIntersection,
   isObjectSchemaNode,
   type lengthConstraints,
   type numberConstraints,
-  objectConstraints,
   type patternKeySchema,
   preserveRequiredProperties,
   shouldCoerce,
@@ -54,6 +58,10 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
   catchall: (object: string, value: string) => string
   nullable: (value: string) => string
   unique: (array: string) => string
+  /**
+   * Adds a `refine` to a schema. `check` is the callback with its params, as `jsonContentCheck` builds it.
+   */
+  refine: (value: string, check: string) => string
   extend: (base: string, shape: string) => string
   intersection: (left: string, right: string) => string
   /**
@@ -99,8 +107,14 @@ function hasCoercedDiscriminator({ member, propertyName, options }: { member: as
   })
 }
 
+// `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
+function hasPlainDiscriminator({ member, propertyName }: { member: ast.SchemaNode; propertyName: string }): boolean {
+  const schemas = ast.resolveSchemaProperties({ node: member, propertyName })
+  return schemas.length > 0 && !schemas.some(({ schema }) => ast.getSchemaLiteralValues(syncSchemaRef(schema)).length > 0)
+}
+
 /**
- * Builds the scalar handlers both dialects share. They never recurse into children. The temporal
+ * Builds the scalar handlers both dialects share. Only a string with a `contentSchema` recurses into a child. The temporal
  * scalars and `bigint` differ per dialect, so each printer adds its own.
  */
 export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDialect<TOptions>): ast.PrinterPartial<string, TOptions> {
@@ -113,13 +127,20 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
     null: () => 'z.null()',
     string(node) {
       const coerce = shouldCoerce(this.options.coercion, 'strings')
-      const call = coerce ? undefined : STRING_FORMAT_CALLS.get(node.format)
-      if (call) return `${call}${dialect.lengths({ ...node, regexType: this.options.regexType })}`
-
-      const base = coerce ? 'z.coerce.string()' : 'z.string()'
+      const call = coerce ? undefined : (STRING_FORMAT_CALLS.get(node.format) ?? CONTENT_ENCODING_CALLS.get(node.content?.encoding?.toLowerCase()))
+      const base = call ?? (coerce ? 'z.coerce.string()' : 'z.string()')
       const pattern = node.pattern ?? integerFormatPattern(node.format)
+      const value = `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
 
-      return `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
+      const contentNode = jsonContentSchema(node)
+      if (!contentNode) return value
+      // The string holds wire JSON whichever way the string itself travels, so its schema always decodes.
+      const direction = this.options.direction
+      this.options.direction = 'decode'
+      const contentSchema = this.transform(contentNode)
+      this.options.direction = direction
+
+      return contentSchema ? dialect.refine(value, jsonContentCheck(contentSchema)) : value
     },
     number(node) {
       const base = shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.number()' : 'z.number()'
@@ -177,6 +198,8 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
   cyclicSchemas: ReadonlySet<string> | undefined,
 ): ast.PrinterPartial<string, TOptions> {
   const unionsWithSiblings = new WeakSet<ast.SchemaNode>()
+  // An OpenAPI 3.0 `nullable: true` set on an array item or union member itself, which only a property or a root applies.
+  const printNullable = (schema: ast.SchemaNode, output: string | null | undefined) => (output && schema.nullable ? dialect.nullable(output) : output)
 
   return {
     ...buildScalarNodes(dialect),
@@ -250,23 +273,31 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         return objectBase
       })()
 
-      return objectConstraints({ value: result, node })
+      return result
     },
     array(node) {
-      const items = mapSchemaItems(node, (item) => this.transform(item))
+      const items = mapSchemaItems(node, (item) => printNullable(item, this.transform(item)))
         .map(({ output }) => output)
         .filter(Boolean)
       const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
       const base = `z.array(${inner})${dialect.lengths({ ...node, regexType: this.options.regexType })}`
+      const unique = node.unique ? dialect.unique(base) : base
+      const contains = node.contains && containsCheck(this, node.contains)
 
-      return node.unique ? dialect.unique(base) : base
+      return contains ? dialect.refine(unique, contains) : unique
     },
     tuple(node) {
-      const items = mapSchemaItems(node, (item) => this.transform(item))
+      const items = mapSchemaItems(node, (item) => printNullable(item, this.transform(item)))
         .map(({ output }) => output)
         .filter(Boolean)
 
-      return `z.tuple(${buildList(items)})`
+      // OpenAPI 3.1 `items` next to `prefixItems` types the elements after the positional ones.
+      const rest = node.rest ? this.transform(node.rest) : undefined
+
+      const tuple = `z.tuple(${buildList(items)}${rest ? `, ${rest}` : ''})`
+      const contains = node.contains && containsCheck(this, node.contains)
+
+      return contains ? dialect.refine(tuple, contains) : tuple
     },
     union(node) {
       const literalUnion = getLiteralUnion({ node, options: this.options })
@@ -283,13 +314,15 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       // `z.coerce.number()`, which z.discriminatedUnion cannot read, so it falls back too.
       const isDiscriminated =
         !!discriminatorPropertyName &&
-        nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemas)) &&
+        nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemas) && !hasPlainDiscriminator({ member: m, propertyName: discriminatorPropertyName })) &&
         !nodeMembers.some((m) => hasCoercedDiscriminator({ member: m, propertyName: discriminatorPropertyName, options: this.options }))
       const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
-      // `z.xor` already rejects a value matching several members, so its members stay as declared.
-      const isStrict = node.strategy === 'one' && !isXor && !unionsWithSiblings.has(node)
+      // `z.xor` already rejects a value matching several members, and the discriminator already picks one
+      // member of a `z.discriminatedUnion`, so their members stay as declared.
+      const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !unionsWithSiblings.has(node)
       const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && isStrict && dialect.strictMember ? dialect.strictMember(output, schema, cyclicSchemas) : output))
+        .map((output, index) => (isDiscriminated ? output : printNullable(nodeMembers[index]!, output)))
         .filter(Boolean)
       if (members.length === 0) return ''
       if (members.length === 1) return members[0]!
@@ -323,9 +356,19 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       // An object `allOf` is a merge, not a runtime intersection: extending keeps it a Zod object
       // (usable in z.discriminatedUnion) instead of a non-discriminable intersection.
       if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemas)) {
+        // A discriminated `oneOf` base already pins its discriminator to a literal; a sibling
+        // `type: string` extended after it would widen that literal back to any string.
+        const discriminator = ast.narrowSchema(first, ast.schemaTypes.union)?.discriminatorPropertyName
         return preserveRequiredProperties(members)
           .slice(1)
-          .reduce((acc, member) => dialect.extend(acc, dialect.objectShape(this, member)), firstBase)
+          .reduce((acc, member) => {
+            const object = ast.narrowSchema(member, ast.schemaTypes.object)
+            if (!discriminator || !object?.properties.some((property) => property.name === discriminator)) {
+              return dialect.extend(acc, dialect.objectShape(this, member))
+            }
+            const properties = object.properties.filter((property) => property.name !== discriminator)
+            return properties.length ? dialect.extend(acc, dialect.objectShape(this, { ...object, properties })) : acc
+          }, firstBase)
       }
 
       return rest.reduce((acc, member) => {
@@ -336,4 +379,77 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       }, firstBase)
     },
   }
+}
+
+type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
+
+/**
+ * The `refine` arguments that count the items matching `contains`, at least `min` (default 1) and at most `max`.
+ */
+function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
+  if (min === 0 && max === undefined) return null
+  const bounds = [`count >= ${min}`, max !== undefined ? `count <= ${max}` : null].filter(Boolean).join(' && ')
+  const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
+  const matches = ctx.transform(schema) ?? 'z.unknown()'
+
+  return `(items) => { const count = items.filter((item) => ${matches}.safeParse(item).success).length; return ${bounds} }, { message: ${stringify(message)} }`
+}
+
+/**
+ * A JavaScript condition that is true when `value` matches `schema`. A required `unknown` property means "the key
+ * is present", which a Zod object would accept as missing, so those keys are checked with `in`.
+ */
+function matchesCondition(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
+  if (!schema) return 'true'
+  const object = ast.narrowSchema(schema, ast.schemaTypes.object)
+  const keys =
+    object?.properties.filter((property) => property.required && property.schema.type === ast.schemaTypes.unknown).map((property) => property.name) ?? []
+  const rest = object ? { ...object, properties: object.properties.filter((property) => !keys.includes(property.name)) } : schema
+  const conditions = keys.length ? [`typeof value === "object" && value !== null && ${JSON.stringify(keys)}.every((key) => key in value)`] : []
+  // An object with no properties left still means "is an object", so only a key check stands alone.
+  const isOnlyKeys =
+    keys.length > 0 &&
+    rest.type === 'object' &&
+    rest.properties.length === 0 &&
+    rest.additionalProperties === undefined &&
+    !rest.patternProperties &&
+    !rest.propertyNames &&
+    !hasInputChecks(rest)
+  if (!isOnlyKeys) conditions.push(`${ctx.transform(rest) ?? 'z.unknown()'}.safeParse(value).success`)
+
+  return conditions.join(' && ')
+}
+
+type Handler<TOptions extends ZodNodeOptions, K extends ast.SchemaType> = (
+  this: ThisParameterType<NonNullable<ast.PrinterPartial<string, TOptions>['any']>>,
+  node: ast.SchemaNodeByType[K],
+) => string | null
+
+/**
+ * Wraps each handler so its output first checks the raw input, see {@link inputChecks}.
+ */
+export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.PrinterPartial<string, TOptions>): ast.PrinterPartial<string, TOptions> {
+  const wrapped: ast.PrinterPartial<string, TOptions> = {}
+  const wrap = <K extends ast.SchemaType>(type: K) => {
+    const handler: Handler<TOptions, K> | undefined = nodes[type]
+    if (!handler) return
+    const checked: Handler<TOptions, K> = function (node) {
+      const output = handler.call(this, node)
+      if (!output || !hasInputChecks(node)) return output
+      return inputChecks({
+        value: output,
+        node,
+        keySchema: hasKeyCheck(node) ? this.transform(node.propertyNames) : undefined,
+        conditionals: (node.conditionals ?? []).map(
+          (entry) =>
+            `z.refine((value) => (${matchesCondition(this, entry.if)} ? ${matchesCondition(this, entry.then)} : ${matchesCondition(this, entry.else)}), { message: "Value does not meet a conditional schema" })`,
+        ),
+      })
+    }
+    // TypeScript cannot relate `wrapped[type]` to `K` on a write, so the key and its handler are assigned together.
+    Object.assign(wrapped, { [type]: checked })
+  }
+  Object.values(ast.schemaTypes).forEach(wrap)
+
+  return wrapped
 }
