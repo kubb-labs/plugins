@@ -418,6 +418,8 @@ describe('mswGenerator body encoding', () => {
 
     expect(await getBody(node, { event: 'ping', id: '7', retry: 1000, data: { id: 1 } })).toBe('event: ping\nid: 7\nretry: 1000\ndata: {"id":1}\n\n')
     expect(await getBody(eventOperation('streamTextEvent'), { event: 'ping', data: 'a\nb' })).toBe('event: ping\ndata: a\ndata: b\n\n')
+    // Without a `data` line the client would drop the event.
+    expect(await getBody(eventOperation('streamPingEvent'), { event: 'ping' })).toBe('event: ping\ndata:\n\n')
   })
 
   test('sends a serialized SSE example as it is when there is no body', async () => {

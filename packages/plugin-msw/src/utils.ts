@@ -110,7 +110,8 @@ export function responseReturn(body: string, status: number, response: ast.Respo
     return `${prelude}const event = ${name} as { event?: unknown; id?: unknown; retry?: unknown; data?: unknown } | undefined
     const lines = [
       ...(['event', 'id', 'retry'] as const).filter((field) => event?.[field] !== undefined).map((field) => \`\${field}: \${event?.[field]}\`),
-      ...(event?.data === undefined ? [] : [${sseData('event.data', response)}]),
+      // A client dispatches an event only once it has a \`data\` line, so an event without data still sends an empty one.
+      event?.data === undefined ? 'data:' : ${sseData('event.data', response)},
     ]
 
     return ${responseLiteral(`event === undefined ? ${fallback} : \`\${lines.join('\\n')}\\n\\n\``, status, contentType, headers)}`
