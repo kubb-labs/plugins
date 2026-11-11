@@ -91,7 +91,7 @@ export function getOperationSecurity({
   const security: Array<SecurityRequirement> = []
   const seen = new Set<string>()
   for (const requirement of auth) {
-    const key = requirement.map(({ scheme }) => scheme).join('\0')
+    const key = requirement.map(({ scheme, scopes }) => [scheme, ...(scopes ?? [])].join(' ')).join('\0')
     if (!requirement.length || seen.has(key)) continue
     seen.add(key)
     const resolved = requirement.map(({ scheme, scopes }) => {

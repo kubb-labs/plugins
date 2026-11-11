@@ -192,7 +192,8 @@ function recursiveGetterType({
     }
     if (schema.type === ast.schemaTypes.array && schema.items?.length === 1) {
       const item = baseType(schema.items[0]!)
-      return item ? `z.ZodArray<${item}>` : undefined
+      if (!item) return undefined
+      return `z.ZodArray<${schema.items[0]!.nullable ? `z.ZodNullable<${item}>` : item}>`
     }
     return undefined
   }

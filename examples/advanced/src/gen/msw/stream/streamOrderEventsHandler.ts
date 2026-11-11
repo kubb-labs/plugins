@@ -3,15 +3,16 @@ import { http, HttpResponse } from 'msw/http'
 
 export function streamOrderEventsHandlerResponse200(data: OrderEvent) {
   const event = data as { event?: unknown; id?: unknown; retry?: unknown; data?: unknown } | undefined
-  const payload =
-    typeof event?.data === 'string'
-      ? event.data
-      : event?.data === undefined
-        ? undefined
-        : JSON.stringify(event.data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value))
   const lines = [
     ...(['event', 'id', 'retry'] as const).filter((field) => event?.[field] !== undefined).map((field) => `${field}: ${event?.[field]}`),
-    ...(payload?.split('\n').map((line) => `data: ${line}`) ?? []),
+    ...(event?.data === undefined
+      ? []
+      : [
+          (typeof event.data === 'string' ? event.data : JSON.stringify(event.data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)))
+            .split('\n')
+            .map((line) => `data: ${line}`)
+            .join('\n'),
+        ]),
   ]
 
   return new HttpResponse<string>(event === undefined ? '' : `${lines.join('\n')}\n\n`, {
@@ -30,15 +31,16 @@ export function streamOrderEventsHandler(
     if (typeof data === 'function') return data(info)
 
     const event = data as { event?: unknown; id?: unknown; retry?: unknown; data?: unknown } | undefined
-    const payload =
-      typeof event?.data === 'string'
-        ? event.data
-        : event?.data === undefined
-          ? undefined
-          : JSON.stringify(event.data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value))
     const lines = [
       ...(['event', 'id', 'retry'] as const).filter((field) => event?.[field] !== undefined).map((field) => `${field}: ${event?.[field]}`),
-      ...(payload?.split('\n').map((line) => `data: ${line}`) ?? []),
+      ...(event?.data === undefined
+        ? []
+        : [
+            (typeof event.data === 'string' ? event.data : JSON.stringify(event.data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)))
+              .split('\n')
+              .map((line) => `data: ${line}`)
+              .join('\n'),
+          ]),
     ]
 
     return new HttpResponse<string>(event === undefined ? '' : `${lines.join('\n')}\n\n`, {

@@ -425,8 +425,10 @@ describe('zodGenerator — Schema', () => {
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
-    expect(source).toContain(required ? 'get baz(): z.ZodArray<typeof fooSchema>' : 'get baz(): z.ZodOptional<z.ZodArray<typeof fooSchema>>')
-    expect(source).toContain('return z.array(fooSchema)')
+    // Only `nullable` on the item itself reaches the array: `optional` and `nullish` belong to a property.
+    const item = 'nullable' in itemModifiers ? 'z.ZodNullable<typeof fooSchema>' : 'typeof fooSchema'
+    expect(source).toContain(required ? `get baz(): z.ZodArray<${item}>` : `get baz(): z.ZodOptional<z.ZodArray<${item}>>`)
+    expect(source).toContain('nullable' in itemModifiers ? 'return z.array(fooSchema.nullable())' : 'return z.array(fooSchema)')
     const directory = await fs.mkdtemp(path.join(path.dirname(fileURLToPath(import.meta.url)), '.nullable-recursive-'))
     try {
       const file = path.join(directory, 'schema.ts')

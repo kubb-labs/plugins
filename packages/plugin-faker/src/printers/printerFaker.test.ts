@@ -15,6 +15,17 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker, dateParser }).print(node)).toBe(expected)
   })
 
+  test.each([
+    [{ type: 'ipv4' }, 'faker.internet.ipv4()'],
+    [{ type: 'ipv6' }, 'faker.internet.ipv6()'],
+    [{ type: 'string', format: 'jwt' }, 'faker.internet.jwt()'],
+    [{ type: 'string', format: 'duration' }, "'P1D'"],
+    [{ type: 'integer', min: 0, multipleOf: 5 }, 'faker.number.int({ min: 0, multipleOf: 5 })'],
+    [{ type: 'number', multipleOf: 0.5 }, 'faker.number.float({ multipleOf: 0.5 })'],
+  ] as const)('prints %o as a value its zod schema accepts', (schema, expected) => {
+    expect(printerFaker({ resolver: resolverFaker }).print(ast.factory.createSchema(schema))).toBe(expected)
+  })
+
   test.each([false, true])('populates propertyNames enum records (referenced: %s)', (referenced) => {
     const keys = ast.factory.createSchema({ type: 'enum', enumValues: ['x', 'y'] })
     const node = ast.factory.createSchema({

@@ -39,6 +39,10 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     if (canOverride && (isScalar || isUnion || isValueIntersection)) {
       return node.nullable ? `data !== undefined ? data : ${fakerText}` : `data ?? ${fakerText}`
     }
+    // A nullable ref to a scalar calls the referenced factory, whose `data` does not take `null`.
+    if (canOverride && node.type === 'ref' && node.nullable && SCALAR_TYPES.has(ast.resolveRef(node).type)) {
+      return `data === null ? data : ${fakerText}`
+    }
     return fakerText
   })()
 
@@ -90,7 +94,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     (node.properties ?? []).some((p) => containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
 
   // An `allOf` with a `oneOf` member makes `defaultFakeData` a union, which TypeScript does not relate to the `Omit` of it.
-  const castThroughUnknown = node.type !== 'object' && typeMode !== 'schema'
+  const castThroughUnknown = (node.type !== 'object' || node.min !== undefined) && typeMode !== 'schema'
 
   const defaults = keysToOmit?.length
     ? `{ ${keysToOmit.map((key, index) => `${objectKey(key)}: _omit${index}`).join(', ')}, ...defaultFakeData }`

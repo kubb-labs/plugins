@@ -86,7 +86,10 @@ function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: Printe
  * `faker.number.float()`, `faker.number.int()` or `faker.number.bigInt()`, with `min` and `max` passed only when set,
  * moved inside an exclusive bound, or needed so a lone bound does not contradict faker's default for the other.
  */
-function numberCall(kind: 'float' | 'int' | 'bigInt', { min, max, exclusive }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive'>): string {
+function numberCall(
+  kind: 'float' | 'int' | 'bigInt',
+  { min, max, exclusive, multipleOf }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive' | 'multipleOf'>,
+): string {
   const whole = kind !== 'float'
   // A whole-number bound moves to the next integer. Faker never returns a float's `max`, and its `min` only by chance.
   // shortcut: a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
@@ -96,7 +99,13 @@ function numberCall(kind: 'float' | 'int' | 'bigInt', { min, max, exclusive }: P
   const maxValue = kind === 'float' && lower !== undefined && upper === undefined && lower >= 1 ? lower + 100 : upper
   const minValue = maxValue !== undefined && lower === undefined && (whole ? maxValue < 0 : maxValue <= 0) ? maxValue - 100 : lower
   const suffix = kind === 'bigInt' ? 'n' : ''
-  const args = [minValue !== undefined && `min: ${minValue}${suffix}`, maxValue !== undefined && `max: ${maxValue}${suffix}`].filter(Boolean).join(', ')
+  const args = [
+    minValue !== undefined && `min: ${minValue}${suffix}`,
+    maxValue !== undefined && `max: ${maxValue}${suffix}`,
+    multipleOf !== undefined && `multipleOf: ${multipleOf}${suffix}`,
+  ]
+    .filter(Boolean)
+    .join(', ')
 
   return `faker.number.${kind}(${args ? `{ ${args} }` : ''})`
 }
@@ -127,6 +136,15 @@ function dateTimeCall(
 
   return 'faker.date.anytime()'
 }
+
+// Formats `plugin-zod` checks with a dedicated constructor, which a random string fails.
+const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
+  ['jwt', 'faker.internet.jwt()'],
+  ['ulid', 'faker.string.ulid()'],
+  ['iban', 'faker.finance.iban()'],
+  ['duration', "'P1D'"],
+  ['hostname', 'faker.internet.domainName()'],
+])
 
 function matches(value: string, regexGenerator: 'faker' | 'randexp' = 'faker'): string {
   if (regexGenerator === 'randexp') {
@@ -224,6 +242,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           return node.format === 'int32' ? `faker.number.int({ max: ${maxInt32} }).toString()` : 'faker.number.bigInt().toString()'
         }
 
+        const formatCall = STRING_FORMAT_CALLS.get(node.format)
+        if (formatCall) return formatCall
+
         const contentSchema = jsonContentSchema(node)
         // The document is typed by its own schema, not by the string that holds it.
         if (contentSchema) return `JSON.stringify(${printNested(contentSchema, { typeName: undefined, nestedInObject: true, nestedInUnion: false })})`
@@ -243,6 +264,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       email: () => 'faker.internet.email()',
       url: () => 'faker.internet.url()',
       uuid: () => 'faker.string.uuid()',
+      ipv4: () => 'faker.internet.ipv4()',
+      ipv6: () => 'faker.internet.ipv6()',
       number: (node) => numberCall('float', node),
       integer: (node) =>
         numberCall('int', node.format && node.format in formatMax ? { ...node, max: Math.min(node.max ?? Infinity, formatMax[node.format]!) } : node),
@@ -308,7 +331,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const { discriminatorPropertyName } = node
         const baseTypeName = this.options.typeName
 
-        const items: Array<string> = mapSchemaMembers(node, (member) => {
+        // A member that points back into the cycle would print `undefined`, so the mock picks among the others.
+        const acyclic = (node.members ?? []).filter((member) => !isCyclicRef(member, this.options))
+        const members = acyclic.length ? acyclic : node.members
+
+        const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) => {
           // For a discriminated union, narrow each variant to its own branch so nested
           // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
           const discriminator = discriminatorPropertyName ? getDiscriminator(member, discriminatorPropertyName) : undefined
@@ -341,6 +368,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
           printNested(member, {
             nestedInObject: true,
+            // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
+            ...(member.type === 'ref' && ast.resolveRefName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
           }),
         )
           .map(({ output }) => output)

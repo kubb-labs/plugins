@@ -27,6 +27,23 @@ describe('buildCallConfig', () => {
     expect(callConfig).toContain('...config')
   })
 
+  test('escapes a quote in the path and the request media type', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'getUser',
+      method: 'POST',
+      path: "/Users('{id}')",
+      requestBody: ast.factory.createRequestBody({
+        content: [ast.factory.createContent({ contentType: "text/plain; note='x'", schema: ast.factory.createSchema({ type: 'string' }) })],
+      }),
+      responses: [],
+    })
+
+    const { callConfig } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true, returnType: 'full' })
+
+    expect(callConfig).toContain(String.raw`url: '/Users(\'{id}\')'`)
+    expect(callConfig).toContain(String.raw`request: 'text/plain; note=\'x\''`)
+  })
+
   test.each([
     ['a string', ast.factory.createSchema({ type: 'string' }), true],
     ['an object', ast.factory.createSchema({ type: 'object', properties: [] }), false],

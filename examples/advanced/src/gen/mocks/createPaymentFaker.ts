@@ -19,5 +19,5 @@ export function createPaymentFaker<TData extends Partial<Payment> = object>(data
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }

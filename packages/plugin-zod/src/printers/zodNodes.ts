@@ -105,6 +105,12 @@ function hasCoercedDiscriminator({ member, propertyName, options }: { member: as
   })
 }
 
+// `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
+function hasPlainDiscriminator({ member, propertyName }: { member: ast.SchemaNode; propertyName: string }): boolean {
+  const schemas = ast.resolveSchemaProperties({ node: member, propertyName })
+  return schemas.length > 0 && !schemas.some(({ schema }) => ast.getSchemaLiteralValues(syncSchemaRef(schema)).length > 0)
+}
+
 /**
  * Builds the scalar handlers both dialects share. Only a string with a `contentSchema` recurses into a child. The temporal
  * scalars and `bigint` differ per dialect, so each printer adds its own.
@@ -190,6 +196,8 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
   cyclicSchemas: ReadonlySet<string> | undefined,
 ): ast.PrinterPartial<string, TOptions> {
   const unionsWithSiblings = new WeakSet<ast.SchemaNode>()
+  // An OpenAPI 3.0 `nullable: true` set on an array item or union member itself, which only a property or a root applies.
+  const printNullable = (schema: ast.SchemaNode, output: string | null | undefined) => (output && schema.nullable ? dialect.nullable(output) : output)
 
   return {
     ...buildScalarNodes(dialect),
@@ -266,7 +274,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       return objectConstraints({ value: result, node })
     },
     array(node) {
-      const items = mapSchemaItems(node, (item) => this.transform(item))
+      const items = mapSchemaItems(node, (item) => printNullable(item, this.transform(item)))
         .map(({ output }) => output)
         .filter(Boolean)
       const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
@@ -275,7 +283,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       return node.unique ? dialect.unique(base) : base
     },
     tuple(node) {
-      const items = mapSchemaItems(node, (item) => this.transform(item))
+      const items = mapSchemaItems(node, (item) => printNullable(item, this.transform(item)))
         .map(({ output }) => output)
         .filter(Boolean)
 
@@ -299,7 +307,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       // `z.coerce.number()`, which z.discriminatedUnion cannot read, so it falls back too.
       const isDiscriminated =
         !!discriminatorPropertyName &&
-        nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemas)) &&
+        nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemas) && !hasPlainDiscriminator({ member: m, propertyName: discriminatorPropertyName })) &&
         !nodeMembers.some((m) => hasCoercedDiscriminator({ member: m, propertyName: discriminatorPropertyName, options: this.options }))
       const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
       // `z.xor` already rejects a value matching several members, and the discriminator already picks one
@@ -307,6 +315,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !unionsWithSiblings.has(node)
       const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && isStrict && dialect.strictMember ? dialect.strictMember(output, schema, cyclicSchemas) : output))
+        .map((output, index) => (isDiscriminated ? output : printNullable(nodeMembers[index]!, output)))
         .filter(Boolean)
       if (members.length === 0) return ''
       if (members.length === 1) return members[0]!

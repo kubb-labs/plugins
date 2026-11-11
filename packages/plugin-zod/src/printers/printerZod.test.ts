@@ -19,6 +19,15 @@ describe('printerZod', () => {
     expect(printer.print(ast.factory.createSchema({ type }))).toBe(expected)
   })
 
+  test('keeps nullable set on an array item or a union member', () => {
+    const nullableString = ast.factory.createSchema({ type: 'string', nullable: true })
+    const array = ast.factory.createSchema({ type: 'array', items: [nullableString] })
+    const union = ast.factory.createSchema({ type: 'union', members: [ast.factory.createSchema({ type: 'integer' }), nullableString] })
+
+    expect(printer.print(array)).toBe('z.array(z.string().nullable())')
+    expect(printer.print(union)).toBe('z.union([z.int(), z.string().nullable()])')
+  })
+
   test('tuple with rest items', () => {
     const node = ast.factory.createSchema({
       type: 'tuple',

@@ -1,3 +1,4 @@
+import { jsDocEscape } from '@internals/utils'
 import { ast, type Group, type Memo, type Output, type Resolver, type ResolverFileParams } from '@kubb/kit'
 
 /**
@@ -173,12 +174,12 @@ type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | nul
 
 /**
  * Whether a content entry is a sequence of JSON values the adapter marks as a stream, such as `application/jsonl`,
- * `application/x-ndjson`, `application/json-seq`, or any media type with an OpenAPI 3.2 `itemSchema`.
+ * `application/x-ndjson` or `application/json-seq`.
  */
 function isJsonLines(entry: ResponseContentEntry): boolean {
   const baseType = baseContentType(entry.contentType)
-  // `multipart/mixed` is a stream of parts, not of JSON values.
-  return Boolean(entry.stream) && baseType !== 'text/event-stream' && !baseType.startsWith('multipart/')
+  // Only the types the client runtime can read: another type with an `itemSchema`, such as `multipart/mixed`, stays a plain call.
+  return Boolean(entry.stream) && baseType !== 'text/event-stream' && streamContentType.test(baseType)
 }
 
 /**
@@ -215,9 +216,10 @@ function isTextSchema(schema: ast.SchemaNode | null | undefined): boolean {
 
 /**
  * Whether an operation streams Server-Sent Events whose `data` the document types as a string, so the client keeps each
- * `data` as text instead of JSON-parsing it. With an event-shaped `itemSchema`, every event must type `data` as a string.
+ * `data` as text instead of JSON-parsing it. With an event-shaped `itemSchema` where only some events type `data` as a
+ * string, it returns the names of those events, or `false` when one of them has no fixed name.
  */
-export function hasTextEventData(node: ast.OperationNode): boolean {
+export function hasTextEventData(node: ast.OperationNode): boolean | Array<string> {
   const shape = getEventStream(node)
   const entry = getPrimarySuccessResponse(node)?.content?.[0]
   if (!entry || (shape !== 'data' && shape !== 'event')) return false
@@ -225,10 +227,16 @@ export function hasTextEventData(node: ast.OperationNode): boolean {
 
   const item = entry.stream?.schema ? ast.resolveRef(entry.stream.schema) : undefined
   const events = item && item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : item ? [item] : []
-  return (
-    events.length > 0 &&
-    events.every((event) => isTextSchema(ast.narrowSchema(ast.resolveRef(event), 'object')?.properties.find((property) => property.name === 'data')?.schema))
-  )
+  // A discriminator makes each event an intersection of its `$ref` and the pinned `event`, so every part is read.
+  const property = (event: ast.SchemaNode, propertyName: string) => ast.resolveSchemaProperties({ node: event, propertyName }).map(({ schema }) => schema)
+  const textEvents = events.filter((event) => {
+    const data = property(event, 'data')
+    return data.length > 0 && data.every(isTextSchema)
+  })
+  if (textEvents.length === events.length) return events.length > 0
+
+  const names = textEvents.map((event) => property(event, 'event').flatMap((schema) => ast.getSchemaLiteralValues(ast.resolveRef(schema))))
+  return names.length > 0 && names.every((values) => values.length > 0) && [...new Set(names.flat().map(String))]
 }
 
 /**
@@ -537,7 +545,7 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
     node.description && `@description ${node.description}`,
     node.summary && `@summary ${node.summary}`,
     node.deprecated && '@deprecated',
-    node.externalDocs && `@see ${[node.externalDocs.url, node.externalDocs.description].filter(Boolean).join(' ')}`,
+    node.externalDocs && `@see ${jsDocEscape([node.externalDocs.url, node.externalDocs.description].filter(Boolean).join(' '))}`,
   ]
 
   const filteredComments = comments.filter((comment): comment is string => Boolean(comment))

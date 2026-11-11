@@ -131,6 +131,12 @@ type PrinterTs = PrinterTsFactory
 
 type HandlerContext = { transform: (node: ast.SchemaNode) => factory.TsNode | null }
 
+// Adds the `| null` of an OpenAPI 3.0 `nullable: true` set on an array item or union member itself.
+function printNullable(node: ast.SchemaNode, print: (node: ast.SchemaNode) => factory.TsNode | null | undefined): factory.TsNode | null | undefined {
+  const type = print(node)
+  return type && node.nullable ? factory.createUnionDeclaration({ nodes: [type, factory.keywordTypeNodes.null] }) : type
+}
+
 /**
  * Adapts user overrides, which work in strings, to the node-based printer: `this.transform` hands them printed
  * strings and their result is wrapped back into a node. A deprecated compiler node prints through `@kubb/parser-ts`.
@@ -271,33 +277,32 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         if (hasStringLiteral && hasPlainString) {
           const memberNodes = members
             .map((m) => {
-              if (isStringType(m)) {
-                return factory.createIntersectionDeclaration({
-                  nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])],
-                })
-              }
+              const print = (node: ast.SchemaNode) =>
+                isStringType(node)
+                  ? factory.createIntersectionDeclaration({ nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])] })
+                  : this.transform(node)
 
-              return this.transform(m)
+              return printNullable(m, print)
             })
             .filter(isNonNullable)
 
           return factory.createUnionDeclaration({ nodes: memberNodes })
         }
 
-        return factory.createUnionDeclaration({ nodes: factory.buildMemberNodes(members, this.transform) })
+        return factory.createUnionDeclaration({ nodes: factory.buildMemberNodes(members, (member) => printNullable(member, this.transform)) })
       },
       intersection(node) {
         return factory.createIntersectionDeclaration({ nodes: factory.buildMemberNodes(node.members, this.transform) })
       },
       array(node) {
-        const itemNodes = mapSchemaItems(node, (item) => this.transform(item))
+        const itemNodes = mapSchemaItems(node, (item) => printNullable(item, this.transform))
           .map(({ output }) => output)
           .filter(isNonNullable)
 
         return factory.createArrayDeclaration({ nodes: itemNodes, arrayType: this.options.arrayType })
       },
       tuple(node) {
-        return factory.buildTupleNode(node, this.transform)
+        return factory.buildTupleNode(node, (item) => printNullable(item, this.transform))
       },
       object(node) {
         const { transform, options } = this

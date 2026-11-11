@@ -72,7 +72,7 @@ const explodeCookie = (name: string, value: unknown): Array<string> => {
   const castBody = bodySchema && (['number', 'integer', 'bigint'].includes(bodySchema.primitive ?? '') || ['unknown', 'any'].includes(bodySchema.type))
 
   const requestOptions = [
-    `method: '${node.method}'`,
+    `method: ${singleQuote(node.method)}`,
     `url: ${urlTemplate}`,
     groups.query && 'qs: query',
     groups.cookies ? `headers: { ${groups.headers ? '...headers, ' : ''}...(cookie ? { Cookie: cookie } : {}) }` : groups.headers && 'headers',
