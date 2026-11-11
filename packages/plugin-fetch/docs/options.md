@@ -13,6 +13,7 @@ Pass these options to `pluginFetch()`. Shared options link to [Shared plugin opt
 | [`validator`](#validator)                                                 | Validate request bodies, params, and responses with Zod.               | `false`                                          |
 | [`sdk`](#sdk)                                                             | Generate a class-based SDK instead of functions.                       | None                                             |
 | [`returnType`](#returntype)                                               | Shape of the value a generated call resolves to.                       | `'full'`                                         |
+| [`importPath`](#importpath)                                               | Module the generated operations import the client from.                | `.kubb/client.ts`                                |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                       | None                                             |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                            | `[]`                                             |
 | [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                   | `[]`                                             |
@@ -164,6 +165,32 @@ const pet = await getPetById({ path: { petId: 1 } }) // Pet, not { status, data,
 ```
 
 It applies to the functions and the SDK. The query plugins and `@kubb/plugin-mcp` read it too, including a per-operation value set through [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override). To read headers such as `ETag` under `'data'`, pass `throwOnError: false` and call `result.response.headers.get('etag')`.
+
+### importPath
+
+Module the generated operations import `client` and its types from. Set it to wrap the runtime, for example to add auth headers or interceptors to every call. The value is written into every generated import as given, so it must resolve from the generated operation file: a relative path, a package name, or an alias.
+
+The plugin still copies its runtime to `.kubb/`, so your module can re-export it and replace only `client`. When the spec has streaming operations, `.kubb/client.ts` also re-exports `.kubb/sse.ts`, so `export *` covers the stream helpers too. When [`validator`](#validator) validates header params, also export `toHeadersStandardSchema` from `.kubb/standardSchema.ts`.
+
+|          |                   |
+| -------- | ----------------- |
+| Type     | `string`          |
+| Required | `false`           |
+| Default  | `.kubb/client.ts` |
+
+```typescript [kubb.config.ts]
+pluginFetch({ output: { path: './clients' }, importPath: '../client' }) // relative to src/gen/clients/
+```
+
+```typescript [src/gen/client.ts]
+import { client as runtimeClient } from './.kubb/client'
+
+export * from './.kubb/client'
+
+export const client = runtimeClient.createClient({ headers: { 'x-app': 'web' } })
+```
+
+The query plugins and `@kubb/plugin-mcp` read `importPath` too, so their types come from the same module. The class-based [`sdk`](#sdk) ignores it and always imports `.kubb/client.ts`.
 
 ### resolver
 

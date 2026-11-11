@@ -242,3 +242,73 @@ describe(`plugin-fetch options ${version}`, () => {
     await fs.rm(tmpDir, { recursive: true, force: true })
   })
 })
+
+describe(`plugin-fetch importPath ${version}`, () => {
+  async function build(output: string, options: { input: string; importPath?: string }) {
+    const { diagnostics } = await createKubb(
+      {
+        root: __dirname,
+        input: options.input,
+        output: { path: output, barrel: false },
+        adapter: adapterOas({ validate: false, enums: 'root' }),
+        parsers: [parserTs({ extension: { '.ts': '.ts' } })],
+        reporters: [],
+        storage: fsStorage(),
+        plugins: [
+          pluginTs({ output: { path: './types', barrel: false } }),
+          pluginFetch({ output: { path: './clients', barrel: false }, importPath: options.importPath }),
+        ],
+      } as Config,
+      { hooks: new Hookable<KubbHooks>() },
+    ).safeBuild()
+
+    expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
+  }
+
+  test('operations import the bundled .kubb/client.ts when importPath is unset', async () => {
+    const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-import-path-unset-${Date.now()}`)
+    const output = path.join(tmpDir, 'gen')
+    await build(output, { input: '../../schemas/3.0.x/petStore.yaml' })
+
+    const operation = await fs.readFile(path.join(output, 'clients/getPetById.ts'), 'utf-8')
+    expect(operation).toContain("from '../.kubb/client.ts'")
+
+    await fs.rm(tmpDir, { recursive: true, force: true })
+  })
+
+  test('operations import importPath verbatim and the runtime is still injected', async () => {
+    const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-import-path-${Date.now()}`)
+    const output = path.join(tmpDir, 'gen')
+    await build(output, { input: '../../schemas/3.0.x/eventStream.yaml', importPath: '../client.ts' })
+
+    for (const operation of ['streamGet', 'healthGet']) {
+      const source = await fs.readFile(path.join(output, 'clients', `${operation}.ts`), 'utf-8')
+      expect(source).toContain("from '../client.ts'")
+      expect(source).not.toContain('.kubb/')
+    }
+
+    for (const runtimeFile of ['client.ts', 'core.ts', 'serializers.ts', 'mediaTypes.ts', 'standardSchema.ts', 'sse.ts']) {
+      await expect(fs.access(path.join(output, '.kubb', runtimeFile))).resolves.toBeUndefined()
+    }
+    expect(await fs.readFile(path.join(output, '.kubb/client.ts'), 'utf-8')).toContain("export * from './sse.ts'")
+
+    // A wrapper that re-exports the bundled runtime and replaces `client` is enough for the operations to load.
+    await fs.writeFile(
+      path.join(output, 'client.ts'),
+      [
+        "import { client as runtimeClient } from './.kubb/client.ts'",
+        "export * from './.kubb/client.ts'",
+        "export const client = runtimeClient.createClient({ headers: { 'x-wrapped': '1' } })",
+      ].join('\n'),
+    )
+    const operationPath = path.join(output, 'clients/healthGet.ts')
+    const result = spawnSync(
+      process.execPath,
+      ['--experimental-strip-types', '--input-type=module', '-e', `await import(${JSON.stringify(pathToFileURL(operationPath).href)})`],
+      { encoding: 'utf8' },
+    )
+    expect(result.status, result.stderr).toBe(0)
+
+    await fs.rm(tmpDir, { recursive: true, force: true })
+  })
+})

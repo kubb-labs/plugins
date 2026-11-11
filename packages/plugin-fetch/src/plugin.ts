@@ -15,7 +15,8 @@ export const pluginFetchName = 'plugin-fetch' satisfies PluginFetch['name']
  * Generates a type-safe HTTP client pinned to the Fetch API. Each operation becomes one async
  * function that takes a single grouped `options` object and returns the shared `RequestResult`
  * contract. The runtime is always bundled into `.kubb/client.ts`, so generated code never imports
- * from `@kubb/plugin-fetch` and the only runtime dependency is the global `fetch`.
+ * from `@kubb/plugin-fetch` and the only runtime dependency is the global `fetch`. Set `importPath` to
+ * make the operations import a module of your own that wraps that runtime.
  *
  * @example
  * ```ts
@@ -38,7 +39,7 @@ export const pluginFetch = defineExtension<PluginFetch>({
   meta: { name: pluginFetchName, version, compatibility },
   dependencies: clientDependencies,
   setup(options) {
-    const resolved = resolveClientOptions(options)
+    const resolved = { ...resolveClientOptions(options), importPath: options.importPath }
     setupClient({ name: 'fetch', resolved, macros: options.macros, client: fileURLToPath(new URL('../templates/client.ts', import.meta.url)) })
     return resolved
   },
