@@ -222,14 +222,7 @@ export function buildLiteral(value: unknown): string {
 /**
  * Numeric constraint limits for Zod schemas (min, max, and exclusive bounds).
  */
-export type NumericConstraints = Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive' | 'exclusiveMinimum' | 'exclusiveMaximum' | 'multipleOf'>
-
-/**
- * The exclusive bounds, falling back to the deprecated `exclusiveMinimum` and `exclusiveMaximum` a custom node may still set.
- */
-function exclusiveBounds({ exclusive, exclusiveMinimum, exclusiveMaximum }: NumericConstraints): { min?: number; max?: number } {
-  return { min: exclusive?.min ?? exclusiveMinimum, max: exclusive?.max ?? exclusiveMaximum }
-}
+export type NumericConstraints = Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive' | 'multipleOf'>
 
 /**
  * Length constraint limits for string and array schemas (min, max, and regex pattern).
@@ -308,14 +301,12 @@ export type ModifierOptions = {
  * Build `.min()` / `.max()` / `.gt()` / `.lt()` constraint chains for numbers
  * using the standard chainable Zod v4 API.
  */
-export function numberConstraints(constraints: NumericConstraints, suffix: '' | 'n' = ''): string {
-  const { min, max, multipleOf } = constraints
-  const exclusive = exclusiveBounds(constraints)
+export function numberConstraints({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): string {
   return [
     min !== undefined ? `.min(${min}${suffix})` : '',
     max !== undefined ? `.max(${max}${suffix})` : '',
-    exclusive.min !== undefined ? `.gt(${exclusive.min}${suffix})` : '',
-    exclusive.max !== undefined ? `.lt(${exclusive.max}${suffix})` : '',
+    exclusive?.min !== undefined ? `.gt(${exclusive.min}${suffix})` : '',
+    exclusive?.max !== undefined ? `.lt(${exclusive.max}${suffix})` : '',
     multipleOf !== undefined ? `.multipleOf(${multipleOf}${suffix})` : '',
   ].join('')
 }
@@ -336,18 +327,16 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
  * Rounds numeric bounds to whole numbers so they print as bigint literals without loosening them.
  * A fractional exclusive bound becomes the nearest inclusive one; a fractional `multipleOf` is left out.
  */
-export function bigintConstraints(constraints: NumericConstraints): NumericConstraints {
-  const { min, max, multipleOf } = constraints
-  const exclusive = exclusiveBounds(constraints)
+export function bigintConstraints({ min, max, exclusive, multipleOf }: NumericConstraints): NumericConstraints {
   const fractional = (bound: number | undefined): bound is number => bound !== undefined && !Number.isInteger(bound)
-  const lower = [min, fractional(exclusive.min) ? exclusive.min : undefined].filter((bound) => bound !== undefined).map(Math.ceil)
-  const upper = [max, fractional(exclusive.max) ? exclusive.max : undefined].filter((bound) => bound !== undefined).map(Math.floor)
+  const lower = [min, fractional(exclusive?.min) ? exclusive.min : undefined].filter((bound) => bound !== undefined).map(Math.ceil)
+  const upper = [max, fractional(exclusive?.max) ? exclusive.max : undefined].filter((bound) => bound !== undefined).map(Math.floor)
   return {
     min: lower.length ? Math.max(...lower) : undefined,
     max: upper.length ? Math.min(...upper) : undefined,
     exclusive: {
-      min: fractional(exclusive.min) ? undefined : exclusive.min,
-      max: fractional(exclusive.max) ? undefined : exclusive.max,
+      min: fractional(exclusive?.min) ? undefined : exclusive?.min,
+      max: fractional(exclusive?.max) ? undefined : exclusive?.max,
     },
     multipleOf: Number.isInteger(multipleOf) ? multipleOf : undefined,
   }
@@ -356,14 +345,12 @@ export function bigintConstraints(constraints: NumericConstraints): NumericConst
 /**
  * Build `.check(z.minimum(), z.maximum())` for `zod/mini` numeric constraints.
  */
-export function numberChecksMini(constraints: NumericConstraints, suffix: '' | 'n' = ''): string {
-  const { min, max, multipleOf } = constraints
-  const exclusive = exclusiveBounds(constraints)
+export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): string {
   const checks: Array<string> = []
   if (min !== undefined) checks.push(`z.minimum(${min}${suffix})`)
   if (max !== undefined) checks.push(`z.maximum(${max}${suffix})`)
-  if (exclusive.min !== undefined) checks.push(`z.gt(${exclusive.min}${suffix})`)
-  if (exclusive.max !== undefined) checks.push(`z.lt(${exclusive.max}${suffix})`)
+  if (exclusive?.min !== undefined) checks.push(`z.gt(${exclusive.min}${suffix})`)
+  if (exclusive?.max !== undefined) checks.push(`z.lt(${exclusive.max}${suffix})`)
   if (multipleOf !== undefined) checks.push(`z.multipleOf(${multipleOf}${suffix})`)
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
@@ -377,13 +364,6 @@ export function lengthChecksMini({ min, max, pattern, regexType }: LengthConstra
   if (max !== undefined) checks.push(`z.maxLength(${max})`)
   if (pattern !== undefined) checks.push(`z.regex(${regexSource(pattern, regexType)})`)
   return checks.length ? `.check(${checks.join(', ')})` : ''
-}
-
-/**
- * The property counts of an object, falling back to the deprecated `minProperties` and `maxProperties` a custom node may still set.
- */
-function propertyCounts(node: ast.SchemaNode): { min?: number; max?: number } {
-  return node.type === 'object' ? { min: node.min ?? node.minProperties, max: node.max ?? node.maxProperties } : {}
 }
 
 /**
@@ -401,8 +381,7 @@ export function hasKeyCheck(node: ast.SchemaNode): node is ast.ObjectSchemaNode 
  * Whether the node prints inside `z.pipe(z.unknown().check(…), …)`, see {@link inputChecks}.
  */
 export function hasInputChecks(node: ast.SchemaNode): boolean {
-  const { min, max } = propertyCounts(node)
-  return Boolean(node.conditionals?.length) || min !== undefined || max !== undefined || hasKeyCheck(node)
+  return Boolean(node.conditionals?.length) || (node.type === 'object' && (node.min !== undefined || node.max !== undefined)) || hasKeyCheck(node)
 }
 
 /**
@@ -413,16 +392,16 @@ export function inputChecks({
   value,
   node,
   keySchema,
-  conditionals = [],
+  conditionals,
 }: {
   value: string
   node: ast.SchemaNode
   keySchema?: string | null
-  conditionals?: Array<string>
+  conditionals: Array<string>
 }): string {
   const checks: Array<string> = []
   const skip = 'typeof value !== "object" || value === null || Array.isArray(value)'
-  const { min, max } = propertyCounts(node)
+  const { min, max } = node.type === 'object' ? node : {}
   if (min !== undefined) {
     checks.push(`z.refine(value => ${skip} || Object.keys(value).length >= ${min}, { message: "Object must have at least ${min} properties" })`)
   }

@@ -1,5 +1,4 @@
 import { adapterOas } from '@kubb/adapter-oas'
-import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import * as z from 'zod'
 import * as mini from 'zod/mini'
@@ -36,9 +35,9 @@ const document = {
 }
 
 describe.each([
-  { name: 'Zod', createPrinter: printerZod, runtime: z },
-  { name: 'Zod Mini', createPrinter: printerZodMini, runtime: mini },
-])('$name conditionals and contains', async ({ createPrinter, runtime }) => {
+  { name: 'Zod', createPrinter: printerZod, runtime: z, expectedChoice: 'z.union([z.pipe(Card.in, Card.out.strict()), Cash.strict()])' },
+  { name: 'Zod Mini', createPrinter: printerZodMini, runtime: mini, expectedChoice: 'z.union([Card, Cash])' },
+])('$name conditionals and contains', async ({ createPrinter, runtime, expectedChoice }) => {
   const root = await adapterOas({ validate: false }).parse({ type: 'data', data: JSON.stringify(document) })
   const printer = createPrinter({})
   const evaluate = (name: string): z.ZodType => new Function('z', `return ${printer.print(root.schemas.find((node) => node.name === name)!)}`)(runtime)
@@ -53,9 +52,9 @@ describe.each([
     expect(evaluate('Payment').safeParse(input).success).toBe(valid)
   })
 
-  test('does not call `.strict()` on a oneOf member that checks its input in a pipe', () => {
+  test('makes the object behind a piped oneOf member strict, where the dialect has `.strict()`', () => {
     const choice = printer.print(root.schemas.find((node) => node.name === 'Choice')!)
-    expect(choice).not.toContain('Card.strict()')
+    expect(choice).toBe(expectedChoice)
   })
 
   test('reads an `if` object without properties as "is an object"', () => {
@@ -83,19 +82,6 @@ describe.each([
     { input: { id: 'a', Extra: 1 }, valid: false },
   ])('checks propertyNames next to declared properties for $input', ({ input, valid }) => {
     expect(evaluate('Tags').safeParse(input).success).toBe(valid)
-  })
-
-  test('reads the deprecated count and exclusive fields of a custom node', () => {
-    const evaluateNode = (node: ast.SchemaNode): z.ZodType => new Function('z', `return ${printer.print(node)}`)(runtime)
-    const object = evaluateNode(ast.factory.createSchema({ type: 'object', properties: [], minProperties: 1, maxProperties: 2 }))
-    expect(object.safeParse({}).success).toBe(false)
-    expect(object.safeParse({ a: 1 }).success).toBe(true)
-    expect(object.safeParse({ a: 1, b: 2, c: 3 }).success).toBe(false)
-
-    const number = evaluateNode(ast.factory.createSchema({ type: 'number', exclusiveMinimum: 0, exclusiveMaximum: 10 }))
-    expect(number.safeParse(0).success).toBe(false)
-    expect(number.safeParse(5).success).toBe(true)
-    expect(number.safeParse(10).success).toBe(false)
   })
 
   test.each([

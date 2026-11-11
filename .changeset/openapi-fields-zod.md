@@ -10,4 +10,4 @@ Add a schema for response headers, check the JSON Schema 2020-12 keywords, and f
 - Check `if`/`then`/`else`, `dependentRequired` and `dependentSchemas` with one `z.refine` each. A `dependentRequired` key is checked for presence, so `{ creditCard: ['billingAddress'] }` fails when `creditCard` is set without `billingAddress`.
 - Count the items that match `contains`, within `minContains` and `maxContains`.
 - Check `propertyNames` on an object that also declares `properties` or `patternProperties`. It used to be checked only on a map.
-- Read `min`, `max` and `exclusive` on a custom node. The deprecated `minProperties`, `maxProperties`, `exclusiveMinimum` and `exclusiveMaximum` still work when the new field is not set.
+- Set `min`, `max` and `exclusive` on a custom node. The deprecated `minProperties`, `maxProperties`, `exclusiveMinimum` and `exclusiveMaximum` are no longer read.

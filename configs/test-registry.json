@@ -59,7 +59,7 @@
   "packages/plugin-vue-query/src/generators/queryGenerator.test.tsx": "Rendered query hook with the configured query importPath, plus the variant passed to a custom queryKey.",
   "packages/plugin-vue-query/src/index.test.ts": "Pins the default key transformer re-exports; swapping one fails only this test.",
   "packages/plugin-zod/src/generators/zodGenerator.test.tsx": "Regressions #332 and #3172, typeGuards, compile, inferred codec, custom imports beyond the e2e configs.",
-  "packages/plugin-zod/src/printers/conditionals.test.ts": "Runtime-checks if/then, dependentRequired, dependentSchemas, contains, propertyNames and the deprecated count fields in both Zod printers; the printed refines are only meaningful when evaluated.",
+  "packages/plugin-zod/src/printers/conditionals.test.ts": "Runtime-checks if/then, dependentRequired, dependentSchemas, contains and propertyNames in both Zod printers; the printed refines are only meaningful when evaluated.",
   "packages/plugin-zod/src/printers/const.test.ts": "OpenAPI 3.1 structural const across ts, faker and zod printers; schemas/3.0.x/constCases.yaml is in no e2e suite.",
   "packages/plugin-zod/src/printers/objectConstraints.test.ts": "Runtime-checks minProperties and maxProperties in nested, allOf, union and omit cases; printer tests never mention them.",
   "packages/plugin-zod/src/printers/printerZod.test.ts": "Branchy printer: records, discriminated unions, cycles, omit unwrap (issue #567), coercion.",

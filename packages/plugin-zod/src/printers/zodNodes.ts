@@ -420,13 +420,20 @@ function matchesCondition(ctx: PrinterContext, schema: ast.SchemaNode | undefine
   return conditions.join(' && ')
 }
 
+type Handler<TOptions extends ZodNodeOptions, K extends ast.SchemaType> = (
+  this: ThisParameterType<NonNullable<ast.PrinterPartial<string, TOptions>['any']>>,
+  node: ast.SchemaNodeByType[K],
+) => string | null
+
 /**
  * Wraps each handler so its output first checks the raw input, see {@link inputChecks}.
  */
 export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.PrinterPartial<string, TOptions>): ast.PrinterPartial<string, TOptions> {
-  const wrapped: Record<string, unknown> = {}
-  for (const [type, handler] of Object.entries(nodes) as Array<[string, (this: PrinterContext, node: ast.SchemaNode) => string | null]>) {
-    wrapped[type] = function (this: PrinterContext, node: ast.SchemaNode) {
+  const wrapped: ast.PrinterPartial<string, TOptions> = {}
+  const wrap = <K extends ast.SchemaType>(type: K) => {
+    const handler: Handler<TOptions, K> | undefined = nodes[type]
+    if (!handler) return
+    const checked: Handler<TOptions, K> = function (node) {
       const output = handler.call(this, node)
       if (!output || !hasInputChecks(node)) return output
       return inputChecks({
@@ -439,6 +446,10 @@ export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.Prin
         ),
       })
     }
+    // TypeScript cannot relate `wrapped[type]` to `K` on a write, so the key and its handler are assigned together.
+    Object.assign(wrapped, { [type]: checked })
   }
-  return wrapped as ast.PrinterPartial<string, TOptions>
+  Object.values(ast.schemaTypes).forEach(wrap)
+
+  return wrapped
 }
