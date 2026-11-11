@@ -23,17 +23,10 @@ const formMediaTypes = {
 } as const
 
 /**
- * Writes the runtime a document needs into `.kubb/`, next to the `client.ts` the plugin injected:
- * - `config.ts`, which `client.ts` passes to `setConfig`: the `baseURL` set at generation time, and the media types and
- *   serializers the document needs, imported from their own files. `setConfig` before the first call only records the
- *   config, so the lazy client is still created on first use.
- * - `sse.ts` only for a document with an operation that streams, each form media type only for a document with a body of
- *   that type, and the query, path, header and cookie serializers the document's parameters need.
- * - The footer of `client.ts`: the named `servers` and `securitySchemes`, and the `sse.ts` re-export, so
- *   `parseEventStream` stays importable from the client.
- *
- * `templates` is the folder the runtime is copied from, set by the plugins that ship it, so a custom client from
- * `@kubb/plugin-client` gets none of this.
+ * Writes the runtime a document needs into `.kubb/`: the optional media type, serializer and `sse.ts` files, and a
+ * `config.ts` that imports them, which `client.ts` passes to `setConfig`. The footer of `client.ts` gets the named
+ * `servers` and `securitySchemes` and the `sse.ts` re-export. `templates` is the folder the runtime is copied from, set
+ * by the plugins that ship it, so a custom client from `@kubb/plugin-client` gets none of this.
  */
 export function StreamRuntime({
   nodes,
@@ -56,7 +49,6 @@ export function StreamRuntime({
   const forms = [...new Set(nodes.flatMap(getFormContentTypes))].sort().map((contentType) => ({ contentType, ...formMediaTypes[contentType] }))
   const queryStyles = nodes.some(hasQueryStyles)
 
-  // Each serializer the document needs, by its `serializer` key. Every document has a query and a path one.
   const serializers = [
     queryStyles
       ? { key: 'query', file: 'serializers/queryStyles', name: 'serializeStyledQuery' }

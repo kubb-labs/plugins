@@ -17,9 +17,7 @@ function toAsciiJson(value: unknown): string {
   return JSON.stringify(value, jsonReplacer).replace(/[\u007f-\uffff]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`)
 }
 
-/**
- * Serializes array and object headers with the OpenAPI `simple` style.
- */
+/** Serializes array and object headers with the OpenAPI `simple` style. */
 export const applyHeaderStyles: HeaderSerializer = (headers, styles) => {
   // A `Headers` instance only holds strings, so there is nothing to style.
   if (!headers || headers instanceof Headers) return headers

@@ -369,7 +369,6 @@ describe('clientGenerator runtime files', () => {
       footer: runtime.find((file) => file.baseName === 'client.ts')?.footer,
     }
   }
-  // Every document gets a query and a path serializer.
   const serializerConfig = 'serializer: { query: serializeQuery, path: serializePath }'
 
   test.each([

@@ -1,10 +1,7 @@
 import { encodeComponent, isRecord, notNullish, serializeDefaultQueryParam } from '../serializers.ts'
 import type { QuerySerializer } from '../serializers.ts'
 
-/**
- * The query serializer for a spec without styled query parameters: arrays repeat their key and objects use the OpenAPI
- * default, `form` with explode, so `{ a: 1, b: 2 }` becomes `a=1&b=2`.
- */
+/** The query serializer for a spec without styled query parameters: arrays repeat their key, objects use `form` with explode. */
 export const serializeQuery: QuerySerializer = (params, options) => {
   const parts: Array<string> = []
   for (const [key, value] of Object.entries(params)) {
