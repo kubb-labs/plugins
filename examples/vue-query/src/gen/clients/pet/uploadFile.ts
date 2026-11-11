@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/UploadFile'
-import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
 /**
  * `POST /pet/{petId}/uploadImage`
@@ -20,9 +20,7 @@ export function uploadFile<ThrowOnError extends boolean = true>(
     apiClient<UploadFileResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet/{petId}/uploadImage',
-      security: [
-        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
-      ],
+      security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/json' },
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),

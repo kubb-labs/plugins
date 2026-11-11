@@ -194,4 +194,18 @@ client.setConfig({
  * The servers from the spec by name, for `baseURL`.
  */
 export const servers = { production: 'https://petstore3.swagger.io/api/v3', staging: 'https://staging.petstore3.swagger.io/api/v3' } as const
+/**
+ * The security schemes from the spec by name. A generated call sends one of them to the `auth` resolver.
+ */
+export const securitySchemes = {
+  petstore_auth: { type: 'oauth2', flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+  api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
+  device_auth: {
+    type: 'oauth2',
+    flows: {
+      deviceAuthorization: { deviceAuthorizationUrl: 'https://petstore3.swagger.io/oauth/device', tokenUrl: 'https://petstore3.swagger.io/oauth/token' },
+    },
+    metadataUrl: 'https://petstore3.swagger.io/.well-known/oauth-authorization-server',
+  },
+} as const
 export * from './sse.ts'

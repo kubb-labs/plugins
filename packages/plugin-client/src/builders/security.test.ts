@@ -1,6 +1,6 @@
 import type { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { buildSecurityMetadata, getOperationSecurity, resolveCredential } from './security.ts'
+import { buildSecurityMetadata, buildSecuritySchemes, getOperationSecurity, resolveCredential } from './security.ts'
 
 describe('buildSecurityMetadata', () => {
   test('returns null when there is no security', () => {
@@ -109,5 +109,30 @@ describe('getOperationSecurity', () => {
   test('escapes quotes in names and scopes', () => {
     const security = [{ type: 'apiKey' as const, name: "X-It's-Key", in: 'header' as const, scopes: ["it's"] }]
     expect(buildSecurityMetadata({ security })).toBe("[{ type: 'apiKey', name: 'X-It\\'s-Key', in: 'header', scopes: ['it\\'s'] }]")
+  })
+
+  test('points at the hoisted scheme by name, and adds the scopes of the requirement', () => {
+    const auth = [[{ scheme: 'api_key', scopes: [] }], [{ scheme: 'petstore_auth', scopes: ['read:pets'] }]]
+    const hoisted: Array<ast.AuthScheme> = [...schemes, { name: 'x-key', credential: { type: 'apiKey', name: 'X-Key', in: 'header' } }]
+
+    expect(buildSecurityMetadata({ security: getOperationSecurity({ auth, schemes, hoist: true }) })).toBe(
+      "[securitySchemes.api_key, { ...securitySchemes.petstore_auth, scopes: ['read:pets'] }]",
+    )
+    expect(buildSecurityMetadata({ security: getOperationSecurity({ auth: [[{ scheme: 'x-key', scopes: [] }]], schemes: hoisted, hoist: true }) })).toBe(
+      "[securitySchemes['x-key']]",
+    )
+  })
+})
+
+describe('buildSecuritySchemes', () => {
+  test('lists the schemes the runtime can place by name, and nothing for a document without one', () => {
+    const schemes: Array<ast.AuthScheme> = [
+      { name: 'x-key', credential: { type: 'apiKey', name: 'X-Key', in: 'header' } },
+      { name: 'mtls', credential: { type: 'mutualTLS' } },
+    ]
+
+    expect(buildSecuritySchemes(schemes)).toContain("export const securitySchemes = { 'x-key': { type: 'apiKey', name: 'X-Key', in: 'header' } } as const")
+    expect(buildSecuritySchemes([{ name: 'mtls', credential: { type: 'mutualTLS' } }])).toBeNull()
+    expect(buildSecuritySchemes(undefined)).toBeNull()
   })
 })

@@ -2,7 +2,7 @@
 
 import type { Options, Unwrappable, RequestResult } from './.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from './FindPetsByTags'
-import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from './.kubb/client'
 
 /**
  * `GET /pet/findByTags`
@@ -16,7 +16,7 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
     apiClient<FindPetsByTagsResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/findByTags',
-      security: [{ type: 'http', scheme: 'bearer' }],
+      security: [securitySchemes.bearerAuth],
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),

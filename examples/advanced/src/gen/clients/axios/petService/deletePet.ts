@@ -1,5 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { deletePetResponseSchema, deletePetStatus400Schema } from '../../../zod/pet/deletePetSchema'
 
 /**
@@ -40,9 +40,7 @@ export function deletePet<ThrowOnError extends boolean = true>(
     >({
       method: 'DELETE',
       url: '/pet/{petId}:search',
-      security: [
-        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
-      ],
+      security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
       ...config,
       validator: { response: deletePetResponseSchema, error: { 400: deletePetStatus400Schema }, ...config.validator },
       throwOnError: resolveThrowOnError(config.throwOnError, true),

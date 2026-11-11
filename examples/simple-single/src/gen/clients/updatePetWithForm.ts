@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../models'
-import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
 /**
  * `POST /pet/{petId}`
@@ -20,9 +20,7 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
     apiClient<UpdatePetWithFormResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet/{petId}',
-      security: [
-        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
-      ],
+      security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),

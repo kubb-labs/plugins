@@ -3,6 +3,7 @@ import { getFormContentTypes, hasEventStreamContent, hasStreamVariant, isEventSt
 import { objectKey, singleQuote } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
+import { buildSecuritySchemes } from '../builders/security.ts'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 function buildServers(servers: Array<ast.InputServer> | undefined): string | null {
@@ -24,7 +25,7 @@ type FormContentType = keyof typeof formMediaTypes
 
 /**
  * The `footer` of `.kubb/client.ts`: the `baseURL` set at generation time, the form and stream media types the document
- * needs, the named `servers`, and the `sse.ts` re-export when it streams, so `parseEventStream` stays importable from the
+ * needs, the named `servers` and `securitySchemes`, and the `sse.ts` re-export when it streams, so `parseEventStream` stays importable from the
  * client. `setConfig` before the first call only records the config, so the lazy client is still created on first use.
  */
 function buildClientFooter({
@@ -32,11 +33,13 @@ function buildClientFooter({
   forms,
   streams,
   servers,
+  auth,
 }: {
   baseURL?: string
   forms: Array<FormContentType>
   streams: boolean
   servers?: Array<ast.InputServer>
+  auth?: Array<ast.AuthScheme>
 }): string | undefined {
   const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
   const mediaTypes = [...forms.map((contentType) => `'${contentType}': ${formMediaTypes[contentType].name}`), streams ? '...streamMediaTypes' : null].filter(
@@ -51,6 +54,7 @@ function buildClientFooter({
       streams ? `import { streamMediaTypes } from './sse.ts'` : null,
       config.length ? `client.setConfig({ ${config.join(', ')} })` : null,
       buildServers(servers),
+      buildSecuritySchemes(auth),
       streams ? `export * from './sse.ts'` : null,
     ]
       .filter(Boolean)
@@ -70,17 +74,19 @@ export function StreamRuntime({
   templates,
   baseURL,
   servers,
+  auth,
 }: {
   nodes: Array<ast.OperationNode>
   root: string
   templates?: string
   baseURL?: string
   servers?: Array<ast.InputServer>
+  auth?: Array<ast.AuthScheme>
 }): KubbReactNode {
   if (!templates) return null
   const streams = nodes.some((node) => hasEventStreamContent(node) || isEventStream(node) || hasStreamVariant(node))
   const forms = [...new Set(nodes.flatMap(getFormContentTypes))].sort()
-  const footer = buildClientFooter({ baseURL, forms, streams, servers })
+  const footer = buildClientFooter({ baseURL, forms, streams, servers, auth })
   return (
     <>
       {streams && <File baseName="sse.ts" path={path.resolve(root, '.kubb/sse.ts')} copy={path.join(templates, 'sse.ts')} />}

@@ -1,7 +1,7 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { AddPetRequest } from '../../../models/ts/AddPetRequest'
 import type { Pet } from '../../../models/ts/Pet'
-import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { addPetResponseSchema, addPetStatus405Schema, addPetStatusDefaultSchema } from '../../../zod/pet/addPetSchema'
 
 /**
@@ -89,9 +89,7 @@ export function addPet<ThrowOnError extends boolean = true>(
     >({
       method: 'POST',
       url: '/pet',
-      security: [
-        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
-      ],
+      security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/json' },
       ...config,
       validator: { response: addPetResponseSchema, error: { 405: addPetStatus405Schema, default: addPetStatusDefaultSchema }, ...config.validator },

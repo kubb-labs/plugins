@@ -18,7 +18,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
     name,
     renderer: jsxRenderer,
     operations(nodes, ctx) {
-      return <StreamRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} />
+      return <StreamRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
     },
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null
@@ -44,11 +44,14 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
       const stream = getEventStream(node)
 
-      const clientValueImports = {
-        plain: ['client'],
-        data: ['client', 'unwrapResult', 'resolveThrowOnError'],
-        full: ['client', 'withUnwrap', 'resolveThrowOnError'],
-      }[returnType]
+      const clientValueImports = [
+        ...{
+          plain: ['client'],
+          data: ['client', 'unwrapResult', 'resolveThrowOnError'],
+          full: ['client', 'withUnwrap', 'resolveThrowOnError'],
+        }[returnType],
+        ...(importPath === undefined && data.security ? ['securitySchemes'] : []),
+      ]
 
       const clientTypeImports = stream
         ? buildEventStreamImports({ returnType, typed: stream === 'event', line: stream === 'line' })

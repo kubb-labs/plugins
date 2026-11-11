@@ -1,6 +1,6 @@
 import type { StreamOptions, Unwrappable, StreamResult } from '../../../.kubb/client'
 import type { PetEvent } from '../../../models/ts/PetEvent'
-import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 
 /**
  * `GET /pet/{petId}/events`
@@ -38,10 +38,7 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
     >({
       method: 'GET',
       url: '/pet/{petId}/events',
-      security: [
-        { type: 'apiKey', name: 'api_key', in: 'header' },
-        { type: 'oauth2', scopes: ['read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
-      ],
+      security: [securitySchemes.api_key, { ...securitySchemes.petstore_auth, scopes: ['read:pets'] }],
       contentType: { response: 'text/event-stream' },
       eventShape: 'data',
       ...config,
