@@ -7,7 +7,7 @@
 import type { GetThingStatus200 } from './GetThingOperation'
 import { http, HttpResponse } from 'msw/http'
 
-export function getThingHandlerResponse200(data: GetThingStatus200) {
+export function getThingHandlerResponse200(data?: GetThingStatus200) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -23,11 +23,6 @@ export function getThingHandler(
   return http.get(`${options?.baseURL ?? ''}/thing`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    return getThingHandlerResponse200(data)
   })
 }

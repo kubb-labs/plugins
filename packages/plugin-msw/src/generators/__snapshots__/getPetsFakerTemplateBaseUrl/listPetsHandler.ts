@@ -8,7 +8,7 @@ import type { ListPetsResponse, ListPetsStatus400 } from './ListPets'
 import { createListPetsResponse } from './createListPets'
 import { http, HttpResponse } from 'msw/http'
 
-export function listPetsHandlerResponse200(data: ListPetsResponse) {
+export function listPetsHandlerResponse200(data?: ListPetsResponse) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -30,11 +30,6 @@ export function listPetsHandler(
   return http.get(`${options?.baseURL ?? `${process.env.API_URL}`}/pets`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(JSON.stringify(data ?? createListPetsResponse()), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    return listPetsHandlerResponse200(data ?? createListPetsResponse())
   })
 }

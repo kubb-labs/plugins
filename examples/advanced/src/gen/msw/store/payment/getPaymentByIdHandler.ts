@@ -1,7 +1,7 @@
 import type { Payment } from '../../../models/ts/Payment'
 import { http, HttpResponse } from 'msw/http'
 
-export function getPaymentByIdHandlerResponse200(data: Payment) {
+export function getPaymentByIdHandlerResponse200(data?: Payment) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -17,11 +17,6 @@ export function getPaymentByIdHandler(
   return http.get(`${options?.baseURL ?? ''}/store/payments/:paymentId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    return getPaymentByIdHandlerResponse200(data)
   })
 }

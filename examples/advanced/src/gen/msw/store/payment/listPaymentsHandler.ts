@@ -2,7 +2,7 @@ import type { Payment } from '../../../models/ts/Payment'
 import type { PaymentError } from '../../../models/ts/PaymentError'
 import { http, HttpResponse } from 'msw/http'
 
-export function listPaymentsHandlerResponse2xx(data: Array<Payment>) {
+export function listPaymentsHandlerResponse2xx(data?: Array<Payment>) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -13,7 +13,7 @@ export function listPaymentsHandlerResponse2xx(data: Array<Payment>) {
   })
 }
 
-export function listPaymentsHandlerResponse4xx(data: PaymentError) {
+export function listPaymentsHandlerResponse4xx(data?: PaymentError) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
     headers: {

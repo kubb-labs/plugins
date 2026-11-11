@@ -8,7 +8,7 @@ import type { HttpResponseResolver } from 'msw/http'
 import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
-export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse) {
+export function placeOrderPatchHandlerResponse200(data?: PlaceOrderPatchResponse) {
   return new HttpResponse<string>(
     JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
     {
@@ -37,15 +37,7 @@ export function placeOrderPatchHandler(
     function handler(info) {
       if (typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(
-        JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-        {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
+      return placeOrderPatchHandlerResponse200(data)
     },
   )
 }

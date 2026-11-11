@@ -6,7 +6,7 @@
 import type { OfficeWeatherstoryResponse } from '../types/OfficeWeatherstoryOperation'
 import { http, HttpResponse } from 'msw/http'
 
-export function officeWeatherstoryHandlerResponse200(data: OfficeWeatherstoryResponse) {
+export function officeWeatherstoryHandlerResponse200(data?: OfficeWeatherstoryResponse) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -19,11 +19,6 @@ export function officeWeatherstoryHandler(data?: OfficeWeatherstoryResponse | ((
   return http.get(`${options?.baseURL ?? ''}/stories`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+      return officeWeatherstoryHandlerResponse200(data)
     })
 }
