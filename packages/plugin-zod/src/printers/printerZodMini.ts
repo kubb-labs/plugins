@@ -11,7 +11,7 @@ import {
   printWithOmit,
   shouldCoerce,
 } from '../utils.ts'
-import { buildZodNodes, type ZodDialect } from './zodNodes.ts'
+import { buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
 /**
  * Partial map of node-type overrides for the Zod Mini printer.
@@ -133,7 +133,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
   return {
     name: 'zod-mini',
     options,
-    nodes: {
+    nodes: withInputChecks({
       ...buildZodNodes(miniDialect, options.cyclicSchemas),
       bigint(node) {
         return `z.coerce.bigint()${numberChecksMini(bigintConstraints(node), 'n')}`
@@ -156,7 +156,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
         return 'z.date()'
       },
-    },
+    }),
     overrides: options.nodes,
     print(node) {
       return printWithOmit(

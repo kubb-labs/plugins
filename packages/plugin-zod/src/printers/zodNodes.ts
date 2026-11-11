@@ -8,6 +8,9 @@ import {
   type buildObjectShape,
   CONTENT_ENCODING_CALLS,
   getMemberConstraint,
+  hasInputChecks,
+  hasKeyCheck,
+  inputChecks,
   integerFormatPattern,
   jsonContentCheck,
   isClosedKeySchema,
@@ -15,7 +18,6 @@ import {
   isObjectSchemaNode,
   type lengthConstraints,
   type numberConstraints,
-  objectConstraints,
   type patternKeySchema,
   preserveRequiredProperties,
   shouldCoerce,
@@ -271,7 +273,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         return objectBase
       })()
 
-      return objectConstraints({ value: result, node })
+      return result
     },
     array(node) {
       const items = mapSchemaItems(node, (item) => printNullable(item, this.transform(item)))
@@ -279,8 +281,10 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         .filter(Boolean)
       const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
       const base = `z.array(${inner})${dialect.lengths({ ...node, regexType: this.options.regexType })}`
+      const unique = node.unique ? dialect.unique(base) : base
+      const contains = node.contains && containsCheck(this, node.contains)
 
-      return node.unique ? dialect.unique(base) : base
+      return contains ? dialect.refine(unique, contains) : unique
     },
     tuple(node) {
       const items = mapSchemaItems(node, (item) => printNullable(item, this.transform(item)))
@@ -290,7 +294,10 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       // OpenAPI 3.1 `items` next to `prefixItems` types the elements after the positional ones.
       const rest = node.rest ? this.transform(node.rest) : undefined
 
-      return `z.tuple(${buildList(items)}${rest ? `, ${rest}` : ''})`
+      const tuple = `z.tuple(${buildList(items)}${rest ? `, ${rest}` : ''})`
+      const contains = node.contains && containsCheck(this, node.contains)
+
+      return contains ? dialect.refine(tuple, contains) : tuple
     },
     union(node) {
       const literalUnion = getLiteralUnion({ node, options: this.options })
@@ -372,4 +379,77 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       }, firstBase)
     },
   }
+}
+
+type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
+
+/**
+ * The `refine` arguments that count the items matching `contains`, at least `min` (default 1) and at most `max`.
+ */
+function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
+  if (min === 0 && max === undefined) return null
+  const bounds = [`count >= ${min}`, max !== undefined ? `count <= ${max}` : null].filter(Boolean).join(' && ')
+  const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
+  const matches = ctx.transform(schema) ?? 'z.unknown()'
+
+  return `(items) => { const count = items.filter((item) => ${matches}.safeParse(item).success).length; return ${bounds} }, { message: ${stringify(message)} }`
+}
+
+/**
+ * A JavaScript condition that is true when `value` matches `schema`. A required `unknown` property means "the key
+ * is present", which a Zod object would accept as missing, so those keys are checked with `in`.
+ */
+function matchesCondition(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
+  if (!schema) return 'true'
+  const object = ast.narrowSchema(schema, ast.schemaTypes.object)
+  const keys =
+    object?.properties.filter((property) => property.required && property.schema.type === ast.schemaTypes.unknown).map((property) => property.name) ?? []
+  const rest = object ? { ...object, properties: object.properties.filter((property) => !keys.includes(property.name)) } : schema
+  const conditions = keys.length ? [`typeof value === "object" && value !== null && ${JSON.stringify(keys)}.every((key) => key in value)`] : []
+  // An object with no properties left still means "is an object", so only a key check stands alone.
+  const isOnlyKeys =
+    keys.length > 0 &&
+    rest.type === 'object' &&
+    rest.properties.length === 0 &&
+    rest.additionalProperties === undefined &&
+    !rest.patternProperties &&
+    !rest.propertyNames &&
+    !hasInputChecks(rest)
+  if (!isOnlyKeys) conditions.push(`${ctx.transform(rest) ?? 'z.unknown()'}.safeParse(value).success`)
+
+  return conditions.join(' && ')
+}
+
+type Handler<TOptions extends ZodNodeOptions, K extends ast.SchemaType> = (
+  this: ThisParameterType<NonNullable<ast.PrinterPartial<string, TOptions>['any']>>,
+  node: ast.SchemaNodeByType[K],
+) => string | null
+
+/**
+ * Wraps each handler so its output first checks the raw input, see {@link inputChecks}.
+ */
+export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.PrinterPartial<string, TOptions>): ast.PrinterPartial<string, TOptions> {
+  const wrapped: ast.PrinterPartial<string, TOptions> = {}
+  const wrap = <K extends ast.SchemaType>(type: K) => {
+    const handler: Handler<TOptions, K> | undefined = nodes[type]
+    if (!handler) return
+    const checked: Handler<TOptions, K> = function (node) {
+      const output = handler.call(this, node)
+      if (!output || !hasInputChecks(node)) return output
+      return inputChecks({
+        value: output,
+        node,
+        keySchema: hasKeyCheck(node) ? this.transform(node.propertyNames) : undefined,
+        conditionals: (node.conditionals ?? []).map(
+          (entry) =>
+            `z.refine((value) => (${matchesCondition(this, entry.if)} ? ${matchesCondition(this, entry.then)} : ${matchesCondition(this, entry.else)}), { message: "Value does not meet a conditional schema" })`,
+        ),
+      })
+    }
+    // TypeScript cannot relate `wrapped[type]` to `K` on a write, so the key and its handler are assigned together.
+    Object.assign(wrapped, { [type]: checked })
+  }
+  Object.values(ast.schemaTypes).forEach(wrap)
+
+  return wrapped
 }

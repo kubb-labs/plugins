@@ -5,7 +5,7 @@ import {
   applyModifiers,
   buildObjectShape,
   defaultLiteral,
-  hasPropertyCounts,
+  hasInputChecks,
   lengthConstraints,
   bigintConstraints,
   numberConstraints,
@@ -13,7 +13,7 @@ import {
   printWithOmit,
   shouldCoerce,
 } from '../utils.ts'
-import { buildScalarNodes, buildZodNodes, type ZodDialect } from './zodNodes.ts'
+import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
 /**
  * Partial map of node-type overrides for the Zod printer.
@@ -138,8 +138,11 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
     }
 
     if (schema.type === ast.schemaTypes.object && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
-      // Property counts print a `z.pipe(…)`, which has no `.strict()`, so its object output is made strict.
-      return hasPropertyCounts(schema) ? `z.pipe(${member}.in, ${member}.out.strict())` : `${member}.strict()`
+      // Input checks print a `z.pipe(…)`, which has no `.strict()`, so its object output is made strict.
+      // A ref with its own `conditionals` around a target with checks is a pipe in a pipe, which stays as it is.
+      const checks = [node, node.schema].filter((entry) => entry && hasInputChecks(entry)).length
+      if (checks === 2) return member
+      return checks ? `z.pipe(${member}.in, ${member}.out.strict())` : `${member}.strict()`
     }
   }
 
@@ -345,7 +348,7 @@ const scalarNodes: PrinterZodNodes = {
  * ```
  */
 export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
-  const nodes: PrinterZodNodes = { ...buildZodNodes(standardDialect, options.cyclicSchemas), ...scalarNodes }
+  const nodes: PrinterZodNodes = withInputChecks({ ...buildZodNodes(standardDialect, options.cyclicSchemas), ...scalarNodes })
 
   return {
     name: 'zod',

@@ -141,6 +141,12 @@ Generated files import `myCodec` from `my-codec/zod`. Leave `root` unset on this
 | `object`, `propertyNames: <schema>`                    | `z.record(keySchema, schema)`         | `z.record(keySchema, schema)`         | Dynamic map with validated key schema (e.g. pattern, format)                    |
 | `object`, `propertyNames: <enum>`                      | `z.partialRecord(enumSchema, schema)` | `z.partialRecord(enumSchema, schema)` | Enum keys may be missing                                                        |
 
+Three keywords print a `z.refine` check, in both APIs:
+
+- `if`/`then`/`else`, `dependentRequired`, and `dependentSchemas` check the input before it is parsed, in `z.pipe(z.unknown().check(...), schema)`.
+- `contains` with `minContains` and `maxContains` counts the matching items of an array.
+- `propertyNames` on an object that also declares `properties` checks every key of the input. A dictionary keeps `z.record(keySchema, schema)`.
+
 ## Dictionaries, open objects, and key schemas
 
 OpenAPI 3.1 `propertyNames` validates dictionary keys. Open key schemas use `z.record(keySchema, valueSchema)`, including regex, UUID, and length constraints. Closed keys, such as enums, literals, or unions of enums, use `z.partialRecord` so only present keys are validated. Keys may be missing, as in OpenAPI, and the inferred type is `Partial<Record<Keys, Value>>`.

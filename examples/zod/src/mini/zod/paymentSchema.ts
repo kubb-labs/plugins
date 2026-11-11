@@ -14,13 +14,41 @@ export const paymentSchema = z.pipe(
     z.refine((value) => typeof value !== 'object' || value === null || Array.isArray(value) || Object.keys(value).length <= 10, {
       message: 'Object must have at most 10 properties',
     }),
+    z.refine(
+      (value) =>
+        z
+          .object({
+            method: z.enum(['card']),
+          })
+          .safeParse(value).success
+          ? typeof value === 'object' && value !== null && ['creditCard'].every((key) => key in value)
+          : true,
+      { message: 'Value does not meet a conditional schema' },
+    ),
+    z.refine(
+      (value) =>
+        typeof value === 'object' && value !== null && ['creditCard'].every((key) => key in value)
+          ? typeof value === 'object' && value !== null && ['billingAddress'].every((key) => key in value)
+          : true,
+      { message: 'Value does not meet a conditional schema' },
+    ),
   ),
   z.object({
     id: z.int().check(z.gt(0)),
     method: z.optional(z.enum(['card', 'cash'])),
     creditCard: z.optional(z.string()),
     billingAddress: z.optional(z.string()),
-    labels: z.optional(z.array(z.string())),
+    labels: z.optional(
+      z.array(z.string()).check(
+        z.refine(
+          (items) => {
+            const count = items.filter((item) => z.enum(['priority']).safeParse(item).success).length
+            return count >= 1 && count <= 2
+          },
+          { message: 'Array must contain 1 to 2 matching items' },
+        ),
+      ),
+    ),
     lastError: z.optional(
       z.string().check(
         z.refine(

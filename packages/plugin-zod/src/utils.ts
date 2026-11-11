@@ -34,12 +34,12 @@ export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
 
 /**
  * Whether the node is a plain inline object whose shape can be lifted into an `.extend({ … })`
- * argument. Property counts, a catchall, `patternProperties`, or a nullable/optional wrapper cannot, so those stay
+ * argument. Input checks, a catchall, `patternProperties`, or a nullable/optional wrapper cannot, so those stay
  * on `.and(…)`.
  */
 export function isPlainInlineObject(node: ast.SchemaNode): boolean {
   if (node.type !== 'object') return false
-  if (hasPropertyCounts(node)) return false
+  if (hasInputChecks(node)) return false
   if (node.nullable || node.optional || node.nullish) return false
 
   const hasAdditionalProperties = node.additionalProperties !== undefined
@@ -53,11 +53,11 @@ export function isPlainInlineObject(node: ast.SchemaNode): boolean {
  * `z.discriminatedUnion` option. Covers object nodes, `$ref`s that resolve to (or are still
  * unresolved) objects, single-member unions of an object, and object-composable `allOf`.
  *
- * Property counts render as a pipe. A ref into `cyclicSchemas` renders as `z.lazy(…)`.
+ * Input checks, such as property counts and `conditionals`, render as a pipe. A ref into `cyclicSchemas` renders as `z.lazy(…)`.
  */
 export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.nullable || node.optional || node.nullish) return false
-  if (hasPropertyCounts(node)) return false
+  if (hasInputChecks(node)) return false
   if (node.type === 'object') {
     const hasProperties = Boolean(node.properties?.length)
     const hasTypedAdditionalProperties = Boolean(node.additionalProperties && node.additionalProperties !== true)
@@ -366,23 +366,54 @@ export function lengthChecksMini({ min, max, pattern, regexType }: LengthConstra
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
 
-export function hasPropertyCounts(node: ast.SchemaNode): boolean {
-  return node.type === 'object' && (node.min !== undefined || node.max !== undefined)
+/**
+ * Whether `propertyNames` needs its own check: `z.record` checks the keys of a map, but `z.object` and a record keyed by
+ * `patternProperties` do not.
+ */
+export function hasKeyCheck(node: ast.SchemaNode): node is ast.ObjectSchemaNode & { propertyNames: ast.SchemaNode } {
+  if (node.type !== 'object' || !node.propertyNames) return false
+  const hasTypedAdditionalProperties = Boolean(node.additionalProperties && node.additionalProperties !== true)
+
+  return node.properties.length > 0 || (Boolean(node.patternProperties) && !hasTypedAdditionalProperties)
 }
 
 /**
- * Checks property counts before object parsing strips unknown keys or inserts defaults.
+ * Whether the node prints inside `z.pipe(z.unknown().check(…), …)`, see {@link inputChecks}.
  */
-export function objectConstraints({ value, node }: { value: string; node: ast.SchemaNode }): string {
-  if (node.type !== 'object') return value
+export function hasInputChecks(node: ast.SchemaNode): boolean {
+  return Boolean(node.conditionals?.length) || (node.type === 'object' && (node.min !== undefined || node.max !== undefined)) || hasKeyCheck(node)
+}
+
+/**
+ * Checks the raw input, before parsing strips unknown keys or inserts defaults: property counts, key names, then the
+ * printed `conditionals`.
+ */
+export function inputChecks({
+  value,
+  node,
+  keySchema,
+  conditionals,
+}: {
+  value: string
+  node: ast.SchemaNode
+  keySchema?: string | null
+  conditionals: Array<string>
+}): string {
   const checks: Array<string> = []
   const skip = 'typeof value !== "object" || value === null || Array.isArray(value)'
-  if (node.min !== undefined) {
-    checks.push(`z.refine(value => ${skip} || Object.keys(value).length >= ${node.min}, { message: "Object must have at least ${node.min} properties" })`)
+  const { min, max } = node.type === 'object' ? node : {}
+  if (min !== undefined) {
+    checks.push(`z.refine(value => ${skip} || Object.keys(value).length >= ${min}, { message: "Object must have at least ${min} properties" })`)
   }
-  if (node.max !== undefined) {
-    checks.push(`z.refine(value => ${skip} || Object.keys(value).length <= ${node.max}, { message: "Object must have at most ${node.max} properties" })`)
+  if (max !== undefined) {
+    checks.push(`z.refine(value => ${skip} || Object.keys(value).length <= ${max}, { message: "Object must have at most ${max} properties" })`)
   }
+  if (keySchema) {
+    checks.push(
+      `z.refine(value => ${skip} || Object.keys(value).every((key) => ${keySchema}.safeParse(key).success), { message: "Object keys must match the property names schema" })`,
+    )
+  }
+  checks.push(...conditionals)
   return checks.length ? `z.pipe(z.unknown().check(${checks.join(', ')}), ${value})` : value
 }
 
@@ -494,6 +525,8 @@ export function getMemberConstraint({
   lengths: (constraints: LengthConstraints) => string
   numbers: (constraints: NumericConstraints) => string
 }): string | undefined {
+  // Checks a suffix cannot carry stay on the member's own schema.
+  if (hasInputChecks(member) || ast.narrowSchema(member, 'array')?.contains) return undefined
   if (member.primitive === 'string') return lengths({ ...(ast.narrowSchema(member, 'string') ?? {}), regexType }) || undefined
   if (member.primitive === 'number' || member.primitive === 'integer')
     return numbers(ast.narrowSchema(member, 'number') ?? ast.narrowSchema(member, 'integer') ?? {}) || undefined
@@ -567,7 +600,7 @@ export function printWithOmit(
     const mask = `{ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }`
     const omit = (target: string) => {
       const inner = `${target}${unwrap}`
-      const hasObjectConstraints = hasPropertyCounts(meta)
+      const hasObjectConstraints = hasInputChecks(meta)
       const pipe = mini ? `${inner}._zod.def` : inner
       const object = hasObjectConstraints ? `${pipe}.out` : inner
       const omitted = mini ? `z.omit(${object}, ${mask})` : `${object}.omit(${mask})`
