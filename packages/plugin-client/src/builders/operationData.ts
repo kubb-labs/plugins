@@ -1,5 +1,5 @@
 import { getResponseHeadersTypeNames, type OperationTypeNames, type OperationTypeSource } from '@internals/client'
-import { isEventStream, operationKey, resolveOperationFile } from '@internals/shared'
+import { operationKey, resolveOperationFile } from '@internals/shared'
 import type { ast, Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import type { ContractClientFactory } from '../types.ts'
@@ -18,7 +18,7 @@ export type OperationData = {
   /** `null` unless `validator` turns a direction on. */
   zodFile: ast.FileNode | null
   validatorHooks: ValidatorHooks
-  /** The names of the headers types the result references, empty for a stream. */
+  /** The names of the headers types the result references. */
   headerTypeNames: Array<string>
   security?: Array<SecurityRequirement>
   baseURL?: string
@@ -51,7 +51,7 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
           })
         : null,
     validatorHooks: buildValidatorHooks({ node, validator, zodResolver }),
-    headerTypeNames: isEventStream(node) ? [] : getResponseHeadersTypeNames({ node, types }),
+    headerTypeNames: getResponseHeadersTypeNames({ node, types }),
     // The fetch and axios clients write `securitySchemes` into `.kubb/client.ts`. A custom client module has none.
     security: getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth, hoist: importPath === undefined }),
     baseURL: getOperationBaseURL({ servers: node.servers, server: (ctx.adapter.options as { server?: ServerOptions } | undefined)?.server }),

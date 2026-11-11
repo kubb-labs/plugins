@@ -278,6 +278,22 @@ describe('clientGenerator operation', () => {
     // Declared response headers type `headers` on the result, also on the full result `returnType: 'data'` resolves to without throwing.
     { name: 'addPetWithResponseHeaders', node: createPetWithHeadersNode, options: {} },
     { name: 'addPetWithResponseHeadersData', node: createPetWithHeadersNode, options: { returnType: 'data' } },
+    // A stream's declared response headers type `headers` too, so the call spells out its default item type.
+    {
+      name: 'streamEventsWithResponseHeaders',
+      node: { ...streamEventsNode, responses: [{ ...streamEventsNode.responses[0]!, headers: [header('X-Request-ID')] }] },
+      options: {},
+    },
+    {
+      name: 'streamEventsWithResponseHeadersData',
+      node: { ...streamEventsNode, responses: [{ ...streamEventsNode.responses[0]!, headers: [header('X-Request-ID')] }] },
+      options: { returnType: 'data' },
+    },
+    {
+      name: 'streamChatTypedEventsWithResponseHeaders',
+      node: { ...streamChatNode, responses: [{ ...streamChatNode.responses[0]!, headers: [header('X-Request-ID')] }] },
+      options: {},
+    },
     // A path-level `servers` entry becomes the call's default `baseURL`, before `...config` so a per-call one still wins.
     {
       name: 'streamEventsWithPathServer',

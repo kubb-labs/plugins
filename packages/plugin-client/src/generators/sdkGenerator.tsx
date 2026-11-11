@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { type OperationTypeSource, resolveOperationTypes } from '@internals/client'
-import { getEventStream, isEventStream } from '@internals/shared'
+import { isEventStream } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { ast, camelCase, defineGenerator, Diagnostics } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
@@ -120,8 +120,6 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
         const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = validatorEnabled
           ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.validatorHooks.importedZodNames }))
           : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, ast.FileNode>() }
-        const shapes = new Set(ops.map((op) => getEventStream(op.node)).filter(Boolean))
-        const hasEventStream = shapes.size > 0
         const resultOps = ops.filter((op) => !isEventStream(op.node))
         const typedHeaders = (op: OperationData) => op.headerTypeNames.length > 0
         const resultName = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
@@ -147,7 +145,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
                   ...(returnType === 'data' ? [] : ['Unwrappable']),
                   ...(resultOps.some((op) => !typedHeaders(op)) ? [resultName] : []),
                   ...(resultOps.some(typedHeaders) ? [`${resultName}WithHeaders`] : []),
-                  ...(hasEventStream ? buildEventStreamImports({ returnType, typed: shapes.has('event'), line: shapes.has('line') }) : []),
+                  ...ops.filter((op) => isEventStream(op.node)).flatMap((op) => buildEventStreamImports({ node: op.node, types: op.types, returnType })),
                 ]),
               )}
               root={file.path}
