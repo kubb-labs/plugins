@@ -331,8 +331,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const { discriminatorPropertyName } = node
         const baseTypeName = this.options.typeName
 
-        // A member that points back into the cycle would print `undefined`, so the mock picks among the others.
-        const acyclic = (node.members ?? []).filter((member) => !isCyclicRef(member, this.options))
+        // A member that points back into the cycle would print `undefined`, so the mock picks among the others. A discriminated
+        // variant (`allOf: [ref, { type }]`) counts too: spreading its ref reads every lazy getter, which recurses without end.
+        const isCyclicMember = (member: ast.SchemaNode) =>
+          isCyclicRef(member, this.options) || (member.type === 'intersection' && (member.members ?? []).some((part) => isCyclicRef(part, this.options)))
+        const acyclic = (node.members ?? []).filter((member) => !isCyclicMember(member))
         const members = acyclic.length ? acyclic : node.members
 
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) => {

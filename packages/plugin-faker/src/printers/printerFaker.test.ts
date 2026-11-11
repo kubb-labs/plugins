@@ -167,6 +167,22 @@ describe('printerFaker', () => {
     expect(print(object(false))).toContain('const _value = undefined as unknown')
   })
 
+  test('picks a discriminated variant outside the cycle, since spreading one inside it never ends', () => {
+    const variant = (name: string) =>
+      ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}` }),
+          ast.factory.createSchema({ type: 'object', properties: [] }),
+        ],
+      })
+    const node = ast.factory.createSchema({ type: 'union', members: [variant('Equal'), variant('And'), variant('Or')] })
+
+    expect(printerFaker({ resolver: resolverFaker, schemaName: 'And', cyclicSchemas: new Set(['And', 'Or']) }).print(node)).toBe(
+      'faker.helpers.arrayElement([{...createEqual(), ...{}}])',
+    )
+  })
+
   test('keeps integers and floats inside exclusive bounds', () => {
     const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
 
