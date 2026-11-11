@@ -11,6 +11,7 @@ Pass these options to `pluginClient()`. Shared options link to [Shared plugin op
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path: `type`, `name`.                           | None                                             |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | Default `throwOnError` value passed to your client.                    | `true`                                           |
 | [`validator`](#validator)                                                 | Pass Zod schemas to your client.                                       | `false`                                          |
+| [`returnType`](#returntype)                                               | Shape of the value a generated operation resolves to.                  | `'plain'`                                        |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                       | None                                             |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                            | `[]`                                             |
 | [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                   | `[]`                                             |
@@ -46,6 +47,29 @@ Default for the `throwOnError` field that every generated function passes to you
 | Type     | `boolean` |
 | Required | `false`   |
 | Default  | `true`    |
+
+The setting applies to the whole plugin, so you cannot set it in `override`.
+
+### returnType
+
+Shape of the value a generated operation resolves to.
+
+- `'plain'`: returns what your `client` returns.
+- `'full'`: wraps the call in `withUnwrap`, so the caller can `await` it or call `.unwrap()`. Your module must export `withUnwrap`, `resolveThrowOnError`, and the `Unwrappable` type.
+- `'data'`: passes the call through `unwrapResult` and resolves to the body. Your module must export `unwrapResult`, `resolveThrowOnError`, and the `UnwrappedResult` type.
+
+`@kubb/plugin-client/templates/core.ts` exports all of these, so your module can re-export them from there.
+
+|          |                               |
+| -------- | ----------------------------- |
+| Type     | `'plain' \| 'full' \| 'data'` |
+| Required | `false`                       |
+| Default  | `'plain'`                     |
+
+```typescript
+pluginClient({ importPath: '../../client', returnType: 'full' })
+// const pet = await getPetById({ path: { petId: 1 } }).unwrap()
+```
 
 The setting applies to the whole plugin, so you cannot set it in `override`.
 
