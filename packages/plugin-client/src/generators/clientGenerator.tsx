@@ -1,15 +1,11 @@
 import path from 'node:path'
-import { getResponseHeadersTypeNames, resolveOperationTypes } from '@internals/client'
-import { getEventStream, operationFileEntry, operationKey, resolveOperationFile } from '@internals/shared'
+import { resolveOperationTypes } from '@internals/client'
+import { getEventStream, operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
-import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { resolveOperationData } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
-import { isValidatorEnabled } from '../builders/validatorOptions.ts'
-import { getOperationSecurity } from '../builders/security.ts'
-import { getOperationBaseURL, type ServerOptions } from '../builders/server.ts'
-import { buildValidatorHooks } from '../builders/validator.ts'
 import { Operation } from '../components/Operation.tsx'
 import { StreamRuntime } from '../components/StreamRuntime.tsx'
 import type { ContractClientFactory } from '../types.ts'
@@ -28,52 +24,21 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       if (!ast.isHttpOperationNode(node)) return null
 
       const { config, driver, resolver, root } = ctx
-      const { output, validator, returnType, throwOnErrorDefault, group, importPath } = ctx.options
+      const { output, returnType, throwOnErrorDefault, group, importPath } = ctx.options
 
       const resolvedTypes = resolveOperationTypes(driver, ctx.plugin.name)
       // A custom client module keeps the two-argument `RequestResult` it documents, so its results get no typed headers.
       const types = importPath === undefined ? resolvedTypes : { ...resolvedTypes, response: { ...resolvedTypes.response, headers: undefined } }
 
-      const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : null
-      const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
-
-      const importedTypeNames = [types.response.options(node), types.response.responses(node)]
-
-      const validatorHooks = buildValidatorHooks({ node, validator, zodResolver })
-      const importedZodNames = validatorHooks.importedZodNames
-      const operationName = resolver.name(node.operationId)
-
-      const meta = {
-        name: resolver.resolveName({ key: operationKey(node), name: operationName }),
-        file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
-        fileTypes: resolveOperationFile({
-          ctx,
-          node,
-          resolver: types.resolver,
-          root,
-          output: types.output ?? output,
-          group: types.group,
-        }),
-        fileZod:
-          zodResolver && pluginZod?.options
-            ? resolveOperationFile({
-                ctx,
-                node,
-                resolver: zodResolver,
-                root,
-                output: pluginZod.options.output ?? output,
-                group: pluginZod.options?.group ?? undefined,
-              })
-            : null,
-      } as const
-
-      const security = getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth })
-      const baseURL = getOperationBaseURL({ servers: node.servers, server: (ctx.adapter.options as { server?: ServerOptions } | undefined)?.server })
+      const data = resolveOperationData({ node, ctx, types })
+      const { validatorHooks, headerTypeNames } = data
+      const file = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
+      const importedTypeNames = [types.response.options(node), types.response.responses(node), ...headerTypeNames]
 
       // A custom client module is emitted verbatim, so `importPath` is used exactly as configured.
       // The default `.kubb/client.ts` is a file path and is made relative to the operation file.
       const clientPath = importPath ?? path.resolve(root, '.kubb/client.ts')
-      const clientRoot = importPath === undefined ? meta.file.path : undefined
+      const clientRoot = importPath === undefined ? file.path : undefined
       // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
       // alongside its other runtime helpers.
       const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
@@ -85,9 +50,6 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
         full: ['client', 'withUnwrap', 'resolveThrowOnError'],
       }[returnType]
 
-      const headerTypeNames = stream ? [] : getResponseHeadersTypeNames({ node, types })
-      importedTypeNames.push(...headerTypeNames)
-
       const clientTypeImports = stream
         ? buildEventStreamImports({ returnType, typed: stream === 'event', line: stream === 'line' })
         : { plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType].map(
@@ -96,31 +58,31 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
       return (
         <File
-          baseName={meta.file.baseName}
-          path={meta.file.path}
-          meta={meta.file.meta}
-          banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-          footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+          baseName={file.baseName}
+          path={file.path}
+          meta={file.meta}
+          banner={resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
+          footer={resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
         >
           <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
           <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
 
-          {meta.fileTypes && importedTypeNames.length > 0 && (
-            <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTypes.path} isTypeOnly />
-          )}
+          <File.Import name={Array.from(new Set(importedTypeNames))} root={file.path} path={data.typeFile.path} isTypeOnly />
 
-          {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
+          {data.zodFile && validatorHooks.importedZodNames.length > 0 && (
+            <File.Import name={validatorHooks.importedZodNames} root={file.path} path={data.zodFile.path} />
+          )}
           {validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
 
           <Operation
-            name={meta.name}
+            name={data.name}
             node={node}
             types={types}
             validatorHooks={validatorHooks}
             returnType={returnType}
             throwOnErrorDefault={throwOnErrorDefault}
-            security={security}
-            baseURL={baseURL}
+            security={data.security}
+            baseURL={data.baseURL}
           />
         </File>
       )
