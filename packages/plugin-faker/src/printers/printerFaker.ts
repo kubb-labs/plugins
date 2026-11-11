@@ -388,7 +388,17 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
                 .filter((key): key is string => typeof key === 'string' && !node.properties.some((property) => property.name === key))
                 .map((name) => ast.factory.createProperty({ name, schema: valueSchema }))
             : []
-        const entries = [...node.properties, ...recordProperties].map((property): string => {
+        const properties = [...node.properties, ...recordProperties]
+        // `maxProperties` keeps the required properties first.
+        const kept = node.max === undefined ? properties : properties.toSorted((a, b) => Number(b.required) - Number(a.required)).slice(0, node.max)
+        // `minProperties` adds keys from `additionalProperties`, skipping any name a declared property uses.
+        const names = new Set(properties.map((property) => property.name))
+        const extras: typeof kept = []
+        for (let index = 1; typeof valueSchema === 'object' && kept.length + extras.length < (node.min ?? 0); index++) {
+          const name = `additionalProperty${index}`
+          if (!names.has(name)) extras.push(ast.factory.createProperty({ name, schema: valueSchema }))
+        }
+        const entries = [...kept, ...extras].map((property): string => {
           const value: string =
             printNested(property.schema, {
               typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,
