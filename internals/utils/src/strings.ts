@@ -8,10 +8,17 @@
  * singleQuote("o'clock")  // "'o\\'clock'"
  * ```
  */
+// A raw line break would end the literal.
+const singleQuoteEscapes = new Map([
+  ['\\', '\\\\'],
+  ["'", "\\'"],
+  ['\n', '\\n'],
+  ['\r', '\\r'],
+])
+
 export function singleQuote(value: string | number | boolean | undefined | null): string {
   if (value === undefined || value === null) return "''"
-  // A raw line break would end the literal.
-  const escaped = String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r')
+  const escaped = Array.from(String(value), (char) => singleQuoteEscapes.get(char) ?? char).join('')
 
   return `'${escaped}'`
 }

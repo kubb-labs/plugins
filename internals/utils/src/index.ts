@@ -1,5 +1,5 @@
 export { capitalize, screamingSnakeCase, snakeCase } from './casing.ts'
-export { buildJSDoc, buildList, buildObject, lazyGetter, objectKey } from './codegen.ts'
+export { buildJSDoc, buildList, buildObject, lazyGetter, objectKey, toLiteral } from './codegen.ts'
 export { getRelativePath, toFilePath } from './fs.ts'
 export { ensureValidVarName, isValidVarName } from './reserved.ts'
 export { getNestedAccessor, jsDocEscape, jsStringEscape, singleQuote, stringify, toRegExpString, trimQuotes } from './strings.ts'

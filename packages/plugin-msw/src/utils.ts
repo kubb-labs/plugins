@@ -1,14 +1,18 @@
 import { baseContentType, getStatusClass, toResponseContent } from '@internals/shared'
-import { jsStringEscape, objectKey, singleQuote } from '@internals/utils'
+import { isValidVarName, singleQuote, toLiteral } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
-/** The status a mock responds with. A range such as `2xx` mocks the first code of its class, `200`, and `default` mocks `200`. */
+/**
+ * The status a mock responds with. A range such as `2xx` mocks the first code of its class, `200`, and `default` mocks `200`.
+ */
 export function getMockStatus(statusCode: ast.StatusCode): number {
   const code = Number(statusCode)
   return Number.isNaN(code) ? (getStatusClass(statusCode) ?? 2) * 100 : code
 }
 
-/** The declared headers a mock sends, each with its example's `serializedValue` or `value`, else its schema's `default` or first example. */
+/**
+ * The declared headers a mock sends, each with its example's `serializedValue` or `value`, else its schema's `default` or first example.
+ */
 export function getMockHeaders(response: ast.ResponseNode | null | undefined): Array<[name: string, value: string]> {
   return (response?.headers ?? []).flatMap((header): Array<[string, string]> => {
     // OpenAPI ignores a `Content-Type` response header, and the mock already sends one.
@@ -94,7 +98,7 @@ export function responseReturn(body: string, status: number, response: ast.Respo
   const contentType = getContentType(response)
   const headers = getMockHeaders(response)
   // A plain variable such as `data` is checked as it is, an expression such as `data ?? createPet()` is read once.
-  const name = /^\w+$/.test(body) ? body : 'body'
+  const name = isValidVarName(body) ? body : 'body'
   const prelude = name === body ? '' : `const body = ${body}\n    `
 
   // shortcut: one event per mock, upgrade when a mock needs to send several events.
@@ -152,19 +156,6 @@ export function getExampleBody(response: ast.ResponseNode | null | undefined): s
   } catch {
     return null
   }
-}
-
-/**
- * A JSON value as a JavaScript literal, with single-quoted strings.
- */
-function toLiteral(value: unknown): string {
-  if (typeof value === 'string') return `'${jsStringEscape(value)}'`
-  if (Array.isArray(value)) return `[${value.map(toLiteral).join(', ')}]`
-  if (value && typeof value === 'object')
-    return `{ ${Object.entries(value)
-      .map(([key, item]) => `${objectKey(key)}: ${toLiteral(item)}`)
-      .join(', ')} }`
-  return String(value)
 }
 
 const mswMethods = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'])

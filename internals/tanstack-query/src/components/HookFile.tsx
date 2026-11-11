@@ -30,10 +30,14 @@ type ResolvedHookFile = {
   tsResolver: ResolverTs
   contractOp: ClientOperation
   importedTypeNames: Array<string>
-  /** The client's result type the hook names with `returnType: 'full'`. */
+  /**
+   * The client's result type the hook names with `returnType: 'full'`.
+   */
   resultTypeName: 'RequestResult' | 'RequestResultWithHeaders'
   returnType: ReturnTypeOption
-  /** Whether the client's results carry the declared response headers. A custom client module keeps untyped headers. */
+  /**
+   * Whether the client's results carry the declared response headers. A custom client module keeps untyped headers.
+   */
   typedHeaders: boolean
   banner: string | null
   footer: string | null

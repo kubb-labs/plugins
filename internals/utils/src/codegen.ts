@@ -66,6 +66,25 @@ export function objectKey(name: string): string {
 }
 
 /**
+ * A JSON value as a JavaScript literal, with single-quoted strings and identifier keys left unquoted.
+ *
+ * @example
+ * ```ts
+ * toLiteral({ id: 1, 'x-tag': ['a'] }) // "{ id: 1, 'x-tag': ['a'] }"
+ * ```
+ */
+export function toLiteral(value: unknown): string {
+  if (typeof value === 'string') return singleQuote(value)
+  if (Array.isArray(value)) return `[${value.map(toLiteral).join(', ')}]`
+  if (value && typeof value === 'object') {
+    return `{ ${Object.entries(value)
+      .map(([key, item]) => `${objectKey(key)}: ${toLiteral(item)}`)
+      .join(', ')} }`
+  }
+  return String(value)
+}
+
+/**
  * Assembles a multi-line object literal from already-rendered `entries`, indenting each entry one
  * level and closing the brace at column zero. Entries that are themselves multi-line objects indent
  * cumulatively. Each entry ends with a trailing comma to match the formatter's multi-line style.

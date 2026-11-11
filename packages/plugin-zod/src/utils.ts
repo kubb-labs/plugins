@@ -345,12 +345,13 @@ export function bigintConstraints({ min, max, exclusive, multipleOf }: NumericCo
  * Build `.check(z.minimum(), z.maximum())` for `zod/mini` numeric constraints.
  */
 export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): string {
-  const checks: Array<string> = []
-  if (min !== undefined) checks.push(`z.minimum(${min}${suffix})`)
-  if (max !== undefined) checks.push(`z.maximum(${max}${suffix})`)
-  if (exclusive?.min !== undefined) checks.push(`z.gt(${exclusive.min}${suffix})`)
-  if (exclusive?.max !== undefined) checks.push(`z.lt(${exclusive.max}${suffix})`)
-  if (multipleOf !== undefined) checks.push(`z.multipleOf(${multipleOf}${suffix})`)
+  const checks = [
+    min !== undefined && `z.minimum(${min}${suffix})`,
+    max !== undefined && `z.maximum(${max}${suffix})`,
+    exclusive?.min !== undefined && `z.gt(${exclusive.min}${suffix})`,
+    exclusive?.max !== undefined && `z.lt(${exclusive.max}${suffix})`,
+    multipleOf !== undefined && `z.multipleOf(${multipleOf}${suffix})`,
+  ].filter(Boolean)
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
 
@@ -358,10 +359,11 @@ export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericCon
  * Build `.check(z.minLength(), z.maxLength(), z.regex())` for `zod/mini` length constraints.
  */
 export function lengthChecksMini({ min, max, pattern, regexType }: LengthConstraints): string {
-  const checks: Array<string> = []
-  if (min !== undefined) checks.push(`z.minLength(${min})`)
-  if (max !== undefined) checks.push(`z.maxLength(${max})`)
-  if (pattern !== undefined) checks.push(`z.regex(${regexSource(pattern, regexType)})`)
+  const checks = [
+    min !== undefined && `z.minLength(${min})`,
+    max !== undefined && `z.maxLength(${max})`,
+    pattern !== undefined && `z.regex(${regexSource(pattern, regexType)})`,
+  ].filter(Boolean)
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
 
@@ -398,21 +400,15 @@ export function inputChecks({
   keySchema?: string | null
   conditionals: Array<string>
 }): string {
-  const checks: Array<string> = []
   const skip = 'typeof value !== "object" || value === null || Array.isArray(value)'
   const { min, max } = node.type === 'object' ? node : {}
-  if (min !== undefined) {
-    checks.push(`z.refine(value => ${skip} || Object.keys(value).length >= ${min}, { message: "Object must have at least ${min} properties" })`)
-  }
-  if (max !== undefined) {
-    checks.push(`z.refine(value => ${skip} || Object.keys(value).length <= ${max}, { message: "Object must have at most ${max} properties" })`)
-  }
-  if (keySchema) {
-    checks.push(
+  const checks = [
+    min !== undefined && `z.refine(value => ${skip} || Object.keys(value).length >= ${min}, { message: "Object must have at least ${min} properties" })`,
+    max !== undefined && `z.refine(value => ${skip} || Object.keys(value).length <= ${max}, { message: "Object must have at most ${max} properties" })`,
+    keySchema &&
       `z.refine(value => ${skip} || Object.keys(value).every((key) => ${keySchema}.safeParse(key).success), { message: "Object keys must match the property names schema" })`,
-    )
-  }
-  checks.push(...conditionals)
+    ...conditionals,
+  ].filter(Boolean)
   return checks.length ? `z.pipe(z.unknown().check(${checks.join(', ')}), ${value})` : value
 }
 
