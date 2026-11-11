@@ -87,8 +87,9 @@ export function StreamRuntime({
         {imports.map(({ file, name }) => (
           <File.Import key={name} name={[name]} root={configPath} path={runtimePath(file)} />
         ))}
+        <File.Import name={['ClientConfig']} root={configPath} path={runtimePath('core')} isTypeOnly />
         <File.Source name="defaultConfig" isExportable>
-          {`/**\n * The config \`client.ts\` starts with: what this spec needs from the runtime.\n */\nexport const defaultConfig = { ${config.join(', ')} }`}
+          {`/**\n * The config \`client.ts\` starts with: what this spec needs from the runtime.\n */\nexport const defaultConfig: ClientConfig = { ${config.join(', ')} }`}
         </File.Source>
       </File>
       {footer && <File baseName="client.ts" path={path.resolve(root, '.kubb/client.ts')} footer={footer} />}

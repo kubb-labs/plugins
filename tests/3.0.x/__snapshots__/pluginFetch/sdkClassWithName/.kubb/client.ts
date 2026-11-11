@@ -82,10 +82,10 @@ export const defaultTransport = async (request: core.ResolvedRequest): Promise<T
 /**
  * The client every generated operation uses unless a call passes its own. It is created on first use.
  */
-export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
+export const client: ClientInstance = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
 client.setConfig(defaultConfig)
 
-export const createClient = client.createClient
+export const createClient: ClientInstance['createClient'] = client.createClient
 
 /**
  * The security schemes from the spec by name. A generated call sends one of them to the `auth` resolver.

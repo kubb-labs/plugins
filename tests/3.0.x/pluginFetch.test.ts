@@ -160,12 +160,12 @@ describe(`plugin-fetch options ${version}`, () => {
     {
       name: 'literal',
       baseURL: 'https://petstore3.swagger.io/api/v3',
-      expected: 'defaultConfig = { baseURL: "https://petstore3.swagger.io/api/v3", ',
+      expected: 'defaultConfig: ClientConfig = { baseURL: "https://petstore3.swagger.io/api/v3", ',
     },
     {
       name: 'template',
       baseURL: '${import.meta.env.VITE_API_SERVER}',
-      expected: 'defaultConfig = { baseURL: `${import.meta.env.VITE_API_SERVER}`, ',
+      expected: 'defaultConfig: ClientConfig = { baseURL: `${import.meta.env.VITE_API_SERVER}`, ',
     },
   ])('emits $name baseURL in the client config', async ({ name, baseURL, expected }) => {
     const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-base-url-${name}-${Date.now()}`)

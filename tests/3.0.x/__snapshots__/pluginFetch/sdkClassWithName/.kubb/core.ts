@@ -263,11 +263,11 @@ export type EventStreamOptions = {
    * The most characters one event or JSON line may hold. A larger one throws a `RangeError`, and `Infinity` turns the limit off.
    * @default 16777216
    */
-  maxEventSize?: number
+  maxEventSize?: number | undefined
   /**
    * Ends the stream when an event's raw `data` or a JSON line equals this value, such as `[DONE]`.
    */
-  terminator?: string
+  terminator?: string | undefined
   /**
    * Maps each Server-Sent Event before validation.
    */
@@ -280,7 +280,7 @@ export type EventStreamOptions = {
    * Keeps each Server-Sent Event's `data` as the raw text instead of JSON-parsing it. The generated client sets it when the
    * document types `data` as a string. A list of event names keeps it for those events only.
    */
-  rawData?: boolean | Array<string>
+  rawData?: boolean | Array<string> | undefined
 }
 
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = {
@@ -296,10 +296,10 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
   cookies?: unknown
   body?: TBody
   headers?: unknown
-  styles?: Styles
-  signal?: AbortSignal
-  credentials?: RequestCredentials
-  options?: NativeOptions
+  styles?: Styles | undefined
+  signal?: AbortSignal | undefined
+  credentials?: RequestCredentials | undefined
+  options?: NativeOptions | undefined
   contentType?: ContentType
   parseAs?: ParseAs
   throwOnError?: boolean
@@ -369,10 +369,10 @@ export type ResolvedRequest = {
   url: string
   method: string
   headers: Record<string, string>
-  body?: RequestBody
-  signal?: AbortSignal
-  credentials?: RequestCredentials
-  options?: NativeOptions
+  body?: RequestBody | undefined
+  signal?: AbortSignal | undefined
+  credentials?: RequestCredentials | undefined
+  options?: NativeOptions | undefined
   /**
    * Read the response as a stream. A transport that buffers bodies, such as axios, must stream it.
    */
@@ -403,7 +403,7 @@ export type DecodedResponse<TData = unknown, TRequest = NativeRequest, TResponse
   status: number
   statusText: string
   headers: Headers
-  contentType?: string
+  contentType?: string | undefined
   request: TRequest
   response: TResponse
 }
@@ -501,12 +501,12 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     data: TError
     status: number
     statusText: string
-    contentType?: string
-    headers?: Headers
+    contentType?: string | undefined
+    headers?: Headers | undefined
     request: TRequest
     response: TResponse
-    method?: string
-    url?: string
+    method?: string | undefined
+    url?: string | undefined
   }) {
     // The query and hash stay out of the message, so secrets in them do not reach logs.
     const cleanUrl = config.url?.split(/[?#]/)[0]
@@ -625,7 +625,7 @@ function serializeUrl({
   pathParams: Record<string, unknown>
   query: Record<string, unknown>
   serializers: Serializers
-  styles?: Styles
+  styles?: Styles | undefined
 }): string {
   const path = parts
     // A base URL that ends in `/` would give `//` before a path that starts with one.
@@ -722,8 +722,8 @@ export function toRequestInit(request: ResolvedRequest): RequestInit {
     ...request.options,
     method: request.method,
     headers: request.headers,
-    body: request.body,
-    signal: request.signal,
+    body: request.body ?? null,
+    signal: request.signal ?? null,
   }
   if (request.credentials) init.credentials = request.credentials
   return init
@@ -731,7 +731,7 @@ export function toRequestInit(request: ResolvedRequest): RequestInit {
 
 function pickErrorValidator(error: Validator | Record<string, Validator> | undefined, status: number): Validator | undefined {
   if (!error || '~standard' in error) return error as Validator | undefined
-  return error[String(status)] ?? error[`${String(status)[0]}xx`] ?? error.default
+  return error[String(status)] ?? error[`${String(status)[0]}xx`] ?? error['default']
 }
 
 // Checks the shape, so a `Response` from another realm or a polyfill counts too.
@@ -742,7 +742,7 @@ function isResponse(value: unknown): value is Response {
 // Leaves out the body, which was already sent. A relative URL keeps the resolved request.
 function toNativeRequest(request: ResolvedRequest): Request | ResolvedRequest {
   try {
-    return new Request(request.url, { ...toRequestInit(request), body: undefined })
+    return new Request(request.url, { ...toRequestInit(request), body: null })
   } catch {
     return request
   }
@@ -894,7 +894,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }
 
 // A signal in `options` counts too, since every transport spreads `options` under the resolved fields.
-function signalOf(config: { signal?: AbortSignal; options?: unknown }): AbortSignal | undefined {
+function signalOf(config: { signal?: AbortSignal | undefined; options?: unknown }): AbortSignal | undefined {
   return config.signal ?? (config.options as { signal?: AbortSignal } | undefined)?.signal
 }
 

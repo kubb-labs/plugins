@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "verbatimModuleSyntax": true,
+    "isolatedDeclarations": true,
+    "declaration": true
+  },
+  "include": ["./src/gen/.kubb/**/*"],
+  "exclude": []
+}

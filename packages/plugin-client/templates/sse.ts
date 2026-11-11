@@ -53,7 +53,7 @@ type EventStreamInput = ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>
  * Parses a `text/event-stream` body into events, as the WHATWG spec does. Break the loop to cancel the stream.
  */
 export async function* parseEventStream<TData = unknown>(
-  input: EventStreamInput | (Pick<EventStreamOptions, 'maxEventSize' | 'terminator' | 'rawData'> & { stream: EventStreamInput; cursor?: Cursor }),
+  input: EventStreamInput | (Pick<EventStreamOptions, 'maxEventSize' | 'terminator' | 'rawData'> & { stream: EventStreamInput; cursor?: Cursor | undefined }),
 ): AsyncGenerator<ServerSentEvent<TData>> {
   const { stream, maxEventSize = 16 * 1024 * 1024, terminator, rawData, cursor = { lastEventId: '' } } = isStreamBody(input) ? { stream: input } : input
   const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
