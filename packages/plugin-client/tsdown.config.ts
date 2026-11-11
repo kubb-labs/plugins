@@ -43,6 +43,7 @@ export default defineConfig([
       'templates/mediaTypes/mixed': 'templates/mediaTypes/mixed.ts',
       'templates/mediaTypes/urlencoded': 'templates/mediaTypes/urlencoded.ts',
       'templates/serializers': 'templates/serializers.ts',
+      'templates/serializers/cookies': 'templates/serializers/cookies.ts',
       'templates/sse': 'templates/sse.ts',
       'templates/standardSchema': 'templates/standardSchema.ts',
     },

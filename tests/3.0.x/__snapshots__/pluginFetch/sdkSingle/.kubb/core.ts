@@ -3,7 +3,7 @@ import type { MediaTypeContext, MediaTypes } from './mediaTypes'
 import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
 import { defaultMediaTypes, isEncodedBody, resolveMediaType } from './mediaTypes'
-import { applyHeaderStyles, baseContentType, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers'
+import { applyHeaderStyles, baseContentType, defaultPathSerializer, defaultQuerySerializer } from './serializers'
 import { isValidationEnabled, runValidator } from './standardSchema'
 export * from './mediaTypes'
 export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema'
@@ -765,12 +765,13 @@ function isEmpty(response: Response, method: string): boolean {
   return [204, 205, 304].includes(response.status) || method === 'HEAD' || !response.body || response.headers.get('Content-Length') === '0'
 }
 
-function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes }>(config: T, next: T): T {
+function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes; serializer?: Serializers }>(config: T, next: T): T {
   return {
     ...config,
     ...next,
     headers: { ...serializeHeaders(config.headers), ...serializeHeaders(next.headers) },
     mediaTypes: { ...config.mediaTypes, ...next.mediaTypes },
+    serializer: { ...config.serializer, ...next.serializer },
   }
 }
 
@@ -827,8 +828,14 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     query,
   })
 
-  const cookie = validatedCookies ? serializeCookies(validatedCookies as Record<string, unknown>, requestConfig.styles?.cookie) : ''
-  if (cookie) appendCookie(headers, cookie)
+  const cookies = validatedCookies as Record<string, unknown> | undefined
+  // An object with only nullish values sends nothing, so it needs no serializer.
+  if (cookies && Object.values(cookies).some((value) => value !== undefined && value !== null)) {
+    const serializeCookies = requestConfig.serializer?.cookie ?? config.serializer?.cookie
+    if (!serializeCookies) throw new TypeError('Cannot send cookies without a cookie serializer, register serializer.cookie on the client.')
+    const cookie = serializeCookies(cookies, requestConfig.styles?.cookie)
+    if (cookie) appendCookie(headers, cookie)
+  }
 
   const validatedBody = await runValidator({
     validator: isValidationEnabled(validate, 'request') ? requestConfig.validator?.request : undefined,

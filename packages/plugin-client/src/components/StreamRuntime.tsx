@@ -24,20 +24,22 @@ const formMediaTypes = {
 type FormContentType = keyof typeof formMediaTypes
 
 /**
- * The `footer` of `.kubb/client.ts`: the `baseURL` set at generation time, the form and stream media types the document
- * needs, the named `servers` and `securitySchemes`, and the `sse.ts` re-export when it streams, so `parseEventStream` stays importable from the
+ * The `footer` of `.kubb/client.ts`: the `baseURL` set at generation time, the form and stream media types and the cookie
+ * serializer the document needs, the named `servers` and `securitySchemes`, and the `sse.ts` re-export when it streams, so `parseEventStream` stays importable from the
  * client. `setConfig` before the first call only records the config, so the lazy client is still created on first use.
  */
 function buildClientFooter({
   baseURL,
   forms,
   streams,
+  cookies,
   servers,
   auth,
 }: {
   baseURL?: string
   forms: Array<FormContentType>
   streams: boolean
+  cookies: boolean
   servers?: Array<ast.InputServer>
   auth?: Array<ast.AuthScheme>
 }): string | undefined {
@@ -45,13 +47,16 @@ function buildClientFooter({
   const mediaTypes = [...forms.map((contentType) => `'${contentType}': ${formMediaTypes[contentType].name}`), streams ? '...streamMediaTypes' : null].filter(
     Boolean,
   )
-  const config = [baseURLExpression ? `baseURL: ${baseURLExpression}` : null, mediaTypes.length ? `mediaTypes: { ${mediaTypes.join(', ')} }` : null].filter(
-    Boolean,
-  )
+  const config = [
+    baseURLExpression ? `baseURL: ${baseURLExpression}` : null,
+    mediaTypes.length ? `mediaTypes: { ${mediaTypes.join(', ')} }` : null,
+    cookies ? 'serializer: { cookie: serializeCookies }' : null,
+  ].filter(Boolean)
   return (
     [
       ...forms.map((contentType) => `import { ${formMediaTypes[contentType].name} } from './mediaTypes/${formMediaTypes[contentType].file}.ts'`),
       streams ? `import { streamMediaTypes } from './sse.ts'` : null,
+      cookies ? `import { serializeCookies } from './serializers/cookies.ts'` : null,
       config.length ? `client.setConfig({ ${config.join(', ')} })` : null,
       buildServers(servers),
       buildSecuritySchemes(auth),
@@ -64,8 +69,8 @@ function buildClientFooter({
 
 /**
  * Writes the footer of the `.kubb/client.ts` the plugin injected, the one place it is built, and copies the optional
- * runtime into `.kubb/`: `sse.ts` only for a document with an operation that streams, and each form media type only for a
- * document with a body of that type. `templates` is the folder they are copied from, set by the plugins that ship the
+ * runtime into `.kubb/`: `sse.ts` only for a document with an operation that streams, each form media type only for a
+ * document with a body of that type, and the cookie serializer only for a document with a cookie parameter. `templates` is the folder they are copied from, set by the plugins that ship the
  * runtime, so a custom client from `@kubb/plugin-client` gets none of them.
  */
 export function StreamRuntime({
@@ -86,7 +91,8 @@ export function StreamRuntime({
   if (!templates) return null
   const streams = nodes.some((node) => hasEventStreamContent(node) || isEventStream(node) || hasStreamVariant(node))
   const forms = [...new Set(nodes.flatMap(getFormContentTypes))].sort()
-  const footer = buildClientFooter({ baseURL, forms, streams, servers, auth })
+  const cookies = nodes.some((node) => node.parameters.some((parameter) => parameter.in === 'cookie'))
+  const footer = buildClientFooter({ baseURL, forms, streams, cookies, servers, auth })
   return (
     <>
       {streams && <File baseName="sse.ts" path={path.resolve(root, '.kubb/sse.ts')} copy={path.join(templates, 'sse.ts')} />}
@@ -101,6 +107,9 @@ export function StreamRuntime({
           />
         )
       })}
+      {cookies && (
+        <File baseName="cookies.ts" path={path.resolve(root, '.kubb/serializers/cookies.ts')} copy={path.join(templates, 'serializers/cookies.ts')} />
+      )}
       {footer && <File baseName="client.ts" path={path.resolve(root, '.kubb/client.ts')} footer={footer} />}
     </>
   )
