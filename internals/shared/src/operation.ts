@@ -354,6 +354,18 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
 }
 
 /**
+ * Returns the request entry with the schema of the body the client sends. A `multipart/*` body the adapter marks as a
+ * `stream`, such as `multipart/mixed` with an OpenAPI 3.2 `itemSchema`, is an array of parts, so the item becomes an array.
+ */
+export function toRequestContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T): T {
+  const item = entry.stream?.schema
+  if (!item || !baseContentType(entry.contentType).startsWith('multipart/')) return entry
+  const { optional, ...itemSchema } = item
+  // shortcut: `keysToOmit` applies to the top-level type only, so a part keeps its readOnly keys; move it onto the item when the printers can.
+  return { ...entry, schema: ast.factory.createSchema({ type: 'array', items: [itemSchema], optional }), keysToOmit: null }
+}
+
+/**
  * Resolves per-content-type variant names for a set of content entries, deduplicating suffix
  * collisions with a numeric counter. Entries without a schema are skipped. The returned `suffix` is
  * the final (possibly counter-augmented) value, so callers can derive parallel names in another

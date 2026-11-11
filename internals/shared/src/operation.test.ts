@@ -23,6 +23,7 @@ import {
   resolveResponseTypes,
   resolveStatusCodeNames,
   resolveSuccessNames,
+  toRequestContent,
   toResponseContent,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
@@ -506,6 +507,24 @@ describe('toResponseContent', () => {
     const unknown = ast.factory.createSchema({ type: 'unknown' })
     expect(typeOf('application/x-www-form-urlencoded', unknown).schema).toBe(unknown)
     expect(typeOf('text/plain', unknown).schema).toStrictEqual(ast.factory.createSchema({ type: 'string' }))
+  })
+})
+
+describe('toRequestContent', () => {
+  const part = ast.factory.createSchema({ type: 'object', optional: true, properties: [] })
+
+  test('sends a multipart stream of parts as an array of its item', () => {
+    const entry = toRequestContent(ast.factory.createContent({ contentType: 'multipart/mixed', schema: part, stream: { schema: part } }))
+
+    expect(entry.schema).toMatchObject({ type: 'array', optional: true, items: [{ type: 'object' }] })
+    expect(ast.narrowSchema(entry.schema!, 'array')?.items?.[0]?.optional).toBeUndefined()
+  })
+
+  test.each([
+    ast.factory.createContent({ contentType: 'multipart/mixed', schema: part }),
+    ast.factory.createContent({ contentType: 'application/jsonl', schema: part, stream: { schema: part } }),
+  ])('keeps $contentType without a multipart stream as is', (content) => {
+    expect(toRequestContent(content)).toBe(content)
   })
 })
 

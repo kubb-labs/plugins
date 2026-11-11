@@ -4,7 +4,7 @@ import {
   getPerContentTypeName,
   resolveContentTypeVariants,
   resolveOperationFile,
-  toResponseContent,
+  toRequestContent, toResponseContent,
 } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -182,7 +182,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ),
     )
     const dataUnits = expandContentUnits(
-      node.requestBody?.content ?? [],
+      (node.requestBody?.content ?? []).map(toRequestContent),
       resolver.response.body(node),
       tsResolver.response.body(node),
       node.requestBody?.description,
