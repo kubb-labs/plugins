@@ -9,7 +9,7 @@ import type { GetInventoryOptions, GetInventoryResponses } from '../../models/st
 import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/store/GetOrderById'
 import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/PlaceOrder'
 import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch'
-import { createClient, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
+import { createClient, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
 export class StoreClient {
   readonly client: ClientInstance
@@ -32,7 +32,7 @@ export class StoreClient {
       apiClient<GetInventoryResponses, ThrowOnError>({
         method: 'GET',
         url: '/store/inventory',
-        security: [{ type: 'apiKey', name: 'api_key', in: 'header' }],
+        security: [securitySchemes.api_key],
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
       }),

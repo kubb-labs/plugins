@@ -1,7 +1,7 @@
 import type { Pet } from '../../models/ts/Pet'
 import { http, HttpResponse } from 'msw/http'
 
-export function getPetByIdHandlerResponse200(data: Omit<NonNullable<Pet>, 'name'> | string) {
+export function getPetByIdHandlerResponse200(data?: Omit<NonNullable<Pet>, 'name'> | string) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -19,15 +19,21 @@ export function getPetByIdHandlerResponse200(data: Omit<NonNullable<Pet>, 'name'
 }
 
 export function getPetByIdHandlerResponse400(data?: unknown) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 400,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 400,
+    },
+  )
 }
 
 export function getPetByIdHandlerResponse404(data?: unknown) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 404,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 404,
+    },
+  )
 }
 
 export function getPetByIdHandler(
@@ -37,19 +43,6 @@ export function getPetByIdHandler(
   return http.get(`${options?.baseURL ?? ''}/pet/:petId\\:search`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    if (typeof data === 'string')
-      return new HttpResponse<string>(data, {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/xml',
-        },
-      })
-
-    return new HttpResponse<string>(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    return getPetByIdHandlerResponse200(data)
   })
 }

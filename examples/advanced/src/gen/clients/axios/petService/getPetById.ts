@@ -1,6 +1,6 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
-import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { getPetByIdResponseSchema, getPetByIdStatus400Schema, getPetByIdStatus404Schema } from '../../../zod/pet/getPetByIdSchema'
 
 /**
@@ -59,10 +59,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
     >({
       method: 'GET',
       url: '/pet/{petId}:search',
-      security: [
-        { type: 'apiKey', name: 'api_key', in: 'header' },
-        { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
-      ],
+      security: [securitySchemes.api_key, { ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
       ...config,
       validator: { response: getPetByIdResponseSchema, error: { 400: getPetByIdStatus400Schema, 404: getPetByIdStatus404Schema }, ...config.validator },
       throwOnError: resolveThrowOnError(config.throwOnError, true),

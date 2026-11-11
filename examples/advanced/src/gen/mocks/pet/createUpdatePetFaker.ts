@@ -10,7 +10,7 @@ export function createUpdatePetStatus200FakerJson<TData extends Partial<Omit<Non
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -75,7 +75,7 @@ export function createUpdatePetBodyFakerJson<TData extends Partial<Omit<NonNulla
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -86,7 +86,7 @@ export function createUpdatePetBodyFakerXml<TData extends Partial<Omit<NonNullab
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -97,7 +97,7 @@ export function createUpdatePetBodyFakerFormUrlEncoded<TData extends Partial<Omi
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -123,14 +123,7 @@ export function createUpdatePetResponseFaker(
   | {
       id?: number
     } {
-  return (data ??
-    faker.helpers.arrayElement([
-      createUpdatePetStatus200Faker(),
-      createUpdatePetStatus202Faker(),
-      createUpdatePetStatus400Faker(),
-      createUpdatePetStatus404Faker(),
-      createUpdatePetStatus405Faker(),
-    ])) as
+  return (data ?? faker.helpers.arrayElement([createUpdatePetStatus200Faker(), createUpdatePetStatus202Faker()])) as
     | (Omit<NonNullable<Pet>, 'name'> | string)
     | {
         id?: number

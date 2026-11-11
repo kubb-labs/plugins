@@ -12,7 +12,7 @@ import type { GetPetByIdOptions, GetPetByIdResponses } from '../../models/pet/Ge
 import type { UpdatePetOptions, UpdatePetResponses } from '../../models/pet/UpdatePet'
 import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../../models/pet/UpdatePetWithForm'
 import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/UploadFile'
-import { createClient, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
+import { createClient, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
 export class PetClient {
   readonly client: ClientInstance
@@ -35,7 +35,7 @@ export class PetClient {
       apiClient<UpdatePetResponses, ThrowOnError>({
         method: 'PUT',
         url: '/pet',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
         contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
@@ -55,7 +55,7 @@ export class PetClient {
       apiClient<AddPetResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
         contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
@@ -77,7 +77,7 @@ export class PetClient {
       apiClient<FindPetsByStatusResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/findByStatus',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
         ...config,
         styles: { ...config.styles, query: { status: { explode: true }, ...config.styles?.query } },
         throwOnError: resolveThrowOnError(config.throwOnError, true),
@@ -99,7 +99,7 @@ export class PetClient {
       apiClient<FindPetsByTagsResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/findByTags',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
         ...config,
         styles: { ...config.styles, query: { tags: { explode: true }, ...config.styles?.query } },
         throwOnError: resolveThrowOnError(config.throwOnError, true),
@@ -121,10 +121,7 @@ export class PetClient {
       apiClient<GetPetByIdResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/{petId}',
-        security: [
-          { type: 'apiKey', name: 'api_key', in: 'header' },
-          { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
-        ],
+        security: [securitySchemes.api_key, { ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
       }),
@@ -144,7 +141,7 @@ export class PetClient {
       apiClient<UpdatePetWithFormResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet/{petId}',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
       }),
@@ -165,7 +162,7 @@ export class PetClient {
       apiClient<DeletePetResponses, ThrowOnError>({
         method: 'DELETE',
         url: '/pet/{petId}',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
       }),
@@ -185,7 +182,7 @@ export class PetClient {
       apiClient<UploadFileResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet/{petId}/uploadImage',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
         contentType: { request: 'application/json' },
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),

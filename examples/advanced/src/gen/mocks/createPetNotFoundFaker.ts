@@ -3,7 +3,7 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPetNotFoundFaker<TData extends Partial<PetNotFound> = object>(data?: TData) {
   const defaultFakeData = {
-    code: faker.number.int(),
+    code: faker.number.int({ max: 2147483647 }),
     message: faker.string.alpha(),
   }
   return {

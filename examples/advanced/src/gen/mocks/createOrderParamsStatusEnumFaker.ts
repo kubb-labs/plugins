@@ -5,5 +5,5 @@ import { fakerEN as faker } from '@faker-js/faker'
  * @description Order Status
  */
 export function createOrderParamsStatusEnumFaker(data?: OrderParamsStatusEnumKey): OrderParamsStatusEnumKey {
-  return data ?? faker.helpers.arrayElement<OrderParamsStatusEnumKey>(['placed', 'approved', 'delivered'])
+  return data ?? faker.helpers.arrayElement(['placed', 'approved', 'delivered'] as Array<OrderParamsStatusEnumKey>)
 }

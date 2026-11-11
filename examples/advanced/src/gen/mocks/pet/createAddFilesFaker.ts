@@ -10,7 +10,7 @@ export function createAddFilesStatus200Faker<TData extends Partial<Omit<NonNulla
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -39,7 +39,7 @@ export function createAddFilesBodyFakerFormData<TData extends Partial<Omit<NonNu
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createAddFilesBodyFaker(
@@ -62,5 +62,5 @@ export function createAddFilesBodyFaker(
 }
 
 export function createAddFilesResponseFaker(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
-  return (data ?? faker.helpers.arrayElement([createAddFilesStatus200Faker(), createAddFilesStatus405Faker()])) as Omit<NonNullable<Pet>, 'name'>
+  return createAddFilesStatus200Faker(data) as Omit<NonNullable<Pet>, 'name'>
 }

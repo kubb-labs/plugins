@@ -6,13 +6,16 @@
 import type { OptionsFindPetsByStatusResponse } from '../../../models/OptionsFindPetsByStatus'
 import { http, HttpResponse } from 'msw/http'
 
-export function optionsFindPetsByStatusHandlerResponse200(data: OptionsFindPetsByStatusResponse) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
+export function optionsFindPetsByStatusHandlerResponse200(data?: OptionsFindPetsByStatusResponse) {
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     },
-  })
+  )
 }
 
 export function optionsFindPetsByStatusHandler(
@@ -22,11 +25,6 @@ export function optionsFindPetsByStatusHandler(
   return http.options(`${options?.baseURL ?? 'http://localhost:3000'}/pet/findByStatus`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    return optionsFindPetsByStatusHandlerResponse200(data)
   })
 }

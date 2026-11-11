@@ -88,11 +88,5 @@ export function createUpdatePetBody(data?: Partial<UpdatePetBody>): UpdatePetBod
 }
 
 export function createUpdatePetResponse(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
-  return (data ??
-    faker.helpers.arrayElement([
-      createUpdatePetStatus200(),
-      createUpdatePetStatus400(),
-      createUpdatePetStatus404(),
-      createUpdatePetStatus405(),
-    ])) as UpdatePetResponse
+  return (data ?? faker.helpers.arrayElement([createPet(), faker.string.alpha()])) as UpdatePetResponse
 }

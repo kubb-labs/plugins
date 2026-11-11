@@ -22,7 +22,7 @@ export function createGetInventoryStatus200(data?: Partial<GetInventoryStatus200
  */
 export function createGetInventoryStatus401(data?: Partial<GetInventoryStatus401>): GetInventoryStatus401 {
   const defaultFakeData = {
-    error: faker.helpers.arrayElement<NonNullable<GetInventoryStatus401>['error']>(['unauthorized']),
+    error: faker.helpers.arrayElement(['unauthorized'] as Array<NonNullable<GetInventoryStatus401>['error']>),
   }
   return {
     ...defaultFakeData,
@@ -31,5 +31,5 @@ export function createGetInventoryStatus401(data?: Partial<GetInventoryStatus401
 }
 
 export function createGetInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
-  return (data ?? faker.helpers.arrayElement([createGetInventoryStatus200(), createGetInventoryStatus401()])) as GetInventoryResponse
+  return createGetInventoryStatus200(data) as GetInventoryResponse
 }

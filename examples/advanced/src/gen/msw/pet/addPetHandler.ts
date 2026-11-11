@@ -4,7 +4,7 @@ import type { HttpResponseResolver } from 'msw/http'
 import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
-export function addPetHandlerResponse405(data: { code?: number; message?: string }) {
+export function addPetHandlerResponse405(data?: { code?: number; message?: string }) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 405,
     headers: {
@@ -32,8 +32,11 @@ export function addPetHandler(
   >(`${options?.baseURL ?? ''}/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(JSON.stringify(data), {
-      status: 200,
-    })
+    return new HttpResponse<string>(
+      JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+      {
+        status: 200,
+      },
+    )
   })
 }
