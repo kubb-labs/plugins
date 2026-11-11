@@ -8,7 +8,7 @@ export function streamOrderEventsHandlerResponse200(data: OrderEvent) {
     ...(event?.data === undefined
       ? []
       : [
-          (typeof event.data === 'string' ? event.data : JSON.stringify(event.data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)))
+          (typeof event.data === 'string' ? event.data : JSON.stringify(event.data))
             .split('\n')
             .map((line) => `data: ${line}`)
             .join('\n'),
@@ -36,7 +36,7 @@ export function streamOrderEventsHandler(
       ...(event?.data === undefined
         ? []
         : [
-            (typeof event.data === 'string' ? event.data : JSON.stringify(event.data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)))
+            (typeof event.data === 'string' ? event.data : JSON.stringify(event.data))
               .split('\n')
               .map((line) => `data: ${line}`)
               .join('\n'),

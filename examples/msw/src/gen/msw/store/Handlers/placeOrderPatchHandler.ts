@@ -21,12 +21,9 @@ export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse)
 }
 
 export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus405) {
-  return new HttpResponse<string>(
-    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-    {
-      status: 405,
-    },
-  )
+  return new HttpResponse<string>(JSON.stringify(data), {
+    status: 405,
+  })
 }
 
 export function placeOrderPatchHandler(

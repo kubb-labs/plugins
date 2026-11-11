@@ -103,36 +103,37 @@ export function responseReturn(body: string, status: number, response: ast.Respo
     const serialized = entry?.examples?.find((example) => example.serializedValue !== undefined)?.serializedValue
     const fallback = serialized === undefined ? "''" : toLiteral(serialized)
     if (entry?.stream?.shape !== 'event') {
-      return `${prelude}return ${responseLiteral(`${name} === undefined ? ${fallback} : \`\${${sseData(name)}}\\n\\n\``, status, contentType, headers)}`
+      return `${prelude}return ${responseLiteral(`${name} === undefined ? ${fallback} : \`\${${sseData(name, response)}}\\n\\n\``, status, contentType, headers)}`
     }
     // The item is the whole event, so its fields become SSE lines and the client parses it back to the same object.
     return `${prelude}const event = ${name} as { event?: unknown; id?: unknown; retry?: unknown; data?: unknown } | undefined
     const lines = [
       ...(['event', 'id', 'retry'] as const).filter((field) => event?.[field] !== undefined).map((field) => \`\${field}: \${event?.[field]}\`),
-      ...(event?.data === undefined ? [] : [${sseData('event.data')}]),
+      ...(event?.data === undefined ? [] : [${sseData('event.data', response)}]),
     ]
 
     return ${responseLiteral(`event === undefined ? ${fallback} : \`\${lines.join('\\n')}\\n\\n\``, status, contentType, headers)}`
   }
 
   const textContentType = hasResponseSchema(response) ? getTextContentType(response) : null
-  if (!textContentType) return `return ${responseLiteral(toJson(body), status, contentType, headers)}`
+  if (!textContentType) return `return ${responseLiteral(toJson(body, response), status, contentType, headers)}`
 
   return `${prelude}if (typeof ${name} === 'string') return ${responseLiteral(name, status, textContentType, headers)}
 
-    return ${responseLiteral(toJson(name), status, contentType, headers)}`
+    return ${responseLiteral(toJson(name, response), status, contentType, headers)}`
 }
 
-// An `int64` mock is a `bigint`, which `JSON.stringify` rejects, so it is sent as a JSON number like the client sends it.
 /**
  * The `data:` lines of one Server-Sent Event. A string goes out as it is, since a client keeps string `data` as text.
  */
-function sseData(body: string): string {
-  return `(typeof ${body} === 'string' ? ${body} : ${toJson(body)}).split('\\n').map((line) => \`data: \${line}\`).join('\\n')`
+function sseData(body: string, response: ast.ResponseNode | null | undefined): string {
+  return `(typeof ${body} === 'string' ? ${body} : ${toJson(body, response)}).split('\\n').map((line) => \`data: \${line}\`).join('\\n')`
 }
 
-function toJson(body: string): string {
-  return `JSON.stringify(${body}, (_key, value) => (typeof value === 'bigint' ? Number(value) : value))`
+// An `int64` mock is a `bigint`, which `JSON.stringify` rejects, so a response with one sends it as a JSON number like the client does.
+function toJson(body: string, response: ast.ResponseNode | null | undefined): string {
+  const hasBigint = response && ast.findSchema(response, { predicate: (schema) => schema.type === 'bigint', followRefs: true })
+  return hasBigint ? `JSON.stringify(${body}, (_key, value) => (typeof value === 'bigint' ? Number(value) : value))` : `JSON.stringify(${body})`
 }
 
 /**

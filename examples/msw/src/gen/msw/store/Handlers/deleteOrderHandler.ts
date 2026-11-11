@@ -7,21 +7,15 @@ import type { DeleteOrderStatus400, DeleteOrderStatus404 } from '../../../models
 import { http, HttpResponse } from 'msw/http'
 
 export function deleteOrderHandlerResponse400(data?: DeleteOrderStatus400) {
-  return new HttpResponse<string>(
-    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-    {
-      status: 400,
-    },
-  )
+  return new HttpResponse<string>(JSON.stringify(data), {
+    status: 400,
+  })
 }
 
 export function deleteOrderHandlerResponse404(data?: DeleteOrderStatus404) {
-  return new HttpResponse<string>(
-    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-    {
-      status: 404,
-    },
-  )
+  return new HttpResponse<string>(JSON.stringify(data), {
+    status: 404,
+  })
 }
 
 export function deleteOrderHandler(
@@ -31,11 +25,8 @@ export function deleteOrderHandler(
   return http.delete(`${options?.baseURL ?? 'http://localhost:3000'}/store/order/:orderId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(
-      JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-      {
-        status: 200,
-      },
-    )
+    return new HttpResponse<string>(JSON.stringify(data), {
+      status: 200,
+    })
   })
 }
