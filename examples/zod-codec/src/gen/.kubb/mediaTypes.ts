@@ -93,10 +93,7 @@ export function parseJson(text: string, contentType: string | undefined): unknow
   try {
     return JSON.parse(text)
   } catch (error) {
-    // `cause` is assigned, since the constructor option needs the ES2022 library.
-    throw Object.assign(new ParseError({ message: `Invalid JSON in a ${baseContentType(contentType)} body`, issues: [{ message: String(error) }] }), {
-      cause: error,
-    })
+    throw new ParseError({ message: `Invalid JSON in a ${baseContentType(contentType)} body`, issues: [{ message: String(error) }], cause: error })
   }
 }
 

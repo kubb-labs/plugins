@@ -19,11 +19,14 @@ export type StandardSchemaIssue = {
  */
 export class ParseError extends Error {
   readonly issues: ReadonlyArray<StandardSchemaIssue>
+  // Declared here and set below, since the `cause` constructor option needs the ES2022 library.
+  declare readonly cause?: unknown
 
-  constructor({ issues, message }: { issues: ReadonlyArray<StandardSchemaIssue>; message?: string }) {
+  constructor({ issues, message, cause }: { issues: ReadonlyArray<StandardSchemaIssue>; message?: string; cause?: unknown }) {
     super(message ?? 'Validation failed')
     this.name = 'ParseError'
     this.issues = issues
+    if (cause !== undefined) this.cause = cause
   }
 }
 
