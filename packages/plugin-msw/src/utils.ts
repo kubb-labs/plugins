@@ -130,9 +130,10 @@ function sseData(body: string, response: ast.ResponseNode | null | undefined): s
   return `(typeof ${body} === 'string' ? ${body} : ${toJson(body, response)}).split('\\n').map((line) => \`data: \${line}\`).join('\\n')`
 }
 
-// An `int64` mock is a `bigint`, which `JSON.stringify` rejects, so a response with one sends it as a JSON number like the client does.
+// An `int64` mock is a `bigint`, which `JSON.stringify` rejects, so a response that can hold one sends it as a JSON number like
+// the client does: one with a `bigint` in its schema, or one without a schema, whose `data` takes any object.
 function toJson(body: string, response: ast.ResponseNode | null | undefined): string {
-  const hasBigint = response && ast.findSchema(response, { predicate: (schema) => schema.type === 'bigint', followRefs: true })
+  const hasBigint = !hasResponseSchema(response) || ast.findSchema(response!, { predicate: (schema) => schema.type === 'bigint', followRefs: true })
   return hasBigint ? `JSON.stringify(${body}, (_key, value) => (typeof value === 'bigint' ? Number(value) : value))` : `JSON.stringify(${body})`
 }
 

@@ -555,7 +555,7 @@ describe('createClientCore', () => {
     const { transport } = fakeTransport()
     const bare = createClientCore<string, string>({ defaultTransport: transport })
     await expect(bare({ method: 'GET', url: '/pet', cookies: { session: 'abc' } })).rejects.toThrow('register serializer.cookie')
-    await bare({ method: 'GET', url: '/pet', cookies: {} })
+    await bare({ method: 'GET', url: '/pet', cookies: { session: undefined, theme: null } })
 
     const { client, calls } = createClient()
     client.setConfig({ serializer: { query: () => 'q=1' } })
