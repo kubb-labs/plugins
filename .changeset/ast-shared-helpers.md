@@ -11,4 +11,8 @@
 '@kubb/plugin-zod': patch
 ---
 
-Read media types, status codes, servers and auth through the `ast.mediaType`, `ast.http`, `ast.server` and `ast.auth` helpers from `@kubb/kit`, instead of each plugin's own copy. The generated code stays the same, except that `@kubb/plugin-msw` now mocks a `text/json` response as JSON, like `application/json`.
+Read media types, status codes, servers, auth, parameters, stream framing and number bounds through the `ast` helpers from `@kubb/kit`, and print literals with `code`, instead of each plugin's own copy. Generated code stays the same, except:
+
+- `@kubb/plugin-msw` mocks a `text/json` response as JSON, like `application/json`.
+- `@kubb/plugin-zod` prints a bigint's bounds inclusive, such as `.min(1n)` for `exclusiveMinimum: 0`, the same bounds `@kubb/plugin-faker` mocks against.
+- A `group: { type: 'path' }` folder is the camelCased first path segment, such as `petStore` for `/pet-store/{id}`, the same as Kubb names it.
