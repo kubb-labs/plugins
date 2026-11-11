@@ -1,6 +1,6 @@
 import { multipartFormData } from './mediaTypes/formData'
 import { urlencoded } from './mediaTypes/urlencoded'
-import { applyHeaderStyles } from './serializers/headers'
+import { serializeHeaders } from './serializers/headers'
 import { serializePath } from './serializers/path'
 import { serializeStyledQuery } from './serializers/queryStyles'
 
@@ -9,5 +9,5 @@ import { serializeStyledQuery } from './serializers/queryStyles'
  */
 export const defaultConfig = {
   mediaTypes: { 'application/x-www-form-urlencoded': urlencoded, 'multipart/form-data': multipartFormData },
-  serializer: { query: serializeStyledQuery, path: serializePath, header: applyHeaderStyles },
+  serializer: { query: serializeStyledQuery, path: serializePath, header: serializeHeaders },
 }

@@ -1,13 +1,13 @@
 import { describe, expect, test, vi } from 'vitest'
 import { type ClientConfig, createClientCore as createCore, type EventStreamOptions, type RequestConfig, type ServerSentEvent } from './core.ts'
 import { serializeCookies } from './serializers/cookies.ts'
-import { applyHeaderStyles } from './serializers/headers.ts'
+import { serializeHeaders } from './serializers/headers.ts'
 import { serializeStyledPath } from './serializers/pathStyles.ts'
 import { serializeStyledQuery } from './serializers/queryStyles.ts'
 import { parseEventStream, parseJsonLines, streamMediaTypes } from './sse.ts'
 import { ParseError, type StandardSchemaValidator } from './standardSchema.ts'
 
-const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: applyHeaderStyles, cookie: serializeCookies }
+const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: serializeHeaders, cookie: serializeCookies }
 
 // `.kubb/client.ts` registers the serializers of a spec. These tests register all of them.
 function createClientCore<TRequest = unknown, TResponse = unknown>(options: Parameters<typeof createCore<TRequest, TResponse>>[0]) {

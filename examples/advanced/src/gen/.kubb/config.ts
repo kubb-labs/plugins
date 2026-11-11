@@ -2,7 +2,7 @@ import { multipartFormData } from './mediaTypes/formData'
 import { multipartMixed } from './mediaTypes/mixed'
 import { urlencoded } from './mediaTypes/urlencoded'
 import { serializeCookies } from './serializers/cookies'
-import { applyHeaderStyles } from './serializers/headers'
+import { serializeHeaders } from './serializers/headers'
 import { serializePath } from './serializers/path'
 import { serializeStyledQuery } from './serializers/queryStyles'
 import { streamMediaTypes } from './sse'
@@ -18,5 +18,5 @@ export const defaultConfig = {
     'multipart/mixed': multipartMixed,
     ...streamMediaTypes,
   },
-  serializer: { query: serializeStyledQuery, path: serializePath, header: applyHeaderStyles, cookie: serializeCookies },
+  serializer: { query: serializeStyledQuery, path: serializePath, header: serializeHeaders, cookie: serializeCookies },
 }

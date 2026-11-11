@@ -18,7 +18,7 @@ function toAsciiJson(value: unknown): string {
 }
 
 /** Serializes array and object headers with the OpenAPI `simple` style. */
-export const applyHeaderStyles: HeaderSerializer = (headers, styles) => {
+export const serializeHeaders: HeaderSerializer = (headers, styles) => {
   // A `Headers` instance only holds strings, so there is nothing to style.
   if (!headers || headers instanceof Headers) return headers
   const entries = Array.isArray(headers) ? headers : Object.entries(headers)

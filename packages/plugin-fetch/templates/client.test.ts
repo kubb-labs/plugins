@@ -24,7 +24,7 @@ import {
 } from './client.ts'
 import type { BodyEncoding } from './serializers.ts'
 import { serializeCookies } from '../../plugin-client/templates/serializers/cookies.ts'
-import { applyHeaderStyles } from '../../plugin-client/templates/serializers/headers.ts'
+import { serializeHeaders } from '../../plugin-client/templates/serializers/headers.ts'
 import { serializeStyledPath } from '../../plugin-client/templates/serializers/pathStyles.ts'
 import { serializeStyledQuery } from '../../plugin-client/templates/serializers/queryStyles.ts'
 import { serializePath } from '../../plugin-client/templates/serializers/path.ts'
@@ -36,7 +36,7 @@ import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
 
 const formMediaTypes = { 'multipart/form-data': multipartFormData, 'multipart/mixed': multipartMixed, 'application/x-www-form-urlencoded': urlencoded }
 
-const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: applyHeaderStyles, cookie: serializeCookies }
+const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: serializeHeaders, cookie: serializeCookies }
 
 // `.kubb/client.ts` registers the serializers of a spec. These tests register all of them.
 function createClientCore<TRequest = Request, TResponse = Response>(options: Parameters<typeof createCore<TRequest, TResponse>>[0]) {
@@ -421,9 +421,9 @@ describe('serializeCookies', () => {
   })
 })
 
-describe('applyHeaderStyles', () => {
+describe('serializeHeaders', () => {
   test('sends a header with a JSON content type as its JSON string', () => {
-    const result = applyHeaderStyles(
+    const result = serializeHeaders(
       { 'X-Meta': { a: 1 }, 'X-Name': 'odie' },
       { 'X-Meta': { contentType: 'application/json' }, 'X-Name': { contentType: 'application/json' } },
     )
@@ -431,28 +431,28 @@ describe('applyHeaderStyles', () => {
   })
 
   test('escapes non-ASCII characters in a JSON header so it stays a valid header value', () => {
-    const result = applyHeaderStyles({ 'X-Meta': { name: '日本' } }, { 'X-Meta': { contentType: 'application/json' } }) as Array<[string, string]>
+    const result = serializeHeaders({ 'X-Meta': { name: '日本' } }, { 'X-Meta': { contentType: 'application/json' } }) as Array<[string, string]>
     expect(result[0]?.[1]).toBe('{"name":"\\u65e5\\u672c"}')
     expect(JSON.parse(result[0]?.[1] ?? '')).toStrictEqual({ name: '日本' })
   })
 
   test('serializes array and object headers with the simple style', () => {
-    const result = applyHeaderStyles({ 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } }, { 'X-Ids': { explode: false }, 'X-Filter': { explode: true } })
+    const result = serializeHeaders({ 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } }, { 'X-Ids': { explode: false }, 'X-Filter': { explode: true } })
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Ids': '3,4', 'X-Filter': 'role=admin' })
   })
 
   test('serializes a Date header value as ISO-8601', () => {
-    const result = applyHeaderStyles({ 'X-Since': new Date('2020-01-02T03:04:05.000Z') }, { 'X-Since': {} })
+    const result = serializeHeaders({ 'X-Since': new Date('2020-01-02T03:04:05.000Z') }, { 'X-Since': {} })
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Since': '2020-01-02T03:04:05.000Z' })
   })
 
   test('passes primitives through and uses the simple style for headers without metadata', () => {
-    const result = applyHeaderStyles({ Authorization: 'Bearer x', 'X-Raw': [1, 2] }, { Authorization: { explode: true } })
+    const result = serializeHeaders({ Authorization: 'Bearer x', 'X-Raw': [1, 2] }, { Authorization: { explode: true } })
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ Authorization: 'Bearer x', 'X-Raw': '1,2' })
   })
 
   test('uses the simple style when the operation has no header styles', () => {
-    const result = applyHeaderStyles({ 'X-List': ['a', 'b'], 'X-Obj': { k: 'v' } }, undefined)
+    const result = serializeHeaders({ 'X-List': ['a', 'b'], 'X-Obj': { k: 'v' } }, undefined)
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-List': 'a,b', 'X-Obj': 'k,v' })
   })
 })

@@ -56,7 +56,7 @@ export function StreamRuntime({
     hasParameter((parameter) => parameter.in === 'path' && (parameter.style === 'label' || parameter.style === 'matrix'))
       ? { key: 'path', file: 'serializers/pathStyles', name: 'serializeStyledPath' }
       : { key: 'path', file: 'serializers/path', name: 'serializePath' },
-    hasParameter((parameter) => parameter.in === 'header') ? { key: 'header', file: 'serializers/headers', name: 'applyHeaderStyles' } : null,
+    hasParameter((parameter) => parameter.in === 'header') ? { key: 'header', file: 'serializers/headers', name: 'serializeHeaders' } : null,
     hasParameter((parameter) => parameter.in === 'cookie') ? { key: 'cookie', file: 'serializers/cookies', name: 'serializeCookies' } : null,
   ].filter((serializer) => serializer !== null)
   const imports = [...forms, ...(streams ? [{ file: 'sse', name: 'streamMediaTypes' }] : []), ...serializers]
