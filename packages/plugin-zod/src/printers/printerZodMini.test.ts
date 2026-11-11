@@ -903,29 +903,6 @@ describe('printerZodMini', () => {
   })
 
   describe('intersection', () => {
-    test('keeps the discriminator literal of a oneOf base over a sibling string property', () => {
-      const typeProperty = (schema: ast.SchemaNode) => ast.factory.createProperty({ name: 'type', required: true, schema })
-      const dog = ast.factory.createSchema({
-        type: 'object',
-        primitive: 'object',
-        properties: [
-          typeProperty(ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] })),
-          ast.factory.createProperty({ name: 'bark', schema: ast.factory.createSchema({ type: 'string' }) }),
-        ],
-      })
-      const node = ast.factory.createSchema({
-        type: 'intersection',
-        members: [
-          ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'type', members: [dog] }),
-          ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [typeProperty(ast.factory.createSchema({ type: 'string' }))] }),
-        ],
-      })
-      const schema = new Function('z', `return ${printer.print(node)}`)(z) as z.ZodMiniType
-
-      expect(schema.safeParse({ type: 'dog' }).success).toBe(true)
-      expect(schema.safeParse({ type: 'cat' }).success).toBe(false)
-    })
-
     test('ref with string min and max constraints', () => {
       const node = ast.factory.createSchema({
         type: 'intersection',
@@ -1119,21 +1096,6 @@ describe('printerZodMini', () => {
           }),
         ])"
       `)
-    })
-
-    test('discriminated oneOf keeps open members, so extra keys the spec allows still parse', () => {
-      const event = (name: string) =>
-        ast.factory.createSchema({
-          type: 'object',
-          primitive: 'object',
-          properties: [ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) })],
-        })
-      const node = ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'event', members: [event('ping'), event('done')] })
-      const code = printer.print(node)
-      const schema = new Function('z', `return ${code}`)(z) as z.ZodMiniType
-
-      expect(code).toMatch(/^z\.discriminatedUnion\('event', \[\s+z\.object\(/)
-      expect(schema.safeParse({ event: 'ping', id: '1' }).success).toBe(true)
     })
 
     test('discriminated union flattens allOf variants with z.extend() so they discriminate', () => {

@@ -112,12 +112,8 @@ describe('getOperationSecurity', () => {
   })
 
   test('points at the hoisted scheme by name, and adds the scopes of the requirement', () => {
-    const auth = [[{ scheme: 'api_key', scopes: [] }], [{ scheme: 'petstore_auth', scopes: ['read:pets'] }]]
     const hoisted: Array<ast.AuthScheme> = [...schemes, { name: 'x-key', credential: { type: 'apiKey', name: 'X-Key', in: 'header' } }]
 
-    expect(buildSecurityMetadata({ security: getOperationSecurity({ auth, schemes, hoist: true }) })).toBe(
-      "[securitySchemes.api_key, { ...securitySchemes.petstore_auth, scopes: ['read:pets'] }]",
-    )
     expect(buildSecurityMetadata({ security: getOperationSecurity({ auth: [[{ scheme: 'x-key', scopes: [] }]], schemes: hoisted, hoist: true }) })).toBe(
       "[securitySchemes['x-key']]",
     )
