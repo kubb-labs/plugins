@@ -25,7 +25,7 @@ export function addPetHandlerResponse200(data?: AddPetResponse) {
 }
 
 export function addPetHandlerResponse405(data?: AddPetStatus405) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 405,
   })
 }

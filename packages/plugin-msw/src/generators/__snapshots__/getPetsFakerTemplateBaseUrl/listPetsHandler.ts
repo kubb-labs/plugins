@@ -18,9 +18,12 @@ export function listPetsHandlerResponse200(data?: ListPetsResponse) {
 }
 
 export function listPetsHandlerResponse400(data?: ListPetsStatus400) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 400,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 400,
+    },
+  )
 }
 
 export function listPetsHandler(

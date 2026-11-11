@@ -827,7 +827,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   })
 
   const cookies = validatedCookies as Record<string, unknown> | undefined
-  if (cookies && Object.keys(cookies).length) {
+  // An object with only nullish values sends nothing, so it needs no serializer.
+  if (cookies && Object.values(cookies).some((value) => value !== undefined && value !== null)) {
     const serializeCookies = requestConfig.serializer?.cookie ?? config.serializer?.cookie
     if (!serializeCookies) throw new TypeError('Cannot send cookies without a cookie serializer, register serializer.cookie on the client.')
     const cookie = serializeCookies(cookies, requestConfig.styles?.cookie)
