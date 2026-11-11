@@ -86,20 +86,26 @@ function encodeOrJson(body: unknown, { contentType }: MediaTypeContext): Request
   return JSON.stringify(body, jsonReplacer)
 }
 
+/**
+ * Parses JSON text, throwing a `ParseError` that names the content type when it is not valid JSON.
+ */
+export function parseJson(text: string, contentType: string | undefined): unknown {
+  try {
+    return JSON.parse(text)
+  } catch (error) {
+    // `cause` is assigned, since the constructor option needs the ES2022 library.
+    throw Object.assign(new ParseError({ message: `Invalid JSON in a ${baseContentType(contentType)} body`, issues: [{ message: String(error) }] }), {
+      cause: error,
+    })
+  }
+}
+
 const json: MediaType = {
   // A string is JSON-encoded too, so it arrives as a JSON string.
   encode: (body) => (isEncodedBody(body) && typeof body !== 'string' ? body : JSON.stringify(body, jsonReplacer)),
   decode: async (response, { contentType }) => {
     const text = await response.text()
-    if (!text) return undefined
-    try {
-      return JSON.parse(text)
-    } catch (error) {
-      // `cause` is assigned, since the constructor option needs the ES2022 library.
-      throw Object.assign(new ParseError({ message: `Invalid JSON in a ${baseContentType(contentType)} body`, issues: [{ message: String(error) }] }), {
-        cause: error,
-      })
-    }
+    return text ? parseJson(text, contentType) : undefined
   },
 }
 

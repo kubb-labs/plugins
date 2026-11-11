@@ -261,6 +261,18 @@ describe('response status helpers', () => {
     expect(getPrimarySuccessResponse(ranged)?.statusCode).toBe('200')
   })
 
+  test('prefers a success response with a body over an exact code without one', () => {
+    const content = [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'bigint' }) })]
+    const node = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pets',
+      responses: [ast.factory.createResponse({ statusCode: '204' }), ast.factory.createResponse({ statusCode: '2xx', content })],
+    })
+
+    expect(getPrimarySuccessResponse(node)?.statusCode).toBe('2xx')
+  })
+
   test('resolves error, success, and all response status names', () => {
     expect(resolveErrorNames(node, resolver)).toStrictEqual(['Status400'])
     expect(resolveSuccessNames(node, resolver)).toStrictEqual(['Status201'])

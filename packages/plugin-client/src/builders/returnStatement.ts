@@ -1,6 +1,6 @@
 import { getEventStream } from '@internals/shared'
 import type { ast } from '@kubb/kit'
-import { buildResponseHeadersType, type OperationTypeNames } from '@internals/client'
+import { buildResponseHeadersType, buildResultTypeRef, resultTypeName, type OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildRequestResultGenerics } from './generics.ts'
 
@@ -66,10 +66,7 @@ export function buildEventStreamReturn({
   // The headers come after the item in `client.stream`, so a typed-headers call spells out the default item.
   const callItem = item ?? (headers ? `ServerSentEvent<${success}>` : null)
   const call = `apiClient.stream<${[responses, 'ThrowOnError', callItem, headers].filter(Boolean).join(', ')}>(${callConfig})`
-  const result = (name: string) =>
-    headers
-      ? `${name}WithHeaders<${[responses, headers, 'ThrowOnError', item].filter(Boolean).join(', ')}>`
-      : `${name}<${[responses, 'ThrowOnError', item].filter(Boolean).join(', ')}>`
+  const result = (name: string) => buildResultTypeRef(name, responses, headers, ['ThrowOnError', item])
   if (returnType === 'plain') return { returnType: `Promise<${result('StreamResult')}>`, statement: `return ${call}` }
   if (returnType === 'data') {
     return {
@@ -100,7 +97,7 @@ export function buildEventStreamImports({
     plain: ['Options', 'StreamResult'],
     full: ['StreamOptions', 'Unwrappable', 'StreamResult'],
     data: ['StreamOptions', 'UnwrappedStreamResult'],
-  }[returnType].map((name) => (headers && name.endsWith('Result') ? `${name}WithHeaders` : name))
+  }[returnType].map((name) => (name.endsWith('Result') ? resultTypeName(name, headers) : name))
   const item = { event: ['SuccessOf', 'TypedEvent'], data: headers ? ['SuccessOf', 'ServerSentEvent'] : [], line: ['SuccessOf'] }[shape]
   return [...result, ...item]
 }

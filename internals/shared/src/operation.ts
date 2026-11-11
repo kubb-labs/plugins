@@ -834,8 +834,10 @@ export function getOperationSuccessResponses(node: ast.OperationNode): Array<ast
 
 export function getPrimarySuccessResponse(node: ast.OperationNode): ast.ResponseNode | null {
   const responses = getOperationSuccessResponses(node)
-  // An exact code such as `200` wins over a `2xx` range the spec lists before it.
-  return responses.find((response) => getStatusCodeNumber(response.statusCode) !== null) ?? responses[0] ?? null
+  // A response with a body wins over a `204`, then an exact code such as `200` over a `2xx` range the spec lists before it.
+  const withBody = responses.filter((response) => response.content?.length)
+  const candidates = withBody.length ? withBody : responses
+  return candidates.find((response) => getStatusCodeNumber(response.statusCode) !== null) ?? candidates[0] ?? null
 }
 
 export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {

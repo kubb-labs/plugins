@@ -113,10 +113,11 @@ export type ResolverZod = Resolver & {
      */
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**
-     * Resolves the name for the headers a response declares.
+     * Resolves the name for the headers a response declares. The schema holds the spec's header names and types,
+     * so it does not parse a fetch `Headers` object, whose names are lower case and whose values are strings.
      *
      * @example Response headers names
-     * `resolver.response.headers(node, 200) // → 'listPetsStatus200HeadersSchema'`
+     * `resolver.response.headers(node, '200') // → 'listPetsStatus200HeadersSchema'`
      */
     headers(node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**

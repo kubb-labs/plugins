@@ -15,7 +15,7 @@ import {
 import type { ast } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
-import { buildResponseHeadersType } from '@internals/client'
+import { buildResponseHeadersType, buildResultTypeRef } from '@internals/client'
 import type { ReturnTypeOption } from '@internals/client'
 import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
 
@@ -203,9 +203,7 @@ export function buildCallResultBody(call: string, options: { clientReturnType?: 
 }
 
 function buildResultType(node: ast.OperationNode, resolver: ResolverTs): string {
-  const responses = resolver.response.responses(node)
-  const headers = buildResponseHeadersType({ node, types: resolver })
-  return headers ? `RequestResultWithHeaders<${responses}, ${headers}, true>` : `RequestResult<${responses}, true>`
+  return buildResultTypeRef('RequestResult', resolver.response.responses(node), buildResponseHeadersType({ node, types: resolver }), ['true'])
 }
 
 type ResponseTypes = {

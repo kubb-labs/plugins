@@ -259,6 +259,28 @@ describe('printerFaker', () => {
     expect(print(ast.factory.createSchema({ type: 'number', max: 50 }))).toBe('faker.number.float({ max: 50 })')
   })
 
+  test('keeps exclusive and filled-in bounds on the multipleOf grid', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+
+    expect(print(ast.factory.createSchema({ type: 'number', exclusive: { min: 0 }, multipleOf: 10 }))).toBe(
+      'faker.number.float({ min: 10, max: 1010, multipleOf: 10 })',
+    )
+    expect(print(ast.factory.createSchema({ type: 'number', min: 0, exclusive: { max: 10 }, multipleOf: 5 }))).toBe(
+      'faker.number.float({ min: 0, max: 5, multipleOf: 5 })',
+    )
+    expect(print(ast.factory.createSchema({ type: 'integer', max: -5, multipleOf: 1000 }))).toBe(
+      'faker.number.int({ min: -100005, max: -5, multipleOf: 1000 })',
+    )
+    expect(print(ast.factory.createSchema({ type: 'number', min: 0.5, multipleOf: 2 }))).toBe('faker.number.float({ min: 0.5, max: 200.5, multipleOf: 2 })')
+  })
+
+  test('prints only whole, safe bigint bounds and a whole multipleOf', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+
+    expect(print(ast.factory.createSchema({ type: 'bigint', min: 0.5, multipleOf: 0.5 }))).toBe('faker.number.bigInt({ min: 1n })')
+    expect(print(ast.factory.createSchema({ type: 'bigint', min: 0, max: 2 ** 63 }))).toBe('faker.number.bigInt({ min: 0n })')
+  })
+
   test('mocks a string int32 within the 32-bit range', () => {
     const node = ast.factory.createSchema({ type: 'string', format: 'int32' })
 

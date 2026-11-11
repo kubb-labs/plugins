@@ -42,6 +42,16 @@ export function buildResponseHeadersType({ node, types }: { node: ast.OperationN
   return entries.length ? `{ ${entries.join('; ')} }` : null
 }
 
+/** A runtime result type, such as `RequestResult`, in its `WithHeaders` form when `headers` is set. */
+export function resultTypeName(name: string, headers: unknown): string {
+  return headers ? `${name}WithHeaders` : name
+}
+
+/** A runtime result type with its arguments, such as `RequestResultWithHeaders<Responses, Headers, ThrowOnError>`. */
+export function buildResultTypeRef(name: string, responses: string, headers: string | null, rest: Array<string | null> = []): string {
+  return `${resultTypeName(name, headers)}<${[responses, headers, ...rest].filter(Boolean).join(', ')}>`
+}
+
 /** The names of the headers types `buildResponseHeadersType` references, for the file's imports. */
 export function getResponseHeadersTypeNames({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<string> {
   return getResponseHeaderTypes({ node, types }).map(([, name]) => name)

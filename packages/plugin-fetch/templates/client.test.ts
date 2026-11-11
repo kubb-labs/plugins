@@ -611,6 +611,13 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers['X-Filter']).toBe('role=admin')
   })
 
+  test('sends a Date header as ISO text when the spec registers no header serializer', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createCore<string, string>({ defaultTransport: transport, serializer: { ...serializers, header: undefined } })
+    await client({ method: 'GET', url: '/pet', headers: { 'If-Modified-Since': new Date(0) } as never })
+    expect(calls[0]?.headers['If-Modified-Since']).toBe('1970-01-01T00:00:00.000Z')
+  })
+
   // `plugin-ts`'s `syntaxType: 'interface'` types path/headers/cookies params as interfaces, which
   // (unlike a type alias) get no implicit index signature, so `RequestConfig` must accept them too.
   test('accepts interface-typed path, headers, and cookies params', async () => {
@@ -874,6 +881,8 @@ describe('createClientCore', () => {
     await expect(call(404, { code: 'upstream' }, byStatus)).rejects.toMatchObject({ name: 'ParseError' })
     expect(await call(503, { code: 'upstream' }, byStatus)).toMatchObject({ status: 503, error: { checkedBy: 'upstream' } })
     expect(await call(422, '<html>Unprocessable</html>', byStatus)).toMatchObject({ status: 422, error: '<html>Unprocessable</html>' })
+
+    expect(await call(503, { code: 'upstream' }, { '5XX': toCodeSchema('upstream') })).toMatchObject({ status: 503, error: { checkedBy: 'upstream' } })
 
     const withDefault = { 404: toCodeSchema('not-found'), default: toCodeSchema('other') }
     expect(await call(502, { code: 'other' }, withDefault)).toMatchObject({ status: 502, error: { checkedBy: 'other' } })
