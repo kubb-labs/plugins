@@ -13,7 +13,7 @@
 '@kubb/plugin-cypress': patch
 ---
 
-Read the OpenAPI 3.1 and 3.2 fields that Kubb 5.18 adds, which needs Kubb 5.18.3 or later.
+Read the OpenAPI 3.1 and 3.2 fields that Kubb 5.18 adds, which needs Kubb 5.18.4 or later.
 
 - Treat a status range such as `2XX` as a success response.
 - Write a range in lower case: `ListPetsStatus2XX` becomes `ListPetsStatus2xx`, and the `'2XX'` key becomes `'2xx'`.

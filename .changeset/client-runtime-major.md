@@ -16,6 +16,7 @@ Run the fetch and axios clients on one core with the same interceptors and clien
 - On axios, `client.interceptors` handlers get the core objects. Put native handlers on `getAxiosInstance().interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
 - Make a custom client (`importPath`) generic and add a `stream` method.
 - With `sdk` tag classes, rename `new pet(config)` to `new PetClient(config)`.
+- Use the `servers` entry on a path or operation as that operation's default `baseURL`, so its calls go to that host instead of the client's. A call picks `baseURL` from the call, then the operation's `servers`, then the path's, then the client config. The adapter's `server.index` picks the entry, falling back to the first, and a relative URL or one with `{variable}` placeholders is skipped.
 
 ```diff
 - import { client, defaultTransport } from './gen/.kubb/client'
