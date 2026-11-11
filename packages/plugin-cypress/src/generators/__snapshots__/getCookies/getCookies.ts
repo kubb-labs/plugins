@@ -35,10 +35,10 @@ export function getCookies({ headers, cookies }: GetCookiesOptions = {}, options
   const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>)
     .filter(([, value]) => value != null)
     .flatMap(([name, value]) =>
-      ['sid'].includes(name)
+      ['tags'].includes(name)
         ? explodeCookie(name, value)
         : [
-            `${name}=${encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))}`,
+            `${name}=${['sid'].includes(name) ? rawCookie(value) : encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))}`,
           ],
     )
     .join('; ')

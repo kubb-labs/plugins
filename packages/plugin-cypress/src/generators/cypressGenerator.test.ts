@@ -92,7 +92,7 @@ describe('cypressGenerator — numeric body', () => {
 
 describe('cypressGenerator — cookie parameters', () => {
   // The request takes the cookies as an optional group and sends `Cookie` only when the call passes cookies. A `style: cookie`
-  // value goes out as it is.
+  // value goes out as it is, and only the array `tags` gets the explode code.
   test('getCookies', async () => {
     const node = ast.factory.createOperation({
       operationId: 'getCookies',
@@ -102,6 +102,12 @@ describe('cypressGenerator — cookie parameters', () => {
       parameters: [
         ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
         ast.factory.createParameter({ name: 'sid', in: 'cookie', style: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({
+          name: 'tags',
+          in: 'cookie',
+          style: 'cookie',
+          schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+        }),
         ast.factory.createParameter({ name: 'x-trace', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
       ],
       responses: [

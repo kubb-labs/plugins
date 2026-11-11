@@ -40,22 +40,30 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   // With `explode` (its default) an array sends one cookie per item and an object one cookie per key, otherwise both join with commas.
   const rawParameters = node.parameters.filter((parameter) => parameter.in === 'cookie' && parameter.style === 'cookie')
   const rawCookies = rawParameters.map((parameter) => singleQuote(parameter.name))
-  const explodedCookies = rawParameters.filter((parameter) => parameter.explode !== false).map((parameter) => singleQuote(parameter.name))
-  const joinedCookies = rawParameters.filter((parameter) => parameter.explode === false).map((parameter) => singleQuote(parameter.name))
-  // Keep the cookie-octet pattern in step with `rawCookieValue` in plugin-client's `templates/serializers.ts`.
-  const rawCookieLine = rawCookies.length
-    ? `const rawCookie = (value: unknown): string => {
-  if (Array.isArray(value)) return value.filter((item) => item != null).map(rawCookie).join(',')
-  if (typeof value === 'object' && value !== null && !(value instanceof Date)) return Object.entries(value).filter(([, item]) => item != null).flat().map(rawCookie).join(',')
-  const text = value instanceof Date ? value.toISOString() : String(value)
-  if (!/^[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]*$/.test(text)) throw new TypeError('A cookie has characters the cookie style cannot send, escape it first.')
-  return text
-}
-const explodeCookie = (name: string, value: unknown): Array<string> => {
+  // Only an array or object needs the join and explode code. A value with one primitive type goes out as one cookie.
+  const isComposite = (parameter: ast.ParameterNode) =>
+    !['string', 'number', 'integer', 'bigint', 'boolean'].includes(ast.resolveRef(parameter.schema).primitive ?? '')
+  const isExploded = (parameter: ast.ParameterNode) => parameter.explode !== false && isComposite(parameter)
+  const explodedCookies = rawParameters.filter(isExploded).map((parameter) => singleQuote(parameter.name))
+  const joinedCookies = rawParameters.filter((parameter) => !isExploded(parameter)).map((parameter) => singleQuote(parameter.name))
+  const compositeLines = rawParameters.some(isComposite)
+    ? `  if (Array.isArray(value)) return value.filter((item) => item != null).map(rawCookie).join(',')
+  if (typeof value === 'object' && value !== null && !(value instanceof Date)) return Object.entries(value).filter(([, item]) => item != null).flat().map(rawCookie).join(',')\n`
+    : ''
+  const explodeCookieLine = explodedCookies.length
+    ? `const explodeCookie = (name: string, value: unknown): Array<string> => {
   if (Array.isArray(value)) return value.filter((item) => item != null).map((item) => \`\${name}=\${rawCookie(item)}\`)
   if (typeof value === 'object' && value !== null && !(value instanceof Date)) return Object.entries(value).filter(([, item]) => item != null).map(([key, item]) => \`\${rawCookie(key)}=\${rawCookie(item)}\`)
   return [\`\${name}=\${rawCookie(value)}\`]
 }\n`
+    : ''
+  // Keep the cookie-octet pattern in step with `rawCookieValue` in plugin-client's `templates/serializers.ts`.
+  const rawCookieLine = rawCookies.length
+    ? `const rawCookie = (value: unknown): string => {
+${compositeLines}  const text = value instanceof Date ? value.toISOString() : String(value)
+  if (!/^[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]*$/.test(text)) throw new TypeError('A cookie has characters the cookie style cannot send, escape it first.')
+  return text
+}\n${explodeCookieLine}`
     : ''
   const encodeCookie = joinedCookies.length
     ? `([${joinedCookies.join(', ')}].includes(name) ? rawCookie(value) : encodeURIComponent(${cookieText}))`
