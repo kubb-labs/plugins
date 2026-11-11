@@ -117,7 +117,8 @@ Header parameters use the `simple` style and cookie parameters use the `form` st
 for these locations carries only `explode`, plus `style: 'cookie'` for a cookie parameter with the
 OpenAPI 3.2 `cookie` style. Header values are sent as-is. Cookie values are URL-encoded into a single
 `Cookie` header. The `cookie` style sends them unencoded, as RFC 6265 describes, defaults `explode` to
-`true`, and throws on a value with a character such as `;` or a space.
+`true`, and throws on a value with a character such as `;` or a space, or on an exploded object key that is not a valid
+cookie name, such as `a=b`.
 
 | Location               | `explode` | Input                             | Result                    |
 | ---------------------- | --------- | --------------------------------- | ------------------------- |
