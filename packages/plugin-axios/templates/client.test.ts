@@ -4,7 +4,6 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosReq
 import axios from 'axios'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { multipartFormData } from '../../plugin-client/templates/mediaTypes/formData.ts'
-import { multipartMixed } from '../../plugin-client/templates/mediaTypes/mixed.ts'
 import { urlencoded } from '../../plugin-client/templates/mediaTypes/urlencoded.ts'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
 import { serializeCookies } from '../../plugin-client/templates/serializers/cookies.ts'
@@ -14,7 +13,7 @@ import { serializeStyledQuery } from '../../plugin-client/templates/serializers/
 import { client, createAxiosTransport, createClient, createClientCore as createCore, getAxiosInstance, ResponseError } from './client.ts'
 import type { NativeRequest, NativeResponse } from './client.ts'
 
-const formMediaTypes = { 'multipart/form-data': multipartFormData, 'multipart/mixed': multipartMixed, 'application/x-www-form-urlencoded': urlencoded }
+const formMediaTypes = { 'multipart/form-data': multipartFormData, 'application/x-www-form-urlencoded': urlencoded }
 
 const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: serializeHeaders, cookie: serializeCookies }
 

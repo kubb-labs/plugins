@@ -40,7 +40,6 @@ export default defineConfig([
       'templates/core': 'templates/core.ts',
       'templates/mediaTypes': 'templates/mediaTypes.ts',
       'templates/mediaTypes/formData': 'templates/mediaTypes/formData.ts',
-      'templates/mediaTypes/mixed': 'templates/mediaTypes/mixed.ts',
       'templates/mediaTypes/urlencoded': 'templates/mediaTypes/urlencoded.ts',
       'templates/serializers': 'templates/serializers.ts',
       'templates/serializers/cookies': 'templates/serializers/cookies.ts',

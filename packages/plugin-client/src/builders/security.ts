@@ -26,28 +26,30 @@ export type SecurityRequirement = OperationAuth | Array<OperationAuth>
 /** A scheme of one operation. `ref` names its entry in `securitySchemes`, which the call then points at. */
 type OperationAuth = Auth & { ref?: string }
 
+// The order the keys of an inline scheme are printed in.
+const authKeys = ['type', 'scheme', 'name', 'in', 'scopes', 'flows', 'metadataUrl', 'url'] as const
+
+function literal(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(literal).join(', ')}]`
+  if (value && typeof value === 'object') {
+    return `{ ${Object.entries(value)
+      .map(([key, entry]) => `${objectKey(key)}: ${literal(entry)}`)
+      .join(', ')} }`
+  }
+  return stringify(value as string)
+}
+
 function serializeScheme({ ref, ...auth }: OperationAuth): string {
+  const scopes = auth.scopes?.length ? auth.scopes : undefined
   if (ref) {
     const scheme = isValidVarName(ref) ? `securitySchemes.${ref}` : `securitySchemes[${stringify(ref)}]`
-    return auth.scopes?.length ? `{ ...${scheme}, scopes: [${auth.scopes.map((scope) => stringify(scope)).join(', ')}] }` : scheme
+    return scopes ? `{ ...${scheme}, scopes: ${literal(scopes)} }` : scheme
   }
-  const parts = [`type: ${stringify(auth.type)}`]
-  if (auth.scheme) parts.push(`scheme: ${stringify(auth.scheme)}`)
-  if (auth.name) parts.push(`name: ${stringify(auth.name)}`)
-  if (auth.in) parts.push(`in: ${stringify(auth.in)}`)
-  if (auth.scopes?.length) parts.push(`scopes: [${auth.scopes.map((scope) => stringify(scope)).join(', ')}]`)
-  if (auth.flows && Object.keys(auth.flows).length) {
-    const flows = Object.entries(auth.flows).map(
-      ([name, flow]) =>
-        `${objectKey(name)}: { ${Object.entries(flow)
-          .map(([key, value]) => `${objectKey(key)}: ${stringify(value)}`)
-          .join(', ')} }`,
-    )
-    parts.push(`flows: { ${flows.join(', ')} }`)
-  }
-  if (auth.metadataUrl) parts.push(`metadataUrl: ${stringify(auth.metadataUrl)}`)
-  if (auth.url) parts.push(`url: ${stringify(auth.url)}`)
-  return `{ ${parts.join(', ')} }`
+  const entries = authKeys.flatMap((key) => {
+    const value = key === 'scopes' ? scopes : auth[key]
+    return value ? [`${key}: ${literal(value)}`] : []
+  })
+  return `{ ${entries.join(', ')} }`
 }
 
 function serializeRequirement(requirement: SecurityRequirement): string {

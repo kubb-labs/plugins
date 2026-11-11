@@ -4,7 +4,6 @@ import {
   getPerContentTypeName,
   resolveContentTypeVariants,
   resolveOperationFile,
-  toRequestContent,
   toResponseContent,
 } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
@@ -183,7 +182,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ),
     )
     const dataUnits = expandContentUnits(
-      (node.requestBody?.content ?? []).map(toRequestContent),
+      node.requestBody?.content ?? [],
       resolver.response.body(node),
       tsResolver.response.body(node),
       node.requestBody?.description,

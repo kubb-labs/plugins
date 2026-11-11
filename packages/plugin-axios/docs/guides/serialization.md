@@ -84,14 +84,11 @@ A call that needs a serializer the spec did not register throws a `TypeError` th
 | `application/json`, `application/*+json`, `text/json`                                    | JSON                                              | JSON                                       |
 | `text/*`                                                                                 | a string                                          | text                                       |
 | `multipart/form-data`, `application/x-www-form-urlencoded`                               | `FormData` or `URLSearchParams` from an object    | `FormData`                                 |
-| `multipart/mixed`                                                                        | one part per array item                           |                                            |
 | `application/octet-stream`, `application/pdf`, `image/*`, `audio/*`, `video/*`           | a `Blob` as is                                    | `Blob`                                     |
 | `text/event-stream`, `application/jsonl`, `application/x-ndjson`, `application/json-seq` |                                                   | text, or item by item with `client.stream` |
 | `*/*`                                                                                    | JSON for objects, strings and binary bodies as is | JSON, or text when the body is not JSON    |
 
-A `multipart/mixed` body is an array. Each part gets the media type of its position in the OpenAPI 3.2 `prefixEncoding`, then `itemEncoding`, which the generated call passes as `styles.parts`. Without one, a `Blob` keeps its own type, other binary data is `application/octet-stream`, a string is `text/plain`, and anything else is JSON.
-
-`.kubb/client.ts` registers a form media type only when the document has a body of that type, and the stream media types only when it streams. Each form media type has its own file, which Kubb writes only when the document needs it: `multipartFormData` in `.kubb/mediaTypes/formData.ts`, `multipartMixed` in `.kubb/mediaTypes/mixed.ts`, and `urlencoded` in `.kubb/mediaTypes/urlencoded.ts`. The stream media types are `streamMediaTypes` in `.kubb/sse.ts`.
+`.kubb/client.ts` registers a form media type only when the document has a body of that type, and the stream media types only when it streams. Each form media type has its own file, which Kubb writes only when the document needs it: `multipartFormData` in `.kubb/mediaTypes/formData.ts` and `urlencoded` in `.kubb/mediaTypes/urlencoded.ts`. The stream media types are `streamMediaTypes` in `.kubb/sse.ts`.
 
 A key can be a pattern. The runtime lower-cases the type, drops its parameters, and tries the exact type, then a suffix such as `application/*+json`, then a wildcard such as `text/*`, then `*/*`. Write your own keys in lower case.
 

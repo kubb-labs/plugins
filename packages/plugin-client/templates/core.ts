@@ -884,11 +884,6 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   }
   // The transport sets the multipart boundary.
   if (body instanceof FormData) deleteHeader(headers, 'content-type')
-  // A multipart body built as a Blob, such as `multipart/mixed`, carries its boundary in its type.
-  if (body instanceof Blob && /^multipart\//i.test(body.type)) {
-    deleteHeader(headers, 'content-type')
-    headers['Content-Type'] = body.type
-  }
 
   const url = serializeUrl({
     parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],

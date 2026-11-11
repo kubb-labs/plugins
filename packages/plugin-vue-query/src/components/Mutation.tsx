@@ -26,9 +26,12 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: ResolverTs; returnType: ReturnTypeOption }): FunctionParametersNode {
-  const { resolver, returnType } = options
-  const { TData, TError } = buildResponseTypes(node, resolver, { returnType })
+function buildMutationParamsNode(
+  node: ast.OperationNode,
+  options: { resolver: ResolverTs; returnType: ReturnTypeOption; typedHeaders?: boolean },
+): FunctionParametersNode {
+  const { resolver, returnType, typedHeaders } = options
+  const { TData, TError } = buildResponseTypes(node, resolver, { returnType, typedHeaders })
 
   return buildHookParams(node, {
     resolver,
@@ -40,8 +43,8 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
   })
 }
 
-export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, clientReturnType, returnType }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
+export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, clientReturnType, returnType, typedHeaders }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
@@ -60,7 +63,7 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
   )
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
 
-  const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType })
+  const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType, typedHeaders })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

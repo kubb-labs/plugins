@@ -34,7 +34,6 @@ export {
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveSuccessNames,
-  toRequestContent,
   toResponseContent,
 } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'

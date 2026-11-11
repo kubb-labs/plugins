@@ -24,8 +24,8 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, infinite, returnType }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
+export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, infinite, returnType, typedHeaders }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
   const optionsName = infinite ? 'UseInfiniteQueryOptions' : 'UseQueryOptions'
   const hookName = infinite ? 'useInfiniteQuery' : 'useQuery'
   const resultType = `${infinite ? 'UseInfiniteQueryReturnType' : 'UseQueryReturnType'}<${['TData', TError].join(', ')}> & { queryKey: TQueryKey }`

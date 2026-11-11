@@ -1,4 +1,4 @@
-import { baseContentType, getOperationParameters } from '@internals/shared'
+import { getOperationParameters } from '@internals/shared'
 import { isValidVarName, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
@@ -56,23 +56,12 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
   })
 }
 
-function serializePartsEncoding(node: ast.HttpOperationNode): Array<string> {
-  // Only the `multipart/mixed` media type reads `parts`, whichever position it has among the request content types.
-  const entry = node.requestBody?.content?.find((content) => baseContentType(content.contentType) === 'multipart/mixed')
-  const part = (encoding: ast.EncodingNode) => (encoding.contentType ? `{ contentType: ${singleQuote(encoding.contentType)} }` : '{}')
-  return [
-    ...(entry?.prefixEncoding?.length ? [`prefix: [${entry.prefixEncoding.map(part).join(', ')}]`] : []),
-    ...(entry?.itemEncoding?.contentType ? [`item: ${part(entry.itemEncoding)}`] : []),
-  ]
-}
-
 /**
  * Builds the per-operation `styles` literal from the operation's parameters, grouped by location.
  * Entries are keyed by the spec name of the parameter.
  * Only parameters whose source defines `style`, `explode`, `allowReserved`, or `contentType` are
  * emitted, so calls without serialization metadata keep the runtime defaults and existing output
- * is unchanged. A form request body adds a `body` group keyed by property name from its `encoding`,
- * and a `multipart/mixed` body a `parts` group with its `prefix` and `item` encoding.
+ * is unchanged. A form request body adds a `body` group keyed by property name from its `encoding`.
  * Returns `null` when nothing carries metadata.
  *
  * With `merge`, the literal spreads `config.styles` per parameter, so a per-call entry overrides the generated one for
@@ -87,14 +76,7 @@ function serializePartsEncoding(node: ast.HttpOperationNode): Array<string> {
 export function buildStyles({ node, merge }: { node: ast.OperationNode; merge?: boolean }): string | null {
   if (!ast.isHttpOperationNode(node)) return null
 
-  const groups: Record<StyledLocation | 'body' | 'parts', Array<string>> = {
-    path: [],
-    query: [],
-    header: [],
-    cookie: [],
-    body: serializeBodyEncoding(node),
-    parts: serializePartsEncoding(node),
-  }
+  const groups: Record<StyledLocation | 'body', Array<string>> = { path: [], query: [], header: [], cookie: [], body: serializeBodyEncoding(node) }
 
   for (const [location, parameters] of Object.entries(getOperationParameters(node)) as Array<[StyledLocation, Array<ast.ParameterNode>]>) {
     for (const parameter of parameters) {

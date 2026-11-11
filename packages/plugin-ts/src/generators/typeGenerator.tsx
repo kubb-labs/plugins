@@ -5,7 +5,6 @@ import {
   getOperationParameters,
   resolveContentTypeVariants,
   resolveOperationFile,
-  toRequestContent,
   toResponseContent,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -187,7 +186,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         renderSchemaType({ schema: buildParams({ params, serializedExamples: true }), name: resolveName.call(resolver.param, node, params[0]!) }),
     )
 
-    const requestBodyContent = (node.requestBody?.content ?? []).map(toRequestContent)
+    const requestBodyContent = node.requestBody?.content ?? []
 
     function buildRequestType() {
       if (requestBodyContent.length === 0) return null

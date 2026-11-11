@@ -88,8 +88,9 @@ export function Query({
   suspense,
   infinite,
   returnType,
+  typedHeaders,
 }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const prefix = suspense ? 'UseSuspense' : 'Use'
   const hookName = `${suspense ? 'useSuspense' : 'use'}${infinite ? 'InfiniteQuery' : 'Query'}`

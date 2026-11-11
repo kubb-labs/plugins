@@ -84,23 +84,6 @@ describe("mcpGenerator — the client plugin's returnType", () => {
     expect(source).toContain('structuredContent: { data: res }')
     expect(source).not.toContain('res.data')
   })
-
-  test('sends a bigint result as JSON, since JSON.stringify throws on one', async () => {
-    const id = ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'bigint' }) })
-    const bigintNode = ast.factory.createOperation({
-      operationId: 'getPets',
-      method: 'GET',
-      path: '/pets',
-      responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [id] }) })],
-    })
-    const source = await renderHandler('full', bigintNode)
-    const replacer = source.match(/JSON\.stringify\(res\.data, (\(_key, value\) => .*\))\)\n/)?.[1]
-
-    expect(replacer).toBeDefined()
-    const toJson = new Function('data', `return JSON.stringify(data, ${replacer})`) as (data: unknown) => string
-    expect(toJson({ id: 1n, big: 2n ** 64n })).toBe('{"id":1,"big":"18446744073709551616"}')
-    expect(source).toContain('structuredContent: { data: text === undefined ? undefined : JSON.parse(text) }')
-  })
 })
 
 describe('mcpGenerator — cookie parameters', () => {

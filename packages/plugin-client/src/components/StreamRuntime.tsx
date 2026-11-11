@@ -18,7 +18,6 @@ function buildServers(servers: Array<ast.InputServer> | undefined): string | nul
 // The form media types, each in its own file under `templates/mediaTypes/`, so a document ships only the ones it uses.
 const formMediaTypes = {
   'multipart/form-data': { file: 'mediaTypes/formData', name: 'multipartFormData' },
-  'multipart/mixed': { file: 'mediaTypes/mixed', name: 'multipartMixed' },
   'application/x-www-form-urlencoded': { file: 'mediaTypes/urlencoded', name: 'urlencoded' },
 } as const
 
