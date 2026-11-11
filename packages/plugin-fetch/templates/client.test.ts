@@ -25,6 +25,7 @@ import {
 import type { BodyEncoding } from './serializers.ts'
 import { applyHeaderStyles, defaultPathSerializer, defaultQuerySerializer } from './serializers.ts'
 import { serializeCookies } from '../../plugin-client/templates/serializers/cookies.ts'
+import { serializePath } from '../../plugin-client/templates/serializers/pathStyles.ts'
 import { multipartFormData } from '../../plugin-client/templates/mediaTypes/formData.ts'
 import { multipartMixed } from '../../plugin-client/templates/mediaTypes/mixed.ts'
 import { urlencoded } from '../../plugin-client/templates/mediaTypes/urlencoded.ts'
@@ -59,7 +60,11 @@ function encodeBody({ body, contentType, encoding }: { body: unknown; contentTyp
 
 function createClient(result?: FakeResult) {
   const { transport, calls } = fakeTransport(result)
-  const client = createClientCore<string, string>({ defaultTransport: transport, mediaTypes: formMediaTypes, serializer: { cookie: serializeCookies } })
+  const client = createClientCore<string, string>({
+    defaultTransport: transport,
+    mediaTypes: formMediaTypes,
+    serializer: { cookie: serializeCookies, path: serializePath },
+  })
   return { client, calls }
 }
 
@@ -222,17 +227,22 @@ describe('defaultPathSerializer', () => {
   })
 
   test('label style prefixes a dot', () => {
-    expect(defaultPathSerializer({ name: 'id', value: 5, options: { style: 'label' } })).toBe('.5')
-    expect(defaultPathSerializer({ name: 'ids', value: [3, 4], options: { style: 'label' } })).toBe('.3,4')
-    expect(defaultPathSerializer({ name: 'ids', value: [3, 4], options: { style: 'label', explode: true } })).toBe('.3.4')
-    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'label', explode: true } })).toBe('.x=1.y=2')
+    expect(serializePath({ name: 'id', value: 5, options: { style: 'label' } })).toBe('.5')
+    expect(serializePath({ name: 'ids', value: [3, 4], options: { style: 'label' } })).toBe('.3,4')
+    expect(serializePath({ name: 'ids', value: [3, 4], options: { style: 'label', explode: true } })).toBe('.3.4')
+    expect(serializePath({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'label', explode: true } })).toBe('.x=1.y=2')
   })
 
   test('matrix style prefixes a named segment', () => {
-    expect(defaultPathSerializer({ name: 'id', value: 5, options: { style: 'matrix' } })).toBe(';id=5')
-    expect(defaultPathSerializer({ name: 'id', value: [3, 4], options: { style: 'matrix' } })).toBe(';id=3,4')
-    expect(defaultPathSerializer({ name: 'id', value: [3, 4], options: { style: 'matrix', explode: true } })).toBe(';id=3;id=4')
-    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'matrix', explode: true } })).toBe(';x=1;y=2')
+    expect(serializePath({ name: 'id', value: 5, options: { style: 'matrix' } })).toBe(';id=5')
+    expect(serializePath({ name: 'id', value: [3, 4], options: { style: 'matrix' } })).toBe(';id=3,4')
+    expect(serializePath({ name: 'id', value: [3, 4], options: { style: 'matrix', explode: true } })).toBe(';id=3;id=4')
+    expect(serializePath({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'matrix', explode: true } })).toBe(';x=1;y=2')
+  })
+
+  test('throws on a label or matrix parameter, which needs the registered path serializer', () => {
+    expect(() => defaultPathSerializer({ name: 'id', value: 5, options: { style: 'label' } })).toThrow('register serializer.path')
+    expect(serializePath({ name: 'ids', value: [3, 4] })).toBe('3,4')
   })
 
   test('serializes undefined and null to an empty string', () => {
