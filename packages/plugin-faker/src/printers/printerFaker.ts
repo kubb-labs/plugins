@@ -1,4 +1,4 @@
-import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
+import { jsonContentSchema, mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
 import { ast, containsCircularRef, Diagnostics, syncSchemaRef } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
@@ -223,6 +223,15 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         if (node.format && integerFormats.has(node.format)) {
           return node.format === 'int32' ? `faker.number.int({ max: ${maxInt32} }).toString()` : 'faker.number.bigInt().toString()'
         }
+
+        const contentSchema = jsonContentSchema(node)
+        // The document is typed by its own schema, not by the string that holds it.
+        if (contentSchema) return `JSON.stringify(${printNested(contentSchema, { typeName: undefined, nestedInObject: true, nestedInUnion: false })})`
+
+        const encoding = node.content?.encoding?.toLowerCase()
+        if (encoding === 'base64') return 'btoa(faker.string.alpha())'
+        // Eight letters or digits are base64url as they are: no padding, and none of the characters base64 swaps.
+        if (encoding === 'base64url') return 'faker.string.alphanumeric(8)'
 
         const { min, max } = node
         // A string as long as a large `maxLength` makes a mock of megabytes, so the length stays within 100 of the minimum.

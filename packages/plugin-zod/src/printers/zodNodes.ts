@@ -1,4 +1,4 @@
-import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
+import { jsonContentSchema, mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildList, stringify } from '@internals/utils'
 import { ast, syncSchemaRef } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
@@ -6,8 +6,10 @@ import {
   buildEnum,
   buildLiteral,
   type buildObjectShape,
+  CONTENT_ENCODING_CALLS,
   getMemberConstraint,
   integerFormatPattern,
+  jsonContentCheck,
   isClosedKeySchema,
   isObjectComposableIntersection,
   isObjectSchemaNode,
@@ -54,6 +56,10 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
   catchall: (object: string, value: string) => string
   nullable: (value: string) => string
   unique: (array: string) => string
+  /**
+   * Adds a `refine` to a schema. `check` is the callback with its params, as `jsonContentCheck` builds it.
+   */
+  refine: (value: string, check: string) => string
   extend: (base: string, shape: string) => string
   intersection: (left: string, right: string) => string
   /**
@@ -100,7 +106,7 @@ function hasCoercedDiscriminator({ member, propertyName, options }: { member: as
 }
 
 /**
- * Builds the scalar handlers both dialects share. They never recurse into children. The temporal
+ * Builds the scalar handlers both dialects share. Only a string with a `contentSchema` recurses into a child. The temporal
  * scalars and `bigint` differ per dialect, so each printer adds its own.
  */
 export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDialect<TOptions>): ast.PrinterPartial<string, TOptions> {
@@ -113,13 +119,20 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
     null: () => 'z.null()',
     string(node) {
       const coerce = shouldCoerce(this.options.coercion, 'strings')
-      const call = coerce ? undefined : STRING_FORMAT_CALLS.get(node.format)
-      if (call) return `${call}${dialect.lengths({ ...node, regexType: this.options.regexType })}`
-
-      const base = coerce ? 'z.coerce.string()' : 'z.string()'
+      const call = coerce ? undefined : (STRING_FORMAT_CALLS.get(node.format) ?? CONTENT_ENCODING_CALLS.get(node.content?.encoding?.toLowerCase()))
+      const base = call ?? (coerce ? 'z.coerce.string()' : 'z.string()')
       const pattern = node.pattern ?? integerFormatPattern(node.format)
+      const value = `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
 
-      return `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
+      const contentNode = jsonContentSchema(node)
+      if (!contentNode) return value
+      // The string holds wire JSON whichever way the string itself travels, so its schema always decodes.
+      const direction = this.options.direction
+      this.options.direction = 'decode'
+      const contentSchema = this.transform(contentNode)
+      this.options.direction = direction
+
+      return contentSchema ? dialect.refine(value, jsonContentCheck(contentSchema)) : value
     },
     number(node) {
       const base = shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.number()' : 'z.number()'

@@ -284,6 +284,7 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
   coercedNumber: (schema) => `z.coerce.number().pipe(${schema})`,
   catchall: (object, value) => `${object}.catchall(${value})`,
   nullable: (value) => `${value}.nullable()`,
+  refine: (value, check) => `${value}.refine(${check})`,
   unique: (array) => `${array}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })`,
   extend: (base, shape) => `${base}.extend(${shape})`,
   intersection: (left, right) => `${left}.and(${right})`,

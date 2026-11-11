@@ -270,6 +270,17 @@ function isJsonContentType(baseType: string): boolean {
 }
 
 /**
+ * The schema of the JSON document a string holds (`contentMediaType` with `contentSchema`), or `undefined` when the
+ * string holds no JSON or has no schema for it.
+ */
+export function jsonContentSchema({ content }: ast.StringSchemaNode): ast.SchemaNode | undefined {
+  // shortcut: an encoded document (`contentEncoding`) is not decoded, so only its encoding is checked; decode it once a spec needs both.
+  if (!content?.schema || content.encoding || !content.mediaType) return undefined
+
+  return isJsonContentType(baseContentType(content.mediaType)) ? content.schema : undefined
+}
+
+/**
  * Parser for one response content entry.
  *
  * JSON stays unset so the runtime detects it. `text/event-stream` and JSON Lines are streams. A binary schema

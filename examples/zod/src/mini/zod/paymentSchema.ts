@@ -4,6 +4,7 @@
  */
 
 import * as z from 'zod/mini'
+import { paymentErrorSchema } from './paymentErrorSchema'
 
 export const paymentSchema = z.pipe(
   z.unknown().check(
@@ -20,5 +21,20 @@ export const paymentSchema = z.pipe(
     creditCard: z.optional(z.string()),
     billingAddress: z.optional(z.string()),
     labels: z.optional(z.array(z.string())),
+    lastError: z.optional(
+      z.string().check(
+        z.refine(
+          (value) => {
+            try {
+              return paymentErrorSchema.safeParse(JSON.parse(value)).success
+            } catch {
+              return false
+            }
+          },
+          { message: 'String must hold JSON that matches its content schema' },
+        ),
+      ),
+    ),
+    signature: z.optional(z.base64url()),
   }),
 )

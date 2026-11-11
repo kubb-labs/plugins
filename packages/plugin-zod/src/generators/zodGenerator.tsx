@@ -49,6 +49,19 @@ function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boo
 }
 
 /**
+ * The imports of a schema, with the refs inside a string's `contentSchema`. `checks` also returns the refs inside
+ * `conditionals` and `contains`, which the printer does not print, so an import the printed schema never names is dropped.
+ */
+function resolveImports(resolver: ResolverZod, params: Parameters<ResolverZod['imports']>[0], print: () => string | null | undefined) {
+  const imports = resolver.imports(params)
+  const withChecks = resolver.imports({ ...params, checks: true })
+  if (withChecks.length === imports.length) return imports
+  const text = print() ?? ''
+
+  return withChecks.filter((entry) => [entry.name].flat().some((name) => text.includes(String(name))))
+}
+
+/**
  * Built-in generator for `@kubb/plugin-zod`. Emits one Zod schema per
  * schema in the spec plus per-operation request/response/parameter schemas.
  * When `mini: true`, schemas use the Zod Mini functional API instead of
@@ -74,7 +87,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const hasDirectionalNode = !mini && containsDirectionalNode({ node, printerOptions })
 
     const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions }) : [])
-    const importEntries = resolver.imports({ node, root, output, group: group ?? undefined })
+    const importEntries = resolveImports(resolver, { node, root, output, group: group ?? undefined }, () =>
+      getPrinter(resolver, printerOptions, mini, 'decode').print(node),
+    )
     const inputImportEntries = hasDirectionalNode
       ? [...directionalRefNames].map((schemaName) => ({
           name: [resolver.schema.inputName(schemaName)],
@@ -170,15 +185,18 @@ export const zodGenerator = defineGenerator<PluginZod>({
       if (!schema) return null
 
       const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
-      const imports = resolver.imports({
-        node: schema,
-        root,
-        output,
-        group: group ?? undefined,
-        name: (schemaName) => (directionalRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
-      })
-
       const schemaPrinter = getPrinter(resolver, { ...printerOptions, keysToOmit }, mini, direction)
+      const imports = resolveImports(
+        resolver,
+        {
+          node: schema,
+          root,
+          output,
+          group: group ?? undefined,
+          name: (schemaName) => (directionalRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
+        },
+        () => schemaPrinter.print(schema),
+      )
 
       return (
         <>

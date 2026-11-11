@@ -93,6 +93,24 @@ describe('printerFaker', () => {
     `)
   })
 
+  test('mocks the document or the encoding a string holds', () => {
+    const print = (content: ast.StringSchemaNode['content']) =>
+      printerFaker({ resolver: resolverFaker, typeName: 'Pet' }).print(ast.factory.createSchema({ type: 'string', content }))
+    const schema = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+    })
+
+    expect(print({ mediaType: 'application/json', schema })).toMatchInlineSnapshot(`
+      "JSON.stringify({
+        id: faker.number.int(),
+      })"
+    `)
+    expect(print({ mediaType: 'text/html', schema })).toBe('faker.string.alpha()')
+    expect(print({ encoding: 'base64' })).toBe('btoa(faker.string.alpha())')
+    expect(print({ encoding: 'base64url' })).toBe('faker.string.alphanumeric(8)')
+  })
+
   test('mocks a string int64 as digits', () => {
     const node = ast.factory.createSchema({ type: 'string', format: 'int64' })
 

@@ -1119,6 +1119,15 @@ components:
           type: array
           items:
             type: string
+        lastError:
+          description: The error of the last failed attempt, as a JSON document
+          type: string
+          contentMediaType: application/json
+          contentSchema:
+            $ref: '#/components/schemas/PaymentError'
+        signature:
+          type: string
+          contentEncoding: base64url
     PaymentError:
       type: object
       required:

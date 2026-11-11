@@ -38,6 +38,46 @@ describe('printerZod', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.string()')
     })
 
+    const jsonContent = ast.factory.createSchema({
+      type: 'string',
+      content: {
+        mediaType: 'application/json; charset=utf-8',
+        schema: ast.factory.createSchema({
+          type: 'object',
+          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+        }),
+      },
+    })
+
+    test('string with a JSON contentSchema checks the parsed document', () => {
+      const code = printer.print(jsonContent)!
+      const schema = new Function('z', `return ${code}`)(z) as z.ZodType
+
+      expect(code).toMatchInlineSnapshot(`
+        "z.string().refine((value) => { try { return z.object({
+          id: z.int(),
+        }).safeParse(JSON.parse(value)).success } catch { return false } }, { message: "String must hold JSON that matches its content schema" })"
+      `)
+      expect(schema.parse('{"id":1}')).toBe('{"id":1}')
+      expect(schema.safeParse('{"id":"1"}').success).toBe(false)
+      expect(schema.safeParse('not json').success).toBe(false)
+    })
+
+    test('string with contentEncoding uses the base64 constructors', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', max: 8, content: { encoding: 'base64' } }))).toBe('z.base64().max(8)')
+      expect(printer.print(ast.factory.createSchema({ type: 'string', content: { encoding: 'base64url' } }))).toBe('z.base64url()')
+      expect(printer.print(ast.factory.createSchema({ type: 'string', content: { encoding: 'quoted-printable' } }))).toBe('z.string()')
+    })
+
+    test('an encoded or non-JSON document is not parsed', () => {
+      const schema = ast.factory.createSchema({ type: 'integer' })
+
+      expect(printer.print(ast.factory.createSchema({ type: 'string', content: { mediaType: 'application/json', encoding: 'base64', schema } }))).toBe(
+        'z.base64()',
+      )
+      expect(printer.print(ast.factory.createSchema({ type: 'string', content: { mediaType: 'text/html', schema } }))).toBe('z.string()')
+    })
+
     test('string with coercion', () => {
       const p = printerZod({ coercion: { strings: true } })
       expect(p.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.coerce.string()')

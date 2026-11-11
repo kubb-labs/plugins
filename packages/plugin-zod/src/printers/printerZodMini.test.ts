@@ -34,6 +34,26 @@ describe('printerZodMini', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.string()')
     })
 
+    test('string with a JSON contentSchema checks the parsed document', () => {
+      const code = printer.print(
+        ast.factory.createSchema({
+          type: 'string',
+          content: {
+            mediaType: 'application/json',
+            schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'integer' })] }),
+          },
+        }),
+      )!
+      const schema = new Function('z', `return ${code}`)(z) as z.ZodMiniType
+
+      expect(code).toMatchInlineSnapshot(
+        `"z.string().check(z.refine((value) => { try { return z.array(z.int()).safeParse(JSON.parse(value)).success } catch { return false } }, { message: "String must hold JSON that matches its content schema" }))"`,
+      )
+      expect(z.parse(schema, '[1]')).toBe('[1]')
+      expect(z.safeParse(schema, '["1"]').success).toBe(false)
+      expect(z.safeParse(schema, '[').success).toBe(false)
+    })
+
     test('string with length checks', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string', min: 1, max: 10 }))).toBe('z.string().check(z.minLength(1), z.maxLength(10))')
     })
