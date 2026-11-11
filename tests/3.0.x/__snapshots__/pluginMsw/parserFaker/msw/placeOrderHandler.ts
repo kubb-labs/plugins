@@ -19,7 +19,7 @@ export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
 }
 
 export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 405,
   })
 }

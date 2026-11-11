@@ -42,21 +42,30 @@ export function updatePetHandlerResponse202(
 }
 
 export function updatePetHandlerResponse400(data?: unknown) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 400,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 400,
+    },
+  )
 }
 
 export function updatePetHandlerResponse404(data?: unknown) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 404,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 404,
+    },
+  )
 }
 
 export function updatePetHandlerResponse405(data?: unknown) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 405,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 405,
+    },
+  )
 }
 
 export function updatePetHandler(
