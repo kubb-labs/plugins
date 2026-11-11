@@ -21,7 +21,7 @@ In v6 the axios client runs on the same core as `@kubb/plugin-fetch`. Most edits
 
 ## Upgrade steps
 
-1. Upgrade `kubb` and `@kubb/plugin-axios` together. v6 needs Kubb 5.18.0 or later:
+1. Upgrade `kubb` and `@kubb/plugin-axios` together. v6 needs Kubb 5.18.3 or later:
 
    ```bash
    npm install --save-dev kubb@latest @kubb/plugin-axios@6

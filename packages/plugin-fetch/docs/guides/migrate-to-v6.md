@@ -18,7 +18,7 @@ The fetch client keeps its API in v6, so most projects only regenerate. Find you
 
 ## Upgrade steps
 
-1. Upgrade `kubb` and `@kubb/plugin-fetch` together. v6 needs Kubb 5.18.0 or later:
+1. Upgrade `kubb` and `@kubb/plugin-fetch` together. v6 needs Kubb 5.18.3 or later:
 
    ```bash
    npm install --save-dev kubb@latest @kubb/plugin-fetch@6
