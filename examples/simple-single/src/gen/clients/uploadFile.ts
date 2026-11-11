@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { UploadFileOptions, UploadFileResponses } from '../models'
-import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
 /**
  * `POST /pet/{petId}/uploadImage`
@@ -20,7 +20,7 @@ export function uploadFile<ThrowOnError extends boolean = true>(
     apiClient<UploadFileResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet/{petId}/uploadImage',
-      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/octet-stream' },
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),

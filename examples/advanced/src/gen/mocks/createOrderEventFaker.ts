@@ -10,23 +10,25 @@ export function createOrderEventFaker(data?: Partial<OrderEvent>): OrderEvent {
       {
         ...createOrderPlacedEventFaker(),
         ...{
-          event: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<OrderEvent>, { event: 'order_placed' }>> & Record<'event', unknown>)['event']>([
-            'order_placed',
-          ]),
+          event: faker.helpers.arrayElement(['order_placed'] as Array<
+            (NonNullable<Extract<NonNullable<OrderEvent>, { event: 'order_placed' }>> & Record<'event', unknown>)['event']
+          >),
         },
       },
       {
         ...createOrderShippedEventFaker(),
         ...{
-          event: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<OrderEvent>, { event: 'order_shipped' }>> & Record<'event', unknown>)['event']>([
-            'order_shipped',
-          ]),
+          event: faker.helpers.arrayElement(['order_shipped'] as Array<
+            (NonNullable<Extract<NonNullable<OrderEvent>, { event: 'order_shipped' }>> & Record<'event', unknown>)['event']
+          >),
         },
       },
       {
         ...createPingEventFaker(),
         ...{
-          event: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<OrderEvent>, { event: 'ping' }>> & Record<'event', unknown>)['event']>(['ping']),
+          event: faker.helpers.arrayElement(['ping'] as Array<
+            (NonNullable<Extract<NonNullable<OrderEvent>, { event: 'ping' }>> & Record<'event', unknown>)['event']
+          >),
         },
       },
     ])) as OrderEvent

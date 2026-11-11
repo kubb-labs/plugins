@@ -3,7 +3,7 @@ import type { HttpResponseResolver } from 'msw/http'
 import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
-export function uploadFileHandlerResponse200(data: ApiResponse) {
+export function uploadFileHandlerResponse200(data?: ApiResponse) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -21,12 +21,7 @@ export function uploadFileHandler(
     function handler(info) {
       if (typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      return uploadFileHandlerResponse200(data)
     },
   )
 }

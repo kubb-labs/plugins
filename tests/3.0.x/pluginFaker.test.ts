@@ -3,7 +3,7 @@ import fs from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
@@ -12,6 +12,7 @@ import { ast, type Config, Diagnostics, type KubbHooks, fsStorage } from 'kubb/k
 import { parserTs } from '@kubb/parser-ts'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs } from '@kubb/plugin-ts'
+import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, onTestFinished, test } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -425,4 +426,67 @@ createOrder({ quantity: 2, foo: '' })
   )
 
   expect(await typecheck(usagePath)).toStrictEqual([])
+})
+
+/**
+ * Generates zod schemas and faker mocks for `schemas` and parses the mock of each schema with its own zod schema.
+ */
+async function expectMocksToParse(schemas: Record<string, unknown>) {
+  const root = await fs.mkdtemp(path.join(__dirname, '.faker-zod-'))
+  onTestFinished(() => fs.rm(root, { recursive: true, force: true }))
+
+  const { diagnostics } = await createKubb({
+    root,
+    input: { openapi: '3.1.0', info: { title: 'Round trip', version: '1' }, paths: {}, components: { schemas } },
+    adapter: adapterOas(),
+    parsers: [parserTs()],
+    storage: fsStorage(),
+    output: { path: 'generated', clean: true, format: false, lint: false },
+    plugins: [pluginTs({ output: { path: 'types' } }), pluginZod({ output: { path: 'zod' } }), pluginFaker({ output: { path: 'mocks' } })],
+  }).safeBuild()
+  expect(Diagnostics.hasError(diagnostics)).toBe(false)
+
+  for (const name of Object.keys(schemas)) {
+    const mocks = await import(pathToFileURL(path.join(root, `generated/mocks/create${name}.ts`)).href)
+    const zod = await import(pathToFileURL(path.join(root, `generated/zod/${name[0]!.toLowerCase()}${name.slice(1)}Schema.ts`)).href)
+    const schema = Object.values(zod)[0] as { parse: (value: unknown) => unknown }
+
+    for (let run = 0; run < 20; run++) {
+      const mock = mocks[`create${name}`]()
+      expect(() => JSON.stringify(mock), name).not.toThrow()
+      expect(() => schema.parse(mock), `${name}: ${JSON.stringify(mock)}`).not.toThrow()
+    }
+  }
+}
+
+// One build for every case: `printerFaker.test.ts` pins the code each of these prints, this proves the values parse.
+test('mocks of recursive filters, allOf extensions and patterns pass their zod schema', async () => {
+  // The shape of Mistral's search filters: each combinator lists every filter, itself included, as a mapped variant.
+  const names = ['Equal', 'And', 'Or', 'Not']
+  const filter = {
+    oneOf: names.map((name) => ({ $ref: `#/components/schemas/${name}` })),
+    discriminator: { propertyName: 'type', mapping: Object.fromEntries(names.map((name) => [name.toLowerCase(), `#/components/schemas/${name}`])) },
+  }
+  const tag = (value: string) => ({ type: { type: 'string', const: value, default: value } })
+
+  await expectMocksToParse({
+    Equal: { type: 'object', required: ['field'], properties: { ...tag('equal'), field: { type: 'string' } } },
+    And: { type: 'object', required: ['matches'], properties: { ...tag('and'), matches: { type: 'array', items: filter } } },
+    Or: { type: 'object', required: ['matches'], properties: { ...tag('or'), matches: { type: 'array', items: filter } } },
+    Not: { type: 'object', required: ['match'], properties: { ...tag('not'), match: filter } },
+    Base: { type: 'object', required: ['type', 'id'], properties: { type: { type: 'string' }, id: { type: 'integer' } } },
+    Child: {
+      allOf: [{ type: 'object', required: ['type'], properties: { type: { type: 'string', enum: ['child'] } } }, { $ref: '#/components/schemas/Base' }],
+    },
+    Contact: {
+      type: 'object',
+      required: ['code', 'phone', 'slug', 'version'],
+      properties: {
+        code: { type: 'string', pattern: '^A[A-Z0-9]{1,}$' },
+        phone: { type: 'string', pattern: '^\\+[1-9]\\d{1,14}$' },
+        slug: { type: 'string', pattern: '^[\\w\\-]{3,}$' },
+        version: { type: 'string', pattern: '^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$' },
+      },
+    },
+  })
 })

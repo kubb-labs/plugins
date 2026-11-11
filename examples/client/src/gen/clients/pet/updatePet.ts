@@ -20,7 +20,9 @@ export function updatePet<ThrowOnError extends boolean = true>(
   return apiClient<UpdatePetResponses, ThrowOnError>({
     method: 'PUT',
     url: '/pet',
-    security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+    security: [
+      { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+    ],
     contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
     ...config,
     throwOnError: config.throwOnError ?? true,

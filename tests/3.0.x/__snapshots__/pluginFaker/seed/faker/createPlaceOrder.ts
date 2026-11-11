@@ -40,5 +40,5 @@ export function createPlaceOrderBody(data?: Partial<PlaceOrderBody>): PlaceOrder
 }
 
 export function createPlaceOrderResponse(data?: Partial<PlaceOrderResponse>): PlaceOrderResponse {
-  return (data ?? faker.helpers.arrayElement([createPlaceOrderStatus200(), createPlaceOrderStatus405()])) as PlaceOrderResponse
+  return createPlaceOrderStatus200(data) as PlaceOrderResponse
 }

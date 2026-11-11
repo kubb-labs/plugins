@@ -24,7 +24,7 @@ export function createGetPetByIdStatus200FakerJson<TData extends Partial<Omit<No
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -58,7 +58,5 @@ export function createGetPetByIdStatus404Faker() {
 }
 
 export function createGetPetByIdResponseFaker(data?: Partial<Omit<NonNullable<Pet>, 'name'> | string>): Omit<NonNullable<Pet>, 'name'> | string {
-  return (data ?? faker.helpers.arrayElement([createGetPetByIdStatus200Faker(), createGetPetByIdStatus400Faker(), createGetPetByIdStatus404Faker()])) as
-    | Omit<NonNullable<Pet>, 'name'>
-    | string
+  return (data ?? faker.helpers.arrayElement([createPetFaker(), faker.string.alpha()])) as Omit<NonNullable<Pet>, 'name'> | string
 }

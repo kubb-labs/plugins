@@ -12,32 +12,32 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
   const defaultFakeData = {
+    ...{
+      id: faker.number.bigInt(),
+      name: faker.string.alpha(),
+      type: faker.helpers.arrayElement(['dog', 'cat'] as Array<NonNullable<Pet>['type']>),
+      category: createCategory(),
+      photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
+      tags: faker.helpers.multiple(() => createTag()),
+      status: faker.helpers.arrayElement(['available', 'pending', 'sold'] as Array<NonNullable<Pet>['status']>),
+    },
     ...faker.helpers.arrayElement([
       {
         ...createDog(),
         ...{
-          type: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<Pet>, { type: 'dog' }>> & Record<'type', unknown>)['type']>(['dog']),
+          type: faker.helpers.arrayElement(['dog'] as Array<(NonNullable<Extract<NonNullable<Pet>, { type: 'dog' }>> & Record<'type', unknown>)['type']>),
         },
       },
       {
         ...createCat(),
         ...{
-          type: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<Pet>, { type: 'cat' }>> & Record<'type', unknown>)['type']>(['cat']),
+          type: faker.helpers.arrayElement(['cat'] as Array<(NonNullable<Extract<NonNullable<Pet>, { type: 'cat' }>> & Record<'type', unknown>)['type']>),
         },
       },
     ]),
-    ...{
-      id: faker.number.bigInt(),
-      name: faker.string.alpha(),
-      type: faker.helpers.arrayElement<NonNullable<Pet>['type']>(['dog', 'cat']),
-      category: createCategory(),
-      photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-      tags: faker.helpers.multiple(() => createTag()),
-      status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
-    },
   }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }

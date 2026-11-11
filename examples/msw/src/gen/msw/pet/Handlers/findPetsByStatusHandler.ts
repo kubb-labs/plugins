@@ -6,7 +6,7 @@
 import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../../models/FindPetsByStatus'
 import { http, HttpResponse } from 'msw/http'
 
-export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusResponse) {
+export function findPetsByStatusHandlerResponse200(data?: FindPetsByStatusResponse) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -36,19 +36,6 @@ export function findPetsByStatusHandler(
   return http.get(`${options?.baseURL ?? 'http://localhost:3000'}/pet/findByStatus`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    if (typeof data === 'string')
-      return new HttpResponse<string>(data, {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/xml',
-        },
-      })
-
-    return new HttpResponse<string>(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    return findPetsByStatusHandlerResponse200(data)
   })
 }

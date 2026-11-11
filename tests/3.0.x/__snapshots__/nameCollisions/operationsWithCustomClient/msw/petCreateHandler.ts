@@ -7,7 +7,7 @@ import type { PetCreateResponse2 } from '../types/PetCreate'
 import type { PetCreateResponse } from '../types/pet/Create'
 import { http, HttpResponse } from 'msw/http'
 
-export function petCreateHandlerResponse200(data: PetCreateResponse) {
+export function petCreateHandlerResponse200(data?: PetCreateResponse) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -20,16 +20,11 @@ export function petCreateHandler(data?: PetCreateResponse | ((info: Parameters<P
   return http.post(`${options?.baseURL ?? ''}/pets/create-first`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+      return petCreateHandlerResponse200(data)
     })
 }
 
-export function petCreateHandler2Response200(data: PetCreateResponse2) {
+export function petCreateHandler2Response200(data?: PetCreateResponse2) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -42,11 +37,6 @@ export function petCreateHandler2(data?: PetCreateResponse2 | ((info: Parameters
   return http.post(`${options?.baseURL ?? ''}/pets/create-second`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+      return petCreateHandler2Response200(data)
     })
 }

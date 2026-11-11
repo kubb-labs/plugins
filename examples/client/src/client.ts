@@ -21,6 +21,20 @@ type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: 
 type ErrorBody = NonNullable<unknown>
 
 /**
+ * One security scheme of an operation. A nested array in `security` lists schemes that are all needed together.
+ */
+export type Auth = {
+  type: string
+  scheme?: string
+  name?: string
+  in?: string
+  scopes?: Array<string>
+  flows?: Record<string, Record<string, string>>
+  metadataUrl?: string
+  url?: string
+}
+
+/**
  * The request a generated operation hands to `client`.
  */
 export type RequestConfig = {
@@ -53,7 +67,7 @@ export type RequestConfig = {
   /**
    * The security schemes of the operation. Generated for reference. This skeleton ignores them, use them to add auth.
    */
-  security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
+  security?: Array<Auth | Array<Auth>>
   client?: typeof client
 }
 
@@ -167,15 +181,13 @@ async function send(config: RequestConfig): Promise<{ data: unknown; error: unkn
  * arguments, so the result is typed per operation. `stream` backs server-sent event operations; this skeleton does
  * not parse streams, so it throws. Implement it if you use SSE.
  */
-export const client = Object.assign(
-  <TResponses, ThrowOnError extends boolean = true>(config: RequestConfig): Promise<RequestResult<TResponses, ThrowOnError>> =>
-    // The skeleton trusts the server to answer with the documented body; validate here if you need to.
-    send(config) as Promise<RequestResult<TResponses, ThrowOnError>>,
-  {
-    stream: async <TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>>(
-      _config: RequestConfig,
-    ): Promise<StreamResult<TResponses, ThrowOnError, TEvent>> => {
-      throw new Error('client.stream is not implemented in this client')
-    },
-  },
-)
+export function client<TResponses, ThrowOnError extends boolean = true>(config: RequestConfig): Promise<RequestResult<TResponses, ThrowOnError>> {
+  // The skeleton trusts the server to answer with the documented body; validate here if you need to.
+  return send(config) as Promise<RequestResult<TResponses, ThrowOnError>>
+}
+
+client.stream = async <TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>>(
+  _config: RequestConfig,
+): Promise<StreamResult<TResponses, ThrowOnError, TEvent>> => {
+  throw new Error('client.stream is not implemented in this client')
+}

@@ -8,6 +8,10 @@ import { updatePetHandler } from './pet/updatePetHandler'
 import { updatePetWithFormHandler } from './pet/updatePetWithFormHandler'
 import { uploadFileHandler } from './pet/uploadFileHandler'
 import { createPetsHandler } from './pets/createPetsHandler'
+import { createPaymentBatchHandler } from './store/payment/createPaymentBatchHandler'
+import { createPaymentHandler } from './store/payment/createPaymentHandler'
+import { getPaymentByIdHandler } from './store/payment/getPaymentByIdHandler'
+import { listPaymentsHandler } from './store/payment/listPaymentsHandler'
 import { streamOrderEventsHandler } from './stream/streamOrderEventsHandler'
 import { streamPetEventsHandler } from './stream/streamPetEventsHandler'
 
@@ -25,6 +29,10 @@ export function createHandlers(options?: { baseURL?: string }) {
     uploadFileHandler(undefined, options),
     streamPetEventsHandler(undefined, options),
     streamOrderEventsHandler(undefined, options),
+    listPaymentsHandler(undefined, options),
+    createPaymentHandler(undefined, options),
+    createPaymentBatchHandler(undefined, options),
+    getPaymentByIdHandler(undefined, options),
   ] as const
 }
 

@@ -9,7 +9,7 @@ import type { DefaultBodyType } from 'msw'
 import { createAddPetResponse } from '../faker/createAddPet'
 import { http, HttpResponse } from 'msw/http'
 
-export function addPetHandlerResponse200(data: AddPetResponse) {
+export function addPetHandlerResponse200(data?: AddPetResponse) {
   if (typeof data === 'string') return new HttpResponse<string>(data, {
     status: 200,
     headers: {
@@ -35,19 +35,6 @@ export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Recor
   return http.post<Record<string, string>, AddPetBody extends DefaultBodyType ? AddPetBody : DefaultBodyType>(`${options?.baseURL ?? ''}/pet`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      const body = data ?? createAddPetResponse(data)
-      if (typeof body === 'string') return new HttpResponse<string>(body, {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/xml'
-        },
-      })
-
-      return new HttpResponse<string>(JSON.stringify(body), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+      return addPetHandlerResponse200(data ?? createAddPetResponse())
     })
 }
