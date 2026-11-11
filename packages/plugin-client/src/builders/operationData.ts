@@ -15,14 +15,10 @@ export type OperationData = {
   name: string
   types: OperationTypeNames
   typeFile: ast.FileNode
-  /**
-   * `null` unless `validator` turns a direction on.
-   */
+  /** `null` unless `validator` turns a direction on. */
   zodFile: ast.FileNode | null
   validatorHooks: ValidatorHooks
-  /**
-   * The names of the headers types the result references, empty for a stream.
-   */
+  /** The names of the headers types the result references, empty for a stream. */
   headerTypeNames: Array<string>
   security?: Array<SecurityRequirement>
   baseURL?: string
