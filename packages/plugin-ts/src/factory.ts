@@ -1,5 +1,4 @@
-import { screamingSnakeCase, snakeCase } from '@internals/utils'
-import { ast, camelCase, pascalCase } from '@kubb/kit'
+import { ast, casing } from '@kubb/kit'
 import { generate } from 'yuku-codegen'
 
 /**
@@ -231,21 +230,21 @@ function valueToExpression(value: string | number | boolean, asNumber = isNumber
 /**
  * Apply casing transformation to enum keys
  */
-function applyEnumKeyCasing(key: string, casing: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none' = 'none'): string {
-  if (casing === 'none') {
+function applyEnumKeyCasing(key: string, keyCasing: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none' = 'none'): string {
+  if (keyCasing === 'none') {
     return key
   }
-  if (casing === 'screamingSnakeCase') {
-    return screamingSnakeCase(key)
+  if (keyCasing === 'screamingSnakeCase') {
+    return casing.screamingSnake(key)
   }
-  if (casing === 'snakeCase') {
-    return snakeCase(key)
+  if (keyCasing === 'snakeCase') {
+    return casing.snake(key)
   }
-  if (casing === 'pascalCase') {
-    return pascalCase(key)
+  if (keyCasing === 'pascalCase') {
+    return casing.pascal(key)
   }
-  if (casing === 'camelCase') {
-    return camelCase(key)
+  if (keyCasing === 'camelCase') {
+    return casing.camel(key)
   }
   return key
 }

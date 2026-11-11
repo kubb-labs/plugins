@@ -1,5 +1,5 @@
+import { casing } from '@kubb/kit'
 import { operationKey } from '@internals/shared'
-import { capitalize } from '@internals/utils'
 import type { ast, Resolver } from '@kubb/kit'
 
 /**
@@ -44,7 +44,7 @@ export type MutationResolver = {
 export function createQueryResolver(variant: QueryVariant = ''): QueryResolver {
   return {
     name(node) {
-      const name = `use${capitalize(this.name(node.operationId))}${variant}`
+      const name = `use${casing.capitalize(this.name(node.operationId))}${variant}`
       return this.resolveName({ key: operationKey(node, 'query', variant, 'name'), name })
     },
     optionsName(node) {
@@ -56,7 +56,7 @@ export function createQueryResolver(variant: QueryVariant = ''): QueryResolver {
       return this.resolveName({ key: operationKey(node, 'query', variant, 'keyName'), name })
     },
     keyTypeName(node) {
-      const name = `${capitalize(this.name(node.operationId))}${variant}QueryKey`
+      const name = `${casing.capitalize(this.name(node.operationId))}${variant}QueryKey`
       return this.resolveName({ key: operationKey(node, 'query', variant, 'keyTypeName'), name })
     },
   }
@@ -75,7 +75,7 @@ export function createQueryResolver(variant: QueryVariant = ''): QueryResolver {
 export function createMutationResolver(): MutationResolver {
   return {
     name(node) {
-      const name = `use${capitalize(this.name(node.operationId))}`
+      const name = `use${casing.capitalize(this.name(node.operationId))}`
       return this.resolveName({ key: operationKey(node, 'mutation', 'name'), name })
     },
     keyName(node) {

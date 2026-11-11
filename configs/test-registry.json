@@ -5,7 +5,6 @@
   "internals/tanstack-query/src/components/InfiniteQueryOptions.test.tsx": "Branchy page-param combinations (previousParam mixes, null initialPageParam) the package generator tests do not render.",
   "internals/tanstack-query/src/components/keys.test.ts": "Pins the empty query and mutation keys for an operation without a path, and that cookies stay out of a query key; no generator snapshot reaches either.",
   "internals/tanstack-query/src/utils.test.ts": "Branchy classification and page-param warning: ref chains, allOf, json priority, QUERY method, and cookie-only operations without key params.",
-  "internals/utils/src/casing.test.ts": "Pins enum-key regressions #1292 and #1296; the word splitter has acronym and digit branches.",
   "internals/utils/src/codegen.test.ts": "Pins the buildJSDoc fallback and buildList custom brackets, which no generator output reaches.",
   "internals/utils/src/filePath.test.ts": "Pins the path-traversal guard for leading dots and version-number dots; nothing else tests it.",
   "internals/utils/src/fs.test.ts": "The Windows backslash branch of getRelativePath cannot be hit by snapshots on Linux CI.",

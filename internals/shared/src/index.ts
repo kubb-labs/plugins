@@ -9,6 +9,7 @@ export {
   getContentTypeInfo,
   getEventStream,
   getStreamFraming,
+  hasTextEventData,
   getFormContentTypes,
   getPerContentTypeName,
   getRequestGroupOptionality,

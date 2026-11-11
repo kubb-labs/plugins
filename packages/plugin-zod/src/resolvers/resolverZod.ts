@@ -1,6 +1,6 @@
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, operationKey } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
-import { camelCase, createResolver, pascalCase } from '@kubb/kit'
+import { casing, createResolver } from '@kubb/kit'
 import type { PluginZod } from '../types.ts'
 
 /**
@@ -21,15 +21,15 @@ import type { PluginZod } from '../types.ts'
 export const resolverZod = createResolver<PluginZod>({
   pluginName: 'plugin-zod',
   name(name) {
-    return this.memo(`name:${name}`, () => ensureValidVarName(camelCase(name, { suffix: 'schema' })))
+    return this.memo(`name:${name}`, () => ensureValidVarName(casing.camel(name, { suffix: 'schema' })))
   },
-  file: createCasedFile((part) => camelCase(part, { suffix: 'schema' })),
+  file: createCasedFile((part) => casing.camel(part, { suffix: 'schema' })),
   schema: {
     typeName(name) {
-      return this.memo(`typeName:${name}`, () => ensureValidVarName(pascalCase(name, { suffix: 'schema type' })))
+      return this.memo(`typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
     },
     type(name) {
-      return this.memo(`type:${name}`, () => ensureValidVarName(pascalCase(name, { suffix: 'type' })))
+      return this.memo(`type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
     },
     inputName(name) {
       return this.name(`${name} input`)
@@ -38,10 +38,10 @@ export const resolverZod = createResolver<PluginZod>({
       return this.schema.typeName(`${name} input`)
     },
     isName(name) {
-      return ensureValidVarName(camelCase(name, { prefix: 'is' }))
+      return ensureValidVarName(casing.camel(name, { prefix: 'is' }))
     },
     assertName(name) {
-      return ensureValidVarName(camelCase(name, { prefix: 'assert' }))
+      return ensureValidVarName(casing.camel(name, { prefix: 'assert' }))
     },
   },
   param: createOperationParamResolver(),

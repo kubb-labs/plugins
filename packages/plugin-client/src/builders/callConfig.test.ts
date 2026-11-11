@@ -53,9 +53,7 @@ describe('buildCallConfig', () => {
       operationId: 'streamEvents',
       method: 'GET',
       path: '/events',
-      responses: [
-        ast.factory.createResponse({ statusCode: '200', content: [createStreamContent('text/event-stream', schema, expected ? { textData: true } : {})] }),
-      ],
+      responses: [ast.factory.createResponse({ statusCode: '200', content: [createStreamContent('text/event-stream', schema)] })],
     })
 
     const { callConfig } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true, returnType: 'full' })

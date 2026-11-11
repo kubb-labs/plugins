@@ -1,12 +1,12 @@
 import { ensureValidVarName, toFilePath } from '@internals/utils'
-import { ast, camelCase } from '@kubb/kit'
+import { ast, casing } from '@kubb/kit'
 import type { GeneratorContext, Resolver, ResolverFile } from '@kubb/kit'
 
 /**
  * The shared top-level `name` of the operation plugins, computed once per operation name and build.
  */
 export function resolveOperationName(this: Resolver, name: string): string {
-  return this.memo(`operation:${name}`, () => ensureValidVarName(camelCase(name)))
+  return this.memo(`operation:${name}`, () => ensureValidVarName(casing.camel(name)))
 }
 
 /**

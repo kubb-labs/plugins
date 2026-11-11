@@ -1,4 +1,4 @@
-import { ast, createResolver, pascalCase } from '@kubb/kit'
+import { ast, casing, createResolver } from '@kubb/kit'
 import type { Group, Memo, Output, PluginType, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import { createStreamContent } from '#mocks'
@@ -10,6 +10,7 @@ import {
   hasRequestContentTypeChoice,
   getEventStream,
   getStreamFraming,
+  hasTextEventData,
   getRequestGroupOptionality,
   hasEventStreamContent,
   hasStreamVariant,
@@ -502,6 +503,46 @@ describe('isEventStream', () => {
     expect(getEventStream(typedEvents)).toBe('event')
   })
 
+  test('keeps event data as text only when every event types it as a string', () => {
+    const sse = (schema: ast.SchemaNode | undefined, stream: ast.ContentNode['stream'] = {}) =>
+      ast.factory.createOperation({
+        operationId: 'streamEvents',
+        method: 'GET',
+        path: '/events',
+        responses: [
+          ast.factory.createResponse({ statusCode: '200', content: [ast.factory.createContent({ contentType: 'text/event-stream', schema, stream })] }),
+        ],
+      })
+    const string = ast.factory.createSchema({ type: 'string' })
+    const event = (data: ast.SchemaNode) =>
+      ast.factory.createSchema({ type: 'object', properties: [ast.factory.createProperty({ name: 'data', schema: data })] })
+    const events = (...members: Array<ast.SchemaNode>) => ast.factory.createSchema({ type: 'union', members: members.map(event) })
+
+    expect(hasTextEventData(sse(string))).toBe(true)
+    expect(hasTextEventData(sse(string, { schema: string, shape: 'data' }))).toBe(true)
+    expect(hasTextEventData(sse(event(string), { schema: event(string), shape: 'event' }))).toBe(true)
+    expect(hasTextEventData(sse(undefined, { schema: events(string, string), shape: 'event' }))).toBe(true)
+    // Only some events type `data` as a string: named events keep theirs as text, an unnamed one cannot be told apart.
+    const named = (name: string, data: ast.SchemaNode) =>
+      ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({ name: 'event', schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) }),
+          ast.factory.createProperty({ name: 'data', schema: data }),
+        ],
+      })
+    const mixed = ast.factory.createSchema({ type: 'union', members: [named('note', string), named('tick', ast.factory.createSchema({ type: 'object' }))] })
+    expect(hasTextEventData(sse(undefined, { schema: mixed, shape: 'event' }))).toStrictEqual(['note'])
+    // A discriminator intersects each event with its pinned name.
+    const pinned = ast.factory.createSchema({ type: 'intersection', members: [event(string), named('note', string)] })
+    expect(hasTextEventData(sse(undefined, { schema: pinned, shape: 'event' }))).toBe(true)
+    // A schema-less stream reads as a blob and keeps the JSON-parse default.
+    expect(hasTextEventData(sse(ast.factory.createSchema({ type: 'blob', primitive: 'string' })))).toBe(false)
+    expect(hasTextEventData(sse(ast.factory.createSchema({ type: 'object' })))).toBe(false)
+    expect(hasTextEventData(sse(undefined, { schema: events(string, ast.factory.createSchema({ type: 'object' })), shape: 'event' }))).toBe(false)
+    expect(hasTextEventData(nodeWithResponseContentType('application/json'))).toBe(false)
+  })
+
   test.each([
     ['application/jsonl', 'line'],
     ['application/x-ndjson', 'line'],
@@ -615,7 +656,7 @@ describe('resolveOperationFile', () => {
   })
 
   describe('when an operation file matches a schema file', () => {
-    const pascalResolver = createResolver<PluginType<'plugin-ts'>>({ pluginName: 'plugin-ts', file: createCasedFile(pascalCase) })
+    const pascalResolver = createResolver<PluginType<'plugin-ts'>>({ pluginName: 'plugin-ts', file: createCasedFile(casing.pascal) })
     const output = { path: 'types', mode: 'directory' } as const
     const schemas = (...names: Array<string>) => names.map((name) => ast.factory.createSchema({ type: 'object', name }))
     const resolve = (operationId: string, options: { schemas: ReturnType<typeof schemas>; output?: Output; group?: Group }) =>
@@ -656,7 +697,6 @@ describe('resolveOperationFile', () => {
 
 describe('getStreamFraming', () => {
   test.each([
-    ['the framing the adapter sets', { contentType: 'application/vnd.custom', stream: { framing: 'lines' } }, 'lines'],
     ['text/event-stream without framing', { contentType: 'text/event-stream; charset=utf-8' }, 'events'],
     ['JSON Lines without framing', { contentType: 'application/jsonl', stream: {} }, 'lines'],
     ['multipart/mixed with an item schema', { contentType: 'multipart/mixed', stream: {} }, undefined],

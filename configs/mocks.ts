@@ -15,7 +15,7 @@ import type {
   Plugin,
   PluginType,
 } from '@kubb/kit'
-import { ast, camelCase, Diagnostics, Hookable, memoryStorage } from '@kubb/kit'
+import { ast, casing, Diagnostics, Hookable, memoryStorage } from '@kubb/kit'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'
@@ -237,7 +237,7 @@ async function matchFilesBase(
     const code = file.baseName.endsWith('.json') || !format ? parsed : await format(parsed)
     processed.set(file.path, code)
 
-    const snapshotPath = path.join('__snapshots__', ...(pre ? [camelCase(pre)] : []), file.baseName)
+    const snapshotPath = path.join('__snapshots__', ...(pre ? [casing.camel(pre)] : []), file.baseName)
     await expect(code).toMatchFileSnapshot(snapshotPath)
   }
 

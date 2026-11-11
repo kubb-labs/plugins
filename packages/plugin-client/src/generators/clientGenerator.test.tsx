@@ -231,7 +231,7 @@ const streamChatNode = ast.factory.createOperation({
     ast.factory.createResponse({
       statusCode: '200',
       description: 'typed events',
-      content: [createStreamContent('text/event-stream', streamChatSchema, { schema: streamChatSchema, shape: 'event', textData: true })],
+      content: [createStreamContent('text/event-stream', streamChatSchema, { schema: streamChatSchema, shape: 'event' })],
     }),
   ],
 })

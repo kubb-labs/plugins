@@ -1,4 +1,4 @@
-import { getEventStream } from '@internals/shared'
+import { getEventStream, hasTextEventData } from '@internals/shared'
 
 import { ast, code } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
@@ -56,9 +56,7 @@ export function buildCallConfig({
     ? `throwOnError: resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault})`
     : `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`
 
-  // Server-sent events whose `data` is a string stay text instead of being JSON-parsed. A stream has one content entry.
-  // shortcut: an adapter-oas older than 5.19 sets no `textData`, so string `data` that parses as JSON is parsed; require 5.19 once plugins depend on the adapter.
-  const rawData = stream === 'event' || stream === 'data' ? content[0]?.stream?.textData : undefined
+  const rawData = hasTextEventData(node)
   const callConfig = `{ ${[
     `method: ${code.string(node.method.toUpperCase())}`,
     `url: ${code.string(node.path)}`,
