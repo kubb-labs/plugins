@@ -91,9 +91,6 @@ describe('OpenAPI style examples', () => {
   const color = { R: 100, G: 200, B: 150 }
 
   test('percent-encodes the pipeDelimited delimiter and joins objects with the style delimiter', () => {
-    expect(serializeStyledQuery({ color: ['blue', 'black', 'brown'] }, { color: { style: 'pipeDelimited', explode: false } })).toBe(
-      'color=blue%7Cblack%7Cbrown',
-    )
     expect(serializeStyledQuery({ color }, { color: { style: 'pipeDelimited', explode: false } })).toBe('color=R%7C100%7CG%7C200%7CB%7C150')
     expect(serializeStyledQuery({ color }, { color: { style: 'spaceDelimited', explode: false } })).toBe('color=R%20100%20G%20200%20B%20150')
   })

@@ -459,7 +459,8 @@ async function expectMocksToParse(schemas: Record<string, unknown>) {
   }
 }
 
-test('mocks mutually recursive filters through discriminated unions in arrays', async () => {
+// One build for every case: `printerFaker.test.ts` pins the code each of these prints, this proves the values parse.
+test('mocks of recursive filters, allOf extensions and patterns pass their zod schema', async () => {
   // The shape of Mistral's search filters: each combinator lists every filter, itself included, as a mapped variant.
   const names = ['Equal', 'And', 'Or', 'Not']
   const filter = {
@@ -473,20 +474,10 @@ test('mocks mutually recursive filters through discriminated unions in arrays', 
     And: { type: 'object', required: ['matches'], properties: { ...tag('and'), matches: { type: 'array', items: filter } } },
     Or: { type: 'object', required: ['matches'], properties: { ...tag('or'), matches: { type: 'array', items: filter } } },
     Not: { type: 'object', required: ['match'], properties: { ...tag('not'), match: filter } },
-  })
-})
-
-test('keeps the literal an allOf extension sets over the string of its base', async () => {
-  await expectMocksToParse({
     Base: { type: 'object', required: ['type', 'id'], properties: { type: { type: 'string' }, id: { type: 'integer' } } },
     Child: {
       allOf: [{ type: 'object', required: ['type'], properties: { type: { type: 'string', enum: ['child'] } } }, { $ref: '#/components/schemas/Base' }],
     },
-  })
-})
-
-test('mocks patterns with shorthand classes, escapes and open-ended counts', async () => {
-  await expectMocksToParse({
     Contact: {
       type: 'object',
       required: ['code', 'phone', 'slug', 'version'],

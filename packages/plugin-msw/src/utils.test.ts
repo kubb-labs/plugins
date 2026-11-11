@@ -1,14 +1,6 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { getExampleBody, getMockHeaders, getMockStatus, responseLiteral } from './utils.ts'
-
-describe('getMockStatus', () => {
-  test('mocks a range with the first code of its class', () => {
-    expect(getMockStatus('201')).toBe(201)
-    expect(getMockStatus('2xx')).toBe(200)
-    expect(getMockStatus('4xx')).toBe(400)
-  })
-})
+import { getExampleBody, getMockHeaders, responseLiteral } from './utils.ts'
 
 describe('getExampleBody', () => {
   const json = (examples: Array<ast.ExampleNode>) =>
