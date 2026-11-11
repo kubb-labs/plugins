@@ -38,8 +38,8 @@ async function* readLines(stream: EventStreamInput): AsyncGenerator<{ lines: Arr
   }
 }
 
-function parseData<TData>(raw: string, rawData?: boolean): TData {
-  if (rawData) return raw as TData
+function parseData<TData>(raw: string, event: string, rawData?: boolean | Array<string>): TData {
+  if (rawData === true || (rawData && rawData.includes(event))) return raw as TData
   try {
     return JSON.parse(raw) as TData
   } catch {
@@ -91,7 +91,7 @@ export async function* parseEventStream<TData = unknown>(
           const raw = data.join('\n')
           if (raw === terminator) return
           yield {
-            data: parseData<TData>(raw, rawData),
+            data: parseData<TData>(raw, type || 'message', rawData),
             event: type || 'message',
             ...(cursor.lastEventId ? { id: cursor.lastEventId } : {}),
             ...(retry !== undefined ? { retry } : {}),

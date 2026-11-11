@@ -1,4 +1,5 @@
 import { getEventStream, getPrimarySuccessResponse, hasTextEventData } from '@internals/shared'
+import { singleQuote } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
@@ -55,16 +56,17 @@ export function buildCallConfig({
     ? `throwOnError: resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault})`
     : `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`
 
+  const rawData = hasTextEventData(node)
   const callConfig = `{ ${[
-    `method: '${node.method.toUpperCase()}'`,
-    `url: '${node.path}'`,
+    `method: ${singleQuote(node.method.toUpperCase())}`,
+    `url: ${singleQuote(node.path)}`,
     baseURL ? `baseURL: ${JSON.stringify(baseURL)}` : null,
     securityLiteral ? `security: ${securityLiteral}` : null,
     ownRuntime ? null : styles,
     contentTypeLiteral,
     buildParseAsLiteral(node),
     stream === 'event' || stream === 'data' ? `eventShape: '${stream}'` : null,
-    hasTextEventData(node) ? 'rawData: true' : null,
+    rawData ? `rawData: ${rawData === true ? 'true' : `[${rawData.map(singleQuote).join(', ')}]`}` : null,
     '...config',
     ownRuntime ? styles : null,
     validatorLiteral,

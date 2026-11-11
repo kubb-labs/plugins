@@ -7,7 +7,7 @@
 '@kubb/plugin-swr': patch
 ---
 
-Fix generated clients and hooks that did not compile for three kinds of operation found in real OpenAPI 3.1 and 3.2 documents.
+Fix generated clients and hooks that did not compile for four kinds of operation found in real OpenAPI 3.1 and 3.2 documents.
 
 - An operation without a response body no longer imports a `<operation>ResponseSchema` that `@kubb/plugin-zod` never writes.
 - A custom method from an OpenAPI 3.2 `additionalOperations` entry, such as `COPY`, is accepted as `method`.

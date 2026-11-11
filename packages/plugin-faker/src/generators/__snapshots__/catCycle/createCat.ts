@@ -11,7 +11,7 @@ export function createCat<TData extends Partial<Cat> = object>(data?: TData): Om
   const defaultFakeData = {
     id: faker.number.int(),
     get archEnemy() {
-      const _value = faker.helpers.arrayElement([null, undefined as unknown as NonNullable<Cat>['archEnemy']])
+      const _value = faker.helpers.arrayElement([null])
       Object.defineProperty(this, 'archEnemy', { value: _value, configurable: true, writable: true, enumerable: true })
       return _value
     },

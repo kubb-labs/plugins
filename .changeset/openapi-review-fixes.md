@@ -15,7 +15,7 @@
 Fix OpenAPI 3.1 and 3.2 edge cases found on real specs.
 
 - zod: a tuple keeps its rest items, so `prefixItems` with `items` prints `z.tuple([a], b)`. A `null` example stays in `.meta({ examples })`.
-- cypress: a `style: cookie` array or object no longer throws. Each item is checked and the items are joined with commas.
+- cypress: a `style: cookie` array or object no longer throws.
 - msw: a declared `Content-Type` response header is left out, so the mock no longer has a duplicate key.
 - client: a string part of `multipart/mixed` declared as JSON is sent as JSON.
 - An exact success code such as `200` now wins over a `2XX` range listed before it.

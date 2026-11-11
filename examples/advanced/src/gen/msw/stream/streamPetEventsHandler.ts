@@ -3,7 +3,12 @@ import { http, HttpResponse } from 'msw/http'
 
 export function streamPetEventsHandlerResponse200(data: PetEvent) {
   return new HttpResponse<string>(
-    data === undefined ? '' : `data: ${JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value))}\n\n`,
+    data === undefined
+      ? ''
+      : `${(typeof data === 'string' ? data : JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)))
+          .split('\n')
+          .map((line) => `data: ${line}`)
+          .join('\n')}\n\n`,
     {
       status: 200,
       headers: {
@@ -21,7 +26,12 @@ export function streamPetEventsHandler(
     if (typeof data === 'function') return data(info)
 
     return new HttpResponse<string>(
-      data === undefined ? '' : `data: ${JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value))}\n\n`,
+      data === undefined
+        ? ''
+        : `${(typeof data === 'string' ? data : JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)))
+            .split('\n')
+            .map((line) => `data: ${line}`)
+            .join('\n')}\n\n`,
       {
         status: 200,
         headers: {

@@ -658,6 +658,20 @@ describe('isEventStream', () => {
     expect(hasTextEventData(sse(string, { schema: string, shape: 'data' }))).toBe(true)
     expect(hasTextEventData(sse(event(string), { schema: event(string), shape: 'event' }))).toBe(true)
     expect(hasTextEventData(sse(undefined, { schema: events(string, string), shape: 'event' }))).toBe(true)
+    // Only some events type `data` as a string: named events keep theirs as text, an unnamed one cannot be told apart.
+    const named = (name: string, data: ast.SchemaNode) =>
+      ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({ name: 'event', schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) }),
+          ast.factory.createProperty({ name: 'data', schema: data }),
+        ],
+      })
+    const mixed = ast.factory.createSchema({ type: 'union', members: [named('note', string), named('tick', ast.factory.createSchema({ type: 'object' }))] })
+    expect(hasTextEventData(sse(undefined, { schema: mixed, shape: 'event' }))).toStrictEqual(['note'])
+    // A discriminator intersects each event with its pinned name.
+    const pinned = ast.factory.createSchema({ type: 'intersection', members: [event(string), named('note', string)] })
+    expect(hasTextEventData(sse(undefined, { schema: pinned, shape: 'event' }))).toBe(true)
     // A schema-less stream reads as a blob and keeps the JSON-parse default.
     expect(hasTextEventData(sse(ast.factory.createSchema({ type: 'blob', primitive: 'string' })))).toBe(false)
     expect(hasTextEventData(sse(ast.factory.createSchema({ type: 'object' })))).toBe(false)
@@ -670,6 +684,8 @@ describe('isEventStream', () => {
     ['application/x-ndjson', 'line'],
     ['application/json-seq', 'line'],
     ['multipart/mixed', null],
+    // No stream handler in the client runtime reads this type.
+    ['application/x-jsonlines', null],
   ])('reads %s the adapter marks as a stream as %s', (contentType, shape) => {
     const schema = ast.factory.createSchema({ type: 'object' })
     const node = ast.factory.createOperation({
