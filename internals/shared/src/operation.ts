@@ -236,7 +236,7 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
   if (textEvents.length === events.length) return events.length > 0
 
   const names = textEvents.map((event) => property(event, 'event').flatMap((schema) => ast.getSchemaLiteralValues(ast.resolveRef(schema))))
-  return names.length > 0 && names.every((values) => values.length > 0) && names.flat().map(String)
+  return names.length > 0 && names.every((values) => values.length > 0) && [...new Set(names.flat().map(String))]
 }
 
 /**
