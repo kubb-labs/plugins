@@ -140,6 +140,14 @@ describe('printerFaker', () => {
     expect(print(ast.factory.createSchema({ type: 'number', exclusive: { min: 0, max: 1 } }))).toBe('faker.number.float({ min: 0, max: 1 })')
   })
 
+  test('mocks unique array items within the count limits', () => {
+    const node = ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })], unique: true, min: 1, max: 5 })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe(
+      'faker.helpers.uniqueArray(() => (faker.string.alpha()), faker.number.int({ min: 1, max: 5 }))',
+    )
+  })
+
   test('keeps an object within its property counts', () => {
     const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
     const string = ast.factory.createSchema({ type: 'string' })

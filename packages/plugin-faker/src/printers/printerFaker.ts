@@ -360,6 +360,12 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const { min, max } = node
         const item = items[0]
         // Like a string, a list stays within 100 items of its minimum, however large `maxItems` is.
+        if (node.unique) {
+          // `uniqueArray` takes a fixed length and compares like the zod `Set` check. It returns fewer items when the generator runs out of values.
+          const count = max !== undefined ? `faker.number.int({ min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} })` : (min ?? 3)
+
+          return `faker.helpers.uniqueArray(() => (${item}), ${count})`
+        }
         if (max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} }})`
         if (min !== undefined) return `faker.helpers.multiple(() => (${item}), { count: ${min} })`
 
