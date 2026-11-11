@@ -23,10 +23,7 @@ export type Auth = {
  */
 export type SecurityRequirement = OperationAuth | Array<OperationAuth>
 
-/**
- * A scheme of one operation. `ref` names its entry in the `securitySchemes` of `.kubb/client.ts`, so the call points at
- * it instead of repeating it.
- */
+/** A scheme of one operation. `ref` names its entry in `securitySchemes`, which the call then points at. */
 type OperationAuth = Auth & { ref?: string }
 
 function serializeScheme({ ref, ...auth }: OperationAuth): string {
@@ -131,8 +128,7 @@ export function buildSecurityMetadata({ security }: { security?: Array<SecurityR
 }
 
 /**
- * The `securitySchemes` const of `.kubb/client.ts`: every scheme of the document the runtime can place, by name, or
- * `null` when there is none. A generated call points at its schemes here.
+ * The `securitySchemes` const of `.kubb/client.ts`: every scheme the runtime can place, by name, or `null` without one.
  */
 export function buildSecuritySchemes(schemes: Array<ast.AuthScheme> | undefined): string | null {
   const entries = (schemes ?? []).flatMap(({ name, credential }) => {
