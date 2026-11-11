@@ -23,13 +23,13 @@ export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
 }
 
 export function getPetByIdHandlerResponse400(data?: GetPetByIdStatus400) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 400,
   })
 }
 
 export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 404,
   })
 }
