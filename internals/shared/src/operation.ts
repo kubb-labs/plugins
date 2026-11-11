@@ -166,7 +166,9 @@ export function getResponseContentTypeInfo(node: ast.OperationNode): ContentType
 
 type ResponseType = 'blob' | 'text' | 'stream'
 
-/** The media type without its parameters, in lower case: `Text/Plain; charset=utf-8` gives `text/plain`. */
+/**
+ * The media type without its parameters, in lower case: `Text/Plain; charset=utf-8` gives `text/plain`.
+ */
 export function baseContentType(contentType: string): string {
   return contentType.split(';')[0]!.trim().toLowerCase()
 }

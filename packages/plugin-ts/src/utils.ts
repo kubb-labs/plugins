@@ -141,7 +141,9 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   return [...comments, typeTag].filter(Boolean)
 }
 
-/** The example values. With `serialized`, each `serializedValue` is added as a `<caption>Serialized</caption>` example. */
+/**
+ * The example values. With `serialized`, each `serializedValue` is added as a `<caption>Serialized</caption>` example.
+ */
 export function getExampleValues(examples: Array<ast.ExampleNode> | undefined, serialized = false): Array<unknown> | undefined {
   const values = (examples ?? []).flatMap((example) => [
     ...(example.value !== undefined ? [example.value] : []),
@@ -150,7 +152,9 @@ export function getExampleValues(examples: Array<ast.ExampleNode> | undefined, s
   return values.length > 0 ? values : undefined
 }
 
-/** The JSDoc lines of a response type: `@summary`, and one `@see` per link, such as `@see getPet: getPet({ petId: $response.body#/id })`. */
+/**
+ * The JSDoc lines of a response type: `@summary`, and one `@see` per link, such as `@see getPet: getPet({ petId: $response.body#/id })`.
+ */
 export function buildResponseComments(response: ast.ResponseNode): Array<string> {
   const links = Object.entries(response.links ?? {}).map(([name, link]) => {
     const values = { ...link.parameters, ...(link.requestBody !== undefined ? { body: link.requestBody } : {}) }
@@ -178,10 +182,11 @@ type BuildOperationSchemaOptions = {
  * so the group is the only type these entries are exported as.
  */
 export function buildParams({ params, serializedExamples }: BuildParamsSchemaOptions): ast.SchemaNode {
+  const pointer = params[0]?.pointer
   return ast.factory.createSchema({
     type: 'object',
     // The group points at the `parameters` list or `headers` map that declares its first parameter.
-    pointer: params[0]?.pointer?.replace(/\/[^/]+$/, ''),
+    pointer: pointer?.slice(0, pointer.lastIndexOf('/')),
     properties: params.map((param) =>
       ast.factory.createProperty({
         name: param.name,

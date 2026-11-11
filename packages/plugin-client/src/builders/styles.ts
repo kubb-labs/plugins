@@ -21,13 +21,14 @@ function toKey(name: string): string {
  * `allowReserved` only applies to query parameters, and `contentType` to every location except path.
  */
 function serializeParameter(parameter: ast.ParameterNode): string | null {
-  const parts: Array<string> = []
-  if ((parameter.in === 'path' || parameter.in === 'query') && parameter.style) parts.push(`style: '${parameter.style}'`)
-  if (parameter.in === 'cookie' && parameter.style === 'cookie') parts.push(`style: 'cookie'`)
-  if (parameter.explode !== undefined) parts.push(`explode: ${parameter.explode}`)
-  if (parameter.in === 'query' && parameter.allowReserved !== undefined) parts.push(`allowReserved: ${parameter.allowReserved}`)
-  if (parameter.in !== 'path' && parameter.contentType) parts.push(`contentType: ${singleQuote(parameter.contentType)}`)
-  if (parameter.in === 'querystring') parts.push('querystring: true')
+  const parts = [
+    (parameter.in === 'path' || parameter.in === 'query') && parameter.style && `style: '${parameter.style}'`,
+    parameter.in === 'cookie' && parameter.style === 'cookie' && `style: 'cookie'`,
+    parameter.explode !== undefined && `explode: ${parameter.explode}`,
+    parameter.in === 'query' && parameter.allowReserved !== undefined && `allowReserved: ${parameter.allowReserved}`,
+    parameter.in !== 'path' && parameter.contentType && `contentType: ${singleQuote(parameter.contentType)}`,
+    parameter.in === 'querystring' && 'querystring: true',
+  ].filter(Boolean)
   return parts.length > 0 ? `{ ${parts.join(', ')} }` : null
 }
 

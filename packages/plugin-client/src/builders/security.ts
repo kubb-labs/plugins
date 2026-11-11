@@ -1,4 +1,4 @@
-import { isValidVarName, objectKey, stringify } from '@internals/utils'
+import { isValidVarName, objectKey, stringify, toLiteral } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 
 /**
@@ -23,31 +23,23 @@ export type Auth = {
  */
 export type SecurityRequirement = OperationAuth | Array<OperationAuth>
 
-/** A scheme of one operation. `ref` names its entry in `securitySchemes`, which the call then points at. */
+/**
+ * A scheme of one operation. `ref` names its entry in `securitySchemes`, which the call then points at.
+ */
 type OperationAuth = Auth & { ref?: string }
 
 // The order the keys of an inline scheme are printed in.
 const authKeys = ['type', 'scheme', 'name', 'in', 'scopes', 'flows', 'metadataUrl', 'url'] as const
 
-function literal(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(literal).join(', ')}]`
-  if (value && typeof value === 'object') {
-    return `{ ${Object.entries(value)
-      .map(([key, entry]) => `${objectKey(key)}: ${literal(entry)}`)
-      .join(', ')} }`
-  }
-  return stringify(value as string)
-}
-
 function serializeScheme({ ref, ...auth }: OperationAuth): string {
   const scopes = auth.scopes?.length ? auth.scopes : undefined
   if (ref) {
     const scheme = isValidVarName(ref) ? `securitySchemes.${ref}` : `securitySchemes[${stringify(ref)}]`
-    return scopes ? `{ ...${scheme}, scopes: ${literal(scopes)} }` : scheme
+    return scopes ? `{ ...${scheme}, scopes: ${toLiteral(scopes)} }` : scheme
   }
   const entries = authKeys.flatMap((key) => {
     const value = key === 'scopes' ? scopes : auth[key]
-    return value ? [`${key}: ${literal(value)}`] : []
+    return value ? [`${key}: ${toLiteral(value)}`] : []
   })
   return `{ ${entries.join(', ')} }`
 }

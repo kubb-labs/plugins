@@ -36,23 +36,31 @@ function getResponseHeaderTypes({ node, types }: { node: ast.OperationNode; type
     .map((response) => [response.statusCode, resolve.call(types.response, node, response.statusCode)])
 }
 
-/** The headers type argument of `RequestResult`, such as `{ '200': LoginUserStatus200Headers }`, or `null` when no response declares headers. */
+/**
+ * The headers type argument of `RequestResult`, such as `{ '200': LoginUserStatus200Headers }`, or `null` when no response declares headers.
+ */
 export function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
   const entries = getResponseHeaderTypes({ node, types }).map(([statusCode, name]) => `'${statusCode}': ${name}`)
   return entries.length ? `{ ${entries.join('; ')} }` : null
 }
 
-/** A runtime result type, such as `RequestResult`, in its `WithHeaders` form when `headers` is set. */
+/**
+ * A runtime result type, such as `RequestResult`, in its `WithHeaders` form when `headers` is set.
+ */
 export function resultTypeName(name: string, headers: unknown): string {
   return headers ? `${name}WithHeaders` : name
 }
 
-/** A runtime result type with its arguments, such as `RequestResultWithHeaders<Responses, Headers, ThrowOnError>`. */
+/**
+ * A runtime result type with its arguments, such as `RequestResultWithHeaders<Responses, Headers, ThrowOnError>`.
+ */
 export function buildResultTypeRef(name: string, responses: string, headers: string | null, rest: Array<string | null> = []): string {
   return `${resultTypeName(name, headers)}<${[responses, headers, ...rest].filter(Boolean).join(', ')}>`
 }
 
-/** The names of the headers types `buildResponseHeadersType` references, for the file's imports. */
+/**
+ * The names of the headers types `buildResponseHeadersType` references, for the file's imports.
+ */
 export function getResponseHeadersTypeNames({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<string> {
   return getResponseHeaderTypes({ node, types }).map(([, name]) => name)
 }
