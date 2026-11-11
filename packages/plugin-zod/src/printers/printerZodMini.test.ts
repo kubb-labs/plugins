@@ -1068,6 +1068,23 @@ describe('printerZodMini', () => {
       `)
     })
 
+    test('discriminated oneOf keeps open members, so extra keys the spec allows still parse', () => {
+      const event = (name: string) =>
+        ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [
+            ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) }),
+          ],
+        })
+      const node = ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'event', members: [event('ping'), event('done')] })
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(z) as z.ZodMiniType
+
+      expect(code).toMatch(/^z\.discriminatedUnion\('event', \[\s+z\.object\(/)
+      expect(schema.safeParse({ event: 'ping', id: '1' }).success).toBe(true)
+    })
+
     test('discriminated union flattens allOf variants with z.extend() so they discriminate', () => {
       const node = ast.factory.createSchema({
         type: 'union',

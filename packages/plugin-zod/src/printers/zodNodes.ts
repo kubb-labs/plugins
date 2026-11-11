@@ -289,8 +289,9 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemas)) &&
         !nodeMembers.some((m) => hasCoercedDiscriminator({ member: m, propertyName: discriminatorPropertyName, options: this.options }))
       const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
-      // `z.xor` already rejects a value matching several members, so its members stay as declared.
-      const isStrict = node.strategy === 'one' && !isXor && !unionsWithSiblings.has(node)
+      // `z.xor` already rejects a value matching several members, and the discriminator already picks one
+      // member of a `z.discriminatedUnion`, so their members stay as declared.
+      const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !unionsWithSiblings.has(node)
       const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && isStrict && dialect.strictMember ? dialect.strictMember(output, schema, cyclicSchemas) : output))
         .filter(Boolean)
