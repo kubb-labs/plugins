@@ -1,4 +1,4 @@
-import { defaultQuerySerializer, encodeComponent, isJsonMediaType, isRecord, jsonReplacer, notNullish, toValue } from '../serializers.ts'
+import { encodeComponent, isJsonMediaType, isRecord, jsonReplacer, notNullish, serializeDefaultQueryParam, toValue } from '../serializers.ts'
 import type { QueryParamStyle, QuerySerializer, QueryStyle } from '../serializers.ts'
 
 const queryDelimiters: Record<QueryStyle, string> = { form: ',', spaceDelimited: '%20', pipeDelimited: '|', deepObject: ',' }
@@ -71,21 +71,25 @@ export function serializeStyledQueryParam({ key, value, options }: { key: string
 }
 
 /**
- * The query serializer for parameters with an OpenAPI style, `allowReserved` or a JSON content type. A parameter without
- * a style entry uses the default serializer.
+ * The query serializer for a spec with styled query parameters: an OpenAPI style, `allowReserved` or a JSON content
+ * type. Without a style entry, arrays repeat their key and objects use `form` with explode.
  */
-export const serializeQuery: QuerySerializer = (params, options) => {
+export const serializeStyledQuery: QuerySerializer = (params, options) => {
   const parts: Array<string> = []
   for (const [key, value] of Object.entries(params)) {
     const paramOptions = options?.[key]
-    if (!paramOptions) {
-      parts.push(defaultQuerySerializer({ [key]: value }))
-    } else if (notNullish(value) && isJsonMediaType(paramOptions.contentType)) {
+    if (notNullish(value) && isJsonMediaType(paramOptions?.contentType)) {
       const json = encodeComponent(JSON.stringify(value, jsonReplacer))
-      parts.push(paramOptions.querystring ? json : `${encodeComponent(key)}=${json}`)
-    } else {
-      parts.push(...serializeStyledQueryParam({ key, value, options: paramOptions }))
+      parts.push(paramOptions?.querystring ? json : `${encodeComponent(key)}=${json}`)
+      continue
     }
+    const styled = paramOptions ?? (isRecord(value) ? {} : undefined)
+    // `URLSearchParams` writes a space as `+`, form encoding for bodies. A query follows RFC 6570, as a styled one does: `%20`.
+    parts.push(
+      ...(styled
+        ? serializeStyledQueryParam({ key, value, options: styled })
+        : serializeDefaultQueryParam(key, value).map((part) => part.replaceAll('+', '%20'))),
+    )
   }
-  return parts.filter(Boolean).join('&')
+  return parts.join('&')
 }

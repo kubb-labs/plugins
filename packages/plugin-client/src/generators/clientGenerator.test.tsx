@@ -3,7 +3,15 @@ import { ast, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, renderGeneratorOperations } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMockedPluginDriver,
+  matchFiles,
+  rawSources,
+  renderGeneratorOperation,
+  renderGeneratorOperations,
+} from '#mocks'
 import { resolverClient } from '../resolver.ts'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
 import { createClientGenerator } from './clientGenerator.tsx'
@@ -352,6 +360,16 @@ describe('clientGenerator without an operation type source', () => {
 
 describe('clientGenerator runtime files', () => {
   const sseGenerator = createClientGenerator<PluginFetch>('fetch', { templates: '/templates' })
+  // The files copied into `.kubb/`, the generated `config.ts`, and the footer of `client.ts`.
+  const readRuntime = (files: Array<ast.FileNode>) => {
+    const runtime = files.filter((file) => file.path.includes('.kubb/'))
+    return {
+      copied: runtime.flatMap((file) => (file.copy ? [file.path.split('.kubb/')[1]] : [])).sort(),
+      config: rawSources(runtime.filter((file) => file.baseName === 'config.ts'))[0],
+      footer: runtime.find((file) => file.baseName === 'client.ts')?.footer,
+    }
+  }
+  const serializerConfig = 'serializer: { query: serializeQuery, path: serializePath }'
 
   test.each([
     {
@@ -379,20 +397,19 @@ describe('clientGenerator runtime files', () => {
       resolver: resolverClient,
     })
 
-    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
-    if (!expected) return expect(runtime).toStrictEqual([])
-    expect(runtime.map((file) => [file.path.split('/').slice(-2).join('/'), file.copy, file.footer]).sort()).toStrictEqual([
-      [
-        '.kubb/client.ts',
-        undefined,
-        [
-          "import { streamMediaTypes } from './sse.ts'",
-          `client.setConfig({ ${baseURL ? `baseURL: "${baseURL}", ` : ''}mediaTypes: { ...streamMediaTypes } })`,
-          "export * from './sse.ts'",
-        ].join('\n'),
-      ],
-      ['.kubb/sse.ts', '/templates/sse.ts', undefined],
-    ])
+    const { copied, config, footer } = readRuntime(driver.fileManager.files)
+    expect(config).toContain("import { serializeQuery } from './serializers/query")
+    if (!expected) {
+      expect(copied).toStrictEqual(['serializers/path.ts', 'serializers/query.ts'])
+      expect(config).toContain(`export const defaultConfig = { ${serializerConfig} }`)
+      return expect(footer).toBeUndefined()
+    }
+    expect(copied).toStrictEqual(['serializers/path.ts', 'serializers/query.ts', 'sse.ts'])
+    expect(config).toContain("import { streamMediaTypes } from './sse")
+    expect(config).toContain(
+      `export const defaultConfig = { ${baseURL ? `baseURL: "${baseURL}", ` : ''}mediaTypes: { ...streamMediaTypes }, ${serializerConfig} }`,
+    )
+    expect(footer).toBe("export * from './sse.ts'")
   })
 
   test('exports the named servers, the first one for a name used twice', async () => {
@@ -419,8 +436,9 @@ describe('clientGenerator runtime files', () => {
       resolver: resolverClient,
     })
 
-    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
-    expect(runtime[0]?.footer).toContain("export const servers = { production: 'https://api.test', 'eu-west': 'https://eu.api.test' } as const")
+    expect(readRuntime(driver.fileManager.files).footer).toContain(
+      "export const servers = { production: 'https://api.test', 'eu-west': 'https://eu.api.test' } as const",
+    )
   })
 
   test('copies and registers only the form media types an operation sends', async () => {
@@ -439,18 +457,13 @@ describe('clientGenerator runtime files', () => {
       resolver: resolverClient,
     })
 
-    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
-    expect(runtime.map((file) => [file.path.split('.kubb/')[1], file.copy, file.footer]).sort()).toStrictEqual([
-      [
-        'client.ts',
-        undefined,
-        "import { multipartFormData } from './mediaTypes/formData.ts'\nclient.setConfig({ mediaTypes: { 'multipart/form-data': multipartFormData } })",
-      ],
-      ['mediaTypes/formData.ts', '/templates/mediaTypes/formData.ts', undefined],
-    ])
+    const { copied, config } = readRuntime(driver.fileManager.files)
+    expect(copied).toStrictEqual(['mediaTypes/formData.ts', 'serializers/path.ts', 'serializers/query.ts'])
+    expect(config).toContain("import { multipartFormData } from './mediaTypes/formData")
+    expect(config).toContain(`export const defaultConfig = { mediaTypes: { 'multipart/form-data': multipartFormData }, ${serializerConfig} }`)
   })
 
-  test('copies and registers the cookie and path serializers only for a cookie or a label or matrix path parameter', async () => {
+  test('copies and registers the cookie and styled path serializers for a cookie and a matrix path parameter', async () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: 'runtime',
@@ -476,19 +489,9 @@ describe('clientGenerator runtime files', () => {
       resolver: resolverClient,
     })
 
-    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
-    expect(runtime.map((file) => [file.path.split('.kubb/')[1], file.copy, file.footer]).sort()).toStrictEqual([
-      [
-        'client.ts',
-        undefined,
-        [
-          "import { serializeCookies } from './serializers/cookies.ts'",
-          "import { serializePath } from './serializers/pathStyles.ts'",
-          'client.setConfig({ serializer: { cookie: serializeCookies, path: serializePath } })',
-        ].join('\n'),
-      ],
-      ['serializers/cookies.ts', '/templates/serializers/cookies.ts', undefined],
-      ['serializers/pathStyles.ts', '/templates/serializers/pathStyles.ts', undefined],
-    ])
+    const { copied, config } = readRuntime(driver.fileManager.files)
+    expect(copied).toStrictEqual(['serializers/cookies.ts', 'serializers/path.ts', 'serializers/pathStyles.ts', 'serializers/query.ts'])
+    expect(config).toContain("import { serializeStyledPath } from './serializers/pathStyles")
+    expect(config).toContain('export const defaultConfig = { serializer: { query: serializeQuery, path: serializeStyledPath, cookie: serializeCookies } }')
   })
 })

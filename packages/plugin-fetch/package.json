@@ -39,6 +39,7 @@
     "src",
     "dist",
     "templates",
+    "!templates/config.ts",
     "!templates/core.ts",
     "!templates/serializers.ts",
     "!templates/standardSchema.ts",

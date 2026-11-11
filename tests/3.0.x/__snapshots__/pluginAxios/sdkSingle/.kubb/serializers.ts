@@ -68,16 +68,26 @@ export type PathParamStyle = SerializationStyle<PathStyle>
 export type CookieSerializer = (cookies: Record<string, unknown>, styles?: Record<string, CookieParamStyle>) => string
 
 /**
+ * Serializes the header parameters of a call that are arrays or objects.
+ */
+export type HeaderSerializer = (headers: HeadersInit | undefined, styles?: Record<string, HeaderParamStyle>) => HeadersInit | undefined
+
+/**
  * Turns one path parameter into its URL segment.
  */
 export type PathSerializer = (args: { name: string; value: unknown; options?: PathParamStyle }) => string
 
 /**
- * Parameter serializers, set per client or per call. Bodies are encoded by `mediaTypes`.
+ * Parameter serializers, set per client or per call. `.kubb/client.ts` registers the ones the spec needs. Bodies are
+ * encoded by `mediaTypes`.
  */
 export type Serializers = {
   query?: QuerySerializer
   path?: PathSerializer
+  /**
+   * Turns array and object header values into strings. Without one, such a value is sent as JSON.
+   */
+  header?: HeaderSerializer
   /**
    * Sends the `cookies` of a call. Kubb registers `serializeCookies` when the spec has a cookie parameter.
    */
@@ -173,76 +183,4 @@ export function serializeDefaultQueryParam(key: string, value: unknown): Array<s
   appendQueryValue({ search, key, value })
   const result = search.toString()
   return result ? [result] : []
-}
-
-/**
- * The default query serializer, for parameters without a style: arrays repeat their key and objects use the OpenAPI
- * default, `form` with explode, so `{ a: 1, b: 2 }` becomes `a=1&b=2`. Kubb registers `serializeQuery` when the spec
- * has a styled query parameter.
- */
-export const defaultQuerySerializer: QuerySerializer = (params, options) => {
-  const parts: Array<string> = []
-  for (const [key, value] of Object.entries(params)) {
-    if (options?.[key]) throw new TypeError(`Cannot send query parameter ${key} with a style, register serializer.query on the client.`)
-    // `URLSearchParams` writes a space as `+`, form encoding for bodies. A query follows RFC 6570: `%20`.
-    parts.push(
-      ...(isRecord(value)
-        ? Object.entries(value)
-            .filter(([, item]) => notNullish(item))
-            .map(([prop, item]) => `${encodeComponent(prop)}=${encodeComponent(item)}`)
-        : serializeDefaultQueryParam(key, value).map((part) => part.replaceAll('+', '%20'))),
-    )
-  }
-  return parts.join('&')
-}
-
-/**
- * The default path serializer, for the `simple` style. Kubb registers `serializePath` when the spec has a `label` or
- * `matrix` parameter.
- */
-export const defaultPathSerializer: PathSerializer = ({ name, value, options }) => {
-  if (value === undefined || value === null) return ''
-  if (options?.style && options.style !== 'simple') {
-    throw new TypeError(`Cannot send path parameter ${name} with the ${options.style} style, register serializer.path on the client.`)
-  }
-  if (Array.isArray(value)) return value.map(encodeComponent).join(',')
-  if (isRecord(value)) {
-    return Object.entries(value)
-      .map(([key, item]) => `${encodeComponent(key)}${options?.explode ? '=' : ','}${encodeComponent(item)}`)
-      .join(',')
-  }
-  return encodeComponent(value)
-}
-
-function serializeHeaderValue(value: unknown, explode: boolean): string {
-  if (Array.isArray(value)) return value.filter(notNullish).map(toValue).join(',')
-  if (!isRecord(value)) return toValue(value)
-  const entries = Object.entries(value).filter(([, item]) => notNullish(item))
-  if (explode) return entries.map(([key, item]) => `${key}=${toValue(item)}`).join(',')
-  return entries
-    .flatMap(([key, item]) => [key, item])
-    .map(toValue)
-    .join(',')
-}
-
-// Header values must be Latin-1, so non-ASCII characters become JSON escapes.
-function toAsciiJson(value: unknown): string {
-  return JSON.stringify(value, jsonReplacer).replace(/[\u007f-\uffff]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`)
-}
-
-/**
- * Serializes array and object headers with the OpenAPI `simple` style.
- */
-export function applyHeaderStyles(headers: HeadersInit | undefined, styles: Record<string, HeaderParamStyle> | undefined): HeadersInit | undefined {
-  // A `Headers` instance only holds strings, so there is nothing to style.
-  if (!headers || headers instanceof Headers) return headers
-  const entries = Array.isArray(headers) ? headers : Object.entries(headers)
-  return entries.map(([key, value]) => {
-    // Without an entry the parameter uses the OpenAPI default: `simple`, no explode.
-    const style = styles?.[key] ?? {}
-    if (value === undefined || value === null) return [key, value] as [string, HeaderValue]
-    if (isJsonMediaType(style.contentType)) return [key, toAsciiJson(value)] as [string, HeaderValue]
-    if (typeof value !== 'object') return [key, value] as [string, HeaderValue]
-    return [key, serializeHeaderValue(value, style.explode ?? false)] as [string, HeaderValue]
-  })
 }

@@ -1,4 +1,5 @@
 import { createClientCore, createLazyClient, toRequestInit } from './core.ts'
+import { defaultConfig } from './config.ts'
 import * as core from './core.ts'
 
 export * from './core.ts'
@@ -67,5 +68,6 @@ export const defaultTransport = async (request: core.ResolvedRequest): Promise<T
  * The client every generated operation uses unless a call passes its own. It is created on first use.
  */
 export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
+client.setConfig(defaultConfig)
 
 export const createClient = client.createClient
