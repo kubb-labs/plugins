@@ -109,7 +109,7 @@ export type ResolverZod = Resolver & {
      * Resolves the name for an operation response by status code.
      *
      * @example Response status names
-     * `resolver.response.status(node, 200) // → 'listPetsStatus200Schema'`
+     * `resolver.response.status(node, '200') // → 'listPetsStatus200Schema'`
      */
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**
