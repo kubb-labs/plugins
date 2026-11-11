@@ -148,9 +148,7 @@ describe('printerFaker', () => {
     })
     const node = ast.factory.createSchema({ type: 'intersection', members: [ast.factory.createSchema({ type: 'union', members: [dog] }), base] })
 
-    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe(
-      '{...{\n  type: faker.string.alpha(),\n}, ...faker.helpers.arrayElement([createDog()])}',
-    )
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('{...{\n  type: faker.string.alpha(),\n}, ...faker.helpers.arrayElement([createDog()])}')
   })
 
   test('mocks unique array items within the count limits', () => {
@@ -166,9 +164,9 @@ describe('printerFaker', () => {
     const string = ast.factory.createSchema({ type: 'string' })
     const property = (name: string, required = false) => ast.factory.createProperty({ name, required, schema: string })
 
-    expect(
-      print(ast.factory.createSchema({ type: 'object', min: 2, properties: [property('additionalProperty1')], additionalProperties: string })),
-    ).toBe('{\n  additionalProperty1: faker.string.alpha(),\n  additionalProperty2: faker.string.alpha(),\n}')
+    expect(print(ast.factory.createSchema({ type: 'object', min: 2, properties: [property('additionalProperty1')], additionalProperties: string }))).toBe(
+      '{\n  additionalProperty1: faker.string.alpha(),\n  additionalProperty2: faker.string.alpha(),\n}',
+    )
     expect(print(ast.factory.createSchema({ type: 'object', max: 1, properties: [property('a'), property('b', true), property('c')] }))).toBe(
       '{\n  b: faker.string.alpha(),\n}',
     )
