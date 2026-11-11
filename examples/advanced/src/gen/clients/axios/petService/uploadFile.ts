@@ -1,6 +1,6 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { ApiResponse } from '../../../models/ts/ApiResponse'
-import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 
 /**
  * `POST /pet/{petId}/uploadImage`
@@ -39,9 +39,7 @@ export function uploadFile<ThrowOnError extends boolean = true>(
     >({
       method: 'POST',
       url: '/pet/{petId}/uploadImage',
-      security: [
-        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
-      ],
+      security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/octet-stream' },
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),

@@ -1,7 +1,7 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
 import type { Pet } from '../../../models/ts/Pet'
-import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { findPetsByTagsResponseSchema, findPetsByTagsStatus400Schema } from '../../../zod/pet/findPetsByTagsSchema'
 
 /**
@@ -62,9 +62,7 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
     >({
       method: 'GET',
       url: '/pet/findByTags',
-      security: [
-        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
-      ],
+      security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
       ...config,
       styles: { ...config.styles, query: { tags: { explode: true }, ...config.styles?.query } },
       validator: { response: findPetsByTagsResponseSchema, error: { 400: findPetsByTagsStatus400Schema }, ...config.validator },

@@ -183,3 +183,10 @@ client.setConfig({
   baseURL: 'https://petstore.swagger.io/v2',
   mediaTypes: { 'application/x-www-form-urlencoded': urlencoded, 'multipart/form-data': multipartFormData },
 })
+/**
+ * The security schemes from the spec by name. A generated call sends one of them to the `auth` resolver.
+ */
+export const securitySchemes = {
+  petstore_auth: { type: 'oauth2', flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+  api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
+} as const

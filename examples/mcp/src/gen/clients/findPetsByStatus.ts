@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../models/ts/FindPetsByStatus'
-import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
 /**
  * `GET /pet/findByStatus/{step_id}`
@@ -21,9 +21,7 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
     apiClient<FindPetsByStatusResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/findByStatus/{step_id}',
-      security: [
-        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
-      ],
+      security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),

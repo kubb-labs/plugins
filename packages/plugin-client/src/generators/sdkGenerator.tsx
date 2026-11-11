@@ -129,7 +129,12 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
             <File.Import
-              name={['createClient', returnType === 'data' ? 'unwrapResult' : 'withUnwrap', 'resolveThrowOnError']}
+              name={[
+                'createClient',
+                returnType === 'data' ? 'unwrapResult' : 'withUnwrap',
+                'resolveThrowOnError',
+                ...(ctx.options.importPath === undefined && ops.some((op) => op.security) ? ['securitySchemes'] : []),
+              ]}
               root={file.path}
               path={clientPath}
             />
@@ -197,7 +202,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
 
       return (
         <>
-          <StreamRuntime nodes={nodes} root={root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} />
+          <StreamRuntime nodes={nodes} root={root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
           {files}
         </>
       )

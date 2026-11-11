@@ -1,4 +1,4 @@
-import { objectKey, stringify } from '@internals/utils'
+import { isValidVarName, objectKey, stringify } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 
 /**
@@ -21,9 +21,19 @@ export type Auth = {
  * One entry of a generated call's `security` array: an OpenAPI security requirement, as one scheme or as the schemes it
  * needs together. The runtime sends the first requirement whose schemes all resolve a token.
  */
-export type SecurityRequirement = Auth | Array<Auth>
+export type SecurityRequirement = OperationAuth | Array<OperationAuth>
 
-function serializeScheme(auth: Auth): string {
+/**
+ * A scheme of one operation. `ref` names its entry in the `securitySchemes` of `.kubb/client.ts`, so the call points at
+ * it instead of repeating it.
+ */
+type OperationAuth = Auth & { ref?: string }
+
+function serializeScheme({ ref, ...auth }: OperationAuth): string {
+  if (ref) {
+    const scheme = isValidVarName(ref) ? `securitySchemes.${ref}` : `securitySchemes[${stringify(ref)}]`
+    return auth.scopes?.length ? `{ ...${scheme}, scopes: [${auth.scopes.map((scope) => stringify(scope)).join(', ')}] }` : scheme
+  }
   const parts = [`type: ${stringify(auth.type)}`]
   if (auth.scheme) parts.push(`scheme: ${stringify(auth.scheme)}`)
   if (auth.name) parts.push(`name: ${stringify(auth.name)}`)
@@ -70,7 +80,7 @@ export function resolveCredential(credential: ast.AuthCredential): Auth | null {
  * Derives the per-operation security metadata from `OperationNode.auth` and the document's `meta.auth` schemes. Each
  * requirement becomes one entry: its scheme, or an array of its schemes when it needs several together. A requirement
  * with a scheme the runtime cannot place or that is not declared is left out, since it can never be met, and so is a
- * repeated one.
+ * repeated one. With `hoist`, each scheme carries its name as `ref`.
  *
  * @example
  * `getOperationSecurity({ auth: [[{ scheme: 'bearerAuth' }]], schemes: meta.auth })`
@@ -81,9 +91,11 @@ export function resolveCredential(credential: ast.AuthCredential): Auth | null {
 export function getOperationSecurity({
   auth,
   schemes,
+  hoist,
 }: {
   auth: Array<ast.AuthRequirement> | undefined
   schemes: Array<ast.AuthScheme> | undefined
+  hoist?: boolean
 }): Array<SecurityRequirement> | undefined {
   if (!auth?.length) return undefined
 
@@ -97,9 +109,9 @@ export function getOperationSecurity({
     const resolved = requirement.map(({ scheme, scopes }) => {
       const credential = credentials.get(scheme)
       const entry = credential ? resolveCredential(credential) : null
-      return entry && scopes?.length ? { ...entry, scopes } : entry
+      return entry && { ...entry, ...(scopes?.length ? { scopes } : {}), ...(hoist ? { ref: scheme } : {}) }
     })
-    if (!resolved.every((entry): entry is Auth => entry !== null)) continue
+    if (!resolved.every((entry): entry is OperationAuth => entry !== null)) continue
     security.push(resolved.length === 1 ? resolved[0]! : resolved)
   }
 
@@ -116,4 +128,17 @@ export function getOperationSecurity({
 export function buildSecurityMetadata({ security }: { security?: Array<SecurityRequirement> }): string | null {
   if (!security?.length) return null
   return `[${security.map(serializeRequirement).join(', ')}]`
+}
+
+/**
+ * The `securitySchemes` const of `.kubb/client.ts`: every scheme of the document the runtime can place, by name, or
+ * `null` when there is none. A generated call points at its schemes here.
+ */
+export function buildSecuritySchemes(schemes: Array<ast.AuthScheme> | undefined): string | null {
+  const entries = (schemes ?? []).flatMap(({ name, credential }) => {
+    const auth = resolveCredential(credential)
+    return auth ? [`${objectKey(name)}: ${serializeScheme(auth)}`] : []
+  })
+  if (!entries.length) return null
+  return `/**\n * The security schemes from the spec by name. A generated call sends one of them to the \`auth\` resolver.\n */\nexport const securitySchemes = { ${entries.join(', ')} } as const`
 }

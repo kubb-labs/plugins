@@ -1,6 +1,6 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { Payment } from '../../../models/ts/Payment'
-import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { createPaymentResponseSchema } from '../../../zod/store/payment/createPaymentSchema'
 
 /**
@@ -36,16 +36,7 @@ export function createPayment<ThrowOnError extends boolean = true>(
     >({
       method: 'POST',
       url: '/store/payments',
-      security: [
-        {
-          type: 'oauth2',
-          scopes: ['write:payments'],
-          flows: {
-            deviceAuthorization: { deviceAuthorizationUrl: 'https://petstore3.swagger.io/oauth/device', tokenUrl: 'https://petstore3.swagger.io/oauth/token' },
-          },
-          metadataUrl: 'https://petstore3.swagger.io/.well-known/oauth-authorization-server',
-        },
-      ],
+      security: [{ ...securitySchemes.device_auth, scopes: ['write:payments'] }],
       contentType: { request: 'application/json' },
       ...config,
       validator: { response: createPaymentResponseSchema, ...config.validator },
