@@ -334,6 +334,30 @@ describe('getOperationParameters', () => {
     expect(getOperationParameters(querystring('application/json')).query.map((param) => param.name)).toStrictEqual(['filter'])
   })
 
+  test('gives a querystring property the style and explode of its encoding entry', () => {
+    const filter = ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({
+          name: 'tags',
+          schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+        }),
+        ast.factory.createProperty({ name: 'limit', schema: ast.factory.createSchema({ type: 'number' }) }),
+      ],
+    })
+    // `encoding` is not on the pinned `ParameterNode` yet, so it is added to the node as the adapter will.
+    const parameter = {
+      ...ast.factory.createParameter({ name: 'q', in: 'querystring', schema: filter, contentType: 'application/x-www-form-urlencoded' }),
+      encoding: { tags: { style: 'form', explode: false } },
+    } as ast.ParameterNode
+    const node = ast.factory.createOperation({ operationId: 'search', method: 'GET', path: '/search', parameters: [parameter] })
+
+    const [tags, limit] = getOperationParameters(node).query
+    expect(tags).toMatchObject({ name: 'tags', style: 'form', explode: false })
+    expect(limit).not.toHaveProperty('style')
+    expect(limit).not.toHaveProperty('explode')
+  })
+
   test('keeps the first of a query parameter and a querystring property with the same name', () => {
     const node = ast.factory.createOperation({
       operationId: 'findPets',
