@@ -1,3 +1,4 @@
+import { isValidVarName, toLiteral } from '@internals/utils'
 import { toResponseContent } from '@internals/shared'
 
 import { ast, code } from '@kubb/kit'
@@ -90,7 +91,7 @@ export function responseReturn(body: string, status: number, response: ast.Respo
   const contentType = getContentType(response)
   const headers = getMockHeaders(response)
   // A plain variable such as `data` is checked as it is, an expression such as `data ?? createPet()` is read once.
-  const name = code.isIdentifier(body) ? body : 'body'
+  const name = isValidVarName(body) ? body : 'body'
   const prelude = name === body ? '' : `const body = ${body}\n    `
 
   // shortcut: one event per mock, upgrade when a mock needs to send several events.
@@ -98,7 +99,7 @@ export function responseReturn(body: string, status: number, response: ast.Respo
     const entry = getResponseEntry(response)
     // Without a body, a spec example already serialized as SSE text goes out as it is.
     const serialized = entry?.examples?.find((example) => example.serializedValue !== undefined)?.serializedValue
-    const fallback = serialized === undefined ? "''" : code.literal(serialized)
+    const fallback = serialized === undefined ? "''" : toLiteral(serialized)
     if (entry?.stream?.shape !== 'event') {
       return `${prelude}return ${responseLiteral(`${name} === undefined ? ${fallback} : \`\${${eventDataLines(name)}}\\n\\n\``, status, contentType, headers)}`
     }
@@ -135,16 +136,16 @@ export function getExampleBody(response: ast.ResponseNode | null | undefined): s
   const entry = getResponseEntry(response)
   const example = entry?.examples?.find((item) => item.value !== undefined || item.serializedValue !== undefined)
   if (!entry || !example) return null
-  if (example.value !== undefined) return code.literal(example.value)
+  if (example.value !== undefined) return toLiteral(example.value)
   // `responseReturn` sends raw text only for a text response. For a binary one the example would go out JSON-encoded.
   // A serialized SSE example is already events, which `responseReturn` sends as is when the body is `undefined`.
   if (!ast.mediaType.isJson(entry)) {
     const isTextBody = ast.mediaType.base(entry) !== 'text/event-stream' && getTextContentType(response) === entry.contentType
-    return isTextBody ? code.literal(example.serializedValue) : null
+    return isTextBody ? toLiteral(example.serializedValue) : null
   }
   // `responseReturn` encodes a JSON body itself, so a serialized JSON example is parsed first.
   try {
-    return code.literal(JSON.parse(example.serializedValue!))
+    return toLiteral(JSON.parse(example.serializedValue!))
   } catch {
     return null
   }

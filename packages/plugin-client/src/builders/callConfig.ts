@@ -1,3 +1,4 @@
+import { toLiteral } from '@internals/utils'
 import { getEventStream, hasTextEventData } from '@internals/shared'
 
 import { ast, code } from '@kubb/kit'
@@ -66,7 +67,7 @@ export function buildCallConfig({
     contentTypeLiteral,
     buildParseAsLiteral(content),
     stream === 'event' || stream === 'data' ? `eventShape: '${stream}'` : null,
-    rawData ? `rawData: ${code.literal(rawData)}` : null,
+    rawData ? `rawData: ${toLiteral(rawData)}` : null,
     '...config',
     ownRuntime ? styles : null,
     validatorLiteral,

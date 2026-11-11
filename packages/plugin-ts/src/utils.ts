@@ -1,3 +1,4 @@
+import { jsDocEscape } from '@internals/utils'
 import { ast, code } from '@kubb/kit'
 import { getEnumNames } from './components/Enum.tsx'
 import type { PluginTs, ResolverTs } from './types.ts'
@@ -113,7 +114,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   const exampleValues = meta?.examples ?? []
 
   const comments = [
-    hasDescription ? `@description ${code.jsDoc(meta.description)}` : null,
+    hasDescription ? `@description ${jsDocEscape(meta.description)}` : null,
     ...formatComment,
     meta && 'deprecated' in meta && meta.deprecated ? '@deprecated' : null,
     // minItems/maxItems on arrays should not be emitted as @minLength/@maxLength
@@ -124,7 +125,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
       ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? code.string(meta.default) : formatExample(meta.default)}`
       : null,
     ...exampleValues.map((example) => `@example ${formatExample(example)}`),
-    meta?.externalDocs ? `@see ${code.jsDoc([meta.externalDocs.url, meta.externalDocs.description].filter(Boolean).join(' '))}` : null,
+    meta?.externalDocs ? `@see ${jsDocEscape([meta.externalDocs.url, meta.externalDocs.description].filter(Boolean).join(' '))}` : null,
   ].filter(Boolean)
 
   // `@type` merely repeats the TypeScript type already sitting next to the property, so it only
@@ -145,7 +146,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
 export function getExampleValues(examples: Array<ast.ExampleNode> | undefined, serialized = false): Array<unknown> | undefined {
   const values = (examples ?? []).flatMap((example) => [
     ...(example.value !== undefined ? [example.value] : []),
-    ...(serialized && example.serializedValue !== undefined ? [`<caption>Serialized</caption> ${code.jsDoc(example.serializedValue)}`] : []),
+    ...(serialized && example.serializedValue !== undefined ? [`<caption>Serialized</caption> ${jsDocEscape(example.serializedValue)}`] : []),
   ])
   return values.length > 0 ? values : undefined
 }
@@ -157,9 +158,9 @@ export function buildResponseComments(response: ast.ResponseNode): Array<string>
   const links = Object.entries(response.links ?? {}).map(([name, link]) => {
     const values = { ...link.parameters, ...(link.requestBody !== undefined ? { body: link.requestBody } : {}) }
     const args = Object.entries(values).map(([key, value]) => `${key}: ${formatExample(value)}`)
-    return `@see ${code.jsDoc(`${name}: ${link.operationId ?? link.operationRef ?? ''}(${args.length ? `{ ${args.join(', ')} }` : ''})`)}`
+    return `@see ${jsDocEscape(`${name}: ${link.operationId ?? link.operationRef ?? ''}(${args.length ? `{ ${args.join(', ')} }` : ''})`)}`
   })
-  return [...(response.summary ? [`@summary ${code.jsDoc(response.summary)}`] : []), ...links]
+  return [...(response.summary ? [`@summary ${jsDocEscape(response.summary)}`] : []), ...links]
 }
 
 type BuildParamsSchemaOptions = {

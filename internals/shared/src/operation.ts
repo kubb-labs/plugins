@@ -1,4 +1,5 @@
-import { ast, code, type Group, type Memo, type Output, type Resolver, type ResolverFileParams } from '@kubb/kit'
+import { jsDocEscape } from '@internals/utils'
+import { ast, type Group, type Memo, type Output, type Resolver, type ResolverFileParams } from '@kubb/kit'
 
 /**
  * Builds the `ResolverFileParams` every operation generator passes to
@@ -506,7 +507,7 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
     node.description && `@description ${node.description}`,
     node.summary && `@summary ${node.summary}`,
     node.deprecated && '@deprecated',
-    node.externalDocs && `@see ${code.jsDoc([node.externalDocs.url, node.externalDocs.description].filter(Boolean).join(' '))}`,
+    node.externalDocs && `@see ${jsDocEscape([node.externalDocs.url, node.externalDocs.description].filter(Boolean).join(' '))}`,
   ]
 
   const filteredComments = comments.filter((comment): comment is string => Boolean(comment))

@@ -1,4 +1,4 @@
-import { buildObject, toRegExpString } from '@internals/utils'
+import { buildObject, objectKey, toRegExpString } from '@internals/utils'
 import { ast, code, Diagnostics } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema, isObjectSchema } from '../utils.ts'
@@ -91,7 +91,7 @@ function numberCall(
   const grid = isWhole && !Number.isInteger(multipleOf) ? undefined : multipleOf
   // Faker returns points of the `multipleOf` grid, ends included, so an exclusive bound moves to the next point.
   // shortcut: without a grid a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
-  const { min: lower, max: upper } = ast.schema.numberBounds({ min, max, exclusive }, { integer: isWhole, step: grid })
+  const { min: lower, max: upper } = ast.schema.numberBounds({ min, max, exclusive, integer: isWhole, step: grid })
   // Faker fills a missing `min` with `0`, and a float's missing `max` with `1`, which a lone bound on the other side contradicts.
   // The span holds grid points, so faker always finds a multiple.
   const span = 100 * (grid ?? 1)
@@ -505,10 +505,10 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           // replaces itself with a plain data property via Object.defineProperty,
           // and returns the cached value, so every subsequent read is stable.
           if (cyclicSchemas && ast.graph.containsCircular(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
-            return `get ${code.key(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
+            return `get ${objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
           }
 
-          return `${code.key(property.name)}: ${value}`
+          return `${objectKey(property.name)}: ${value}`
         })
 
         return buildObject(entries)

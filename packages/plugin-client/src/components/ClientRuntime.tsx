@@ -1,3 +1,4 @@
+import { objectKey } from '@internals/utils'
 import path from 'node:path'
 import { getFormContentTypes, hasEventStreamContent, hasStreamVariant, isEventStream } from '@internals/shared'
 
@@ -10,7 +11,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 function buildServersExport(servers: Array<ast.InputServer> | undefined): string | null {
   const named = ast.server.byName(servers)
   if (!named.size) return null
-  const entries = [...named].map(([name, { url }]) => `${code.key(name)}: ${code.string(url)}`)
+  const entries = [...named].map(([name, { url }]) => `${objectKey(name)}: ${code.string(url)}`)
   return `/**\n * The servers from the spec by name, for \`baseURL\`.\n */\nexport const servers = { ${entries.join(', ')} } as const`
 }
 

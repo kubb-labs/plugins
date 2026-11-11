@@ -1,5 +1,5 @@
-import { lazyGetter } from '@internals/utils'
-import { ast, code } from '@kubb/kit'
+import { lazyGetter, objectKey } from '@internals/utils'
+import { ast } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyMiniModifiers,
@@ -98,7 +98,7 @@ function buildZodMiniObjectShape(ctx: Parameters<typeof buildObjectShape>[0], no
       nullish: schema.nullish,
       defaultValue: meta.default,
     })
-    return cyclic ? lazyGetter({ name, body }) : `${code.key(name)}: ${body}`
+    return cyclic ? lazyGetter({ name, body }) : `${objectKey(name)}: ${body}`
   })
 }
 

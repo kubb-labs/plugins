@@ -80,3 +80,16 @@ export function getNestedAccessor(param: string | Array<string>, accessor: strin
   if (parts.length === 0 || (parts.length === 1 && parts[0] === '')) return null
   return `${accessor}?.['${`${parts.join("']?.['")}']`}`
 }
+
+/**
+ * Escapes an `@` at the start of a line, so a multi-line description can't start a new JSDoc tag.
+ * Editors render `\@` as `@` in hovers.
+ *
+ * @example
+ * ```ts
+ * jsDocEscape('intro\n@example value') // 'intro\n\\@example value'
+ * ```
+ */
+export function jsDocEscape(input: unknown): string {
+  return `${input}`.replace(/^(\s*)@/gm, '$1\\@')
+}

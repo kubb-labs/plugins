@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getNestedAccessor, toRegExpString } from './strings.ts'
+import { getNestedAccessor, jsDocEscape, toRegExpString } from './strings.ts'
 
 describe('toRegExpString', () => {
   it('renders a RegExp constructor call', () => {
@@ -79,5 +79,11 @@ describe('getNestedAccessor', () => {
 
   it('returns null for an empty path', () => {
     expect(getNestedAccessor('', 'root')).toBeNull()
+  })
+})
+
+describe('jsDocEscape', () => {
+  it('escapes an @ that starts a line and keeps the rest', () => {
+    expect(jsDocEscape('intro\n  @example value\nmail me@example.com')).toBe('intro\n  \\@example value\nmail me@example.com')
   })
 })

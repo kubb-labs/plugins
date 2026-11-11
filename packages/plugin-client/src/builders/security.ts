@@ -1,3 +1,4 @@
+import { isValidVarName, objectKey, toLiteral } from '@internals/utils'
 import { ast, code } from '@kubb/kit'
 
 /**
@@ -33,12 +34,12 @@ const inlineAuthKeys = ['type', 'scheme', 'name', 'in', 'scopes', 'flows', 'meta
 function serializeScheme({ ref, ...auth }: OperationAuth): string {
   const scopes = auth.scopes?.length ? auth.scopes : undefined
   if (ref) {
-    const schemeRef = code.isIdentifier(ref) ? `securitySchemes.${ref}` : `securitySchemes[${code.string(ref)}]`
-    return scopes ? `{ ...${schemeRef}, scopes: ${code.literal(scopes)} }` : schemeRef
+    const schemeRef = isValidVarName(ref) ? `securitySchemes.${ref}` : `securitySchemes[${code.string(ref)}]`
+    return scopes ? `{ ...${schemeRef}, scopes: ${toLiteral(scopes)} }` : schemeRef
   }
   const entries = inlineAuthKeys.flatMap((key) => {
     const entryValue = key === 'scopes' ? scopes : auth[key]
-    return entryValue ? [`${key}: ${code.literal(entryValue)}`] : []
+    return entryValue ? [`${key}: ${toLiteral(entryValue)}`] : []
   })
   return `{ ${entries.join(', ')} }`
 }
@@ -87,7 +88,7 @@ export function getOperationSecurity({
   schemes: Array<ast.AuthScheme> | undefined
   hoist?: boolean
 }): Array<SecurityRequirement> | undefined {
-  const security = ast.auth.resolve(auth, schemes).flatMap((requirement): Array<SecurityRequirement> => {
+  const security = ast.auth.resolve({ auth, schemes }).flatMap((requirement): Array<SecurityRequirement> => {
     const resolved = requirement.map(({ name, credential, scopes }) => {
       const entry = resolveCredential(credential)
       return entry && { ...entry, ...(scopes.length ? { scopes } : {}), ...(hoist ? { ref: name } : {}) }
@@ -117,7 +118,7 @@ export function buildSecurityMetadata({ security }: { security?: Array<SecurityR
 export function buildSecuritySchemes(schemes: Array<ast.AuthScheme> | undefined): string | null {
   const entries = (schemes ?? []).flatMap(({ name, credential }) => {
     const auth = resolveCredential(credential)
-    return auth ? [`${code.key(name)}: ${serializeScheme(auth)}`] : []
+    return auth ? [`${objectKey(name)}: ${serializeScheme(auth)}`] : []
   })
   if (!entries.length) return null
   return `/**\n * The security schemes from the spec by name. A generated call sends one of them to the \`auth\` resolver.\n */\nexport const securitySchemes = { ${entries.join(', ')} } as const`

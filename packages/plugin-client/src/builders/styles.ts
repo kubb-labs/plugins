@@ -1,3 +1,4 @@
+import { isValidVarName } from '@internals/utils'
 import { ast, code } from '@kubb/kit'
 
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
@@ -8,7 +9,7 @@ type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
  * URL, and the other locations by the key it serializes.
  */
 function toKey(name: string): string {
-  return code.isIdentifier(name) ? name : JSON.stringify(name)
+  return isValidVarName(name) ? name : JSON.stringify(name)
 }
 
 /**
@@ -51,7 +52,7 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
       allowReserved !== undefined && `allowReserved: ${allowReserved}`,
       contentType && `contentType: ${JSON.stringify(contentType)}`,
     ].filter(Boolean)
-    return `${code.isIdentifier(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`
+    return `${isValidVarName(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`
   })
 }
 

@@ -1,4 +1,4 @@
-export { buildJSDoc, buildList, buildObject, lazyGetter } from './codegen.ts'
+export { buildJSDoc, buildList, buildObject, lazyGetter, objectKey, toLiteral } from './codegen.ts'
 export { getRelativePath, toFilePath } from './fs.ts'
-export { ensureValidVarName } from './reserved.ts'
-export { getNestedAccessor, toRegExpString } from './strings.ts'
+export { ensureValidVarName, isValidVarName } from './reserved.ts'
+export { getNestedAccessor, jsDocEscape, toRegExpString } from './strings.ts'

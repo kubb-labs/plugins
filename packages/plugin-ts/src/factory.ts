@@ -350,7 +350,7 @@ export function createEnumDeclaration({
   const query = { type: 'TSTypeQuery', exprName: identifier(identifierName), typeArguments: null }
 
   return [
-    `export const ${identifierName} = {\n${properties.map((property) => code.indent(property)).join(',\n')},\n} as const;`,
+    `export const ${identifierName} = {\n${properties.map((property) => code.indent({ text: property })).join(',\n')},\n} as const;`,
     typeAlias({
       type: 'TSIndexedAccessType',
       objectType: { type: 'TSParenthesizedType', typeAnnotation: query },
