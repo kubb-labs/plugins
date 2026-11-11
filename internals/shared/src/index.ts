@@ -21,6 +21,7 @@ export {
   hasEventStreamContent,
   hasStreamVariant,
   hasFormBody,
+  hasTextEventData,
   isEventStream,
   isSuccessStatusCode,
   requestGroupOrder,

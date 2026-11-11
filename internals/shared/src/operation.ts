@@ -206,6 +206,31 @@ export function isEventStream(node: ast.OperationNode): boolean {
   return getEventStream(node) !== null
 }
 
+// A stream without a schema is a `blob` with a string primitive, so it keeps the JSON-parse default.
+function isTextSchema(schema: ast.SchemaNode | null | undefined): boolean {
+  if (!schema) return false
+  const resolved = ast.resolveRef(schema)
+  return resolved.type !== 'blob' && resolved.primitive === 'string'
+}
+
+/**
+ * Whether an operation streams Server-Sent Events whose `data` the document types as a string, so the client keeps each
+ * `data` as text instead of JSON-parsing it. With an event-shaped `itemSchema`, every event must type `data` as a string.
+ */
+export function hasTextEventData(node: ast.OperationNode): boolean {
+  const shape = getEventStream(node)
+  const entry = getPrimarySuccessResponse(node)?.content?.[0]
+  if (!entry || (shape !== 'data' && shape !== 'event')) return false
+  if (shape === 'data') return isTextSchema(entry.stream?.schema ?? entry.schema)
+
+  const item = entry.stream?.schema ? ast.resolveRef(entry.stream.schema) : undefined
+  const events = item && item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : item ? [item] : []
+  return (
+    events.length > 0 &&
+    events.every((event) => isTextSchema(ast.narrowSchema(ast.resolveRef(event), 'object')?.properties.find((property) => property.name === 'data')?.schema))
+  )
+}
+
 /**
  * Whether the primary success response offers `text/event-stream`, alone or next to other content types. The client asks
  * for the stream by default and ships the `sse.ts` runtime, so a mixed response can be read as events too.

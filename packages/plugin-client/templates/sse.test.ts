@@ -103,6 +103,12 @@ describe('parseEventStream', () => {
     expect(events).toStrictEqual([message({ data: { n: 1 } }), message({ data: 'hello world' })])
   })
 
+  test('keeps every data as text with rawData', async () => {
+    const events = await collect(parseEventStream({ stream: streamOf(['data: hello\n\ndata: 42\n\ndata: true\n\n']), rawData: true }))
+
+    expect(events).toStrictEqual([message({ data: 'hello' }), message({ data: '42' }), message({ data: 'true' })])
+  })
+
   test('reassembles an event split across chunks', async () => {
     expect(await collect(parseEventStream({ stream: streamOf(['data: {"hal', 'f":true}\n\n']) }))).toStrictEqual([message({ data: { half: true } })])
   })
@@ -272,6 +278,14 @@ describe('streamMediaTypes', () => {
     const transform = (event: ServerSentEvent) => ({ ...event, data: { n: event.data } })
     const result = await stream(streamOf(['data: 1\n\n']), { transform, validator: { response: validator } })
     expect(await collect(result)).toStrictEqual([message({ data: { n: 1, checked: true } })])
+  })
+
+  test('passes rawData to the parser, so a string validator sees the text', async () => {
+    const isString: StandardSchemaValidator = {
+      '~standard': { validate: (value) => (typeof value === 'string' ? { value } : { issues: [{ message: 'not a string' }] }) },
+    }
+    const result = await stream(streamOf(['data: hello\n\ndata: 42\n\n']), { rawData: true, validator: { response: isString } })
+    expect(await collect(result)).toStrictEqual([message({ data: 'hello' }), message({ data: '42' })])
   })
 
   test('validates the whole event for the event shape and keeps id and retry', async () => {

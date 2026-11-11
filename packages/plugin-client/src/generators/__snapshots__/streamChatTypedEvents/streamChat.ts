@@ -18,6 +18,7 @@ export function streamChat<ThrowOnError extends boolean = true>(
       url: '/chat',
       contentType: { response: 'text/event-stream' },
       eventShape: 'event',
+      rawData: true,
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),
