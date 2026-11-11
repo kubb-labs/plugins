@@ -16,7 +16,7 @@ import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
-import { containsIdentifier, shouldCoerce } from '../utils.ts'
+import { shouldCoerce } from '../utils.ts'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
@@ -45,17 +45,6 @@ function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boo
   return resolver.memo(`zodPrinter:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
 }
 
-// `checks` also returns the refs inside `conditionals` and `contains`. A check the printer leaves out, such as
-// `minContains: 0`, names no schema, so its import is dropped.
-function resolveImports(resolver: ResolverZod, params: Parameters<ResolverZod['imports']>[0], print: () => string | null | undefined) {
-  const imports = resolver.imports(params)
-  const withChecks = resolver.imports({ ...params, checks: true })
-  if (withChecks.length === imports.length) return imports
-  const text = print() ?? ''
-
-  return withChecks.filter((entry) => [entry.name].flat().some((name) => containsIdentifier(text, String(name))))
-}
-
 /**
  * Built-in generator for `@kubb/plugin-zod`. Emits one Zod schema per
  * schema in the spec plus per-operation request/response/parameter schemas.
@@ -82,9 +71,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const hasDirectionalNode = !mini && containsDirectionalNode({ node, printerOptions })
 
     const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions }) : [])
-    const importEntries = resolveImports(resolver, { node, root, output, group: group ?? undefined }, () =>
-      getPrinter(resolver, printerOptions, mini, 'decode').print(node),
-    )
+    const importEntries = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
     const inputImportEntries = hasDirectionalNode
       ? [...directionalRefNames].map((schemaName) => ({
           name: [resolver.schema.inputName(schemaName)],
@@ -181,17 +168,14 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
       const schemaPrinter = getPrinter(resolver, { ...printerOptions, keysToOmit }, mini, direction)
-      const imports = resolveImports(
-        resolver,
-        {
-          node: schema,
-          root,
-          output,
-          group: group ?? undefined,
-          name: (schemaName) => (directionalRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
-        },
-        () => schemaPrinter.print(schema),
-      )
+      const imports = resolver.imports({
+        node: schema,
+        root,
+        output,
+        group: group ?? undefined,
+        checks: true,
+        name: (schemaName) => (directionalRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
+      })
 
       return (
         <>

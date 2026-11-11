@@ -609,20 +609,3 @@ export function printWithOmit(
 
   return modify(base, meta)
 }
-
-const identifierChars: ReadonlySet<string> = new Set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$')
-
-/**
- * Whether `text` uses `name` as a whole identifier, so `petSchema` does not match inside `petSchemaList`.
- */
-export function containsIdentifier(text: string, name: string): boolean {
-  // `indexOf('')` never returns -1, so an empty name would loop forever.
-  if (!name) return false
-  for (let index = text.indexOf(name); index !== -1; index = text.indexOf(name, index + 1)) {
-    const before = text[index - 1]
-    const after = text[index + name.length]
-    if ((before === undefined || !identifierChars.has(before)) && (after === undefined || !identifierChars.has(after))) return true
-  }
-
-  return false
-}
