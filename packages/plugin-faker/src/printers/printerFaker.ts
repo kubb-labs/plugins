@@ -69,7 +69,7 @@ const integerFormats: ReadonlySet<string> = new Set(['int32', 'int64', 'uint64']
 
 const maxInt32 = 2_147_483_647
 // The largest value of a 32-bit format, which faker's default `max` exceeds.
-const formatMax: Record<string, number> = { int32: maxInt32, uint32: 4_294_967_295 }
+const maxValueByFormat: Record<string, number> = { int32: maxInt32, uint32: 4_294_967_295 }
 
 /**
  * Whether a ref points back into its own cycle: at the schema being printed, or from one cyclic schema at another. Such a
@@ -90,26 +90,26 @@ function numberCall(
   kind: 'float' | 'int' | 'bigInt',
   { min, max, exclusive, multipleOf }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive' | 'multipleOf'>,
 ): string {
-  const whole = kind !== 'float'
+  const isWhole = kind !== 'float'
   // Faker's `int` and `bigInt` reject a fractional `multipleOf`.
-  const grid = whole && !Number.isInteger(multipleOf) ? undefined : multipleOf
+  const grid = isWhole && !Number.isInteger(multipleOf) ? undefined : multipleOf
   // Faker returns points of the `multipleOf` grid, ends included, so an exclusive bound moves to the next point. A whole number's grid is 1.
   // shortcut: without a grid a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
-  const step = grid ?? (whole ? 1 : undefined)
+  const step = grid ?? (isWhole ? 1 : undefined)
   const above = (bound: number) => (step ? (Math.floor(bound / step) + 1) * step : bound)
   const below = (bound: number) => (step ? (Math.ceil(bound / step) - 1) * step : bound)
   // A bound past `Number.MAX_SAFE_INTEGER`, such as int64's, prints as a rounded or invalid literal, so it is left out.
-  const tightest = (pick: (...bounds: Array<number>) => number, bounds: Array<number | undefined>) => {
-    const usable = bounds.filter((bound): bound is number => bound !== undefined && (!whole || Number.isSafeInteger(bound)))
+  const tightestBound = (pick: (...bounds: Array<number>) => number, bounds: Array<number | undefined>) => {
+    const usable = bounds.filter((bound): bound is number => bound !== undefined && (!isWhole || Number.isSafeInteger(bound)))
     return usable.length ? pick(...usable) : undefined
   }
-  const lower = tightest(Math.max, [min !== undefined && whole ? Math.ceil(min) : min, exclusive?.min === undefined ? undefined : above(exclusive.min)])
-  const upper = tightest(Math.min, [max !== undefined && whole ? Math.floor(max) : max, exclusive?.max === undefined ? undefined : below(exclusive.max)])
+  const lower = tightestBound(Math.max, [min !== undefined && isWhole ? Math.ceil(min) : min, exclusive?.min === undefined ? undefined : above(exclusive.min)])
+  const upper = tightestBound(Math.min, [max !== undefined && isWhole ? Math.floor(max) : max, exclusive?.max === undefined ? undefined : below(exclusive.max)])
   // Faker fills a missing `min` with `0`, and a float's missing `max` with `1`, which a lone bound on the other side contradicts.
   // The span holds grid points, so faker always finds a multiple.
   const span = 100 * (grid ?? 1)
   const maxValue = kind === 'float' && lower !== undefined && upper === undefined && (lower >= 1 || grid !== undefined) ? lower + span : upper
-  const minValue = maxValue !== undefined && lower === undefined && (whole ? maxValue < 0 : maxValue <= 0) ? maxValue - span : lower
+  const minValue = maxValue !== undefined && lower === undefined && (isWhole ? maxValue < 0 : maxValue <= 0) ? maxValue - span : lower
   const suffix = kind === 'bigInt' ? 'n' : ''
   const args = [
     minValue !== undefined && `min: ${minValue}${suffix}`,
@@ -150,13 +150,13 @@ function dateTimeCall(
 }
 
 // Eight letters or digits are base64url as they are: no padding, and none of the characters base64 swaps.
-const ENCODING_CALLS = new Map<string | undefined, string>([
+const encodingCalls = new Map<string | undefined, string>([
   ['base64', 'btoa(faker.string.alpha())'],
   ['base64url', 'faker.string.alphanumeric(8)'],
 ])
 
 // Formats `plugin-zod` checks with a dedicated constructor, which a random string fails.
-const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
+const stringFormatCalls = new Map<string | undefined, string>([
   ['jwt', 'faker.internet.jwt()'],
   ['ulid', 'faker.string.ulid()'],
   ['iban', 'faker.finance.iban()'],
@@ -165,11 +165,7 @@ const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
 ])
 
 // The members an escape becomes inside a character class: `\d` and `\w`, and the punctuation `faker.helpers.fromRegExp` reads there.
-const FAKER_CLASS_ESCAPES = new Map<string, string>([
-  ['d', '0-9'],
-  ['w', 'A-Za-z0-9_'],
-  ...Array.from('-!@#$&()`.+,"', (char): [string, string] => [char, char]),
-])
+const classEscapes = new Map<string, string>([['d', '0-9'], ['w', 'A-Za-z0-9_'], ...Array.from('-!@#$&()`.+,"', (char): [string, string] => [char, char])])
 
 /**
  * Rewrites a pattern into the grammar `faker.helpers.fromRegExp` reads: `\d` and `\w` become character classes, an escaped
@@ -192,7 +188,7 @@ function toFakerPattern(pattern: string): string {
         if (result[classStart] !== '-') result = `${result.slice(0, classStart)}-${result.slice(classStart)}`
         continue
       }
-      const set = FAKER_CLASS_ESCAPES.get(next)
+      const set = classEscapes.get(next)
       if (set === undefined) result += `\\${next}`
       if (set !== undefined) result += inClass ? set : `[${set}]`
       continue
@@ -307,14 +303,14 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           return node.format === 'int32' ? `faker.number.int({ max: ${maxInt32} }).toString()` : 'faker.number.bigInt().toString()'
         }
 
-        const formatCall = STRING_FORMAT_CALLS.get(node.format)
+        const formatCall = stringFormatCalls.get(node.format)
         if (formatCall) return formatCall
 
         const contentSchema = jsonContentSchema(node)
         // The document is typed by its own schema, not by the string that holds it.
         if (contentSchema) return `JSON.stringify(${printNested(contentSchema, { typeName: undefined, nestedInObject: true, nestedInUnion: false })})`
 
-        const encodingCall = ENCODING_CALLS.get(node.content?.encoding?.toLowerCase())
+        const encodingCall = encodingCalls.get(node.content?.encoding?.toLowerCase())
         if (encodingCall) return encodingCall
 
         const { min, max } = node
@@ -331,7 +327,10 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       ipv6: () => 'faker.internet.ipv6()',
       number: (node) => numberCall('float', node),
       integer: (node) =>
-        numberCall('int', node.format && node.format in formatMax ? { ...node, max: Math.min(node.max ?? Infinity, formatMax[node.format]!) } : node),
+        numberCall(
+          'int',
+          node.format && node.format in maxValueByFormat ? { ...node, max: Math.min(node.max ?? Infinity, maxValueByFormat[node.format]!) } : node,
+        ),
       bigint: (node) => numberCall('bigInt', node),
       blob: () => 'new Blob([faker.string.alpha()])',
       datetime(node) {

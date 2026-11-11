@@ -473,7 +473,7 @@ export function applyMiniModifiers({ value, schema, nullable, optional, nullish,
 /**
  * Calls for string `format`s with a dedicated Zod constructor; a `Map` so `constructor` cannot hit `Object.prototype`.
  */
-export const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
+export const stringFormatCalls = new Map<string | undefined, string>([
   ['byte', 'z.base64()'],
   ['base64', 'z.base64()'],
   ['base64url', 'z.base64url()'],
@@ -487,7 +487,7 @@ export const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
 /**
  * Calls for a string's `contentEncoding` with a dedicated Zod constructor.
  */
-export const CONTENT_ENCODING_CALLS = new Map<string | undefined, string>([
+export const contentEncodingCalls = new Map<string | undefined, string>([
   ['base64', 'z.base64()'],
   ['base64url', 'z.base64url()'],
 ])

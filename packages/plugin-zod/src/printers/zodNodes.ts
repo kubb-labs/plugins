@@ -6,7 +6,7 @@ import {
   buildEnum,
   buildLiteral,
   type buildObjectShape,
-  CONTENT_ENCODING_CALLS,
+  contentEncodingCalls,
   getMemberConstraint,
   hasInputChecks,
   hasKeyCheck,
@@ -22,7 +22,7 @@ import {
   preserveRequiredProperties,
   shouldCoerce,
   strictOneOfNode,
-  STRING_FORMAT_CALLS,
+  stringFormatCalls,
 } from '../utils.ts'
 
 /**
@@ -127,7 +127,7 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
     null: () => 'z.null()',
     string(node) {
       const coerce = shouldCoerce(this.options.coercion, 'strings')
-      const call = coerce ? undefined : (STRING_FORMAT_CALLS.get(node.format) ?? CONTENT_ENCODING_CALLS.get(node.content?.encoding?.toLowerCase()))
+      const call = coerce ? undefined : (stringFormatCalls.get(node.format) ?? contentEncodingCalls.get(node.content?.encoding?.toLowerCase()))
       const base = call ?? (coerce ? 'z.coerce.string()' : 'z.string()')
       const pattern = node.pattern ?? integerFormatPattern(node.format)
       const value = `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
@@ -399,7 +399,7 @@ function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullabl
  * A JavaScript condition that is true when `value` matches `schema`. A required `unknown` property means "the key
  * is present", which a Zod object would accept as missing, so those keys are checked with `in`.
  */
-function matchesCondition(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
+function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
   if (!schema) return 'true'
   const object = ast.narrowSchema(schema, ast.schemaTypes.object)
   const keys =
@@ -445,7 +445,7 @@ export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.Prin
         keySchema: hasKeyCheck(node) ? this.transform(node.propertyNames) : undefined,
         conditionals: (node.conditionals ?? []).map(
           (entry) =>
-            `z.refine((value) => (${matchesCondition(this, entry.if)} ? ${matchesCondition(this, entry.then)} : ${matchesCondition(this, entry.else)}), { message: "Value does not meet a conditional schema" })`,
+            `z.refine((value) => (${conditionExpression(this, entry.if)} ? ${conditionExpression(this, entry.then)} : ${conditionExpression(this, entry.else)}), { message: "Value does not meet a conditional schema" })`,
         ),
       })
     }

@@ -29,7 +29,7 @@ export type SecurityRequirement = OperationAuth | Array<OperationAuth>
 type OperationAuth = Auth & { ref?: string }
 
 // The order the keys of an inline scheme are printed in.
-const authKeys = ['type', 'scheme', 'name', 'in', 'scopes', 'flows', 'metadataUrl', 'url'] as const
+const inlineAuthKeys = ['type', 'scheme', 'name', 'in', 'scopes', 'flows', 'metadataUrl', 'url'] as const
 
 function serializeScheme({ ref, ...auth }: OperationAuth): string {
   const scopes = auth.scopes?.length ? auth.scopes : undefined
@@ -37,7 +37,7 @@ function serializeScheme({ ref, ...auth }: OperationAuth): string {
     const scheme = isValidVarName(ref) ? `securitySchemes.${ref}` : `securitySchemes[${stringify(ref)}]`
     return scopes ? `{ ...${scheme}, scopes: ${toLiteral(scopes)} }` : scheme
   }
-  const entries = authKeys.flatMap((key) => {
+  const entries = inlineAuthKeys.flatMap((key) => {
     const value = key === 'scopes' ? scopes : auth[key]
     return value ? [`${key}: ${toLiteral(value)}`] : []
   })

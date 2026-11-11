@@ -7,7 +7,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { resolveOperationData } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { Operation } from '../components/Operation.tsx'
-import { StreamRuntime } from '../components/StreamRuntime.tsx'
+import { ClientRuntime } from '../components/ClientRuntime.tsx'
 import type { ContractClientFactory } from '../types.ts'
 
 /**
@@ -18,7 +18,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
     name,
     renderer: jsxRenderer,
     operations(nodes, ctx) {
-      return <StreamRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
+      return <ClientRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
     },
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null
