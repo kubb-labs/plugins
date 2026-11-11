@@ -10,6 +10,13 @@ export function getMockStatus(statusCode: ast.StatusCode): number {
   return Number.isNaN(code) ? (getStatusClass(statusCode) ?? 2) * 100 : code
 }
 
+// Headers use the `simple` style, so an array or object is sent comma-separated.
+function toSimpleStyle(value: unknown): string {
+  if (Array.isArray(value)) return value.join(',')
+  if (typeof value === 'object' && value !== null) return Object.entries(value).flat().join(',')
+  return String(value)
+}
+
 /**
  * The declared headers a mock sends, each with its example's `serializedValue` or `value`, else its schema's `default` or first example.
  */
@@ -20,12 +27,7 @@ export function getMockHeaders(response: ast.ResponseNode | null | undefined): A
     const example = header.examples?.find((entry) => entry.serializedValue !== undefined || entry.value !== undefined)
     const headerValue = example?.serializedValue ?? example?.value ?? header.schema.default ?? header.schema.examples?.[0]
     if (headerValue === undefined || headerValue === null) return []
-    // Headers use the `simple` style, so an array is sent comma-separated.
-    const headerText = Array.isArray(headerValue)
-      ? headerValue.join(',')
-      : typeof headerValue === 'object'
-        ? Object.entries(headerValue).flat().join(',')
-        : String(headerValue)
+    const headerText = toSimpleStyle(headerValue)
     // `Headers` throws on a line break or a character above U+00FF, so such an example is left out.
     return /^[\t\x20-\x7E\x80-\xFF]*$/.test(headerText) ? [[header.name, headerText]] : []
   })

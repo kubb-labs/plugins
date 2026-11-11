@@ -38,7 +38,6 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   // The OpenAPI 3.2 `cookie` style sends a value as it is, and throws on one it cannot send, like the generated clients do.
   // With `explode` (its default) an array sends one cookie per item and an object one cookie per key, otherwise both join with commas.
   const rawParameters = node.parameters.filter((parameter) => parameter.in === 'cookie' && parameter.style === 'cookie')
-  const rawCookies = rawParameters.map((parameter) => singleQuote(parameter.name))
   // Only an array or object needs the join and explode code. A value with one primitive type goes out as one cookie.
   const isComposite = (parameter: ast.ParameterNode) =>
     !['string', 'number', 'integer', 'bigint', 'boolean'].includes(ast.resolveRef(parameter.schema).primitive ?? '')
@@ -65,7 +64,7 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
     ? 'const formCookie = (item: unknown): string => encodeURIComponent(item instanceof Date ? item.toISOString() : String(item))\n'
     : ''
   // Keep the cookie-octet pattern in step with `rawCookieValue` in plugin-client's `templates/serializers.ts`.
-  const rawCookieLine = rawCookies.length
+  const rawCookieLine = rawParameters.length
     ? `const rawCookie = (value: unknown): string => {
 ${compositeLines}  const text = value instanceof Date ? value.toISOString() : String(value)
   if (!/^[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]*$/.test(text)) throw new TypeError('A cookie has characters the cookie style cannot send, escape it first.')

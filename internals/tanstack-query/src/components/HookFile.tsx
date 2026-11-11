@@ -35,10 +35,6 @@ type ResolvedHookFile = {
    */
   resultTypeName: 'RequestResult' | 'RequestResultWithHeaders'
   returnType: ReturnTypeOption
-  /**
-   * Whether the client's results carry the declared response headers. A custom client module keeps untyped headers.
-   */
-  typedHeaders: boolean
   banner: string | null
   footer: string | null
 }
@@ -61,7 +57,6 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
     })
   }
   const types = resolveOperationTypes(ctx.driver, resolver.pluginName)
-  // A custom client module keeps its two-argument `RequestResult`, so its hooks get no typed headers.
   const tsResolver = types.resolver
   const headerTypeNames = returnType === 'data' || !contractOp.typedHeaders ? [] : getResponseHeadersTypeNames({ node, types: tsResolver })
 
@@ -96,7 +91,6 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
     importedTypeNames,
     resultTypeName: headerTypeNames.length ? 'RequestResultWithHeaders' : 'RequestResult',
     returnType,
-    typedHeaders: contractOp.typedHeaders,
     banner: resolver.default.banner(ctx.meta, { output, config, file: fileMeta }),
     footer: resolver.default.footer(ctx.meta, { output, config, file: fileMeta }),
   }

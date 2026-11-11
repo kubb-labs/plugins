@@ -1,3 +1,11 @@
+// A raw line break would end the literal.
+const singleQuoteEscapes = new Map([
+  ['\\', '\\\\'],
+  ["'", "\\'"],
+  ['\n', '\\n'],
+  ['\r', '\\r'],
+])
+
 /**
  * Wraps a value in single quotes for emitting a single-quoted JavaScript string literal, escaping
  * any backslash or single quote in the content.
@@ -8,14 +16,6 @@
  * singleQuote("o'clock")  // "'o\\'clock'"
  * ```
  */
-// A raw line break would end the literal.
-const singleQuoteEscapes = new Map([
-  ['\\', '\\\\'],
-  ["'", "\\'"],
-  ['\n', '\\n'],
-  ['\r', '\\r'],
-])
-
 export function singleQuote(value: string | number | boolean | undefined | null): string {
   if (value === undefined || value === null) return "''"
   const escaped = Array.from(String(value), (char) => singleQuoteEscapes.get(char) ?? char).join('')

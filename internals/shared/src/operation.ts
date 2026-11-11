@@ -229,7 +229,8 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
   if (shape === 'data') return isTextSchema(entry.stream?.schema ?? entry.schema)
 
   const item = entry.stream?.schema ? ast.resolveRef(entry.stream.schema) : undefined
-  const events = item && item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : item ? [item] : []
+  if (!item) return false
+  const events = item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : [item]
   // A discriminator makes each event an intersection of its `$ref` and the pinned `event`, so every part is read.
   const propertySchemas = (event: ast.SchemaNode, propertyName: string) =>
     ast.resolveSchemaProperties({ node: event, propertyName }).map(({ schema }) => schema)
@@ -791,9 +792,6 @@ export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string
   return Number.isNaN(code) ? null : code
 }
 
-/**
- * The class digit of a status code or range, such as `2` for `201` and `2xx`, or `null` for `default`.
- */
 const statusClassByRange = new Map([
   ['1xx', 1],
   ['2xx', 2],
@@ -802,6 +800,9 @@ const statusClassByRange = new Map([
   ['5xx', 5],
 ])
 
+/**
+ * The class digit of a status code or range, such as `2` for `201` and `2xx`, or `null` for `default`.
+ */
 export function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
   const rangeClass = statusClassByRange.get(String(statusCode))
   if (rangeClass) return rangeClass

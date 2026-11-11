@@ -52,7 +52,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
           tsResolver={tsResolver}
           clientReturnType={contractOp.returnType}
           returnType={hook.returnType}
-          typedHeaders={hook.typedHeaders}
+          typedHeaders={hook.contractOp.typedHeaders}
         />
 
         {mutation && hooks && (
@@ -67,7 +67,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
               tsResolver={tsResolver}
               customOptions={customOptions}
               returnType={hook.returnType}
-              typedHeaders={hook.typedHeaders}
+              typedHeaders={hook.contractOp.typedHeaders}
             />
           </>
         )}

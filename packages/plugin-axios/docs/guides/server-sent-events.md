@@ -424,7 +424,7 @@ The events alone carry no `response` or `lastEventId`. To resume a dropped strea
 
 ## The runtime files
 
-`.kubb/sse.ts` holds `parseEventStream`, `parseJsonLines`, and the `eventStream`, `jsonLines`, and `streamMediaTypes` media types. The `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, `StreamOptions`, `StreamResult`, and `StreamResultWithHeaders` types live in `.kubb/core.ts`. A stream operation takes `StreamOptions` and returns `StreamResult`, or `StreamResultWithHeaders` when the response declares headers, the stream versions of `Options`, `RequestResult`, and `RequestResultWithHeaders`. Kubb writes `sse.ts` only when the document has a JSON Lines operation or an operation that offers `text/event-stream`, and `.kubb/client.ts` re-exports it, so everything imports from the client. Kubb regenerates these files on each run, so do not edit them:
+`.kubb/sse.ts` holds `parseEventStream`, `parseJsonLines`, and the `eventStream`, `jsonLines`, and `streamMediaTypes` media types. The `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, `StreamOptions`, `StreamResult`, and `StreamResultWithHeaders` types live in `.kubb/core.ts`. A stream operation takes `StreamOptions` and returns `StreamResult`, or `StreamResultWithHeaders` when the response declares headers, the stream versions of `Options`, `RequestResult`, and `RequestResultWithHeaders`. `.kubb/client.ts` re-exports `sse.ts`, so everything imports from the client. Kubb regenerates these files on each run, so do not edit them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/client'

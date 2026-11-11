@@ -1,5 +1,5 @@
 import { getEventStream, getPrimarySuccessResponse, hasTextEventData } from '@internals/shared'
-import { singleQuote } from '@internals/utils'
+import { singleQuote, toLiteral } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
@@ -66,7 +66,7 @@ export function buildCallConfig({
     contentTypeLiteral,
     buildParseAsLiteral(node),
     stream === 'event' || stream === 'data' ? `eventShape: '${stream}'` : null,
-    rawData ? `rawData: ${rawData === true ? 'true' : `[${rawData.map(singleQuote).join(', ')}]`}` : null,
+    rawData ? `rawData: ${toLiteral(rawData)}` : null,
     '...config',
     ownRuntime ? styles : null,
     validatorLiteral,

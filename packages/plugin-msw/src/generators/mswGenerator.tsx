@@ -90,9 +90,12 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const hasSuccessSchema = successResponses.some((response) => hasResponseSchema(response))
     // The handler calls the helper of the response it mocks when that helper takes the handler's own data type.
     const primaryResponse = getPrimarySuccessResponse(node)
-    const hasResponseHelper =
+    const responseHelperName =
+      primaryResponse &&
       hasResponseSchema(primaryResponse) &&
-      types.some(([response, typeName]) => response.statusCode === primaryResponse?.statusCode && typeName === mockResponseName)
+      types.some(([response, typeName]) => response.statusCode === primaryResponse.statusCode && typeName === mockResponseName)
+        ? `${mock.name}Response${primaryResponse.statusCode}`
+        : undefined
 
     const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.response.body(node) : null
 
@@ -124,7 +127,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           typeName={mockResponseName}
           requestTypeName={requestName}
           fakerName={faker && hasSuccessSchema ? faker.name : undefined}
-          responseName={hasResponseHelper ? `${mock.name}Response${primaryResponse!.statusCode}` : undefined}
+          responseName={responseHelperName}
           node={node}
           baseURL={baseURL}
         />
