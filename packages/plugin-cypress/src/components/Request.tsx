@@ -85,9 +85,14 @@ ${compositeLines}  const text = value instanceof Date ? value.toISOString() : St
   const cookieLine = `${rawCookieLine}${explodeCookieLine}${formCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null)${toCookies}.join('; ')\n`
 
   // Cypress types a body as a string or an object, so a body that is one number or has no schema type is cast, and an
-  // `int64` is sent as a number.
+  // `int64` is sent as a number. Past the safe-integer range it throws, like the generated clients, instead of losing precision.
   const bodySchema = node.requestBody?.content?.[0]?.schema && ast.resolveRef(node.requestBody.content[0].schema)
   const castBody = bodySchema && (['number', 'integer', 'bigint'].includes(bodySchema.primitive ?? '') || ['unknown', 'any'].includes(bodySchema.type))
+
+  const bigintGuard =
+    bodySchema?.type === 'bigint'
+      ? "if (typeof body === 'bigint' && (body > Number.MAX_SAFE_INTEGER || body < Number.MIN_SAFE_INTEGER)) throw new TypeError(`Cannot send ${body}n as a JSON number without losing precision.`)\n"
+      : ''
 
   const requestOptions = [
     `method: ${singleQuote(node.method)}`,
@@ -99,7 +104,7 @@ ${compositeLines}  const text = value instanceof Date ? value.toISOString() : St
   ].filter(Boolean)
 
   // Cypress's catch-all `then` overload types a union body as `Chainable<Response | Pet> | Chainable<Response | string>`, so cast to the declared return type.
-  const requestCall = `${groups.cookies ? cookieLine : ''}return cy.request<${responseType}>({
+  const requestCall = `${groups.cookies ? cookieLine : ''}${bigintGuard}return cy.request<${responseType}>({
   ${requestOptions.join(',\n  ')}
 }).then((res) => res.body) as ${returnType}`
 

@@ -62,6 +62,7 @@ describe('cypressGenerator — baseURL', () => {
 
 describe('cypressGenerator — numeric body', () => {
   // Cypress types a request body as a string or an object, so a body that is one int64 is sent as a number and cast.
+  // A value past the safe-integer range throws.
   test('patchCounter', async () => {
     const node = ast.factory.createOperation({
       operationId: 'patchCounter',
