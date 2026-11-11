@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { paymentErrorSchema } from './paymentErrorSchema'
 import { paymentMethodEnumSchema } from './paymentMethodEnumSchema'
 
 export const paymentSchema = z
@@ -17,6 +18,21 @@ export const paymentSchema = z
       creditCard: z.string().optional(),
       billingAddress: z.string().optional(),
       labels: z.array(z.string()).optional(),
+      lastError: z
+        .string()
+        .refine(
+          (value) => {
+            try {
+              return paymentErrorSchema.safeParse(JSON.parse(value)).success
+            } catch {
+              return false
+            }
+          },
+          { message: 'String must hold JSON that matches its content schema' },
+        )
+        .optional()
+        .describe('The error of the last failed attempt, as a JSON document'),
+      signature: z.base64url().optional(),
     }),
   )
   .describe('A payment for a store order')

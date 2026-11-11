@@ -440,6 +440,21 @@ export const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
 ])
 
 /**
+ * Calls for a string's `contentEncoding` with a dedicated Zod constructor.
+ */
+export const CONTENT_ENCODING_CALLS = new Map<string | undefined, string>([
+  ['base64', 'z.base64()'],
+  ['base64url', 'z.base64url()'],
+])
+
+/**
+ * The check for a string that holds a JSON document: it must parse, and the parsed value must pass `schema`.
+ */
+export function jsonContentCheck(schema: string): string {
+  return `(value) => { try { return ${schema}.safeParse(JSON.parse(value)).success } catch { return false } }, { message: "String must hold JSON that matches its content schema" }`
+}
+
+/**
  * Marks an inline `oneOf` object strict, so `object()` builds `z.strictObject(...)` and no eager `.shape` read hits a deferred getter.
  */
 export function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {

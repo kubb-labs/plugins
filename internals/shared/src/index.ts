@@ -24,6 +24,7 @@ export {
   hasTextEventData,
   isEventStream,
   isSuccessStatusCode,
+  jsonContentSchema,
   requestGroupOrder,
   operationFileEntry,
   resolveContentTypeVariants,
