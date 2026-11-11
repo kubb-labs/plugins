@@ -47,13 +47,7 @@ export function resultTypeName(name: string, headers: unknown): string {
   return headers ? `${name}WithHeaders` : name
 }
 
-/**
- * A runtime result type with its arguments. The `WithHeaders` form takes the headers right after the responses.
- *
- * @example
- * `buildResultTypeRef('RequestResult', 'LoginUserResponses', "{ '200': LoginUserStatus200Headers }", ['ThrowOnError'])`
- * // "RequestResultWithHeaders<LoginUserResponses, { '200': LoginUserStatus200Headers }, ThrowOnError>"
- */
+/** A runtime result type with its arguments, such as `RequestResultWithHeaders<Responses, Headers, ThrowOnError>`. */
 export function buildResultTypeRef(name: string, responses: string, headers: string | null, rest: Array<string | null> = []): string {
   return `${resultTypeName(name, headers)}<${[responses, headers, ...rest].filter(Boolean).join(', ')}>`
 }
