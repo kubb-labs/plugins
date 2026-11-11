@@ -127,7 +127,8 @@ export function baseContentType(value: string | null | undefined): string | unde
  * Whether a media type is JSON, such as `application/json` or `application/problem+json`.
  */
 export function isJsonMediaType(contentType: string | null | undefined): boolean {
-  return /[/+]json$/.test(baseContentType(contentType) ?? '')
+  const type = baseContentType(contentType) ?? ''
+  return type.endsWith('/json') || type.endsWith('+json')
 }
 
 function appendQueryValue({ search, key, value }: { search: URLSearchParams; key: string; value: unknown }): void {

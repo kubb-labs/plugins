@@ -1,7 +1,9 @@
 import type { PathSerializer } from '../serializers.ts'
 import { encodeComponent, isRecord } from '../serializers.ts'
 
-/** The path serializer for the `simple` style, which `serializeStyledPath` also uses. */
+/**
+ * The path serializer for the `simple` style, which `serializeStyledPath` also uses.
+ */
 export const serializePath: PathSerializer = ({ name, value, options }) => {
   if (value === undefined || value === null) return ''
   if (options?.style && options.style !== 'simple') {

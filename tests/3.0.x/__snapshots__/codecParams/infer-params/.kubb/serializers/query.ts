@@ -1,7 +1,9 @@
 import type { QuerySerializer } from '../serializers'
 import { encodeComponent, isRecord, notNullish, serializeDefaultQueryParam } from '../serializers'
 
-/** The query serializer for a spec without styled query parameters: arrays repeat their key, objects use `form` with explode. */
+/**
+ * The query serializer for a spec without styled query parameters: arrays repeat their key, objects use `form` with explode.
+ */
 export const serializeQuery: QuerySerializer = (params, options) => {
   const parts: Array<string> = []
   for (const [key, value] of Object.entries(params)) {

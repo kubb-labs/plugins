@@ -166,7 +166,9 @@ export type UnwrappedResult<
   THeaders = unknown,
 > = Unwrapped<RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>, ThrowOnError>
 
-/** `UnwrappedResult` with the declared response headers by status, for the full result a `throwOnError: false` call resolves to. */
+/**
+ * `UnwrappedResult` with the declared response headers by status, for the full result a `throwOnError: false` call resolves to.
+ */
 export type UnwrappedResultWithHeaders<TResponses, THeaders, ThrowOnError extends boolean = true> = UnwrappedResult<
   TResponses,
   ThrowOnError,
@@ -472,7 +474,9 @@ export type UnwrappedStreamResult<
   THeaders = unknown,
 > = Unwrapped<StreamResult<TResponses, ThrowOnError, TEvent, NativeRequest, NativeResponse, THeaders>, ThrowOnError>
 
-/** `UnwrappedStreamResult` with the declared response headers by status, for the full result a `throwOnError: false` call resolves to. */
+/**
+ * `UnwrappedStreamResult` with the declared response headers by status, for the full result a `throwOnError: false` call resolves to.
+ */
 export type UnwrappedStreamResultWithHeaders<
   TResponses,
   THeaders,
@@ -515,7 +519,9 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
   status: number
   statusText: string
   contentType: string | undefined
-  /** The response's `Headers`, the same on every transport. */
+  /**
+   * The response's `Headers`, the same on every transport.
+   */
   headers: ResponseHeaders
   request: TRequest
   response: TResponse
