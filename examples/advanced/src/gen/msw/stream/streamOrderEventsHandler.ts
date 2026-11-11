@@ -5,14 +5,13 @@ export function streamOrderEventsHandlerResponse200(data?: OrderEvent) {
   const event = data as { event?: unknown; id?: unknown; retry?: unknown; data?: unknown } | undefined
   const lines = [
     ...(['event', 'id', 'retry'] as const).filter((field) => event?.[field] !== undefined).map((field) => `${field}: ${event?.[field]}`),
-    ...(event?.data === undefined
-      ? []
-      : [
-          (typeof event.data === 'string' ? event.data : JSON.stringify(event.data))
-            .split('\n')
-            .map((line) => `data: ${line}`)
-            .join('\n'),
-        ]),
+    // A client dispatches an event only once it has a `data` line, so an event without data still sends an empty one.
+    event?.data === undefined
+      ? 'data:'
+      : (typeof event.data === 'string' ? event.data : JSON.stringify(event.data))
+          .split('\n')
+          .map((line) => `data: ${line}`)
+          .join('\n'),
   ]
 
   return new HttpResponse<string>(event === undefined ? '' : `${lines.join('\n')}\n\n`, {
