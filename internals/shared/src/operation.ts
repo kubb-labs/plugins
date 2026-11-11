@@ -266,11 +266,14 @@ export function hasStreamVariant(node: ast.OperationNode): boolean {
 const formContentTypes = new Set(['multipart/form-data', 'multipart/mixed', 'application/x-www-form-urlencoded'])
 
 /**
- * Whether the request body offers `multipart/form-data`, `multipart/mixed` or `application/x-www-form-urlencoded`, so the
- * client registers the form media types.
+ * Whether the request body offers `multipart/form-data`, `multipart/mixed` or `application/x-www-form-urlencoded`, or a
+ * response offers `multipart/mixed`, so the client registers the form media types.
  */
 export function hasFormBody(node: ast.OperationNode): boolean {
-  return (node.requestBody?.content ?? []).some((entry) => formContentTypes.has(baseContentType(entry.contentType)))
+  return (
+    (node.requestBody?.content ?? []).some((entry) => formContentTypes.has(baseContentType(entry.contentType))) ||
+    node.responses.some((response) => (response.content ?? []).some(isPartsContent))
+  )
 }
 
 function isJsonContentType(baseType: string): boolean {
@@ -337,6 +340,7 @@ export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaN
  */
 export function toResponseContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T, entries: ReadonlyArray<ResponseContentEntry> = [entry]): T {
   const { contentType, schema } = entry
+  if (isPartsContent(entry)) return toPartsContent(entry)
   if (!schema || entry.stream) return entry
 
   const baseType = baseContentType(contentType)
@@ -362,13 +366,20 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
 }
 
 /**
- * Returns the request entry with the schema of the body the client sends. A `multipart/*` body the adapter marks as a
- * `stream`, such as `multipart/mixed` with an OpenAPI 3.2 `itemSchema`, is an array of parts, so the item becomes an array.
+ * Returns the request entry with the schema of the body the client sends. A `multipart/mixed` body with an OpenAPI 3.2
+ * `itemSchema` is an array of parts, so the item becomes an array.
  */
 export function toRequestContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T): T {
-  const item = entry.stream?.schema
-  if (!item || !baseContentType(entry.contentType).startsWith('multipart/')) return entry
-  const { optional, ...itemSchema } = item
+  return isPartsContent(entry) ? toPartsContent(entry) : entry
+}
+
+// Only `multipart/mixed` is a list of parts: an `itemSchema` on `multipart/form-data` still describes named fields.
+function isPartsContent(entry: ResponseContentEntry): boolean {
+  return Boolean(entry.stream?.schema) && baseContentType(entry.contentType) === 'multipart/mixed'
+}
+
+function toPartsContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T): T {
+  const { optional, ...itemSchema } = entry.stream!.schema!
   // shortcut: `keysToOmit` applies to the top-level type only, so a part keeps its readOnly keys; move it onto the item when the printers can.
   return { ...entry, schema: ast.factory.createSchema({ type: 'array', items: [itemSchema], optional }), keysToOmit: null }
 }

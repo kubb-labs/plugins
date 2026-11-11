@@ -523,8 +523,16 @@ describe('toRequestContent', () => {
   test.each([
     ast.factory.createContent({ contentType: 'multipart/mixed', schema: part }),
     ast.factory.createContent({ contentType: 'application/jsonl', schema: part, stream: { schema: part } }),
+    // An `itemSchema` on form data still describes named fields.
+    ast.factory.createContent({ contentType: 'multipart/form-data', schema: part, stream: { schema: part } }),
   ])('keeps $contentType without a multipart stream as is', (content) => {
     expect(toRequestContent(content)).toBe(content)
+  })
+
+  test('reads a multipart/mixed response as an array of its parts', () => {
+    const entry = toResponseContent(ast.factory.createContent({ contentType: 'multipart/mixed', schema: part, stream: { schema: part } }))
+
+    expect(entry.schema).toMatchObject({ type: 'array', items: [{ type: 'object' }] })
   })
 })
 
