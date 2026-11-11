@@ -1096,9 +1096,7 @@ describe('printerZodMini', () => {
         ast.factory.createSchema({
           type: 'object',
           primitive: 'object',
-          properties: [
-            ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) }),
-          ],
+          properties: [ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) })],
         })
       const node = ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'event', members: [event('ping'), event('done')] })
       const code = printer.print(node)
