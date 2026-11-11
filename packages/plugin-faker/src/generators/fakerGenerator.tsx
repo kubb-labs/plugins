@@ -4,7 +4,8 @@ import {
   getPerContentTypeName,
   resolveContentTypeVariants,
   resolveOperationFile,
-  toRequestContent, toResponseContent,
+  toRequestContent,
+  toResponseContent,
 } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { ast, defineGenerator } from '@kubb/kit'

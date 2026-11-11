@@ -8,7 +8,8 @@ import {
   isSuccessStatusCode,
   resolveContentTypeVariants,
   resolveOperationFile,
-  toRequestContent, toResponseContent,
+  toRequestContent,
+  toResponseContent,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
