@@ -449,4 +449,46 @@ describe('clientGenerator runtime files', () => {
       ['mediaTypes/formData.ts', '/templates/mediaTypes/formData.ts', undefined],
     ])
   })
+
+  test('copies and registers the cookie and path serializers only for a cookie or a label or matrix path parameter', async () => {
+    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'runtime',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+    const node = ast.factory.createOperation({
+      operationId: 'getStyled',
+      method: 'GET',
+      path: '/styled/{id}',
+      parameters: [
+        ast.factory.createParameter({ name: 'id', in: 'path', style: 'matrix', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+        ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
+      ],
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+    })
+
+    await renderGeneratorOperations(sseGenerator, [getPetByIdNode, node], {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverClient,
+    })
+
+    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
+    expect(runtime.map((file) => [file.path.split('.kubb/')[1], file.copy, file.footer]).sort()).toStrictEqual([
+      [
+        'client.ts',
+        undefined,
+        [
+          "import { serializeCookies } from './serializers/cookies.ts'",
+          "import { serializePath } from './serializers/pathStyles.ts'",
+          'client.setConfig({ serializer: { cookie: serializeCookies, path: serializePath } })',
+        ].join('\n'),
+      ],
+      ['serializers/cookies.ts', '/templates/serializers/cookies.ts', undefined],
+      ['serializers/pathStyles.ts', '/templates/serializers/pathStyles.ts', undefined],
+    ])
+  })
 })

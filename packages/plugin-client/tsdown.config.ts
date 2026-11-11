@@ -44,6 +44,7 @@ export default defineConfig([
       'templates/mediaTypes/urlencoded': 'templates/mediaTypes/urlencoded.ts',
       'templates/serializers': 'templates/serializers.ts',
       'templates/serializers/cookies': 'templates/serializers/cookies.ts',
+      'templates/serializers/pathStyles': 'templates/serializers/pathStyles.ts',
       'templates/sse': 'templates/sse.ts',
       'templates/standardSchema': 'templates/standardSchema.ts',
     },

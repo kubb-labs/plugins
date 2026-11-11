@@ -277,39 +277,22 @@ export const defaultQuerySerializer: QuerySerializer = (params, options) => {
   return parts.join('&')
 }
 
-function serializePathPrimitive({ name, value, style }: { name: string; value: unknown; style: PathStyle }): string {
-  const encoded = encodeComponent(value)
-  if (style === 'label') return `.${encoded}`
-  if (style === 'matrix') return `;${name}=${encoded}`
-  return encoded
-}
-
-function serializePathArray({ name, value, style, explode }: { name: string; value: Array<unknown>; style: PathStyle; explode: boolean }): string {
-  const items = value.map(encodeComponent)
-  if (style === 'label') return `.${items.join(explode ? '.' : ',')}`
-  if (style === 'matrix') return explode ? items.map((item) => `;${name}=${item}`).join('') : `;${name}=${items.join(',')}`
-  return items.join(',')
-}
-
-function serializePathObject({ name, value, style, explode }: { name: string; value: Record<string, unknown>; style: PathStyle; explode: boolean }): string {
-  const members = Object.entries(value).map(([key, item]) =>
-    explode ? `${encodeComponent(key)}=${encodeComponent(item)}` : `${encodeComponent(key)},${encodeComponent(item)}`,
-  )
-  if (style === 'label') return `.${members.join(explode ? '.' : ',')}`
-  if (style === 'matrix') return explode ? members.map((member) => `;${member}`).join('') : `;${name}=${members.join(',')}`
-  return members.join(',')
-}
-
 /**
- * The default path serializer. Without a style, it uses `simple` without `explode`.
+ * The default path serializer, for the `simple` style. Kubb registers `serializePath` when the spec has a `label` or
+ * `matrix` parameter.
  */
 export const defaultPathSerializer: PathSerializer = ({ name, value, options }) => {
   if (value === undefined || value === null) return ''
-  const style = options?.style ?? 'simple'
-  const explode = options?.explode ?? false
-  if (Array.isArray(value)) return serializePathArray({ name, value, style, explode })
-  if (isRecord(value)) return serializePathObject({ name, value, style, explode })
-  return serializePathPrimitive({ name, value, style })
+  if (options?.style && options.style !== 'simple') {
+    throw new TypeError(`Cannot send path parameter ${name} with the ${options.style} style, register serializer.path on the client.`)
+  }
+  if (Array.isArray(value)) return value.map(encodeComponent).join(',')
+  if (isRecord(value)) {
+    return Object.entries(value)
+      .map(([key, item]) => `${encodeComponent(key)}${options?.explode ? '=' : ','}${encodeComponent(item)}`)
+      .join(',')
+  }
+  return encodeComponent(value)
 }
 
 function serializeHeaderValue(value: unknown, explode: boolean): string {
