@@ -174,8 +174,20 @@ export function getEventStream(node: ast.OperationNode): 'event' | 'data' | 'lin
   const content = ast.http.responses.primary(node)?.content ?? []
   if (content.length !== 1) return null
   const entry = content[0]!
-  if (entry.stream?.framing === 'events') return entry.stream.shape ?? 'data'
-  return entry.stream?.framing === 'lines' ? 'line' : null
+  const framing = getStreamFraming(entry)
+  if (framing === 'events') return entry.stream?.shape ?? 'data'
+  return framing === 'lines' ? 'line' : null
+}
+
+/**
+ * How a content entry is framed as a stream: `'events'` for Server-Sent Events, `'lines'` for JSON Lines.
+ * An adapter-oas older than 5.19 sets no `stream.framing`, so the media type decides then.
+ */
+export function getStreamFraming(entry: Pick<ast.ContentNode, 'contentType' | 'stream'>): NonNullable<ast.ContentNode['stream']>['framing'] {
+  if (entry.stream?.framing) return entry.stream.framing
+  if (ast.mediaType.base(entry.contentType) === 'text/event-stream') return 'events'
+  // `multipart/mixed` with an `itemSchema` also has `stream`, but it is a stream of parts, not of JSON values.
+  return entry.stream && ast.mediaType.isStream(entry.contentType) ? 'lines' : undefined
 }
 
 /**
@@ -193,7 +205,7 @@ export function isEventStream(node: ast.OperationNode): boolean {
 export function hasEventStreamContent(node: ast.OperationNode): boolean {
   const entries = ast.http.responses.primary(node)?.content ?? []
   // Next to another type, a stream without a schema gets no typed variant, so it keeps the plain call.
-  return entries.some((entry) => ast.mediaType.base(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
+  return entries.some((entry) => getStreamFraming(entry) === 'events' && (entries.length === 1 || Boolean(entry.schema)))
 }
 
 /**
@@ -229,7 +241,7 @@ export function getFormContentTypes(node: ast.OperationNode): Array<(typeof form
 function responseTypeForContent(entry: ResponseContentEntry): ResponseType | undefined {
   const baseType = ast.mediaType.base(entry.contentType)
   if (!baseType) return undefined
-  if (entry.stream?.framing) return 'stream'
+  if (getStreamFraming(entry)) return 'stream'
   if (ast.mediaType.isJson(baseType)) return undefined
   if (entry.schema?.type === 'blob') return 'blob'
   if (baseType.startsWith('text/')) return 'text'

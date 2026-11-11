@@ -9,6 +9,7 @@ import {
   getContentTypeInfo,
   hasRequestContentTypeChoice,
   getEventStream,
+  getStreamFraming,
   getRequestGroupOptionality,
   hasEventStreamContent,
   hasStreamVariant,
@@ -650,5 +651,17 @@ describe('resolveOperationFile', () => {
     test('keeps the single output file when every declaration shares it', () => {
       expect(resolve('point', { schemas: schemas('Point'), output: { path: 'types.ts', mode: 'file' } })).toBe('/root/types.ts')
     })
+  })
+})
+
+describe('getStreamFraming', () => {
+  test.each([
+    ['the framing the adapter sets', { contentType: 'application/vnd.custom', stream: { framing: 'lines' } }, 'lines'],
+    ['text/event-stream without framing', { contentType: 'text/event-stream; charset=utf-8' }, 'events'],
+    ['JSON Lines without framing', { contentType: 'application/jsonl', stream: {} }, 'lines'],
+    ['multipart/mixed with an item schema', { contentType: 'multipart/mixed', stream: {} }, undefined],
+    ['plain JSON', { contentType: 'application/json' }, undefined],
+  ] as const)('%s', (_, entry, expected) => {
+    expect(getStreamFraming(entry)).toBe(expected)
   })
 })

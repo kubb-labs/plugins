@@ -316,8 +316,7 @@ export function createMultiPluginDriver(name: string, plugins: Record<string, { 
   } as typeof driver
 }
 
-/** A content entry with the `stream` field adapter-oas sets for a stream media type, so fixtures match parsed specs. */
+/** A stream content entry with a bare `stream` field and no `framing`, so plugins derive the framing from the media type. */
 export function createStreamContent(contentType: string, schema?: ast.SchemaNode, stream: ast.ContentNode['stream'] = {}): ast.ContentNode {
-  const framing = ast.mediaType.base(contentType) === 'text/event-stream' ? 'events' : ast.mediaType.isStream(contentType) ? 'lines' : undefined
-  return ast.factory.createContent({ contentType, schema, ...(framing ? { stream: { framing, ...stream } } : {}) })
+  return ast.factory.createContent({ contentType, schema, stream })
 }

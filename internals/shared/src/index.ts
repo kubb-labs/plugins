@@ -8,6 +8,7 @@ export {
   buildResponses,
   getContentTypeInfo,
   getEventStream,
+  getStreamFraming,
   getFormContentTypes,
   getPerContentTypeName,
   getRequestGroupOptionality,
