@@ -1,8 +1,13 @@
+import { execFile } from 'node:child_process'
+import fs from 'node:fs/promises'
 import http from 'node:http'
+import { createRequire } from 'node:module'
+import path from 'node:path'
 import { Readable } from 'node:stream'
+import { promisify } from 'node:util'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
-import { afterEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, onTestFinished, test, vi } from 'vitest'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
 import { client, createAxiosTransport, createClient, createClientCore, formMediaTypes, getAxiosInstance, ResponseError } from './client.ts'
 
@@ -490,5 +495,52 @@ describe('client', () => {
     await expect(own({ method: 'GET', url: '/fail', options: { adapter } })).rejects.toBeInstanceOf(ResponseError)
 
     expect(seen).toStrictEqual(['request a', 'response 200', 'updated', 'response 200', 'response 500', 'error 500'])
+  })
+})
+
+// The core's types default to the natives of the `client.ts` next to it. In the package, that is the generic one from
+// `@kubb/plugin-client`, so every type the core defaults must be declared again in this client.
+describe('exported types', () => {
+  test('default to the native request and response, as in the generated client', async () => {
+    const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.types-'))
+    onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
+    const checkPath = path.join(dir, 'check.ts')
+    await fs.writeFile(
+      checkPath,
+      [
+        "import { client, createClient, isResponseError } from '../client.ts'",
+        "import type * as t from '../client.ts'",
+        "import type { AxiosRequestConfig, AxiosResponse } from 'axios'",
+        'type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false',
+        'type Expect<T extends true> = T',
+        'type Responses = { 200: { id: number }; 404: { message: string } }',
+        'const narrow = (error: unknown) => (isResponseError<Responses>(error) ? error : undefined)',
+        'export type Checks = [',
+        '  Expect<Equal<typeof client, t.ClientInstance<AxiosRequestConfig, AxiosResponse>>>,',
+        '  Expect<Equal<ReturnType<typeof createClient>, t.ClientInstance<AxiosRequestConfig, AxiosResponse>>>,',
+        '  Expect<Equal<t.ClientInstance, t.ClientInstance<AxiosRequestConfig, AxiosResponse>>>,',
+        '  Expect<Equal<t.ClientConfig, t.ClientConfig<AxiosRequestConfig, AxiosResponse>>>,',
+        '  Expect<Equal<t.RequestConfig, t.RequestConfig<unknown, AxiosRequestConfig, AxiosResponse>>>,',
+        '  Expect<Equal<t.Options<{}>, t.Options<{}, true, AxiosRequestConfig, AxiosResponse>>>,',
+        '  Expect<Equal<t.Transport, t.Transport<AxiosRequestConfig, AxiosResponse>>>,',
+        '  Expect<Equal<t.Interceptors, t.Interceptors<AxiosRequestConfig, AxiosResponse>>>,',
+        "  Expect<Equal<t.TransportResult['request'], AxiosRequestConfig>>,",
+        "  Expect<Equal<t.DecodedResponse['response'], AxiosResponse>>,",
+        "  Expect<Equal<t.ResponseError['request'], AxiosRequestConfig>>,",
+        "  Expect<Equal<t.ResponseErrorConfig['response'], AxiosResponse>>,",
+        "  Expect<Equal<t.ResponseErrorOf<Responses>['request'], AxiosRequestConfig>>,",
+        "  Expect<Equal<t.RequestResult<Responses>['request'], AxiosRequestConfig>>,",
+        "  Expect<Equal<t.UnwrappedResult<Responses, false>['response'], AxiosResponse>>,",
+        "  Expect<Equal<t.StreamResult<Responses>['request'], AxiosRequestConfig>>,",
+        "  Expect<Equal<t.UnwrappedStreamResult<Responses, false>['response'], AxiosResponse>>,",
+        "  Expect<Equal<NonNullable<t.StreamOptions<{}>['client']>, t.ClientInstance<AxiosRequestConfig, AxiosResponse>>>,",
+        "  Expect<Equal<NonNullable<ReturnType<typeof narrow>>['request'], AxiosRequestConfig>>,",
+        ']',
+      ].join('\n'),
+    )
+    const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
+    const flags =
+      '--ignoreConfig --noEmit --strict --skipLibCheck --allowImportingTsExtensions --module preserve --moduleResolution bundler --target es2022 --lib es2022,dom'
+    await expect(promisify(execFile)(process.execPath, [compiler, ...flags.split(' '), checkPath])).resolves.toMatchObject({ stdout: '', stderr: '' })
   })
 })

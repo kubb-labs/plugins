@@ -16,6 +16,8 @@ export type NativeResponse = AxiosResponse
  */
 export type NativeOptions = AxiosRequestConfig
 
+// The core's types default to the natives of the `client.ts` next to it. Declaring them here gives them this client's natives
+// when they are imported from the package too, where that file is the generic one from `@kubb/plugin-client`.
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
 export const ResponseError = core.ResponseError as {
   new <TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse>(
@@ -54,6 +56,22 @@ export type DecodedResponse<TData = unknown, TRequest = NativeRequest, TResponse
 export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
+export type StreamOptions<TData extends core.DataShape, ThrowOnError extends boolean = true> = Options<TData, ThrowOnError> & core.EventStreamOptions
+export type StreamResult<
+  TResponses,
+  ThrowOnError extends boolean = true,
+  TEvent = core.ServerSentEvent<core.SuccessOf<TResponses>>,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+> = core.StreamResult<TResponses, ThrowOnError, TEvent, TRequest, TResponse>
+export type UnwrappedStreamResult<TResponses, ThrowOnError extends boolean = true, TEvent = core.ServerSentEvent<core.SuccessOf<TResponses>>> = core.Unwrapped<
+  StreamResult<TResponses, ThrowOnError, TEvent>,
+  ThrowOnError
+>
+export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseErrorOf<TResponses, TRequest, TResponse>
+export const isResponseError = core.isResponseError as <TResponses = unknown, TRequest = NativeRequest, TResponse = NativeResponse>(
+  error: unknown,
+) => error is core.ResponseErrorOf<TResponses, TRequest, TResponse>
 
 function toHeaders(raw: AxiosResponse['headers']): Headers {
   const headers = new Headers()
@@ -174,6 +192,6 @@ export const defaultTransport: Transport = (request) => createAxiosTransport(get
 /**
  * The client every generated operation uses unless a call passes its own. It is created on first use.
  */
-export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
+export const client = createLazyClient<NativeRequest, NativeResponse>((config) => createClientCore({ defaultTransport, ...config }))
 
 export const createClient = client.createClient
