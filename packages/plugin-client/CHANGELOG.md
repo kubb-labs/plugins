@@ -1,5 +1,11 @@
 # @kubb/plugin-client
 
+## 5.12.0
+
+### Minor Changes
+
+- [#1450](https://github.com/kubb-labs/plugins/pull/1450) [`beb94f3`](https://github.com/kubb-labs/plugins/commit/beb94f3dfc63f3c44e1db4fbe08d9d6f43edefb9) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add the `returnType` option to `@kubb/plugin-client`. Set it to `'full'` to wrap generated operations in `withUnwrap` from your `importPath` module, so callers can use `.unwrap()`, or to `'data'` to resolve to the body. The default stays `'plain'`.
+
 ## 5.11.1
 
 ### Patch Changes
