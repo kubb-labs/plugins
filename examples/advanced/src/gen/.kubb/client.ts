@@ -181,6 +181,7 @@ import { urlencoded } from './mediaTypes/urlencoded.ts'
 import { multipartFormData } from './mediaTypes/formData.ts'
 import { multipartMixed } from './mediaTypes/mixed.ts'
 import { streamMediaTypes } from './sse.ts'
+import { serializeCookies } from './serializers/cookies.ts'
 client.setConfig({
   baseURL: 'https://petstore3.swagger.io/api/v3',
   mediaTypes: {
@@ -189,6 +190,7 @@ client.setConfig({
     'multipart/mixed': multipartMixed,
     ...streamMediaTypes,
   },
+  serializer: { cookie: serializeCookies },
 })
 /**
  * The servers from the spec by name, for `baseURL`.

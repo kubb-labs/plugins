@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { multipartFormData } from './mediaTypes/formData.ts'
 import { multipartMixed } from './mediaTypes/mixed.ts'
 import { urlencoded } from './mediaTypes/urlencoded.ts'
-import { serializeCookies } from './serializers.ts'
+import { serializeCookies } from './serializers/cookies.ts'
 
 const formMediaTypes = { 'multipart/form-data': multipartFormData, 'multipart/mixed': multipartMixed, 'application/x-www-form-urlencoded': urlencoded }
 

@@ -66,6 +66,8 @@ client.setConfig({
 
 A serializer set this way runs for every call. Pass `serializer` on a single call to override only that request.
 
+Cookie parameters go through `serializer.cookie`. Kubb writes `.kubb/serializers/cookies.ts` and registers its `serializeCookies` there only when the spec has a cookie parameter. To pass `cookies` on a call in a spec without one, set `serializer.cookie` yourself.
+
 ## Built-in media types
 
 | Keys                                                                                     | Encodes                                           | Decodes                                    |

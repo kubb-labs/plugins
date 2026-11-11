@@ -23,7 +23,8 @@ import {
   withUnwrap,
 } from './client.ts'
 import type { BodyEncoding } from './serializers.ts'
-import { applyHeaderStyles, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
+import { applyHeaderStyles, defaultPathSerializer, defaultQuerySerializer } from './serializers.ts'
+import { serializeCookies } from '../../plugin-client/templates/serializers/cookies.ts'
 import { multipartFormData } from '../../plugin-client/templates/mediaTypes/formData.ts'
 import { multipartMixed } from '../../plugin-client/templates/mediaTypes/mixed.ts'
 import { urlencoded } from '../../plugin-client/templates/mediaTypes/urlencoded.ts'
@@ -58,7 +59,7 @@ function encodeBody({ body, contentType, encoding }: { body: unknown; contentTyp
 
 function createClient(result?: FakeResult) {
   const { transport, calls } = fakeTransport(result)
-  const client = createClientCore<string, string>({ defaultTransport: transport, mediaTypes: formMediaTypes })
+  const client = createClientCore<string, string>({ defaultTransport: transport, mediaTypes: formMediaTypes, serializer: { cookie: serializeCookies } })
   return { client, calls }
 }
 
@@ -548,6 +549,19 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers['Content-Type']).toBe('application/json')
     await client({ method: 'POST', url: '/pet', body: 'a', contentType: 'text/plain' })
     expect(calls[1]?.body).toBe('a')
+  })
+
+  test('throws on cookie params without a cookie serializer, and keeps it when another serializer is set', async () => {
+    const { transport } = fakeTransport()
+    const bare = createClientCore<string, string>({ defaultTransport: transport })
+    await expect(bare({ method: 'GET', url: '/pet', cookies: { session: 'abc' } })).rejects.toThrow('register serializer.cookie')
+    await bare({ method: 'GET', url: '/pet', cookies: {} })
+
+    const { client, calls } = createClient()
+    client.setConfig({ serializer: { query: () => 'q=1' } })
+    await client({ method: 'GET', url: '/pet', cookies: { session: 'abc' } })
+    expect(calls[0]?.url).toBe('/pet?q=1')
+    expect(calls[0]?.headers['Cookie']).toBe('session=abc')
   })
 
   test('serializes cookie params into the Cookie header', async () => {
