@@ -31,6 +31,7 @@ export {
   resolveSuccessNames,
   toResponseContent,
 } from './operation.ts'
+export type { RequestGroupOptionality, RequestGroups } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
 export {
   createCasedFile,

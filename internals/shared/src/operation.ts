@@ -413,6 +413,19 @@ export type RequestGroupOptionality = {
  * Resolves which grouped request options an operation carries together with whether each group
  * holds a required member. The grouped parameter stays optional only when nothing inside it is
  * required, matching the generated `RequestConfig` type.
+ *
+ * Exported from `@kubb/plugin-client` so a custom generator that wraps generated calls can pass the
+ * grouped `options` argument with the same arity as the generated client: required when
+ * `isOptional` is `false`, optional (defaulting to `{}`) when `isOptional` is `true`, and carrying no
+ * request group when every entry of `groups` is `false`.
+ *
+ * @example
+ * ```ts
+ * import { getRequestGroupOptionality } from '@kubb/plugin-client'
+ *
+ * const { isOptional } = getRequestGroupOptionality(node)
+ * const param = `options: Options${isOptional ? ' = {}' : ''}`
+ * ```
  */
 export function getRequestGroupOptionality(node: ast.OperationNode): RequestGroupOptionality {
   const groups = getRequestGroups(node)

@@ -21,6 +21,7 @@
   "packages/plugin-client/src/builders/validator.test.ts": "Branchy hook wiring per validator form; 3.0.x zodParams snapshots cover only zod and the full object.",
   "packages/plugin-client/src/builders/validatorOptions.test.ts": "Pins isValidatorEnabled for every validator form and request and params opting in independently; no other test fails when they drift.",
   "packages/plugin-client/src/components/SdkClient.test.ts": "Pins SDK stream calls for full, plain and data (#1345); sdkGenerator snapshots have no stream operation.",
+  "packages/plugin-client/src/index.test.ts": "Pins the public getRequestGroupOptionality export (#1416) that custom generators use to match the generated options arity: required, optional, and no request group.",
   "packages/plugin-client/src/generators/clientGenerator.test.tsx": "Golden path: rendered client files for SSE, styles, security, runtime files, missing-dependency diagnostic.",
   "packages/plugin-client/src/generators/sdkGenerator.test.tsx": "Golden path: rendered SDK classes plus the sdk.mode tag with output.mode file diagnostic.",
   "packages/plugin-client/templates/serializers.test.ts": "Pins Date, zero and false defaults for urlencoded bodies without encoding metadata; the fetch client test only covers the metadata branch.",

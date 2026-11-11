@@ -1,3 +1,5 @@
+export { getRequestGroupOptionality } from '@internals/shared'
+export type { RequestGroupOptionality, RequestGroups } from '@internals/shared'
 export { default, pluginClient, pluginClientName } from './plugin.ts'
 export { resolverClient } from './resolver.ts'
 export { clientDependencies, resolveClientOptions, setupClient } from './setup.ts'
