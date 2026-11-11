@@ -1,4 +1,4 @@
-import { getEnumNames, getOperationSuccessResponses, resolveOperationFile, resolveResponseTypes } from '@internals/shared'
+import { getEnumNames, getOperationSuccessResponses, isSuccessStatusCode, resolveOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -69,11 +69,14 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const hasResponseNameCollision = referencedNames.some((name) => {
       return enumTypeName({ resolver: tsResolver, name, enumOptions, isEnum: enumNames.has(name) }) === type.responseName
     })
-    const types = resolveResponseTypes(node, tsResolver).map(([code, typeName]) => {
-      const successResponse = successResponses.find((response) => response.statusCode === String(code))
-      return [code, hasResponseNameCollision && successResponse ? tsResolver.response.status(node, successResponse.statusCode) : typeName] as const
-    })
-    const responseTypeNames = types.map(([, typeName]) => typeName).filter((name) => !hasResponseNameCollision || name !== type.responseName)
+    // One helper per documented status, a range such as `4xx` included. `default` has no status to mock.
+    const types = node.responses
+      .filter((response) => response.statusCode !== 'default')
+      .map((response) => {
+        const isResponseType = isSuccessStatusCode(response.statusCode) && !hasResponseNameCollision
+        return [response, isResponseType ? type.responseName : tsResolver.response.status(node, response.statusCode)] as const
+      })
+    const responseTypeNames = types.map(([, typeName]) => typeName)
     const mockResponseName =
       hasResponseNameCollision && successResponses[0] ? tsResolver.response.status(node, successResponses[0].statusCode) : type.responseName
     const hasSuccessSchema = successResponses.some((response) => hasResponseSchema(response))
@@ -99,13 +102,9 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         />
         {faker && hasSuccessSchema && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
 
-        {types
-          .filter(([code]) => code !== 'default')
-          .map(([code, typeName]) => {
-            const response = node.responses.find((item) => item.statusCode === String(code))
-            if (!response) return null
-            return <Response key={typeName} typeName={typeName} response={response} name={mock.name} />
-          })}
+        {types.map(([response, typeName]) => (
+          <Response key={response.statusCode} typeName={typeName} response={response} name={mock.name} />
+        ))}
 
         <Mock
           name={mock.name}
