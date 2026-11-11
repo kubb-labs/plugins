@@ -74,7 +74,7 @@ const maxValueByFormat: Record<string, number> = { int32: maxInt32, uint32: 4_29
 // A ref back into its own cycle is left empty, so a mock of a recursive schema is finite and can be serialized.
 function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: PrinterFakerOptions): boolean {
   if (node.type !== 'ref' || !schemaName) return false
-  const refName = ast.ref.resolveName(node)
+  const refName = ast.ref.name(node)
 
   return refName === schemaName || Boolean(refName && cyclicSchemas?.has(schemaName) && cyclicSchemas.has(refName))
 }
@@ -331,11 +331,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return dateTimeCall(node.representation ?? 'string', { format: 'HH:mm:ss', substring: '11, 19' }, this.options.dateParser, this.options.schemaName)
       },
       ref(node) {
-        // `ast.ref.resolveName` prefers the node's `targetName` (set for collision or macro renames),
+        // `ast.ref.name` prefers the node's `targetName` (set for collision or macro renames),
         // then the $ref path segment, since node.name may have been overridden (e.g. by
         // single-member allOf flatten using the property-derived child name). Inline refs
         // (without $ref) from faker utils already carry resolved helper names.
-        const refName = ast.ref.resolveName(node)
+        const refName = ast.ref.name(node)
 
         if (!refName) {
           throw new Diagnostics.Error({
@@ -417,7 +417,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           printNested(member, {
             nestedInObject: true,
             // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
-            ...(member.type === 'ref' && ast.ref.resolveName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
+            ...(member.type === 'ref' && ast.ref.name(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
           }),
         )
           .map(({ output }) => output)

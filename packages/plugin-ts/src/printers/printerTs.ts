@@ -224,8 +224,8 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           return null
         }
         // `node.name` may have been overridden (e.g. by the single-member allOf flatten using the
-        // property-derived child name), so resolve the target through `ast.ref.resolveName` instead.
-        const refName = ast.ref.resolveName(node)
+        // property-derived child name), so resolve the target through `ast.ref.name` instead.
+        const refName = ast.ref.name(node)
         if (!refName) {
           return null
         }

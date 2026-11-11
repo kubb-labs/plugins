@@ -205,7 +205,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
     ...buildScalarNodes(dialect),
     ref(node) {
       if (!node.name) return null
-      const refName = ast.ref.resolveName(node)
+      const refName = ast.ref.name(node)
       if (!refName) return null
 
       // In the input direction, a component whose fields print differently by direction resolves
