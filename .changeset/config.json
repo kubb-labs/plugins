@@ -10,7 +10,7 @@
   "fixed": [],
   "linked": [],
   "access": "restricted",
-  "baseBranch": "main",
+  "baseBranch": "release/v5",
   "format": "oxfmt",
   "privatePackages": { "version": true, "tag": false },
   "updateInternalDependencies": "patch",
