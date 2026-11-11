@@ -1,6 +1,6 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
-import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
-import { ast, Diagnostics } from '@kubb/kit'
+import { buildObject, stringify, toRegExpString } from '@internals/utils'
+import { ast, code, Diagnostics } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema, isObjectSchema } from '../utils.ts'
 
@@ -515,10 +515,10 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           // replaces itself with a plain data property via Object.defineProperty,
           // and returns the cached value, so every subsequent read is stable.
           if (cyclicSchemas && ast.graph.containsCircular(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
-            return `get ${objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
+            return `get ${code.key(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
           }
 
-          return `${objectKey(property.name)}: ${value}`
+          return `${code.key(property.name)}: ${value}`
         })
 
         return buildObject(entries)

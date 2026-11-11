@@ -1,5 +1,4 @@
-import { isIdentifier } from './reserved.ts'
-import { singleQuote } from './strings.ts'
+import { code } from '@kubb/kit'
 
 const INDENT = '  '
 
@@ -49,39 +48,6 @@ function indentLines(text: string): string {
     .split('\n')
     .map((line) => (line.trim() ? `${INDENT}${line}` : ''))
     .join('\n')
-}
-
-/**
- * Renders an object key, quoting it with single quotes only when it is not a valid identifier.
- * Reserved words and globals (`name`, `class`, …) are valid bare keys and stay unquoted.
- *
- * @example
- * ```ts
- * objectKey('name')    // 'name'
- * objectKey('x-total') // "'x-total'"
- * ```
- */
-export function objectKey(name: string): string {
-  return isIdentifier(name) ? name : singleQuote(name)
-}
-
-/**
- * A JSON value as a JavaScript literal, with single-quoted strings and identifier keys left unquoted.
- *
- * @example
- * ```ts
- * toLiteral({ id: 1, 'x-tag': ['a'] }) // "{ id: 1, 'x-tag': ['a'] }"
- * ```
- */
-export function toLiteral(value: unknown): string {
-  if (typeof value === 'string') return singleQuote(value)
-  if (Array.isArray(value)) return `[${value.map(toLiteral).join(', ')}]`
-  if (value && typeof value === 'object') {
-    return `{ ${Object.entries(value)
-      .map(([key, item]) => `${objectKey(key)}: ${toLiteral(item)}`)
-      .join(', ')} }`
-  }
-  return String(value)
 }
 
 /**
@@ -135,5 +101,5 @@ export function buildList(items: Array<string>, brackets: [open: string, close: 
  * ```
  */
 export function lazyGetter({ name, body }: { name: string; body: string }): string {
-  return `get ${objectKey(name)}() { return ${body} }`
+  return `get ${code.key(name)}() { return ${body} }`
 }

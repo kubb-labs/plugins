@@ -1,5 +1,5 @@
-import { isValidVarName, objectKey, stringify, toLiteral } from '@internals/utils'
-import { ast } from '@kubb/kit'
+import { stringify } from '@internals/utils'
+import { ast, code } from '@kubb/kit'
 
 /**
  * A resolved security scheme. The runtime calls the configured `auth` resolver with this object and places the
@@ -34,12 +34,12 @@ const inlineAuthKeys = ['type', 'scheme', 'name', 'in', 'scopes', 'flows', 'meta
 function serializeScheme({ ref, ...auth }: OperationAuth): string {
   const scopes = auth.scopes?.length ? auth.scopes : undefined
   if (ref) {
-    const schemeRef = isValidVarName(ref) ? `securitySchemes.${ref}` : `securitySchemes[${stringify(ref)}]`
-    return scopes ? `{ ...${schemeRef}, scopes: ${toLiteral(scopes)} }` : schemeRef
+    const schemeRef = code.isIdentifier(ref) ? `securitySchemes.${ref}` : `securitySchemes[${stringify(ref)}]`
+    return scopes ? `{ ...${schemeRef}, scopes: ${code.literal(scopes)} }` : schemeRef
   }
   const entries = inlineAuthKeys.flatMap((key) => {
     const entryValue = key === 'scopes' ? scopes : auth[key]
-    return entryValue ? [`${key}: ${toLiteral(entryValue)}`] : []
+    return entryValue ? [`${key}: ${code.literal(entryValue)}`] : []
   })
   return `{ ${entries.join(', ')} }`
 }
@@ -118,7 +118,7 @@ export function buildSecurityMetadata({ security }: { security?: Array<SecurityR
 export function buildSecuritySchemes(schemes: Array<ast.AuthScheme> | undefined): string | null {
   const entries = (schemes ?? []).flatMap(({ name, credential }) => {
     const auth = resolveCredential(credential)
-    return auth ? [`${objectKey(name)}: ${serializeScheme(auth)}`] : []
+    return auth ? [`${code.key(name)}: ${serializeScheme(auth)}`] : []
   })
   if (!entries.length) return null
   return `/**\n * The security schemes from the spec by name. A generated call sends one of them to the \`auth\` resolver.\n */\nexport const securitySchemes = { ${entries.join(', ')} } as const`

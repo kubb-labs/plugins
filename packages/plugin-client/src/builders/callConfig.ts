@@ -1,6 +1,6 @@
 import { getEventStream, hasTextEventData } from '@internals/shared'
-import { singleQuote, toLiteral } from '@internals/utils'
-import { ast } from '@kubb/kit'
+
+import { ast, code } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
 import { buildSecurityMetadata, type SecurityRequirement } from './security.ts'
@@ -58,15 +58,15 @@ export function buildCallConfig({
 
   const rawData = hasTextEventData(node)
   const callConfig = `{ ${[
-    `method: ${singleQuote(node.method.toUpperCase())}`,
-    `url: ${singleQuote(node.path)}`,
+    `method: ${code.string(node.method.toUpperCase())}`,
+    `url: ${code.string(node.path)}`,
     baseURL ? `baseURL: ${JSON.stringify(baseURL)}` : null,
     securityLiteral ? `security: ${securityLiteral}` : null,
     ownRuntime ? null : styles,
     contentTypeLiteral,
     buildParseAsLiteral(node),
     stream === 'event' || stream === 'data' ? `eventShape: '${stream}'` : null,
-    rawData ? `rawData: ${toLiteral(rawData)}` : null,
+    rawData ? `rawData: ${code.literal(rawData)}` : null,
     '...config',
     ownRuntime ? styles : null,
     validatorLiteral,

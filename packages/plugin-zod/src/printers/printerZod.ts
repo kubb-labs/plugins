@@ -1,5 +1,5 @@
-import { lazyGetter, objectKey } from '@internals/utils'
-import { ast } from '@kubb/kit'
+import { lazyGetter } from '@internals/utils'
+import { ast, code } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyModifiers,
@@ -167,9 +167,9 @@ function buildZodObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: 
       description: schema.type !== ast.schemaTypes.ref && meta.type === ast.schemaTypes.ref ? undefined : meta.description,
       examples: meta.examples,
     })
-    if (!cyclic) return `${objectKey(name)}: ${body}`
+    if (!cyclic) return `${code.key(name)}: ${body}`
     const returnType = recursiveGetterType({ ctx, schema, required })
-    return returnType ? `get ${objectKey(name)}(): ${returnType} { return ${body} }` : lazyGetter({ name, body })
+    return returnType ? `get ${code.key(name)}(): ${returnType} { return ${body} }` : lazyGetter({ name, body })
   })
 }
 

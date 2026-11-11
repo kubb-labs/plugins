@@ -1,5 +1,4 @@
-import { jsDocEscape, objectKey } from '@internals/utils'
-import { ast } from '@kubb/kit'
+import { ast, code } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
@@ -66,7 +65,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
           <Function
             export
             name={name}
-            JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
+            JSDoc={{ comments: description ? [`@description ${code.jsDoc(description)}`] : [] }}
             params={canOverride ? paramsSignature : undefined}
             returnType={returnType ?? undefined}
           >
@@ -98,7 +97,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
   const castThroughUnknown = (node.type !== 'object' || node.min !== undefined) && typeMode !== 'schema'
 
   const defaults = keysToOmit?.length
-    ? `{ ${keysToOmit.map((key, index) => `${objectKey(key)}: _omit${index}`).join(', ')}, ...defaultFakeData }`
+    ? `{ ${keysToOmit.map((key, index) => `${code.key(key)}: _omit${index}`).join(', ')}, ...defaultFakeData }`
     : 'defaultFakeData'
   const declaration = `const ${defaults} = ${fakerText}`
   const functionBody = hasGetters
@@ -122,7 +121,7 @@ return {
         <Function
           export
           name={name}
-          JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
+          JSDoc={{ comments: description ? [`@description ${code.jsDoc(description)}`] : [] }}
           generics={typeMode === 'schema' ? undefined : `TData extends Partial<${typeName}> = object`}
           params={typeMode === 'schema' ? `data?: Partial<${typeName}>` : 'data?: TData'}
           returnType={typeMode === 'schema' || isCyclic ? returnType : undefined}

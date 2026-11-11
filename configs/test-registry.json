@@ -10,7 +10,6 @@
   "internals/utils/src/codegen.test.ts": "Pins the buildJSDoc fallback and buildList custom brackets, which no generator output reaches.",
   "internals/utils/src/filePath.test.ts": "Pins the path-traversal guard for leading dots and version-number dots; nothing else tests it.",
   "internals/utils/src/fs.test.ts": "The Windows backslash branch of getRelativePath cannot be hit by snapshots on Linux CI.",
-  "internals/utils/src/reserved.test.ts": "Pins isValidVarName accepting valid identifiers such as a leading $, which no snapshot input reaches.",
   "internals/utils/src/strings.test.ts": "Branchy regex builder: u-flag detection, identity-escape dropping, inline flags, executed against real patterns.",
   "packages/plugin-axios/templates/client.test.ts": "Runtime axios transport shipped to users: status split, adapters, interceptors, stream fallbacks; nothing else tests it.",
   "packages/plugin-client/src/builders/callConfig.test.ts": "Regression #1332: a response that mixes a binary body with an event stream gets a content-type map, not one responseType.",

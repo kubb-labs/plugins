@@ -1,6 +1,6 @@
 import { getOperationParameters } from '@internals/shared'
-import { isValidVarName, singleQuote } from '@internals/utils'
-import { ast } from '@kubb/kit'
+
+import { ast, code } from '@kubb/kit'
 
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
 
@@ -10,7 +10,7 @@ type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
  * URL, and the other locations by the key it serializes.
  */
 function toKey(name: string): string {
-  return isValidVarName(name) ? name : JSON.stringify(name)
+  return code.isIdentifier(name) ? name : JSON.stringify(name)
 }
 
 /**
@@ -26,7 +26,7 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
     parameter.in === 'cookie' && parameter.style === 'cookie' && `style: 'cookie'`,
     parameter.explode !== undefined && `explode: ${parameter.explode}`,
     parameter.in === 'query' && parameter.allowReserved !== undefined && `allowReserved: ${parameter.allowReserved}`,
-    parameter.in !== 'path' && parameter.contentType && `contentType: ${singleQuote(parameter.contentType)}`,
+    parameter.in !== 'path' && parameter.contentType && `contentType: ${code.string(parameter.contentType)}`,
     parameter.in === 'querystring' && 'querystring: true',
   ].filter(Boolean)
   return parts.length > 0 ? `{ ${parts.join(', ')} }` : null
@@ -53,7 +53,7 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
       allowReserved !== undefined && `allowReserved: ${allowReserved}`,
       contentType && `contentType: ${JSON.stringify(contentType)}`,
     ].filter(Boolean)
-    return `${isValidVarName(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`
+    return `${code.isIdentifier(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`
   })
 }
 

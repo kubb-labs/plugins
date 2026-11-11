@@ -1,28 +1,3 @@
-// A raw line break would end the literal.
-const singleQuoteEscapes = new Map([
-  ['\\', '\\\\'],
-  ["'", "\\'"],
-  ['\n', '\\n'],
-  ['\r', '\\r'],
-])
-
-/**
- * Wraps a value in single quotes for emitting a single-quoted JavaScript string literal, escaping
- * any backslash or single quote in the content.
- *
- * @example
- * ```ts
- * singleQuote('foo')      // "'foo'"
- * singleQuote("o'clock")  // "'o\\'clock'"
- * ```
- */
-export function singleQuote(value: string | number | boolean | undefined | null): string {
-  if (value === undefined || value === null) return "''"
-  const escaped = Array.from(String(value), (char) => singleQuoteEscapes.get(char) ?? char).join('')
-
-  return `'${escaped}'`
-}
-
 /**
  * Strips a single matching pair of `"..."`, `'...'`, or `` `...` `` from both ends of `text`.
  * Returns the string unchanged when no balanced quote pair is found.
@@ -61,19 +36,6 @@ export function stringify(value: string | number | boolean | undefined): string 
   const json = JSON.stringify(trimQuotes(value.toString()))
   const inner = json.slice(1, -1).replace(/\\"/g, '"').replace(/'/g, "\\'")
   return `'${inner}'`
-}
-
-/**
- * Escapes an `@` at the start of a line, so a multi-line description can't start a new JSDoc tag.
- * Editors render `\@` as `@` in hovers.
- *
- * @example
- * ```ts
- * jsDocEscape('intro\n@example value') // 'intro\n\\@example value'
- * ```
- */
-export function jsDocEscape(input: unknown): string {
-  return `${input}`.replace(/^(\s*)@/gm, '$1\\@')
 }
 
 /**
