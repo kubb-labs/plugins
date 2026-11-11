@@ -1,6 +1,5 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { createGroupConfig } from '@internals/shared'
 import { addGenerator, injectFile, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -37,7 +36,7 @@ export function resolveClientOptions(options: ClientOptions): ClientResolvedOpti
     exclude,
     include,
     override,
-    group: createGroupConfig(group),
+    group: group ?? null,
     baseURL,
     throwOnErrorDefault,
     validator,

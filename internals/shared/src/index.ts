@@ -39,5 +39,4 @@ export {
   operationKey,
   resolveOperationName,
 } from './resolver.ts'
-export { createGroupConfig } from './group.ts'
 export { mapSchemaItems, mapSchemaMembers, mapSchemaProperties } from './schemaTraversal.ts'

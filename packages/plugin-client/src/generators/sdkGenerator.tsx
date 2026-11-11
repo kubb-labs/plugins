@@ -2,7 +2,7 @@ import path from 'node:path'
 import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
 import { isEventStream } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
-import { ast, camelCase, defineGenerator, Diagnostics } from '@kubb/kit'
+import { ast, defineGenerator, Diagnostics } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
@@ -33,7 +33,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
     const tag = operationNode.tags[0]
     const name = tag ? ensureValidVarName(resolver.groupName(tag)) : resolver.className('ApiClient')
     // `group.name` names the folder and file, never the class.
-    const fileName = tag && group ? ensureValidVarName(group.name?.({ group: camelCase(tag) }) ?? camelCase(tag)) : name
+    const fileName = tag && group ? ensureValidVarName(path.basename(resolver.groupDir(group, tag))) : name
     const file = resolver.file({ name: fileName, extname: '.ts', tag, root, output, group: group ?? undefined })
     const operationData = resolveOperationData({ node: operationNode, ctx, types })
     const previous = acc.find((item) => item.file.path === file.path)
