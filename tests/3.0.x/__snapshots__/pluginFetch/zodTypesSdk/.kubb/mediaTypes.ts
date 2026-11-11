@@ -195,8 +195,21 @@ function toMultipartMixed(parts: Array<unknown>, encoding: PartsEncoding | undef
   return new Blob(chunks, { type: `multipart/mixed; boundary=${boundary}` })
 }
 
+async function fromMultipartMixed(response: Response): Promise<Array<unknown>> {
+  const boundary = /boundary="?([^";]+)"?/i.exec(response.headers.get('content-type') ?? '')?.[1]
+  if (!boundary) throw new TypeError('Expected a boundary in the Content-Type of a multipart/mixed response')
+  // shortcut: parts are read as text, so a binary part does not keep its bytes; read the bytes when a spec returns one.
+  const sections = (await response.text()).split(`--${boundary}`).slice(1, -1)
+  return sections.map((section) => {
+    const [, head = '', body = ''] = /^([\s\S]*?)\r?\n\r?\n([\s\S]*)$/.exec(section) ?? []
+    const value = body.replace(/\r?\n$/, '')
+    return isJsonMediaType(/^content-type:\s*([^;\r\n]+)/im.exec(head)?.[1]?.trim()) ? JSON.parse(value) : value
+  })
+}
+
 const mixed: MediaType = {
   encode: (body, { config }) => (isEncodedBody(body) ? body : toMultipartMixed(Array.isArray(body) ? body : [body], config.styles?.parts)),
+  decode: fromMultipartMixed,
 }
 
 const urlencoded: MediaType = {

@@ -295,8 +295,11 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
 
 const scalarNodes: PrinterZodNodes = {
   ...buildScalarNodes(standardDialect),
-  bigint() {
-    return 'z.coerce.bigint()'
+  bigint(node) {
+    // shortcut: a bound that is not a whole number cannot be a bigint literal, so that one bound is left out.
+    const whole = (bound: number | undefined) => (Number.isInteger(bound) ? bound : undefined)
+    const exclusive = { min: whole(node.exclusive?.min), max: whole(node.exclusive?.max) }
+    return `z.coerce.bigint()${numberConstraints({ min: whole(node.min), max: whole(node.max), exclusive, multipleOf: whole(node.multipleOf) }, 'n')}`
   },
   date(node) {
     if (node.representation !== 'date') return 'z.iso.date()'

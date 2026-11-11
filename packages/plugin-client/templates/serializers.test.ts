@@ -31,6 +31,16 @@ describe('cookie serialization', () => {
   })
 })
 
+describe('multipart/mixed response decoding', () => {
+  test('reads back the parts it encodes, JSON parts as values and text parts as text', async () => {
+    const config = { styles: { parts: { prefix: [{ contentType: 'application/json' }], item: { contentType: 'text/plain' } } } }
+    const body = formMediaTypes['multipart/mixed']!.encode!([{ id: 1 }, 'a\n\nb'], { contentType: 'multipart/mixed', config }) as Blob
+    const response = new Response(body, { headers: { 'Content-Type': body.type } })
+
+    expect(await formMediaTypes['multipart/mixed']!.decode!(response, { contentType: 'multipart/mixed', config: {} })).toStrictEqual([{ id: 1 }, 'a\n\nb'])
+  })
+})
+
 describe('multipart/mixed body encoding', () => {
   test('sends each part with its media type and the boundary on the Content-Type', async () => {
     const config = { styles: { parts: { prefix: [{ contentType: 'application/json' }], item: { contentType: 'text/csv' } } } }
