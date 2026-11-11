@@ -1,6 +1,6 @@
-import { getEventStream, getPrimarySuccessResponse, hasTextEventData } from '@internals/shared'
+import { getEventStream, hasTextEventData } from '@internals/shared'
 import { singleQuote, toLiteral } from '@internals/utils'
-import type { ast } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
 import { buildSecurityMetadata, type SecurityRequirement } from './security.ts'
@@ -12,7 +12,7 @@ import { buildValidatorLiteral, type ValidatorHooks } from './validator.ts'
  * also when the server sends no `Content-Type`. Any other body is decoded by its media type at runtime.
  */
 function buildParseAsLiteral(node: ast.HttpOperationNode): string | null {
-  const content = getPrimarySuccessResponse(node)?.content ?? []
+  const content = ast.http.responses.primary(node)?.content ?? []
   return content.length > 0 && content.every((entry) => entry.schema?.type === 'blob') ? `parseAs: 'blob'` : null
 }
 

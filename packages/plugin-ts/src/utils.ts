@@ -1,4 +1,3 @@
-import { isSuccessStatusCode } from '@internals/shared'
 import { jsDocEscape, stringify } from '@internals/utils'
 import { ast, syncSchemaRef } from '@kubb/kit'
 import { getEnumNames } from './components/Enum.tsx'
@@ -205,7 +204,7 @@ export function buildParams({ params, serializedExamples }: BuildParamsSchemaOpt
 export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode | null {
   const allWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
   // Only 2xx responses, so an `unknown` error body cannot erase the success typing. Falls back to all responses when no 2xx has a schema.
-  const successWithSchema = allWithSchema.filter((res) => isSuccessStatusCode(res.statusCode))
+  const successWithSchema = allWithSchema.filter((res) => ast.http.status.isSuccess(res.statusCode))
   const responsesWithSchema = successWithSchema.length > 0 ? successWithSchema : allWithSchema
 
   if (responsesWithSchema.length === 0) {

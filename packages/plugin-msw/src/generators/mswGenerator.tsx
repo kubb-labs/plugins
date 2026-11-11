@@ -1,11 +1,4 @@
-import {
-  getEnumNames,
-  getOperationSuccessResponses,
-  getPrimarySuccessResponse,
-  getStatusClass,
-  isSuccessStatusCode,
-  resolveOperationFile,
-} from '@internals/shared'
+import { getEnumNames, resolveOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -67,7 +60,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       responseName: tsResolver.response.response(node),
     }
 
-    const successResponses = getOperationSuccessResponses(node)
+    const successResponses = ast.http.responses.success(node)
     const referencedNames = node.responses.flatMap((response) =>
       (response.content ?? []).flatMap((entry) => (entry.schema ? ast.collectImportedRefNames(entry.schema) : [])),
     )
@@ -79,9 +72,9 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     // One helper per documented status, a range such as `4xx` included. `default` has no status to mock,
     // and the Fetch `Response` constructor rejects a `1xx` status.
     const types = node.responses
-      .filter((response) => response.statusCode !== 'default' && getStatusClass(response.statusCode) !== 1)
+      .filter((response) => response.statusCode !== 'default' && ast.http.status.class(response.statusCode) !== 1)
       .map((response) => {
-        const isResponseType = isSuccessStatusCode(response.statusCode) && !hasResponseNameCollision
+        const isResponseType = ast.http.status.isSuccess(response.statusCode) && !hasResponseNameCollision
         return [response, isResponseType ? type.responseName : tsResolver.response.status(node, response.statusCode)] as const
       })
     const responseTypeNames = types.map(([, typeName]) => typeName)
@@ -89,7 +82,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       hasResponseNameCollision && successResponses[0] ? tsResolver.response.status(node, successResponses[0].statusCode) : type.responseName
     const hasSuccessSchema = successResponses.some((response) => hasResponseSchema(response))
     // The handler calls the helper of the response it mocks when that helper takes the handler's own data type.
-    const primaryResponse = getPrimarySuccessResponse(node)
+    const primaryResponse = ast.http.responses.primary(node)
     const responseHelperName =
       primaryResponse &&
       hasResponseSchema(primaryResponse) &&

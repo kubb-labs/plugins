@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getOperationParameters, getPrimarySuccessResponse, hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
+import { getOperationParameters, hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -64,7 +64,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         })
 
         const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.response.body(node) : null
-        const successStatus = getPrimarySuccessResponse(node)?.statusCode
+        const successStatus = ast.http.responses.primary(node)?.statusCode
         const responseName = successStatus ? zodResolver.response.status(node, successStatus) : null
 
         const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.param.name(node, p) }))

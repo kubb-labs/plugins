@@ -1,6 +1,5 @@
 import {
   getOperationParameters,
-  getPrimarySuccessResponse,
   getRequestGroupOptionality,
   getRequestGroups,
   getResponseContentTypeInfo,
@@ -12,7 +11,7 @@ import {
   buildClientOptionType,
   requestGroupOrder,
 } from '@internals/shared'
-import type { ast } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
 import { buildResponseHeadersType, buildResultTypeRef } from '@internals/client'
@@ -400,7 +399,7 @@ export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: I
     !infinite.cursorParam
   if (!usesDefault) return null
 
-  const content = getPrimarySuccessResponse(node)?.content
+  const content = ast.http.responses.primary(node)?.content
   const jsonContent = content?.find((item) => item.contentType?.includes('json')) ?? content?.[0]
   const schema = jsonContent?.schema
 

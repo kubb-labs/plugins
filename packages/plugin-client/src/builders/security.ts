@@ -1,5 +1,5 @@
 import { isValidVarName, objectKey, stringify, toLiteral } from '@internals/utils'
-import type { ast } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 
 /**
  * A resolved security scheme. The runtime calls the configured `auth` resolver with this object and places the
@@ -88,23 +88,14 @@ export function getOperationSecurity({
   schemes: Array<ast.AuthScheme> | undefined
   hoist?: boolean
 }): Array<SecurityRequirement> | undefined {
-  if (!auth?.length) return undefined
-
-  const credentials = new Map(schemes?.map((scheme) => [scheme.name, scheme.credential]))
-  const security: Array<SecurityRequirement> = []
-  const seen = new Set<string>()
-  for (const requirement of auth) {
-    const key = requirement.map(({ scheme, scopes }) => [scheme, ...(scopes ?? [])].join(' ')).join('\0')
-    if (!requirement.length || seen.has(key)) continue
-    seen.add(key)
-    const resolved = requirement.map(({ scheme, scopes }) => {
-      const credential = credentials.get(scheme)
-      const entry = credential ? resolveCredential(credential) : null
-      return entry && { ...entry, ...(scopes?.length ? { scopes } : {}), ...(hoist ? { ref: scheme } : {}) }
+  const security = ast.auth.resolve(auth, schemes).flatMap((requirement): Array<SecurityRequirement> => {
+    const resolved = requirement.map(({ name, credential, scopes }) => {
+      const entry = resolveCredential(credential)
+      return entry && { ...entry, ...(scopes.length ? { scopes } : {}), ...(hoist ? { ref: name } : {}) }
     })
-    if (!resolved.every((entry): entry is OperationAuth => entry !== null)) continue
-    security.push(resolved.length === 1 ? resolved[0]! : resolved)
-  }
+    if (!resolved.length || !resolved.every((entry): entry is OperationAuth => entry !== null)) return []
+    return [resolved.length === 1 ? resolved[0]! : resolved]
+  })
 
   return security.length ? security : undefined
 }

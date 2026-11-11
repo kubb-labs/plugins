@@ -9,14 +9,11 @@ import {
   hasRequestContentTypeChoice,
   getEventStream,
   getOperationParameters,
-  getPrimarySuccessResponse,
   getRequestGroupOptionality,
   hasEventStreamContent,
   hasStreamVariant,
   hasTextEventData,
-  isErrorStatusCode,
   isEventStream,
-  isSuccessStatusCode,
   resolveErrorNames,
   resolveOperationFile,
   resolveOperationTypeNames,
@@ -232,44 +229,6 @@ describe('response status helpers', () => {
       ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'object' }) }),
       ast.factory.createResponse({ statusCode: 'default', schema: ast.factory.createSchema({ type: 'object' }) }),
     ],
-  })
-
-  test('detects success and error status codes', () => {
-    expect(isSuccessStatusCode('201')).toBe(true)
-    expect(isSuccessStatusCode('400')).toBe(false)
-    expect(isErrorStatusCode('400')).toBe(true)
-    expect(isErrorStatusCode('default')).toBe(false)
-  })
-
-  test('reads status ranges such as 2xx', () => {
-    expect(isSuccessStatusCode('2xx')).toBe(true)
-    expect(isSuccessStatusCode('4xx')).toBe(false)
-    expect(isErrorStatusCode('4xx')).toBe(true)
-    expect(isErrorStatusCode('5xx')).toBe(true)
-    expect(isErrorStatusCode('3xx')).toBe(false)
-  })
-
-  test('prefers an exact success code over a range listed before it', () => {
-    const ranged = ast.factory.createOperation({
-      operationId: 'listPets',
-      method: 'GET',
-      path: '/pets',
-      responses: [ast.factory.createResponse({ statusCode: '2xx' }), ast.factory.createResponse({ statusCode: '200' })],
-    })
-
-    expect(getPrimarySuccessResponse(ranged)?.statusCode).toBe('200')
-  })
-
-  test('prefers a success response with a body over an exact code without one', () => {
-    const content = [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'bigint' }) })]
-    const node = ast.factory.createOperation({
-      operationId: 'listPets',
-      method: 'GET',
-      path: '/pets',
-      responses: [ast.factory.createResponse({ statusCode: '204' }), ast.factory.createResponse({ statusCode: '2xx', content })],
-    })
-
-    expect(getPrimarySuccessResponse(node)?.statusCode).toBe('2xx')
   })
 
   test('resolves error, success, and all response status names', () => {

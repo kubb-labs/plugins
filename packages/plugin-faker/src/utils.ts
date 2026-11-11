@@ -1,5 +1,5 @@
 import { posix } from 'node:path'
-import { getSuccessResponses, toResponseContent } from '@internals/shared'
+import { toResponseContent } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast } from '@kubb/kit'
 import type { ResolverFaker } from './types.ts'
@@ -77,7 +77,7 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
   const withSchema = node.responses
     .map((response) => ({ ...response, content: response.content?.map((entry, _, content) => toResponseContent(entry, content)) }))
     .filter((response) => response.content?.[0]?.schema)
-  const success = getSuccessResponses(withSchema)
+  const success = withSchema.filter((response) => ast.http.status.isSuccess(response.statusCode))
   const responses = success.length > 0 ? success : withSchema
 
   if (!responses.length) {
