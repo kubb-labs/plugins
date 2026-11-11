@@ -3,16 +3,16 @@
 * Do not edit manually.
 */
 
-import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema'
-import { getInventoryStatus200Schema } from '../zod/getInventorySchema'
-import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema'
-import { placeOrderBodySchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema'
-import { uploadFileBodySchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema'
 import { findPetsByStatusHandler } from './findPetsByStatus'
 import { getInventoryHandler } from './getInventory'
 import { getPetByIdHandler } from './getPetById'
 import { placeOrderHandler } from './placeOrder'
 import { uploadFileHandler } from './uploadFile'
+import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema'
+import { getInventoryStatus200Schema } from '../zod/getInventorySchema'
+import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema'
+import { placeOrderBodySchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema'
+import { uploadFileBodySchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema'
 import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'

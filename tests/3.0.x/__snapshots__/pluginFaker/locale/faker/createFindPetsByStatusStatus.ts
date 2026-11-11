@@ -10,5 +10,5 @@ import { fakerDE as faker } from '@faker-js/faker'
  * @description Status values that need to be considered for filter
  */
 export function createFindPetsByStatusStatus(data?: FindPetsByStatusStatusKey): FindPetsByStatusStatusKey {
-  return data ?? faker.helpers.arrayElement(['available', 'pending', 'sold'] as Array<FindPetsByStatusStatusKey>)
+  return data ?? faker.helpers.arrayElement<FindPetsByStatusStatusKey>(['available', 'pending', 'sold'])
 }

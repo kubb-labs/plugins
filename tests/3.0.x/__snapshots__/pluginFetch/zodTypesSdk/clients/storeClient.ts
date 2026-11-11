@@ -6,7 +6,7 @@
 import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetInventoryOptionsSchemaType, GetInventoryResponsesSchemaType } from '../zod/getInventorySchema'
 import type { PlaceOrderOptionsSchemaType, PlaceOrderResponsesSchemaType } from '../zod/placeOrderSchema'
-import { createClient, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
+import { createClient, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { getInventoryResponseSchema } from '../zod/getInventorySchema'
 import { placeOrderResponseSchema, placeOrderStatus405Schema } from '../zod/placeOrderSchema'
 
@@ -25,7 +25,7 @@ export class StoreClient {
     public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<GetInventoryResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, validator: { response: getInventoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap(apiClient<GetInventoryResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config, validator: { response: getInventoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**

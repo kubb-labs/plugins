@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import { officeWeatherstoryStatus200Schema } from '../zod/officeWeatherstoryOperationSchema'
-import { pointPathIdSchema, pointStatus200Schema } from '../zod/pointOperationSchema'
 import { officeWeatherstoryHandler } from './officeWeatherstory'
 import { pointHandler } from './point'
+import { officeWeatherstoryStatus200Schema } from '../zod/officeWeatherstoryOperationSchema'
+import { pointPathIdSchema, pointStatus200Schema } from '../zod/pointOperationSchema'
 import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
