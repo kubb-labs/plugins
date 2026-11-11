@@ -122,6 +122,17 @@ describe('printerFaker', () => {
     expect(print({ encoding: 'base64url' })).toBe('faker.string.alphanumeric(8)')
   })
 
+  test.each([
+    ['^A[A-Z0-9]{1,}$', 'faker.helpers.fromRegExp(/^A[A-Z0-9]{1,11}$/)'],
+    ['^\\+[1-9]\\d{1,14}$', 'faker.helpers.fromRegExp(/^[+][1-9][0-9]{1,14}$/)'],
+    // Faker reads a literal `-` only first in a class, and `a\-z` must not become the range `a-z`.
+    ['^[\\w.\\-]+$', 'faker.helpers.fromRegExp(/^[-A-Za-z0-9_.]+$/)'],
+    ['^[^a\\-z]{3}$', 'faker.helpers.fromRegExp(/^[^-az]{3}$/)'],
+    ['^\\s(a|b)$', 'faker.helpers.fromRegExp(/^\\s(a|b)$/)'],
+  ])('rewrites the pattern %s into the grammar faker reads', (pattern, expected) => {
+    expect(printerFaker({ resolver: resolverFaker }).print(ast.factory.createSchema({ type: 'string', pattern }))).toBe(expected)
+  })
+
   test('mocks a string int64 as digits', () => {
     const node = ast.factory.createSchema({ type: 'string', format: 'int64' })
 
@@ -167,6 +178,22 @@ describe('printerFaker', () => {
     expect(print(object(false))).toContain('const _value = undefined as unknown')
   })
 
+  test('picks a discriminated variant outside the cycle, since spreading one inside it never ends', () => {
+    const variant = (name: string) =>
+      ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}` }),
+          ast.factory.createSchema({ type: 'object', properties: [] }),
+        ],
+      })
+    const node = ast.factory.createSchema({ type: 'union', members: [variant('Equal'), variant('And'), variant('Or')] })
+
+    expect(printerFaker({ resolver: resolverFaker, schemaName: 'And', cyclicSchemas: new Set(['And', 'Or']) }).print(node)).toBe(
+      'faker.helpers.arrayElement([{...createEqual(), ...{}}])',
+    )
+  })
+
   test('keeps integers and floats inside exclusive bounds', () => {
     const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
 
@@ -183,6 +210,17 @@ describe('printerFaker', () => {
     const node = ast.factory.createSchema({ type: 'intersection', members: [ast.factory.createSchema({ type: 'union', members: [dog] }), base] })
 
     expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('{...{\n  type: faker.string.alpha(),\n}, ...faker.helpers.arrayElement([createDog()])}')
+  })
+
+  test('spreads a referenced base before the inline object that narrows it', () => {
+    const literal = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'type', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: ['X'] }) })],
+    })
+    const base = ast.factory.createSchema({ type: 'ref', name: 'Base', ref: '#/components/schemas/Base' })
+    const node = ast.factory.createSchema({ type: 'intersection', members: [literal, base] })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe("{...createBase(), ...{\n  type: faker.helpers.arrayElement(['X']),\n}}")
   })
 
   test('mocks unique array items within the count limits', () => {

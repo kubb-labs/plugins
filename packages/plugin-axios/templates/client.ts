@@ -61,7 +61,8 @@ export type StreamResult<
   TEvent = core.ServerSentEvent<core.SuccessOf<TResponses>>,
   TRequest = NativeRequest,
   TResponse = NativeResponse,
-> = core.StreamResult<TResponses, ThrowOnError, TEvent, TRequest, TResponse>
+  THeaders = unknown,
+> = core.StreamResult<TResponses, ThrowOnError, TEvent, TRequest, TResponse, THeaders>
 export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown> = core.ResponseErrorOf<
   TResponses,
   TRequest,

@@ -146,12 +146,54 @@ const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
   ['hostname', 'faker.internet.domainName()'],
 ])
 
+// Punctuation `faker.helpers.fromRegExp` reads inside a character class.
+const FAKER_CLASS_CHARACTERS = new Set('-!@#$&()`.+,"')
+
+/**
+ * Rewrites a pattern into the grammar `faker.helpers.fromRegExp` reads: `\d` and `\w` become character classes, an escaped
+ * literal such as `\+` becomes a one-character class, and an open-ended `{n,}` gets an upper bound of `n + 10`. Faker
+ * otherwise prints these as written, such as `\d` for a digit.
+ *
+ * shortcut: groups, alternation and `\s` stay unsupported, as `regexGenerator: 'randexp'` covers them.
+ */
+function toFakerPattern(pattern: string): string {
+  let result = ''
+  let inClass = false
+  // Where the open class's members start, after `[` or `[^`: faker reads a literal `-` only there.
+  let classStart = -1
+  for (let index = 0; index < pattern.length; index++) {
+    const char = pattern[index]!
+    const next = pattern[index + 1]
+    if (char === '\\' && next !== undefined) {
+      index++
+      if (inClass && next === '-') {
+        if (result[classStart] !== '-') result = `${result.slice(0, classStart)}-${result.slice(classStart)}`
+        continue
+      }
+      const set = next === 'd' ? '0-9' : next === 'w' ? 'A-Za-z0-9_' : FAKER_CLASS_CHARACTERS.has(next) ? next : undefined
+      result += set === undefined ? `\\${next}` : inClass ? set : `[${set}]`
+      continue
+    }
+    if (char === '[' && !inClass) {
+      inClass = true
+      result += pattern[index + 1] === '^' ? '[^' : '['
+      if (pattern[index + 1] === '^') index++
+      classStart = result.length
+      continue
+    }
+    if (char === ']') inClass = false
+    result += char
+  }
+
+  return result.replace(/\{(\d+),\}/g, (_, min: string) => `{${min},${Number(min) + 10}}`)
+}
+
 function matches(value: string, regexGenerator: 'faker' | 'randexp' = 'faker'): string {
   if (regexGenerator === 'randexp') {
     return `${toRegExpString(value, 'RandExp')}.gen()`
   }
 
-  return `faker.helpers.fromRegExp(${toRegExpString(value, null)})`
+  return `faker.helpers.fromRegExp(${toRegExpString(toFakerPattern(value), null)})`
 }
 
 function parseEnumValue(value: string | number | boolean | null | undefined) {
@@ -331,8 +373,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const { discriminatorPropertyName } = node
         const baseTypeName = this.options.typeName
 
-        // A member that points back into the cycle would print `undefined`, so the mock picks among the others.
-        const acyclic = (node.members ?? []).filter((member) => !isCyclicRef(member, this.options))
+        // A member that points back into the cycle would print `undefined`, so the mock picks among the others. A discriminated
+        // variant (`allOf: [ref, { type }]`) counts too: spreading its ref reads every lazy getter, which recurses without end.
+        const isCyclicMember = (member: ast.SchemaNode) =>
+          isCyclicRef(member, this.options) || (member.type === 'intersection' && (member.members ?? []).some((part) => isCyclicRef(part, this.options)))
+        const acyclic = (node.members ?? []).filter((member) => !isCyclicMember(member))
         const members = acyclic.length ? acyclic : node.members
 
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) => {
@@ -361,10 +406,10 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       intersection(node): string {
         const objectMembers = (node.members ?? []).filter((member) => isObjectSchema(member))
-        // A union spreads after the plain objects, so a sibling base object cannot overwrite its discriminator.
-        const members = objectMembers.length
-          ? [...objectMembers.filter((member) => member.type !== 'union'), ...objectMembers.filter((member) => member.type === 'union')]
-          : node.members
+        // A ref (the base) spreads first and a union last, so neither a base nor a sibling object overwrites the narrower value
+        // an extension or a discriminator sets.
+        const rank = (member: ast.SchemaNode) => (member.type === 'ref' ? 0 : member.type === 'union' ? 2 : 1)
+        const members = objectMembers.length ? objectMembers.toSorted((a, b) => rank(a) - rank(b)) : node.members
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
           printNested(member, {
             nestedInObject: true,

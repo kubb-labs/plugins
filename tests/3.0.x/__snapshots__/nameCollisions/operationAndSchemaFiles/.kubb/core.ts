@@ -447,15 +447,38 @@ export type StreamResult<
   TEvent = ServerSentEvent<SuccessOf<TResponses>>,
   TRequest = NativeRequest,
   TResponse = NativeResponse,
-> = WithEvents<RequestResult<TResponses, ThrowOnError, TRequest, TResponse>, TEvent> & StreamParts<TEvent>
+  THeaders = unknown,
+> = WithEvents<RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>, TEvent> & StreamParts<TEvent>
+
+/**
+ * `StreamResult` with the declared response headers by status: `StreamResultWithHeaders<StreamEventsResponses, { '200': StreamEventsStatus200Headers }>`.
+ */
+export type StreamResultWithHeaders<TResponses, THeaders, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>> = StreamResult<
+  TResponses,
+  ThrowOnError,
+  TEvent,
+  NativeRequest,
+  NativeResponse,
+  THeaders
+>
 
 /**
  * What a stream operation returns with `returnType: 'data'`.
  */
-export type UnwrappedStreamResult<TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>> = Unwrapped<
-  StreamResult<TResponses, ThrowOnError, TEvent>,
-  ThrowOnError
->
+export type UnwrappedStreamResult<
+  TResponses,
+  ThrowOnError extends boolean = true,
+  TEvent = ServerSentEvent<SuccessOf<TResponses>>,
+  THeaders = unknown,
+> = Unwrapped<StreamResult<TResponses, ThrowOnError, TEvent, NativeRequest, NativeResponse, THeaders>, ThrowOnError>
+
+/** `UnwrappedStreamResult` with the declared response headers by status, for the full result a `throwOnError: false` call resolves to. */
+export type UnwrappedStreamResultWithHeaders<
+  TResponses,
+  THeaders,
+  ThrowOnError extends boolean = true,
+  TEvent = ServerSentEvent<SuccessOf<TResponses>>,
+> = UnwrappedStreamResult<TResponses, ThrowOnError, TEvent, THeaders>
 
 /**
  * A client. Call it to send a request.
@@ -467,9 +490,9 @@ export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse>
   /**
    * Sends the request and reads a 2xx body item by item. A body whose media type cannot stream throws a `TypeError`.
    */
-  stream: <TResponses = unknown, ThrowOnError extends boolean = true, TItem = ServerSentEvent<SuccessOf<TResponses>>>(
+  stream: <TResponses = unknown, ThrowOnError extends boolean = true, TItem = ServerSentEvent<SuccessOf<TResponses>>, THeaders = unknown>(
     config: RequestConfig<unknown, TRequest, TResponse> & EventStreamOptions & { throwOnError?: ThrowOnError },
-  ) => Promise<StreamResult<TResponses, ThrowOnError, TItem, TRequest, TResponse>>
+  ) => Promise<StreamResult<TResponses, ThrowOnError, TItem, TRequest, TResponse, THeaders>>
   getConfig: () => ClientConfig<TRequest, TResponse>
   setConfig: (config: ClientConfig<TRequest, TResponse>) => ClientConfig<TRequest, TResponse>
   getUrl: (config: UrlConfig) => string
@@ -1077,7 +1100,9 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       async () => (await send(requestConfig, false)).result as RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>,
     )) as ClientInstance<TRequest, TResponse>
 
-  client.stream = <TResponses, ThrowOnError extends boolean, TItem>(requestConfig: RequestConfig<unknown, TRequest, TResponse> & EventStreamOptions) =>
+  client.stream = <TResponses, ThrowOnError extends boolean, TItem, THeaders>(
+    requestConfig: RequestConfig<unknown, TRequest, TResponse> & EventStreamOptions,
+  ) =>
     call(requestConfig, async () => {
       const { result, items, cursor } = await send(requestConfig, true)
       const stream = items as AsyncGenerator<TItem>
@@ -1090,7 +1115,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         },
         [Symbol.asyncIterator]: () => stream,
       }
-      return streamed as unknown as StreamResult<TResponses, ThrowOnError, TItem, TRequest, TResponse>
+      return streamed as unknown as StreamResult<TResponses, ThrowOnError, TItem, TRequest, TResponse, THeaders>
     })
 
   client.getConfig = () => config
