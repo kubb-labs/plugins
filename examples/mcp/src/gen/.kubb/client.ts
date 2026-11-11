@@ -179,9 +179,11 @@ export const createClient = client.createClient
 
 import { urlencoded } from './mediaTypes/urlencoded.ts'
 import { multipartFormData } from './mediaTypes/formData.ts'
+import { serializeQuery } from './serializers/queryStyles.ts'
 client.setConfig({
   baseURL: 'https://petstore.swagger.io/v2',
   mediaTypes: { 'application/x-www-form-urlencoded': urlencoded, 'multipart/form-data': multipartFormData },
+  serializer: { query: serializeQuery },
 })
 /**
  * The security schemes from the spec by name. A generated call sends one of them to the `auth` resolver.

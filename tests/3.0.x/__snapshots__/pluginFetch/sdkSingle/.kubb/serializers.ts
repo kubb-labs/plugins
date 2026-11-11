@@ -115,21 +115,6 @@ export function jsonReplacer(_key: string, value: unknown): unknown {
   return Number(value)
 }
 
-export function serializeUrlencodedBody(body: Record<string, unknown>, encoding: Record<string, BodyEncoding>): string {
-  const parts: Array<string> = []
-  for (const [key, value] of Object.entries(body)) {
-    const propertyEncoding = encoding[key]
-    // OpenAPI ignores `contentType` once a style field is set.
-    const styled = propertyEncoding?.style !== undefined || propertyEncoding?.explode !== undefined || propertyEncoding?.allowReserved !== undefined
-    if (notNullish(value) && !styled && isJsonMediaType(propertyEncoding?.contentType)) {
-      parts.push(`${encodeComponent(key)}=${encodeComponent(JSON.stringify(value, jsonReplacer))}`)
-      continue
-    }
-    parts.push(...(propertyEncoding ? serializeStyledQueryParam({ key, value, options: propertyEncoding }) : serializeDefaultQueryParam(key, value)))
-  }
-  return parts.join('&')
-}
-
 /**
  * A `Content-Type` without its parameters, in lower case.
  */
@@ -160,9 +145,7 @@ function appendQueryValue({ search, key, value }: { search: URLSearchParams; key
   search.append(key, toValue(value))
 }
 
-const queryDelimiters: Record<QueryStyle, string> = { form: ',', spaceDelimited: '%20', pipeDelimited: '|', deepObject: ',' }
-
-function notNullish(value: unknown): boolean {
+export function notNullish(value: unknown): boolean {
   return value !== undefined && value !== null
 }
 
@@ -173,80 +156,19 @@ export function toValue(value: unknown): string {
   return value instanceof Date ? value.toISOString() : String(value)
 }
 
-// `allowReserved` keeps reserved characters, but `#`, `&`, and `+` would end the query or change a form value.
-function encodeReserved(value: unknown): string {
-  return encodeURI(toValue(value)).replace(/[#&+]/g, encodeURIComponent)
-}
-
-function encodeComponent(value: unknown): string {
+export function encodeComponent(value: unknown): string {
   return encodeURIComponent(toValue(value))
 }
 
 // A `Date` is a unit, not an object to expand.
-function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Date)
 }
 
-function serializeDeepObject({ key, value, encode }: { key: string; value: unknown; encode: (value: unknown) => string }): Array<string> {
-  if (value === undefined || value === null) return []
-  if (Array.isArray(value)) return value.flatMap((item, index) => serializeDeepObject({ key: `${key}[${index}]`, value: item, encode }))
-  if (isRecord(value)) {
-    return Object.entries(value)
-      .filter(([, item]) => notNullish(item))
-      .flatMap(([prop, item]) => serializeDeepObject({ key: `${key}[${prop}]`, value: item, encode }))
-  }
-  return [`${encode(key)}=${encode(value)}`]
-}
-
-function serializeStyledQueryArray({
-  key,
-  value,
-  options,
-  encode,
-}: {
-  key: string
-  value: Array<unknown>
-  options: QueryParamStyle
-  encode: (value: unknown) => string
-}): Array<string> {
-  const items = value.filter(notNullish)
-  if (options.explode ?? true) return items.map((item) => `${encode(key)}=${encode(item)}`)
-  return [`${encode(key)}=${items.map(encode).join(queryDelimiters[options.style ?? 'form'])}`]
-}
-
-function serializeStyledQueryObject({
-  key,
-  value,
-  options,
-  encode,
-}: {
-  key: string
-  value: Record<string, unknown>
-  options: QueryParamStyle
-  encode: (value: unknown) => string
-}): Array<string> {
-  if ((options.style ?? 'form') === 'deepObject') return serializeDeepObject({ key, value, encode })
-  const entries = Object.entries(value).filter(([, item]) => notNullish(item))
-  if (options.explode ?? true) return entries.map(([prop, item]) => `${encode(prop)}=${encode(item)}`)
-  return [
-    `${encode(key)}=${entries
-      .flatMap(([prop, item]) => [prop, item])
-      .map(encode)
-      .join(',')}`,
-  ]
-}
-
-function serializeStyledQueryParam({ key, value, options }: { key: string; value: unknown; options: QueryParamStyle }): Array<string> {
-  if (value === undefined || value === null) return []
-  const encode = options.allowReserved ? encodeReserved : encodeComponent
-  // OpenAPI leaves arrays under deepObject undefined. Objects in one are indexed, `items[0][price]=p`, as nested arrays are.
-  if (Array.isArray(value) && options.style === 'deepObject' && value.some(isRecord)) return serializeDeepObject({ key, value, encode })
-  if (Array.isArray(value)) return serializeStyledQueryArray({ key, value, options, encode })
-  if (isRecord(value)) return serializeStyledQueryObject({ key, value, options, encode })
-  return [`${encode(key)}=${encode(value)}`]
-}
-
-function serializeDefaultQueryParam(key: string, value: unknown): Array<string> {
+/**
+ * One parameter as form pairs, with an array repeating its key and an object as `key[prop]`.
+ */
+export function serializeDefaultQueryParam(key: string, value: unknown): Array<string> {
   const search = new URLSearchParams()
   appendQueryValue({ search, key, value })
   const result = search.toString()
@@ -254,23 +176,20 @@ function serializeDefaultQueryParam(key: string, value: unknown): Array<string> 
 }
 
 /**
- * The default query serializer. Without a style, arrays repeat their key and objects use the OpenAPI default, `form` with
- * explode, so `{ a: 1, b: 2 }` becomes `a=1&b=2`.
+ * The default query serializer, for parameters without a style: arrays repeat their key and objects use the OpenAPI
+ * default, `form` with explode, so `{ a: 1, b: 2 }` becomes `a=1&b=2`. Kubb registers `serializeQuery` when the spec
+ * has a styled query parameter.
  */
 export const defaultQuerySerializer: QuerySerializer = (params, options) => {
   const parts: Array<string> = []
   for (const [key, value] of Object.entries(params)) {
-    const paramOptions = options?.[key]
-    if (notNullish(value) && isJsonMediaType(paramOptions?.contentType)) {
-      const json = encodeComponent(JSON.stringify(value, jsonReplacer))
-      parts.push(paramOptions?.querystring ? json : `${encodeComponent(key)}=${json}`)
-      continue
-    }
-    const styled = paramOptions ?? (isRecord(value) ? {} : undefined)
-    // `URLSearchParams` writes a space as `+`, form encoding for bodies. A query follows RFC 6570, as a styled one does: `%20`.
+    if (options?.[key]) throw new TypeError(`Cannot send query parameter ${key} with a style, register serializer.query on the client.`)
+    // `URLSearchParams` writes a space as `+`, form encoding for bodies. A query follows RFC 6570: `%20`.
     parts.push(
-      ...(styled
-        ? serializeStyledQueryParam({ key, value, options: styled })
+      ...(isRecord(value)
+        ? Object.entries(value)
+            .filter(([, item]) => notNullish(item))
+            .map(([prop, item]) => `${encodeComponent(prop)}=${encodeComponent(item)}`)
         : serializeDefaultQueryParam(key, value).map((part) => part.replaceAll('+', '%20'))),
     )
   }
