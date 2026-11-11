@@ -74,7 +74,7 @@ const maxValueByFormat: Record<string, number> = { int32: maxInt32, uint32: 4_29
 // A ref back into its own cycle is left empty, so a mock of a recursive schema is finite and can be serialized.
 function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: PrinterFakerOptions): boolean {
   if (node.type !== 'ref' || !schemaName) return false
-  const refName = ast.resolveRefName(node)
+  const refName = ast.ref.resolveName(node)
 
   return refName === schemaName || Boolean(refName && cyclicSchemas?.has(schemaName) && cyclicSchemas.has(refName))
 }
@@ -220,8 +220,8 @@ function getDiscriminator(
   member: ast.SchemaNode,
   discriminatorPropertyName: string,
 ): { value: string | number | boolean | null; required: boolean } | undefined {
-  for (const property of ast.resolveSchemaProperties({ node: member, propertyName: discriminatorPropertyName })) {
-    const values = ast.getSchemaLiteralValues(property.schema)
+  for (const property of ast.schema.properties({ node: member, propertyName: discriminatorPropertyName })) {
+    const values = ast.schema.literalValues(property.schema)
     if (values.length === 1) {
       return { value: values[0]!, required: property.required }
     }
@@ -331,11 +331,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return dateTimeCall(node.representation ?? 'string', { format: 'HH:mm:ss', substring: '11, 19' }, this.options.dateParser, this.options.schemaName)
       },
       ref(node) {
-        // `resolveRefName` prefers the node's `targetName` (set for collision or macro renames),
+        // `ast.ref.resolveName` prefers the node's `targetName` (set for collision or macro renames),
         // then the $ref path segment, since node.name may have been overridden (e.g. by
         // single-member allOf flatten using the property-derived child name). Inline refs
         // (without $ref) from faker utils already carry resolved helper names.
-        const refName = ast.resolveRefName(node)
+        const refName = ast.ref.resolveName(node)
 
         if (!refName) {
           throw new Diagnostics.Error({
@@ -354,7 +354,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // emitted with resolver output and should not be transformed twice.
         const resolvedName = node.ref ? this.options.resolver.name(refName) : refName
 
-        if (!this.options.nestedInObject && canOverrideSchema(ast.resolveRef(node))) {
+        if (!this.options.nestedInObject && canOverrideSchema(ast.ref.resolve(node))) {
           return `${resolvedName}(data)`
         }
 
@@ -362,7 +362,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       enum(node) {
         const { typeName } = this.options
-        const values = ast.getSchemaLiteralValues(node)
+        const values = ast.schema.literalValues(node)
 
         if (values.length === 1 && values[0] !== null && typeof values[0] === 'object') {
           return JSON.stringify(values[0])
@@ -417,7 +417,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           printNested(member, {
             nestedInObject: true,
             // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
-            ...(member.type === 'ref' && ast.resolveRefName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
+            ...(member.type === 'ref' && ast.ref.resolveName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
           }),
         )
           .map(({ output }) => output)

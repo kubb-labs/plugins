@@ -148,7 +148,7 @@ type SchemaIndexContext = Pick<GeneratorContext, 'memo' | 'driver'>
  * Names of the schemas in a circular reference chain, computed once per build.
  */
 export function getCircularNames(ctx: SchemaIndexContext): ReadonlySet<string> {
-  return ctx.memo('circularNames:set', () => ast.findCircularSchemas(ctx.driver.inputNode?.schemas ?? []))
+  return ctx.memo('circularNames:set', () => ast.graph.circular(ctx.driver.inputNode?.schemas ?? []))
 }
 
 /**

@@ -232,7 +232,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       // redeclaration errors.
       const importedNames = new Set(
         responses.flatMap((res) =>
-          (res.content ?? []).flatMap((entry) => (entry.schema ? ast.collectImportedRefNames(entry.schema).map((refName) => resolver.name(refName)) : [])),
+          (res.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.importedNames(entry.schema).map((refName) => resolver.name(refName)) : [])),
         ),
       )
 

@@ -40,7 +40,7 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const rawParameters = node.parameters.filter((parameter) => parameter.in === 'cookie' && parameter.style === 'cookie')
   // Only an array or object needs the join and explode code. A value with one primitive type goes out as one cookie.
   const isComposite = (parameter: ast.ParameterNode) =>
-    !['string', 'number', 'integer', 'bigint', 'boolean'].includes(ast.resolveRef(parameter.schema).primitive ?? '')
+    !['string', 'number', 'integer', 'bigint', 'boolean'].includes(ast.ref.resolve(parameter.schema).primitive ?? '')
   const isExploded = (parameter: ast.ParameterNode) => parameter.explode !== false && isComposite(parameter)
   const explodedCookies = rawParameters.filter(isExploded).map((parameter) => code.string(parameter.name))
   const joinedCookies = rawParameters.filter((parameter) => !isExploded(parameter)).map((parameter) => code.string(parameter.name))
@@ -84,7 +84,7 @@ ${compositeLines}  const text = value instanceof Date ? value.toISOString() : St
   const cookieLine = `${rawCookieLine}${explodeCookieLine}${formCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null)${toCookies}.join('; ')\n`
 
   // Cypress types a body as a string or an object, so a body that is one number or has no schema type is cast.
-  const bodySchema = node.requestBody?.content?.[0]?.schema && ast.resolveRef(node.requestBody.content[0].schema)
+  const bodySchema = node.requestBody?.content?.[0]?.schema && ast.ref.resolve(node.requestBody.content[0].schema)
   const castBody = bodySchema && (['number', 'integer'].includes(bodySchema.primitive ?? '') || ['unknown', 'any'].includes(bodySchema.type))
 
   const requestOptions = [

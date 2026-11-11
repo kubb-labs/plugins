@@ -281,7 +281,7 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
   if (!schema || entry.stream) return entry
 
   const baseType = ast.mediaType.base(contentType)
-  const resolved = ast.resolveRef(schema)
+  const resolved = ast.ref.resolve(schema)
   if (isBinaryContentType(baseType)) {
     return resolved.type === 'blob' ? entry : { ...entry, schema: ast.factory.createSchema({ type: 'blob' }), keysToOmit: null }
   }

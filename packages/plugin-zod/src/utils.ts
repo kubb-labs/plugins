@@ -69,7 +69,7 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
   }
 
   if (node.type === 'ref') {
-    const refName = ast.resolveRefName(node)
+    const refName = ast.ref.resolveName(node)
     if (refName && cyclicSchemas?.has(refName)) return false
     const resolved = ast.ref.sync(node)
     // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's

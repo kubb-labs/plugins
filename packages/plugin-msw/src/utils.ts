@@ -77,7 +77,7 @@ function getResponseEntry(response: ast.ResponseNode | null | undefined): ast.Co
 function getTextContentType(response: ast.ResponseNode | null | undefined): string | null {
   const entry = (response?.content ?? []).find((entry) => {
     const schema = toResponseContent(entry, response?.content).schema
-    return !ast.mediaType.isJson(entry.contentType) && schema && ast.resolveRef(schema).primitive === 'string'
+    return !ast.mediaType.isJson(entry.contentType) && schema && ast.ref.resolve(schema).primitive === 'string'
   })
   return entry?.contentType ?? null
 }

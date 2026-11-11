@@ -184,7 +184,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const responseName = resolver.response.response(node)
     const importedResponseNames = new Set(
       node.responses.flatMap((response) =>
-        (response.content ?? []).flatMap((entry) => (entry.schema ? ast.collectImportedRefNames(entry.schema).map((name) => resolver.name(name)) : [])),
+        (response.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.importedNames(entry.schema).map((name) => resolver.name(name)) : [])),
       ),
     )
     const hasResponseNameCollision = importedResponseNames.has(responseName)

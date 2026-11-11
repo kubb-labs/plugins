@@ -224,8 +224,8 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           return null
         }
         // `node.name` may have been overridden (e.g. by the single-member allOf flatten using the
-        // property-derived child name), so resolve the target through `resolveRefName` instead.
-        const refName = ast.resolveRefName(node)
+        // property-derived child name), so resolve the target through `ast.ref.resolveName` instead.
+        const refName = ast.ref.resolveName(node)
         if (!refName) {
           return null
         }
@@ -244,7 +244,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         return factory.createTypeReferenceNode(name)
       },
       enum(node) {
-        const values = ast.getSchemaLiteralValues(node)
+        const values = ast.schema.literalValues(node)
 
         if (values.some((value) => value !== null && typeof value === 'object')) {
           return factory.createUnionDeclaration({ nodes: values.map((value) => factory.constToTypeNode(value)) })

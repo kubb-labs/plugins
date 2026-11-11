@@ -101,7 +101,7 @@ function getLiteralUnion({
  * Whether a discriminated union member's discriminator property prints as a coerced literal union.
  */
 function hasCoercedDiscriminator({ member, propertyName, options }: { member: ast.SchemaNode; propertyName: string; options: ZodNodeOptions }): boolean {
-  return ast.resolveSchemaProperties({ node: member, propertyName }).some(({ schema }) => {
+  return ast.schema.properties({ node: member, propertyName }).some(({ schema }) => {
     const resolved = ast.ref.sync(schema)
     return resolved.type === 'union' && !!getLiteralUnion({ node: resolved, options })?.coerce
   })
@@ -109,8 +109,8 @@ function hasCoercedDiscriminator({ member, propertyName, options }: { member: as
 
 // `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
 function hasPlainDiscriminator({ member, propertyName }: { member: ast.SchemaNode; propertyName: string }): boolean {
-  const schemas = ast.resolveSchemaProperties({ node: member, propertyName })
-  return schemas.length > 0 && !schemas.some(({ schema }) => ast.getSchemaLiteralValues(ast.ref.sync(schema)).length > 0)
+  const schemas = ast.schema.properties({ node: member, propertyName })
+  return schemas.length > 0 && !schemas.some(({ schema }) => ast.schema.literalValues(ast.ref.sync(schema)).length > 0)
 }
 
 /**
@@ -205,7 +205,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
     ...buildScalarNodes(dialect),
     ref(node) {
       if (!node.name) return null
-      const refName = ast.resolveRefName(node)
+      const refName = ast.ref.resolveName(node)
       if (!refName) return null
 
       // In the input direction, a component whose fields print differently by direction resolves

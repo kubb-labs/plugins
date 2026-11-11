@@ -55,7 +55,7 @@ export function Zod({ name, node, printer, inferTypeName, inferKind = 'infer', t
   // only strip the `ZodObject` methods (`.omit()`, `.strict()`). Only non-object cyclic schemas (a
   // union/array with a top-level `z.lazy(() => self)`) are implicitly `any` and need the annotation.
   const needsAnnotation = cyclic && node.type !== 'object'
-  const isBare = ast.isBareRef(node, printer.options.keysToOmit)
+  const isBare = ast.ref.isBare(node, printer.options.keysToOmit)
   const isCyclic = Boolean(cyclic || (printer.options.cyclicSchemas && ast.graph.containsCircular(node, { circularSchemas: printer.options.cyclicSchemas })))
   const shouldCompile = Boolean(compile) && !isBare && !isCyclic
   const value = shouldCompile ? (typeof compile === 'object' && compile.strict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output

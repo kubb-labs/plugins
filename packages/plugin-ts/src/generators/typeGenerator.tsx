@@ -246,7 +246,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       const responsesWithSchema = node.responses.filter(hasSchema)
       const importedNames = new Set(
         responsesWithSchema.flatMap((res) =>
-          (res.content ?? []).flatMap((entry) => (entry.schema ? ast.collectImportedRefNames(entry.schema).map(importName) : [])),
+          (res.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.importedNames(entry.schema).map(importName) : [])),
         ),
       )
 

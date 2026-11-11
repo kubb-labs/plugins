@@ -62,7 +62,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const successResponses = ast.http.responses.success(node)
     const referencedNames = node.responses.flatMap((response) =>
-      (response.content ?? []).flatMap((entry) => (entry.schema ? ast.collectImportedRefNames(entry.schema) : [])),
+      (response.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.importedNames(entry.schema) : [])),
     )
     const enumOptions = pluginTs.options?.enum
     const enumNames = getEnumNames(ctx)
