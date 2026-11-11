@@ -89,7 +89,9 @@ describe('event stream runtime', () => {
       ).safeBuild()
       expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
 
-      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'core.ts', 'mediaTypes.ts', 'serializers.ts', 'standardSchema.ts'])
+      // The only form body in petStore is urlencoded.
+      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'core.ts', 'mediaTypes', 'mediaTypes.ts', 'serializers.ts', 'standardSchema.ts'])
+      expect(await fs.readdir(path.join(output, '.kubb/mediaTypes'))).toStrictEqual(['urlencoded.ts'])
       expect(await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')).not.toContain('streamMediaTypes')
     } finally {
       await fs.rm(output, { recursive: true, force: true })

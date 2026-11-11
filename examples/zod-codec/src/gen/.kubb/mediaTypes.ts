@@ -1,6 +1,6 @@
 import type { EventStreamOptions, RequestConfig } from './core.ts'
-import type { BodyEncoding, PartsEncoding, RequestBody } from './serializers.ts'
-import { baseContentType, isJsonMediaType, jsonReplacer, serializeUrlencodedBody, toValue } from './serializers.ts'
+import type { RequestBody } from './serializers.ts'
+import { baseContentType, jsonReplacer } from './serializers.ts'
 import { ParseError } from './standardSchema.ts'
 
 /**
@@ -127,101 +127,6 @@ const catchAll: MediaType = {
   },
 }
 
-function appendFormDataValue({ formData, key, value, contentType }: { formData: FormData; key: string; value: unknown; contentType?: string }): void {
-  if (value === undefined || value === null) return
-  if (value instanceof Blob) {
-    formData.append(key, value)
-    return
-  }
-  if (typeof value === 'object' && !(value instanceof Date)) {
-    const encoded = JSON.stringify(value, jsonReplacer)
-    // A part's media type can only be set by wrapping the value in a typed Blob.
-    formData.append(key, contentType ? new Blob([encoded], { type: contentType }) : encoded)
-    return
-  }
-  formData.append(key, toValue(value))
-}
-
-const formDelimiters: Partial<Record<string, string>> = { spaceDelimited: ' ', pipeDelimited: '|' }
-
-function toFormData(body: Record<string, unknown>, encoding: Record<string, BodyEncoding> | undefined): FormData {
-  const formData = new FormData()
-  for (const [key, value] of Object.entries(body)) {
-    const { contentType, style, explode } = encoding?.[key] ?? {}
-    // `explode: false` sends an array of scalars as one part, its items joined by the style's delimiter.
-    if (Array.isArray(value) && explode === false && value.every((item) => typeof item !== 'object' || item === null || item instanceof Date)) {
-      const delimiter = formDelimiters[style ?? 'form'] ?? ','
-      formData.append(
-        key,
-        value
-          .filter((item) => item !== undefined && item !== null)
-          .map(toValue)
-          .join(delimiter),
-      )
-      continue
-    }
-    for (const item of Array.isArray(value) ? value : [value]) appendFormDataValue({ formData, key, value: item, contentType })
-  }
-  return formData
-}
-
-const multipart: MediaType = {
-  encode: (body, { config }) => (isEncodedBody(body) ? body : toFormData(body as Record<string, unknown>, config.styles?.body)),
-  decode: (response) => response.formData(),
-}
-
-function isBinaryPart(part: unknown): part is Blob | BufferSource {
-  return part instanceof Blob || part instanceof ArrayBuffer || ArrayBuffer.isView(part)
-}
-
-function defaultPartType(part: unknown, binary: boolean): string {
-  if (binary) return (part instanceof Blob && part.type) || 'application/octet-stream'
-  return typeof part === 'string' ? 'text/plain' : 'application/json'
-}
-
-function toMultipartMixed(parts: Array<unknown>, encoding: PartsEncoding | undefined): Blob {
-  // `crypto.randomUUID` needs a secure context, `getRandomValues` works on plain http too.
-  const boundary = `kubb-${Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, '0')).join('')}`
-  const chunks: Array<BlobPart> = []
-  parts.forEach((part, index) => {
-    // An Encoding `contentType` can list several types, such as `image/png, image/jpeg`. A part sends the first.
-    const declared = (encoding?.prefix?.[index] ?? encoding?.item)?.contentType?.split(',')[0]!.trim()
-    const binary = isBinaryPart(part)
-    const contentType = declared ?? defaultPartType(part, binary)
-    const value = binary || (typeof part === 'string' && !isJsonMediaType(declared)) ? part : JSON.stringify(part, jsonReplacer)
-    chunks.push(`--${boundary}\r\nContent-Type: ${contentType}\r\n\r\n`, value, '\r\n')
-  })
-  chunks.push(`--${boundary}--\r\n`)
-  return new Blob(chunks, { type: `multipart/mixed; boundary=${boundary}` })
-}
-
-async function fromMultipartMixed(response: Response): Promise<Array<unknown>> {
-  const boundary = /boundary="?([^";]+)"?/i.exec(response.headers.get('content-type') ?? '')?.[1]
-  if (!boundary) throw new TypeError('Expected a boundary in the Content-Type of a multipart/mixed response')
-  // shortcut: parts are read as text, so a binary part does not keep its bytes; read the bytes when a spec returns one.
-  const sections = (await response.text()).split(`--${boundary}`).slice(1, -1)
-  return sections.map((section) => {
-    const [, head = '', body = ''] = /^([\s\S]*?)\r?\n\r?\n([\s\S]*)$/.exec(section) ?? []
-    const value = body.replace(/\r?\n$/, '')
-    return isJsonMediaType(/^content-type:\s*([^;\r\n]+)/im.exec(head)?.[1]?.trim()) ? JSON.parse(value) : value
-  })
-}
-
-const mixed: MediaType = {
-  encode: (body, { config }) => (isEncodedBody(body) ? body : toMultipartMixed(Array.isArray(body) ? body : [body], config.styles?.parts)),
-  decode: fromMultipartMixed,
-}
-
-const urlencoded: MediaType = {
-  encode: (body, { config }) => {
-    if (isEncodedBody(body)) return body
-    const encoding = config.styles?.body
-    const encoded = serializeUrlencodedBody(body as Record<string, unknown>, encoding ?? {})
-    return encoding ? encoded : new URLSearchParams(encoded)
-  },
-  decode: (response) => response.formData(),
-}
-
 /**
  * The media types every client knows: JSON, text, binary, and a catch-all that sends JSON and reads JSON or text.
  */
@@ -236,14 +141,4 @@ export const defaultMediaTypes: MediaTypes = {
   'audio/*': binary,
   'video/*': binary,
   '*/*': catchAll,
-}
-
-/**
- * The `multipart/form-data` and `application/x-www-form-urlencoded` handlers, which follow `config.styles.body`, and the
- * `multipart/mixed` one, which follows `config.styles.parts`.
- */
-export const formMediaTypes: MediaTypes = {
-  'multipart/form-data': multipart,
-  'multipart/mixed': mixed,
-  'application/x-www-form-urlencoded': urlencoded,
 }

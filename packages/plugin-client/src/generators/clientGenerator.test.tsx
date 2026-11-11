@@ -351,7 +351,7 @@ describe('clientGenerator without an operation type source', () => {
 })
 
 describe('clientGenerator runtime files', () => {
-  const sseGenerator = createClientGenerator<PluginFetch>('fetch', { sse: '/templates/sse.ts' })
+  const sseGenerator = createClientGenerator<PluginFetch>('fetch', { templates: '/templates' })
 
   test.each([
     {
@@ -423,7 +423,7 @@ describe('clientGenerator runtime files', () => {
     expect(runtime[0]?.footer).toContain("export const servers = { production: 'https://api.test', 'eu-west': 'https://eu.api.test' } as const")
   })
 
-  test('registers the form media types only when an operation sends a form body', async () => {
+  test('copies and registers only the form media types an operation sends', async () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: 'runtime',
@@ -440,8 +440,13 @@ describe('clientGenerator runtime files', () => {
     })
 
     const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
-    expect(runtime.map((file) => [file.path.split('/').slice(-2).join('/'), file.footer])).toStrictEqual([
-      ['.kubb/client.ts', "import { formMediaTypes } from './mediaTypes.ts'\nclient.setConfig({ mediaTypes: { ...formMediaTypes } })"],
+    expect(runtime.map((file) => [file.path.split('.kubb/')[1], file.copy, file.footer]).sort()).toStrictEqual([
+      [
+        'client.ts',
+        undefined,
+        "import { multipartFormData } from './mediaTypes/formData.ts'\nclient.setConfig({ mediaTypes: { 'multipart/form-data': multipartFormData } })",
+      ],
+      ['mediaTypes/formData.ts', '/templates/mediaTypes/formData.ts', undefined],
     ])
   })
 })
