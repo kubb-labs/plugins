@@ -19,15 +19,21 @@ export function getPetByIdHandlerResponse200(data: Omit<NonNullable<Pet>, 'name'
 }
 
 export function getPetByIdHandlerResponse400(data?: unknown) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 400,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 400,
+    },
+  )
 }
 
 export function getPetByIdHandlerResponse404(data?: unknown) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 404,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 404,
+    },
+  )
 }
 
 export function getPetByIdHandler(
