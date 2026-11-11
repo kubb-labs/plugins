@@ -277,13 +277,12 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         if (hasStringLiteral && hasPlainString) {
           const memberNodes = members
             .map((m) => {
-              if (isStringType(m)) {
-                return factory.createIntersectionDeclaration({
-                  nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])],
-                })
-              }
+              const print = (node: ast.SchemaNode) =>
+                isStringType(node)
+                  ? factory.createIntersectionDeclaration({ nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])] })
+                  : this.transform(node)
 
-              return printNullable(m, this.transform)
+              return printNullable(m, print)
             })
             .filter(isNonNullable)
 

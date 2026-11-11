@@ -55,6 +55,11 @@ describe('printerTs', () => {
 
     expect(await formatTS(printer.transform(array))).toBe('(string | null)[]')
     expect(await formatTS(printer.transform(union))).toBe('number | (string | null)')
+    const literalOrString = ast.factory.createSchema({
+      type: 'union',
+      members: [ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['a'] }), nullableString],
+    })
+    expect(await formatTS(printer.transform(literalOrString))).toContain('(string & {}) | null')
   })
 
   describe('date / time', () => {
