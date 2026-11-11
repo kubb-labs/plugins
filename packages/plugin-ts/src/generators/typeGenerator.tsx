@@ -5,7 +5,8 @@ import {
   getOperationParameters,
   resolveContentTypeVariants,
   resolveOperationFile,
-  toRequestContent, toResponseContent,
+  toRequestContent,
+  toResponseContent,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -242,7 +243,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     const responsesType = renderSchemaType({
-      schema: buildResponses(node, resolver),
+      // A stream variant next to another content type comes back as the unread body, as the client's `SuccessVariant` types it.
+      schema: buildResponses(node, resolver, { streamData: ast.factory.createSchema({ type: 'ref', name: 'ReadableStream<Uint8Array>' }) }),
       name: resolver.response.responses(node),
     })
 

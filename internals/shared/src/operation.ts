@@ -687,9 +687,15 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
  * The schema a status occupies in the `<Name>Responses` record. A status that documents several
  * content types becomes a `{ contentType; data }` union so the runtime can surface the negotiated type
  * on `result.parsed`, while the standalone `<Name>StatusNNN` alias stays the plain body union that the
- * query hooks and `result.data` use.
+ * query hooks and `result.data` use. With `streamData`, the stream variant of a 2xx status holds that schema, since the
+ * client returns its body unread.
  */
-function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResponseStatusNameResolver): ast.SchemaNode {
+function buildResponseRecordEntry(
+  node: ast.OperationNode,
+  res: ast.ResponseNode,
+  resolver: ResponseStatusNameResolver,
+  streamData: ast.SchemaNode | undefined,
+): ast.SchemaNode {
   const statusName = resolver.response.status(node, res.statusCode)
   const variants = (res.content ?? []).filter((entry) => entry.schema)
   if (variants.length <= 1) {
@@ -712,7 +718,10 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
           ast.factory.createProperty({
             name: 'data',
             required: true,
-            schema: ast.factory.createSchema({ type: 'ref', name: variant.name }),
+            schema:
+              streamData && isSuccessStatusCode(res.statusCode) && streamContentType.test(baseContentType(variant.contentType))
+                ? streamData
+                : ast.factory.createSchema({ type: 'ref', name: variant.name }),
           }),
         ],
       }),
@@ -728,8 +737,14 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
  * Always emits the keyed record, even when an operation declares no responses. An operation with no
  * responses renders as an empty object, which keeps every consumer's import (for example the axios
  * SDK's `RequestResult<XResponses>`) resolvable instead of pointing at a missing export.
+ *
+ * `streamData` is the type of a stream variant's `data`, such as a `ReadableStream<Uint8Array>` reference.
  */
-export function buildResponses(node: ast.OperationNode, resolver: ResponseStatusNameResolver): ast.SchemaNode {
+export function buildResponses(
+  node: ast.OperationNode,
+  resolver: ResponseStatusNameResolver,
+  { streamData }: { streamData?: ast.SchemaNode } = {},
+): ast.SchemaNode {
   return ast.factory.createSchema({
     type: 'object',
     primitive: 'object',
@@ -737,7 +752,7 @@ export function buildResponses(node: ast.OperationNode, resolver: ResponseStatus
       ast.factory.createProperty({
         name: String(res.statusCode),
         required: true,
-        schema: buildResponseRecordEntry(node, res, resolver),
+        schema: buildResponseRecordEntry(node, res, resolver, streamData),
       }),
     ),
   })

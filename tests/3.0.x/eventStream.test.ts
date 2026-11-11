@@ -129,6 +129,11 @@ describe('a response that offers JSON or an event stream', () => {
       const client = await fs.readFile(path.join(output, 'clients', 'listChanges.ts'), 'utf8')
       expect(client).toContain('RequestResult<ListChangesResponses')
       expect(client).toContain("contentType: { response: 'text/event-stream' }")
+
+      // The event stream variant comes back as the unread body, so the record types its `data` as the stream.
+      const types = await fs.readFile(path.join(output, 'types', 'ListChanges.ts'), 'utf8')
+      expect(types).toMatch(/contentType: 'text\/event-stream';?\s+data: ReadableStream<Uint8Array>/)
+      expect(types).toMatch(/contentType: 'application\/json';?\s+data: ListChangesStatus200Json/)
     } finally {
       await fs.rm(output, { recursive: true, force: true })
     }
