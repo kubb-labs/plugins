@@ -83,17 +83,20 @@ function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: Printe
 }
 
 /**
- * `faker.number.float()` or `faker.number.int()`, with `min` and `max` passed only when set, moved inside an exclusive
- * bound, or needed so a lone bound does not contradict faker's default for the other.
+ * `faker.number.float()`, `faker.number.int()` or `faker.number.bigInt()`, with `min` and `max` passed only when set,
+ * moved inside an exclusive bound, or needed so a lone bound does not contradict faker's default for the other.
  */
-function numberCall(kind: 'float' | 'int', { min, max, exclusive }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive'>): string {
-  // An integer bound moves to the next integer. Faker never returns a float's `max`, and its `min` only by chance.
-  if (exclusive?.min !== undefined) min = Math.max(min ?? -Infinity, kind === 'int' ? Math.floor(exclusive.min) + 1 : exclusive.min)
-  if (exclusive?.max !== undefined) max = Math.min(max ?? Infinity, kind === 'int' ? Math.ceil(exclusive.max) - 1 : exclusive.max)
+function numberCall(kind: 'float' | 'int' | 'bigInt', { min, max, exclusive }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive'>): string {
+  const whole = kind !== 'float'
+  // A whole-number bound moves to the next integer. Faker never returns a float's `max`, and its `min` only by chance.
+  // shortcut: a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
+  const lower = exclusive?.min === undefined ? min : Math.max(min ?? -Infinity, whole ? Math.floor(exclusive.min) + 1 : exclusive.min)
+  const upper = exclusive?.max === undefined ? max : Math.min(max ?? Infinity, whole ? Math.ceil(exclusive.max) - 1 : exclusive.max)
   // Faker fills a missing bound with `0` (and `1` for a float's `max`), which a lone bound on the other side of it contradicts.
-  if (kind === 'float' && min !== undefined && max === undefined && min >= 1) max = min + 100
-  if (max !== undefined && min === undefined && (kind === 'float' ? max <= 0 : max < 0)) min = max - 100
-  const args = [min !== undefined && `min: ${min}`, max !== undefined && `max: ${max}`].filter(Boolean).join(', ')
+  const maxValue = kind === 'float' && lower !== undefined && upper === undefined && lower >= 1 ? lower + 100 : upper
+  const minValue = maxValue !== undefined && lower === undefined && (whole ? maxValue < 0 : maxValue <= 0) ? maxValue - 100 : lower
+  const suffix = kind === 'bigInt' ? 'n' : ''
+  const args = [minValue !== undefined && `min: ${minValue}${suffix}`, maxValue !== undefined && `max: ${maxValue}${suffix}`].filter(Boolean).join(', ')
 
   return `faker.number.${kind}(${args ? `{ ${args} }` : ''})`
 }
@@ -234,11 +237,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       number: (node) => numberCall('float', node),
       integer: (node) =>
         numberCall('int', node.format && node.format in formatMax ? { ...node, max: Math.min(node.max ?? Infinity, formatMax[node.format]!) } : node),
-      bigint({ min, max }) {
-        const args = [min !== undefined && `min: ${min}n`, max !== undefined && `max: ${max}n`].filter(Boolean).join(', ')
-
-        return `faker.number.bigInt(${args ? `{ ${args} }` : ''})`
-      },
+      bigint: (node) => numberCall('bigInt', node),
       blob: () => 'new Blob([faker.string.alpha()])',
       datetime(node) {
         const parser = this.options.dateParser ?? 'faker'

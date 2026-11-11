@@ -140,6 +140,12 @@ describe('printerFaker', () => {
     expect(print(ast.factory.createSchema({ type: 'number', exclusive: { min: 0, max: 1 } }))).toBe('faker.number.float({ min: 0, max: 1 })')
   })
 
+  test('keeps a bigint inside exclusive bounds', () => {
+    const node = ast.factory.createSchema({ type: 'bigint', exclusive: { min: 0 } })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('faker.number.bigInt({ min: 1n })')
+  })
+
   test("fills the other bound when faker's default would contradict a lone one", () => {
     const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
 
