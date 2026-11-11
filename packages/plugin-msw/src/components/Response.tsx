@@ -19,7 +19,7 @@ export function Response({ name, typeName, response }: Props): KubbReactNode {
     <File.Source name={responseName} isIndexable isExportable>
       <Function name={responseName} export params={params}>
         {`
-    ${responseReturn('data', ast.http.status.toCode(response.statusCode), response)}`}
+    ${responseReturn('data', ast.http.status.toCode(response), response)}`}
       </Function>
     </File.Source>
   )

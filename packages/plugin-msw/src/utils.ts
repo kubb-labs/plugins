@@ -68,7 +68,7 @@ function getResponseContentType(response: ast.ResponseNode | null | undefined): 
 
 function getResponseEntry(response: ast.ResponseNode | null | undefined): ast.ContentNode | undefined {
   const contents = response?.content ?? []
-  return contents.find((entry) => ast.mediaType.isJson(entry.contentType)) ?? contents[0]
+  return contents.find((entry) => ast.mediaType.isJson(entry)) ?? contents[0]
 }
 
 /**
@@ -77,7 +77,7 @@ function getResponseEntry(response: ast.ResponseNode | null | undefined): ast.Co
 function getTextContentType(response: ast.ResponseNode | null | undefined): string | null {
   const entry = (response?.content ?? []).find((entry) => {
     const schema = toResponseContent(entry, response?.content).schema
-    return !ast.mediaType.isJson(entry.contentType) && schema && ast.ref.resolve(schema).primitive === 'string'
+    return !ast.mediaType.isJson(entry) && schema && ast.ref.resolve(schema).primitive === 'string'
   })
   return entry?.contentType ?? null
 }
@@ -138,8 +138,8 @@ export function getExampleBody(response: ast.ResponseNode | null | undefined): s
   if (example.value !== undefined) return code.literal(example.value)
   // `responseReturn` sends raw text only for a text response. For a binary one the example would go out JSON-encoded.
   // A serialized SSE example is already events, which `responseReturn` sends as is when the body is `undefined`.
-  if (!ast.mediaType.isJson(entry.contentType)) {
-    const isTextBody = ast.mediaType.base(entry.contentType) !== 'text/event-stream' && getTextContentType(response) === entry.contentType
+  if (!ast.mediaType.isJson(entry)) {
+    const isTextBody = ast.mediaType.base(entry) !== 'text/event-stream' && getTextContentType(response) === entry.contentType
     return isTextBody ? code.literal(example.serializedValue) : null
   }
   // `responseReturn` encodes a JSON body itself, so a serialized JSON example is parsed first.

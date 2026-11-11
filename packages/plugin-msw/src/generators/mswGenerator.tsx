@@ -72,9 +72,9 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     // One helper per documented status, a range such as `4xx` included. `default` has no status to mock,
     // and the Fetch `Response` constructor rejects a `1xx` status.
     const types = node.responses
-      .filter((response) => response.statusCode !== 'default' && ast.http.status.class(response.statusCode) !== 1)
+      .filter((response) => response.statusCode !== 'default' && ast.http.status.class(response) !== 1)
       .map((response) => {
-        const isResponseType = ast.http.status.isSuccess(response.statusCode) && !hasResponseNameCollision
+        const isResponseType = ast.http.status.isSuccess(response) && !hasResponseNameCollision
         return [response, isResponseType ? type.responseName : tsResolver.response.status(node, response.statusCode)] as const
       })
     const responseTypeNames = types.map(([, typeName]) => typeName)

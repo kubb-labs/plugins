@@ -185,9 +185,9 @@ export function getEventStream(node: ast.OperationNode): 'event' | 'data' | 'lin
  */
 export function getStreamFraming(entry: Pick<ast.ContentNode, 'contentType' | 'stream'>): NonNullable<ast.ContentNode['stream']>['framing'] {
   if (entry.stream?.framing) return entry.stream.framing
-  if (ast.mediaType.base(entry.contentType) === 'text/event-stream') return 'events'
+  if (ast.mediaType.base(entry) === 'text/event-stream') return 'events'
   // `multipart/mixed` with an `itemSchema` also has `stream`, but it is a stream of parts, not of JSON values.
-  return entry.stream && ast.mediaType.isStream(entry.contentType) ? 'lines' : undefined
+  return entry.stream && ast.mediaType.isStream(entry) ? 'lines' : undefined
 }
 
 /**
@@ -215,7 +215,7 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
 export function hasStreamVariant(node: ast.OperationNode): boolean {
   return ast.http.responses.success(node).some((response) => {
     const variants = (response.content ?? []).filter((entry) => entry.schema)
-    return variants.length > 1 && variants.some((entry) => ast.mediaType.isStream(entry.contentType))
+    return variants.length > 1 && variants.some((entry) => ast.mediaType.isStream(entry))
   })
 }
 
@@ -226,7 +226,7 @@ const formContentTypes = ['multipart/form-data', 'application/x-www-form-urlenco
  * which the client needs a handler for.
  */
 export function getFormContentTypes(node: ast.OperationNode): Array<(typeof formContentTypes)[number]> {
-  const request = new Set((node.requestBody?.content ?? []).map((entry) => ast.mediaType.base(entry.contentType)))
+  const request = new Set((node.requestBody?.content ?? []).map((entry) => ast.mediaType.base(entry)))
   return formContentTypes.filter((contentType) => request.has(contentType))
 }
 
@@ -239,7 +239,7 @@ export function getFormContentTypes(node: ast.OperationNode): Array<(typeof form
  * `image/*`, `audio/*`, and `video/*` are blobs.
  */
 function responseTypeForContent(entry: ResponseContentEntry): ResponseType | undefined {
-  const baseType = ast.mediaType.base(entry.contentType)
+  const baseType = ast.mediaType.base(entry)
   if (!baseType) return undefined
   if (getStreamFraming(entry)) return 'stream'
   if (ast.mediaType.isJson(baseType)) return undefined
@@ -612,13 +612,13 @@ function buildResponseRecordEntry(
             name: 'contentType',
             required: true,
             // The runtime reports the bare media type, without parameters such as `charset` or `profile`.
-            schema: ast.factory.createSchema({ type: 'enum', enumValues: [ast.mediaType.base(variant.contentType)] }),
+            schema: ast.factory.createSchema({ type: 'enum', enumValues: [ast.mediaType.base(variant)] }),
           }),
           ast.factory.createProperty({
             name: 'data',
             required: true,
             schema:
-              streamData && ast.http.status.isSuccess(res.statusCode) && ast.mediaType.isStream(variant.contentType)
+              streamData && ast.http.status.isSuccess(res) && ast.mediaType.isStream(variant)
                 ? streamData
                 : ast.factory.createSchema({ type: 'ref', name: variant.name }),
           }),
@@ -658,15 +658,11 @@ export function buildResponses(
 }
 
 export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses
-    .filter((response) => ast.http.status.isError(response.statusCode))
-    .map((response) => resolver.response.status(node, response.statusCode))
+  return node.responses.filter((response) => ast.http.status.isError(response)).map((response) => resolver.response.status(node, response.statusCode))
 }
 
 export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses
-    .filter((response) => ast.http.status.isSuccess(response.statusCode))
-    .map((response) => resolver.response.status(node, response.statusCode))
+  return node.responses.filter((response) => ast.http.status.isSuccess(response)).map((response) => resolver.response.status(node, response.statusCode))
 }
 
 export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {

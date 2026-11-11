@@ -288,7 +288,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
     // Validate success (2xx) bodies only. Error bodies are surfaced unparsed, typed by plugin-ts (#369).
-    const successResponsesWithSchema = responsesWithSchema.filter((res) => ast.http.status.isSuccess(res.statusCode))
+    const successResponsesWithSchema = responsesWithSchema.filter((res) => ast.http.status.isSuccess(res))
     const responseUnionSchema =
       responsesWithSchema.length > 0
         ? buildResponseUnion({ responses: successResponsesWithSchema, name: resolver.response.response(node), fallbackUnknown: true })
@@ -296,7 +296,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     // Validate error bodies on the non-throw path. Mirrors the success union but selects every
     // non-2xx response (including the OpenAPI `default`) so it lines up with plugin-ts `ErrorOf` (#369).
-    const errorResponsesWithSchema = responsesWithSchema.filter((res) => !ast.http.status.isSuccess(res.statusCode))
+    const errorResponsesWithSchema = responsesWithSchema.filter((res) => !ast.http.status.isSuccess(res))
     const errorUnionSchema =
       errorResponsesWithSchema.length > 0
         ? buildResponseUnion({ responses: errorResponsesWithSchema, name: resolver.response.error(node), fallbackUnknown: false })

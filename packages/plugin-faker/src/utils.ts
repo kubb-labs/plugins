@@ -77,7 +77,7 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
   const withSchema = node.responses
     .map((response) => ({ ...response, content: response.content?.map((entry, _, content) => toResponseContent(entry, content)) }))
     .filter((response) => response.content?.[0]?.schema)
-  const success = withSchema.filter((response) => ast.http.status.isSuccess(response.statusCode))
+  const success = withSchema.filter((response) => ast.http.status.isSuccess(response))
   const responses = success.length > 0 ? success : withSchema
 
   if (!responses.length) {
