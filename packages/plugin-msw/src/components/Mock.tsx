@@ -3,6 +3,7 @@ import type { ast } from '@kubb/kit'
 import { Url } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
+import type { ResponseBody } from '../types.ts'
 import { getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
 
 type Props = {
@@ -12,9 +13,10 @@ type Props = {
   fakerName?: string
   baseURL: string | null | undefined
   node: ast.HttpOperationNode
+  body?: ResponseBody
 }
 
-export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName, node }: Props): KubbReactNode {
+export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName, node, body }: Props): KubbReactNode {
   const method = getMswMethod(node)
   // `http.all` matches every method on the path, so the QUERY handler lets the others pass through.
   const methodGuard = node.method === 'QUERY' ? `if (info.request.method !== 'QUERY') return\n\n    ` : ''
@@ -45,7 +47,7 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
         {`return ${httpCall}(${urlLiteral}, function handler(info) {
     ${methodGuard}if(typeof data === 'function') return data(info)
 
-    ${responseReturn(responseBody, statusCode, successResponse)}
+    ${responseReturn(responseBody, statusCode, successResponse, body)}
   })`}
       </Function>
     </File.Source>

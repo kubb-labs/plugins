@@ -11,6 +11,7 @@ Pass these options to `pluginMsw()`. Shared options link to [Shared plugin optio
 | [`baseURL`](#baseurl)                                                     | Base URL prepended to every handler's request.                         | None                                              |
 | [`handlers`](#handlers)                                                   | Emit a `handlers.ts` that re-exports every handler.                    | `false`                                           |
 | [`parser`](#parser)                                                       | Source of the response body each handler returns.                      | `'data'`                                          |
+| [`responseBody`](#responsebody)                                           | Replace the response body expression per operation and status.         | None                                              |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                       | None                                              |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                            | `[]`                                              |
 | [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                   | `[]`                                              |
@@ -85,6 +86,42 @@ export function getPetHandler(data?: GetPetQueryResponse | ((info: Parameters<Pa
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
+  })
+}
+```
+
+### responseBody
+
+Replaces the response body that the `…Response<status>` helpers and the handler write, for the operations you pick. Use it for a body the generator cannot infer from the spec, such as a stream in a custom framing. The callback runs once per response with a numeric status code and gets `{ node, response, status }`. Return `undefined` to keep the default `JSON.stringify(data)` body.
+
+The returned object has:
+
+- `expression(data)`: returns the body expression passed to `new HttpResponse(...)`. `data` is the source of the value, such as `'data'`, or `'data ?? createGetPetResponse(data)'` with `parser: 'faker'`.
+- `imports`: the imports the expression needs, as `{ name, path, isTypeOnly? }`. They are added to the handler file as written.
+
+The status and `Content-Type` header stay as generated.
+
+|          |                                                               |
+| -------- | ------------------------------------------------------------- |
+| Type     | `(context: ResponseBodyContext) => ResponseBody \| undefined` |
+| Required | `false`                                                       |
+
+```typescript [kubb.config.ts]
+pluginMsw({
+  responseBody: ({ node, status }) =>
+    node.extensions?.['x-acme-streaming'] && status === 200
+      ? { imports: [{ name: ['encodeStream'], path: '@acme/runtime' }], expression: (data) => `encodeStream(${data})` }
+      : undefined,
+})
+```
+
+```typescript [gen/streamLogsHandler.ts]
+import { encodeStream } from '@acme/runtime'
+
+export function streamLogsHandlerResponse200(data: StreamLogsResponse) {
+  return new HttpResponse(encodeStream(data), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
   })
 }
 ```

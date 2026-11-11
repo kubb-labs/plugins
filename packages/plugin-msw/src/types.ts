@@ -20,6 +20,47 @@ export type ResolverMsw = Resolver & {
 }
 
 /**
+ * Arguments passed to the `responseBody` option, once per response of an operation.
+ */
+export type ResponseBodyContext = {
+  /**
+   * The operation the handler is generated for.
+   */
+  node: ast.HttpOperationNode
+  /**
+   * The response the body is written for.
+   */
+  response: ast.ResponseNode
+  /**
+   * The response's status code as a number, such as `200`.
+   */
+  status: number
+}
+
+/**
+ * A custom response body returned by the `responseBody` option.
+ */
+export type ResponseBody = {
+  /**
+   * Returns the body expression passed to `new HttpResponse(...)`. `data` is the source of the
+   * value to send, such as `'data'`, or `'data ?? createPetResponse(data)'` with `parser: 'faker'`.
+   *
+   * @example
+   * ```ts
+   * expression: (data) => `encodeStream(${data})`
+   * ```
+   */
+  expression: (data: string) => string
+  /**
+   * Imports the expression needs, added to the handler file as written.
+   *
+   * @example
+   * `[{ name: ['encodeStream'], path: '@acme/runtime' }]`
+   */
+  imports?: Array<{ name: ast.ImportNode['name']; path: string; isTypeOnly?: boolean }>
+}
+
+/**
  * Where the generated MSW handlers are written and how they are exported, plus the optional
  * `group` strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
  *
@@ -66,6 +107,11 @@ export type Options = OutputOptions & {
    * @default 'data'
    */
   parser?: 'data' | 'faker'
+  /**
+   * Replace the response body of an operation's response helpers and handler. Called once per
+   * response with a status code. Return `undefined` to keep the default `JSON.stringify(data)` body.
+   */
+  responseBody?: (context: ResponseBodyContext) => ResponseBody | undefined
 }
 
 export type ResolvedOptions = {
@@ -77,6 +123,7 @@ export type ResolvedOptions = {
   parser: NonNullable<Options['parser']>
   baseURL: Options['baseURL'] | undefined
   handlers: boolean
+  responseBody: Options['responseBody']
 }
 
 export type PluginMsw = PluginType<'plugin-msw', Options, ResolvedOptions, ResolverMsw>

@@ -25,6 +25,7 @@ const defaultOptions: PluginMsw['resolvedOptions'] = {
   include: undefined,
   override: [],
   handlers: false,
+  responseBody: undefined,
 }
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
@@ -144,6 +145,31 @@ const enumResponseNameCollisionNode = ast.factory.createOperation({
   ],
 })
 
+const streamLogsNode = ast.factory.createOperation({
+  operationId: 'streamLogs',
+  method: 'GET',
+  path: '/logs',
+  tags: ['logs'],
+  extensions: { 'x-acme-streaming': true },
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      description: 'A stream of log entries',
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'object', properties: [] })] }),
+    }),
+    ast.factory.createResponse({
+      statusCode: '400',
+      description: 'Invalid',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+    }),
+  ],
+})
+
+const streamingResponseBody: PluginMsw['resolvedOptions']['responseBody'] = ({ node, status }) =>
+  node.extensions?.['x-acme-streaming'] && status === 200
+    ? { imports: [{ name: ['encodeStream'], path: '@acme/runtime' }], expression: (data) => `encodeStream(${data})` }
+    : undefined
+
 type RenderProps = {
   name: string
   node: ast.OperationNode
@@ -203,6 +229,8 @@ describe('mswGenerator operation', () => {
     { name: 'createPet', node: createPetsNode, options: {} },
     { name: 'createPetFaker', node: createPetsNode, options: { parser: 'faker' as const } },
     { name: 'searchPets', node: searchPetsNode, options: {} },
+    { name: 'streamLogsResponseBody', node: streamLogsNode, options: { responseBody: streamingResponseBody } },
+    { name: 'streamLogsResponseBodyFaker', node: streamLogsNode, options: { parser: 'faker' as const, responseBody: streamingResponseBody } },
     { name: 'responseNameCollision', node: responseNameCollisionNode, options: {} },
     {
       name: 'enumResponseNameCollision',
@@ -273,6 +301,51 @@ createPetsHandler(async ({ request }) => {
         '--target',
         'es2022',
         path.join(dir, 'check.ts'),
+      ]),
+    ).resolves.toMatchObject({ stdout: '', stderr: '' })
+  })
+})
+
+describe('mswGenerator responseBody', () => {
+  test('leaves an operation the callback skips unchanged', async () => {
+    const files = await renderOperation({ name: 'getPets', node: listPetsNode, options: {} })
+    const custom = await renderOperation({ name: 'getPets', node: listPetsNode, options: { responseBody: streamingResponseBody } })
+
+    expect(rawSources(custom)).toEqual(rawSources(files))
+  })
+
+  test('typechecks a handler with a custom body', async () => {
+    const files = await renderOperation({ name: 'streamLogs', node: streamLogsNode, options: { responseBody: streamingResponseBody } })
+    const [source] = rawSources(files)
+    const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.msw-'))
+    onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
+    await fs.writeFile(path.join(dir, 'handler.ts'), source!)
+    await fs.writeFile(
+      path.join(dir, 'StreamLogs.ts'),
+      `export type StreamLogsResponse = Array<{ message: string }>
+export type StreamLogsStatus400 = { code: number }`,
+    )
+    await fs.mkdir(path.join(dir, 'node_modules/@acme/runtime'), { recursive: true })
+    await fs.writeFile(
+      path.join(dir, 'node_modules/@acme/runtime/index.d.ts'),
+      'export declare function encodeStream(data: unknown): ReadableStream<Uint8Array>',
+    )
+    const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
+
+    await expect(
+      promisify(execFile)(process.execPath, [
+        compiler,
+        '--ignoreConfig',
+        '--noEmit',
+        '--strict',
+        '--skipLibCheck',
+        '--module',
+        'preserve',
+        '--moduleResolution',
+        'bundler',
+        '--target',
+        'es2022',
+        path.join(dir, 'handler.ts'),
       ]),
     ).resolves.toMatchObject({ stdout: '', stderr: '' })
   })

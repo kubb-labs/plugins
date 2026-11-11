@@ -5,7 +5,7 @@ import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mock } from '../components/Mock.tsx'
 import { Response } from '../components/Response.tsx'
-import type { PluginMsw } from '../types'
+import type { PluginMsw, ResponseBody } from '../types'
 import { hasResponseSchema } from '../utils.ts'
 
 /**
@@ -20,7 +20,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { driver, resolver, config, root } = ctx
-    const { output, parser, baseURL, group } = ctx.options
+    const { output, parser, baseURL, group, responseBody } = ctx.options
 
     const fileName = resolver.name(node.operationId)
     const mock = {
@@ -80,6 +80,15 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.response.body(node) : null
 
+    // Custom bodies from the `responseBody` option, by status code. `default` has no status to pass.
+    const bodies = new Map<string, ResponseBody>()
+    for (const response of node.responses) {
+      const status = Number(response.statusCode)
+      const body = responseBody && Number.isInteger(status) ? responseBody({ node, response, status }) : undefined
+      if (body) bodies.set(response.statusCode, body)
+    }
+    const bodyImports = new Map([...bodies.values()].flatMap((body) => body.imports ?? []).map((item) => [JSON.stringify(item), item]))
+
     return (
       <File
         baseName={mock.file.baseName}
@@ -98,13 +107,16 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           isTypeOnly
         />
         {faker && hasSuccessSchema && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
+        {[...bodyImports].map(([key, item]) => (
+          <File.Import key={key} name={item.name} path={item.path} isTypeOnly={item.isTypeOnly} />
+        ))}
 
         {types
           .filter(([code]) => code !== 'default')
           .map(([code, typeName]) => {
             const response = node.responses.find((item) => item.statusCode === String(code))
             if (!response) return null
-            return <Response key={typeName} typeName={typeName} response={response} name={mock.name} />
+            return <Response key={typeName} typeName={typeName} response={response} name={mock.name} body={bodies.get(response.statusCode)} />
           })}
 
         <Mock
@@ -114,6 +126,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           fakerName={faker && hasSuccessSchema ? faker.name : undefined}
           node={node}
           baseURL={baseURL}
+          body={successResponses[0] ? bodies.get(successResponses[0].statusCode) : undefined}
         />
       </File>
     )

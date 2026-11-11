@@ -1,5 +1,6 @@
 import { toResponseContent } from '@internals/shared'
 import { ast } from '@kubb/kit'
+import type { ResponseBody } from './types.ts'
 
 /**
  * Returns the base URL as source code. A `${...}` value stays a template literal.
@@ -62,9 +63,11 @@ function getTextContentType(response: ast.ResponseNode | null | undefined): stri
 /**
  * The statements that return a mocked `Response` for `body`. A string body for a response the client reads as text goes
  * out as raw text with that content type, so an XML mock is not sent as a quoted JSON string. Any other body is JSON.
+ * A `custom` body from the `responseBody` option replaces both.
  */
-export function responseReturn(body: string, status: number, response: ast.ResponseNode | null | undefined): string {
+export function responseReturn(body: string, status: number, response: ast.ResponseNode | null | undefined, custom?: ResponseBody): string {
   const contentType = getContentType(response)
+  if (custom) return `return ${responseLiteral(custom.expression(body), status, contentType, null)}`
   const textContentType = hasResponseSchema(response) ? getTextContentType(response) : null
   if (!textContentType) return `return ${responseLiteral(`JSON.stringify(${body})`, status, contentType)}`
 
@@ -91,10 +94,10 @@ function headersBlock(contentType: string | null): string {
 }
 
 /**
- * The `new HttpResponse<string>(...)` expression a mocked handler returns.
+ * The `new HttpResponse<string>(...)` expression a mocked handler returns. Pass `null` as `bodyType` to let MSW type the body.
  */
-export function responseLiteral(body: string, status: number, contentType: string | null): string {
-  return `new HttpResponse<string>(${body}, {
+export function responseLiteral(body: string, status: number, contentType: string | null, bodyType: string | null = 'string'): string {
+  return `new HttpResponse${bodyType ? `<${bodyType}>` : ''}(${body}, {
       status: ${status},${headersBlock(contentType)}
     })`
 }

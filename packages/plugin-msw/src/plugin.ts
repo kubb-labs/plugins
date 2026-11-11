@@ -55,6 +55,7 @@ export const pluginMsw = defineExtension<PluginMsw>({
       handlers = false,
       parser = 'data',
       baseURL,
+      responseBody,
       resolver: userResolver,
       macros: userMacros,
     } = options
@@ -80,6 +81,7 @@ export const pluginMsw = defineExtension<PluginMsw>({
       include,
       override,
       handlers,
+      responseBody,
     }
   },
 })
