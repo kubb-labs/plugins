@@ -270,6 +270,10 @@ describe('printerZod', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'bigint', min: 0.5, max: 10.5, exclusive: { min: 1.5 } }))).toBe(
         'z.coerce.bigint().min(2n).max(10n)',
       )
+      // A bound past the safe integer range would print as `1e+21n` or a rounded literal.
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', min: 0, max: 9223372036854775807, exclusive: { max: 1e21 } }))).toBe(
+        'z.coerce.bigint().min(0n)',
+      )
     })
   })
 
