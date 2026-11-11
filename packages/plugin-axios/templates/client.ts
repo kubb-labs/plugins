@@ -145,9 +145,9 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       responseType: request.stream ? 'stream' : 'arraybuffer',
       transformResponse: (data) => data,
-      signal: request.signal,
       validateStatus: () => true,
     }
+    if (request.signal) config.signal = request.signal
 
     // XHR buffers the body and cannot omit same-origin cookies, so a stream or `credentials: 'omit'` uses fetch in the browser.
     const instanceAdapter = instance.defaults?.adapter
@@ -191,7 +191,7 @@ export const defaultTransport: Transport = (request) => createAxiosTransport(get
 /**
  * The client every generated operation uses unless a call passes its own. It is created on first use.
  */
-export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
+export const client: ClientInstance = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
 client.setConfig(defaultConfig)
 
-export const createClient = client.createClient
+export const createClient: ClientInstance['createClient'] = client.createClient

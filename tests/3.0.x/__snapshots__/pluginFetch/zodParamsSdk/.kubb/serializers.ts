@@ -75,7 +75,7 @@ export type HeaderSerializer = (headers: HeadersInit | undefined, styles?: Recor
 /**
  * Turns one path parameter into its URL segment.
  */
-export type PathSerializer = (args: { name: string; value: unknown; options?: PathParamStyle }) => string
+export type PathSerializer = (args: { name: string; value: unknown; options?: PathParamStyle | undefined }) => string
 
 /**
  * Parameter serializers, set per client or per call. `.kubb/client.ts` registers the ones the spec needs. Bodies are

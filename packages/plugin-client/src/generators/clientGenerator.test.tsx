@@ -401,13 +401,13 @@ describe('clientGenerator runtime files', () => {
     expect(config).toContain("import { serializeQuery } from './serializers/query")
     if (!expected) {
       expect(copied).toStrictEqual(['serializers/path.ts', 'serializers/query.ts'])
-      expect(config).toContain(`export const defaultConfig = { ${serializerConfig} }`)
+      expect(config).toContain(`export const defaultConfig: ClientConfig = { ${serializerConfig} }`)
       return expect(footer).toBeUndefined()
     }
     expect(copied).toStrictEqual(['serializers/path.ts', 'serializers/query.ts', 'sse.ts'])
     expect(config).toContain("import { streamMediaTypes } from './sse")
     expect(config).toContain(
-      `export const defaultConfig = { ${baseURL ? `baseURL: "${baseURL}", ` : ''}mediaTypes: { ...streamMediaTypes }, ${serializerConfig} }`,
+      `export const defaultConfig: ClientConfig = { ${baseURL ? `baseURL: "${baseURL}", ` : ''}mediaTypes: { ...streamMediaTypes }, ${serializerConfig} }`,
     )
     expect(footer).toBe("export * from './sse.ts'")
   })
@@ -460,7 +460,7 @@ describe('clientGenerator runtime files', () => {
     const { copied, config } = readRuntime(driver.fileManager.files)
     expect(copied).toStrictEqual(['mediaTypes/formData.ts', 'serializers/path.ts', 'serializers/query.ts'])
     expect(config).toContain("import { multipartFormData } from './mediaTypes/formData")
-    expect(config).toContain(`export const defaultConfig = { mediaTypes: { 'multipart/form-data': multipartFormData }, ${serializerConfig} }`)
+    expect(config).toContain(`export const defaultConfig: ClientConfig = { mediaTypes: { 'multipart/form-data': multipartFormData }, ${serializerConfig} }`)
   })
 
   test('copies and registers the cookie and styled path serializers for a cookie and a matrix path parameter', async () => {
@@ -492,6 +492,8 @@ describe('clientGenerator runtime files', () => {
     const { copied, config } = readRuntime(driver.fileManager.files)
     expect(copied).toStrictEqual(['serializers/cookies.ts', 'serializers/path.ts', 'serializers/pathStyles.ts', 'serializers/query.ts'])
     expect(config).toContain("import { serializeStyledPath } from './serializers/pathStyles")
-    expect(config).toContain('export const defaultConfig = { serializer: { query: serializeQuery, path: serializeStyledPath, cookie: serializeCookies } }')
+    expect(config).toContain(
+      'export const defaultConfig: ClientConfig = { serializer: { query: serializeQuery, path: serializeStyledPath, cookie: serializeCookies } }',
+    )
   })
 })

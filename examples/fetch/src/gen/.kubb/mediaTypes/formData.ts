@@ -3,7 +3,17 @@ import type { BodyEncoding } from '../serializers'
 import { isEncodedBody } from '../mediaTypes'
 import { jsonReplacer, toValue } from '../serializers'
 
-function appendFormDataValue({ formData, key, value, contentType }: { formData: FormData; key: string; value: unknown; contentType?: string }): void {
+function appendFormDataValue({
+  formData,
+  key,
+  value,
+  contentType,
+}: {
+  formData: FormData
+  key: string
+  value: unknown
+  contentType?: string | undefined
+}): void {
   if (value === undefined || value === null) return
   if (value instanceof Blob) {
     formData.append(key, value)

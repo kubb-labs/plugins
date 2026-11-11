@@ -3,7 +3,17 @@ import type { MediaType } from '../mediaTypes.ts'
 import { jsonReplacer, toValue } from '../serializers.ts'
 import type { BodyEncoding } from '../serializers.ts'
 
-function appendFormDataValue({ formData, key, value, contentType }: { formData: FormData; key: string; value: unknown; contentType?: string }): void {
+function appendFormDataValue({
+  formData,
+  key,
+  value,
+  contentType,
+}: {
+  formData: FormData
+  key: string
+  value: unknown
+  contentType?: string | undefined
+}): void {
   if (value === undefined || value === null) return
   if (value instanceof Blob) {
     formData.append(key, value)

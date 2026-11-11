@@ -14,7 +14,7 @@
   "sideEffects": false,
   "scripts": {
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
-    "typecheck": "tsc"
+    "typecheck": "tsc && tsc -p tsconfig.strict.json"
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",

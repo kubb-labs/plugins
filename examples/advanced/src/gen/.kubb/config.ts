@@ -1,3 +1,4 @@
+import type { ClientConfig } from './core'
 import { multipartFormData } from './mediaTypes/formData'
 import { multipartMixed } from './mediaTypes/mixed'
 import { urlencoded } from './mediaTypes/urlencoded'
@@ -10,7 +11,7 @@ import { streamMediaTypes } from './sse'
 /**
  * The config `client.ts` starts with: what this spec needs from the runtime.
  */
-export const defaultConfig = {
+export const defaultConfig: ClientConfig = {
   baseURL: 'https://petstore3.swagger.io/api/v3',
   mediaTypes: {
     'application/x-www-form-urlencoded': urlencoded,

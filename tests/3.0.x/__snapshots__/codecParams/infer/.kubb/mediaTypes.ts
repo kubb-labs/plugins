@@ -11,13 +11,13 @@ export type MediaTypeContext = {
   /**
    * The response status, or `undefined` while a request body is encoded.
    */
-  status?: number
-  signal?: AbortSignal
+  status?: number | undefined
+  signal?: AbortSignal | undefined
   config: Omit<RequestConfig, 'client' | 'transport'> & EventStreamOptions
   /**
    * Where a stream records the last event ID it read, for `StreamResult.lastEventId`.
    */
-  cursor?: { lastEventId: string }
+  cursor?: { lastEventId: string } | undefined
 }
 
 /**
