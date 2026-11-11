@@ -1,4 +1,4 @@
-import { ast, containsCircularRef } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import { Const, File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterZodFactory } from '../printers/printerZod.ts'
@@ -56,7 +56,7 @@ export function Zod({ name, node, printer, inferTypeName, inferKind = 'infer', t
   // union/array with a top-level `z.lazy(() => self)`) are implicitly `any` and need the annotation.
   const needsAnnotation = cyclic && node.type !== 'object'
   const isBare = ast.isBareRef(node, printer.options.keysToOmit)
-  const isCyclic = Boolean(cyclic || (printer.options.cyclicSchemas && containsCircularRef(node, { circularSchemas: printer.options.cyclicSchemas })))
+  const isCyclic = Boolean(cyclic || (printer.options.cyclicSchemas && ast.graph.containsCircular(node, { circularSchemas: printer.options.cyclicSchemas })))
   const shouldCompile = Boolean(compile) && !isBare && !isCyclic
   const value = shouldCompile ? (typeof compile === 'object' && compile.strict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output
 

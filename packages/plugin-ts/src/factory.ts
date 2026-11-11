@@ -1,6 +1,5 @@
 import { screamingSnakeCase, snakeCase } from '@internals/utils'
-import { camelCase, pascalCase, syncSchemaRef } from '@kubb/kit'
-import type { ast } from '@kubb/kit'
+import { ast, camelCase, pascalCase } from '@kubb/kit'
 import { generate } from 'yuku-codegen'
 
 /**
@@ -498,7 +497,7 @@ export function buildPropertyType(
   optional?: boolean,
 ): TsNode {
   const addsUndefined = optionalType === 'undefined' || optionalType === 'questionTokenAndUndefined'
-  const meta = syncSchemaRef(schema)
+  const meta = ast.ref.sync(schema)
 
   return wrapNullableOptional(baseType, !!meta.nullable, addsUndefined && !!(optional || meta.nullish || meta.optional))
 }

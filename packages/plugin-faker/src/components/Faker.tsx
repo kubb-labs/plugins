@@ -1,5 +1,5 @@
 import { jsDocEscape, objectKey } from '@internals/utils'
-import { ast, containsCircularRef } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
@@ -91,7 +91,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
   const hasGetters =
     node.type === 'object' &&
     !!cyclicSchemas &&
-    (node.properties ?? []).some((p) => containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
+    (node.properties ?? []).some((p) => ast.graph.containsCircular(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
 
   // A non-object root (such as an `allOf` with a `oneOf` member) or an object padded up to `minProperties` gives
   // `defaultFakeData` a type TypeScript does not relate to the `Omit` of it.

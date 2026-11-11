@@ -1,6 +1,6 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildList, stringify } from '@internals/utils'
-import { ast, syncSchemaRef } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   buildEnum,
@@ -102,7 +102,7 @@ function getLiteralUnion({
  */
 function hasCoercedDiscriminator({ member, propertyName, options }: { member: ast.SchemaNode; propertyName: string; options: ZodNodeOptions }): boolean {
   return ast.resolveSchemaProperties({ node: member, propertyName }).some(({ schema }) => {
-    const resolved = syncSchemaRef(schema)
+    const resolved = ast.ref.sync(schema)
     return resolved.type === 'union' && !!getLiteralUnion({ node: resolved, options })?.coerce
   })
 }
@@ -110,7 +110,7 @@ function hasCoercedDiscriminator({ member, propertyName, options }: { member: as
 // `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
 function hasPlainDiscriminator({ member, propertyName }: { member: ast.SchemaNode; propertyName: string }): boolean {
   const schemas = ast.resolveSchemaProperties({ node: member, propertyName })
-  return schemas.length > 0 && !schemas.some(({ schema }) => ast.getSchemaLiteralValues(syncSchemaRef(schema)).length > 0)
+  return schemas.length > 0 && !schemas.some(({ schema }) => ast.getSchemaLiteralValues(ast.ref.sync(schema)).length > 0)
 }
 
 /**

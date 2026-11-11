@@ -1,6 +1,6 @@
 import { buildObject, stringify, toRegExpString } from '@internals/utils'
 import { mapSchemaProperties } from '@internals/shared'
-import { ast, containsCircularRef, syncSchemaRef } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
 
 /**
@@ -23,7 +23,7 @@ export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] 
  */
 export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
   if (!node) return false
-  const resolved = syncSchemaRef(node)
+  const resolved = ast.ref.sync(node)
   if (resolved.type === 'enum') return true
   if (resolved.type === 'union') {
     const members = resolved.members ?? []
@@ -71,7 +71,7 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
   if (node.type === 'ref') {
     const refName = ast.resolveRefName(node)
     if (refName && cyclicSchemas?.has(refName)) return false
-    const resolved = syncSchemaRef(node)
+    const resolved = ast.ref.sync(node)
     // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's
     // prior optimism that only a resolved intersection blocks a discriminated union).
     return resolved.type === 'ref' || isObjectSchemaNode(resolved, cyclicSchemas)
@@ -108,7 +108,7 @@ export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Arra
   }): boolean => {
     if (seen.has(node)) return false
     seen.add(node)
-    const resolved = syncSchemaRef(node)
+    const resolved = ast.ref.sync(node)
     const composition = ast.narrowSchema(resolved, ast.schemaTypes.intersection) ?? ast.narrowSchema(resolved, ast.schemaTypes.union)
     // Property lookup skips unions, but a single-member union prints as its member.
     if (composition) {
@@ -165,7 +165,7 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   // A `null` default is invalid on a non-nullable schema and redundant on a nullish one, and emitting
   // it produces a bare `.default()` (no argument). Drop it.
   if (value === null) return null
-  const resolved = node ? syncSchemaRef(node) : undefined
+  const resolved = node ? ast.ref.sync(node) : undefined
   // A binary schema parses to a `Blob`, which a spec default, a string, cannot be.
   if (resolved?.type === 'blob') return null
   if (resolved && ast.narrowSchema(resolved, 'bigint')) {
@@ -544,7 +544,7 @@ export function buildObjectShape(
     value: string
     schema: ast.SchemaNode
     required?: boolean
-    meta: ReturnType<typeof syncSchemaRef>
+    meta: ReturnType<typeof ast.ref.sync>
     cyclic: boolean
   }) => string,
 ): string {
@@ -552,7 +552,7 @@ export function buildObjectShape(
   if (!objectNode) return '{}'
 
   const isCyclic = (schema: ast.SchemaNode): boolean =>
-    ctx.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
+    ctx.options.cyclicSchemas != null && ast.graph.containsCircular(schema, { circularSchemas: ctx.options.cyclicSchemas })
 
   const entries = mapSchemaProperties(objectNode, (schema) => {
     // A getter defers evaluation, so clear cyclicSchemas to skip z.lazy() on nested refs.
@@ -564,7 +564,7 @@ export function buildObjectShape(
     return baseOutput
   }).map(({ name, property, output: value }) => {
     const { schema } = property
-    return renderProperty({ name, value, schema, required: property.required, meta: syncSchemaRef(schema), cyclic: isCyclic(schema) })
+    return renderProperty({ name, value, schema, required: property.required, meta: ast.ref.sync(schema), cyclic: isCyclic(schema) })
   })
 
   return buildObject(entries)
@@ -576,7 +576,7 @@ export function buildObjectShape(
 export function printWithOmit(
   ctx: { transform: (node: ast.SchemaNode) => string | null; options: { keysToOmit?: Array<string> | null } },
   node: ast.SchemaNode,
-  modify: (value: string, meta: ReturnType<typeof syncSchemaRef>) => string,
+  modify: (value: string, meta: ReturnType<typeof ast.ref.sync>) => string,
   mini = false,
 ): string | null {
   const { keysToOmit } = ctx.options
@@ -584,7 +584,7 @@ export function printWithOmit(
   const transformed = ctx.transform(node)
   if (!transformed) return null
 
-  const meta = syncSchemaRef(node)
+  const meta = ast.ref.sync(node)
 
   const base = (() => {
     if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed

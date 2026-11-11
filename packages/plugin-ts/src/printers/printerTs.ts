@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module'
 import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
-import { ast, Diagnostics, isStringType, syncSchemaRef } from '@kubb/kit'
+import { ast, Diagnostics } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isBinarySchema, isInlineConstEnum } from '../utils.ts'
@@ -272,13 +272,13 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           const enumNode = ast.narrowSchema(m, ast.schemaTypes.enum)
           return enumNode?.primitive === 'string'
         })
-        const hasPlainString = members.some((m) => isStringType(m))
+        const hasPlainString = members.some((m) => ast.schema.isString(m))
 
         if (hasStringLiteral && hasPlainString) {
           const memberNodes = members
             .map((m) => {
               const print = (node: ast.SchemaNode) =>
-                isStringType(node)
+                ast.schema.isString(node)
                   ? factory.createIntersectionDeclaration({ nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])] })
                   : this.transform(node)
 
@@ -307,7 +307,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       object(node) {
         const { transform, options } = this
 
-        const keySchema = node.propertyNames && syncSchemaRef(node.propertyNames)
+        const keySchema = node.propertyNames && ast.ref.sync(node.propertyNames)
         if (
           !node.properties.length &&
           !Object.keys(node.patternProperties ?? {}).length &&
@@ -328,7 +328,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           const baseType = output ?? factory.keywordTypeNodes.unknown
           const optional = !property.required || !!property.schema.optional || !!property.schema.nullish
           const type = factory.buildPropertyType(property.schema, baseType, options.optionalType, optional)
-          const propMeta = syncSchemaRef(property.schema)
+          const propMeta = ast.ref.sync(property.schema)
 
           const propertyNode = factory.createPropertySignature({
             questionToken: optional ? addsQuestionToken : false,
@@ -363,7 +363,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       if (!transformed) return null
 
       // For ref nodes, structural metadata lives on node.schema rather than the ref node itself.
-      const meta = syncSchemaRef(node)
+      const meta = ast.ref.sync(node)
 
       // Without name, apply modifiers inline and return.
       if (!name) {

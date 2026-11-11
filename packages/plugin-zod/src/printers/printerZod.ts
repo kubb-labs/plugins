@@ -1,5 +1,5 @@
 import { lazyGetter, objectKey } from '@internals/utils'
-import { ast, syncSchemaRef } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyModifiers,
@@ -131,7 +131,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
       return member
     }
 
-    const schema = syncSchemaRef(node)
+    const schema = ast.ref.sync(node)
 
     if (schema.nullable || schema.optional || node.nullable || node.optional) {
       return member
@@ -204,7 +204,7 @@ function recursiveGetterType({
   const base = baseType(schema)
   if (!base) return undefined
 
-  const meta = syncSchemaRef(schema)
+  const meta = ast.ref.sync(schema)
   const optional = schema.optional || required === false
   const wrapped = (() => {
     if (schema.nullish || (meta.nullable && optional)) return `z.ZodOptional<z.ZodNullable<${base}>>`

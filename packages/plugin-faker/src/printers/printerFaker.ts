@@ -1,6 +1,6 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
-import { ast, containsCircularRef, Diagnostics, syncSchemaRef } from '@kubb/kit'
+import { ast, Diagnostics } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema, isObjectSchema } from '../utils.ts'
 
@@ -480,7 +480,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       object(node): string {
         const cyclicSchemas = this.options.cyclicSchemas
-        const keySchema = node.propertyNames && syncSchemaRef(node.propertyNames)
+        const keySchema = node.propertyNames && ast.ref.sync(node.propertyNames)
         const valueSchema = node.additionalProperties
         const recordProperties =
           keySchema?.type === 'enum' && typeof valueSchema === 'object'
@@ -514,7 +514,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           // emit a memoizing lazy getter. On first access it computes the value,
           // replaces itself with a plain data property via Object.defineProperty,
           // and returns the cached value, so every subsequent read is stable.
-          if (cyclicSchemas && containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
+          if (cyclicSchemas && ast.graph.containsCircular(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
             return `get ${objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
           }
 
