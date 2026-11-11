@@ -736,7 +736,8 @@ describe('createClientCore', () => {
   })
 
   test('ResponseError.is matches by name, so an error from another bundled client still counts', () => {
-    const foreign = Object.assign(new Error('boom'), { name: 'ResponseError' })
+    const foreign = new Error('boom')
+    foreign.name = 'ResponseError'
     expect(ResponseError.is(foreign)).toBe(true)
     expect(ResponseError.is(new ResponseError({ data: undefined, status: 500, statusText: '', request: 'REQ', response: 'RES' }))).toBe(true)
     expect(ResponseError.is(new Error('boom'))).toBe(false)

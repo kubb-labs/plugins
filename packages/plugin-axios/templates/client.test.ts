@@ -1,7 +1,7 @@
 import http from 'node:http'
 import { Readable } from 'node:stream'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { multipartFormData } from '../../plugin-client/templates/mediaTypes/formData.ts'
 import { urlencoded } from '../../plugin-client/templates/mediaTypes/urlencoded.ts'
@@ -377,7 +377,7 @@ describe('createAxiosTransport', () => {
   })
 
   test('rethrows a network error from axios', async () => {
-    const networkError = Object.assign(new Error('Network Error'), { isAxiosError: true, name: 'AxiosError' })
+    const networkError = new AxiosError('Network Error', AxiosError.ERR_NETWORK)
     const instance = { request: vi.fn(async () => Promise.reject(networkError)) } as unknown as AxiosInstance
     const client = createClientCore({ defaultTransport: createAxiosTransport(instance) })
     const seen: Array<unknown> = []
