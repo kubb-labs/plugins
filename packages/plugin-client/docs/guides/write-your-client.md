@@ -132,6 +132,17 @@ OpenAPI 3.2 `cookie` style. Header values are sent as-is. Cookie values are URL-
 The client below uses `fetch`. Replace the transport with the HTTP library you use.
 
 ```typescript [src/client.ts]
+export type Auth = {
+  type: string
+  scheme?: string
+  name?: string
+  in?: string
+  scopes?: Array<string>
+  flows?: Record<string, Record<string, string>>
+  metadataUrl?: string
+  url?: string
+}
+
 export type RequestConfig = {
   method: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD'
   url: string
@@ -145,16 +156,7 @@ export type RequestConfig = {
   parseAs?: 'json' | 'text' | 'blob' | 'arrayBuffer' | 'stream'
   contentType?: string | { request?: string; response?: string }
   throwOnError?: boolean
-  security?: Array<{
-    type: string
-    scheme?: string
-    name?: string
-    in?: string
-    scopes?: Array<string>
-    flows?: Record<string, Record<string, string>>
-    metadataUrl?: string
-    url?: string
-  }>
+  security?: Array<Auth | Array<Auth>>
   styles?: object
   client?: typeof client
 }
