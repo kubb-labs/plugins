@@ -170,8 +170,7 @@ type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | nul
  */
 function isJsonLines(entry: ResponseContentEntry): boolean {
   const baseType = ast.mediaType.base(entry.contentType)
-  // `multipart/mixed` is a stream of parts, not of JSON values.
-  return Boolean(entry.stream) && baseType !== 'text/event-stream' && isStreamContentType(baseType)
+  return Boolean(entry.stream) && baseType !== 'text/event-stream' && ast.mediaType.isStream(baseType)
 }
 
 /**
@@ -243,11 +242,6 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
   return entries.some((entry) => ast.mediaType.base(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
 }
 
-// The client runtime reads `multipart/mixed` as a whole body, not as a stream. Keep in sync with `streamMediaTypes` in the client's `sse.ts`.
-function isStreamContentType(contentType: string): boolean {
-  return ast.mediaType.isStream(contentType) && ast.mediaType.base(contentType) !== 'multipart/mixed'
-}
-
 /**
  * Whether a success response offers a stream media type next to other content types. The client returns that variant's
  * body as a `ReadableStream`, so the stream runtime is registered and a hook's data type includes the stream.
@@ -255,7 +249,7 @@ function isStreamContentType(contentType: string): boolean {
 export function hasStreamVariant(node: ast.OperationNode): boolean {
   return ast.http.responses.success(node).some((response) => {
     const variants = (response.content ?? []).filter((entry) => entry.schema)
-    return variants.length > 1 && variants.some((entry) => isStreamContentType(entry.contentType))
+    return variants.length > 1 && variants.some((entry) => ast.mediaType.isStream(entry.contentType))
   })
 }
 
@@ -728,7 +722,7 @@ function buildResponseRecordEntry(
             name: 'data',
             required: true,
             schema:
-              streamData && ast.http.status.isSuccess(res.statusCode) && isStreamContentType(variant.contentType)
+              streamData && ast.http.status.isSuccess(res.statusCode) && ast.mediaType.isStream(variant.contentType)
                 ? streamData
                 : ast.factory.createSchema({ type: 'ref', name: variant.name }),
           }),
