@@ -761,6 +761,29 @@ describe('printerZod', () => {
   })
 
   describe('intersection', () => {
+    test('keeps the discriminator literal of a oneOf base over a sibling string property', () => {
+      const typeProperty = (schema: ast.SchemaNode) => ast.factory.createProperty({ name: 'type', required: true, schema })
+      const dog = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [
+          typeProperty(ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] })),
+          ast.factory.createProperty({ name: 'bark', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+      })
+      const node = ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'type', members: [dog] }),
+          ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [typeProperty(ast.factory.createSchema({ type: 'string' }))] }),
+        ],
+      })
+      const schema = new Function('z', `return ${printer.print(node)}`)(z) as z.ZodType
+
+      expect(schema.safeParse({ type: 'dog' }).success).toBe(true)
+      expect(schema.safeParse({ type: 'cat' }).success).toBe(false)
+    })
+
     test('ref with string min and max constraints', () => {
       const node = ast.factory.createSchema({
         type: 'intersection',

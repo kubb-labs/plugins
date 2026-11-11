@@ -327,9 +327,19 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       // An object `allOf` is a merge, not a runtime intersection: extending keeps it a Zod object
       // (usable in z.discriminatedUnion) instead of a non-discriminable intersection.
       if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemas)) {
+        // A discriminated `oneOf` base already pins its discriminator to a literal; a sibling
+        // `type: string` extended after it would widen that literal back to any string.
+        const discriminator = ast.narrowSchema(first, ast.schemaTypes.union)?.discriminatorPropertyName
         return preserveRequiredProperties(members)
           .slice(1)
-          .reduce((acc, member) => dialect.extend(acc, dialect.objectShape(this, member)), firstBase)
+          .reduce((acc, member) => {
+            const object = ast.narrowSchema(member, ast.schemaTypes.object)
+            if (!discriminator || !object?.properties.some((property) => property.name === discriminator)) {
+              return dialect.extend(acc, dialect.objectShape(this, member))
+            }
+            const properties = object.properties.filter((property) => property.name !== discriminator)
+            return properties.length ? dialect.extend(acc, dialect.objectShape(this, { ...object, properties })) : acc
+          }, firstBase)
       }
 
       return rest.reduce((acc, member) => {
