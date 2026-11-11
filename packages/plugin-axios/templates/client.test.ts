@@ -3,8 +3,13 @@ import { Readable } from 'node:stream'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { afterEach, describe, expect, test, vi } from 'vitest'
+import { multipartFormData } from '../../plugin-client/templates/mediaTypes/formData.ts'
+import { multipartMixed } from '../../plugin-client/templates/mediaTypes/mixed.ts'
+import { urlencoded } from '../../plugin-client/templates/mediaTypes/urlencoded.ts'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
-import { client, createAxiosTransport, createClient, createClientCore, formMediaTypes, getAxiosInstance, ResponseError } from './client.ts'
+import { client, createAxiosTransport, createClient, createClientCore, getAxiosInstance, ResponseError } from './client.ts'
+
+const formMediaTypes = { 'multipart/form-data': multipartFormData, 'multipart/mixed': multipartMixed, 'application/x-www-form-urlencoded': urlencoded }
 
 type Programmed = { data?: unknown; status?: number; statusText?: string; headers?: Record<string, unknown> }
 

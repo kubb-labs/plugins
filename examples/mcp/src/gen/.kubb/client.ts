@@ -177,5 +177,9 @@ export const client = createLazyClient((config) => createClientCore({ defaultTra
 
 export const createClient = client.createClient
 
-import { formMediaTypes } from './mediaTypes.ts'
-client.setConfig({ baseURL: 'https://petstore.swagger.io/v2', mediaTypes: { ...formMediaTypes } })
+import { urlencoded } from './mediaTypes/urlencoded.ts'
+import { multipartFormData } from './mediaTypes/formData.ts'
+client.setConfig({
+  baseURL: 'https://petstore.swagger.io/v2',
+  mediaTypes: { 'application/x-www-form-urlencoded': urlencoded, 'multipart/form-data': multipartFormData },
+})

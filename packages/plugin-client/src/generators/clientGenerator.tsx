@@ -15,14 +15,14 @@ import { StreamRuntime } from '../components/StreamRuntime.tsx'
 import type { ContractClientFactory } from '../types.ts'
 
 /**
- * Builds the per-operation client generator shared by the client plugins. `sse` is the template copied into `.kubb/sse.ts` for a streaming document.
+ * Builds the per-operation client generator shared by the client plugins. `templates` is the folder the optional runtime, such as `sse.ts`, is copied from.
  */
-export function createClientGenerator<TFactory extends ContractClientFactory>(name: string, { sse }: { sse?: string } = {}): Generator<TFactory> {
+export function createClientGenerator<TFactory extends ContractClientFactory>(name: string, { templates }: { templates?: string } = {}): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name,
     renderer: jsxRenderer,
     operations(nodes, ctx) {
-      return <StreamRuntime nodes={nodes} root={ctx.root} sse={sse} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} />
+      return <StreamRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} />
     },
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null

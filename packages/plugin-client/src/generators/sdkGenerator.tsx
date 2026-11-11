@@ -142,10 +142,10 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
  * is set, a composed root that creates one client and shares it with every tag client. With
  * `sdk.mode: 'flat'` it emits one class named by `sdk.name`, with every operation as a direct method.
  *
- * `sse` is the Server-Sent Events runtime template, copied into `.kubb/sse.ts` only for a document with a
- * `text/event-stream` operation.
+ * `templates` is the folder the optional runtime is copied from: `sse.ts` only for a document that streams, and each
+ * form media type only for a document with a body of that type.
  */
-export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse }: { sse?: string } = {}): Generator<TFactory> {
+export function createSdkGenerator<TFactory extends ContractClientFactory>({ templates }: { templates?: string } = {}): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name: 'sdk',
     renderer: jsxRenderer,
@@ -264,7 +264,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
 
       return (
         <>
-          <StreamRuntime nodes={nodes} root={root} sse={sse} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} />
+          <StreamRuntime nodes={nodes} root={root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} />
           {files}
         </>
       )

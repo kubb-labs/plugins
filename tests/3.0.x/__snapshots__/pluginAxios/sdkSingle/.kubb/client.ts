@@ -177,5 +177,5 @@ export const client = createLazyClient((config) => createClientCore({ defaultTra
 
 export const createClient = client.createClient
 
-import { formMediaTypes } from './mediaTypes.ts'
-client.setConfig({ mediaTypes: { ...formMediaTypes } })
+import { urlencoded } from './mediaTypes/urlencoded.ts'
+client.setConfig({ mediaTypes: { 'application/x-www-form-urlencoded': urlencoded } })

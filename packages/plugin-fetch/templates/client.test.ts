@@ -8,7 +8,6 @@ import {
   defaultMediaTypes,
   defaultTransport,
   createInterceptorStack,
-  formMediaTypes,
   isResponseError,
   type MediaTypeContext,
   type MediaTypes,
@@ -25,7 +24,12 @@ import {
 } from './client.ts'
 import type { BodyEncoding } from './serializers.ts'
 import { applyHeaderStyles, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
+import { multipartFormData } from '../../plugin-client/templates/mediaTypes/formData.ts'
+import { multipartMixed } from '../../plugin-client/templates/mediaTypes/mixed.ts'
+import { urlencoded } from '../../plugin-client/templates/mediaTypes/urlencoded.ts'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
+
+const formMediaTypes = { 'multipart/form-data': multipartFormData, 'multipart/mixed': multipartMixed, 'application/x-www-form-urlencoded': urlencoded }
 
 type FakeResult = { data?: unknown; status?: number; statusText?: string; contentType?: string }
 

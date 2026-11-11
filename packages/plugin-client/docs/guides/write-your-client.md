@@ -27,10 +27,10 @@ With a relative `importPath`, the hooks resolve it from the generated operation 
 
 To reuse the runtime of the fetch and axios clients instead of writing your own request pipeline:
 
-1. Copy `core.ts`, `mediaTypes.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`.
+1. Copy `core.ts`, `mediaTypes.ts`, `serializers.ts`, `standardSchema.ts`, `sse.ts`, and the `mediaTypes/` files your spec needs from `@kubb/plugin-client/templates` next to your `client.ts`.
 2. In `client.ts`, export the three types the core imports, listed below.
 3. Write a `Transport` function that sends a `ResolvedRequest` and returns a web `Response`. If your library does not return one, wrap its bytes in `new Response(bytes, { status, headers })`.
-4. Export `createLazyClient((config) => createClientCore({ defaultTransport, ...config }))` as `client`. Register the form and stream media types your spec needs with `client.setConfig({ mediaTypes: { ...formMediaTypes, ...streamMediaTypes } })`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
+4. Export `createLazyClient((config) => createClientCore({ defaultTransport, ...config }))` as `client`. Register the form and stream media types your spec needs with `client.setConfig({ mediaTypes: { 'multipart/form-data': multipartFormData, ...streamMediaTypes } })`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
 
 | Export           | Purpose                                                 | On fetch      | On axios             |
 | ---------------- | ------------------------------------------------------- | ------------- | -------------------- |

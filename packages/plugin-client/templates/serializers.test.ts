@@ -1,6 +1,10 @@
 import { describe, expect, test } from 'vitest'
-import { formMediaTypes } from './mediaTypes.ts'
+import { multipartFormData } from './mediaTypes/formData.ts'
+import { multipartMixed } from './mediaTypes/mixed.ts'
+import { urlencoded } from './mediaTypes/urlencoded.ts'
 import { serializeCookies } from './serializers.ts'
+
+const formMediaTypes = { 'multipart/form-data': multipartFormData, 'multipart/mixed': multipartMixed, 'application/x-www-form-urlencoded': urlencoded }
 
 describe('urlencoded body serialization', () => {
   test('uses query defaults without encoding metadata', () => {

@@ -263,17 +263,16 @@ export function hasStreamVariant(node: ast.OperationNode): boolean {
   })
 }
 
-const formContentTypes = new Set(['multipart/form-data', 'multipart/mixed', 'application/x-www-form-urlencoded'])
+const formContentTypes = ['multipart/form-data', 'multipart/mixed', 'application/x-www-form-urlencoded'] as const
 
 /**
- * Whether the request body offers `multipart/form-data`, `multipart/mixed` or `application/x-www-form-urlencoded`, or a
- * response offers `multipart/mixed`, so the client registers the form media types.
+ * The form media types the operation needs a handler for: each of `multipart/form-data`, `multipart/mixed` and
+ * `application/x-www-form-urlencoded` its request body offers, plus `multipart/mixed` when a response offers it.
  */
-export function hasFormBody(node: ast.OperationNode): boolean {
-  return (
-    (node.requestBody?.content ?? []).some((entry) => formContentTypes.has(baseContentType(entry.contentType))) ||
-    node.responses.some((response) => (response.content ?? []).some(isPartsContent))
-  )
+export function getFormContentTypes(node: ast.OperationNode): Array<(typeof formContentTypes)[number]> {
+  const request = new Set((node.requestBody?.content ?? []).map((entry) => baseContentType(entry.contentType)))
+  const mixedResponse = node.responses.some((response) => (response.content ?? []).some(isPartsContent))
+  return formContentTypes.filter((contentType) => request.has(contentType) || (contentType === 'multipart/mixed' && mixedResponse))
 }
 
 function isJsonContentType(baseType: string): boolean {
