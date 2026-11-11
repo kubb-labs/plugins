@@ -1119,7 +1119,9 @@ describe('printerZodMini', () => {
               ast.factory.createSchema({
                 type: 'object',
                 primitive: 'object',
-                properties: [ast.factory.createProperty({ name: 'petType', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+                properties: [
+                  ast.factory.createProperty({ name: 'petType', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] }) }),
+                ],
               }),
             ],
           }),
@@ -1130,9 +1132,24 @@ describe('printerZodMini', () => {
       expect(printer.print(node)).toBe(`z.discriminatedUnion('petType', [
   Cat,
   z.extend(BasePet, {
-    petType: z.string(),
+    petType: z.enum(['dog']),
   }),
 ])`)
+    })
+
+    test('falls back to z.union when a member types the discriminator as a plain string', () => {
+      const member = (name: string, schema: ast.SchemaNode) =>
+        ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [ast.factory.createProperty({ name, required: true, schema })] })
+      const node = ast.factory.createSchema({
+        type: 'union',
+        discriminatorPropertyName: 'petType',
+        members: [
+          member('petType', ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] })),
+          member('petType', ast.factory.createSchema({ type: 'string' })),
+        ],
+      })
+
+      expect(printer.print(node)).toMatch(/^z\.union\(/)
     })
 
     test('falls back to z.union when a cyclic variant cannot flatten to an object', () => {

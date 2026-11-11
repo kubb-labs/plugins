@@ -48,6 +48,15 @@ describe('printerTs', () => {
     expect(await formatTS(printer.transform(ast.factory.createSchema({ type })))).toBe(expected)
   })
 
+  it('keeps nullable set on an array item or a union member', async () => {
+    const nullableString = ast.factory.createSchema({ type: 'string', nullable: true })
+    const array = ast.factory.createSchema({ type: 'array', items: [nullableString] })
+    const union = ast.factory.createSchema({ type: 'union', members: [ast.factory.createSchema({ type: 'integer' }), nullableString] })
+
+    expect(await formatTS(printer.transform(array))).toBe('(string | null)[]')
+    expect(await formatTS(printer.transform(union))).toBe('number | (string | null)')
+  })
+
   describe('date / time', () => {
     it('date with representation=date returns Date', async () => {
       const result = printer.transform(ast.factory.createSchema({ type: 'date', representation: 'date' }))
