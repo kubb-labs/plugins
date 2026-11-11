@@ -133,18 +133,16 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
 
     const schema = syncSchemaRef(node)
 
-    // A ref with its own `conditionals` prints a pipe around the target's variable.
-    if (hasInputChecks(node)) {
-      return member
-    }
-
     if (schema.nullable || schema.optional || node.nullable || node.optional) {
       return member
     }
 
     if (schema.type === ast.schemaTypes.object && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
       // Input checks print a `z.pipe(…)`, which has no `.strict()`, so its object output is made strict.
-      return hasInputChecks(schema) ? `z.pipe(${member}.in, ${member}.out.strict())` : `${member}.strict()`
+      // A ref with its own `conditionals` around a target with checks is a pipe in a pipe, which stays as it is.
+      const checks = [node, node.schema].filter((entry) => entry && hasInputChecks(entry)).length
+      if (checks === 2) return member
+      return checks ? `z.pipe(${member}.in, ${member}.out.strict())` : `${member}.strict()`
     }
   }
 

@@ -20,8 +20,9 @@ const document = {
       },
       Labels: { type: 'array', items: { type: 'string' }, contains: { const: 'priority' }, minContains: 1, maxContains: 2 },
       Card: { type: 'object', properties: { number: { type: 'string' }, cvc: { type: 'string' } }, dependentRequired: { number: ['cvc'] } },
-      Cash: { type: 'object', properties: { amount: { type: 'number' } } },
+      Cash: { type: 'object', properties: { amount: { type: 'number' }, currency: { type: 'string' } } },
       Choice: { oneOf: [{ $ref: '#/components/schemas/Card' }, { $ref: '#/components/schemas/Cash' }] },
+      GuardedChoice: { oneOf: [{ $ref: '#/components/schemas/Cash', if: { required: ['amount'] }, then: { required: ['currency'] } }, { type: 'string' }] },
       AnyObject: { if: { type: 'object' }, then: { required: ['id'] } },
       Shipping: {
         type: 'object',
@@ -55,6 +56,14 @@ describe.each([
   test('makes the object behind a piped oneOf member strict, where the dialect has `.strict()`', () => {
     const choice = printer.print(root.schemas.find((node) => node.name === 'Choice')!)
     expect(choice).toBe(expectedChoice)
+  })
+
+  test('keeps a oneOf `$ref` member with its own conditionals strict', () => {
+    const source = printer.print(root.schemas.find((node) => node.name === 'GuardedChoice')!)
+    const choice = new Function('z', 'Cash', `return ${source}`)(runtime, evaluate('Cash'))
+    expect(choice.safeParse({ amount: 1, currency: 'EUR' }).success).toBe(true)
+    expect(choice.safeParse({ amount: 1 }).success).toBe(false)
+    expect(choice.safeParse({ amount: 1, currency: 'EUR', extra: true }).success).toBe(createPrinter !== printerZod)
   })
 
   test('reads an `if` object without properties as "is an object"', () => {
