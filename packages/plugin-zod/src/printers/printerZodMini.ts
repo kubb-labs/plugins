@@ -1,7 +1,16 @@
 import { lazyGetter, objectKey } from '@internals/utils'
 import { ast } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyMiniModifiers, buildObjectShape, lengthChecksMini, numberChecksMini, patternKeySchemaMini, printWithOmit, shouldCoerce } from '../utils.ts'
+import {
+  applyMiniModifiers,
+  bigintConstraints,
+  buildObjectShape,
+  lengthChecksMini,
+  numberChecksMini,
+  patternKeySchemaMini,
+  printWithOmit,
+  shouldCoerce,
+} from '../utils.ts'
 import { buildZodNodes, type ZodDialect } from './zodNodes.ts'
 
 /**
@@ -127,7 +136,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
     nodes: {
       ...buildZodNodes(miniDialect, options.cyclicSchemas),
       bigint(node) {
-        return `z.coerce.bigint()${numberChecksMini(node)}`
+        return `z.coerce.bigint()${numberChecksMini(bigintConstraints(node), 'n')}`
       },
       date(node) {
         if (node.representation === 'string') {

@@ -266,8 +266,10 @@ describe('printerZod', () => {
       const schema = new Function('z', `return ${output}`)(z) as z.ZodType
       expect(schema.safeParse(5).success).toBe(true)
       expect(schema.safeParse(0).success).toBe(false)
-      // A fractional bound is left out on its own, the other bounds stay.
-      expect(printer.print(ast.factory.createSchema({ type: 'bigint', min: 0.5, max: 10 }))).toBe('z.coerce.bigint().max(10n)')
+      // A fractional bound rounds inward, so it never loosens the check.
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', min: 0.5, max: 10.5, exclusive: { min: 1.5 } }))).toBe(
+        'z.coerce.bigint().min(2n).max(10n)',
+      )
     })
   })
 
