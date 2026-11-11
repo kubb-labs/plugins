@@ -1,6 +1,5 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { createStreamContent } from '#mocks'
 import { buildCallConfig } from './callConfig.ts'
 
 describe('buildCallConfig', () => {
@@ -14,7 +13,7 @@ describe('buildCallConfig', () => {
           statusCode: '200',
           content: [
             ast.factory.createContent({ contentType: 'audio/mpeg', schema: ast.factory.createSchema({ type: 'blob' }) }),
-            createStreamContent('text/event-stream', ast.factory.createSchema({ type: 'object', properties: [] })),
+            ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object', properties: [] }), stream: {} }),
           ],
         }),
       ],
@@ -53,7 +52,12 @@ describe('buildCallConfig', () => {
       operationId: 'streamEvents',
       method: 'GET',
       path: '/events',
-      responses: [ast.factory.createResponse({ statusCode: '200', content: [createStreamContent('text/event-stream', schema)] })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: 'text/event-stream', schema: schema, stream: {} })],
+        }),
+      ],
     })
 
     const { callConfig } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true, returnType: 'full' })

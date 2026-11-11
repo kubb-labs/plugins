@@ -6,7 +6,6 @@ import { describe, expect, test } from 'vitest'
 import {
   createMockedAdapter,
   createMockedPlugin,
-  createStreamContent,
   createMockedPluginDriver,
   matchFiles,
   rawSources,
@@ -201,7 +200,9 @@ const streamEventsNode = ast.factory.createOperation({
   responses: [
     ast.factory.createResponse({
       statusCode: '200',
-      content: [createStreamContent('text/event-stream', ast.factory.createSchema({ type: 'object', properties: [] }))],
+      content: [
+        ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object', properties: [] }), stream: {} }),
+      ],
       description: 'event stream',
     }),
   ],
@@ -231,7 +232,9 @@ const streamChatNode = ast.factory.createOperation({
     ast.factory.createResponse({
       statusCode: '200',
       description: 'typed events',
-      content: [createStreamContent('text/event-stream', streamChatSchema, { schema: streamChatSchema, shape: 'event' })],
+      content: [
+        ast.factory.createContent({ contentType: 'text/event-stream', schema: streamChatSchema, stream: { schema: streamChatSchema, shape: 'event' } }),
+      ],
     }),
   ],
 })

@@ -1,7 +1,6 @@
 import { ast, casing, createResolver } from '@kubb/kit'
 import type { Group, Memo, Output, PluginType, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
-import { createStreamContent } from '#mocks'
 import {
   buildOperationComments,
   buildOptionsSchema,
@@ -355,7 +354,9 @@ describe('toResponseContent', () => {
       ['application/*', pet],
       ['application/vnd.github.object', pet],
     ] as const) {
-      expect(toResponseContent({ ...createStreamContent(contentType, schema), keysToOmit: ['id'] }).schema).toBe(schema)
+      expect(toResponseContent({ ...ast.factory.createContent({ contentType: contentType, schema: schema, stream: {} }), keysToOmit: ['id'] }).schema).toBe(
+        schema,
+      )
     }
   })
 
@@ -396,7 +397,12 @@ describe('isEventStream', () => {
       operationId: 'streamEvents',
       method: 'GET',
       path: '/events',
-      responses: [ast.factory.createResponse({ statusCode: '200', content: [createStreamContent(mediaType, ast.factory.createSchema({ type: 'object' }))] })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: mediaType, schema: ast.factory.createSchema({ type: 'object' }), stream: {} })],
+        }),
+      ],
     })
   }
 
@@ -472,7 +478,10 @@ describe('isEventStream', () => {
       method: 'GET',
       path: '/lines',
       responses: [
-        ast.factory.createResponse({ statusCode: '200', content: [createStreamContent('text/event-stream', ast.factory.createSchema({ type: 'string' }))] }),
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'string' }), stream: {} })],
+        }),
       ],
     })
     const member = (name: string, data: ast.SchemaNode) =>
@@ -494,7 +503,7 @@ describe('isEventStream', () => {
       responses: [
         ast.factory.createResponse({
           statusCode: '200',
-          content: [createStreamContent('text/event-stream', union, { schema: union, shape: 'event' })],
+          content: [ast.factory.createContent({ contentType: 'text/event-stream', schema: union, stream: { schema: union, shape: 'event' } })],
         }),
       ],
     })
@@ -556,7 +565,12 @@ describe('isEventStream', () => {
       operationId: 'streamLogs',
       method: 'GET',
       path: '/logs',
-      responses: [ast.factory.createResponse({ statusCode: '200', content: [createStreamContent(contentType, schema, { schema })] })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: contentType, schema: schema, stream: { schema } })],
+        }),
+      ],
     })
 
     expect(getEventStream(node)).toBe(shape)
@@ -587,7 +601,9 @@ function nodeWithResponseContents(entries: Array<{ contentType: string; schemaTy
     responses: [
       ast.factory.createResponse({
         statusCode: '200',
-        content: entries.map((entry) => createStreamContent(entry.contentType, ast.factory.createSchema({ type: entry.schemaType }))),
+        content: entries.map((entry) =>
+          ast.factory.createContent({ contentType: entry.contentType, schema: ast.factory.createSchema({ type: entry.schemaType }), stream: {} }),
+        ),
       }),
     ],
   })

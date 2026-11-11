@@ -315,8 +315,3 @@ export function createMultiPluginDriver(name: string, plugins: Record<string, { 
     getResolver: (pluginName: string) => plugins[pluginName]?.resolver ?? fallback?.resolver,
   } as typeof driver
 }
-
-/** A stream content entry with a bare `stream` field and no `framing`, so plugins derive the framing from the media type. */
-export function createStreamContent(contentType: string, schema?: ast.SchemaNode, stream: ast.ContentNode['stream'] = {}): ast.ContentNode {
-  return ast.factory.createContent({ contentType, schema, stream })
-}

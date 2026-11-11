@@ -4,16 +4,7 @@ import { resolverTs } from '@kubb/plugin-ts'
 import type { PluginZod } from '@kubb/plugin-zod'
 import { resolverZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
-import {
-  createMockedAdapter,
-  createMockedPlugin,
-  createMockedPluginDriver,
-  createStreamContent,
-  matchFiles,
-  rawSources,
-  renderGeneratorOperations,
-  testConfig,
-} from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderGeneratorOperations, testConfig } from '#mocks'
 import { resolverMcp } from '../resolvers/resolverMcp.ts'
 import type { PluginMcp } from '../types.ts'
 import { serverGenerator } from './serverGenerator.tsx'
@@ -129,7 +120,10 @@ describe('serverGenerator — stream and querystring operations', () => {
       method: 'GET',
       path: '/events',
       responses: [
-        ast.factory.createResponse({ statusCode: '200', content: [createStreamContent('text/event-stream', ast.factory.createSchema({ type: 'object' }))] }),
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object' }), stream: {} })],
+        }),
       ],
     })
     const source = rawSources((await renderServer([stream])).fileManager.files).join('\n')

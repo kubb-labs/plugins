@@ -8,7 +8,6 @@ export {
   buildResponses,
   getContentTypeInfo,
   getEventStream,
-  getStreamFraming,
   hasTextEventData,
   getFormContentTypes,
   getPerContentTypeName,
