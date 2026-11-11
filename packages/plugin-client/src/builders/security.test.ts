@@ -89,6 +89,14 @@ describe('getOperationSecurity', () => {
     )
   })
 
+  test('keeps two requirements on one scheme with different scopes', () => {
+    const auth = [[{ scheme: 'petstore_auth', scopes: ['read:pets'] }], [{ scheme: 'petstore_auth', scopes: ['write:pets'] }]]
+    expect(getOperationSecurity({ auth, schemes })).toStrictEqual([
+      { type: 'oauth2', scopes: ['read:pets'] },
+      { type: 'oauth2', scopes: ['write:pets'] },
+    ])
+  })
+
   test('quotes flow names that are not identifiers', () => {
     const security = [
       { type: 'oauth2' as const, flows: { implicit: { authorizationUrl: 'https://a.example.com' }, 'x-vendor': { tokenUrl: 'https://t.example.com' } } },

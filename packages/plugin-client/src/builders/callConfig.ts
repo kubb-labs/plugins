@@ -1,4 +1,5 @@
 import { getEventStream, getPrimarySuccessResponse, hasTextEventData } from '@internals/shared'
+import { singleQuote } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
@@ -57,7 +58,7 @@ export function buildCallConfig({
 
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
-    `url: '${node.path}'`,
+    `url: ${singleQuote(node.path)}`,
     baseURL ? `baseURL: ${JSON.stringify(baseURL)}` : null,
     securityLiteral ? `security: ${securityLiteral}` : null,
     ownRuntime ? null : styles,

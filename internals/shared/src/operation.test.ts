@@ -670,6 +670,8 @@ describe('isEventStream', () => {
     ['application/x-ndjson', 'line'],
     ['application/json-seq', 'line'],
     ['multipart/mixed', null],
+    // No stream handler in the client runtime reads this type.
+    ['application/x-jsonlines', null],
   ])('reads %s the adapter marks as a stream as %s', (contentType, shape) => {
     const schema = ast.factory.createSchema({ type: 'object' })
     const node = ast.factory.createOperation({

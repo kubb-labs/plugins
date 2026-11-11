@@ -173,12 +173,12 @@ type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | nul
 
 /**
  * Whether a content entry is a sequence of JSON values the adapter marks as a stream, such as `application/jsonl`,
- * `application/x-ndjson`, `application/json-seq`, or any media type with an OpenAPI 3.2 `itemSchema`.
+ * `application/x-ndjson` or `application/json-seq`.
  */
 function isJsonLines(entry: ResponseContentEntry): boolean {
   const baseType = baseContentType(entry.contentType)
-  // `multipart/mixed` is a stream of parts, not of JSON values.
-  return Boolean(entry.stream) && baseType !== 'text/event-stream' && !baseType.startsWith('multipart/')
+  // Only the types the client runtime can read: another type with an `itemSchema`, such as `multipart/mixed`, stays a plain call.
+  return Boolean(entry.stream) && baseType !== 'text/event-stream' && streamContentType.test(baseType)
 }
 
 /**

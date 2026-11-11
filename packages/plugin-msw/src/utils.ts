@@ -176,7 +176,7 @@ export function getMswMethod(node: ast.HttpOperationNode): string {
  */
 function headersBlock(contentType: string | null, headers: Array<[string, string]>): string {
   const entries = [
-    ...(contentType ? [`'Content-Type': '${contentType}'`] : []),
+    ...(contentType ? [`'Content-Type': ${singleQuote(contentType)}`] : []),
     ...headers.map(([name, value]) => `${singleQuote(name)}: ${singleQuote(value)}`),
   ]
   return entries.length ? `\n      headers: {\n        ${entries.join(',\n        ')}\n      },` : ''
