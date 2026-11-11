@@ -276,9 +276,9 @@ export type EventStreamOptions = {
   eventShape?: 'event' | 'data'
   /**
    * Keeps each Server-Sent Event's `data` as the raw text instead of JSON-parsing it. The generated client sets it when the
-   * document types `data` as a string.
+   * document types `data` as a string. A list of event names keeps it for those events only.
    */
-  rawData?: boolean
+  rawData?: boolean | Array<string>
 }
 
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = {

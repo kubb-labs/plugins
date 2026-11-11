@@ -50,6 +50,7 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
       url: '/store/order/{orderId}/events',
       contentType: { response: 'text/event-stream' },
       eventShape: 'event',
+      rawData: ['ping', 'ping'],
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),
