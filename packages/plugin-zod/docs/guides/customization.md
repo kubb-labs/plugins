@@ -141,7 +141,7 @@ Generated files import `myCodec` from `my-codec/zod`. Leave `root` unset on this
 | `object`, `propertyNames: <schema>`                    | `z.record(keySchema, schema)`         | `z.record(keySchema, schema)`         | Dynamic map with validated key schema (e.g. pattern, format)                    |
 | `object`, `propertyNames: <enum>`                      | `z.partialRecord(enumSchema, schema)` | `z.partialRecord(enumSchema, schema)` | Enum keys may be missing                                                        |
 
-Three keywords print a `z.refine` check, in both APIs:
+These keywords print a `z.refine` check, in both APIs:
 
 - `if`/`then`/`else`, `dependentRequired`, and `dependentSchemas` check the input before it is parsed, in `z.pipe(z.unknown().check(...), schema)`.
 - `contains` with `minContains` and `maxContains` counts the matching items of an array.

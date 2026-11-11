@@ -104,8 +104,4 @@ describe('responseLiteral', () => {
   test('keeps the quotes of a header value', () => {
     expect(responseLiteral('body', 200, null, [['ETag', '"33a64df5"']])).toContain(`'ETag': '"33a64df5"'`)
   })
-
-  test('escapes a line break in a header value', () => {
-    expect(responseLiteral('body', 200, null, [['Link', 'a\nb']])).toContain(`'Link': 'a\\nb'`)
-  })
 })

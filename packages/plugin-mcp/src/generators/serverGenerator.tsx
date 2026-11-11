@@ -68,6 +68,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         const responseName = successStatus ? zodResolver.response.status(node, successStatus) : null
 
         const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.param.name(node, p) }))
+        const resolveOptional = (params: typeof pathParams) => (params.length ? resolveParams(params) : null)
         // plugin-zod emits no per-param schema for the properties of a spread form-encoded `querystring`, only the grouped query schema.
         const isQuerystringSpread = queryParams.some((p) => !node.parameters.includes(p))
 
@@ -83,9 +84,9 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           },
           zod: {
             pathParams: resolveParams(pathParams),
-            queryParams: isQuerystringSpread ? zodResolver.param.query(node, queryParams[0]!) : queryParams.length ? resolveParams(queryParams) : null,
-            headerParams: headerParams.length ? resolveParams(headerParams) : null,
-            cookieParams: cookieParams.length ? resolveParams(cookieParams) : null,
+            queryParams: isQuerystringSpread ? zodResolver.param.query(node, queryParams[0]!) : resolveOptional(queryParams),
+            headerParams: resolveOptional(headerParams),
+            cookieParams: resolveOptional(cookieParams),
             requestName,
             responseName,
             file: zodFile,
