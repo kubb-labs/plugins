@@ -74,7 +74,7 @@
   "tests/3.0.x/pluginFaker.test.ts": "Golden path: faker options plus type-checked override and typeMode behavior; unique.",
   "tests/3.0.x/pluginFetch.test.ts": "Golden path: sdk modes, zod typing, .ts specifiers run in Node, baseURL, barrel regression.",
   "tests/3.0.x/pluginMcp.test.ts": "Golden path: only snapshot of the MCP server, tools, and .mcp.json output.",
-  "tests/3.0.x/pluginMsw.test.ts": "Golden path: data and faker parsers, handlers, baseURL; only plugin-msw coverage.",
+  "tests/3.0.x/pluginMsw.test.ts": "Golden path: data and faker parsers, handlers, baseURL, a method-changing macro keeping plugin-ts and plugin-faker names; only plugin-msw coverage.",
   "tests/3.0.x/pluginReactQuery.test.ts": "Golden path: mutation off, returnType, filters, params casing; only plugin-react-query option coverage.",
   "tests/3.0.x/pluginRedoc.test.ts": "Golden path: only coverage of plugin-redoc HTML output; one snapshot file.",
   "tests/3.0.x/pluginSwr.test.ts": "Golden path: query and mutation toggles, filters; only plugin-swr option coverage.",
