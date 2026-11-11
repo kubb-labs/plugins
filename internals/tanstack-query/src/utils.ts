@@ -1,5 +1,4 @@
 import {
-  getOperationParameters,
   getRequestGroupOptionality,
   getRequestGroups,
   getResponseContentTypeInfo,
@@ -265,7 +264,7 @@ function resolveFallbackPageParamType(initialPageParam: Infinite['initialPagePar
  * so callers can reuse it when rewriting the paginated request.
  */
 export function resolvePageParamType(node: ast.OperationNode, { resolver, initialPageParam, queryParam }: ResolvePageParamTypeParams): PageParamType {
-  const firstQueryParam = getOperationParameters(node).query[0]
+  const firstQueryParam = ast.http.parameters(node).query[0]
   const groupName = firstQueryParam ? resolver.param.query(node, firstQueryParam) : null
   const individualName = firstQueryParam ? resolver.param.name(node, firstQueryParam) : null
   const queryParamsTypeName = groupName !== individualName ? groupName : null
@@ -383,7 +382,7 @@ export function resolveInfiniteConfig(infinite: Partial<Infinite> | false): Requ
 export function matchesInfinite(node: ast.OperationNode, infinite: Infinite): boolean {
   if (!infinite.queryParam) return false
   // Strip trailing '?' which OpenAPI specs sometimes append to parameter names to denote optionality
-  return getOperationParameters(node).query.some((param) => param.name.replace(/\?$/, '') === infinite.queryParam)
+  return ast.http.parameters(node).query.some((param) => param.name.replace(/\?$/, '') === infinite.queryParam)
 }
 
 /**

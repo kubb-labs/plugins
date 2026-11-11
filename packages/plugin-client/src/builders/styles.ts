@@ -1,5 +1,3 @@
-import { getOperationParameters } from '@internals/shared'
-
 import { ast, code } from '@kubb/kit'
 
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
@@ -36,7 +34,7 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
  * Whether a query parameter of the operation has a style entry, so the call needs the styled query serializer.
  */
 export function hasQueryStyles(node: ast.OperationNode): boolean {
-  return ast.http.is(node) && getOperationParameters(node).query.some((parameter) => serializeParameter(parameter) !== null)
+  return ast.http.is(node) && ast.http.parameters(node).query.some((parameter) => serializeParameter(parameter) !== null)
 }
 
 /**
@@ -79,7 +77,7 @@ export function buildStyles({ node, merge }: { node: ast.OperationNode; merge?: 
 
   const groups: Record<StyledLocation | 'body', Array<string>> = { path: [], query: [], header: [], cookie: [], body: serializeBodyEncoding(node) }
 
-  for (const [location, parameters] of Object.entries(getOperationParameters(node)) as Array<[StyledLocation, Array<ast.ParameterNode>]>) {
+  for (const [location, parameters] of Object.entries(ast.http.parameters(node)) as Array<[StyledLocation, Array<ast.ParameterNode>]>) {
     for (const parameter of parameters) {
       const literal = serializeParameter(parameter)
       if (literal) groups[location].push(`${toKey(parameter.name)}: ${literal}`)

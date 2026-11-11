@@ -3,7 +3,6 @@ import {
   buildResponses,
   getCircularNames,
   getOasAdapter,
-  getOperationParameters,
   resolveContentTypeVariants,
   resolveOperationFile,
   toResponseContent,
@@ -329,7 +328,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     // Grouped path/query/headers/cookies schemas, one object per group: what a client's `validator.path` /
     // `query` / `headers` runs at request time, and what the options schema below references.
-    const { path, query, header, cookie } = getOperationParameters(node)
+    const { path, query, header, cookie } = ast.http.parameters(node)
 
     const paramGroupSchemas = (
       [

@@ -9,7 +9,6 @@ import {
   getContentTypeInfo,
   hasRequestContentTypeChoice,
   getEventStream,
-  getOperationParameters,
   getRequestGroupOptionality,
   hasEventStreamContent,
   hasStreamVariant,
@@ -244,52 +243,6 @@ describe('response status helpers', () => {
       [400, 'Status400'],
       ['default', 'createPetResponse'],
     ])
-  })
-})
-
-describe('getOperationParameters', () => {
-  test('groups parameters by location, keeping every name exactly as in the OpenAPI spec', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'showPet',
-      method: 'GET',
-      path: '/pets/{pet-id}',
-      parameters: [
-        ast.factory.createParameter({ name: 'pet-id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }) }),
-        ast.factory.createParameter({ name: 'page-size', in: 'query', schema: ast.factory.createSchema({ type: 'number' }) }),
-        ast.factory.createParameter({ name: 'x-api-key', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
-        ast.factory.createParameter({ name: 'session-id', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
-      ],
-    })
-
-    const grouped = getOperationParameters(node)
-
-    expect(grouped.path.map((param) => param.name)).toStrictEqual(['pet-id'])
-    expect(grouped.query.map((param) => param.name)).toStrictEqual(['page-size'])
-    expect(grouped.header.map((param) => param.name)).toStrictEqual(['x-api-key'])
-    expect(grouped.cookie.map((param) => param.name)).toStrictEqual(['session-id'])
-  })
-
-  test('drops parameters that share a name within one location, keeping the first', () => {
-    const query = (name: string) => ast.factory.createParameter({ name, in: 'query', schema: ast.factory.createSchema({ type: 'string' }) })
-    const node = ast.factory.createOperation({
-      operationId: 'listUploads',
-      method: 'GET',
-      path: '/uploads',
-      parameters: [query('max-uploads'), query('prefix'), query('max-uploads'), query('MaxUploads')],
-    })
-
-    expect(getOperationParameters(node).query.map((param) => param.name)).toStrictEqual(['max-uploads', 'prefix', 'MaxUploads'])
-  })
-
-  test('caches the grouped result per node so repeat calls for the same operation skip re-grouping', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'showPet',
-      method: 'GET',
-      path: '/pets/{petId}',
-      parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }) })],
-    })
-
-    expect(getOperationParameters(node)).toBe(getOperationParameters(node))
   })
 })
 

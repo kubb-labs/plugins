@@ -1,5 +1,4 @@
-import { getOperationParameters } from '@internals/shared'
-import type { ast } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorOptions } from '../types.ts'
 import { buildZodErrorParse, resolveParamsValidator, resolveRequestValidator, resolveResponseValidator } from './validatorOptions.ts'
@@ -59,7 +58,7 @@ export function buildValidatorHooks({
   const errorParse = parsesResponse ? buildZodErrorParse(node, zodResolver) : null
   const request = zodResolver && resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.response.body(node) || null : null
 
-  const paramGroups = getOperationParameters(node)
+  const paramGroups = ast.http.parameters(node)
   const resolveParamsName = (kind: 'path' | 'query' | 'headers' | 'cookies', params: Array<ast.ParameterNode>): string | null =>
     zodResolver && resolveParamsValidator(validator) === 'zod' && params.length > 0 ? zodResolver.param[kind](node, params[0]!) : null
   const path = resolveParamsName('path', paramGroups.path)

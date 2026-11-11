@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getOperationParameters, hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
+import { hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -51,7 +51,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       .filter(ast.http.is)
       .filter((node) => !isEventStream(node) && !hasStreamVariant(node))
       .map((node) => {
-        const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)
+        const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.parameters(node)
 
         const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
         const zodFile = resolveOperationFile({

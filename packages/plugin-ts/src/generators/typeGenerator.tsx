@@ -1,12 +1,4 @@
-import {
-  buildOptionsSchema,
-  buildResponses,
-  getEnumNames,
-  getOperationParameters,
-  resolveContentTypeVariants,
-  resolveOperationFile,
-  toResponseContent,
-} from '@internals/shared'
+import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -171,7 +163,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       )
     }
 
-    const { path, query, header, cookie } = getOperationParameters(node)
+    const { path, query, header, cookie } = ast.http.parameters(node)
 
     const paramGroupTypes = (
       [

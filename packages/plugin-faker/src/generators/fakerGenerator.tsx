@@ -1,11 +1,4 @@
-import {
-  getCircularNames,
-  getOperationParameters,
-  getPerContentTypeName,
-  resolveContentTypeVariants,
-  resolveOperationFile,
-  toResponseContent,
-} from '@internals/shared'
+import { getCircularNames, getPerContentTypeName, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { ast, defineGenerator } from '@kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -118,7 +111,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)
+    const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.parameters(node)
     const paramGroups = (
       [
         { params: pathParams, name: resolver.param.path, typeName: tsResolver.param.path },

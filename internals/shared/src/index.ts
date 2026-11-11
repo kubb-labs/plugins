@@ -9,7 +9,6 @@ export {
   getContentTypeInfo,
   getEventStream,
   getFormContentTypes,
-  getOperationParameters,
   getPerContentTypeName,
   getRequestGroupOptionality,
   getRequestGroups,

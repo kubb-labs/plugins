@@ -111,8 +111,6 @@ export type BuildOperationCommentsOptions = {
   splitLines?: boolean
 }
 
-export type OperationParameterGroups = Record<Exclude<ast.ParameterNode['in'], 'querystring'>, Array<ast.ParameterNode>>
-
 export type ResolveOperationTypeNameOptions = {
   responseStatusNames?: boolean | 'error'
   exclude?: ReadonlyArray<string | undefined>
@@ -387,7 +385,7 @@ export type RequestGroups = {
  * Which of the grouped request options an operation carries.
  */
 export function getRequestGroups(node: ast.OperationNode): RequestGroups {
-  const { path, query, header, cookie } = getOperationParameters(node)
+  const { path, query, header, cookie } = ast.http.parameters(node)
   return {
     path: path.length > 0,
     query: query.length > 0,
@@ -416,7 +414,7 @@ export type RequestGroupOptionality = {
  */
 export function getRequestGroupOptionality(node: ast.OperationNode): RequestGroupOptionality {
   const groups = getRequestGroups(node)
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header } = ast.http.parameters(node)
   const hasRequiredPath = path.some((param) => param.required)
   const hasRequiredQuery = query.some((param) => param.required)
   const hasRequiredHeader = header.some((param) => param.required)
@@ -487,23 +485,6 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
   return filteredComments.flatMap((text) => text.split(/\r?\n/).map((line) => line.trim())).filter((comment): comment is string => Boolean(comment))
 }
 
-const operationParameterGroupsByNode = new WeakMap<ast.OperationNode, OperationParameterGroups>()
-
-/**
- * Groups an operation's parameters by location (`path`/`query`/`header`/`cookie`), deduping each
- * group by name. Every plugin generator visiting the same `OperationNode` shares one AST instance
- * (see `KubbDriver`), so the result is cached per node to avoid re-filtering and re-deduping the
- * same parameters once per plugin.
- */
-export function getOperationParameters(node: ast.OperationNode): OperationParameterGroups {
-  const cached = operationParameterGroupsByNode.get(node)
-  if (cached) return cached
-
-  const groups = ast.http.parameters(node)
-  operationParameterGroupsByNode.set(node, groups)
-  return groups
-}
-
 /**
  * Whether the operation declares more than one request media type with a schema, so a caller must pick one on `contentType`.
  */
@@ -527,7 +508,7 @@ export function castToClientOptions(callArg: string, clientName: string, returnT
  * than a record.
  */
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver, { pairContentTypes = false } = {}): ast.SchemaNode {
-  const { path, query, header, cookie } = getOperationParameters(node)
+  const { path, query, header, cookie } = ast.http.parameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
@@ -707,7 +688,7 @@ export function resolveOperationTypeNames(
 ): string[] {
   const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   return resolver.memo(`operationTypeNames:${key}`, () => {
-    const { path, query, header, cookie } = getOperationParameters(node)
+    const { path, query, header, cookie } = ast.http.parameters(node)
     const responseStatusNames =
       options.responseStatusNames === 'error'
         ? resolveErrorNames(node, resolver)
