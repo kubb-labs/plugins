@@ -28,7 +28,7 @@ export type OperationTypeNames = {
   }
 }
 
-function getResponseHeaderTypes({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<[ast.StatusCode, string]> {
+function getResponseHeadersEntries({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<[ast.StatusCode, string]> {
   const resolve = types.response.headers
   if (!resolve) return []
   return node.responses
@@ -40,7 +40,7 @@ function getResponseHeaderTypes({ node, types }: { node: ast.OperationNode; type
  * The headers type argument of `RequestResult`, such as `{ '200': LoginUserStatus200Headers }`, or `null` when no response declares headers.
  */
 export function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
-  const entries = getResponseHeaderTypes({ node, types }).map(([statusCode, name]) => `'${statusCode}': ${name}`)
+  const entries = getResponseHeadersEntries({ node, types }).map(([statusCode, name]) => `'${statusCode}': ${name}`)
   return entries.length ? `{ ${entries.join('; ')} }` : null
 }
 
@@ -62,7 +62,7 @@ export function buildResultTypeRef(name: string, responses: string, headers: str
  * The names of the headers types `buildResponseHeadersType` references, for the file's imports.
  */
 export function getResponseHeadersTypeNames({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<string> {
-  return getResponseHeaderTypes({ node, types }).map(([, name]) => name)
+  return getResponseHeadersEntries({ node, types }).map(([, name]) => name)
 }
 
 /**

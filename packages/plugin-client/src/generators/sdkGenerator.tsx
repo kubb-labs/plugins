@@ -9,7 +9,7 @@ import { type GeneratorContext, type OperationData, resolveOperationData } from 
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
-import { StreamRuntime } from '../components/StreamRuntime.tsx'
+import { ClientRuntime } from '../components/ClientRuntime.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
 import type { ContractClientFactory } from '../types.ts'
 
@@ -200,7 +200,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
 
       return (
         <>
-          <StreamRuntime nodes={nodes} root={root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
+          <ClientRuntime nodes={nodes} root={root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
           {files}
         </>
       )

@@ -7,7 +7,7 @@ import { buildSecuritySchemes } from '../builders/security.ts'
 import { hasQueryStyles } from '../builders/styles.ts'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
-function buildServers(servers: Array<ast.InputServer> | undefined): string | null {
+function buildServersExport(servers: Array<ast.InputServer> | undefined): string | null {
   const named = new Map<string, string>()
   for (const server of servers ?? []) if (server.name && !named.has(server.name)) named.set(server.name, server.url)
   if (!named.size) return null
@@ -27,7 +27,7 @@ const formMediaTypes = {
  * `servers` and `securitySchemes` and the `sse.ts` re-export. `templates` is the folder the runtime is copied from, set
  * by the plugins that ship it, so a custom client from `@kubb/plugin-client` gets none of this.
  */
-export function StreamRuntime({
+export function ClientRuntime({
   nodes,
   root,
   templates,
@@ -73,7 +73,7 @@ export function StreamRuntime({
     mediaTypes.length ? `mediaTypes: { ${mediaTypes.join(', ')} }` : null,
     `serializer: { ${serializers.map(({ key, name }) => `${key}: ${name}`).join(', ')} }`,
   ].filter(Boolean)
-  const footer = [buildServers(servers), buildSecuritySchemes(auth), streams ? `export * from './sse.ts'` : null].filter(Boolean).join('\n')
+  const footer = [buildServersExport(servers), buildSecuritySchemes(auth), streams ? `export * from './sse.ts'` : null].filter(Boolean).join('\n')
   const configPath = path.resolve(root, '.kubb/config.ts')
   const runtimePath = (file: string) => path.resolve(root, '.kubb', `${file}.ts`)
 

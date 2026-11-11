@@ -12,7 +12,7 @@ import {
   maybeValueOrGetter,
   resolvePageParamType,
 } from '@internals/tanstack-query'
-import type { HookReturnTypeProps, Infinite } from '@internals/tanstack-query'
+import type { HookResultProps, Infinite } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 
 type Props = {
@@ -35,7 +35,7 @@ type Props = {
     initialPageParam: Infinite['initialPageParam']
     queryParam?: Infinite['queryParam']
   }
-} & HookReturnTypeProps
+} & HookResultProps
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 

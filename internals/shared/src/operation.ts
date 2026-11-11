@@ -793,7 +793,7 @@ export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string
 /**
  * The class digit of a status code or range, such as `2` for `201` and `2xx`, or `null` for `default`.
  */
-const statusRanges = new Map([
+const statusClassByRange = new Map([
   ['1xx', 1],
   ['2xx', 2],
   ['3xx', 3],
@@ -802,7 +802,7 @@ const statusRanges = new Map([
 ])
 
 export function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
-  const range = statusRanges.get(String(statusCode))
+  const range = statusClassByRange.get(String(statusCode))
   if (range) return range
   const code = getStatusCodeNumber(statusCode)
 
