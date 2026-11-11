@@ -1,6 +1,7 @@
 import { ast } from '@kubb/kit'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
+import { createStreamContent } from '#mocks'
 import { buildSdkMethod } from './SdkClient.tsx'
 
 describe('buildSdkMethod', () => {
@@ -13,8 +14,7 @@ describe('buildSdkMethod', () => {
       responses: [
         ast.factory.createResponse({
           statusCode: '200',
-          mediaType: 'text/event-stream',
-          schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+          content: [createStreamContent('text/event-stream', ast.factory.createSchema({ type: 'object', properties: [] }))],
           description: 'event stream',
         }),
       ],
@@ -53,8 +53,7 @@ describe('buildSdkMethod', () => {
       responses: [
         ast.factory.createResponse({
           statusCode: '200',
-          mediaType: 'text/event-stream',
-          schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+          content: [createStreamContent('text/event-stream', ast.factory.createSchema({ type: 'object', properties: [] }))],
           description: 'event stream',
         }),
       ],

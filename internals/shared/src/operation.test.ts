@@ -1,6 +1,7 @@
 import { ast, createResolver, pascalCase } from '@kubb/kit'
 import type { Group, Memo, Output, PluginType, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
+import { createStreamContent } from '#mocks'
 import {
   buildOperationComments,
   buildOptionsSchema,
@@ -471,7 +472,7 @@ describe('toResponseContent', () => {
       ['application/*', pet],
       ['application/vnd.github.object', pet],
     ] as const) {
-      expect(typeOf(contentType, schema).schema).toBe(schema)
+      expect(toResponseContent({ ...createStreamContent(contentType, schema), keysToOmit: ['id'] }).schema).toBe(schema)
     }
   })
 
@@ -512,7 +513,7 @@ describe('isEventStream', () => {
       operationId: 'streamEvents',
       method: 'GET',
       path: '/events',
-      responses: [ast.factory.createResponse({ statusCode: '200', mediaType, schema: ast.factory.createSchema({ type: 'object' }) })],
+      responses: [ast.factory.createResponse({ statusCode: '200', content: [createStreamContent(mediaType, ast.factory.createSchema({ type: 'object' }))] })],
     })
   }
 
@@ -587,7 +588,9 @@ describe('isEventStream', () => {
       operationId: 'streamLines',
       method: 'GET',
       path: '/lines',
-      responses: [ast.factory.createResponse({ statusCode: '200', mediaType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'string' }) })],
+      responses: [
+        ast.factory.createResponse({ statusCode: '200', content: [createStreamContent('text/event-stream', ast.factory.createSchema({ type: 'string' }))] }),
+      ],
     })
     const member = (name: string, data: ast.SchemaNode) =>
       ast.factory.createSchema({
@@ -608,7 +611,7 @@ describe('isEventStream', () => {
       responses: [
         ast.factory.createResponse({
           statusCode: '200',
-          content: [ast.factory.createContent({ contentType: 'text/event-stream', schema: union, stream: { schema: union, shape: 'event' } })],
+          content: [createStreamContent('text/event-stream', union, { schema: union, shape: 'event' })],
         }),
       ],
     })
@@ -617,43 +620,18 @@ describe('isEventStream', () => {
     expect(getEventStream(typedEvents)).toBe('event')
   })
 
-  test('keeps event data as text only when every event types it as a string', () => {
-    const sse = (schema: ast.SchemaNode | undefined, stream: ast.ContentNode['stream'] = {}) =>
+  test('reads text event data from the stream the adapter marks', () => {
+    const sse = (stream: ast.ContentNode['stream']) =>
       ast.factory.createOperation({
         operationId: 'streamEvents',
         method: 'GET',
         path: '/events',
-        responses: [
-          ast.factory.createResponse({ statusCode: '200', content: [ast.factory.createContent({ contentType: 'text/event-stream', schema, stream })] }),
-        ],
+        responses: [ast.factory.createResponse({ statusCode: '200', content: [createStreamContent('text/event-stream', undefined, stream)] })],
       })
-    const string = ast.factory.createSchema({ type: 'string' })
-    const event = (data: ast.SchemaNode) =>
-      ast.factory.createSchema({ type: 'object', properties: [ast.factory.createProperty({ name: 'data', schema: data })] })
-    const events = (...members: Array<ast.SchemaNode>) => ast.factory.createSchema({ type: 'union', members: members.map(event) })
 
-    expect(hasTextEventData(sse(string))).toBe(true)
-    expect(hasTextEventData(sse(string, { schema: string, shape: 'data' }))).toBe(true)
-    expect(hasTextEventData(sse(event(string), { schema: event(string), shape: 'event' }))).toBe(true)
-    expect(hasTextEventData(sse(undefined, { schema: events(string, string), shape: 'event' }))).toBe(true)
-    // Only some events type `data` as a string: named events keep theirs as text, an unnamed one cannot be told apart.
-    const named = (name: string, data: ast.SchemaNode) =>
-      ast.factory.createSchema({
-        type: 'object',
-        properties: [
-          ast.factory.createProperty({ name: 'event', schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) }),
-          ast.factory.createProperty({ name: 'data', schema: data }),
-        ],
-      })
-    const mixed = ast.factory.createSchema({ type: 'union', members: [named('note', string), named('tick', ast.factory.createSchema({ type: 'object' }))] })
-    expect(hasTextEventData(sse(undefined, { schema: mixed, shape: 'event' }))).toStrictEqual(['note'])
-    // A discriminator intersects each event with its pinned name.
-    const pinned = ast.factory.createSchema({ type: 'intersection', members: [event(string), named('note', string)] })
-    expect(hasTextEventData(sse(undefined, { schema: pinned, shape: 'event' }))).toBe(true)
-    // A schema-less stream reads as a blob and keeps the JSON-parse default.
-    expect(hasTextEventData(sse(ast.factory.createSchema({ type: 'blob', primitive: 'string' })))).toBe(false)
-    expect(hasTextEventData(sse(ast.factory.createSchema({ type: 'object' })))).toBe(false)
-    expect(hasTextEventData(sse(undefined, { schema: events(string, ast.factory.createSchema({ type: 'object' })), shape: 'event' }))).toBe(false)
+    expect(hasTextEventData(sse({ textData: true }))).toBe(true)
+    expect(hasTextEventData(sse({ shape: 'event', textData: ['note'] }))).toStrictEqual(['note'])
+    expect(hasTextEventData(sse({}))).toBe(false)
     expect(hasTextEventData(nodeWithResponseContentType('application/json'))).toBe(false)
   })
 
@@ -670,7 +648,7 @@ describe('isEventStream', () => {
       operationId: 'streamLogs',
       method: 'GET',
       path: '/logs',
-      responses: [ast.factory.createResponse({ statusCode: '200', content: [ast.factory.createContent({ contentType, schema, stream: { schema } })] })],
+      responses: [ast.factory.createResponse({ statusCode: '200', content: [createStreamContent(contentType, schema, { schema })] })],
     })
 
     expect(getEventStream(node)).toBe(shape)
@@ -701,9 +679,7 @@ function nodeWithResponseContents(entries: Array<{ contentType: string; schemaTy
     responses: [
       ast.factory.createResponse({
         statusCode: '200',
-        content: entries.map((entry) =>
-          ast.factory.createContent({ contentType: entry.contentType, schema: ast.factory.createSchema({ type: entry.schemaType }) }),
-        ),
+        content: entries.map((entry) => createStreamContent(entry.contentType, ast.factory.createSchema({ type: entry.schemaType }))),
       }),
     ],
   })

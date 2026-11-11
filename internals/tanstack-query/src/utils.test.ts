@@ -1,5 +1,6 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
+import { createStreamContent } from '#mocks'
 import {
   buildCallResultBody,
   classifyOperation,
@@ -20,8 +21,7 @@ describe('classifyOperation', () => {
       responses: [
         ast.factory.createResponse({
           statusCode: '200',
-          mediaType: 'text/event-stream; charset=utf-8',
-          schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+          content: [createStreamContent('text/event-stream; charset=utf-8', ast.factory.createSchema({ type: 'object', properties: [] }))],
         }),
       ],
     })

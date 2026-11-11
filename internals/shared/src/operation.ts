@@ -164,15 +164,6 @@ type ResponseType = 'blob' | 'text' | 'stream'
 type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | null; stream?: ast.ContentNode['stream'] }
 
 /**
- * Whether a content entry is a sequence of JSON values the adapter marks as a stream, such as `application/jsonl`,
- * `application/x-ndjson` or `application/json-seq`.
- */
-function isJsonLines(entry: ResponseContentEntry): boolean {
-  const baseType = ast.mediaType.base(entry.contentType)
-  return Boolean(entry.stream) && baseType !== 'text/event-stream' && ast.mediaType.isStream(baseType)
-}
-
-/**
  * How an operation streams its primary success response item by item, when that response declares one content type:
  * - `'event'` for `text/event-stream` whose `itemSchema` types the whole event with its own `event` and `data`
  * - `'data'` for `text/event-stream` typed by its payload only
@@ -185,8 +176,8 @@ export function getEventStream(node: ast.OperationNode): 'event' | 'data' | 'lin
   const content = ast.http.responses.primary(node)?.content ?? []
   if (content.length !== 1) return null
   const entry = content[0]!
-  if (ast.mediaType.base(entry.contentType) === 'text/event-stream') return entry.stream?.shape ?? 'data'
-  return isJsonLines(entry) ? 'line' : null
+  if (entry.stream?.framing === 'events') return entry.stream.shape ?? 'data'
+  return entry.stream?.framing === 'lines' ? 'line' : null
 }
 
 /**
@@ -197,38 +188,14 @@ export function isEventStream(node: ast.OperationNode): boolean {
   return getEventStream(node) !== null
 }
 
-// A stream without a schema is a `blob` with a string primitive, so it keeps the JSON-parse default.
-function isTextSchema(schema: ast.SchemaNode | null | undefined): boolean {
-  if (!schema) return false
-  const resolved = ast.resolveRef(schema)
-  return resolved.type !== 'blob' && resolved.primitive === 'string'
-}
-
 /**
  * Whether an operation streams Server-Sent Events whose `data` the document types as a string, so the client keeps each
- * `data` as text instead of JSON-parsing it. With an event-shaped `itemSchema` where only some events type `data` as a
- * string, it returns the names of those events, or `false` when one of them has no fixed name.
+ * `data` as text instead of JSON-parsing it: `true` for every event, else the names of the events that do.
  */
 export function hasTextEventData(node: ast.OperationNode): boolean | Array<string> {
   const shape = getEventStream(node)
-  const entry = ast.http.responses.primary(node)?.content?.[0]
-  if (!entry || (shape !== 'data' && shape !== 'event')) return false
-  if (shape === 'data') return isTextSchema(entry.stream?.schema ?? entry.schema)
-
-  const item = entry.stream?.schema ? ast.resolveRef(entry.stream.schema) : undefined
-  if (!item) return false
-  const events = item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : [item]
-  // A discriminator makes each event an intersection of its `$ref` and the pinned `event`, so every part is read.
-  const propertySchemas = (event: ast.SchemaNode, propertyName: string) =>
-    ast.resolveSchemaProperties({ node: event, propertyName }).map(({ schema }) => schema)
-  const textEvents = events.filter((event) => {
-    const dataSchemas = propertySchemas(event, 'data')
-    return dataSchemas.length > 0 && dataSchemas.every(isTextSchema)
-  })
-  if (textEvents.length === events.length) return events.length > 0
-
-  const eventNames = textEvents.map((event) => propertySchemas(event, 'event').flatMap((schema) => ast.getSchemaLiteralValues(ast.resolveRef(schema))))
-  return eventNames.length > 0 && eventNames.every((values) => values.length > 0) && [...new Set(eventNames.flat().map(String))]
+  if (shape !== 'data' && shape !== 'event') return false
+  return ast.http.responses.primary(node)?.content?.[0]?.stream?.textData ?? false
 }
 
 /**
@@ -274,7 +241,7 @@ export function getFormContentTypes(node: ast.OperationNode): Array<(typeof form
 function responseTypeForContent(entry: ResponseContentEntry): ResponseType | undefined {
   const baseType = ast.mediaType.base(entry.contentType)
   if (!baseType) return undefined
-  if (baseType === 'text/event-stream' || isJsonLines(entry)) return 'stream'
+  if (entry.stream?.framing) return 'stream'
   if (ast.mediaType.isJson(baseType)) return undefined
   if (entry.schema?.type === 'blob') return 'blob'
   if (baseType.startsWith('text/')) return 'text'

@@ -10,6 +10,7 @@ import {
   createMockedAdapter,
   createMockedPlugin,
   createMultiPluginDriver,
+  createStreamContent,
   matchFiles,
   rawSources,
   renderGeneratorOperation,
@@ -130,7 +131,9 @@ describe('mcpGenerator — stream operations', () => {
       operationId: 'streamEvents',
       method: 'GET',
       path: '/events',
-      responses: [ast.factory.createResponse({ statusCode: '200', mediaType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object' }) })],
+      responses: [
+        ast.factory.createResponse({ statusCode: '200', content: [createStreamContent('text/event-stream', ast.factory.createSchema({ type: 'object' }))] }),
+      ],
     })
     const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
     const driver = driverFor('streamEvents')
