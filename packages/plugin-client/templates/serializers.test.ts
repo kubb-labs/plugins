@@ -25,6 +25,10 @@ describe('cookie serialization', () => {
     )
     expect(() => serializeCookies({ prefs: { 'a; admin': '1' } }, { prefs: { style: 'cookie' } })).toThrow(TypeError)
   })
+
+  test('percent-encodes an exploded form key so it cannot add a cookie', () => {
+    expect(serializeCookies({ prefs: { 'a; admin': '1' } }, { prefs: { explode: true } })).toBe('a%3B%20admin=1')
+  })
 })
 
 describe('multipart/mixed body encoding', () => {
@@ -45,5 +49,12 @@ describe('multipart/mixed body encoding', () => {
 
     expect(boundary).toMatch(/^kubb-[0-9a-f]{32}$/)
     expect(await body.text()).toBe(`--${boundary}\r\nContent-Type: application/octet-stream\r\n\r\nhi\r\n--${boundary}--\r\n`)
+  })
+
+  test('sends the first type of a content type list', async () => {
+    const config = { styles: { parts: { item: { contentType: 'image/png, image/jpeg' } } } }
+    const body = formMediaTypes['multipart/mixed']!.encode!([new Uint8Array([1])], { contentType: 'multipart/mixed', config }) as Blob
+
+    expect(await body.text()).toContain('Content-Type: image/png\r\n\r\n')
   })
 })

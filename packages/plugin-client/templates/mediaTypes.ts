@@ -174,15 +174,20 @@ function isBinaryPart(part: unknown): part is Blob | BufferSource {
   return part instanceof Blob || part instanceof ArrayBuffer || ArrayBuffer.isView(part)
 }
 
+function defaultPartType(part: unknown, binary: boolean): string {
+  if (binary) return (part instanceof Blob && part.type) || 'application/octet-stream'
+  return typeof part === 'string' ? 'text/plain' : 'application/json'
+}
+
 function toMultipartMixed(parts: Array<unknown>, encoding: PartsEncoding | undefined): Blob {
   // `crypto.randomUUID` needs a secure context, `getRandomValues` works on plain http too.
   const boundary = `kubb-${Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, '0')).join('')}`
   const chunks: Array<BlobPart> = []
   parts.forEach((part, index) => {
-    const declared = (encoding?.prefix?.[index] ?? encoding?.item)?.contentType
+    // An Encoding `contentType` can list several types, such as `image/png, image/jpeg`. A part sends the first.
+    const declared = (encoding?.prefix?.[index] ?? encoding?.item)?.contentType?.split(',')[0]!.trim()
     const binary = isBinaryPart(part)
-    const contentType =
-      declared ?? (binary ? (part instanceof Blob && part.type) || 'application/octet-stream' : typeof part === 'string' ? 'text/plain' : 'application/json')
+    const contentType = declared ?? defaultPartType(part, binary)
     const value = binary || (typeof part === 'string' && !isJsonMediaType(declared)) ? part : JSON.stringify(part, jsonReplacer)
     chunks.push(`--${boundary}\r\nContent-Type: ${contentType}\r\n\r\n`, value, '\r\n')
   })
