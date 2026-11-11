@@ -1,6 +1,6 @@
 import { isEncodedBody } from '../mediaTypes.ts'
 import type { MediaType } from '../mediaTypes.ts'
-import { isJsonMediaType, jsonReplacer, toValue } from '../serializers.ts'
+import { isJsonMediaType, jsonReplacer, notNullish, toValue } from '../serializers.ts'
 import type { BodyEncoding } from '../serializers.ts'
 
 function appendFormDataValue({
@@ -44,10 +44,7 @@ function toFormData(body: Record<string, unknown>, encoding: Record<string, Body
       const delimiter = formDelimiters[style ?? 'form'] ?? ','
       formData.append(
         key,
-        value
-          .filter((item) => item !== undefined && item !== null)
-          .map(toValue)
-          .join(delimiter),
+        value.filter(notNullish).map(toValue).join(delimiter),
       )
       continue
     }

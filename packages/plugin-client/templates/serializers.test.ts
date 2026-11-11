@@ -40,6 +40,10 @@ describe('cookie serialization', () => {
   test('percent-encodes an exploded form key so it cannot add a cookie', () => {
     expect(serializeCookies({ prefs: { 'a; admin': '1' } }, { prefs: { explode: true } })).toBe('a%3B%20admin=1')
   })
+
+  test('adds no empty segment for an empty exploded array or object', () => {
+    expect(serializeCookies({ a: 1, b: [], c: {}, d: 2 }, { b: { style: 'cookie' }, c: { style: 'cookie' } })).toBe('a=1; d=2')
+  })
 })
 
 describe('multipart/mixed response decoding', () => {
@@ -57,6 +61,20 @@ describe('multipart/mixed response decoding', () => {
 
     expect(await formMediaTypes['multipart/mixed']!.decode!(response, { contentType: 'multipart/mixed', config: {} })).toStrictEqual(['x--b:1y', { a: 1 }])
   })
+
+  test('keeps the trailing newline of a part', async () => {
+    const config = { styles: { parts: { item: { contentType: 'text/plain' } } } }
+    const body = formMediaTypes['multipart/mixed']!.encode!(['line\n', 'x'], { contentType: 'multipart/mixed', config }) as Blob
+    const response = new Response(body, { headers: { 'Content-Type': body.type } })
+
+    expect(await formMediaTypes['multipart/mixed']!.decode!(response, { contentType: 'multipart/mixed', config: {} })).toStrictEqual(['line\n', 'x'])
+  })
+
+  test('throws a ParseError for a JSON part that is not JSON', async () => {
+    const response = new Response('--b\r\nContent-Type: application/json\r\n\r\n{bad\r\n--b--\r\n', { headers: { 'Content-Type': 'multipart/mixed; boundary=b' } })
+
+    await expect(formMediaTypes['multipart/mixed']!.decode!(response, { contentType: 'multipart/mixed', config: {} })).rejects.toMatchObject({ name: 'ParseError' })
+  })
 })
 
 describe('multipart/mixed body encoding', () => {
@@ -69,6 +87,14 @@ describe('multipart/mixed body encoding', () => {
     expect(await body.text()).toBe(
       `--${boundary}\r\nContent-Type: application/json\r\n\r\n{"id":1}\r\n--${boundary}\r\nContent-Type: text/csv\r\n\r\na,b\r\n--${boundary}--\r\n`,
     )
+  })
+
+  test('leaves out an undefined part and keeps the prefix encoding of the parts after it', async () => {
+    const config = { styles: { parts: { prefix: [{ contentType: 'application/json' }, { contentType: 'text/csv' }] } } }
+    const body = formMediaTypes['multipart/mixed']!.encode!([undefined, 'a,b'], { contentType: 'multipart/mixed', config }) as Blob
+    const boundary = body.type.match(/boundary=(.+)$/)?.[1]
+
+    expect(await body.text()).toBe(`--${boundary}\r\nContent-Type: text/csv\r\n\r\na,b\r\n--${boundary}--\r\n`)
   })
 
   test('sends binary parts as bytes', async () => {

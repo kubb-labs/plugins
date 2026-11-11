@@ -1,4 +1,4 @@
-import { isJsonMediaType, jsonReplacer, toValue } from '../serializers.ts'
+import { isJsonMediaType, isRecord, jsonReplacer, notNullish, toValue } from '../serializers.ts'
 import type { CookieSerializer } from '../serializers.ts'
 
 // RFC 6265 cookie-octets, which the `cookie` style sends unescaped.
@@ -18,18 +18,13 @@ function rawCookieName(name: string, key: string): string {
   return key
 }
 
-function notNullish(value: unknown): boolean {
-  return value !== undefined && value !== null
-}
-
 function serializeCookie({ name, value, explode, raw }: { name: string; value: unknown; explode: boolean; raw: boolean }): string {
   const encode = (item: unknown) => (raw ? rawCookieValue(name, item) : encodeURIComponent(toValue(item)))
   if (Array.isArray(value)) {
     const items = value.filter(notNullish).map(encode)
     return explode ? items.map((item) => `${name}=${item}`).join('; ') : `${name}=${items.join(',')}`
   }
-  // A `Date` is a unit, not an object to expand.
-  if (typeof value === 'object' && value !== null && !(value instanceof Date)) {
+  if (isRecord(value)) {
     const entries = Object.entries(value).filter(([, item]) => notNullish(item))
     // An exploded key becomes a cookie name, so the cookie style checks it as a token.
     if (explode) return entries.map(([key, item]) => `${raw ? rawCookieName(name, key) : encodeURIComponent(key)}=${encode(item)}`).join('; ')
@@ -55,7 +50,9 @@ export const serializeCookies: CookieSerializer = (cookies, styles) => {
     }
     // OpenAPI 3.2 defaults `explode` to true for the `cookie` style.
     const raw = style?.style === 'cookie'
-    parts.push(serializeCookie({ name, value, explode: style?.explode ?? raw, raw }))
+    const cookie = serializeCookie({ name, value, explode: style?.explode ?? raw, raw })
+    // An empty exploded array or object has no pairs, so it adds no `; ` segment.
+    if (cookie) parts.push(cookie)
   }
   return parts.join('; ')
 }

@@ -1,10 +1,6 @@
-import { toValue } from '../serializers.ts'
+import { encodeComponent as encode, isRecord } from '../serializers.ts'
 import type { PathSerializer } from '../serializers.ts'
 import { serializePath } from './path.ts'
-
-function encode(value: unknown): string {
-  return encodeURIComponent(toValue(value))
-}
 
 /**
  * The path serializer for the OpenAPI `label` and `matrix` styles. A `simple` parameter uses `serializePath`.
@@ -19,8 +15,7 @@ export const serializeStyledPath: PathSerializer = ({ name, value, options }) =>
     if (label) return `.${items.join(explode ? '.' : ',')}`
     return explode ? items.map((item) => `;${name}=${item}`).join('') : `;${name}=${items.join(',')}`
   }
-  // A `Date` is a unit, not an object to expand.
-  if (typeof value === 'object' && !(value instanceof Date)) {
+  if (isRecord(value)) {
     const members = Object.entries(value).map(([key, item]) => `${encode(key)}${explode ? '=' : ','}${encode(item)}`)
     if (label) return `.${members.join(explode ? '.' : ',')}`
     return explode ? members.map((member) => `;${member}`).join('') : `;${name}=${members.join(',')}`

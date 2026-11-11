@@ -600,7 +600,8 @@ function serializeHeaders(headers: HeadersInit | undefined): Record<string, stri
   const result: Record<string, string> = {}
   for (const [key, value] of entries) {
     if (value === undefined || value === null) continue
-    result[key] = typeof value === 'string' ? value : typeof value === 'object' ? JSON.stringify(value) : String(value)
+    // A `Date` is a unit like in the parameter serializers, not an object to send as JSON.
+    result[key] = value instanceof Date ? value.toISOString() : typeof value === 'object' ? JSON.stringify(value) : String(value)
   }
   return result
 }
@@ -754,7 +755,9 @@ export function toRequestInit(request: ResolvedRequest): RequestInit {
 
 function pickErrorValidator(error: Validator | Record<string, Validator> | undefined, status: number): Validator | undefined {
   if (!error || '~standard' in error) return error as Validator | undefined
-  return error[String(status)] ?? error[`${String(status)[0]}xx`] ?? error['default']
+  const range = String(status)[0]
+  // `5XX` is the spelling validator maps used before ranges were written in lower case.
+  return error[String(status)] ?? error[`${range}xx`] ?? error[`${range}XX`] ?? error['default']
 }
 
 // Checks the shape, so a `Response` from another realm or a polyfill counts too.
