@@ -324,21 +324,10 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
 }
 
 /**
- * Rounds numeric bounds to whole numbers so they print as bigint literals without loosening them.
- * A fractional exclusive bound becomes the nearest inclusive one; a fractional `multipleOf` is left out.
+ * Numeric bounds for a bigint: the inclusive, whole, safe bounds faker mocks against, and a whole, safe `multipleOf`.
  */
 export function bigintConstraints({ min, max, exclusive, multipleOf }: NumericConstraints): NumericConstraints {
-  const fractional = (bound: number | undefined): bound is number => bound !== undefined && !Number.isInteger(bound)
-  // A bound past `Number.MAX_SAFE_INTEGER`, such as int64's, prints as a rounded or invalid literal (`1e+21n`), so it is left out.
-  const safe = (bound: number | undefined) => (Number.isSafeInteger(bound) ? bound : undefined)
-  const lower = [min, fractional(exclusive?.min) ? exclusive.min : undefined].filter((bound) => bound !== undefined).map(Math.ceil)
-  const upper = [max, fractional(exclusive?.max) ? exclusive.max : undefined].filter((bound) => bound !== undefined).map(Math.floor)
-  return {
-    min: safe(lower.length ? Math.max(...lower) : undefined),
-    max: safe(upper.length ? Math.min(...upper) : undefined),
-    exclusive: { min: safe(exclusive?.min), max: safe(exclusive?.max) },
-    multipleOf: safe(multipleOf),
-  }
+  return { ...ast.schema.numberBounds({ min, max, exclusive }, { integer: true }), multipleOf: Number.isSafeInteger(multipleOf) ? multipleOf : undefined }
 }
 
 /**

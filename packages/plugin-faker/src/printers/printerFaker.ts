@@ -90,18 +90,9 @@ function numberCall(
   const isWhole = kind !== 'float'
   // Faker's `int` and `bigInt` reject a fractional `multipleOf`.
   const grid = isWhole && !Number.isInteger(multipleOf) ? undefined : multipleOf
-  // Faker returns points of the `multipleOf` grid, ends included, so an exclusive bound moves to the next point. A whole number's grid is 1.
+  // Faker returns points of the `multipleOf` grid, ends included, so an exclusive bound moves to the next point.
   // shortcut: without a grid a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
-  const step = grid ?? (isWhole ? 1 : undefined)
-  const above = (bound: number) => (step ? (Math.floor(bound / step) + 1) * step : bound)
-  const below = (bound: number) => (step ? (Math.ceil(bound / step) - 1) * step : bound)
-  // A bound past `Number.MAX_SAFE_INTEGER`, such as int64's, prints as a rounded or invalid literal, so it is left out.
-  const tightestBound = (pick: (...bounds: Array<number>) => number, bounds: Array<number | undefined>) => {
-    const safeBounds = bounds.filter((bound): bound is number => bound !== undefined && (!isWhole || Number.isSafeInteger(bound)))
-    return safeBounds.length ? pick(...safeBounds) : undefined
-  }
-  const lower = tightestBound(Math.max, [min !== undefined && isWhole ? Math.ceil(min) : min, exclusive?.min === undefined ? undefined : above(exclusive.min)])
-  const upper = tightestBound(Math.min, [max !== undefined && isWhole ? Math.floor(max) : max, exclusive?.max === undefined ? undefined : below(exclusive.max)])
+  const { min: lower, max: upper } = ast.schema.numberBounds({ min, max, exclusive }, { integer: isWhole, step: grid })
   // Faker fills a missing `min` with `0`, and a float's missing `max` with `1`, which a lone bound on the other side contradicts.
   // The span holds grid points, so faker always finds a multiple.
   const span = 100 * (grid ?? 1)
