@@ -125,7 +125,9 @@ describe('printerFaker', () => {
   test.each([
     ['^A[A-Z0-9]{1,}$', 'faker.helpers.fromRegExp(/^A[A-Z0-9]{1,11}$/)'],
     ['^\\+[1-9]\\d{1,14}$', 'faker.helpers.fromRegExp(/^[+][1-9][0-9]{1,14}$/)'],
-    ['^[\\w.\\-]+$', 'faker.helpers.fromRegExp(/^[A-Za-z0-9_.-]+$/)'],
+    // Faker reads a literal `-` only first in a class, and `a\-z` must not become the range `a-z`.
+    ['^[\\w.\\-]+$', 'faker.helpers.fromRegExp(/^[-A-Za-z0-9_.]+$/)'],
+    ['^[^a\\-z]{3}$', 'faker.helpers.fromRegExp(/^[^-az]{3}$/)'],
     ['^\\s(a|b)$', 'faker.helpers.fromRegExp(/^\\s(a|b)$/)'],
   ])('rewrites the pattern %s into the grammar faker reads', (pattern, expected) => {
     expect(printerFaker({ resolver: resolverFaker }).print(ast.factory.createSchema({ type: 'string', pattern }))).toBe(expected)

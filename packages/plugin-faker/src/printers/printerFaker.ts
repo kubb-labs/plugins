@@ -159,16 +159,28 @@ const FAKER_CLASS_CHARACTERS = new Set('-!@#$&()`.+,"')
 function toFakerPattern(pattern: string): string {
   let result = ''
   let inClass = false
+  // Where the open class's members start, after `[` or `[^`: faker reads a literal `-` only there.
+  let classStart = -1
   for (let index = 0; index < pattern.length; index++) {
     const char = pattern[index]!
     const next = pattern[index + 1]
     if (char === '\\' && next !== undefined) {
       index++
+      if (inClass && next === '-') {
+        if (result[classStart] !== '-') result = `${result.slice(0, classStart)}-${result.slice(classStart)}`
+        continue
+      }
       const set = next === 'd' ? '0-9' : next === 'w' ? 'A-Za-z0-9_' : FAKER_CLASS_CHARACTERS.has(next) ? next : undefined
       result += set === undefined ? `\\${next}` : inClass ? set : `[${set}]`
       continue
     }
-    if (char === '[') inClass = true
+    if (char === '[' && !inClass) {
+      inClass = true
+      result += pattern[index + 1] === '^' ? '[^' : '['
+      if (pattern[index + 1] === '^') index++
+      classStart = result.length
+      continue
+    }
     if (char === ']') inClass = false
     result += char
   }
