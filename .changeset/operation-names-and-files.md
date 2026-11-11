@@ -13,7 +13,7 @@
 '@kubb/plugin-swr': patch
 ---
 
-Keep operation names and files apart from each other and from schemas. Specs without such a clash generate the same output as before.
+Keep operation names and files apart from each other and from schemas.
 
-- Give an operation file an `Operation` suffix when it would have the same name as a schema's file, ignoring case. Operation `point` goes to `types/PointOperation.ts` and `zod/pointOperationSchema.ts`, next to schema `Point`. Before, the two were merged into one file, which could throw `Cannot access 'pointSchema' before initialization` or fail `tsc` with TS1149 on macOS and Windows. The exported names stay the same.
-- Allocate operation names per source operation instead of per method and path. A plugin's `macros` that change `method` or `path`, such as an MSW macro that turns `GET` into `POST`, no longer make the handler import `FindPetsByStatusResponse2` while `plugin-ts` emits `FindPetsByStatusResponse`.
+- Give an operation file an `Operation` suffix when a schema file has the same name, ignoring case. Operation `point` goes to `types/PointOperation.ts`, next to schema `Point`. The exported names stay the same.
+- Name an operation the same in every plugin when a `macros` entry changes its `method` or `path`. The MSW handler no longer imports `FindPetsByStatusResponse2`.
