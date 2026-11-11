@@ -109,6 +109,12 @@ describe('parseEventStream', () => {
     expect(events).toStrictEqual([message({ data: 'hello' }), message({ data: '42' }), message({ data: 'true' })])
   })
 
+  test('keeps data as text for the named events only', async () => {
+    const events = await collect(parseEventStream({ stream: streamOf(['event: note\ndata: 42\n\nevent: tick\ndata: 42\n\n']), rawData: ['note'] }))
+
+    expect(events.map(({ data }) => data)).toStrictEqual(['42', 42])
+  })
+
   test('reassembles an event split across chunks', async () => {
     expect(await collect(parseEventStream({ stream: streamOf(['data: {"hal', 'f":true}\n\n']) }))).toStrictEqual([message({ data: { half: true } })])
   })

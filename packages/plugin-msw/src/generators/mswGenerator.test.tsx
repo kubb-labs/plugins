@@ -361,6 +361,8 @@ describe('mswGenerator body encoding', () => {
 
   test('frames an event-stream mock as one data event, and sends nothing without data', async () => {
     expect(await getBody(operation('streamPet', 'text/event-stream'), { id: 1 })).toBe('data: {"id":1}\n\n')
+    // A string goes out unquoted, one `data:` line per line, since the client keeps string data as text.
+    expect(await getBody(operation('streamText', 'text/event-stream'), 'a\nb')).toBe('data: a\ndata: b\n\n')
     expect(await getBody(operation('streamNoPet', 'text/event-stream'), undefined)).toBe('')
   })
 

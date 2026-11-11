@@ -56,6 +56,7 @@ export function buildCallConfig({
     ? `throwOnError: resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault})`
     : `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`
 
+  const rawData = hasTextEventData(node)
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: ${singleQuote(node.path)}`,
@@ -65,7 +66,7 @@ export function buildCallConfig({
     contentTypeLiteral,
     buildParseAsLiteral(node),
     stream === 'event' || stream === 'data' ? `eventShape: '${stream}'` : null,
-    hasTextEventData(node) ? 'rawData: true' : null,
+    rawData ? `rawData: ${rawData === true ? 'true' : `[${rawData.map(singleQuote).join(', ')}]`}` : null,
     '...config',
     ownRuntime ? styles : null,
     validatorLiteral,
