@@ -14,5 +14,5 @@
 Read media types, status codes, servers, auth, parameters, stream framing and number bounds through the `ast` helpers from `@kubb/kit`, and print literals with `code`, instead of each plugin's own copy. Generated code stays the same, except:
 
 - `@kubb/plugin-msw` mocks a `text/json` response as JSON, like `application/json`.
-- `@kubb/plugin-zod` prints a bigint's bounds inclusive, such as `.min(1n)` for `exclusiveMinimum: 0`, the same bounds `@kubb/plugin-faker` mocks against.
-- A `group: { type: 'path' }` folder is the camelCased first path segment, such as `petStore` for `/pet-store/{id}`, the same as Kubb names it.
+- `@kubb/plugin-zod` prints a bigint's bounds as inclusive, such as `.min(1n)` for `exclusiveMinimum: 0`. These are the bounds `@kubb/plugin-faker` mocks against.
+- A `group: { type: 'path' }` folder is named after the camelCased first path segment, such as `petStore` for `/pet-store/{id}`. Kubb names it the same way.
