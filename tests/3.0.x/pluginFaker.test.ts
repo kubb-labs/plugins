@@ -484,3 +484,18 @@ test('keeps the literal an allOf extension sets over the string of its base', as
     },
   })
 })
+
+test('mocks patterns with shorthand classes, escapes and open-ended counts', async () => {
+  await expectMocksToParse({
+    Contact: {
+      type: 'object',
+      required: ['code', 'phone', 'slug', 'version'],
+      properties: {
+        code: { type: 'string', pattern: '^A[A-Z0-9]{1,}$' },
+        phone: { type: 'string', pattern: '^\\+[1-9]\\d{1,14}$' },
+        slug: { type: 'string', pattern: '^[\\w\\-]{3,}$' },
+        version: { type: 'string', pattern: '^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$' },
+      },
+    },
+  })
+})

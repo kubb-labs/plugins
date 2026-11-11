@@ -146,12 +146,42 @@ const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
   ['hostname', 'faker.internet.domainName()'],
 ])
 
+// Punctuation `faker.helpers.fromRegExp` reads inside a character class.
+const FAKER_CLASS_CHARACTERS = new Set('-!@#$&()`.+,"')
+
+/**
+ * Rewrites a pattern into the grammar `faker.helpers.fromRegExp` reads: `\d` and `\w` become character classes, an escaped
+ * literal such as `\+` becomes a one-character class, and an open-ended `{n,}` gets an upper bound of `n + 10`. Faker
+ * otherwise prints these as written, such as `\d` for a digit.
+ *
+ * shortcut: groups, alternation and `\s` stay unsupported, as `regexGenerator: 'randexp'` covers them.
+ */
+function toFakerPattern(pattern: string): string {
+  let result = ''
+  let inClass = false
+  for (let index = 0; index < pattern.length; index++) {
+    const char = pattern[index]!
+    const next = pattern[index + 1]
+    if (char === '\\' && next !== undefined) {
+      index++
+      const set = next === 'd' ? '0-9' : next === 'w' ? 'A-Za-z0-9_' : FAKER_CLASS_CHARACTERS.has(next) ? next : undefined
+      result += set === undefined ? `\\${next}` : inClass ? set : `[${set}]`
+      continue
+    }
+    if (char === '[') inClass = true
+    if (char === ']') inClass = false
+    result += char
+  }
+
+  return result.replace(/\{(\d+),\}/g, (_, min: string) => `{${min},${Number(min) + 10}}`)
+}
+
 function matches(value: string, regexGenerator: 'faker' | 'randexp' = 'faker'): string {
   if (regexGenerator === 'randexp') {
     return `${toRegExpString(value, 'RandExp')}.gen()`
   }
 
-  return `faker.helpers.fromRegExp(${toRegExpString(value, null)})`
+  return `faker.helpers.fromRegExp(${toRegExpString(toFakerPattern(value), null)})`
 }
 
 function parseEnumValue(value: string | number | boolean | null | undefined) {

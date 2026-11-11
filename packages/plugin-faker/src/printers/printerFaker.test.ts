@@ -122,6 +122,15 @@ describe('printerFaker', () => {
     expect(print({ encoding: 'base64url' })).toBe('faker.string.alphanumeric(8)')
   })
 
+  test.each([
+    ['^A[A-Z0-9]{1,}$', 'faker.helpers.fromRegExp(/^A[A-Z0-9]{1,11}$/)'],
+    ['^\\+[1-9]\\d{1,14}$', 'faker.helpers.fromRegExp(/^[+][1-9][0-9]{1,14}$/)'],
+    ['^[\\w.\\-]+$', 'faker.helpers.fromRegExp(/^[A-Za-z0-9_.-]+$/)'],
+    ['^\\s(a|b)$', 'faker.helpers.fromRegExp(/^\\s(a|b)$/)'],
+  ])('rewrites the pattern %s into the grammar faker reads', (pattern, expected) => {
+    expect(printerFaker({ resolver: resolverFaker }).print(ast.factory.createSchema({ type: 'string', pattern }))).toBe(expected)
+  })
+
   test('mocks a string int64 as digits', () => {
     const node = ast.factory.createSchema({ type: 'string', format: 'int64' })
 
