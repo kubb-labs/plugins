@@ -166,7 +166,8 @@ export function getResponseContentTypeInfo(node: ast.OperationNode): ContentType
 
 type ResponseType = 'blob' | 'text' | 'stream'
 
-function baseContentType(contentType: string): string {
+/** The media type without its parameters, in lower case: `Text/Plain; charset=utf-8` gives `text/plain`. */
+export function baseContentType(contentType: string): string {
   return contentType.split(';')[0]!.trim().toLowerCase()
 }
 
@@ -576,7 +577,7 @@ const operationParameterGroupsByNode = new WeakMap<ast.OperationNode, OperationP
  */
 function spreadQuerystring(param: ast.ParameterNode): Array<ast.ParameterNode> {
   const schema = param.schema.type === 'ref' ? param.schema.schema : param.schema
-  const formEncoded = !param.contentType || param.contentType.split(';')[0]!.trim().toLowerCase() === 'application/x-www-form-urlencoded'
+  const formEncoded = !param.contentType || baseContentType(param.contentType) === 'application/x-www-form-urlencoded'
   if (schema?.type !== 'object' || !formEncoded) return [param]
   return schema.properties.map((property) => {
     const { style, explode, allowReserved } = param.encoding?.[property.name] ?? {}

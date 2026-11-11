@@ -324,15 +324,34 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
 }
 
 /**
+ * Rounds numeric bounds to whole numbers so they print as bigint literals without loosening them.
+ * A fractional exclusive bound becomes the nearest inclusive one; a fractional `multipleOf` is left out.
+ */
+export function bigintConstraints({ min, max, exclusive, multipleOf }: NumericConstraints): NumericConstraints {
+  const fractional = (bound: number | undefined): bound is number => bound !== undefined && !Number.isInteger(bound)
+  const lower = [min, fractional(exclusive?.min) ? exclusive.min : undefined].filter((bound) => bound !== undefined).map(Math.ceil)
+  const upper = [max, fractional(exclusive?.max) ? exclusive.max : undefined].filter((bound) => bound !== undefined).map(Math.floor)
+  return {
+    min: lower.length ? Math.max(...lower) : undefined,
+    max: upper.length ? Math.min(...upper) : undefined,
+    exclusive: {
+      min: fractional(exclusive?.min) ? undefined : exclusive?.min,
+      max: fractional(exclusive?.max) ? undefined : exclusive?.max,
+    },
+    multipleOf: Number.isInteger(multipleOf) ? multipleOf : undefined,
+  }
+}
+
+/**
  * Build `.check(z.minimum(), z.maximum())` for `zod/mini` numeric constraints.
  */
-export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericConstraints): string {
+export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): string {
   const checks: Array<string> = []
-  if (min !== undefined) checks.push(`z.minimum(${min})`)
-  if (max !== undefined) checks.push(`z.maximum(${max})`)
-  if (exclusive?.min !== undefined) checks.push(`z.gt(${exclusive.min})`)
-  if (exclusive?.max !== undefined) checks.push(`z.lt(${exclusive.max})`)
-  if (multipleOf !== undefined) checks.push(`z.multipleOf(${multipleOf})`)
+  if (min !== undefined) checks.push(`z.minimum(${min}${suffix})`)
+  if (max !== undefined) checks.push(`z.maximum(${max}${suffix})`)
+  if (exclusive?.min !== undefined) checks.push(`z.gt(${exclusive.min}${suffix})`)
+  if (exclusive?.max !== undefined) checks.push(`z.lt(${exclusive.max}${suffix})`)
+  if (multipleOf !== undefined) checks.push(`z.multipleOf(${multipleOf}${suffix})`)
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
 

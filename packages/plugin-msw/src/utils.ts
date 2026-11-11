@@ -1,4 +1,4 @@
-import { getStatusClass, toResponseContent } from '@internals/shared'
+import { baseContentType, getStatusClass, toResponseContent } from '@internals/shared'
 import { jsStringEscape, objectKey, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
@@ -70,8 +70,9 @@ function getResponseEntry(response: ast.ResponseNode | null | undefined): ast.Co
 }
 
 function isJson(contentType: string | undefined): boolean {
-  const baseType = contentType?.split(';')[0]?.trim().toLowerCase()
-  return baseType === 'application/json' || Boolean(baseType?.endsWith('+json'))
+  if (!contentType) return false
+  const baseType = baseContentType(contentType)
+  return baseType === 'application/json' || baseType.endsWith('+json')
 }
 
 /**
@@ -97,7 +98,7 @@ export function responseReturn(body: string, status: number, response: ast.Respo
   const prelude = name === body ? '' : `const body = ${body}\n    `
 
   // shortcut: one event per mock, upgrade when a mock needs to send several events.
-  if (contentType?.split(';')[0]!.trim().toLowerCase() === 'text/event-stream') {
+  if (contentType && baseContentType(contentType) === 'text/event-stream') {
     const entry = getResponseEntry(response)
     // Without a body, a spec example already serialized as SSE text goes out as it is.
     const serialized = entry?.examples?.find((example) => example.serializedValue !== undefined)?.serializedValue

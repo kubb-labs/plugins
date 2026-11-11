@@ -1,4 +1,11 @@
-import { getEnumNames, getOperationSuccessResponses, getPrimarySuccessResponse, isSuccessStatusCode, resolveOperationFile } from '@internals/shared'
+import {
+  getEnumNames,
+  getOperationSuccessResponses,
+  getPrimarySuccessResponse,
+  getStatusClass,
+  isSuccessStatusCode,
+  resolveOperationFile,
+} from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -69,9 +76,10 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const hasResponseNameCollision = referencedNames.some((name) => {
       return enumTypeName({ resolver: tsResolver, name, enumOptions, isEnum: enumNames.has(name) }) === type.responseName
     })
-    // One helper per documented status, a range such as `4xx` included. `default` has no status to mock.
+    // One helper per documented status, a range such as `4xx` included. `default` has no status to mock,
+    // and the Fetch `Response` constructor rejects a `1xx` status.
     const types = node.responses
-      .filter((response) => response.statusCode !== 'default')
+      .filter((response) => response.statusCode !== 'default' && getStatusClass(response.statusCode) !== 1)
       .map((response) => {
         const isResponseType = isSuccessStatusCode(response.statusCode) && !hasResponseNameCollision
         return [response, isResponseType ? type.responseName : tsResolver.response.status(node, response.statusCode)] as const

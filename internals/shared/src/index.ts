@@ -12,6 +12,7 @@ export {
   getOperationParameters,
   getOperationSuccessResponses,
   getPerContentTypeName,
+  baseContentType,
   getPrimarySuccessResponse,
   getRequestGroupOptionality,
   getRequestGroups,

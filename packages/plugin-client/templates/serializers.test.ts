@@ -28,6 +28,11 @@ describe('cookie serialization', () => {
       new TypeError('Cookie sid has characters the cookie style cannot send, escape it first.'),
     )
     expect(() => serializeCookies({ prefs: { 'a; admin': '1' } }, { prefs: { style: 'cookie' } })).toThrow(TypeError)
+    // `=` is a valid value octet but would split `a=b=1` into cookie `a`.
+    expect(() => serializeCookies({ prefs: { 'a=b': '1' } }, { prefs: { style: 'cookie' } })).toThrow(
+      new TypeError('Cookie prefs has a key the cookie style cannot send as a cookie name, escape it first.'),
+    )
+    expect(serializeCookies({ prefs: { theme: 'a=b' } }, { prefs: { style: 'cookie' } })).toBe('theme=a=b')
   })
 
   test('percent-encodes an exploded form key so it cannot add a cookie', () => {

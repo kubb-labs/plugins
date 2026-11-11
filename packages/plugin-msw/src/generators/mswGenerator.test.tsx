@@ -474,7 +474,7 @@ describe('mswGenerator ranged statuses', () => {
       operationId: 'getRanged',
       method: 'GET',
       path: '/ranged',
-      responses: (['2xx', '4xx'] as const).map((statusCode) =>
+      responses: (['1xx', '2xx', '4xx'] as const).map((statusCode) =>
         ast.factory.createResponse({ statusCode, schema: ast.factory.createSchema({ type: 'object', properties: [] }) }),
       ),
     })
@@ -483,5 +483,7 @@ describe('mswGenerator ranged statuses', () => {
 
     expect(handlers.getRangedHandlerResponse4xx({ id: 1 }).status).toBe(400)
     expect(handlers.getRangedHandlerResponse2xx({ id: 1 }).status).toBe(200)
+    // `new Response()` throws on a `1xx` status, so that range gets no helper.
+    expect(handlers.getRangedHandlerResponse1xx).toBeUndefined()
   })
 })

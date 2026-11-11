@@ -1,4 +1,4 @@
-import { getOperationParameters } from '@internals/shared'
+import { baseContentType, getOperationParameters } from '@internals/shared'
 import { isValidVarName, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
@@ -58,7 +58,7 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
 
 function serializePartsEncoding(node: ast.HttpOperationNode): Array<string> {
   // Only the `multipart/mixed` media type reads `parts`, whichever position it has among the request content types.
-  const entry = node.requestBody?.content?.find((content) => content.contentType.split(';')[0]!.trim().toLowerCase() === 'multipart/mixed')
+  const entry = node.requestBody?.content?.find((content) => baseContentType(content.contentType) === 'multipart/mixed')
   const part = (encoding: ast.EncodingNode) => (encoding.contentType ? `{ contentType: ${singleQuote(encoding.contentType)} }` : '{}')
   return [
     ...(entry?.prefixEncoding?.length ? [`prefix: [${entry.prefixEncoding.map(part).join(', ')}]`] : []),
