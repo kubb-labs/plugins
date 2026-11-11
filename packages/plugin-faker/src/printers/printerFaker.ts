@@ -324,7 +324,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const { discriminatorPropertyName } = node
         const baseTypeName = this.options.typeName
 
-        const items: Array<string> = mapSchemaMembers(node, (member) => {
+        // A member that points back into the cycle would print `undefined`, so the mock picks among the others.
+        const acyclic = (node.members ?? []).filter((member) => !isCyclicRef(member, this.options))
+        const members = acyclic.length ? acyclic : node.members
+
+        const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) => {
           // For a discriminated union, narrow each variant to its own branch so nested
           // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
           const discriminator = discriminatorPropertyName ? getDiscriminator(member, discriminatorPropertyName) : undefined
@@ -357,6 +361,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
           printNested(member, {
             nestedInObject: true,
+            // An `allOf` member carries required properties, so only a ref to the schema itself is cut. A cycle through
+            // another schema is cut further down, at the array or property that closes it.
+            ...(member.type === 'ref' && ast.resolveRefName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
           }),
         )
           .map(({ output }) => output)
