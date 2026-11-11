@@ -325,7 +325,10 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       intersection(node): string {
         const objectMembers = (node.members ?? []).filter((member) => isObjectSchema(member))
-        const members = objectMembers.length ? objectMembers : node.members
+        // A union spreads after the plain objects, so a sibling base object cannot overwrite its discriminator.
+        const members = objectMembers.length
+          ? [...objectMembers.filter((member) => member.type !== 'union'), ...objectMembers.filter((member) => member.type === 'union')]
+          : node.members
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
           printNested(member, {
             nestedInObject: true,
