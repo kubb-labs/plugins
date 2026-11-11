@@ -16,7 +16,6 @@ export {
   getResponseContentTypeInfo,
   hasEventStreamContent,
   hasStreamVariant,
-  hasTextEventData,
   isEventStream,
   requestGroupOrder,
   operationFileEntry,

@@ -12,7 +12,6 @@ import {
   getRequestGroupOptionality,
   hasEventStreamContent,
   hasStreamVariant,
-  hasTextEventData,
   isEventStream,
   resolveErrorNames,
   resolveOperationFile,
@@ -500,21 +499,6 @@ describe('isEventStream', () => {
 
     expect(getEventStream(textItem)).toBe('data')
     expect(getEventStream(typedEvents)).toBe('event')
-  })
-
-  test('reads text event data from the stream the adapter marks', () => {
-    const sse = (stream: ast.ContentNode['stream']) =>
-      ast.factory.createOperation({
-        operationId: 'streamEvents',
-        method: 'GET',
-        path: '/events',
-        responses: [ast.factory.createResponse({ statusCode: '200', content: [createStreamContent('text/event-stream', undefined, stream)] })],
-      })
-
-    expect(hasTextEventData(sse({ textData: true }))).toBe(true)
-    expect(hasTextEventData(sse({ shape: 'event', textData: ['note'] }))).toStrictEqual(['note'])
-    expect(hasTextEventData(sse({}))).toBe(false)
-    expect(hasTextEventData(nodeWithResponseContentType('application/json'))).toBe(false)
   })
 
   test.each([

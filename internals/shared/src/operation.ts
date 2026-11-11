@@ -187,16 +187,6 @@ export function isEventStream(node: ast.OperationNode): boolean {
 }
 
 /**
- * Whether an operation streams Server-Sent Events whose `data` the document types as a string, so the client keeps each
- * `data` as text instead of JSON-parsing it: `true` for every event, else the names of the events that do.
- */
-export function hasTextEventData(node: ast.OperationNode): boolean | Array<string> {
-  const shape = getEventStream(node)
-  if (shape !== 'data' && shape !== 'event') return false
-  return ast.http.responses.primary(node)?.content?.[0]?.stream?.textData ?? false
-}
-
-/**
  * Whether the primary success response offers `text/event-stream`, alone or next to other content types. The client asks
  * for the stream by default and ships the `sse.ts` runtime, so a mixed response can be read as events too.
  */
@@ -655,12 +645,6 @@ export function buildResponses(
   })
 }
 
-export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string): number | null {
-  const code = Number(statusCode)
-
-  return Number.isNaN(code) ? null : code
-}
-
 export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
   return node.responses
     .filter((response) => ast.http.status.isError(response.statusCode))
@@ -724,8 +708,8 @@ export function resolveResponseTypes(node: ast.OperationNode, resolver: Response
       continue
     }
 
-    const code = getStatusCodeNumber(response.statusCode)
-    if (code === null) {
+    const code = Number(response.statusCode)
+    if (Number.isNaN(code)) {
       continue
     }
 

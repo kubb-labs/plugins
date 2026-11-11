@@ -1,4 +1,4 @@
-import { getEventStream, hasTextEventData } from '@internals/shared'
+import { getEventStream } from '@internals/shared'
 
 import { ast, code } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
@@ -56,7 +56,8 @@ export function buildCallConfig({
     ? `throwOnError: resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault})`
     : `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`
 
-  const rawData = hasTextEventData(node)
+  // Server-sent events whose `data` is a string stay text instead of being JSON-parsed.
+  const rawData = stream === 'event' || stream === 'data' ? ast.http.responses.primary(node)?.content?.[0]?.stream?.textData : undefined
   const callConfig = `{ ${[
     `method: ${code.string(node.method.toUpperCase())}`,
     `url: ${code.string(node.path)}`,
