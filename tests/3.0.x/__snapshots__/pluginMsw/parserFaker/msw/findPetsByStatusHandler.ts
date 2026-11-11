@@ -15,7 +15,7 @@ export function findPetsByStatusHandlerResponse200(data?: FindPetsByStatusRespon
     },
   })
 
-  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -24,7 +24,7 @@ export function findPetsByStatusHandlerResponse200(data?: FindPetsByStatusRespon
 }
 
 export function findPetsByStatusHandlerResponse400(data?: FindPetsByStatusStatus400) {
-  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }

@@ -15,14 +15,13 @@ import { placeOrder } from '../clients/placeOrder'
 export async function placeOrderHandler({ body }: Pick<PlaceOrderOptions, 'body'> = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await placeOrder({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
 
-  const text = JSON.stringify(res.data, (_key, value) => (typeof value === 'bigint' ? (Number.isSafeInteger(Number(value)) ? Number(value) : String(value)) : value))
   return {
     content: [
       {
         type: 'text',
-        text
+        text: JSON.stringify(res.data)
       }
     ],
-    structuredContent: { data: text === undefined ? undefined : JSON.parse(text) }
+    structuredContent: { data: res.data }
   }
 }

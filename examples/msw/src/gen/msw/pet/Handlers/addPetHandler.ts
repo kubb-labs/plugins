@@ -17,15 +17,12 @@ export function addPetHandlerResponse200(data?: AddPetResponse) {
       },
     })
 
-  return new HttpResponse<string>(
-    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+  return new HttpResponse<string>(JSON.stringify(data), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
     },
-  )
+  })
 }
 
 export function addPetHandlerResponse405(data?: AddPetStatus405) {

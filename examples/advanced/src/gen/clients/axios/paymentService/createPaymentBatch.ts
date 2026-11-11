@@ -38,7 +38,6 @@ export function createPaymentBatch<ThrowOnError extends boolean = true>(
       url: '/store/payments/batch',
       contentType: { request: 'multipart/mixed' },
       ...config,
-      styles: { ...config.styles, parts: { prefix: [{ contentType: 'application/json' }], item: { contentType: 'text/plain' }, ...config.styles?.parts } },
       validator: { response: createPaymentBatchResponseSchema, ...config.validator },
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),

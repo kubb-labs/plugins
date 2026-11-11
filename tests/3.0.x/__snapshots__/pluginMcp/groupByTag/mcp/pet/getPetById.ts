@@ -15,14 +15,13 @@ import { getPetById } from '../../clients/getPetById'
 export async function getPetByIdHandler({ path }: GetPetByIdOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await getPetById({ path, signal: ctx.mcpReq.signal, throwOnError: true })
 
-  const text = JSON.stringify(res.data, (_key, value) => (typeof value === 'bigint' ? (Number.isSafeInteger(Number(value)) ? Number(value) : String(value)) : value))
   return {
     content: [
       {
         type: 'text',
-        text
+        text: JSON.stringify(res.data)
       }
     ],
-    structuredContent: { data: text === undefined ? undefined : JSON.parse(text) }
+    structuredContent: { data: res.data }
   }
 }

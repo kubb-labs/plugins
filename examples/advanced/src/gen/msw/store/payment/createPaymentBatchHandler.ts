@@ -4,12 +4,9 @@ import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function createPaymentBatchHandlerResponse204(data?: unknown) {
-  return new HttpResponse<string>(
-    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-    {
-      status: 204,
-    },
-  )
+  return new HttpResponse<string>(JSON.stringify(data), {
+    status: 204,
+  })
 }
 
 export function createPaymentBatchHandler(
@@ -27,12 +24,9 @@ export function createPaymentBatchHandler(
     function handler(info) {
       if (typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(
-        JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-        {
-          status: 204,
-        },
-      )
+      return new HttpResponse<string>(JSON.stringify(data), {
+        status: 204,
+      })
     },
   )
 }

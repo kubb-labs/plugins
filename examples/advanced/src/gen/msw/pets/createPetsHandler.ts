@@ -3,12 +3,9 @@ import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function createPetsHandlerResponse201(data?: unknown) {
-  return new HttpResponse<string>(
-    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-    {
-      status: 201,
-    },
-  )
+  return new HttpResponse<string>(JSON.stringify(data), {
+    status: 201,
+  })
 }
 
 export function createPetsHandler(
@@ -46,11 +43,8 @@ export function createPetsHandler(
   >(`${options?.baseURL ?? ''}/pets/:uuid`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(
-      JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-      {
-        status: 201,
-      },
-    )
+    return new HttpResponse<string>(JSON.stringify(data), {
+      status: 201,
+    })
   })
 }
