@@ -579,10 +579,8 @@ function spreadQuerystring(param: ast.ParameterNode): Array<ast.ParameterNode> {
   const schema = param.schema.type === 'ref' ? param.schema.schema : param.schema
   const formEncoded = !param.contentType || param.contentType.split(';')[0]!.trim().toLowerCase() === 'application/x-www-form-urlencoded'
   if (schema?.type !== 'object' || !formEncoded) return [param]
-  // shortcut: `encoding` is on `ParameterNode` from the Kubb release after kubb-labs/kubb#4574; drop the cast once the catalog has it.
-  const { encoding } = param as ast.ParameterNode & { encoding?: Record<string, ast.EncodingNode> }
   return schema.properties.map((property) => {
-    const { style, explode, allowReserved } = encoding?.[property.name] ?? {}
+    const { style, explode, allowReserved } = param.encoding?.[property.name] ?? {}
     return ast.factory.createParameter({
       name: property.name,
       in: 'query',
