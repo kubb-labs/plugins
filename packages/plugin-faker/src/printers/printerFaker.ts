@@ -1,4 +1,3 @@
-import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, toRegExpString } from '@internals/utils'
 import { ast, code, Diagnostics } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
@@ -383,26 +382,26 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const acyclicMembers = (node.members ?? []).filter((member) => !isCyclicMember(member))
         const members = acyclicMembers.length ? acyclicMembers : node.members
 
-        const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) => {
-          // For a discriminated union, narrow each variant to its own branch so nested
-          // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
-          const discriminator = discriminatorPropertyName ? getDiscriminator(member, discriminatorPropertyName) : undefined
+        const items: Array<string> = (members ?? [])
+          .map((member) => {
+            // For a discriminated union, narrow each variant to its own branch so nested
+            // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
+            const discriminator = discriminatorPropertyName ? getDiscriminator(member, discriminatorPropertyName) : undefined
 
-          if (baseTypeName && discriminator) {
-            // An optional discriminator (`strategy?: 'a'`) does not extend `{ strategy: 'a' }`,
-            // so match it as optional too.
-            const key = `${JSON.stringify(discriminatorPropertyName)}${discriminator.required ? '' : '?'}`
-            const typeName = `Extract<NonNullable<${baseTypeName}>, { ${key}: ${parseEnumValue(discriminator.value)} }>`
+            if (baseTypeName && discriminator) {
+              // An optional discriminator (`strategy?: 'a'`) does not extend `{ strategy: 'a' }`,
+              // so match it as optional too.
+              const key = `${JSON.stringify(discriminatorPropertyName)}${discriminator.required ? '' : '?'}`
+              const typeName = `Extract<NonNullable<${baseTypeName}>, { ${key}: ${parseEnumValue(discriminator.value)} }>`
 
-            return printNested(member, { typeName, nestedInObject: true, nestedInUnion: true })
-          }
+              return printNested(member, { typeName, nestedInObject: true, nestedInUnion: true })
+            }
 
-          // Without a discriminator, keep the union type but guard each indexed access (see
-          // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
-          // rather than erroring with TS2339.
-          return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
-        })
-          .map(({ output }) => output)
+            // Without a discriminator, keep the union type but guard each indexed access (see
+            // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
+            // rather than erroring with TS2339.
+            return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
+          })
           .filter((item): item is string => Boolean(item))
 
         return `faker.helpers.arrayElement([${items.join(', ')}])`
@@ -413,14 +412,14 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // an extension or a discriminator sets.
         const memberRank = (member: ast.SchemaNode) => (member.type === 'ref' ? 0 : member.type === 'union' ? 2 : 1)
         const members = objectMembers.length ? objectMembers.toSorted((a, b) => memberRank(a) - memberRank(b)) : node.members
-        const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
-          printNested(member, {
-            nestedInObject: true,
-            // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
-            ...(member.type === 'ref' && ast.ref.name(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
-          }),
-        )
-          .map(({ output }) => output)
+        const items: Array<string> = (members ?? [])
+          .map((member) =>
+            printNested(member, {
+              nestedInObject: true,
+              // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
+              ...(member.type === 'ref' && ast.ref.name(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
+            }),
+          )
           // An `allOf` member with no shape (any/unknown/void → 'undefined') adds no
           // constraint. Keeping it would spread `...undefined` into the merged object.
           .filter((item): item is string => Boolean(item) && item !== 'undefined')
@@ -433,13 +432,13 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // An array of items that would recurse stays empty, which is valid where a list of `undefined` is not.
         if (node.items?.length === 1 && isCyclicRef(node.items[0]!, this.options)) return this.options.typeName ? `[] as ${this.options.typeName}` : '[]'
 
-        const items: Array<string> = mapSchemaItems(node, (member) =>
-          printNested(member, {
-            typeName: this.options.typeName ? itemTypeName(this.options.typeName, this.options.nestedInUnion) : undefined,
-            nestedInObject: true,
-          }),
-        )
-          .map(({ output }) => output)
+        const items: Array<string> = (node.items ?? [])
+          .map((member) =>
+            printNested(member, {
+              typeName: this.options.typeName ? itemTypeName(this.options.typeName, this.options.nestedInUnion) : undefined,
+              nestedInObject: true,
+            }),
+          )
           .filter((item): item is string => Boolean(item))
 
         if (items.length > 1) {

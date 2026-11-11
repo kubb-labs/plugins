@@ -1,4 +1,3 @@
-import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildList } from '@internals/utils'
 import { ast, code } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
@@ -276,9 +275,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       return result
     },
     array(node) {
-      const items = mapSchemaItems(node, (item) => printNullable(item, this.transform(item)))
-        .map(({ output }) => output)
-        .filter(Boolean)
+      const items = (node.items ?? []).map((item) => printNullable(item, this.transform(item))).filter(Boolean)
       const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
       const base = `z.array(${inner})${dialect.lengths({ ...node, regexType: this.options.regexType })}`
       const unique = node.unique ? dialect.unique(base) : base
@@ -287,9 +284,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       return contains ? dialect.refine(unique, contains) : unique
     },
     tuple(node) {
-      const items = mapSchemaItems(node, (item) => printNullable(item, this.transform(item)))
-        .map(({ output }) => output)
-        .filter(Boolean)
+      const items = (node.items ?? []).map((item) => printNullable(item, this.transform(item))).filter(Boolean)
 
       // OpenAPI 3.1 `items` next to `prefixItems` types the elements after the positional ones.
       const rest = node.rest ? this.transform(node.rest) : undefined
@@ -320,8 +315,11 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       // `z.xor` already rejects a value matching several members, and the discriminator already picks one
       // member of a `z.discriminatedUnion`, so their members stay as declared.
       const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !unionsWithSiblings.has(node)
-      const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
-        .map(({ schema, output }) => (output && isStrict && dialect.strictMember ? dialect.strictMember(output, schema, cyclicSchemas) : output))
+      const members = (node.members ?? [])
+        .map((memberNode) => {
+          const output = this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode)
+          return output && isStrict && dialect.strictMember ? dialect.strictMember(output, memberNode, cyclicSchemas) : output
+        })
         .map((output, index) => printNullable(nodeMembers[index]!, output))
         .filter(Boolean)
       if (members.length === 0) return ''

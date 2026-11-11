@@ -39,4 +39,3 @@ export {
   operationKey,
   resolveOperationName,
 } from './resolver.ts'
-export { mapSchemaItems, mapSchemaMembers, mapSchemaProperties } from './schemaTraversal.ts'

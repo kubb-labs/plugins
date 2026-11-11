@@ -1,5 +1,4 @@
 import { createRequire } from 'node:module'
-import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
 import { ast, Diagnostics } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
@@ -295,9 +294,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         return factory.createIntersectionDeclaration({ nodes: factory.buildMemberNodes(node.members, this.transform) })
       },
       array(node) {
-        const itemNodes = mapSchemaItems(node, (item) => printNullable(item, this.transform))
-          .map(({ output }) => output)
-          .filter(isNonNullable)
+        const itemNodes = (node.items ?? []).map((item) => printNullable(item, this.transform)).filter(isNonNullable)
 
         return factory.createArrayDeclaration({ nodes: itemNodes, arrayType: this.options.arrayType })
       },
@@ -324,7 +321,9 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
 
         const addsQuestionToken = options.optionalType === 'questionToken' || options.optionalType === 'questionTokenAndUndefined'
 
-        const propertyNodes: Array<factory.TsNode> = mapSchemaProperties(node, (schema) => transform(schema)).map(({ name, property, output }) => {
+        const propertyNodes: Array<factory.TsNode> = node.properties.map((property) => {
+          const { name } = property
+          const output = transform(property.schema)
           const baseType = output ?? factory.keywordTypeNodes.unknown
           const optional = !property.required || !!property.schema.optional || !!property.schema.nullish
           const type = factory.buildPropertyType(property.schema, baseType, options.optionalType, optional)

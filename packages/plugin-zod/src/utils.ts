@@ -1,5 +1,4 @@
 import { buildObject, toRegExpString } from '@internals/utils'
-import { mapSchemaProperties } from '@internals/shared'
 import { ast, code } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
 
@@ -543,7 +542,7 @@ export function buildObjectShape(
   const isCyclic = (schema: ast.SchemaNode): boolean =>
     ctx.options.cyclicSchemas != null && ast.graph.containsCircular(schema, { circularSchemas: ctx.options.cyclicSchemas })
 
-  const entries = mapSchemaProperties(objectNode, (schema) => {
+  const transformed = objectNode.properties.map(({ schema }) => {
     // A getter defers evaluation, so clear cyclicSchemas to skip z.lazy() on nested refs.
     const hasSelfRef = isCyclic(schema)
     const savedCyclicSchemas = ctx.options.cyclicSchemas
@@ -551,8 +550,10 @@ export function buildObjectShape(
     const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
     if (hasSelfRef) ctx.options.cyclicSchemas = savedCyclicSchemas
     return baseOutput
-  }).map(({ name, property, output: value }) => {
-    const { schema } = property
+  })
+  const entries = objectNode.properties.map((property, index) => {
+    const { name, schema } = property
+    const value = transformed[index]!
     return renderProperty({ name, value, schema, required: property.required, meta: ast.ref.sync(schema), cyclic: isCyclic(schema) })
   })
 
