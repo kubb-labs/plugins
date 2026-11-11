@@ -70,6 +70,8 @@ Cookie parameters go through `serializer.cookie`. Kubb writes `.kubb/serializers
 
 The default path serializer handles the `simple` style. For a spec with a `label` or `matrix` path parameter, Kubb writes `.kubb/serializers/pathStyles.ts` and registers its `serializePath` as `serializer.path`.
 
+The default query serializer handles parameters without a style entry. For a spec with a styled query parameter, Kubb writes `.kubb/serializers/queryStyles.ts` and registers its `serializeQuery` as `serializer.query`. The urlencoded media type uses the same file for a styled form field.
+
 ## Built-in media types
 
 | Keys                                                                                     | Encodes                                           | Decodes                                    |

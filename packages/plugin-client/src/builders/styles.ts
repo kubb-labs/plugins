@@ -36,6 +36,13 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
  * entries, empty when it carries none. Only an operation with a single request content type
  * emits it, because the runtime applies `styles.body` to whichever type the caller selects.
  */
+/**
+ * Whether a query parameter of the operation has a style entry, so the call needs the styled query serializer.
+ */
+export function hasQueryStyles(node: ast.OperationNode): boolean {
+  return ast.isHttpOperationNode(node) && getOperationParameters(node).query.some((parameter) => serializeParameter(parameter) !== null)
+}
+
 function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
   const content = node.requestBody?.content
   return Object.entries(content?.length === 1 ? (content[0]?.encoding ?? {}) : {}).map(([property, { contentType, style, explode, allowReserved }]) => {

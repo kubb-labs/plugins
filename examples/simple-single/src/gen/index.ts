@@ -3,6 +3,7 @@ export * from './.kubb/core'
 export * from './.kubb/mediaTypes'
 export * from './.kubb/mediaTypes/urlencoded'
 export * from './.kubb/serializers'
+export * from './.kubb/serializers/queryStyles'
 export * from './.kubb/standardSchema'
 export type {
   AddPetBody,

@@ -70,7 +70,8 @@ export const client = createLazyClient((config) => createClientCore({ defaultTra
 export const createClient = client.createClient
 
 import { urlencoded } from './mediaTypes/urlencoded.ts'
-client.setConfig({ mediaTypes: { 'application/x-www-form-urlencoded': urlencoded } })
+import { serializeQuery } from './serializers/queryStyles.ts'
+client.setConfig({ mediaTypes: { 'application/x-www-form-urlencoded': urlencoded }, serializer: { query: serializeQuery } })
 /**
  * The security schemes from the spec by name. A generated call sends one of them to the `auth` resolver.
  */
