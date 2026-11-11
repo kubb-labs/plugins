@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../configs/bundler.json",
+  "compilerOptions": {
+    "types": ["@total-typescript/ts-reset"]
+  },
+  "include": ["templates/**/*"],
+  "exclude": ["templates/**/*.test.ts"]
+}

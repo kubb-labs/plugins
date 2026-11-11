@@ -494,7 +494,8 @@ export function isResponseError<TResponses = unknown, TRequest = NativeRequest, 
 }
 
 function headerEntries(headers: object): Array<[string, unknown]> {
-  if (Array.isArray(headers)) return headers
+  // `Array.isArray` narrows an `object` to `any[]`, or to `unknown[]` with ts-reset, so the cast names the tuple type.
+  if (Array.isArray(headers)) return headers as Array<[string, unknown]>
   return headers instanceof Headers ? [...headers] : Object.entries(headers)
 }
 
