@@ -18,12 +18,16 @@ export function getMockHeaders(response: ast.ResponseNode | null | undefined): A
     // OpenAPI ignores a `Content-Type` response header, and the mock already sends one.
     if (header.name.toLowerCase() === 'content-type') return []
     const example = header.examples?.find((entry) => entry.serializedValue !== undefined || entry.value !== undefined)
-    const value = example?.serializedValue ?? example?.value ?? header.schema.default ?? header.schema.examples?.[0]
-    if (value === undefined || value === null) return []
+    const headerValue = example?.serializedValue ?? example?.value ?? header.schema.default ?? header.schema.examples?.[0]
+    if (headerValue === undefined || headerValue === null) return []
     // Headers use the `simple` style, so an array is sent comma-separated.
-    const text = Array.isArray(value) ? value.join(',') : typeof value === 'object' ? Object.entries(value).flat().join(',') : String(value)
+    const headerText = Array.isArray(headerValue)
+      ? headerValue.join(',')
+      : typeof headerValue === 'object'
+        ? Object.entries(headerValue).flat().join(',')
+        : String(headerValue)
     // `Headers` throws on a line break or a character above U+00FF, so such an example is left out.
-    return /^[\t\x20-\x7E\x80-\xFF]*$/.test(text) ? [[header.name, text]] : []
+    return /^[\t\x20-\x7E\x80-\xFF]*$/.test(headerText) ? [[header.name, headerText]] : []
   })
 }
 
@@ -64,8 +68,8 @@ export function hasResponseSchema(response: ast.ResponseNode | null | undefined)
  * content types, JSON is preferred (the faker mock body is JSON), otherwise the first declared type.
  */
 function getResponseContentType(response: ast.ResponseNode | null | undefined): string | null {
-  const value = getResponseEntry(response)?.contentType
-  return typeof value === 'string' && value.length > 0 ? value : null
+  const contentType = getResponseEntry(response)?.contentType
+  return typeof contentType === 'string' && contentType.length > 0 ? contentType : null
 }
 
 function getResponseEntry(response: ast.ResponseNode | null | undefined): ast.ContentNode | undefined {
@@ -147,8 +151,8 @@ export function getExampleBody(response: ast.ResponseNode | null | undefined): s
   // `responseReturn` sends raw text only for a text response. For a binary one the example would go out JSON-encoded.
   // A serialized SSE example is already events, which `responseReturn` sends as is when the body is `undefined`.
   if (!isJson(entry.contentType)) {
-    const text = baseContentType(entry.contentType) !== 'text/event-stream' && getTextContentType(response) === entry.contentType
-    return text ? toLiteral(example.serializedValue) : null
+    const isTextBody = baseContentType(entry.contentType) !== 'text/event-stream' && getTextContentType(response) === entry.contentType
+    return isTextBody ? toLiteral(example.serializedValue) : null
   }
   // `responseReturn` encodes a JSON body itself, so a serialized JSON example is parsed first.
   try {

@@ -231,15 +231,16 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
   const item = entry.stream?.schema ? ast.resolveRef(entry.stream.schema) : undefined
   const events = item && item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : item ? [item] : []
   // A discriminator makes each event an intersection of its `$ref` and the pinned `event`, so every part is read.
-  const property = (event: ast.SchemaNode, propertyName: string) => ast.resolveSchemaProperties({ node: event, propertyName }).map(({ schema }) => schema)
+  const propertySchemas = (event: ast.SchemaNode, propertyName: string) =>
+    ast.resolveSchemaProperties({ node: event, propertyName }).map(({ schema }) => schema)
   const textEvents = events.filter((event) => {
-    const data = property(event, 'data')
-    return data.length > 0 && data.every(isTextSchema)
+    const dataSchemas = propertySchemas(event, 'data')
+    return dataSchemas.length > 0 && dataSchemas.every(isTextSchema)
   })
   if (textEvents.length === events.length) return events.length > 0
 
-  const names = textEvents.map((event) => property(event, 'event').flatMap((schema) => ast.getSchemaLiteralValues(ast.resolveRef(schema))))
-  return names.length > 0 && names.every((values) => values.length > 0) && [...new Set(names.flat().map(String))]
+  const eventNames = textEvents.map((event) => propertySchemas(event, 'event').flatMap((schema) => ast.getSchemaLiteralValues(ast.resolveRef(schema))))
+  return eventNames.length > 0 && eventNames.every((values) => values.length > 0) && [...new Set(eventNames.flat().map(String))]
 }
 
 /**
@@ -802,8 +803,8 @@ const statusClassByRange = new Map([
 ])
 
 export function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
-  const range = statusClassByRange.get(String(statusCode))
-  if (range) return range
+  const rangeClass = statusClassByRange.get(String(statusCode))
+  if (rangeClass) return rangeClass
   const code = getStatusCodeNumber(statusCode)
 
   return code === null ? null : Math.floor(code / 100)
