@@ -18,7 +18,7 @@ import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
-import { shouldCoerce } from '../utils.ts'
+import { containsIdentifier, shouldCoerce } from '../utils.ts'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
@@ -47,17 +47,15 @@ function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boo
   return resolver.memo(`zodPrinter:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
 }
 
-/**
- * The imports of a schema, with the refs inside a string's `contentSchema`. `checks` also returns the refs inside
- * `conditionals` and `contains`. A check the printer leaves out, such as `minContains: 0`, names no schema, so its import is dropped.
- */
+// `checks` also returns the refs inside `conditionals` and `contains`. A check the printer leaves out, such as
+// `minContains: 0`, names no schema, so its import is dropped.
 function resolveImports(resolver: ResolverZod, params: Parameters<ResolverZod['imports']>[0], print: () => string | null | undefined) {
   const imports = resolver.imports(params)
   const withChecks = resolver.imports({ ...params, checks: true })
   if (withChecks.length === imports.length) return imports
   const text = print() ?? ''
 
-  return withChecks.filter((entry) => [entry.name].flat().some((name) => text.includes(String(name))))
+  return withChecks.filter((entry) => [entry.name].flat().some((name) => containsIdentifier(text, String(name))))
 }
 
 /**

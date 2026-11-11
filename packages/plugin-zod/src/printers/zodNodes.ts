@@ -383,9 +383,6 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 
 type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
 
-/**
- * The `refine` arguments that count the items matching `contains`, at least `min` (default 1) and at most `max`.
- */
 function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
   if (min === 0 && max === undefined) return null
   const countBounds = [`count >= ${min}`, max !== undefined && `count <= ${max}`].filter(Boolean).join(' && ')
@@ -395,10 +392,7 @@ function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullabl
   return `(items) => { const count = items.filter((item) => ${itemSchema}.safeParse(item).success).length; return ${countBounds} }, { message: ${stringify(message)} }`
 }
 
-/**
- * A JavaScript condition that is true when `value` matches `schema`. A required `unknown` property means "the key
- * is present", which a Zod object would accept as missing, so those keys are checked with `in`.
- */
+// A required `unknown` property means "the key is present", which a Zod object would accept as missing, so those keys are checked with `in`.
 function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
   if (!schema) return 'true'
   const object = ast.narrowSchema(schema, ast.schemaTypes.object)

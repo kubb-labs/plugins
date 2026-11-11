@@ -71,10 +71,7 @@ const maxInt32 = 2_147_483_647
 // The largest value of a 32-bit format, which faker's default `max` exceeds.
 const maxValueByFormat: Record<string, number> = { int32: maxInt32, uint32: 4_294_967_295 }
 
-/**
- * Whether a ref points back into its own cycle: at the schema being printed, or from one cyclic schema at another. Such a
- * ref is left empty, so a mock of a recursive schema is finite and can be serialized.
- */
+// A ref back into its own cycle is left empty, so a mock of a recursive schema is finite and can be serialized.
 function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: PrinterFakerOptions): boolean {
   if (node.type !== 'ref' || !schemaName) return false
   const refName = ast.resolveRefName(node)
@@ -167,13 +164,8 @@ const stringFormatCalls = new Map<string | undefined, string>([
 // The members an escape becomes inside a character class: `\d` and `\w`, and the punctuation `faker.helpers.fromRegExp` reads there.
 const classEscapes = new Map<string, string>([['d', '0-9'], ['w', 'A-Za-z0-9_'], ...Array.from('-!@#$&()`.+,"', (char): [string, string] => [char, char])])
 
-/**
- * Rewrites a pattern into the grammar `faker.helpers.fromRegExp` reads: `\d` and `\w` become character classes, an escaped
- * literal such as `\+` becomes a one-character class, and an open-ended `{n,}` gets an upper bound of `n + 10`. Faker
- * otherwise prints these as written, such as `\d` for a digit.
- *
- * shortcut: groups, alternation and `\s` stay unsupported, as `regexGenerator: 'randexp'` covers them.
- */
+// `faker.helpers.fromRegExp` prints `\d`, `\w`, escaped literals and an open-ended `{n,}` as written, so they become classes and `{n,n+10}`.
+// shortcut: groups, alternation and `\s` stay unsupported, as `regexGenerator: 'randexp'` covers them.
 function toFakerPattern(pattern: string): string {
   let result = ''
   let inClass = false
@@ -189,8 +181,11 @@ function toFakerPattern(pattern: string): string {
         continue
       }
       const classMembers = classEscapes.get(next)
-      if (classMembers === undefined) result += `\\${next}`
-      if (classMembers !== undefined) result += inClass ? classMembers : `[${classMembers}]`
+      if (classMembers === undefined) {
+        result += `\\${next}`
+        continue
+      }
+      result += inClass ? classMembers : `[${classMembers}]`
       continue
     }
     if (char === '[' && !inClass) {
@@ -262,10 +257,7 @@ function indexedTypeName(typeName: string, propertyName: string, nestedInUnion?:
   return nestedInUnion ? `(NonNullable<${typeName}> & Record<${key}, unknown>)[${key}]` : `NonNullable<${typeName}>[${key}]`
 }
 
-/**
- * Type expression for an array's items. In a union only some branches are arrays, and indexing the others with `number`
- * is a TS2537 error, so a union member reads the items of its array branches.
- */
+// In a union only some branches are arrays, and indexing the others with `number` is a TS2537 error.
 function itemTypeName(typeName: string, nestedInUnion?: boolean): string {
   return nestedInUnion ? `Extract<NonNullable<${typeName}>, ReadonlyArray<unknown>>[number]` : `NonNullable<${typeName}>[number]`
 }

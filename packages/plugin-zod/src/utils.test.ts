@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 import {
   applyMiniModifiers,
   applyModifiers,
+  containsIdentifier,
   defaultLiteral,
   formatDefault,
   isClosedKeySchema,
@@ -448,5 +449,15 @@ describe('isClosedKeySchema', () => {
       schema: ast.factory.createSchema({ type: 'string' }),
     })
     expect(isClosedKeySchema(refToString)).toBe(false)
+  })
+})
+
+describe('containsIdentifier', () => {
+  test('matches a whole identifier only', () => {
+    expect(containsIdentifier('z.array(petSchemaList)', 'petSchema')).toBe(false)
+    expect(containsIdentifier('z.array(petSchemaList).and(petSchema)', 'petSchema')).toBe(true)
+    expect(containsIdentifier('petSchema', 'petSchema')).toBe(true)
+    expect(containsIdentifier('$petSchema', 'petSchema')).toBe(false)
+    expect(containsIdentifier('anything', '')).toBe(false)
   })
 })

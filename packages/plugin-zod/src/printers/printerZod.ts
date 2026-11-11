@@ -3,11 +3,11 @@ import { ast, syncSchemaRef } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyModifiers,
+  bigintConstraints,
   buildObjectShape,
   defaultLiteral,
   hasInputChecks,
   lengthConstraints,
-  bigintConstraints,
   numberConstraints,
   patternKeySchema,
   printWithOmit,
