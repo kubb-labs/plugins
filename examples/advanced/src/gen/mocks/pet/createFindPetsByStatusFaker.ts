@@ -20,7 +20,10 @@ export function createFindPetsByStatusPathFaker<
  * @description successful operation
  */
 export function createFindPetsByStatusStatus200FakerJson(data?: Partial<Array<Pet>>): Array<Pet> {
-  return [...faker.helpers.multiple(() => createPetFaker(), { count: { min: 1, max: 3 } }), ...(data || []).filter((item) => item !== undefined)] as Array<Pet>
+  return [
+    ...faker.helpers.uniqueArray(() => createPetFaker(), faker.number.int({ min: 1, max: 3 })),
+    ...(data || []).filter((item) => item !== undefined),
+  ] as Array<Pet>
 }
 
 /**
@@ -45,7 +48,8 @@ export function createFindPetsByStatusStatus400Faker() {
 }
 
 export function createFindPetsByStatusResponseFaker(data?: Partial<Array<Pet> | string>): Array<Pet> | string {
-  return (data ?? faker.helpers.arrayElement([faker.helpers.multiple(() => createPetFaker(), { count: { min: 1, max: 3 } }), faker.string.alpha()])) as
+  return (data ??
+    faker.helpers.arrayElement([faker.helpers.uniqueArray(() => createPetFaker(), faker.number.int({ min: 1, max: 3 })), faker.string.alpha()])) as
     | Array<Pet>
     | string
 }

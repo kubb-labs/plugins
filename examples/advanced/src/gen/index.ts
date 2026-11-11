@@ -474,7 +474,7 @@ export { createPetsHandler, createPetsHandlerResponse201 } from './msw/pets/crea
 export { createPaymentBatchHandler, createPaymentBatchHandlerResponse204 } from './msw/store/payment/createPaymentBatchHandler'
 export { createPaymentHandler, createPaymentHandlerResponse201 } from './msw/store/payment/createPaymentHandler'
 export { getPaymentByIdHandler, getPaymentByIdHandlerResponse200 } from './msw/store/payment/getPaymentByIdHandler'
-export { listPaymentsHandler } from './msw/store/payment/listPaymentsHandler'
+export { listPaymentsHandler, listPaymentsHandlerResponse2xx, listPaymentsHandlerResponse4xx } from './msw/store/payment/listPaymentsHandler'
 export { streamOrderEventsHandler, streamOrderEventsHandlerResponse200 } from './msw/stream/streamOrderEventsHandler'
 export { streamPetEventsHandler, streamPetEventsHandlerResponse200 } from './msw/stream/streamPetEventsHandler'
 export { addPetRequestSchema } from './zod/addPetRequestSchema'
