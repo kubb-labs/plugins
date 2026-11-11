@@ -1,3 +1,4 @@
+import { jsDocEscape } from '@internals/utils'
 import { ast, type Group, type Memo, type Output, type Resolver, type ResolverFileParams } from '@kubb/kit'
 
 /**
@@ -533,7 +534,7 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
     node.description && `@description ${node.description}`,
     node.summary && `@summary ${node.summary}`,
     node.deprecated && '@deprecated',
-    node.externalDocs && `@see ${[node.externalDocs.url, node.externalDocs.description].filter(Boolean).join(' ')}`,
+    node.externalDocs && `@see ${jsDocEscape([node.externalDocs.url, node.externalDocs.description].filter(Boolean).join(' '))}`,
   ]
 
   const filteredComments = comments.filter((comment): comment is string => Boolean(comment))

@@ -58,7 +58,7 @@ export function buildCallConfig({
 
   const rawData = hasTextEventData(node)
   const callConfig = `{ ${[
-    `method: '${node.method.toUpperCase()}'`,
+    `method: ${singleQuote(node.method.toUpperCase())}`,
     `url: ${singleQuote(node.path)}`,
     baseURL ? `baseURL: ${JSON.stringify(baseURL)}` : null,
     securityLiteral ? `security: ${securityLiteral}` : null,
