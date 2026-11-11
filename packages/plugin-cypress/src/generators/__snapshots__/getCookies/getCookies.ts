@@ -24,22 +24,25 @@ export function getCookies({ headers, cookies }: GetCookiesOptions = {}, options
       throw new TypeError('A cookie has characters the cookie style cannot send, escape it first.')
     return text
   }
-  const explodeCookie = (name: string, value: unknown): Array<string> => {
-    if (Array.isArray(value)) return value.filter((item) => item != null).map((item) => `${name}=${rawCookie(item)}`)
+  const explodeCookie = (name: string, value: unknown, encode: (item: unknown) => string): Array<string> => {
+    if (Array.isArray(value)) return value.filter((item) => item != null).map((item) => `${name}=${encode(item)}`)
     if (typeof value === 'object' && value !== null && !(value instanceof Date))
       return Object.entries(value)
         .filter(([, item]) => item != null)
-        .map(([key, item]) => `${rawCookie(key)}=${rawCookie(item)}`)
-    return [`${name}=${rawCookie(value)}`]
+        .map(([key, item]) => `${encode(key)}=${encode(item)}`)
+    return [`${name}=${encode(value)}`]
   }
+  const formCookie = (item: unknown): string => encodeURIComponent(item instanceof Date ? item.toISOString() : String(item))
   const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>)
     .filter(([, value]) => value != null)
     .flatMap(([name, value]) =>
       ['tags'].includes(name)
-        ? explodeCookie(name, value)
-        : [
-            `${name}=${['sid'].includes(name) ? rawCookie(value) : encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))}`,
-          ],
+        ? explodeCookie(name, value, rawCookie)
+        : ['ids'].includes(name)
+          ? explodeCookie(name, value, formCookie)
+          : [
+              `${name}=${['sid'].includes(name) ? rawCookie(value) : encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))}`,
+            ],
     )
     .join('; ')
   return cy
