@@ -36,18 +36,20 @@ export type Options<TData extends core.DataShape, ThrowOnError extends boolean =
 > & { options?: NativeOptions }
 export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: NativeOptions }
 export type ResolvedRequest = core.ResolvedRequest & { options?: NativeOptions }
-export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestResult<
+export type RequestResult<
   TResponses,
-  ThrowOnError,
-  TRequest,
-  TResponse
->
-export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.UnwrappedResult<
+  ThrowOnError extends boolean = true,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+  THeaders = unknown,
+> = core.RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>
+export type UnwrappedResult<
   TResponses,
-  ThrowOnError,
-  TRequest,
-  TResponse
->
+  ThrowOnError extends boolean = true,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+  THeaders = unknown,
+> = core.UnwrappedResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>
 export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
 export type TransportResult<TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TRequest, TResponse>
 export type DecodedResponse<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.DecodedResponse<TData, TRequest, TResponse>

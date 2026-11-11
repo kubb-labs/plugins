@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { resolveOperationTypes } from '@internals/client'
+import { resolveOperationTypes, resultTypeName } from '@internals/client'
 import { getEventStream, operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
@@ -56,7 +56,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       const clientTypeImports = stream
         ? buildEventStreamImports({ node, types, returnType })
         : { plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType].map(
-            (name) => (name.endsWith('Result') && headerTypeNames.length ? `${name}WithHeaders` : name),
+            (name) => (name.endsWith('Result') ? resultTypeName(name, headerTypeNames.length) : name),
           )
 
       return (

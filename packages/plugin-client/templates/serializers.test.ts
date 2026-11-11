@@ -71,9 +71,13 @@ describe('multipart/mixed response decoding', () => {
   })
 
   test('throws a ParseError for a JSON part that is not JSON', async () => {
-    const response = new Response('--b\r\nContent-Type: application/json\r\n\r\n{bad\r\n--b--\r\n', { headers: { 'Content-Type': 'multipart/mixed; boundary=b' } })
+    const response = new Response('--b\r\nContent-Type: application/json\r\n\r\n{bad\r\n--b--\r\n', {
+      headers: { 'Content-Type': 'multipart/mixed; boundary=b' },
+    })
 
-    await expect(formMediaTypes['multipart/mixed']!.decode!(response, { contentType: 'multipart/mixed', config: {} })).rejects.toMatchObject({ name: 'ParseError' })
+    await expect(formMediaTypes['multipart/mixed']!.decode!(response, { contentType: 'multipart/mixed', config: {} })).rejects.toMatchObject({
+      name: 'ParseError',
+    })
   })
 })
 

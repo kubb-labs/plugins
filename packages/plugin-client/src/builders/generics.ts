@@ -1,5 +1,5 @@
 import type { ast } from '@kubb/kit'
-import { buildResponseHeadersType, type OperationTypeNames } from '@internals/client'
+import { buildResponseHeadersType, buildResultTypeRef, type OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 
 /**
@@ -23,9 +23,7 @@ export function buildRequestResultGenerics({ node, types }: { node: ast.Operatio
  * `buildResultType({ node, types, returnType: 'data' }) // 'Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>'`
  */
 export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ReturnTypeOption }): string {
-  const responses = types.response.responses(node)
-  const headers = buildResponseHeadersType({ node, types })
   const name = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
-  const result = headers ? `${name}WithHeaders<${responses}, ${headers}, ThrowOnError>` : `${name}<${responses}, ThrowOnError>`
+  const result = buildResultTypeRef(name, types.response.responses(node), buildResponseHeadersType({ node, types }), ['ThrowOnError'])
   return returnType === 'full' ? `Unwrappable<${result}>` : `Promise<${result}>`
 }

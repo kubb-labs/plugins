@@ -1,6 +1,6 @@
 import type { MediaType } from '../mediaTypes'
 import type { PartsEncoding } from '../serializers'
-import { isEncodedBody } from '../mediaTypes'
+import { isEncodedBody, parseJson } from '../mediaTypes'
 import { isJsonMediaType, jsonReplacer } from '../serializers'
 
 function isBinaryPart(part: unknown): part is Blob | BufferSource {
@@ -17,6 +17,8 @@ function toMultipartMixed(parts: Array<unknown>, encoding: PartsEncoding | undef
   const boundary = `kubb-${Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, '0')).join('')}`
   const chunks: Array<BlobPart> = []
   parts.forEach((part, index) => {
+    // `JSON.stringify(undefined)` is not JSON. Skipping the part keeps the `prefixEncoding` indexes of the rest.
+    if (part === undefined) return
     // An Encoding `contentType` can list several types, such as `image/png, image/jpeg`. A part sends the first.
     const declared = (encoding?.prefix?.[index] ?? encoding?.item)?.contentType?.split(',')[0]!.trim()
     const binary = isBinaryPart(part)
@@ -37,8 +39,9 @@ async function fromMultipartMixed(response: Response): Promise<Array<unknown>> {
   const sections = (await response.text()).split(delimiter).slice(1, -1)
   return sections.map((section) => {
     const [, head = '', body = ''] = /^([\s\S]*?)\r?\n\r?\n([\s\S]*)$/.exec(section) ?? []
-    const value = body.replace(/\r?\n$/, '')
-    return isJsonMediaType(/^content-type:\s*([^;\r\n]+)/im.exec(head)?.[1]?.trim()) ? JSON.parse(value) : value
+    // The delimiter already took the line break before the next boundary, so the body keeps its own trailing newline.
+    const contentType = /^content-type:\s*([^;\r\n]+)/im.exec(head)?.[1]?.trim()
+    return isJsonMediaType(contentType) ? parseJson(body, contentType) : body
   })
 }
 
