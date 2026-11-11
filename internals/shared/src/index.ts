@@ -21,6 +21,7 @@ export {
   hasEventStreamContent,
   hasStreamVariant,
   hasFormBody,
+  hasTextEventData,
   isEventStream,
   isSuccessStatusCode,
   requestGroupOrder,
@@ -31,6 +32,7 @@ export {
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveSuccessNames,
+  toRequestContent,
   toResponseContent,
 } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'

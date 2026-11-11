@@ -24,11 +24,11 @@ export type Auth = {
 export type SecurityRequirement = Auth | Array<Auth>
 
 function serializeScheme(auth: Auth): string {
-  const parts = [`type: '${auth.type}'`]
-  if (auth.scheme) parts.push(`scheme: '${auth.scheme}'`)
-  if (auth.name) parts.push(`name: '${auth.name}'`)
-  if (auth.in) parts.push(`in: '${auth.in}'`)
-  if (auth.scopes?.length) parts.push(`scopes: [${auth.scopes.map((scope) => `'${scope}'`).join(', ')}]`)
+  const parts = [`type: ${stringify(auth.type)}`]
+  if (auth.scheme) parts.push(`scheme: ${stringify(auth.scheme)}`)
+  if (auth.name) parts.push(`name: ${stringify(auth.name)}`)
+  if (auth.in) parts.push(`in: ${stringify(auth.in)}`)
+  if (auth.scopes?.length) parts.push(`scopes: [${auth.scopes.map((scope) => stringify(scope)).join(', ')}]`)
   if (auth.flows && Object.keys(auth.flows).length) {
     const flows = Object.entries(auth.flows).map(
       ([name, flow]) =>

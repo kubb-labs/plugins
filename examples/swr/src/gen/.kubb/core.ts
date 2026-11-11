@@ -274,6 +274,11 @@ export type EventStreamOptions = {
    * What `validator.response` checks on each event: the payload (`data`) or the whole event (`event`).
    */
   eventShape?: 'event' | 'data'
+  /**
+   * Keeps each Server-Sent Event's `data` as the raw text instead of JSON-parsing it. The generated client sets it when the
+   * document types `data` as a string.
+   */
+  rawData?: boolean
 }
 
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = {

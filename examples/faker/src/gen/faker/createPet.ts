@@ -12,6 +12,15 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
   const defaultFakeData = {
+    ...{
+      id: faker.number.bigInt(),
+      name: faker.string.alpha(),
+      type: faker.helpers.arrayElement(['dog', 'cat'] as Array<NonNullable<Pet>['type']>),
+      category: createCategory(),
+      photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
+      tags: faker.helpers.multiple(() => createTag()),
+      status: faker.helpers.arrayElement(['available', 'pending', 'sold'] as Array<NonNullable<Pet>['status']>),
+    },
     ...faker.helpers.arrayElement([
       {
         ...createDog(),
@@ -26,15 +35,6 @@ export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
         },
       },
     ]),
-    ...{
-      id: faker.number.bigInt(),
-      name: faker.string.alpha(),
-      type: faker.helpers.arrayElement(['dog', 'cat'] as Array<NonNullable<Pet>['type']>),
-      category: createCategory(),
-      photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-      tags: faker.helpers.multiple(() => createTag()),
-      status: faker.helpers.arrayElement(['available', 'pending', 'sold'] as Array<NonNullable<Pet>['status']>),
-    },
   }
   return {
     ...defaultFakeData,

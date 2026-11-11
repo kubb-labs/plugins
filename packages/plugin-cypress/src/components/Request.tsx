@@ -33,14 +33,16 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
 
   // `cy.request` has no cookie option, so the cookie group goes out as a `Cookie` header. An array joins with commas, a Date
   // is ISO 8601, and an object is JSON.
-  // shortcut: ignores per-cookie `explode`, upgrade when a spec needs exploded cookie arrays in Cypress.
+  // shortcut: ignores `explode` on `form` cookies, upgrade when a spec needs exploded form cookie arrays in Cypress.
   const cookieText =
     "value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value)"
   // The OpenAPI 3.2 `cookie` style sends a value as it is, and throws on one it cannot send, like the generated clients do.
-  // An array or object is checked item by item and joined with commas, as the clients do for `explode: false`.
-  const rawCookies = node.parameters
-    .filter((parameter) => parameter.in === 'cookie' && parameter.style === 'cookie')
-    .map((parameter) => singleQuote(parameter.name))
+  // With `explode` (its default) an array sends one cookie per item and an object one cookie per key, otherwise both join with commas.
+  const rawParameters = node.parameters.filter((parameter) => parameter.in === 'cookie' && parameter.style === 'cookie')
+  const rawCookies = rawParameters.map((parameter) => singleQuote(parameter.name))
+  const explodedCookies = rawParameters.filter((parameter) => parameter.explode !== false).map((parameter) => singleQuote(parameter.name))
+  const joinedCookies = rawParameters.filter((parameter) => parameter.explode === false).map((parameter) => singleQuote(parameter.name))
+  // Keep the cookie-octet pattern in step with `rawCookieValue` in plugin-client's `templates/serializers.ts`.
   const rawCookieLine = rawCookies.length
     ? `const rawCookie = (value: unknown): string => {
   if (Array.isArray(value)) return value.filter((item) => item != null).map(rawCookie).join(',')
@@ -48,13 +50,21 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const text = value instanceof Date ? value.toISOString() : String(value)
   if (!/^[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]*$/.test(text)) throw new TypeError('A cookie has characters the cookie style cannot send, escape it first.')
   return text
+}
+const explodeCookie = (name: string, value: unknown): Array<string> => {
+  if (Array.isArray(value)) return value.filter((item) => item != null).map((item) => \`\${name}=\${rawCookie(item)}\`)
+  if (typeof value === 'object' && value !== null && !(value instanceof Date)) return Object.entries(value).filter(([, item]) => item != null).map(([key, item]) => \`\${rawCookie(key)}=\${rawCookie(item)}\`)
+  return [\`\${name}=\${rawCookie(value)}\`]
 }\n`
     : ''
-  const encodeCookie = rawCookies.length
-    ? `([${rawCookies.join(', ')}].includes(name) ? rawCookie(value) : encodeURIComponent(${cookieText}))`
+  const encodeCookie = joinedCookies.length
+    ? `([${joinedCookies.join(', ')}].includes(name) ? rawCookie(value) : encodeURIComponent(${cookieText}))`
     : `encodeURIComponent(${cookieText})`
+  const toCookies = explodedCookies.length
+    ? `.flatMap(([name, value]) => ([${explodedCookies.join(', ')}].includes(name) ? explodeCookie(name, value) : [\`\${name}=\${${encodeCookie}}\`]))`
+    : `.map(([name, value]) => \`\${name}=\${${encodeCookie}}\`)`
   // Built first and sent only when non-empty, so a call without cookies keeps the cookies Cypress attaches itself.
-  const cookieLine = `${rawCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')\n`
+  const cookieLine = `${rawCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null)${toCookies}.join('; ')\n`
 
   // Cypress types a body as a string or an object, so a body that is one number or has no schema type is cast, and an
   // `int64` is sent as a number.

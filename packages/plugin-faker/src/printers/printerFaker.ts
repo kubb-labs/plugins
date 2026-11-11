@@ -83,17 +83,20 @@ function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: Printe
 }
 
 /**
- * `faker.number.float()` or `faker.number.int()`, with `min` and `max` passed only when set, moved inside an exclusive
- * bound, or needed so a lone bound does not contradict faker's default for the other.
+ * `faker.number.float()`, `faker.number.int()` or `faker.number.bigInt()`, with `min` and `max` passed only when set,
+ * moved inside an exclusive bound, or needed so a lone bound does not contradict faker's default for the other.
  */
-function numberCall(kind: 'float' | 'int', { min, max, exclusive }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive'>): string {
-  // An integer bound moves to the next integer. Faker never returns a float's `max`, and its `min` only by chance.
-  if (exclusive?.min !== undefined) min = Math.max(min ?? -Infinity, kind === 'int' ? Math.floor(exclusive.min) + 1 : exclusive.min)
-  if (exclusive?.max !== undefined) max = Math.min(max ?? Infinity, kind === 'int' ? Math.ceil(exclusive.max) - 1 : exclusive.max)
+function numberCall(kind: 'float' | 'int' | 'bigInt', { min, max, exclusive }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive'>): string {
+  const whole = kind !== 'float'
+  // A whole-number bound moves to the next integer. Faker never returns a float's `max`, and its `min` only by chance.
+  // shortcut: a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
+  const lower = exclusive?.min === undefined ? min : Math.max(min ?? -Infinity, whole ? Math.floor(exclusive.min) + 1 : exclusive.min)
+  const upper = exclusive?.max === undefined ? max : Math.min(max ?? Infinity, whole ? Math.ceil(exclusive.max) - 1 : exclusive.max)
   // Faker fills a missing bound with `0` (and `1` for a float's `max`), which a lone bound on the other side of it contradicts.
-  if (kind === 'float' && min !== undefined && max === undefined && min >= 1) max = min + 100
-  if (max !== undefined && min === undefined && (kind === 'float' ? max <= 0 : max < 0)) min = max - 100
-  const args = [min !== undefined && `min: ${min}`, max !== undefined && `max: ${max}`].filter(Boolean).join(', ')
+  const maxValue = kind === 'float' && lower !== undefined && upper === undefined && lower >= 1 ? lower + 100 : upper
+  const minValue = maxValue !== undefined && lower === undefined && (whole ? maxValue < 0 : maxValue <= 0) ? maxValue - 100 : lower
+  const suffix = kind === 'bigInt' ? 'n' : ''
+  const args = [minValue !== undefined && `min: ${minValue}${suffix}`, maxValue !== undefined && `max: ${maxValue}${suffix}`].filter(Boolean).join(', ')
 
   return `faker.number.${kind}(${args ? `{ ${args} }` : ''})`
 }
@@ -234,11 +237,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       number: (node) => numberCall('float', node),
       integer: (node) =>
         numberCall('int', node.format && node.format in formatMax ? { ...node, max: Math.min(node.max ?? Infinity, formatMax[node.format]!) } : node),
-      bigint({ min, max }) {
-        const args = [min !== undefined && `min: ${min}n`, max !== undefined && `max: ${max}n`].filter(Boolean).join(', ')
-
-        return `faker.number.bigInt(${args ? `{ ${args} }` : ''})`
-      },
+      bigint: (node) => numberCall('bigInt', node),
       blob: () => 'new Blob([faker.string.alpha()])',
       datetime(node) {
         const parser = this.options.dateParser ?? 'faker'
@@ -326,7 +325,10 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       intersection(node): string {
         const objectMembers = (node.members ?? []).filter((member) => isObjectSchema(member))
-        const members = objectMembers.length ? objectMembers : node.members
+        // A union spreads after the plain objects, so a sibling base object cannot overwrite its discriminator.
+        const members = objectMembers.length
+          ? [...objectMembers.filter((member) => member.type !== 'union'), ...objectMembers.filter((member) => member.type === 'union')]
+          : node.members
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
           printNested(member, {
             nestedInObject: true,
@@ -361,6 +363,12 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const { min, max } = node
         const item = items[0]
         // Like a string, a list stays within 100 items of its minimum, however large `maxItems` is.
+        if (node.unique) {
+          // `uniqueArray` takes a fixed length and compares like the zod `Set` check. It returns fewer items when the generator runs out of values.
+          const count = max !== undefined ? `faker.number.int({ min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} })` : (min ?? 3)
+
+          return `faker.helpers.uniqueArray(() => (${item}), ${count})`
+        }
         if (max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} }})`
         if (min !== undefined) return `faker.helpers.multiple(() => (${item}), { count: ${min} })`
 
@@ -389,7 +397,17 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
                 .filter((key): key is string => typeof key === 'string' && !node.properties.some((property) => property.name === key))
                 .map((name) => ast.factory.createProperty({ name, schema: valueSchema }))
             : []
-        const entries = [...node.properties, ...recordProperties].map((property): string => {
+        const properties = [...node.properties, ...recordProperties]
+        // `maxProperties` keeps the required properties first.
+        const kept = node.max === undefined ? properties : properties.toSorted((a, b) => Number(b.required) - Number(a.required)).slice(0, node.max)
+        // `minProperties` adds keys from `additionalProperties`, skipping any name a declared property uses.
+        const names = new Set(properties.map((property) => property.name))
+        const extras: typeof kept = []
+        for (let index = 1; typeof valueSchema === 'object' && kept.length + extras.length < (node.min ?? 0); index++) {
+          const name = `additionalProperty${index}`
+          if (!names.has(name)) extras.push(ast.factory.createProperty({ name, schema: valueSchema }))
+        }
+        const entries = [...kept, ...extras].map((property): string => {
           const value: string =
             printNested(property.schema, {
               typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,

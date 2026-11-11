@@ -1,10 +1,11 @@
-import { toResponseContent } from '@internals/shared'
+import { getStatusClass, toResponseContent } from '@internals/shared'
 import { jsStringEscape, objectKey, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
-/** The status a mock responds with. A range such as `2xx` mocks the first code of its class, `200`. */
+/** The status a mock responds with. A range such as `2xx` mocks the first code of its class, `200`, and `default` mocks `200`. */
 export function getMockStatus(statusCode: ast.StatusCode): number {
-  return /^[1-5]xx$/.test(statusCode) ? Number(statusCode[0]) * 100 : Number(statusCode)
+  const code = Number(statusCode)
+  return Number.isNaN(code) ? (getStatusClass(statusCode) ?? 2) * 100 : code
 }
 
 /** The declared headers a mock sends, each with its example's `serializedValue` or `value`, else its schema's `default` or first example. */
@@ -95,9 +96,24 @@ export function responseReturn(body: string, status: number, response: ast.Respo
   const name = /^\w+$/.test(body) ? body : 'body'
   const prelude = name === body ? '' : `const body = ${body}\n    `
 
-  // shortcut: one `data:` frame with the JSON payload, upgrade when a mock needs several events or the `event` and `id` fields.
+  // shortcut: one event per mock, upgrade when a mock needs to send several events.
   if (contentType?.split(';')[0]!.trim().toLowerCase() === 'text/event-stream') {
-    return `${prelude}return ${responseLiteral(`${name} === undefined ? '' : \`data: \${${toJson(name)}}\\n\\n\``, status, contentType, headers)}`
+    const entry = getResponseEntry(response)
+    // Without a body, a spec example already serialized as SSE text goes out as it is.
+    const serialized = entry?.examples?.find((example) => example.serializedValue !== undefined)?.serializedValue
+    const fallback = serialized === undefined ? "''" : toLiteral(serialized)
+    if (entry?.stream?.shape !== 'event') {
+      return `${prelude}return ${responseLiteral(`${name} === undefined ? ${fallback} : \`data: \${${toJson(name)}}\\n\\n\``, status, contentType, headers)}`
+    }
+    // The item is the whole event, so its fields become SSE lines and the client parses it back to the same object.
+    return `${prelude}const event = ${name} as { event?: unknown; id?: unknown; retry?: unknown; data?: unknown } | undefined
+    const payload = typeof event?.data === 'string' ? event.data : event?.data === undefined ? undefined : ${toJson('event.data')}
+    const lines = [
+      ...(['event', 'id', 'retry'] as const).filter((field) => event?.[field] !== undefined).map((field) => \`\${field}: \${event?.[field]}\`),
+      ...(payload?.split('\\n').map((line) => \`data: \${line}\`) ?? []),
+    ]
+
+    return ${responseLiteral(`event === undefined ? ${fallback} : \`\${lines.join('\\n')}\\n\\n\``, status, contentType, headers)}`
   }
 
   const textContentType = hasResponseSchema(response) ? getTextContentType(response) : null

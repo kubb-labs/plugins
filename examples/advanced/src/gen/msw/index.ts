@@ -19,6 +19,6 @@ export { createPetsHandler, createPetsHandlerResponse201 } from './pets/createPe
 export { createPaymentBatchHandler, createPaymentBatchHandlerResponse204 } from './store/payment/createPaymentBatchHandler'
 export { createPaymentHandler, createPaymentHandlerResponse201 } from './store/payment/createPaymentHandler'
 export { getPaymentByIdHandler, getPaymentByIdHandlerResponse200 } from './store/payment/getPaymentByIdHandler'
-export { listPaymentsHandler } from './store/payment/listPaymentsHandler'
+export { listPaymentsHandler, listPaymentsHandlerResponse2xx, listPaymentsHandlerResponse4xx } from './store/payment/listPaymentsHandler'
 export { streamOrderEventsHandler, streamOrderEventsHandlerResponse200 } from './stream/streamOrderEventsHandler'
 export { streamPetEventsHandler, streamPetEventsHandlerResponse200 } from './stream/streamPetEventsHandler'

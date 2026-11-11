@@ -140,6 +140,44 @@ describe('printerFaker', () => {
     expect(print(ast.factory.createSchema({ type: 'number', exclusive: { min: 0, max: 1 } }))).toBe('faker.number.float({ min: 0, max: 1 })')
   })
 
+  test('spreads a discriminated union after its sibling base object', () => {
+    const dog = ast.factory.createSchema({ type: 'ref', name: 'Dog', ref: '#/components/schemas/Dog' })
+    const base = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'type', schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+    const node = ast.factory.createSchema({ type: 'intersection', members: [ast.factory.createSchema({ type: 'union', members: [dog] }), base] })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('{...{\n  type: faker.string.alpha(),\n}, ...faker.helpers.arrayElement([createDog()])}')
+  })
+
+  test('mocks unique array items within the count limits', () => {
+    const node = ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })], unique: true, min: 1, max: 5 })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe(
+      'faker.helpers.uniqueArray(() => (faker.string.alpha()), faker.number.int({ min: 1, max: 5 }))',
+    )
+  })
+
+  test('keeps an object within its property counts', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+    const string = ast.factory.createSchema({ type: 'string' })
+    const property = (name: string, required = false) => ast.factory.createProperty({ name, required, schema: string })
+
+    expect(print(ast.factory.createSchema({ type: 'object', min: 2, properties: [property('additionalProperty1')], additionalProperties: string }))).toBe(
+      '{\n  additionalProperty1: faker.string.alpha(),\n  additionalProperty2: faker.string.alpha(),\n}',
+    )
+    expect(print(ast.factory.createSchema({ type: 'object', max: 1, properties: [property('a'), property('b', true), property('c')] }))).toBe(
+      '{\n  b: faker.string.alpha(),\n}',
+    )
+  })
+
+  test('keeps a bigint inside exclusive bounds', () => {
+    const node = ast.factory.createSchema({ type: 'bigint', exclusive: { min: 0 } })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('faker.number.bigInt({ min: 1n })')
+  })
+
   test("fills the other bound when faker's default would contradict a lone one", () => {
     const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
 

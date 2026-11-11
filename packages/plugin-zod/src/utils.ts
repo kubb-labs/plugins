@@ -222,12 +222,7 @@ export function buildLiteral(value: unknown): string {
 /**
  * Numeric constraint limits for Zod schemas (min, max, and exclusive bounds).
  */
-export type NumericConstraints = {
-  min?: number
-  max?: number
-  exclusive?: { min?: number; max?: number }
-  multipleOf?: number
-}
+export type NumericConstraints = Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive' | 'multipleOf'>
 
 /**
  * Length constraint limits for string and array schemas (min, max, and regex pattern).

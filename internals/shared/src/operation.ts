@@ -206,6 +206,31 @@ export function isEventStream(node: ast.OperationNode): boolean {
   return getEventStream(node) !== null
 }
 
+// A stream without a schema is a `blob` with a string primitive, so it keeps the JSON-parse default.
+function isTextSchema(schema: ast.SchemaNode | null | undefined): boolean {
+  if (!schema) return false
+  const resolved = ast.resolveRef(schema)
+  return resolved.type !== 'blob' && resolved.primitive === 'string'
+}
+
+/**
+ * Whether an operation streams Server-Sent Events whose `data` the document types as a string, so the client keeps each
+ * `data` as text instead of JSON-parsing it. With an event-shaped `itemSchema`, every event must type `data` as a string.
+ */
+export function hasTextEventData(node: ast.OperationNode): boolean {
+  const shape = getEventStream(node)
+  const entry = getPrimarySuccessResponse(node)?.content?.[0]
+  if (!entry || (shape !== 'data' && shape !== 'event')) return false
+  if (shape === 'data') return isTextSchema(entry.stream?.schema ?? entry.schema)
+
+  const item = entry.stream?.schema ? ast.resolveRef(entry.stream.schema) : undefined
+  const events = item && item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : item ? [item] : []
+  return (
+    events.length > 0 &&
+    events.every((event) => isTextSchema(ast.narrowSchema(ast.resolveRef(event), 'object')?.properties.find((property) => property.name === 'data')?.schema))
+  )
+}
+
 /**
  * Whether the primary success response offers `text/event-stream`, alone or next to other content types. The client asks
  * for the stream by default and ships the `sse.ts` runtime, so a mixed response can be read as events too.
@@ -326,6 +351,18 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
   const isText = responseType === 'text' || (!responseType && isPlainMediaType && !isVendorJson)
 
   return isText ? { ...entry, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null } : entry
+}
+
+/**
+ * Returns the request entry with the schema of the body the client sends. A `multipart/*` body the adapter marks as a
+ * `stream`, such as `multipart/mixed` with an OpenAPI 3.2 `itemSchema`, is an array of parts, so the item becomes an array.
+ */
+export function toRequestContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T): T {
+  const item = entry.stream?.schema
+  if (!item || !baseContentType(entry.contentType).startsWith('multipart/')) return entry
+  const { optional, ...itemSchema } = item
+  // shortcut: `keysToOmit` applies to the top-level type only, so a part keeps its readOnly keys; move it onto the item when the printers can.
+  return { ...entry, schema: ast.factory.createSchema({ type: 'array', items: [itemSchema], optional }), keysToOmit: null }
 }
 
 /**
@@ -650,9 +687,15 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
  * The schema a status occupies in the `<Name>Responses` record. A status that documents several
  * content types becomes a `{ contentType; data }` union so the runtime can surface the negotiated type
  * on `result.parsed`, while the standalone `<Name>StatusNNN` alias stays the plain body union that the
- * query hooks and `result.data` use.
+ * query hooks and `result.data` use. With `streamData`, the stream variant of a 2xx status holds that schema, since the
+ * client returns its body unread.
  */
-function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResponseStatusNameResolver): ast.SchemaNode {
+function buildResponseRecordEntry(
+  node: ast.OperationNode,
+  res: ast.ResponseNode,
+  resolver: ResponseStatusNameResolver,
+  streamData: ast.SchemaNode | undefined,
+): ast.SchemaNode {
   const statusName = resolver.response.status(node, res.statusCode)
   const variants = (res.content ?? []).filter((entry) => entry.schema)
   if (variants.length <= 1) {
@@ -675,7 +718,10 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
           ast.factory.createProperty({
             name: 'data',
             required: true,
-            schema: ast.factory.createSchema({ type: 'ref', name: variant.name }),
+            schema:
+              streamData && isSuccessStatusCode(res.statusCode) && streamContentType.test(baseContentType(variant.contentType))
+                ? streamData
+                : ast.factory.createSchema({ type: 'ref', name: variant.name }),
           }),
         ],
       }),
@@ -691,8 +737,14 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
  * Always emits the keyed record, even when an operation declares no responses. An operation with no
  * responses renders as an empty object, which keeps every consumer's import (for example the axios
  * SDK's `RequestResult<XResponses>`) resolvable instead of pointing at a missing export.
+ *
+ * `streamData` is the type of a stream variant's `data`, such as a `ReadableStream<Uint8Array>` reference.
  */
-export function buildResponses(node: ast.OperationNode, resolver: ResponseStatusNameResolver): ast.SchemaNode {
+export function buildResponses(
+  node: ast.OperationNode,
+  resolver: ResponseStatusNameResolver,
+  { streamData }: { streamData?: ast.SchemaNode } = {},
+): ast.SchemaNode {
   return ast.factory.createSchema({
     type: 'object',
     primitive: 'object',
@@ -700,7 +752,7 @@ export function buildResponses(node: ast.OperationNode, resolver: ResponseStatus
       ast.factory.createProperty({
         name: String(res.statusCode),
         required: true,
-        schema: buildResponseRecordEntry(node, res, resolver),
+        schema: buildResponseRecordEntry(node, res, resolver, streamData),
       }),
     ),
   })

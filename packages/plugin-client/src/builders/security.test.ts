@@ -97,4 +97,9 @@ describe('getOperationSecurity', () => {
       "[{ type: 'oauth2', flows: { implicit: { authorizationUrl: 'https://a.example.com' }, 'x-vendor': { tokenUrl: 'https://t.example.com' } } }]",
     )
   })
+
+  test('escapes quotes in names and scopes', () => {
+    const security = [{ type: 'apiKey' as const, name: "X-It's-Key", in: 'header' as const, scopes: ["it's"] }]
+    expect(buildSecurityMetadata({ security })).toBe("[{ type: 'apiKey', name: 'X-It\\'s-Key', in: 'header', scopes: ['it\\'s'] }]")
+  })
 })

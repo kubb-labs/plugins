@@ -8,6 +8,7 @@ import {
   isSuccessStatusCode,
   resolveContentTypeVariants,
   resolveOperationFile,
+  toRequestContent,
   toResponseContent,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -305,7 +306,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
         ? buildResponseUnion({ responses: errorResponsesWithSchema, name: resolver.response.error(node), fallbackUnknown: false })
         : null
 
-    const requestBodyContent = node.requestBody?.content ?? []
+    const requestBodyContent = (node.requestBody?.content ?? []).map(toRequestContent)
     const requestSchema = (() => {
       if (requestBodyContent.length === 0) return null
       if (requestBodyContent.length === 1) {

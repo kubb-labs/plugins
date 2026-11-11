@@ -761,6 +761,29 @@ describe('printerZod', () => {
   })
 
   describe('intersection', () => {
+    test('keeps the discriminator literal of a oneOf base over a sibling string property', () => {
+      const typeProperty = (schema: ast.SchemaNode) => ast.factory.createProperty({ name: 'type', required: true, schema })
+      const dog = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [
+          typeProperty(ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] })),
+          ast.factory.createProperty({ name: 'bark', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+      })
+      const node = ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'type', members: [dog] }),
+          ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [typeProperty(ast.factory.createSchema({ type: 'string' }))] }),
+        ],
+      })
+      const schema = new Function('z', `return ${printer.print(node)}`)(z) as z.ZodType
+
+      expect(schema.safeParse({ type: 'dog' }).success).toBe(true)
+      expect(schema.safeParse({ type: 'cat' }).success).toBe(false)
+    })
+
     test('ref with string min and max constraints', () => {
       const node = ast.factory.createSchema({
         type: 'intersection',
@@ -897,16 +920,23 @@ describe('printerZod', () => {
         expect(xorPrinter.print(node)).toBe('z.xor([EmailContact, PhoneContact])')
       })
 
-      test('keeps z.discriminatedUnion with strict members for a discriminated oneOf', () => {
-        const node = ast.factory.createSchema({
-          type: 'union',
-          strategy: 'one',
-          discriminatorPropertyName: 'email',
-          members: [contactBy('email'), contactBy('phone')],
-        })
-        const code = xorPrinter.print(node)
+      test.each([
+        ['union', printer],
+        ['xor', xorPrinter],
+      ])('keeps z.discriminatedUnion with open members for a discriminated oneOf (%s)', (_, p) => {
+        const event = (name: string) =>
+          ast.factory.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) })],
+          })
+        const node = ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'event', members: [event('ping'), event('done')] })
+        const code = p.print(node)
 
-        expect(code).toMatch(/^z\.discriminatedUnion\('email', \[\s+z\.strictObject\(/)
+        expect(code).toMatch(/^z\.discriminatedUnion\('event', \[\s+z\.object\(/)
+        // An SSE line such as `id: 1` is an extra key the spec allows.
+        expect(load(code).safeParse({ event: 'ping', id: '1' }).success).toBe(true)
+        expect(load(code).safeParse({ event: 'other' }).success).toBe(false)
       })
 
       test('keeps z.union for anyOf', () => {

@@ -141,7 +141,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   return [...comments, typeTag].filter(Boolean)
 }
 
-/** The example values. With `serialized`, each `serializedValue` follows as a `<caption>Serialized</caption>` line, a captioned `@example`. */
+/** The example values. With `serialized`, each `serializedValue` is added as a `<caption>Serialized</caption>` example. */
 export function getExampleValues(examples: Array<ast.ExampleNode> | undefined, serialized = false): Array<unknown> | undefined {
   const values = (examples ?? []).flatMap((example) => [
     ...(example.value !== undefined ? [example.value] : []),
@@ -174,9 +174,8 @@ type BuildOperationSchemaOptions = {
 }
 
 /**
- * Builds the object schema for a group of parameters sharing one `in` location (path, query, or
- * header), embedding each param's own schema (and JSDoc) directly rather than referencing a
- * separate per-param type — the group itself is the only type these params get exported as.
+ * Builds the object schema for one parameter group or a response's headers. Each entry embeds its own schema and JSDoc,
+ * so the group is the only type these entries are exported as.
  */
 export function buildParams({ params, serializedExamples }: BuildParamsSchemaOptions): ast.SchemaNode {
   return ast.factory.createSchema({

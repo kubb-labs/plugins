@@ -363,6 +363,39 @@ describe('mswGenerator body encoding', () => {
     expect(await getBody(operation('streamPet', 'text/event-stream'), { id: 1 })).toBe('data: {"id":1}\n\n')
     expect(await getBody(operation('streamNoPet', 'text/event-stream'), undefined)).toBe('')
   })
+
+  const eventOperation = (operationId: string, examples?: Array<ast.ExampleNode>) =>
+    ast.factory.createOperation({
+      operationId,
+      method: 'GET',
+      path: `/${operationId}`,
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({
+              contentType: 'text/event-stream',
+              schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+              stream: { shape: 'event' },
+              examples,
+            }),
+          ],
+        }),
+      ],
+    })
+
+  test('writes an event-shaped item as its event, id, retry, and data lines', async () => {
+    const node = eventOperation('streamEvent')
+
+    expect(await getBody(node, { event: 'ping', id: '7', retry: 1000, data: { id: 1 } })).toBe('event: ping\nid: 7\nretry: 1000\ndata: {"id":1}\n\n')
+    expect(await getBody(eventOperation('streamTextEvent'), { event: 'ping', data: 'a\nb' })).toBe('event: ping\ndata: a\ndata: b\n\n')
+  })
+
+  test('sends a serialized SSE example as it is when there is no body', async () => {
+    const node = eventOperation('streamExample', [{ serializedValue: 'event: ping\ndata: hi\n\n' }])
+
+    expect(await getBody(node, undefined)).toBe('event: ping\ndata: hi\n\n')
+  })
 })
 
 describe('mswGenerator text response', () => {
@@ -402,5 +435,24 @@ describe('mswGenerator text response', () => {
 
     expect(response?.headers.get('Content-Type')).toBe('application/json')
     expect(await response?.json()).toEqual({ id: 1 })
+  })
+})
+
+describe('mswGenerator ranged statuses', () => {
+  // A range such as `4xx` gets its own helper, which answers with the first code of its class.
+  test('generates a helper per range that responds with its first code', async () => {
+    const node = ast.factory.createOperation({
+      operationId: 'getRanged',
+      method: 'GET',
+      path: '/ranged',
+      responses: (['2xx', '4xx'] as const).map((statusCode) =>
+        ast.factory.createResponse({ statusCode, schema: ast.factory.createSchema({ type: 'object', properties: [] }) }),
+      ),
+    })
+    const files = await renderOperation({ name: 'getRanged', node, options: {} })
+    const handlers = await importGenerated(rawSources(files)[0]!)
+
+    expect(handlers.getRangedHandlerResponse4xx({ id: 1 }).status).toBe(400)
+    expect(handlers.getRangedHandlerResponse2xx({ id: 1 }).status).toBe(200)
   })
 })

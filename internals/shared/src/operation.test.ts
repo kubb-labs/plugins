@@ -13,6 +13,7 @@ import {
   getRequestGroupOptionality,
   hasEventStreamContent,
   hasStreamVariant,
+  hasTextEventData,
   isErrorStatusCode,
   isEventStream,
   isSuccessStatusCode,
@@ -22,6 +23,7 @@ import {
   resolveResponseTypes,
   resolveStatusCodeNames,
   resolveSuccessNames,
+  toRequestContent,
   toResponseContent,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
@@ -508,6 +510,24 @@ describe('toResponseContent', () => {
   })
 })
 
+describe('toRequestContent', () => {
+  const part = ast.factory.createSchema({ type: 'object', optional: true, properties: [] })
+
+  test('sends a multipart stream of parts as an array of its item', () => {
+    const entry = toRequestContent(ast.factory.createContent({ contentType: 'multipart/mixed', schema: part, stream: { schema: part } }))
+
+    expect(entry.schema).toMatchObject({ type: 'array', optional: true, items: [{ type: 'object' }] })
+    expect(ast.narrowSchema(entry.schema!, 'array')?.items?.[0]?.optional).toBeUndefined()
+  })
+
+  test.each([
+    ast.factory.createContent({ contentType: 'multipart/mixed', schema: part }),
+    ast.factory.createContent({ contentType: 'application/jsonl', schema: part, stream: { schema: part } }),
+  ])('keeps $contentType without a multipart stream as is', (content) => {
+    expect(toRequestContent(content)).toBe(content)
+  })
+})
+
 describe('isEventStream', () => {
   function nodeWithResponseContentType(mediaType: string): ast.OperationNode {
     return ast.factory.createOperation({
@@ -617,6 +637,32 @@ describe('isEventStream', () => {
 
     expect(getEventStream(textItem)).toBe('data')
     expect(getEventStream(typedEvents)).toBe('event')
+  })
+
+  test('keeps event data as text only when every event types it as a string', () => {
+    const sse = (schema: ast.SchemaNode | undefined, stream: ast.ContentNode['stream'] = {}) =>
+      ast.factory.createOperation({
+        operationId: 'streamEvents',
+        method: 'GET',
+        path: '/events',
+        responses: [
+          ast.factory.createResponse({ statusCode: '200', content: [ast.factory.createContent({ contentType: 'text/event-stream', schema, stream })] }),
+        ],
+      })
+    const string = ast.factory.createSchema({ type: 'string' })
+    const event = (data: ast.SchemaNode) =>
+      ast.factory.createSchema({ type: 'object', properties: [ast.factory.createProperty({ name: 'data', schema: data })] })
+    const events = (...members: Array<ast.SchemaNode>) => ast.factory.createSchema({ type: 'union', members: members.map(event) })
+
+    expect(hasTextEventData(sse(string))).toBe(true)
+    expect(hasTextEventData(sse(string, { schema: string, shape: 'data' }))).toBe(true)
+    expect(hasTextEventData(sse(event(string), { schema: event(string), shape: 'event' }))).toBe(true)
+    expect(hasTextEventData(sse(undefined, { schema: events(string, string), shape: 'event' }))).toBe(true)
+    // A schema-less stream reads as a blob and keeps the JSON-parse default.
+    expect(hasTextEventData(sse(ast.factory.createSchema({ type: 'blob', primitive: 'string' })))).toBe(false)
+    expect(hasTextEventData(sse(ast.factory.createSchema({ type: 'object' })))).toBe(false)
+    expect(hasTextEventData(sse(undefined, { schema: events(string, ast.factory.createSchema({ type: 'object' })), shape: 'event' }))).toBe(false)
+    expect(hasTextEventData(nodeWithResponseContentType('application/json'))).toBe(false)
   })
 
   test.each([

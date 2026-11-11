@@ -21,6 +21,20 @@ type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: 
 type ErrorBody = NonNullable<unknown>
 
 /**
+ * One security scheme of an operation. A nested array in `security` lists schemes that are all needed together.
+ */
+export type Auth = {
+  type: string
+  scheme?: string
+  name?: string
+  in?: string
+  scopes?: Array<string>
+  flows?: Record<string, Record<string, string>>
+  metadataUrl?: string
+  url?: string
+}
+
+/**
  * The request a generated operation hands to `client`.
  */
 export type RequestConfig = {
@@ -53,16 +67,7 @@ export type RequestConfig = {
   /**
    * The security schemes of the operation. Generated for reference. This skeleton ignores them, use them to add auth.
    */
-  security?: Array<{
-    type: string
-    scheme?: string
-    name?: string
-    in?: string
-    scopes?: Array<string>
-    flows?: Record<string, Record<string, string>>
-    metadataUrl?: string
-    url?: string
-  }>
+  security?: Array<Auth | Array<Auth>>
   client?: typeof client
 }
 

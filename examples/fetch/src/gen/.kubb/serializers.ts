@@ -155,7 +155,7 @@ function serializeCookie({ name, value, explode, raw }: { name: string; value: u
   if (isRecord(value)) {
     const entries = Object.entries(value).filter(([, item]) => notNullish(item))
     // An exploded key becomes a cookie name, so the cookie style checks it like a value.
-    if (explode) return entries.map(([key, item]) => `${raw ? rawCookieValue(name, key) : key}=${encode(item)}`).join('; ')
+    if (explode) return entries.map(([key, item]) => `${raw ? rawCookieValue(name, key) : encodeURIComponent(key)}=${encode(item)}`).join('; ')
     return `${name}=${entries
       .flatMap(([key, item]) => [key, item])
       .map(encode)

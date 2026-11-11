@@ -5,6 +5,7 @@ import {
   getOperationParameters,
   resolveContentTypeVariants,
   resolveOperationFile,
+  toRequestContent,
   toResponseContent,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -186,7 +187,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         renderSchemaType({ schema: buildParams({ params, serializedExamples: true }), name: resolveName.call(resolver.param, node, params[0]!) }),
     )
 
-    const requestBodyContent = node.requestBody?.content ?? []
+    const requestBodyContent = (node.requestBody?.content ?? []).map(toRequestContent)
 
     function buildRequestType() {
       if (requestBodyContent.length === 0) return null
@@ -242,7 +243,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     const responsesType = renderSchemaType({
-      schema: buildResponses(node, resolver),
+      // A stream variant next to another content type comes back as the unread body, as the client's `SuccessVariant` types it.
+      schema: buildResponses(node, resolver, { streamData: ast.factory.createSchema({ type: 'ref', name: 'ReadableStream<Uint8Array>' }) }),
       name: resolver.response.responses(node),
     })
 

@@ -289,8 +289,9 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemas)) &&
         !nodeMembers.some((m) => hasCoercedDiscriminator({ member: m, propertyName: discriminatorPropertyName, options: this.options }))
       const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
-      // `z.xor` already rejects a value matching several members, so its members stay as declared.
-      const isStrict = node.strategy === 'one' && !isXor && !unionsWithSiblings.has(node)
+      // `z.xor` already rejects a value matching several members, and the discriminator already picks one
+      // member of a `z.discriminatedUnion`, so their members stay as declared.
+      const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !unionsWithSiblings.has(node)
       const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && isStrict && dialect.strictMember ? dialect.strictMember(output, schema, cyclicSchemas) : output))
         .filter(Boolean)
@@ -326,9 +327,19 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       // An object `allOf` is a merge, not a runtime intersection: extending keeps it a Zod object
       // (usable in z.discriminatedUnion) instead of a non-discriminable intersection.
       if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemas)) {
+        // A discriminated `oneOf` base already pins its discriminator to a literal; a sibling
+        // `type: string` extended after it would widen that literal back to any string.
+        const discriminator = ast.narrowSchema(first, ast.schemaTypes.union)?.discriminatorPropertyName
         return preserveRequiredProperties(members)
           .slice(1)
-          .reduce((acc, member) => dialect.extend(acc, dialect.objectShape(this, member)), firstBase)
+          .reduce((acc, member) => {
+            const object = ast.narrowSchema(member, ast.schemaTypes.object)
+            if (!discriminator || !object?.properties.some((property) => property.name === discriminator)) {
+              return dialect.extend(acc, dialect.objectShape(this, member))
+            }
+            const properties = object.properties.filter((property) => property.name !== discriminator)
+            return properties.length ? dialect.extend(acc, dialect.objectShape(this, { ...object, properties })) : acc
+          }, firstBase)
       }
 
       return rest.reduce((acc, member) => {

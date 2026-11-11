@@ -38,9 +38,9 @@ type Props = {
     zod: {
       pathParams: Array<ZodParam>
       /**
-       * Query params — individual schemas to compose into `z.object({ ... })`.
+       * Query params — individual schemas to compose into `z.object({ ... })`, or the name of the grouped query schema.
        */
-      queryParams?: Array<ZodParam> | null
+      queryParams?: Array<ZodParam> | string | null
       /**
        * Header params — individual schemas to compose into `z.object({ ... })`.
        */
@@ -67,7 +67,7 @@ export function Server({ serverName, serverVersion, operations }: Props): KubbRe
       }
 
       if (zod.queryParams) {
-        entries.push({ key: 'query', value: zodObject(zod.queryParams) })
+        entries.push({ key: 'query', value: typeof zod.queryParams === 'string' ? zod.queryParams : zodObject(zod.queryParams) })
       }
 
       if (zod.headerParams) {
