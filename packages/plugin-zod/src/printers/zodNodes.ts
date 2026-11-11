@@ -99,10 +99,7 @@ function hasCoercedDiscriminator({ member, propertyName, options }: { member: as
   })
 }
 
-/**
- * Whether a union member declares the discriminator property without literal values, which `z.discriminatedUnion` rejects.
- * A member outside the `mapping`, such as an OpenAPI 3.2 `defaultMapping`, declares a plain type.
- */
+// `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
 function hasPlainDiscriminator({ member, propertyName }: { member: ast.SchemaNode; propertyName: string }): boolean {
   const schemas = ast.resolveSchemaProperties({ node: member, propertyName })
   return schemas.length > 0 && !schemas.some(({ schema }) => ast.getSchemaLiteralValues(syncSchemaRef(schema)).length > 0)
@@ -305,7 +302,6 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !unionsWithSiblings.has(node)
       const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && isStrict && dialect.strictMember ? dialect.strictMember(output, schema, cyclicSchemas) : output))
-        // `z.discriminatedUnion` takes objects only.
         .map((output, index) => (isDiscriminated ? output : printNullable(nodeMembers[index]!, output)))
         .filter(Boolean)
       if (members.length === 0) return ''

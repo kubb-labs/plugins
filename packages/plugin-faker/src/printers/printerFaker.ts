@@ -137,9 +137,7 @@ function dateTimeCall(
   return 'faker.date.anytime()'
 }
 
-/**
- * Mocks for the string `format`s `plugin-zod` checks with a dedicated constructor, which a random string fails.
- */
+// Formats `plugin-zod` checks with a dedicated constructor, which a random string fails.
 const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
   ['jwt', 'faker.internet.jwt()'],
   ['ulid', 'faker.string.ulid()'],
@@ -361,8 +359,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
           printNested(member, {
             nestedInObject: true,
-            // An `allOf` member carries required properties, so only a ref to the schema itself is cut. A cycle through
-            // another schema is cut further down, at the array or property that closes it.
+            // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
             ...(member.type === 'ref' && ast.resolveRefName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
           }),
         )
