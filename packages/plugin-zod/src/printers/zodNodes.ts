@@ -1,6 +1,6 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
-import { buildList, stringify } from '@internals/utils'
-import { ast } from '@kubb/kit'
+import { buildList } from '@internals/utils'
+import { ast, code } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   buildEnum,
@@ -327,7 +327,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       if (members.length === 0) return ''
       if (members.length === 1) return members[0]!
       if (isDiscriminated) {
-        return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
+        return `z.discriminatedUnion(${code.string(node.discriminatorPropertyName)}, ${buildList(members)})`
       }
       if (isXor) return `z.xor(${buildList(members)})`
 
@@ -389,7 +389,7 @@ function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullabl
   const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
   const itemSchema = ctx.transform(schema) ?? 'z.unknown()'
 
-  return `(items) => { const count = items.filter((item) => ${itemSchema}.safeParse(item).success).length; return ${countBounds} }, { message: ${stringify(message)} }`
+  return `(items) => { const count = items.filter((item) => ${itemSchema}.safeParse(item).success).length; return ${countBounds} }, { message: ${code.string(message)} }`
 }
 
 // A required `unknown` property means "the key is present", which a Zod object would accept as missing, so those keys are checked with `in`.

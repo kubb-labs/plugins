@@ -1,4 +1,4 @@
-import { ast, casing } from '@kubb/kit'
+import { ast, casing, code } from '@kubb/kit'
 import { generate } from 'yuku-codegen'
 
 /**
@@ -54,16 +54,6 @@ function isValidIdentifier(name: string): boolean {
  */
 function propertyName(name: string): TsNode {
   return isValidIdentifier(name) ? identifier(name) : literal(name)
-}
-
-/**
- * Indents every non-empty line of `text` by two spaces.
- */
-function indent(text: string): string {
-  return text
-    .split('\n')
-    .map((line) => (line ? `  ${line}` : line))
-    .join('\n')
 }
 
 /**
@@ -360,7 +350,7 @@ export function createEnumDeclaration({
   const query = { type: 'TSTypeQuery', exprName: identifier(identifierName), typeArguments: null }
 
   return [
-    `export const ${identifierName} = {\n${properties.map(indent).join(',\n')},\n} as const;`,
+    `export const ${identifierName} = {\n${properties.map((property) => code.indent(property)).join(',\n')},\n} as const;`,
     typeAlias({
       type: 'TSIndexedAccessType',
       objectType: { type: 'TSParenthesizedType', typeAnnotation: query },

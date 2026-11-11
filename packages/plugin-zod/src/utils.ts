@@ -1,6 +1,6 @@
-import { buildObject, stringify, toRegExpString } from '@internals/utils'
+import { buildObject, toRegExpString } from '@internals/utils'
 import { mapSchemaProperties } from '@internals/shared'
-import { ast } from '@kubb/kit'
+import { ast, code } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
 
 /**
@@ -146,7 +146,7 @@ export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Arra
  * representation, strings are quoted.
  */
 export function formatDefault(value: unknown): string {
-  if (typeof value === 'string') return stringify(value)
+  if (typeof value === 'string') return code.string(value)
   if (typeof value === 'object' && value !== null) return JSON.stringify(value)
 
   return String(value ?? '')
@@ -414,7 +414,7 @@ export function applyModifiers({ value, schema, nullable, optional, nullish, def
   })()
   const literal = defaultValue !== undefined ? defaultLiteral(schema, defaultValue) : null
   const withDefault = literal !== null ? `${withModifier}.default(${literal})` : withModifier
-  const withDescription = description ? `${withDefault}.describe(${stringify(description)})` : withDefault
+  const withDescription = description ? `${withDefault}.describe(${code.string(description)})` : withDefault
   return examples?.length
     ? `${withDescription}.meta({ examples: [${examples.map((example) => (example === null ? 'null' : formatDefault(example))).join(', ')}] })`
     : withDescription

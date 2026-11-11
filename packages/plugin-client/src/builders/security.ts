@@ -1,4 +1,3 @@
-import { stringify } from '@internals/utils'
 import { ast, code } from '@kubb/kit'
 
 /**
@@ -34,7 +33,7 @@ const inlineAuthKeys = ['type', 'scheme', 'name', 'in', 'scopes', 'flows', 'meta
 function serializeScheme({ ref, ...auth }: OperationAuth): string {
   const scopes = auth.scopes?.length ? auth.scopes : undefined
   if (ref) {
-    const schemeRef = code.isIdentifier(ref) ? `securitySchemes.${ref}` : `securitySchemes[${stringify(ref)}]`
+    const schemeRef = code.isIdentifier(ref) ? `securitySchemes.${ref}` : `securitySchemes[${code.string(ref)}]`
     return scopes ? `{ ...${schemeRef}, scopes: ${code.literal(scopes)} }` : schemeRef
   }
   const entries = inlineAuthKeys.flatMap((key) => {

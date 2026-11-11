@@ -1,7 +1,5 @@
 import { code } from '@kubb/kit'
 
-const INDENT = '  '
-
 /**
  * Builds a JSDoc comment block from an array of lines. Returns `fallback` when there are no
  * comments.
@@ -40,17 +38,6 @@ export function buildJSDoc(
 }
 
 /**
- * Indents every non-empty line of `text` by one indent level, leaving blank lines empty.
- */
-function indentLines(text: string): string {
-  if (!text) return ''
-  return text
-    .split('\n')
-    .map((line) => (line.trim() ? `${INDENT}${line}` : ''))
-    .join('\n')
-}
-
-/**
  * Assembles a multi-line object literal from already-rendered `entries`, indenting each entry one
  * level and closing the brace at column zero. Entries that are themselves multi-line objects indent
  * cumulatively. Each entry ends with a trailing comma to match the formatter's multi-line style.
@@ -63,7 +50,7 @@ function indentLines(text: string): string {
  */
 export function buildObject(entries: Array<string>): string {
   if (entries.length === 0) return '{}'
-  const body = entries.map((entry) => `${indentLines(entry)},`).join('\n')
+  const body = entries.map((entry) => `${code.indent(entry)},`).join('\n')
 
   return `{\n${body}\n}`
 }
@@ -84,7 +71,7 @@ export function buildList(items: Array<string>, brackets: [open: string, close: 
   const [open, close] = brackets
   if (items.length === 0) return `${open}${close}`
   if (!items.some((item) => item.includes('\n'))) return `${open}${items.join(', ')}${close}`
-  const body = items.map((item) => `${indentLines(item)},`).join('\n')
+  const body = items.map((item) => `${code.indent(item)},`).join('\n')
 
   return `${open}\n${body}\n${close}`
 }

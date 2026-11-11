@@ -1,5 +1,5 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
-import { buildObject, stringify, toRegExpString } from '@internals/utils'
+import { buildObject, toRegExpString } from '@internals/utils'
 import { ast, code, Diagnostics } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema, isObjectSchema } from '../utils.ts'
@@ -203,7 +203,7 @@ function matches(value: string, regexGenerator: 'faker' | 'randexp' = 'faker'): 
 
 function parseEnumValue(value: string | number | boolean | null | undefined) {
   if (typeof value === 'string') {
-    return stringify(value)
+    return code.string(value)
   }
 
   return value
