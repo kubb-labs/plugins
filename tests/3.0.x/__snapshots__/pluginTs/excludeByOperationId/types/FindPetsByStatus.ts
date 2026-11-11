@@ -9,7 +9,6 @@ import type { Pet } from './Pet'
 export type FindPetsByStatusQuery = {
   /**
    * @description Status values that need to be considered for filter
-   * @deprecated
    * @default available
    */
   status?: FindPetsByStatusStatusKey;

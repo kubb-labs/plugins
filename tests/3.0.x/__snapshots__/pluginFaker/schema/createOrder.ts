@@ -10,9 +10,9 @@ export function createOrder(data?: Partial<Order>): Order {
   const defaultFakeData = {
     id: faker.number.bigInt(),
     petId: faker.number.bigInt(),
-    quantity: faker.number.int({ max: 2147483647 }),
+    quantity: faker.number.int(),
     shipDate: faker.date.anytime().toISOString(),
-    status: faker.helpers.arrayElement(['placed', 'approved', 'delivered'] as Array<NonNullable<Order>["status"]>),
+    status: faker.helpers.arrayElement<NonNullable<Order>["status"]>(['placed', 'approved', 'delivered']),
     complete: faker.datatype.boolean(),
   }
   return {

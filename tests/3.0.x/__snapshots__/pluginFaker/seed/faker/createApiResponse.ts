@@ -10,7 +10,7 @@ faker.seed([42])
 
 export function createApiResponse<TData extends Partial<ApiResponse> = object>(data?: TData) {
   const defaultFakeData = {
-    code: faker.number.int({ max: 2147483647 }),
+    code: faker.number.int(),
     type: faker.string.alpha(),
     message: faker.string.alpha(),
   }

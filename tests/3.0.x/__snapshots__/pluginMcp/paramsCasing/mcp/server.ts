@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import { updatePetBodySchema, updatePetHeaderXRequestIDSchema, updatePetPathPetIdSchema, updatePetQueryIncludeDeletedSchema, updatePetQueryRequestSourceSchema, updatePetStatus200Schema } from '../zod/updatePetSchema'
 import { updatePetHandler } from './updatePet'
+import { updatePetBodySchema, updatePetHeaderXRequestIDSchema, updatePetPathPetIdSchema, updatePetQueryIncludeDeletedSchema, updatePetQueryRequestSourceSchema, updatePetStatus200Schema } from '../zod/updatePetSchema'
 import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'

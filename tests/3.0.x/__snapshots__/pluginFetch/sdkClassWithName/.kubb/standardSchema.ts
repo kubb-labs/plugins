@@ -11,7 +11,7 @@ export type StandardSchemaResult<TOutput> = { readonly value: TOutput; readonly 
 
 export type StandardSchemaIssue = {
   readonly message?: string
-  readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }> | undefined
+  readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }>
 }
 
 /**
@@ -95,9 +95,9 @@ export type ValidationErrorContext = {
   value: unknown
   direction: 'request' | 'response' | 'error'
   source: 'body' | 'path' | 'query' | 'headers' | 'cookies'
-  method?: string | undefined
-  url?: string | undefined
-  status?: number | undefined
+  method?: string
+  url?: string
+  status?: number
 }
 
 /**

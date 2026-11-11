@@ -8,7 +8,7 @@ import type { HttpResponseResolver } from 'msw/http'
 import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
-export function uploadFileHandlerResponse200(data?: UploadFileResponse) {
+export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -21,6 +21,11 @@ export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolv
   return http.post<Record<string, string>, UploadFileBody extends DefaultBodyType ? UploadFileBody : DefaultBodyType>(`${options?.baseURL ?? ''}/pet/:petId/uploadImage`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return uploadFileHandlerResponse200(data)
+      return new HttpResponse<string>(JSON.stringify(data), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
     })
 }

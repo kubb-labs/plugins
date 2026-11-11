@@ -1,17 +1,17 @@
 import type { NativeOptions, NativeRequest, NativeResponse } from './client'
 import type { MediaTypeContext, MediaTypes } from './mediaTypes'
-import type { HeadersInit, HttpMethod, RequestBody, Serializers, Styles } from './serializers'
+import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
 import { defaultMediaTypes, isEncodedBody, resolveMediaType } from './mediaTypes'
-import { baseContentType } from './serializers'
+import { applyHeaderStyles, baseContentType, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers'
 import { isValidationEnabled, runValidator } from './standardSchema'
 export * from './mediaTypes'
 export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema'
 
 /**
- * The status keys that count as success. `2xx` covers every 2xx status.
+ * The status keys that count as success. `2XX` covers every 2xx status.
  */
-export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226' | '2xx'
+export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226' | '2XX'
 
 export type SuccessOf<TResponses> = TResponses[Extract<keyof TResponses, SuccessStatusCode>]
 
@@ -22,11 +22,11 @@ type Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 type ToNumber<T> = T extends `${infer TNumber extends number}` ? TNumber : never
 
 /**
- * Maps a status key such as `404` or `4xx` to its numeric statuses. `default` becomes `number`.
+ * Maps a status key such as `404` or `4XX` to its numeric statuses. `default` becomes `number`.
  */
 export type ToStatusNumber<TStatus, TKeys = never> = TStatus extends `${infer TNumber extends number}`
   ? TNumber
-  : TStatus extends `${infer TFirst extends '1' | '2' | '3' | '4' | '5'}xx`
+  : Uppercase<TStatus & string> extends `${infer TFirst extends '1' | '2' | '3' | '4' | '5'}XX`
     ? Exclude<ToNumber<`${TFirst}${Digit}${Digit}`>, ToNumber<TKeys>>
     : number
 
@@ -37,101 +37,55 @@ export type EmptyErrorBody = { status: number; statusText: string }
 
 export type DataOf<T> = T extends { contentType: string; data: infer TData } ? TData : T
 
-/**
- * A response's `Headers`, whose `get` suggests the header names the spec declares. Values stay strings, as sent.
- */
-export type ResponseHeaders<THeaders = unknown> = Omit<Headers, 'get'> & {
-  get: (name: Extract<keyof THeaders, string> | (string & {})) => string | null
-}
-
-// The media types `streamMediaTypes` reads as a stream: a response with one of them resolves to its raw body.
-type StreamContentType =
-  | `text/event-stream${string}`
-  | `application/jsonl${string}`
-  | `application/x-ndjson${string}`
-  | `application/json-seq${string}`
-  | `application/${string}+json-seq${string}`
-
-type HeadersFor<THeaders, TStatus> = ResponseHeaders<TStatus extends keyof THeaders ? THeaders[TStatus] : unknown>
-
-export type SuccessVariant<TStatus, TEntry, TRequest, TResponse, TKeys = never, THeaders = unknown> = TEntry extends { contentType: string; data: unknown }
+export type SuccessVariant<TStatus, TEntry, TRequest, TResponse, TKeys = never> = TEntry extends { contentType: string; data: unknown }
   ? TEntry extends { contentType: infer TContentType; data: infer TData }
     ? {
         status: ToStatusNumber<TStatus, TKeys>
-        data: TContentType extends StreamContentType ? ReadableStream<Uint8Array> : TData
+        data: TContentType extends `text/event-stream${string}` ? ReadableStream<Uint8Array> : TData
         error: undefined
         contentType: TContentType
-        headers: HeadersFor<THeaders, TStatus>
         request: TRequest
         response: TResponse
       }
     : never
-  : {
-      status: ToStatusNumber<TStatus, TKeys>
-      data: TEntry
-      error: undefined
-      contentType: string | undefined
-      headers: HeadersFor<THeaders, TStatus>
-      request: TRequest
-      response: TResponse
-    }
+  : { status: ToStatusNumber<TStatus, TKeys>; data: TEntry; error: undefined; contentType: string | undefined; request: TRequest; response: TResponse }
 
-export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TRequest, TResponse, THeaders = unknown> = TStatus extends SuccessStatusCode
-  ? SuccessVariant<TStatus, TResponses[TStatus], TRequest, TResponse, keyof TResponses, THeaders>
+export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TRequest, TResponse> = TStatus extends SuccessStatusCode
+  ? SuccessVariant<TStatus, TResponses[TStatus], TRequest, TResponse, keyof TResponses>
   : {
       status: ToStatusNumber<TStatus, keyof TResponses>
       data: undefined
       error: DataOf<TResponses[TStatus]> | EmptyErrorBody
       contentType: string | undefined
-      headers: HeadersFor<THeaders, TStatus>
       request: TRequest
       response: TResponse
     }
 
-export type ResultUnion<TResponses, TRequest, TResponse, THeaders = unknown> = {
-  [TStatus in keyof TResponses]: ResultByStatus<TResponses, TStatus, TRequest, TResponse, THeaders>
+export type ResultUnion<TResponses, TRequest, TResponse> = {
+  [TStatus in keyof TResponses]: ResultByStatus<TResponses, TStatus, TRequest, TResponse>
 }[keyof TResponses]
 
-export type SuccessResultUnion<TResponses, TRequest, TResponse, THeaders = unknown> = {
-  [TStatus in Extract<keyof TResponses, SuccessStatusCode>]: ResultByStatus<TResponses, TStatus, TRequest, TResponse, THeaders>
+export type SuccessResultUnion<TResponses, TRequest, TResponse> = {
+  [TStatus in Extract<keyof TResponses, SuccessStatusCode>]: ResultByStatus<TResponses, TStatus, TRequest, TResponse>
 }[Extract<keyof TResponses, SuccessStatusCode>]
 
 /**
- * The result of a call, narrowed by `status`. With `throwOnError`, it holds only the success variants. `THeaders` keys the
- * declared response headers by status like the responses record, so `headers.get` suggests them for the narrowed status.
+ * The result of a call, narrowed by `status`. With `throwOnError`, it holds only the success variants.
  */
-export type RequestResult<
-  TResponses,
-  ThrowOnError extends boolean = true,
-  TRequest = NativeRequest,
-  TResponse = NativeResponse,
-  THeaders = unknown,
-> = ThrowOnError extends true
-  ? [SuccessResultUnion<TResponses, TRequest, TResponse, THeaders>] extends [never]
+export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = ThrowOnError extends true
+  ? [SuccessResultUnion<TResponses, TRequest, TResponse>] extends [never]
     ? {
         status: number
         data: SuccessOf<TResponses>
         error: undefined
         contentType: string | undefined
-        headers: ResponseHeaders
         request: TRequest
         response: TResponse
       }
-    : SuccessResultUnion<TResponses, TRequest, TResponse, THeaders>
-  : [ResultUnion<TResponses, TRequest, TResponse, THeaders>] extends [never]
-    ? { status: number; data: undefined; error: undefined; contentType: string | undefined; headers: ResponseHeaders; request: TRequest; response: TResponse }
-    : ResultUnion<TResponses, TRequest, TResponse, THeaders>
-
-/**
- * `RequestResult` with the declared response headers by status: `RequestResultWithHeaders<ListPetsResponses, { '200': ListPetsStatus200Headers }>`.
- */
-export type RequestResultWithHeaders<TResponses, THeaders, ThrowOnError extends boolean = true> = RequestResult<
-  TResponses,
-  ThrowOnError,
-  NativeRequest,
-  NativeResponse,
-  THeaders
->
+    : SuccessResultUnion<TResponses, TRequest, TResponse>
+  : [ResultUnion<TResponses, TRequest, TResponse>] extends [never]
+    ? { status: number; data: undefined; error: undefined; contentType: string | undefined; request: TRequest; response: TResponse }
+    : ResultUnion<TResponses, TRequest, TResponse>
 
 /**
  * A result promise whose `unwrap()` resolves to the success body.
@@ -158,21 +112,9 @@ export type Unwrapped<T, ThrowOnError extends boolean> = ThrowOnError extends tr
 /**
  * What an operation returns with `returnType: 'data'`: the success body, or the full result when `throwOnError` is false.
  */
-export type UnwrappedResult<
-  TResponses,
-  ThrowOnError extends boolean = true,
-  TRequest = NativeRequest,
-  TResponse = NativeResponse,
-  THeaders = unknown,
-> = Unwrapped<RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>, ThrowOnError>
-
-/** `UnwrappedResult` with the declared response headers by status, for the full result a `throwOnError: false` call resolves to. */
-export type UnwrappedResultWithHeaders<TResponses, THeaders, ThrowOnError extends boolean = true> = UnwrappedResult<
-  TResponses,
-  ThrowOnError,
-  NativeRequest,
-  NativeResponse,
-  THeaders
+export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = Unwrapped<
+  RequestResult<TResponses, ThrowOnError, TRequest, TResponse>,
+  ThrowOnError
 >
 
 /**
@@ -211,8 +153,7 @@ export type Validator<T = unknown> = StandardSchemaValidator<T>
 
 
 /**
- * A security scheme of a generated call, passed to the `auth` resolver. OAuth2 `flows` and `metadataUrl` (RFC 8414) and
- * the OpenID Connect `url` tell the resolver where to get a token.
+ * A security scheme of a generated call, passed to the `auth` resolver.
  */
 export type Auth = {
   type: 'http' | 'apiKey' | 'oauth2' | 'openIdConnect'
@@ -220,9 +161,6 @@ export type Auth = {
   name?: string
   in?: 'header' | 'query' | 'cookie'
   scopes?: Array<string>
-  flows?: Record<string, { authorizationUrl?: string; deviceAuthorizationUrl?: string; tokenUrl?: string; refreshUrl?: string }>
-  metadataUrl?: string
-  url?: string
 }
 
 /**
@@ -263,11 +201,11 @@ export type EventStreamOptions = {
    * The most characters one event or JSON line may hold. A larger one throws a `RangeError`, and `Infinity` turns the limit off.
    * @default 16777216
    */
-  maxEventSize?: number | undefined
+  maxEventSize?: number
   /**
    * Ends the stream when an event's raw `data` or a JSON line equals this value, such as `[DONE]`.
    */
-  terminator?: string | undefined
+  terminator?: string
   /**
    * Maps each Server-Sent Event before validation.
    */
@@ -276,11 +214,6 @@ export type EventStreamOptions = {
    * What `validator.response` checks on each event: the payload (`data`) or the whole event (`event`).
    */
   eventShape?: 'event' | 'data'
-  /**
-   * Keeps each Server-Sent Event's `data` as the raw text instead of JSON-parsing it. The generated client sets it when the
-   * document types `data` as a string. A list of event names keeps it for those events only.
-   */
-  rawData?: boolean | Array<string> | undefined
 }
 
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = {
@@ -296,10 +229,10 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
   cookies?: unknown
   body?: TBody
   headers?: unknown
-  styles?: Styles | undefined
-  signal?: AbortSignal | undefined
-  credentials?: RequestCredentials | undefined
-  options?: NativeOptions | undefined
+  styles?: Styles
+  signal?: AbortSignal
+  credentials?: RequestCredentials
+  options?: NativeOptions
   contentType?: ContentType
   parseAs?: ParseAs
   throwOnError?: boolean
@@ -311,7 +244,7 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
    */
   mediaTypes?: MediaTypes
   /**
-   * `error` takes one validator, or a map by status such as `{ 404: schema, '5xx': schema, default: schema }`.
+   * `error` takes one validator, or a map by status such as `{ 404: schema, '5XX': schema, default: schema }`.
    */
   validator?: {
     request?: Validator
@@ -369,10 +302,10 @@ export type ResolvedRequest = {
   url: string
   method: string
   headers: Record<string, string>
-  body?: RequestBody | undefined
-  signal?: AbortSignal | undefined
-  credentials?: RequestCredentials | undefined
-  options?: NativeOptions | undefined
+  body?: RequestBody
+  signal?: AbortSignal
+  credentials?: RequestCredentials
+  options?: NativeOptions
   /**
    * Read the response as a stream. A transport that buffers bodies, such as axios, must stream it.
    */
@@ -403,7 +336,7 @@ export type DecodedResponse<TData = unknown, TRequest = NativeRequest, TResponse
   status: number
   statusText: string
   headers: Headers
-  contentType?: string | undefined
+  contentType?: string
   request: TRequest
   response: TResponse
 }
@@ -447,52 +380,29 @@ export type StreamResult<
   TEvent = ServerSentEvent<SuccessOf<TResponses>>,
   TRequest = NativeRequest,
   TResponse = NativeResponse,
-  THeaders = unknown,
-> = WithEvents<RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>, TEvent> & StreamParts<TEvent>
-
-/**
- * `StreamResult` with the declared response headers by status: `StreamResultWithHeaders<StreamEventsResponses, { '200': StreamEventsStatus200Headers }>`.
- */
-export type StreamResultWithHeaders<TResponses, THeaders, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>> = StreamResult<
-  TResponses,
-  ThrowOnError,
-  TEvent,
-  NativeRequest,
-  NativeResponse,
-  THeaders
->
+> = WithEvents<RequestResult<TResponses, ThrowOnError, TRequest, TResponse>, TEvent> & StreamParts<TEvent>
 
 /**
  * What a stream operation returns with `returnType: 'data'`.
  */
-export type UnwrappedStreamResult<
-  TResponses,
-  ThrowOnError extends boolean = true,
-  TEvent = ServerSentEvent<SuccessOf<TResponses>>,
-  THeaders = unknown,
-> = Unwrapped<StreamResult<TResponses, ThrowOnError, TEvent, NativeRequest, NativeResponse, THeaders>, ThrowOnError>
-
-/** `UnwrappedStreamResult` with the declared response headers by status, for the full result a `throwOnError: false` call resolves to. */
-export type UnwrappedStreamResultWithHeaders<
-  TResponses,
-  THeaders,
-  ThrowOnError extends boolean = true,
-  TEvent = ServerSentEvent<SuccessOf<TResponses>>,
-> = UnwrappedStreamResult<TResponses, ThrowOnError, TEvent, THeaders>
+export type UnwrappedStreamResult<TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>> = Unwrapped<
+  StreamResult<TResponses, ThrowOnError, TEvent>,
+  ThrowOnError
+>
 
 /**
  * A client. Call it to send a request.
  */
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = {
-  <TResponses = unknown, ThrowOnError extends boolean = true, THeaders = unknown>(
+  <TResponses = unknown, ThrowOnError extends boolean = true>(
     config: RequestConfig<unknown, TRequest, TResponse> & { throwOnError?: ThrowOnError },
-  ): Promise<RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>>
+  ): Promise<RequestResult<TResponses, ThrowOnError, TRequest, TResponse>>
   /**
    * Sends the request and reads a 2xx body item by item. A body whose media type cannot stream throws a `TypeError`.
    */
-  stream: <TResponses = unknown, ThrowOnError extends boolean = true, TItem = ServerSentEvent<SuccessOf<TResponses>>, THeaders = unknown>(
+  stream: <TResponses = unknown, ThrowOnError extends boolean = true, TItem = ServerSentEvent<SuccessOf<TResponses>>>(
     config: RequestConfig<unknown, TRequest, TResponse> & EventStreamOptions & { throwOnError?: ThrowOnError },
-  ) => Promise<StreamResult<TResponses, ThrowOnError, TItem, TRequest, TResponse, THeaders>>
+  ) => Promise<StreamResult<TResponses, ThrowOnError, TItem, TRequest, TResponse>>
   getConfig: () => ClientConfig<TRequest, TResponse>
   setConfig: (config: ClientConfig<TRequest, TResponse>) => ClientConfig<TRequest, TResponse>
   getUrl: (config: UrlConfig) => string
@@ -515,8 +425,6 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
   status: number
   statusText: string
   contentType: string | undefined
-  /** The response's `Headers`, the same on every transport. */
-  headers: ResponseHeaders
   request: TRequest
   response: TResponse
 
@@ -524,12 +432,11 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     data: TError
     status: number
     statusText: string
-    contentType?: string | undefined
-    headers?: Headers | undefined
+    contentType?: string
     request: TRequest
     response: TResponse
-    method?: string | undefined
-    url?: string | undefined
+    method?: string
+    url?: string
   }) {
     // The query and hash stay out of the message, so secrets in them do not reach logs.
     const cleanUrl = config.url?.split(/[?#]/)[0]
@@ -541,7 +448,6 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     this.status = config.status
     this.statusText = config.statusText
     this.contentType = config.contentType
-    this.headers = config.headers ?? new Headers()
     this.request = config.request
     this.response = config.response
   }
@@ -559,15 +465,13 @@ export type ResponseErrorConfig<TError = unknown> = ResponseError<TError>
 type ErrorStatus<TResponses> = Exclude<keyof TResponses, SuccessStatusCode>
 
 /**
- * The `ResponseError` an operation throws. Checking `status` narrows `data` to that status's body, and `headers.get` to
- * the header names in `THeaders`, the same record `RequestResult` takes.
+ * The `ResponseError` an operation throws. Checking `status` narrows `data` to that status's body.
  */
-export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown> = [ErrorStatus<TResponses>] extends [never]
+export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse> = [ErrorStatus<TResponses>] extends [never]
   ? ResponseError<unknown, TRequest, TResponse>
   : {
       [TStatus in ErrorStatus<TResponses>]: ResponseError<DataOf<TResponses[TStatus]>, TRequest, TResponse> & {
         status: ToStatusNumber<TStatus, keyof TResponses>
-        headers: HeadersFor<THeaders, TStatus>
       }
     }[ErrorStatus<TResponses>]
 
@@ -583,14 +487,14 @@ export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = Na
  * }
  * ```
  */
-export function isResponseError<TResponses = unknown, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown>(
+export function isResponseError<TResponses = unknown, TRequest = NativeRequest, TResponse = NativeResponse>(
   error: unknown,
-): error is ResponseErrorOf<TResponses, TRequest, TResponse, THeaders> {
+): error is ResponseErrorOf<TResponses, TRequest, TResponse> {
   return ResponseError.is(error)
 }
 
 function headerEntries(headers: object): Array<[string, unknown]> {
-  if (Array.isArray(headers)) return headers as Array<[string, unknown]>
+  if (Array.isArray(headers)) return headers
   return headers instanceof Headers ? [...headers] : Object.entries(headers)
 }
 
@@ -600,8 +504,7 @@ function serializeHeaders(headers: HeadersInit | undefined): Record<string, stri
   const result: Record<string, string> = {}
   for (const [key, value] of entries) {
     if (value === undefined || value === null) continue
-    // A `Date` is a unit like in the parameter serializers, not an object to send as JSON.
-    result[key] = value instanceof Date ? value.toISOString() : typeof value === 'object' ? JSON.stringify(value) : String(value)
+    result[key] = typeof value === 'string' ? value : typeof value === 'object' ? JSON.stringify(value) : String(value)
   }
   return result
 }
@@ -641,26 +544,26 @@ function deleteHeader(headers: Record<string, string>, name: string): void {
 function serializeUrl({
   parts,
   pathParams,
-  query,
-  serializers,
-  styles,
+  search,
+  pathSerializer = defaultPathSerializer,
+  pathStyles,
 }: {
   parts: Array<string | undefined>
   pathParams: Record<string, unknown>
-  query: Record<string, unknown>
-  serializers: Serializers
-  styles?: Styles | undefined
+  search: string
+  pathSerializer?: PathSerializer
+  pathStyles?: Record<string, PathParamStyle>
 }): string {
   const path = parts
     // A base URL that ends in `/` would give `//` before a path that starts with one.
     .reduce<string>((url, part) => (part ? url + (url.endsWith('/') && part.startsWith('/') ? part.slice(1) : part) : url), '')
-    .replace(/\{([^{}]+)\}/g, (_, key: string) => requireSerializer(serializers, 'path')({ name: key, value: pathParams[key], options: styles?.path?.[key] }))
-  // A query without values needs no serializer.
-  const hasQuery = Object.values(query).some((value) => value !== undefined && value !== null)
-  const search = serializers.query || hasQuery ? requireSerializer(serializers, 'query')(query, styles?.query) : ''
+    .replace(/\{([^{}]+)\}/g, (_, key: string) => pathSerializer({ name: key, value: pathParams[key], options: pathStyles?.[key] }))
   return path + (search ? `?${search}` : '')
 }
 
+/**
+ * Runs handlers in the order they were added. A handler that returns nothing keeps the value.
+ */
 export function createInterceptorStack<T, TContext = never, TResult = T>(): InterceptorStack<T, TContext, TResult> {
   let entries: Array<{ id: number; fn: InterceptorFn<T, TContext, TResult> }> = []
   let counter = 0
@@ -746,8 +649,8 @@ export function toRequestInit(request: ResolvedRequest): RequestInit {
     ...request.options,
     method: request.method,
     headers: request.headers,
-    body: request.body ?? null,
-    signal: request.signal ?? null,
+    body: request.body,
+    signal: request.signal,
   }
   if (request.credentials) init.credentials = request.credentials
   return init
@@ -755,9 +658,8 @@ export function toRequestInit(request: ResolvedRequest): RequestInit {
 
 function pickErrorValidator(error: Validator | Record<string, Validator> | undefined, status: number): Validator | undefined {
   if (!error || '~standard' in error) return error as Validator | undefined
-  const range = String(status)[0]
-  // `5XX` is the spelling validator maps used before ranges were written in lower case.
-  return error[String(status)] ?? error[`${range}xx`] ?? error[`${range}XX`] ?? error['default']
+  const range = Object.keys(error).find((key) => key.toUpperCase() === `${String(status)[0]}XX`)
+  return error[String(status)] ?? (range ? error[range] : undefined) ?? error.default
 }
 
 // Checks the shape, so a `Response` from another realm or a polyfill counts too.
@@ -768,7 +670,7 @@ function isResponse(value: unknown): value is Response {
 // Leaves out the body, which was already sent. A relative URL keeps the resolved request.
 function toNativeRequest(request: ResolvedRequest): Request | ResolvedRequest {
   try {
-    return new Request(request.url, { ...toRequestInit(request), body: null })
+    return new Request(request.url, { ...toRequestInit(request), body: undefined })
   } catch {
     return request
   }
@@ -791,21 +693,20 @@ function isEmpty(response: Response, method: string): boolean {
   return [204, 205, 304].includes(response.status) || method === 'HEAD' || !response.body || response.headers.get('Content-Length') === '0'
 }
 
-function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes; serializer?: Serializers }>(config: T, next: T): T {
+function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes }>(config: T, next: T): T {
   return {
     ...config,
     ...next,
     headers: { ...serializeHeaders(config.headers), ...serializeHeaders(next.headers) },
     mediaTypes: { ...config.mediaTypes, ...next.mediaTypes },
-    serializer: { ...config.serializer, ...next.serializer },
   }
 }
 
-// The serializer for `name`, which `.kubb/client.ts` registers for a spec that needs it.
-function requireSerializer<TName extends keyof Serializers>(serializers: Serializers, name: TName): NonNullable<Serializers[TName]> {
-  const serializer = serializers[name]
-  if (!serializer) throw new TypeError(`Cannot send ${name} parameters without a serializer, register serializer.${name} on the client.`)
-  return serializer
+function resolveSerializers({ config, requestConfig }: { config: { serializer?: Serializers }; requestConfig: { serializer?: Serializers } }) {
+  return {
+    querySerializer: requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer,
+    pathSerializer: requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer,
+  }
 }
 
 async function resolveRequest<TBody, TRequest, TResponse>({
@@ -815,7 +716,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   config: ClientConfig<TRequest, TResponse>
   requestConfig: RequestConfig<TBody, TRequest, TResponse>
 }): Promise<{ request: ResolvedRequest; mediaTypes: MediaTypes; validate: ValidateOption | undefined; responseContentType: string | undefined }> {
-  const serializers = { ...config.serializer, ...requestConfig.serializer }
+  const { querySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
   const mediaTypes = { ...defaultMediaTypes, ...config.mediaTypes, ...requestConfig.mediaTypes }
   const onValidationError = requestConfig.onValidationError ?? config.onValidationError
   const validate = requestConfig.validate ?? config.validate
@@ -838,8 +739,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     ),
   )
 
-  const headerValues = validatedHeaders as HeadersInit | undefined
-  const headers = serializeHeaders(serializers.header ? serializers.header(headerValues, requestConfig.styles?.header) : headerValues)
+  const headers = serializeHeaders(applyHeaderStyles(validatedHeaders as HeadersInit | undefined, requestConfig.styles?.header))
   const contentType = requestConfig.contentType
   const { request: requestContentTypeOption, response: responseContentType } = typeof contentType === 'string' ? { request: contentType } : (contentType ?? {})
   if (responseContentType && getHeader(headers, 'accept') === undefined) {
@@ -855,12 +755,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     query,
   })
 
-  const cookies = validatedCookies as Record<string, unknown> | undefined
-  // An object with only nullish values sends nothing, so it needs no serializer.
-  if (cookies && Object.values(cookies).some((value) => value !== undefined && value !== null)) {
-    const cookie = requireSerializer(serializers, 'cookie')(cookies, requestConfig.styles?.cookie)
-    if (cookie) appendCookie(headers, cookie)
-  }
+  const cookie = validatedCookies ? serializeCookies(validatedCookies as Record<string, unknown>, requestConfig.styles?.cookie) : ''
+  if (cookie) appendCookie(headers, cookie)
 
   const validatedBody = await runValidator({
     validator: isValidationEnabled(validate, 'request') ? requestConfig.validator?.request : undefined,
@@ -884,18 +780,13 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   }
   // The transport sets the multipart boundary.
   if (body instanceof FormData) deleteHeader(headers, 'content-type')
-  // A multipart body built as a Blob, such as `multipart/mixed`, carries its boundary in its type.
-  if (body instanceof Blob && /^multipart\//i.test(body.type)) {
-    deleteHeader(headers, 'content-type')
-    headers['Content-Type'] = body.type
-  }
 
   const url = serializeUrl({
     parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
     pathParams: (validatedPath ?? {}) as Record<string, unknown>,
-    query,
-    serializers,
-    styles: requestConfig.styles,
+    search: querySerializer(query, requestConfig.styles?.query),
+    pathSerializer,
+    pathStyles: requestConfig.styles?.path,
   })
 
   const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
@@ -920,7 +811,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }
 
 // A signal in `options` counts too, since every transport spreads `options` under the resolved fields.
-function signalOf(config: { signal?: AbortSignal | undefined; options?: unknown }): AbortSignal | undefined {
+function signalOf(config: { signal?: AbortSignal; options?: unknown }): AbortSignal | undefined {
   return config.signal ?? (config.options as { signal?: AbortSignal } | undefined)?.signal
 }
 
@@ -1048,7 +939,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         status: result.status,
         statusText: result.statusText,
         contentType: result.contentType,
-        headers: result.headers,
         request: result.request,
         response: result.response,
         method: resolvedRequest.method,
@@ -1080,7 +970,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
             ? ({ status: result.status, statusText: result.statusText } satisfies EmptyErrorBody)
             : data,
         contentType: result.contentType,
-        headers: result.headers,
         request: result.request,
         response: result.response,
       },
@@ -1097,15 +986,13 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     }
   }
 
-  const client = (<TResponses, ThrowOnError extends boolean, THeaders>(requestConfig: RequestConfig<unknown, TRequest, TResponse>) =>
+  const client = (<TResponses, ThrowOnError extends boolean>(requestConfig: RequestConfig<unknown, TRequest, TResponse>) =>
     call(
       requestConfig,
-      async () => (await send(requestConfig, false)).result as RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>,
+      async () => (await send(requestConfig, false)).result as RequestResult<TResponses, ThrowOnError, TRequest, TResponse>,
     )) as ClientInstance<TRequest, TResponse>
 
-  client.stream = <TResponses, ThrowOnError extends boolean, TItem, THeaders>(
-    requestConfig: RequestConfig<unknown, TRequest, TResponse> & EventStreamOptions,
-  ) =>
+  client.stream = <TResponses, ThrowOnError extends boolean, TItem>(requestConfig: RequestConfig<unknown, TRequest, TResponse> & EventStreamOptions) =>
     call(requestConfig, async () => {
       const { result, items, cursor } = await send(requestConfig, true)
       const stream = items as AsyncGenerator<TItem>
@@ -1118,7 +1005,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         },
         [Symbol.asyncIterator]: () => stream,
       }
-      return streamed as unknown as StreamResult<TResponses, ThrowOnError, TItem, TRequest, TResponse, THeaders>
+      return streamed as unknown as StreamResult<TResponses, ThrowOnError, TItem, TRequest, TResponse>
     })
 
   client.getConfig = () => config
@@ -1127,13 +1014,14 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     return config
   }
   client.getUrl = (requestConfig) => {
+    const { querySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
     return serializeUrl({
       parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
       pathParams: (requestConfig.path ?? {}) as Record<string, unknown>,
-      query,
-      serializers: { ...config.serializer, ...requestConfig.serializer },
-      styles: requestConfig.styles,
+      search: querySerializer(query, requestConfig.styles?.query),
+      pathSerializer,
+      pathStyles: requestConfig.styles?.path,
     })
   }
   client.interceptors = own
