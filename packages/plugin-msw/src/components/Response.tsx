@@ -1,7 +1,7 @@
-import type { ast } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { getMockStatus, responseReturn } from '../utils.ts'
+import { responseReturn } from '../utils.ts'
 
 type Props = {
   typeName: string
@@ -19,7 +19,7 @@ export function Response({ name, typeName, response }: Props): KubbReactNode {
     <File.Source name={responseName} isIndexable isExportable>
       <Function name={responseName} export params={params}>
         {`
-    ${responseReturn('data', getMockStatus(response.statusCode), response)}`}
+    ${responseReturn('data', ast.http.status.toCode(response.statusCode), response)}`}
       </Function>
     </File.Source>
   )

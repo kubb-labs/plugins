@@ -3,7 +3,7 @@ import { ast } from '@kubb/kit'
 import { Url } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { getExampleBody, getMockStatus, getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
+import { getExampleBody, getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
 
 type Props = {
   name: string
@@ -23,7 +23,7 @@ export function Mock({ baseURL = '', name, fakerName, responseName, typeName, re
   // `http.all` matches every method on the path, so a handler for a method MSW has no helper for lets the others pass through.
   const methodGuard = method === 'all' ? `if (info.request.method !== ${singleQuote(node.method)}) return\n\n    ` : ''
   const successResponse = ast.http.responses.primary(node)
-  const statusCode = successResponse ? getMockStatus(successResponse.statusCode) : 200
+  const statusCode = successResponse ? ast.http.status.toCode(successResponse.statusCode) : 200
   const url = Url.toPath(node.path)
 
   const responseHasSchema = hasResponseSchema(successResponse)

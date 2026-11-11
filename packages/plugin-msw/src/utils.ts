@@ -2,14 +2,6 @@ import { toResponseContent } from '@internals/shared'
 import { isValidVarName, singleQuote, toLiteral } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
-/**
- * The status a mock responds with. A range such as `2xx` mocks the first code of its class, `200`, and `default` mocks `200`.
- */
-export function getMockStatus(statusCode: ast.StatusCode): number {
-  const code = Number(statusCode)
-  return Number.isNaN(code) ? (ast.http.status.class(statusCode) ?? 2) * 100 : code
-}
-
 // Headers use the `simple` style, so an array or object is sent comma-separated.
 function toSimpleStyle(value: unknown): string {
   if (Array.isArray(value)) return value.join(',')

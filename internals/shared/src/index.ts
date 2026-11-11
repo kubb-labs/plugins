@@ -19,7 +19,6 @@ export {
   hasStreamVariant,
   hasTextEventData,
   isEventStream,
-  jsonContentSchema,
   requestGroupOrder,
   operationFileEntry,
   resolveContentTypeVariants,

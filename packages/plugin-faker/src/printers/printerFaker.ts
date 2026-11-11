@@ -1,4 +1,4 @@
-import { jsonContentSchema, mapSchemaItems, mapSchemaMembers } from '@internals/shared'
+import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
 import { ast, containsCircularRef, Diagnostics, syncSchemaRef } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
@@ -298,7 +298,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const formatCall = stringFormatCalls.get(node.format)
         if (formatCall) return formatCall
 
-        const contentSchema = jsonContentSchema(node)
+        const contentSchema = ast.schema.jsonContent(node)
         // The document is typed by its own schema, not by the string that holds it.
         if (contentSchema) return `JSON.stringify(${printNested(contentSchema, { typeName: undefined, nestedInObject: true, nestedInUnion: false })})`
 

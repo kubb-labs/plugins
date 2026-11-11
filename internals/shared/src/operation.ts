@@ -265,17 +265,6 @@ export function getFormContentTypes(node: ast.OperationNode): Array<(typeof form
 }
 
 /**
- * The schema of the JSON document a string holds (`contentMediaType` with `contentSchema`), or `undefined` when the
- * string holds no JSON or has no schema for it.
- */
-export function jsonContentSchema({ content }: ast.StringSchemaNode): ast.SchemaNode | undefined {
-  // shortcut: an encoded document (`contentEncoding`) is not decoded, so only its encoding is checked; decode it once a spec needs both.
-  if (!content?.schema || content.encoding || !content.mediaType) return undefined
-
-  return ast.mediaType.isJson(content.mediaType) ? content.schema : undefined
-}
-
-/**
  * Parser for one response content entry.
  *
  * JSON stays unset so the runtime detects it. `text/event-stream` and JSON Lines are streams. A binary schema
@@ -567,24 +556,13 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
   const cached = operationParameterGroupsByNode.get(node)
   if (cached) return cached
 
-  // A malformed spec can declare the same name twice within one location. Both would resolve to the
-  // same output property, so emitting both would yield an object type with a duplicate member,
-  // which TypeScript rejects. Keep the first.
-  const dedupe = (params: Array<ast.ParameterNode>) => {
-    const seen = new Set<string>()
-    return params.filter((param) => {
-      if (seen.has(param.name)) return false
-      seen.add(param.name)
-      return true
-    })
-  }
-  const group = (location: ast.ParameterNode['in']) => dedupe(node.parameters.filter((param) => param.in === location))
-
-  const groups: OperationParameterGroups = {
-    path: group('path'),
-    query: dedupe([...group('query'), ...group('querystring').flatMap(spreadQuerystring)]),
-    header: group('header'),
-    cookie: group('cookie'),
+  const groups = ast.http.parameters(node)
+  // shortcut: the OpenAPI 3.2 `querystring` spread stays here until adapter-oas emits plain query parameters.
+  const names = new Set(groups.query.map((param) => param.name))
+  for (const param of node.parameters.filter((param) => param.in === 'querystring').flatMap(spreadQuerystring)) {
+    if (names.has(param.name)) continue
+    names.add(param.name)
+    groups.query.push(param)
   }
 
   operationParameterGroupsByNode.set(node, groups)

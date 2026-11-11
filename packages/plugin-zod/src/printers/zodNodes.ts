@@ -1,4 +1,4 @@
-import { jsonContentSchema, mapSchemaItems, mapSchemaMembers } from '@internals/shared'
+import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildList, stringify } from '@internals/utils'
 import { ast, syncSchemaRef } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
@@ -132,7 +132,7 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
       const pattern = node.pattern ?? integerFormatPattern(node.format)
       const value = `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
 
-      const contentNode = jsonContentSchema(node)
+      const contentNode = ast.schema.jsonContent(node)
       if (!contentNode) return value
       // The string holds wire JSON whichever way the string itself travels, so its schema always decodes.
       const direction = this.options.direction
