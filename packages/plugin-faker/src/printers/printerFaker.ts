@@ -86,7 +86,10 @@ function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: Printe
  * `faker.number.float()`, `faker.number.int()` or `faker.number.bigInt()`, with `min` and `max` passed only when set,
  * moved inside an exclusive bound, or needed so a lone bound does not contradict faker's default for the other.
  */
-function numberCall(kind: 'float' | 'int' | 'bigInt', { min, max, exclusive }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive'>): string {
+function numberCall(
+  kind: 'float' | 'int' | 'bigInt',
+  { min, max, exclusive, multipleOf }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive' | 'multipleOf'>,
+): string {
   const whole = kind !== 'float'
   // A whole-number bound moves to the next integer. Faker never returns a float's `max`, and its `min` only by chance.
   // shortcut: a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
@@ -96,7 +99,13 @@ function numberCall(kind: 'float' | 'int' | 'bigInt', { min, max, exclusive }: P
   const maxValue = kind === 'float' && lower !== undefined && upper === undefined && lower >= 1 ? lower + 100 : upper
   const minValue = maxValue !== undefined && lower === undefined && (whole ? maxValue < 0 : maxValue <= 0) ? maxValue - 100 : lower
   const suffix = kind === 'bigInt' ? 'n' : ''
-  const args = [minValue !== undefined && `min: ${minValue}${suffix}`, maxValue !== undefined && `max: ${maxValue}${suffix}`].filter(Boolean).join(', ')
+  const args = [
+    minValue !== undefined && `min: ${minValue}${suffix}`,
+    maxValue !== undefined && `max: ${maxValue}${suffix}`,
+    multipleOf !== undefined && `multipleOf: ${multipleOf}${suffix}`,
+  ]
+    .filter(Boolean)
+    .join(', ')
 
   return `faker.number.${kind}(${args ? `{ ${args} }` : ''})`
 }
@@ -127,6 +136,17 @@ function dateTimeCall(
 
   return 'faker.date.anytime()'
 }
+
+/**
+ * Mocks for the string `format`s `plugin-zod` checks with a dedicated constructor, which a random string fails.
+ */
+const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
+  ['jwt', 'faker.internet.jwt()'],
+  ['ulid', 'faker.string.ulid()'],
+  ['iban', 'faker.finance.iban()'],
+  ['duration', "'P1D'"],
+  ['hostname', 'faker.internet.domainName()'],
+])
 
 function matches(value: string, regexGenerator: 'faker' | 'randexp' = 'faker'): string {
   if (regexGenerator === 'randexp') {
@@ -224,6 +244,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           return node.format === 'int32' ? `faker.number.int({ max: ${maxInt32} }).toString()` : 'faker.number.bigInt().toString()'
         }
 
+        const formatCall = STRING_FORMAT_CALLS.get(node.format)
+        if (formatCall) return formatCall
+
         const { min, max } = node
         // A string as long as a large `maxLength` makes a mock of megabytes, so the length stays within 100 of the minimum.
         if (max !== undefined) return `faker.string.alpha({ length: { min: ${min ?? Math.min(1, max)}, max: ${Math.min(max, (min ?? 0) + 100)} } })`
@@ -234,6 +257,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       email: () => 'faker.internet.email()',
       url: () => 'faker.internet.url()',
       uuid: () => 'faker.string.uuid()',
+      ipv4: () => 'faker.internet.ipv4()',
+      ipv6: () => 'faker.internet.ipv6()',
       number: (node) => numberCall('float', node),
       integer: (node) =>
         numberCall('int', node.format && node.format in formatMax ? { ...node, max: Math.min(node.max ?? Infinity, formatMax[node.format]!) } : node),
