@@ -18,7 +18,7 @@ client.setConfig({
 
 ## Read the schemes of the spec
 
-`.kubb/client.ts` exports every scheme of the spec by name as `securitySchemes`. A generated operation points at its schemes there, and adds the scopes it needs:
+`.kubb/client.ts` exports the schemes of the spec by name as `securitySchemes`. A `mutualTLS` scheme is left out, since the client cannot send it. A generated operation points at its schemes there, and adds the scopes it needs:
 
 ```typescript
 security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets'] }]
