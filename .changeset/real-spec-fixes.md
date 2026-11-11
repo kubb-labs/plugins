@@ -19,4 +19,4 @@ Fix bugs found on real OpenAPI 3.0, 3.1 and 3.2 specs.
 - Prefer an exact success code such as `200` over a `2XX` range listed before it.
 - Keep an OpenAPI 3.0 `nullable: true` on an array item or a `oneOf`/`anyOf` member in the types and Zod schemas.
 - Accept a custom OpenAPI 3.2 method such as `COPY`, and stop importing a `<operation>ResponseSchema` that does not exist.
-- Type a stream variant next to another content type as `ReadableStream`, keep string event `data` as text, and read a `multipart/mixed` response as an array of parts.
+- Type a stream variant next to another content type as `ReadableStream` and keep string event `data` as text.

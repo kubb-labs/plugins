@@ -68,8 +68,9 @@ export function InfiniteQueryOptions({
   unwrapName,
   clientReturnType,
   returnType,
+  typedHeaders,
 }: Props): KubbReactNode {
-  const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver, { returnType })
+  const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
   const dataSuffix = returnType === 'data' ? '' : '.data'
 
   const { queryParamsTypeName, pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })

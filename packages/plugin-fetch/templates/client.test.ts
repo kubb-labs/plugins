@@ -30,11 +30,10 @@ import { serializeStyledQuery } from '../../plugin-client/templates/serializers/
 import { serializePath } from '../../plugin-client/templates/serializers/path.ts'
 import { serializeQuery } from '../../plugin-client/templates/serializers/query.ts'
 import { multipartFormData } from '../../plugin-client/templates/mediaTypes/formData.ts'
-import { multipartMixed } from '../../plugin-client/templates/mediaTypes/mixed.ts'
 import { urlencoded } from '../../plugin-client/templates/mediaTypes/urlencoded.ts'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
 
-const formMediaTypes = { 'multipart/form-data': multipartFormData, 'multipart/mixed': multipartMixed, 'application/x-www-form-urlencoded': urlencoded }
+const formMediaTypes = { 'multipart/form-data': multipartFormData, 'application/x-www-form-urlencoded': urlencoded }
 
 const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: serializeHeaders, cookie: serializeCookies }
 

@@ -179,8 +179,8 @@ type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | nul
  */
 function isJsonLines(entry: ResponseContentEntry): boolean {
   const baseType = baseContentType(entry.contentType)
-  // Only the types the client runtime can read: another type with an `itemSchema`, such as `multipart/mixed`, stays a plain call.
-  return Boolean(entry.stream) && baseType !== 'text/event-stream' && streamContentType.test(baseType)
+  // `multipart/mixed` is a stream of parts, not of JSON values.
+  return Boolean(entry.stream) && baseType !== 'text/event-stream' && isStreamContentType(baseType)
 }
 
 /**
@@ -251,7 +251,11 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
 }
 
 // The media types the client runtime reads as a stream. Keep in sync with `streamMediaTypes` in the client's `sse.ts`.
-const streamContentType = /^(text\/event-stream|application\/(jsonl|x-ndjson|json-seq|.+\+json-seq))$/
+const streamContentTypes = new Set(['text/event-stream', 'application/jsonl', 'application/x-ndjson', 'application/json-seq'])
+
+function isStreamContentType(baseType: string): boolean {
+  return streamContentTypes.has(baseType) || (baseType.startsWith('application/') && baseType.endsWith('+json-seq'))
+}
 
 /**
  * Whether a success response offers a stream media type next to other content types. The client returns that variant's
@@ -260,24 +264,25 @@ const streamContentType = /^(text\/event-stream|application\/(jsonl|x-ndjson|jso
 export function hasStreamVariant(node: ast.OperationNode): boolean {
   return getSuccessResponses(node.responses).some((response) => {
     const variants = (response.content ?? []).filter((entry) => entry.schema)
-    return variants.length > 1 && variants.some((entry) => streamContentType.test(baseContentType(entry.contentType)))
+    return variants.length > 1 && variants.some((entry) => isStreamContentType(baseContentType(entry.contentType)))
   })
 }
 
-const formContentTypes = ['multipart/form-data', 'multipart/mixed', 'application/x-www-form-urlencoded'] as const
+const formContentTypes = ['multipart/form-data', 'application/x-www-form-urlencoded'] as const
 
 /**
- * The form media types the operation needs a handler for: each of `multipart/form-data`, `multipart/mixed` and
- * `application/x-www-form-urlencoded` its request body offers, plus `multipart/mixed` when a response offers it.
+ * The form media types the operation's request body offers, `multipart/form-data` and `application/x-www-form-urlencoded`,
+ * which the client needs a handler for.
  */
 export function getFormContentTypes(node: ast.OperationNode): Array<(typeof formContentTypes)[number]> {
   const request = new Set((node.requestBody?.content ?? []).map((entry) => baseContentType(entry.contentType)))
-  const mixedResponse = node.responses.some((response) => (response.content ?? []).some(isPartsContent))
-  return formContentTypes.filter((contentType) => request.has(contentType) || (contentType === 'multipart/mixed' && mixedResponse))
+  return formContentTypes.filter((contentType) => request.has(contentType))
 }
 
+const jsonContentTypes = new Set(['application/json', 'text/json'])
+
 function isJsonContentType(baseType: string): boolean {
-  return baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json'
+  return jsonContentTypes.has(baseType) || baseType.endsWith('+json')
 }
 
 /**
@@ -351,7 +356,6 @@ export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaN
  */
 export function toResponseContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T, entries: ReadonlyArray<ResponseContentEntry> = [entry]): T {
   const { contentType, schema } = entry
-  if (isPartsContent(entry)) return toPartsContent(entry)
   if (!schema || entry.stream) return entry
 
   const baseType = baseContentType(contentType)
@@ -374,25 +378,6 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
   const isText = responseType === 'text' || (!responseType && isPlainMediaType && !isVendorJson)
 
   return isText ? { ...entry, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null } : entry
-}
-
-/**
- * Returns the request entry with the schema of the body the client sends. A `multipart/mixed` body with an OpenAPI 3.2
- * `itemSchema` is an array of parts, so the item becomes an array.
- */
-export function toRequestContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T): T {
-  return isPartsContent(entry) ? toPartsContent(entry) : entry
-}
-
-// Only `multipart/mixed` is a list of parts: an `itemSchema` on `multipart/form-data` still describes named fields.
-function isPartsContent(entry: ResponseContentEntry): boolean {
-  return Boolean(entry.stream?.schema) && baseContentType(entry.contentType) === 'multipart/mixed'
-}
-
-function toPartsContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T): T {
-  const { optional, ...itemSchema } = entry.stream!.schema!
-  // shortcut: `keysToOmit` applies to the top-level type only, so a part keeps its readOnly keys; move it onto the item when the printers can.
-  return { ...entry, schema: ast.factory.createSchema({ type: 'array', items: [itemSchema], optional }), keysToOmit: null }
 }
 
 /**
@@ -758,7 +743,7 @@ function buildResponseRecordEntry(
             name: 'data',
             required: true,
             schema:
-              streamData && isSuccessStatusCode(res.statusCode) && streamContentType.test(baseContentType(variant.contentType))
+              streamData && isSuccessStatusCode(res.statusCode) && isStreamContentType(baseContentType(variant.contentType))
                 ? streamData
                 : ast.factory.createSchema({ type: 'ref', name: variant.name }),
           }),
@@ -806,9 +791,17 @@ export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string
 /**
  * The class digit of a status code or range, such as `2` for `201` and `2xx`, or `null` for `default`.
  */
+const statusRanges = new Map([
+  ['1xx', 1],
+  ['2xx', 2],
+  ['3xx', 3],
+  ['4xx', 4],
+  ['5xx', 5],
+])
+
 export function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
-  const range = /^([1-5])xx$/.exec(String(statusCode))
-  if (range) return Number(range[1])
+  const range = statusRanges.get(String(statusCode))
+  if (range) return range
   const code = getStatusCodeNumber(statusCode)
 
   return code === null ? null : Math.floor(code / 100)

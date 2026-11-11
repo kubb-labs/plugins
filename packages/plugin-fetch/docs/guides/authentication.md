@@ -18,7 +18,7 @@ client.setConfig({
 
 ## Read the schemes of the spec
 
-`.kubb/client.ts` exports the schemes of the spec by name as `securitySchemes`. A `mutualTLS` scheme is left out, since the client cannot send it. A generated operation points at its schemes there, and adds the scopes it needs:
+`.kubb/client.ts` exports the schemes of the spec by name as `securitySchemes`. A `mutualTLS` scheme is left out, because its credential is a client certificate in the TLS handshake, not a token the `auth` resolver can return. See [Use mutual TLS](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/authentication#use-mutual-tls). A generated operation points at its schemes there, and adds the scopes it needs:
 
 ```typescript
 security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets'] }]
@@ -78,3 +78,7 @@ const { data } = await getPetById({ path: { petId: 1 }, client: tenant })
 To override the client for one request, pass `auth` on that single call, which suits a one-off token refresh. A header you set yourself always wins over the resolved token: client-level `headers`, or `headers` on a call to an operation that declares header parameters.
 
 For authentication outside OpenAPI security schemes, use an async request interceptor to sign requests or supply custom headers.
+
+## Use mutual TLS
+
+For a `mutualTLS` scheme, the client certificate goes on the connection, not on the request. In Node.js, send through an undici `Agent` that holds the certificate, with a [custom transport](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/transport). In the browser, the browser picks the client certificate itself.

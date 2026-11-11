@@ -22,9 +22,12 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: ResolverTs; returnType: ReturnTypeOption }): FunctionParametersNode {
-  const { resolver, returnType } = options
-  const { TData, TError } = buildResponseTypes(node, resolver, { returnType })
+function buildMutationParamsNode(
+  node: ast.OperationNode,
+  options: { resolver: ResolverTs; returnType: ReturnTypeOption; typedHeaders?: boolean },
+): FunctionParametersNode {
+  const { resolver, returnType, typedHeaders } = options
+  const { TData, TError } = buildResponseTypes(node, resolver, { returnType, typedHeaders })
   const generics = [TData, TError, resolveMutationRequestType(node, resolver), 'TContext'].join(', ')
 
   return buildHookParams(node, {
@@ -37,8 +40,8 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
   })
 }
 
-export function Mutation({ name, mutationOptionsName, node, tsResolver, mutationKeyName, customOptions, returnType }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
+export function Mutation({ name, mutationOptionsName, node, tsResolver, mutationKeyName, customOptions, returnType, typedHeaders }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const TRequest = resolveMutationRequestType(node, tsResolver)
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
@@ -47,7 +50,7 @@ export function Mutation({ name, mutationOptionsName, node, tsResolver, mutation
   const mutationOptionsConfigNode = buildMutationConfigParamsNode(node)
   const mutationOptionsParamsCall = callPrinter.print(mutationOptionsConfigNode) ?? ''
 
-  const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType })
+  const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType, typedHeaders })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

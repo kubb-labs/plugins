@@ -19,8 +19,8 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, returnType }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
+export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, returnType, typedHeaders }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
   const generics = [TData, TError, `${queryKeyTypeName} | null`]
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })

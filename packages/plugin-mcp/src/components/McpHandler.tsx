@@ -1,11 +1,5 @@
-import {
-  buildOperationComments,
-  buildRequestParamsSignature,
-  castToClientOptions,
-  getPrimarySuccessResponse,
-  hasRequestContentTypeChoice,
-} from '@internals/shared'
-import { ast } from '@kubb/kit'
+import { buildOperationComments, buildRequestParamsSignature, castToClientOptions, hasRequestContentTypeChoice } from '@internals/shared'
+import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -43,23 +37,8 @@ export function McpHandler({ name, clientName, node, resolver, returnType = 'ful
   // Tool arguments carry no media type, so the call takes the client's default one.
   const callArg = hasRequestContentTypeChoice(node) ? castToClientOptions(callConfig, clientName, returnType) : callConfig
   const body = returnType === 'data' ? 'res' : 'res.data'
-  const response = getPrimarySuccessResponse(node)
-  // `JSON.stringify` throws on the `bigint` a validated `int64` holds, so such a result goes out as a JSON number,
-  // or as a string past the safe range, which `z.coerce.bigint()` in the output schema reads back.
-  const hasBigint = !!response && !!ast.findSchema(response, { predicate: (schema) => schema.type === 'bigint', followRefs: true })
 
-  const callToolResult = hasBigint
-    ? `const text = JSON.stringify(${body}, (_key, value) => (typeof value === 'bigint' ? (Number.isSafeInteger(Number(value)) ? Number(value) : String(value)) : value))
-return {
-  content: [
-    {
-      type: 'text',
-      text
-    }
-  ],
-  structuredContent: { data: text === undefined ? undefined : JSON.parse(text) }
-}`
-    : `return {
+  const callToolResult = `return {
   content: [
     {
       type: 'text',

@@ -28,10 +28,11 @@ function buildMutationParamsNode(
     mutationArgTypeName: string
     resolver: ResolverTs
     returnType: ReturnTypeOption
+    typedHeaders?: boolean
   },
 ): FunctionParametersNode {
-  const { mutationKeyTypeName, mutationArgTypeName, resolver, returnType } = options
-  const { TData, TError } = buildResponseTypes(node, resolver, { returnType })
+  const { mutationKeyTypeName, mutationArgTypeName, resolver, returnType, typedHeaders } = options
+  const { TData, TError } = buildResponseTypes(node, resolver, { returnType, typedHeaders })
 
   return createFunctionParameters({
     params: [
@@ -58,8 +59,9 @@ export function Mutation({
   tsResolver,
   clientReturnType,
   returnType,
+  typedHeaders,
 }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
@@ -78,6 +80,7 @@ export function Mutation({
     mutationArgTypeName,
     resolver: tsResolver,
     returnType,
+    typedHeaders,
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 

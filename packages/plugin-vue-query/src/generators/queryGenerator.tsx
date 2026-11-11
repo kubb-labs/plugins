@@ -69,6 +69,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
           tsResolver={tsResolver}
           clientReturnType={contractOp.returnType}
           returnType={hook.returnType}
+          typedHeaders={hook.typedHeaders}
         />
 
         {query && hooks && (
@@ -83,6 +84,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
               node={node}
               tsResolver={tsResolver}
               returnType={hook.returnType}
+              typedHeaders={hook.typedHeaders}
             />
           </>
         )}

@@ -355,37 +355,6 @@ describe('mswGenerator body encoding', () => {
     return response?.text()
   }
 
-  test('sends an int64 mock, a bigint, as a JSON number', async () => {
-    const node = ast.factory.createOperation({
-      operationId: 'getBigPet',
-      method: 'GET',
-      path: '/getBigPet',
-      responses: [
-        ast.factory.createResponse({
-          statusCode: '200',
-          content: [
-            ast.factory.createContent({
-              contentType: 'application/json',
-              schema: ast.factory.createSchema({
-                type: 'object',
-                properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'bigint' }) })],
-              }),
-            }),
-          ],
-        }),
-      ],
-    })
-
-    expect(await getBody(node, { id: 9n })).toBe('{"id":9}')
-  })
-
-  test('prints the bigint replacer only for a response with a bigint', async () => {
-    const [file] = rawSources(await renderOperation({ name: 'getPlainPet', node: operation('getPlainPet', 'application/json'), options: {} }))
-
-    expect(file).toContain('JSON.stringify(data)')
-    expect(file).not.toContain('bigint')
-  })
-
   test('frames an event-stream mock as one data event, and sends nothing without data', async () => {
     expect(await getBody(operation('streamPet', 'text/event-stream'), { id: 1 })).toBe('data: {"id":1}\n\n')
     // A string goes out unquoted, one `data:` line per line, since the client keeps string data as text.

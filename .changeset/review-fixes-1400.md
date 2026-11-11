@@ -10,7 +10,6 @@
 
 Fix edge cases in the OpenAPI 3.1 and 3.2 support.
 
-- `multipart/mixed` keeps a part's trailing newline, throws a `ParseError` for a JSON part that is not JSON, and leaves out an `undefined` part.
 - A `Date` header passed per call goes out as ISO text, also when the spec declares no header parameters.
 - An empty exploded cookie adds no empty `; ` segment.
 - An error validator map keyed `'5XX'` still matches, next to the lower case `'5xx'`.

@@ -31,8 +31,8 @@ export function buildMutationConfigParamsNode(node: ast.OperationNode): Function
   })
 }
 
-export function MutationOptions({ name, clientName, node, tsResolver, mutationKeyName, clientReturnType, returnType }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
+export function MutationOptions({ name, clientName, node, tsResolver, mutationKeyName, clientReturnType, returnType, typedHeaders }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const configParamsNode = buildMutationConfigParamsNode(node)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''

@@ -202,8 +202,9 @@ export function buildCallResultBody(call: string, options: { clientReturnType?: 
   return `return ${call}.unwrap()`
 }
 
-function buildResultType(node: ast.OperationNode, resolver: ResolverTs): string {
-  return buildResultTypeRef('RequestResult', resolver.response.responses(node), buildResponseHeadersType({ node, types: resolver }), ['true'])
+function buildResultType(node: ast.OperationNode, resolver: ResolverTs, typedHeaders: boolean): string {
+  const headers = typedHeaders ? buildResponseHeadersType({ node, types: resolver }) : null
+  return buildResultTypeRef('RequestResult', resolver.response.responses(node), headers, ['true'])
 }
 
 type ResponseTypes = {
@@ -228,10 +229,14 @@ type ResolvePageParamTypeParams = {
  * With `returnType` `'full'`, `TData` is the client's `RequestResult` over the operation's responses record, with the
  * response headers the operation declares.
  */
-export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs, options: { returnType?: ReturnTypeOption } = {}): ResponseTypes {
-  const { returnType = 'data' } = options
+export function buildResponseTypes(
+  node: ast.OperationNode,
+  resolver: ResolverTs,
+  options: { returnType?: ReturnTypeOption; typedHeaders?: boolean } = {},
+): ResponseTypes {
+  const { returnType = 'data', typedHeaders = true } = options
   // The same operation gets typed headers from one client and not from another, so both results are kept.
-  return resolver.memo(`responseTypes:${returnType}:${Boolean(resolver.response.headers)}:${node.method}\0${node.path}`, () => {
+  return resolver.memo(`responseTypes:${returnType}:${typedHeaders}:${node.method}\0${node.path}`, () => {
     const successNames = resolveSuccessNames(node, resolver)
     const bodyName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
     // The client resolves a stream variant of a mixed response to its raw body.
@@ -239,7 +244,7 @@ export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs
     const errorNames = resolveErrorNames(node, resolver)
 
     return {
-      TData: returnType === 'data' ? responseName : buildResultType(node, resolver),
+      TData: returnType === 'data' ? responseName : buildResultType(node, resolver, typedHeaders),
       TError: `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`,
     }
   })

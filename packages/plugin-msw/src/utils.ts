@@ -104,39 +104,32 @@ export function responseReturn(body: string, status: number, response: ast.Respo
     const serialized = entry?.examples?.find((example) => example.serializedValue !== undefined)?.serializedValue
     const fallback = serialized === undefined ? "''" : toLiteral(serialized)
     if (entry?.stream?.shape !== 'event') {
-      return `${prelude}return ${responseLiteral(`${name} === undefined ? ${fallback} : \`\${${sseData(name, response)}}\\n\\n\``, status, contentType, headers)}`
+      return `${prelude}return ${responseLiteral(`${name} === undefined ? ${fallback} : \`\${${sseData(name)}}\\n\\n\``, status, contentType, headers)}`
     }
     // The item is the whole event, so its fields become SSE lines and the client parses it back to the same object.
     return `${prelude}const event = ${name} as { event?: unknown; id?: unknown; retry?: unknown; data?: unknown } | undefined
     const lines = [
       ...(['event', 'id', 'retry'] as const).filter((field) => event?.[field] !== undefined).map((field) => \`\${field}: \${event?.[field]}\`),
       // A client dispatches an event only once it has a \`data\` line, so an event without data still sends an empty one.
-      event?.data === undefined ? 'data:' : ${sseData('event.data', response)},
+      event?.data === undefined ? 'data:' : ${sseData('event.data')},
     ]
 
     return ${responseLiteral(`event === undefined ? ${fallback} : \`\${lines.join('\\n')}\\n\\n\``, status, contentType, headers)}`
   }
 
   const textContentType = hasResponseSchema(response) ? getTextContentType(response) : null
-  if (!textContentType) return `return ${responseLiteral(toJson(body, response), status, contentType, headers)}`
+  if (!textContentType) return `return ${responseLiteral(`JSON.stringify(${body})`, status, contentType, headers)}`
 
   return `${prelude}if (typeof ${name} === 'string') return ${responseLiteral(name, status, textContentType, headers)}
 
-    return ${responseLiteral(toJson(name, response), status, contentType, headers)}`
+    return ${responseLiteral(`JSON.stringify(${name})`, status, contentType, headers)}`
 }
 
 /**
  * The `data:` lines of one Server-Sent Event. A string goes out as it is, since a client keeps string `data` as text.
  */
-function sseData(body: string, response: ast.ResponseNode | null | undefined): string {
-  return `(typeof ${body} === 'string' ? ${body} : ${toJson(body, response)}).split('\\n').map((line) => \`data: \${line}\`).join('\\n')`
-}
-
-// An `int64` mock is a `bigint`, which `JSON.stringify` rejects, so a response that can hold one sends it as a JSON number like
-// the client does: one with a `bigint` in its schema, or one without a schema, whose `data` takes any object.
-function toJson(body: string, response: ast.ResponseNode | null | undefined): string {
-  const hasBigint = !hasResponseSchema(response) || ast.findSchema(response!, { predicate: (schema) => schema.type === 'bigint', followRefs: true })
-  return hasBigint ? `JSON.stringify(${body}, (_key, value) => (typeof value === 'bigint' ? Number(value) : value))` : `JSON.stringify(${body})`
+function sseData(body: string): string {
+  return `(typeof ${body} === 'string' ? ${body} : JSON.stringify(${body})).split('\\n').map((line) => \`data: \${line}\`).join('\\n')`
 }
 
 /**

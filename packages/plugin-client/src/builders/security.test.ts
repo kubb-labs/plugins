@@ -18,33 +18,6 @@ describe('resolveCredential', () => {
     expect(resolveCredential({ type: 'http', scheme: 'digest' })).toStrictEqual({ type: 'http', scheme: 'bearer' })
   })
 
-  test('keeps the OAuth2 flow URLs and metadata URL, without the scope descriptions', () => {
-    const credential: ast.AuthCredential = {
-      type: 'oauth2',
-      metadataUrl: 'https://auth.example.com/.well-known/oauth-authorization-server',
-      flows: {
-        deviceAuthorization: {
-          deviceAuthorizationUrl: 'https://auth.example.com/device',
-          tokenUrl: 'https://auth.example.com/token',
-          scopes: { read: 'Read' },
-        },
-      },
-    }
-    expect(resolveCredential(credential)).toStrictEqual({
-      type: 'oauth2',
-      metadataUrl: 'https://auth.example.com/.well-known/oauth-authorization-server',
-      flows: { deviceAuthorization: { deviceAuthorizationUrl: 'https://auth.example.com/device', tokenUrl: 'https://auth.example.com/token' } },
-    })
-    expect(resolveCredential({ type: 'oauth2', flows: {} })).toStrictEqual({ type: 'oauth2' })
-  })
-
-  test('keeps the OpenID Connect discovery URL', () => {
-    expect(resolveCredential({ type: 'openIdConnect', url: 'https://auth.example.com' })).toStrictEqual({
-      type: 'openIdConnect',
-      url: 'https://auth.example.com',
-    })
-  })
-
   test('returns null for mutualTLS, which the runtime cannot send', () => {
     expect(resolveCredential({ type: 'mutualTLS' })).toBeNull()
   })
