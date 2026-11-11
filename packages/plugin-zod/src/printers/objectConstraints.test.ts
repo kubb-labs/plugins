@@ -38,38 +38,38 @@ describe.each([
   })
 
   test.each([
-    { minProperties: 1, input: {}, valid: false },
-    { minProperties: 1, input: { a: 'a' }, valid: true },
-    { maxProperties: 1, input: { a: 'a', b: 'b' }, valid: false },
-    { maxProperties: 1, input: { a: 'a' }, valid: true },
-    { maxProperties: 0, input: {}, valid: true },
-    { maxProperties: 0, input: { a: 'a' }, valid: false },
-    { minProperties: 0, input: {}, valid: true },
-    { minProperties: 1, maxProperties: 2, input: { a: 'a', b: 'b' }, valid: true },
-    { minProperties: 1, maxProperties: 2, input: {}, valid: false },
-    { minProperties: 1, maxProperties: 2, input: { a: 'a', b: 'b', c: 'c' }, valid: false },
-  ])('enforces $minProperties <= property count <= $maxProperties for $input', ({ input, valid, ...constraints }) => {
+    { min: 1, input: {}, valid: false },
+    { min: 1, input: { a: 'a' }, valid: true },
+    { max: 1, input: { a: 'a', b: 'b' }, valid: false },
+    { max: 1, input: { a: 'a' }, valid: true },
+    { max: 0, input: {}, valid: true },
+    { max: 0, input: { a: 'a' }, valid: false },
+    { min: 0, input: {}, valid: true },
+    { min: 1, max: 2, input: { a: 'a', b: 'b' }, valid: true },
+    { min: 1, max: 2, input: {}, valid: false },
+    { min: 1, max: 2, input: { a: 'a', b: 'b', c: 'c' }, valid: false },
+  ])('enforces $min <= property count <= $max for $input', ({ input, valid, ...constraints }) => {
     const node = ast.factory.createSchema({ type: 'object', properties: [property], ...constraints })
     const schema = evaluate(printer.print(node))
     expect(schema.safeParse(input).success).toBe(valid)
   })
 
   test('counts input keys before unknown properties are stripped', () => {
-    const node = ast.factory.createSchema({ type: 'object', properties: [property], minProperties: 1 })
+    const node = ast.factory.createSchema({ type: 'object', properties: [property], min: 1 })
     expect(evaluate(printer.print(node)).parse({ b: 'b' })).toStrictEqual({})
   })
 
   test('does not count properties inserted by defaults', () => {
     const node = ast.factory.createSchema({
       type: 'object',
-      minProperties: 1,
+      min: 1,
       properties: [ast.factory.createProperty({ name: 'a', schema: ast.factory.createSchema({ type: 'string', default: 'a' }) })],
     })
     expect(evaluate(printer.print(node)).safeParse({}).success).toBe(false)
   })
 
   test.each([true, false, ast.factory.createSchema({ type: 'string' })])('enforces bounds with additionalProperties: %s', (additionalProperties) => {
-    const node = ast.factory.createSchema({ type: 'object', additionalProperties, minProperties: 1, maxProperties: 1 })
+    const node = ast.factory.createSchema({ type: 'object', additionalProperties, min: 1, max: 1 })
     const schema = evaluate(printer.print(node))
     expect(schema.safeParse({}).success).toBe(false)
     expect(schema.safeParse({ a: 'a', b: 'b' }).success).toBe(false)
@@ -77,7 +77,7 @@ describe.each([
   })
 
   test('preserves nullable and optional object modifiers', () => {
-    const node = ast.factory.createSchema({ type: 'object', minProperties: 1, nullable: true, optional: true })
+    const node = ast.factory.createSchema({ type: 'object', min: 1, nullable: true, optional: true })
     const schema = evaluate(printer.print(node))
     expect(schema.parse(null)).toBeNull()
     expect(schema.parse(undefined)).toBeUndefined()
@@ -87,7 +87,7 @@ describe.each([
   })
 
   test.each([true, false])('preserves constraints on an allOf member when first: %s', (first) => {
-    const constrained = ast.factory.createSchema({ type: 'object', properties: [property], minProperties: 1 })
+    const constrained = ast.factory.createSchema({ type: 'object', properties: [property], min: 1 })
     const other = ast.factory.createSchema({ type: 'object', properties: [] })
     const node = ast.factory.createSchema({ type: 'intersection', members: first ? [constrained, other] : [other, constrained] })
     const schema = evaluate(printer.print(node))
@@ -96,7 +96,7 @@ describe.each([
   })
 
   test('preserves constraints when omitting an object property', () => {
-    const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [property], minProperties: 1 })
+    const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [property], min: 1 })
     const schema = evaluate(createPrinter({ keysToOmit: ['a'] }).print(node))
     expect(schema.safeParse({}).success).toBe(false)
     expect(schema.parse({ a: 'a' })).toStrictEqual({})
@@ -105,7 +105,7 @@ describe.each([
   test('enforces bounds on nested objects', () => {
     const node = ast.factory.createSchema({
       type: 'object',
-      properties: [ast.factory.createProperty({ name: 'nested', required: true, schema: ast.factory.createSchema({ type: 'object', maxProperties: 0 }) })],
+      properties: [ast.factory.createProperty({ name: 'nested', required: true, schema: ast.factory.createSchema({ type: 'object', max: 0 }) })],
     })
     const schema = evaluate(printer.print(node))
     expect(schema.parse({ nested: {} })).toStrictEqual({ nested: {} })
@@ -115,7 +115,7 @@ describe.each([
   test('enforces bounds on discriminated union members', () => {
     const member = ast.factory.createSchema({
       type: 'object',
-      minProperties: 2,
+      min: 2,
       properties: [
         ast.factory.createProperty({ name: 'kind', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: ['a'] }) }),
         property,

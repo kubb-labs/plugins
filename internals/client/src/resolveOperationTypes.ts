@@ -8,8 +8,8 @@ const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
 type GeneratorDriver = GeneratorContext['driver']
 
 /**
- * The two per-operation type names a generated client references: the grouped input and the
- * per-status responses record its `RequestResult` is keyed on.
+ * The per-operation type names a generated client references: the grouped input, the per-status
+ * responses record its `RequestResult` is keyed on, and the headers each response declares.
  */
 export type OperationTypeNames = {
   response: {
@@ -21,7 +21,30 @@ export type OperationTypeNames = {
      * Resolves the name of the operation's per-status responses record type.
      */
     responses(node: ast.OperationNode): string
+    /**
+     * Resolves the name of the type of the headers one response declares. Left out, results keep untyped headers.
+     */
+    headers?(node: ast.OperationNode, statusCode: ast.StatusCode): string
   }
+}
+
+function getResponseHeaderTypes({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<[ast.StatusCode, string]> {
+  const resolve = types.response.headers
+  if (!resolve) return []
+  return node.responses
+    .filter((response) => response.headers?.length)
+    .map((response) => [response.statusCode, resolve.call(types.response, node, response.statusCode)])
+}
+
+/** The headers type argument of `RequestResult`, such as `{ '200': LoginUserStatus200Headers }`, or `null` when no response declares headers. */
+export function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
+  const entries = getResponseHeaderTypes({ node, types }).map(([statusCode, name]) => `'${statusCode}': ${name}`)
+  return entries.length ? `{ ${entries.join('; ')} }` : null
+}
+
+/** The names of the headers types `buildResponseHeadersType` references, for the file's imports. */
+export function getResponseHeadersTypeNames({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<string> {
+  return getResponseHeaderTypes({ node, types }).map(([, name]) => name)
 }
 
 /**
@@ -68,6 +91,7 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
       status: (node: ast.OperationNode, statusCode: ast.StatusCode) => type(resolver.response.status(node, statusCode)),
       response: (node: ast.OperationNode) => type(resolver.response.response(node)),
       responses: (node: ast.OperationNode) => type(resolver.response.responses(node)),
+      headers: (node: ast.OperationNode, statusCode: ast.StatusCode) => type(resolver.response.headers(node, statusCode)),
       options: (node: ast.OperationNode) => resolver.response.options(node),
     },
   } as unknown as ResolverTs

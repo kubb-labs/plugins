@@ -11,13 +11,13 @@ export function createApiErrorDetailed(data?: Partial<ApiErrorDetailed>): ApiErr
   return (data ??
     faker.helpers.arrayElement([
       {
-        error: faker.helpers.arrayElement<(NonNullable<ApiErrorDetailed> & Record<'error', unknown>)['error']>(['validation_failed']),
+        error: faker.helpers.arrayElement(['validation_failed'] as Array<(NonNullable<ApiErrorDetailed> & Record<'error', unknown>)['error']>),
         details: {
           field_errors: faker.string.alpha(),
         },
       },
       {
-        error: faker.helpers.arrayElement<(NonNullable<ApiErrorDetailed> & Record<'error', unknown>)['error']>(['rate_limited']),
+        error: faker.helpers.arrayElement(['rate_limited'] as Array<(NonNullable<ApiErrorDetailed> & Record<'error', unknown>)['error']>),
         details: {
           retry_after_seconds: faker.number.int(),
         },

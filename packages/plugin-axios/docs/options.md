@@ -148,7 +148,7 @@ Shape of the value a generated call resolves to.
 ::field-group
 
 :::field{name="'full'"}
-Default value. Returns `{ status, data, error, contentType, request, response }`.
+Default value. Returns `{ status, data, error, contentType, headers, request, response }`. `headers` is the response's `Headers`. For an operation whose responses declare `headers`, its `get` suggests those names once `status` is narrowed, and the values stay strings.
 :::
 
 :::field{name="'data'"}

@@ -3,8 +3,27 @@ import { Readable } from 'node:stream'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { afterEach, describe, expect, test, vi } from 'vitest'
+import { multipartFormData } from '../../plugin-client/templates/mediaTypes/formData.ts'
+import { multipartMixed } from '../../plugin-client/templates/mediaTypes/mixed.ts'
+import { urlencoded } from '../../plugin-client/templates/mediaTypes/urlencoded.ts'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
-import { client, createAxiosTransport, createClient, createClientCore, formMediaTypes, getAxiosInstance, ResponseError } from './client.ts'
+import { serializeCookies } from '../../plugin-client/templates/serializers/cookies.ts'
+import { serializeHeaders } from '../../plugin-client/templates/serializers/headers.ts'
+import { serializeStyledPath } from '../../plugin-client/templates/serializers/pathStyles.ts'
+import { serializeStyledQuery } from '../../plugin-client/templates/serializers/queryStyles.ts'
+import { client, createAxiosTransport, createClient, createClientCore as createCore, getAxiosInstance, ResponseError } from './client.ts'
+import type { NativeRequest, NativeResponse } from './client.ts'
+
+const formMediaTypes = { 'multipart/form-data': multipartFormData, 'multipart/mixed': multipartMixed, 'application/x-www-form-urlencoded': urlencoded }
+
+const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: serializeHeaders, cookie: serializeCookies }
+
+// `.kubb/client.ts` registers the serializers of a spec. These tests register all of them.
+function createClientCore<TRequest = NativeRequest, TResponse = NativeResponse>(options: Parameters<typeof createCore<TRequest, TResponse>>[0]) {
+  return createCore<TRequest, TResponse>({ ...options, serializer: { ...serializers, ...options.serializer } })
+}
+
+client.setConfig({ serializer: serializers })
 
 type Programmed = { data?: unknown; status?: number; statusText?: string; headers?: Record<string, unknown> }
 

@@ -65,7 +65,7 @@ export function createUpdatePetBodyJson<TData extends Partial<UpdatePetBodyJson>
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -76,7 +76,7 @@ export function createUpdatePetBodyXml<TData extends Partial<UpdatePetBodyXml> =
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -87,7 +87,7 @@ export function createUpdatePetBodyFormUrlEncoded<TData extends Partial<UpdatePe
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as unknown as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -98,11 +98,5 @@ export function createUpdatePetBody(data?: Partial<UpdatePetBody>): UpdatePetBod
 }
 
 export function createUpdatePetResponse(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
-  return (data ??
-    faker.helpers.arrayElement([
-      createUpdatePetStatus200(),
-      createUpdatePetStatus400(),
-      createUpdatePetStatus404(),
-      createUpdatePetStatus405(),
-    ])) as UpdatePetResponse
+  return (data ?? faker.helpers.arrayElement([createPet(), faker.string.alpha()])) as UpdatePetResponse
 }

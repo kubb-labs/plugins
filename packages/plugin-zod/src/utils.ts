@@ -39,7 +39,7 @@ export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
  */
 export function isPlainInlineObject(node: ast.SchemaNode): boolean {
   if (node.type !== 'object') return false
-  if (node.minProperties !== undefined || node.maxProperties !== undefined) return false
+  if (hasPropertyCounts(node)) return false
   if (node.nullable || node.optional || node.nullish) return false
 
   const hasAdditionalProperties = node.additionalProperties !== undefined
@@ -57,8 +57,8 @@ export function isPlainInlineObject(node: ast.SchemaNode): boolean {
  */
 export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.nullable || node.optional || node.nullish) return false
+  if (hasPropertyCounts(node)) return false
   if (node.type === 'object') {
-    if (node.minProperties !== undefined || node.maxProperties !== undefined) return false
     const hasProperties = Boolean(node.properties?.length)
     const hasTypedAdditionalProperties = Boolean(node.additionalProperties && node.additionalProperties !== true)
     const hasPatternProperties = Boolean(node.patternProperties)
@@ -166,6 +166,8 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   // it produces a bare `.default()` (no argument). Drop it.
   if (value === null) return null
   const resolved = node ? syncSchemaRef(node) : undefined
+  // A binary schema parses to a `Blob`, which a spec default, a string, cannot be.
+  if (resolved?.type === 'blob') return null
   if (resolved && ast.narrowSchema(resolved, 'bigint')) {
     if (typeof value === 'bigint') return `BigInt(${value})`
     if (typeof value === 'number' && Number.isInteger(value)) return `BigInt(${value})`
@@ -220,13 +222,7 @@ export function buildLiteral(value: unknown): string {
 /**
  * Numeric constraint limits for Zod schemas (min, max, and exclusive bounds).
  */
-export type NumericConstraints = {
-  min?: number
-  max?: number
-  exclusiveMinimum?: number
-  exclusiveMaximum?: number
-  multipleOf?: number
-}
+export type NumericConstraints = Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive' | 'multipleOf'>
 
 /**
  * Length constraint limits for string and array schemas (min, max, and regex pattern).
@@ -305,13 +301,13 @@ export type ModifierOptions = {
  * Build `.min()` / `.max()` / `.gt()` / `.lt()` constraint chains for numbers
  * using the standard chainable Zod v4 API.
  */
-export function numberConstraints({ min, max, exclusiveMinimum, exclusiveMaximum, multipleOf }: NumericConstraints): string {
+export function numberConstraints({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): string {
   return [
-    min !== undefined ? `.min(${min})` : '',
-    max !== undefined ? `.max(${max})` : '',
-    exclusiveMinimum !== undefined ? `.gt(${exclusiveMinimum})` : '',
-    exclusiveMaximum !== undefined ? `.lt(${exclusiveMaximum})` : '',
-    multipleOf !== undefined ? `.multipleOf(${multipleOf})` : '',
+    min !== undefined ? `.min(${min}${suffix})` : '',
+    max !== undefined ? `.max(${max}${suffix})` : '',
+    exclusive?.min !== undefined ? `.gt(${exclusive.min}${suffix})` : '',
+    exclusive?.max !== undefined ? `.lt(${exclusive.max}${suffix})` : '',
+    multipleOf !== undefined ? `.multipleOf(${multipleOf}${suffix})` : '',
   ].join('')
 }
 
@@ -330,12 +326,12 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
 /**
  * Build `.check(z.minimum(), z.maximum())` for `zod/mini` numeric constraints.
  */
-export function numberChecksMini({ min, max, exclusiveMinimum, exclusiveMaximum, multipleOf }: NumericConstraints): string {
+export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericConstraints): string {
   const checks: Array<string> = []
   if (min !== undefined) checks.push(`z.minimum(${min})`)
   if (max !== undefined) checks.push(`z.maximum(${max})`)
-  if (exclusiveMinimum !== undefined) checks.push(`z.minimum(${exclusiveMinimum}, { exclusive: true })`)
-  if (exclusiveMaximum !== undefined) checks.push(`z.maximum(${exclusiveMaximum}, { exclusive: true })`)
+  if (exclusive?.min !== undefined) checks.push(`z.gt(${exclusive.min})`)
+  if (exclusive?.max !== undefined) checks.push(`z.lt(${exclusive.max})`)
   if (multipleOf !== undefined) checks.push(`z.multipleOf(${multipleOf})`)
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
@@ -351,6 +347,10 @@ export function lengthChecksMini({ min, max, pattern, regexType }: LengthConstra
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
 
+export function hasPropertyCounts(node: ast.SchemaNode): boolean {
+  return node.type === 'object' && (node.min !== undefined || node.max !== undefined)
+}
+
 /**
  * Checks property counts before object parsing strips unknown keys or inserts defaults.
  */
@@ -358,15 +358,11 @@ export function objectConstraints({ value, node }: { value: string; node: ast.Sc
   if (node.type !== 'object') return value
   const checks: Array<string> = []
   const skip = 'typeof value !== "object" || value === null || Array.isArray(value)'
-  if (node.minProperties !== undefined) {
-    checks.push(
-      `z.refine(value => ${skip} || Object.keys(value).length >= ${node.minProperties}, { message: "Object must have at least ${node.minProperties} properties" })`,
-    )
+  if (node.min !== undefined) {
+    checks.push(`z.refine(value => ${skip} || Object.keys(value).length >= ${node.min}, { message: "Object must have at least ${node.min} properties" })`)
   }
-  if (node.maxProperties !== undefined) {
-    checks.push(
-      `z.refine(value => ${skip} || Object.keys(value).length <= ${node.maxProperties}, { message: "Object must have at most ${node.maxProperties} properties" })`,
-    )
+  if (node.max !== undefined) {
+    checks.push(`z.refine(value => ${skip} || Object.keys(value).length <= ${node.max}, { message: "Object must have at most ${node.max} properties" })`)
   }
   return checks.length ? `z.pipe(z.unknown().check(${checks.join(', ')}), ${value})` : value
 }
@@ -385,7 +381,9 @@ export function applyModifiers({ value, schema, nullable, optional, nullish, def
   const literal = defaultValue !== undefined ? defaultLiteral(schema, defaultValue) : null
   const withDefault = literal !== null ? `${withModifier}.default(${literal})` : withModifier
   const withDescription = description ? `${withDefault}.describe(${stringify(description)})` : withDefault
-  return examples?.length ? `${withDescription}.meta({ examples: [${examples.map(formatDefault).join(', ')}] })` : withDescription
+  return examples?.length
+    ? `${withDescription}.meta({ examples: [${examples.map((example) => (example === null ? 'null' : formatDefault(example))).join(', ')}] })`
+    : withDescription
 }
 
 function modifierDepth(schema: ast.SchemaNode): number {
@@ -440,6 +438,21 @@ export const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
   ['duration', 'z.iso.duration()'],
   ['hostname', 'z.hostname()'],
 ])
+
+/**
+ * Calls for a string's `contentEncoding` with a dedicated Zod constructor.
+ */
+export const CONTENT_ENCODING_CALLS = new Map<string | undefined, string>([
+  ['base64', 'z.base64()'],
+  ['base64url', 'z.base64url()'],
+])
+
+/**
+ * The check for a string that holds a JSON document: it must parse, and the parsed value must pass `schema`.
+ */
+export function jsonContentCheck(schema: string): string {
+  return `(value) => { try { return ${schema}.safeParse(JSON.parse(value)).success } catch { return false } }, { message: "String must hold JSON that matches its content schema" }`
+}
 
 /**
  * Marks an inline `oneOf` object strict, so `object()` builds `z.strictObject(...)` and no eager `.shape` read hits a deferred getter.
@@ -535,7 +548,7 @@ export function printWithOmit(
     const mask = `{ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }`
     const omit = (target: string) => {
       const inner = `${target}${unwrap}`
-      const hasObjectConstraints = meta.type === 'object' && (meta.minProperties !== undefined || meta.maxProperties !== undefined)
+      const hasObjectConstraints = hasPropertyCounts(meta)
       const pipe = mini ? `${inner}._zod.def` : inner
       const object = hasObjectConstraints ? `${pipe}.out` : inner
       const omitted = mini ? `z.omit(${object}, ${mask})` : `${object}.omit(${mask})`

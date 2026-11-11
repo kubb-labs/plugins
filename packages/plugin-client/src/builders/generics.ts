@@ -1,17 +1,15 @@
 import type { ast } from '@kubb/kit'
-import type { OperationTypeNames } from '@internals/client'
+import { buildResponseHeadersType, type OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 
 /**
- * Builds the `RequestResult` generic arguments for one operation: the per-status responses record
- * plus the per-call `ThrowOnError` flag. `SuccessOf` / `ErrorOf` split the record inside the
- * runtime, so this only names the record and threads `ThrowOnError`.
+ * Builds the `RequestResult` type arguments of one operation: responses, `ThrowOnError` and the response headers, when a response declares any.
  *
  * @example
- * `buildRequestResultGenerics({ node, types }) // 'AddPetResponses, ThrowOnError'`
+ * `buildRequestResultGenerics({ node, types }) // "LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }"`
  */
 export function buildRequestResultGenerics({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string {
-  return `${types.response.responses(node)}, ThrowOnError`
+  return [types.response.responses(node), 'ThrowOnError', buildResponseHeadersType({ node, types })].filter(Boolean).join(', ')
 }
 
 /**
@@ -25,8 +23,9 @@ export function buildRequestResultGenerics({ node, types }: { node: ast.Operatio
  * `buildResultType({ node, types, returnType: 'data' }) // 'Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>'`
  */
 export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ReturnTypeOption }): string {
-  const generics = buildRequestResultGenerics({ node, types })
-  if (returnType === 'data') return `Promise<UnwrappedResult<${generics}>>`
-  if (returnType === 'plain') return `Promise<RequestResult<${generics}>>`
-  return `Unwrappable<RequestResult<${generics}>>`
+  const responses = types.response.responses(node)
+  const headers = buildResponseHeadersType({ node, types })
+  const name = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
+  const result = headers ? `${name}WithHeaders<${responses}, ${headers}, ThrowOnError>` : `${name}<${responses}, ThrowOnError>`
+  return returnType === 'full' ? `Unwrappable<${result}>` : `Promise<${result}>`
 }

@@ -2,7 +2,7 @@
 
 import type { Options, Unwrappable, RequestResult } from './.kubb/client'
 import type { AddPetOptions, AddPetResponses } from './AddPet'
-import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from './.kubb/client'
 
 /**
  * `POST /pet`
@@ -16,7 +16,7 @@ export function addPet<ThrowOnError extends boolean = true>(
     apiClient<AddPetResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet',
-      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/json' },
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),

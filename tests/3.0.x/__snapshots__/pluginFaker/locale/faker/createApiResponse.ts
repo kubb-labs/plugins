@@ -8,7 +8,7 @@ import { fakerDE as faker } from '@faker-js/faker'
 
 export function createApiResponse<TData extends Partial<ApiResponse> = object>(data?: TData) {
   const defaultFakeData = {
-    code: faker.number.int(),
+    code: faker.number.int({ max: 2147483647 }),
     type: faker.string.alpha(),
     message: faker.string.alpha(),
   }

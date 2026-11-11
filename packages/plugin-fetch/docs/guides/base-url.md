@@ -20,6 +20,24 @@ paths:
 
 A relative server URL, such as `/v2`, or one with `{variable}` placeholders is skipped, so the client's `baseURL` applies.
 
+## Pick a server by name
+
+OpenAPI 3.2 lets a server have a `name`. The generated `.kubb/client.ts` exports the document's named servers as `servers`, so you can pick one by name:
+
+```yaml [petStore.yaml]
+servers:
+  - url: https://api.example.com
+    name: production
+  - url: https://staging.example.com
+    name: staging
+```
+
+```typescript
+import { client, servers } from './gen/.kubb/client'
+
+client.setConfig({ baseURL: servers.staging })
+```
+
 ## Use the baseURL option
 
 Pass `baseURL` to `pluginFetch` to set the generated default. Add `pluginTs` for the operation types.

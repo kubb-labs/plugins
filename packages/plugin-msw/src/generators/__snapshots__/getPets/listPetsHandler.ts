@@ -7,7 +7,7 @@
 import type { ListPetsResponse, ListPetsStatus400 } from './ListPets'
 import { http, HttpResponse } from 'msw/http'
 
-export function listPetsHandlerResponse200(data: ListPetsResponse) {
+export function listPetsHandlerResponse200(data?: ListPetsResponse) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -17,9 +17,12 @@ export function listPetsHandlerResponse200(data: ListPetsResponse) {
 }
 
 export function listPetsHandlerResponse400(data?: ListPetsStatus400) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 400,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 400,
+    },
+  )
 }
 
 export function listPetsHandler(
@@ -29,11 +32,6 @@ export function listPetsHandler(
   return http.get(`${options?.baseURL ?? ''}/pets`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    return listPetsHandlerResponse200(data)
   })
 }

@@ -8,19 +8,25 @@ import type { HttpResponseResolver } from 'msw/http'
 import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
-export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
+export function placeOrderPatchHandlerResponse200(data?: PlaceOrderPatchResponse) {
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     },
-  })
+  )
 }
 
 export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus405) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 405,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 405,
+    },
+  )
 }
 
 export function placeOrderPatchHandler(
@@ -34,12 +40,7 @@ export function placeOrderPatchHandler(
     function handler(info) {
       if (typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      return placeOrderPatchHandlerResponse200(data)
     },
   )
 }

@@ -1,6 +1,6 @@
 import { buildRequestParamsSignature } from '@internals/shared'
-import { Url } from '@kubb/kit'
-import type { ast } from '@kubb/kit'
+import { singleQuote } from '@internals/utils'
+import { ast, Url } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -33,18 +33,58 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
 
   // `cy.request` has no cookie option, so the cookie group goes out as a `Cookie` header. An array joins with commas, a Date
   // is ISO 8601, and an object is JSON.
-  // shortcut: ignores per-cookie `style` and `explode`, upgrade when a spec needs exploded cookie arrays in Cypress.
-  const encodeCookie =
-    "encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))"
+  // shortcut: ignores `explode` on `form` cookies, upgrade when a spec needs exploded form cookie arrays in Cypress.
+  const cookieText =
+    "value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value)"
+  // The OpenAPI 3.2 `cookie` style sends a value as it is, and throws on one it cannot send, like the generated clients do.
+  // With `explode` (its default) an array sends one cookie per item and an object one cookie per key, otherwise both join with commas.
+  const rawParameters = node.parameters.filter((parameter) => parameter.in === 'cookie' && parameter.style === 'cookie')
+  const rawCookies = rawParameters.map((parameter) => singleQuote(parameter.name))
+  // Only an array or object needs the join and explode code. A value with one primitive type goes out as one cookie.
+  const isComposite = (parameter: ast.ParameterNode) =>
+    !['string', 'number', 'integer', 'bigint', 'boolean'].includes(ast.resolveRef(parameter.schema).primitive ?? '')
+  const isExploded = (parameter: ast.ParameterNode) => parameter.explode !== false && isComposite(parameter)
+  const explodedCookies = rawParameters.filter(isExploded).map((parameter) => singleQuote(parameter.name))
+  const joinedCookies = rawParameters.filter((parameter) => !isExploded(parameter)).map((parameter) => singleQuote(parameter.name))
+  const compositeLines = rawParameters.some(isComposite)
+    ? `  if (Array.isArray(value)) return value.filter((item) => item != null).map(rawCookie).join(',')
+  if (typeof value === 'object' && value !== null && !(value instanceof Date)) return Object.entries(value).filter(([, item]) => item != null).flat().map(rawCookie).join(',')\n`
+    : ''
+  const explodeCookieLine = explodedCookies.length
+    ? `const explodeCookie = (name: string, value: unknown): Array<string> => {
+  if (Array.isArray(value)) return value.filter((item) => item != null).map((item) => \`\${name}=\${rawCookie(item)}\`)
+  if (typeof value === 'object' && value !== null && !(value instanceof Date)) return Object.entries(value).filter(([, item]) => item != null).map(([key, item]) => \`\${rawCookie(key)}=\${rawCookie(item)}\`)
+  return [\`\${name}=\${rawCookie(value)}\`]
+}\n`
+    : ''
+  // Keep the cookie-octet pattern in step with `rawCookieValue` in plugin-client's `templates/serializers.ts`.
+  const rawCookieLine = rawCookies.length
+    ? `const rawCookie = (value: unknown): string => {
+${compositeLines}  const text = value instanceof Date ? value.toISOString() : String(value)
+  if (!/^[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]*$/.test(text)) throw new TypeError('A cookie has characters the cookie style cannot send, escape it first.')
+  return text
+}\n${explodeCookieLine}`
+    : ''
+  const encodeCookie = joinedCookies.length
+    ? `([${joinedCookies.join(', ')}].includes(name) ? rawCookie(value) : encodeURIComponent(${cookieText}))`
+    : `encodeURIComponent(${cookieText})`
+  const toCookies = explodedCookies.length
+    ? `.flatMap(([name, value]) => ([${explodedCookies.join(', ')}].includes(name) ? explodeCookie(name, value) : [\`\${name}=\${${encodeCookie}}\`]))`
+    : `.map(([name, value]) => \`\${name}=\${${encodeCookie}}\`)`
   // Built first and sent only when non-empty, so a call without cookies keeps the cookies Cypress attaches itself.
-  const cookieLine = `const cookie = Object.entries(cookies ?? {}).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')\n`
+  const cookieLine = `${rawCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null)${toCookies}.join('; ')\n`
+
+  // Cypress types a body as a string or an object, so a body that is one number or has no schema type is cast, and an
+  // `int64` is sent as a number.
+  const bodySchema = node.requestBody?.content?.[0]?.schema && ast.resolveRef(node.requestBody.content[0].schema)
+  const castBody = bodySchema && (['number', 'integer', 'bigint'].includes(bodySchema.primitive ?? '') || ['unknown', 'any'].includes(bodySchema.type))
 
   const requestOptions = [
-    `method: '${node.method}'`,
+    `method: ${singleQuote(node.method)}`,
     `url: ${urlTemplate}`,
     groups.query && 'qs: query',
     groups.cookies ? `headers: { ${groups.headers ? '...headers, ' : ''}...(cookie ? { Cookie: cookie } : {}) }` : groups.headers && 'headers',
-    groups.body && 'body',
+    groups.body && (castBody ? "body: (typeof body === 'bigint' ? Number(body) : body) as unknown as Cypress.RequestBody" : 'body'),
     '...options',
   ].filter(Boolean)
 

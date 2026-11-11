@@ -66,8 +66,8 @@ export function setupClient({
   setResolver(resolved.resolver)
   setMacros([...defaultMacros, ...macros])
 
-  const sse = templatePath('sse.ts')
-  addGenerator<ContractClientFactory>(resolved.sdk ? createSdkGenerator({ sse }) : createClientGenerator(name, { sse }))
+  const templates = templatePath('')
+  addGenerator<ContractClientFactory>(resolved.sdk ? createSdkGenerator({ templates }) : createClientGenerator(name, { templates }))
 
   const root = path.resolve(config.root, config.output.path)
   const files = [

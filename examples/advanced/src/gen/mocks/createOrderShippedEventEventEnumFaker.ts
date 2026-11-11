@@ -2,5 +2,5 @@ import type { OrderShippedEventEventEnumKey } from '../models/ts/OrderShippedEve
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createOrderShippedEventEventEnumFaker(data?: OrderShippedEventEventEnumKey): OrderShippedEventEventEnumKey {
-  return data ?? faker.helpers.arrayElement<OrderShippedEventEventEnumKey>(['order_shipped'])
+  return data ?? faker.helpers.arrayElement(['order_shipped'] as Array<OrderShippedEventEventEnumKey>)
 }

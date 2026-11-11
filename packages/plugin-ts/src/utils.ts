@@ -65,13 +65,6 @@ export function isInlineConstEnum(node: ast.EnumSchemaNode, enumSchemaNames?: Re
   return isConst && !(node.name && enumSchemaNames?.has(node.name))
 }
 
-/**
- * Collects JSDoc annotation strings for a schema node.
- *
- * Only uses official JSDoc tags from https://jsdoc.app/: `@description`, `@deprecated`, `@default`, `@example`, `@type`.
- * Constraint metadata (min/max length, pattern, multipleOf, min/maxProperties) is emitted as plain-text lines.
-
- */
 function isSchemaOptional(schema: ast.SchemaNode): boolean {
   return Boolean(('optional' in schema && schema.optional) || ('nullish' in schema && schema.nullish))
 }
@@ -94,10 +87,18 @@ export function isBinarySchema(schema: ast.SchemaNode): boolean {
   return !!meta && (isBlob(meta) || (meta.type === 'array' && 'items' in meta && (meta.items ?? []).some(isBlob)))
 }
 
+/**
+ * Collects JSDoc annotation strings for a schema node.
+ *
+ * Only uses official JSDoc tags from https://jsdoc.app/: `@description`, `@deprecated`, `@minimum`, `@maximum`, `@minLength`,
+ * `@maxLength`, `@pattern`, `@default`, `@example`, `@see` and `@type`.
+ */
 export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
   const meta = syncSchemaRef(schema)
 
   const isArray = meta?.primitive === 'array'
+  // An object's `min`/`max` count properties, which no JSDoc tag describes.
+  const isObject = meta?.type === 'object'
   const isNumeric = meta?.primitive === 'number' || meta?.primitive === 'integer' || meta?.primitive === 'bigint'
 
   const hasDescription = meta && 'description' in meta && meta.description
@@ -118,13 +119,14 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
     ...formatComment,
     meta && 'deprecated' in meta && meta.deprecated ? '@deprecated' : null,
     // minItems/maxItems on arrays should not be emitted as @minLength/@maxLength
-    !isArray && meta && 'min' in meta && meta.min !== undefined ? `@${isNumeric ? 'minimum' : 'minLength'} ${meta.min}` : null,
-    !isArray && meta && 'max' in meta && meta.max !== undefined ? `@${isNumeric ? 'maximum' : 'maxLength'} ${meta.max}` : null,
+    !isArray && !isObject && meta && 'min' in meta && meta.min !== undefined ? `@${isNumeric ? 'minimum' : 'minLength'} ${meta.min}` : null,
+    !isArray && !isObject && meta && 'max' in meta && meta.max !== undefined ? `@${isNumeric ? 'maximum' : 'maxLength'} ${meta.max}` : null,
     meta && 'pattern' in meta && meta.pattern ? `@pattern ${meta.pattern}` : null,
     meta && 'default' in meta && meta.default !== undefined
       ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? stringify(meta.default) : formatExample(meta.default)}`
       : null,
     ...exampleValues.map((example) => `@example ${formatExample(example)}`),
+    meta?.externalDocs ? `@see ${jsDocEscape([meta.externalDocs.url, meta.externalDocs.description].filter(Boolean).join(' '))}` : null,
   ].filter(Boolean)
 
   // `@type` merely repeats the TypeScript type already sitting next to the property, so it only
@@ -139,8 +141,32 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   return [...comments, typeTag].filter(Boolean)
 }
 
+/** The example values. With `serialized`, each `serializedValue` is added as a `<caption>Serialized</caption>` example. */
+export function getExampleValues(examples: Array<ast.ExampleNode> | undefined, serialized = false): Array<unknown> | undefined {
+  const values = (examples ?? []).flatMap((example) => [
+    ...(example.value !== undefined ? [example.value] : []),
+    ...(serialized && example.serializedValue !== undefined ? [`<caption>Serialized</caption> ${jsDocEscape(example.serializedValue)}`] : []),
+  ])
+  return values.length > 0 ? values : undefined
+}
+
+/** The JSDoc lines of a response type: `@summary`, and one `@see` per link, such as `@see getPet: getPet({ petId: $response.body#/id })`. */
+export function buildResponseComments(response: ast.ResponseNode): Array<string> {
+  const links = Object.entries(response.links ?? {}).map(([name, link]) => {
+    const values = { ...link.parameters, ...(link.requestBody !== undefined ? { body: link.requestBody } : {}) }
+    const args = Object.entries(values).map(([key, value]) => `${key}: ${formatExample(value)}`)
+    return `@see ${jsDocEscape(`${name}: ${link.operationId ?? link.operationRef ?? ''}(${args.length ? `{ ${args.join(', ')} }` : ''})`)}`
+  })
+  return [...(response.summary ? [`@summary ${jsDocEscape(response.summary)}`] : []), ...links]
+}
+
 type BuildParamsSchemaOptions = {
   params: Array<ast.ParameterNode>
+  /**
+   * Adds each serialized example to `examples` as a `<caption>Serialized</caption>` JSDoc line.
+   * Leave it off when `examples` must hold values, such as for mocks.
+   */
+  serializedExamples?: boolean
 }
 
 type BuildOperationSchemaOptions = {
@@ -148,20 +174,24 @@ type BuildOperationSchemaOptions = {
 }
 
 /**
- * Builds the object schema for a group of parameters sharing one `in` location (path, query, or
- * header), embedding each param's own schema (and JSDoc) directly rather than referencing a
- * separate per-param type — the group itself is the only type these params get exported as.
+ * Builds the object schema for one parameter group or a response's headers. Each entry embeds its own schema and JSDoc,
+ * so the group is the only type these entries are exported as.
  */
-export function buildParams({ params }: BuildParamsSchemaOptions): ast.SchemaNode {
+export function buildParams({ params, serializedExamples }: BuildParamsSchemaOptions): ast.SchemaNode {
   return ast.factory.createSchema({
     type: 'object',
-    // The group points at the `parameters` list that declares its first parameter.
-    pointer: params[0]?.pointer?.replace(/\/\d+$/, ''),
+    // The group points at the `parameters` list or `headers` map that declares its first parameter.
+    pointer: params[0]?.pointer?.replace(/\/[^/]+$/, ''),
     properties: params.map((param) =>
       ast.factory.createProperty({
         name: param.name,
         required: param.required,
-        schema: ast.factory.createSchema({ ...param.schema, optional: !param.required }),
+        schema: ast.factory.createSchema({
+          ...param.schema,
+          optional: !param.required,
+          deprecated: param.deprecated || param.schema.deprecated,
+          examples: getExampleValues(param.examples, serializedExamples) ?? param.schema.examples,
+        }),
       }),
     ),
   })

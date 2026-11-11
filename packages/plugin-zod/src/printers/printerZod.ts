@@ -5,6 +5,7 @@ import {
   applyModifiers,
   buildObjectShape,
   defaultLiteral,
+  hasPropertyCounts,
   lengthConstraints,
   numberConstraints,
   patternKeySchema,
@@ -136,7 +137,8 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
     }
 
     if (schema.type === ast.schemaTypes.object && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
-      return `${member}.strict()`
+      // Property counts print a `z.pipe(…)`, which has no `.strict()`, so its object output is made strict.
+      return hasPropertyCounts(schema) ? `z.pipe(${member}.in, ${member}.out.strict())` : `${member}.strict()`
     }
   }
 
@@ -190,7 +192,8 @@ function recursiveGetterType({
     }
     if (schema.type === ast.schemaTypes.array && schema.items?.length === 1) {
       const item = baseType(schema.items[0]!)
-      return item ? `z.ZodArray<${item}>` : undefined
+      if (!item) return undefined
+      return `z.ZodArray<${schema.items[0]!.nullable ? `z.ZodNullable<${item}>` : item}>`
     }
     return undefined
   }
@@ -282,6 +285,7 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
   coercedNumber: (schema) => `z.coerce.number().pipe(${schema})`,
   catchall: (object, value) => `${object}.catchall(${value})`,
   nullable: (value) => `${value}.nullable()`,
+  refine: (value, check) => `${value}.refine(${check})`,
   unique: (array) => `${array}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })`,
   extend: (base, shape) => `${base}.extend(${shape})`,
   intersection: (left, right) => `${left}.and(${right})`,
@@ -291,8 +295,11 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
 
 const scalarNodes: PrinterZodNodes = {
   ...buildScalarNodes(standardDialect),
-  bigint() {
-    return 'z.coerce.bigint()'
+  bigint(node) {
+    // shortcut: a bound that is not a whole number cannot be a bigint literal, so that one bound is left out.
+    const whole = (bound: number | undefined) => (Number.isInteger(bound) ? bound : undefined)
+    const exclusive = { min: whole(node.exclusive?.min), max: whole(node.exclusive?.max) }
+    return `z.coerce.bigint()${numberConstraints({ min: whole(node.min), max: whole(node.max), exclusive, multipleOf: whole(node.multipleOf) }, 'n')}`
   },
   date(node) {
     if (node.representation !== 'date') return 'z.iso.date()'

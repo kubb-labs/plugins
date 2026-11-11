@@ -27,10 +27,10 @@ With a relative `importPath`, the hooks resolve it from the generated operation 
 
 To reuse the runtime of the fetch and axios clients instead of writing your own request pipeline:
 
-1. Copy `core.ts`, `mediaTypes.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`.
+1. Copy `core.ts`, `mediaTypes.ts`, `serializers.ts`, `standardSchema.ts`, `sse.ts`, and the `mediaTypes/` and `serializers/` files your spec needs from `@kubb/plugin-client/templates` next to your `client.ts`.
 2. In `client.ts`, export the three types the core imports, listed below.
 3. Write a `Transport` function that sends a `ResolvedRequest` and returns a web `Response`. If your library does not return one, wrap its bytes in `new Response(bytes, { status, headers })`.
-4. Export `createLazyClient((config) => createClientCore({ defaultTransport, ...config }))` as `client`. Register the form and stream media types your spec needs with `client.setConfig({ mediaTypes: { ...formMediaTypes, ...streamMediaTypes } })`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
+4. Export `createLazyClient((config) => createClientCore({ defaultTransport, ...config }))` as `client`. Register the form and stream media types your spec needs with `client.setConfig({ mediaTypes: { 'multipart/form-data': multipartFormData, ...streamMediaTypes } })`, and add `export * from './core.ts'` and `export * from './sse.ts'`. The core has no serializers of its own, so also set `serializer: { query: serializeQuery, path: serializePath }` from `serializers/query.ts` and `serializers/path.ts`, or their styled versions, and `header` and `cookie` for a spec with such parameters.
 
 | Export           | Purpose                                                 | On fetch      | On axios             |
 | ---------------- | ------------------------------------------------------- | ------------- | -------------------- |
@@ -113,22 +113,36 @@ parameter named `id`.
 
 ### Header and cookie
 
-Header parameters use the `simple` style and cookie parameters use the `form` style. Both fix the
-style and only let `explode` vary, so the metadata for these locations carries `explode` alone.
-Header values are sent as-is, and cookie values are URL-encoded into a single `Cookie` header.
+Header parameters use the `simple` style and cookie parameters use the `form` style, so the metadata
+for these locations carries only `explode`, plus `style: 'cookie'` for a cookie parameter with the
+OpenAPI 3.2 `cookie` style. Header values are sent as-is. Cookie values are URL-encoded into a single
+`Cookie` header. The `cookie` style sends them unencoded, as RFC 6265 describes, defaults `explode` to
+`true`, and throws on a value with a character such as `;` or a space.
 
-| Location | `explode` | Input                             | Result                 |
-| -------- | --------- | --------------------------------- | ---------------------- |
-| header   | `false`   | `[3, 4]`                          | `X-Ids: 3,4`           |
-| header   | `true`    | `{ role: 'admin' }`               | `X-Filter: role=admin` |
-| cookie   | `false`   | `{ session: 'abc', ids: [1, 2] }` | `session=abc; ids=1,2` |
-| cookie   | `true`    | `{ ids: [1, 2] }`                 | `ids=1; ids=2`         |
+| Location               | `explode` | Input                             | Result                    |
+| ---------------------- | --------- | --------------------------------- | ------------------------- |
+| header                 | `false`   | `[3, 4]`                          | `X-Ids: 3,4`              |
+| header                 | `true`    | `{ role: 'admin' }`               | `X-Filter: role=admin`    |
+| cookie                 | `false`   | `{ session: 'abc', ids: [1, 2] }` | `session=abc; ids=1,2`    |
+| cookie                 | `true`    | `{ ids: [1, 2] }`                 | `ids=1; ids=2`            |
+| cookie, `cookie` style | default   | `{ sid: 'a%20b', ids: [1, 2] }`   | `sid=a%20b; ids=1; ids=2` |
 
 ## A minimal client
 
 The client below uses `fetch`. Replace the transport with the HTTP library you use.
 
 ```typescript [src/client.ts]
+export type Auth = {
+  type: string
+  scheme?: string
+  name?: string
+  in?: string
+  scopes?: Array<string>
+  flows?: Record<string, Record<string, string>>
+  metadataUrl?: string
+  url?: string
+}
+
 export type RequestConfig = {
   method: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD'
   url: string
@@ -142,7 +156,7 @@ export type RequestConfig = {
   parseAs?: 'json' | 'text' | 'blob' | 'arrayBuffer' | 'stream'
   contentType?: string | { request?: string; response?: string }
   throwOnError?: boolean
-  security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
+  security?: Array<Auth | Array<Auth>>
   styles?: object
   client?: typeof client
 }

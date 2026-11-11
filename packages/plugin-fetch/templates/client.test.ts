@@ -3,12 +3,11 @@ import {
   type Auth,
   type ClientConfig,
   createClient as createFetchClient,
-  createClientCore,
+  createClientCore as createCore,
   createLazyClient,
   defaultMediaTypes,
   defaultTransport,
   createInterceptorStack,
-  formMediaTypes,
   isResponseError,
   type MediaTypeContext,
   type MediaTypes,
@@ -24,8 +23,25 @@ import {
   withUnwrap,
 } from './client.ts'
 import type { BodyEncoding } from './serializers.ts'
-import { applyHeaderStyles, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
+import { serializeCookies } from '../../plugin-client/templates/serializers/cookies.ts'
+import { serializeHeaders } from '../../plugin-client/templates/serializers/headers.ts'
+import { serializeStyledPath } from '../../plugin-client/templates/serializers/pathStyles.ts'
+import { serializeStyledQuery } from '../../plugin-client/templates/serializers/queryStyles.ts'
+import { serializePath } from '../../plugin-client/templates/serializers/path.ts'
+import { serializeQuery } from '../../plugin-client/templates/serializers/query.ts'
+import { multipartFormData } from '../../plugin-client/templates/mediaTypes/formData.ts'
+import { multipartMixed } from '../../plugin-client/templates/mediaTypes/mixed.ts'
+import { urlencoded } from '../../plugin-client/templates/mediaTypes/urlencoded.ts'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
+
+const formMediaTypes = { 'multipart/form-data': multipartFormData, 'multipart/mixed': multipartMixed, 'application/x-www-form-urlencoded': urlencoded }
+
+const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: serializeHeaders, cookie: serializeCookies }
+
+// `.kubb/client.ts` registers the serializers of a spec. These tests register all of them.
+function createClientCore<TRequest = Request, TResponse = Response>(options: Parameters<typeof createCore<TRequest, TResponse>>[0]) {
+  return createCore<TRequest, TResponse>({ ...options, serializer: { ...serializers, ...options.serializer } })
+}
 
 type FakeResult = { data?: unknown; status?: number; statusText?: string; contentType?: string }
 
@@ -54,7 +70,10 @@ function encodeBody({ body, contentType, encoding }: { body: unknown; contentTyp
 
 function createClient(result?: FakeResult) {
   const { transport, calls } = fakeTransport(result)
-  const client = createClientCore<string, string>({ defaultTransport: transport, mediaTypes: formMediaTypes })
+  const client = createClientCore<string, string>({
+    defaultTransport: transport,
+    mediaTypes: formMediaTypes,
+  })
   return { client, calls }
 }
 
@@ -104,139 +123,147 @@ describe('createInterceptorStack', () => {
   })
 })
 
-describe('defaultQuerySerializer', () => {
+describe('serializeQuery and serializeStyledQuery', () => {
   test('explodes arrays into repeated keys', () => {
-    expect(defaultQuerySerializer({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
+    expect(serializeStyledQuery({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
   })
 
   test('JSON-encodes a parameter with a JSON content type as one value', () => {
     const filter = { root: { nested: ['!#=~[]', 1] } }
-    const query = defaultQuerySerializer({ filter, page: 2 }, { filter: { contentType: 'application/json' } })
+    const query = serializeStyledQuery({ filter, page: 2 }, { filter: { contentType: 'application/json' } })
     expect(query).toBe(`filter=${encodeURIComponent(JSON.stringify(filter))}&page=2`)
     expect(new URLSearchParams(query).get('filter')).toBe(JSON.stringify(filter))
   })
 
   test('sends a JSON querystring parameter as the whole query string, without its name', () => {
     const filter = { status: 'sold' }
-    expect(defaultQuerySerializer({ filter }, { filter: { contentType: 'application/json', querystring: true } })).toBe(
+    expect(serializeStyledQuery({ filter }, { filter: { contentType: 'application/json', querystring: true } })).toBe(
       encodeURIComponent(JSON.stringify(filter)),
     )
   })
 
   test('fully encodes a JSON value even when allowReserved is set', () => {
-    expect(defaultQuerySerializer({ f: { q: 'a&b#c' } }, { f: { contentType: 'application/json', allowReserved: true } })).toBe(
+    expect(serializeStyledQuery({ f: { q: 'a&b#c' } }, { f: { contentType: 'application/json', allowReserved: true } })).toBe(
       `f=${encodeURIComponent('{"q":"a&b#c"}')}`,
     )
   })
 
   test('only treats application/json and +json media types as JSON', () => {
     const value = { a: 1 }
-    expect(defaultQuerySerializer({ value }, { value: { contentType: 'application/vnd.api+json; charset=utf-8' } })).toBe(
+    expect(serializeStyledQuery({ value }, { value: { contentType: 'application/vnd.api+json; charset=utf-8' } })).toBe(
       `value=${encodeURIComponent('{"a":1}')}`,
     )
-    expect(defaultQuerySerializer({ value }, { value: { contentType: 'application/jsonl' } })).toBe('a=1')
+    expect(serializeStyledQuery({ value }, { value: { contentType: 'application/jsonl' } })).toBe('a=1')
   })
 
   test('serializes an object without a style as form with explode', () => {
-    expect(defaultQuerySerializer({ filter: { name: 'odie', age: 3 } })).toBe('name=odie&age=3')
+    expect(serializeStyledQuery({ filter: { name: 'odie', age: 3 } })).toBe('name=odie&age=3')
   })
 
   test('skips undefined and null members', () => {
-    expect(defaultQuerySerializer({ a: 1, b: undefined, c: null })).toBe('a=1')
+    expect(serializeStyledQuery({ a: 1, b: undefined, c: null })).toBe('a=1')
   })
 
   test('form style without explode joins arrays with commas', () => {
-    expect(defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'form', explode: false } })).toBe('id=3,4,5')
+    expect(serializeStyledQuery({ id: [3, 4, 5] }, { id: { style: 'form', explode: false } })).toBe('id=3,4,5')
   })
 
   test('spaceDelimited and pipeDelimited join arrays without explode', () => {
-    expect(defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'spaceDelimited', explode: false } })).toBe('id=3%204%205')
-    expect(defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } })).toBe('id=3|4|5')
+    expect(serializeStyledQuery({ id: [3, 4, 5] }, { id: { style: 'spaceDelimited', explode: false } })).toBe('id=3%204%205')
+    expect(serializeStyledQuery({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } })).toBe('id=3|4|5')
   })
 
   test('form style with explode expands objects into top-level keys', () => {
-    expect(defaultQuerySerializer({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: true } })).toBe('role=admin&name=alex')
+    expect(serializeStyledQuery({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: true } })).toBe('role=admin&name=alex')
   })
 
   test('form style without explode flattens objects with commas', () => {
-    expect(defaultQuerySerializer({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: false } })).toBe(
-      'filter=role,admin,name,alex',
-    )
+    expect(serializeStyledQuery({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: false } })).toBe('filter=role,admin,name,alex')
   })
 
   test('deepObject style renders bracketed object keys', () => {
-    expect(defaultQuerySerializer({ filter: { role: 'admin' } }, { filter: { style: 'deepObject' } })).toBe('filter%5Brole%5D=admin')
+    expect(serializeStyledQuery({ filter: { role: 'admin' } }, { filter: { style: 'deepObject' } })).toBe('filter%5Brole%5D=admin')
   })
 
   test('deepObject style recurses into nested objects', () => {
-    expect(defaultQuerySerializer({ a: { b: { c: 1 } } }, { a: { style: 'deepObject' } })).toBe('a%5Bb%5D%5Bc%5D=1')
+    expect(serializeStyledQuery({ a: { b: { c: 1 } } }, { a: { style: 'deepObject' } })).toBe('a%5Bb%5D%5Bc%5D=1')
   })
 
   test('deepObject style indexes an array of objects', () => {
-    expect(defaultQuerySerializer({ items: [{ price: 'p_1', quantity: 1 }] }, { items: { style: 'deepObject' } })).toBe(
+    expect(serializeStyledQuery({ items: [{ price: 'p_1', quantity: 1 }] }, { items: { style: 'deepObject' } })).toBe(
       'items%5B0%5D%5Bprice%5D=p_1&items%5B0%5D%5Bquantity%5D=1',
     )
-    expect(defaultQuerySerializer({ expand: ['a', 'b'] }, { expand: { style: 'deepObject' } })).toBe('expand=a&expand=b')
+    expect(serializeStyledQuery({ expand: ['a', 'b'] }, { expand: { style: 'deepObject' } })).toBe('expand=a&expand=b')
   })
 
   test('encodes a space as %20 with or without a style', () => {
-    expect(defaultQuerySerializer({ q: 'a b', styled: 'a b', plus: 'a+b' }, { styled: { style: 'form' } })).toBe('q=a%20b&styled=a%20b&plus=a%2Bb')
+    expect(serializeStyledQuery({ q: 'a b', styled: 'a b', plus: 'a+b' }, { styled: { style: 'form' } })).toBe('q=a%20b&styled=a%20b&plus=a%2Bb')
   })
 
   test('serializes Date values as ISO-8601', () => {
-    expect(defaultQuerySerializer({ since: new Date('2020-01-02T03:04:05.000Z') })).toBe('since=2020-01-02T03%3A04%3A05.000Z')
+    expect(serializeStyledQuery({ since: new Date('2020-01-02T03:04:05.000Z') })).toBe('since=2020-01-02T03%3A04%3A05.000Z')
   })
 
   test('allowReserved leaves reserved characters unencoded', () => {
-    expect(defaultQuerySerializer({ path: '/a/b' }, { path: { allowReserved: true } })).toBe('path=/a/b')
-    expect(defaultQuerySerializer({ path: '/a/b' })).toBe('path=%2Fa%2Fb')
+    expect(serializeStyledQuery({ path: '/a/b' }, { path: { allowReserved: true } })).toBe('path=/a/b')
+    expect(serializeStyledQuery({ path: '/a/b' })).toBe('path=%2Fa%2Fb')
   })
 
   test('allowReserved still encodes characters that end the query or change a form value', () => {
-    expect(defaultQuerySerializer({ r: 'a/b?c#d', q: 'x' }, { r: { allowReserved: true } })).toBe('r=a/b?c%23d&q=x')
-    expect(defaultQuerySerializer({ r: 'a&b=c+d' }, { r: { allowReserved: true } })).toBe('r=a%26b=c%2Bd')
-    expect(defaultQuerySerializer({ r: ['a#', 'b&'] }, { r: { allowReserved: true, explode: false } })).toBe('r=a%23,b%26')
+    expect(serializeStyledQuery({ r: 'a/b?c#d', q: 'x' }, { r: { allowReserved: true } })).toBe('r=a/b?c%23d&q=x')
+    expect(serializeStyledQuery({ r: 'a&b=c+d' }, { r: { allowReserved: true } })).toBe('r=a%26b=c%2Bd')
+    expect(serializeStyledQuery({ r: ['a#', 'b&'] }, { r: { allowReserved: true, explode: false } })).toBe('r=a%23,b%26')
   })
 })
 
-describe('defaultPathSerializer', () => {
+describe('serializePath and serializeStyledPath', () => {
   test('simple style URL-encodes a primitive value', () => {
-    expect(defaultPathSerializer({ name: 'id', value: 'a b' })).toBe('a%20b')
+    expect(serializePath({ name: 'id', value: 'a b' })).toBe('a%20b')
   })
 
   test('simple style joins array members with commas', () => {
-    expect(defaultPathSerializer({ name: 'ids', value: [3, 4, 5] })).toBe('3,4,5')
+    expect(serializePath({ name: 'ids', value: [3, 4, 5] })).toBe('3,4,5')
   })
 
   test('simple style flattens objects to comma-separated key,value pairs', () => {
-    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 } })).toBe('x,1,y,2')
+    expect(serializePath({ name: 'point', value: { x: 1, y: 2 } })).toBe('x,1,y,2')
   })
 
   test('simple style with explode renders objects as key=value pairs', () => {
-    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 }, options: { explode: true } })).toBe('x=1,y=2')
+    expect(serializePath({ name: 'point', value: { x: 1, y: 2 }, options: { explode: true } })).toBe('x=1,y=2')
   })
 
   test('label style prefixes a dot', () => {
-    expect(defaultPathSerializer({ name: 'id', value: 5, options: { style: 'label' } })).toBe('.5')
-    expect(defaultPathSerializer({ name: 'ids', value: [3, 4], options: { style: 'label' } })).toBe('.3,4')
-    expect(defaultPathSerializer({ name: 'ids', value: [3, 4], options: { style: 'label', explode: true } })).toBe('.3.4')
-    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'label', explode: true } })).toBe('.x=1.y=2')
+    expect(serializeStyledPath({ name: 'id', value: 5, options: { style: 'label' } })).toBe('.5')
+    expect(serializeStyledPath({ name: 'ids', value: [3, 4], options: { style: 'label' } })).toBe('.3,4')
+    expect(serializeStyledPath({ name: 'ids', value: [3, 4], options: { style: 'label', explode: true } })).toBe('.3.4')
+    expect(serializeStyledPath({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'label', explode: true } })).toBe('.x=1.y=2')
   })
 
   test('matrix style prefixes a named segment', () => {
-    expect(defaultPathSerializer({ name: 'id', value: 5, options: { style: 'matrix' } })).toBe(';id=5')
-    expect(defaultPathSerializer({ name: 'id', value: [3, 4], options: { style: 'matrix' } })).toBe(';id=3,4')
-    expect(defaultPathSerializer({ name: 'id', value: [3, 4], options: { style: 'matrix', explode: true } })).toBe(';id=3;id=4')
-    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'matrix', explode: true } })).toBe(';x=1;y=2')
+    expect(serializeStyledPath({ name: 'id', value: 5, options: { style: 'matrix' } })).toBe(';id=5')
+    expect(serializeStyledPath({ name: 'id', value: [3, 4], options: { style: 'matrix' } })).toBe(';id=3,4')
+    expect(serializeStyledPath({ name: 'id', value: [3, 4], options: { style: 'matrix', explode: true } })).toBe(';id=3;id=4')
+    expect(serializeStyledPath({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'matrix', explode: true } })).toBe(';x=1;y=2')
+  })
+
+  test('throws on a styled query parameter, which needs the registered query serializer', () => {
+    expect(() => serializeQuery({ ids: [1, 2] }, { ids: { explode: false } })).toThrow('register serializer.query')
+    expect(serializeQuery({ ids: [1, 2], filter: { a: 'x y' }, skip: undefined })).toBe('ids=1&ids=2&a=x%20y')
+  })
+
+  test('throws on a label or matrix parameter, which needs the registered path serializer', () => {
+    expect(() => serializePath({ name: 'id', value: 5, options: { style: 'label' } })).toThrow('register serializer.path')
+    expect(serializeStyledPath({ name: 'ids', value: [3, 4] })).toBe('3,4')
   })
 
   test('serializes undefined and null to an empty string', () => {
-    expect(defaultPathSerializer({ name: 'id', value: undefined })).toBe('')
-    expect(defaultPathSerializer({ name: 'id', value: null })).toBe('')
+    expect(serializePath({ name: 'id', value: undefined })).toBe('')
+    expect(serializePath({ name: 'id', value: null })).toBe('')
   })
 
   test('serializes a Date value as ISO-8601', () => {
-    expect(defaultPathSerializer({ name: 'since', value: new Date('2020-01-02T03:04:05.000Z') })).toBe('2020-01-02T03%3A04%3A05.000Z')
+    expect(serializePath({ name: 'since', value: new Date('2020-01-02T03:04:05.000Z') })).toBe('2020-01-02T03%3A04%3A05.000Z')
   })
 })
 
@@ -394,9 +421,9 @@ describe('serializeCookies', () => {
   })
 })
 
-describe('applyHeaderStyles', () => {
+describe('serializeHeaders', () => {
   test('sends a header with a JSON content type as its JSON string', () => {
-    const result = applyHeaderStyles(
+    const result = serializeHeaders(
       { 'X-Meta': { a: 1 }, 'X-Name': 'odie' },
       { 'X-Meta': { contentType: 'application/json' }, 'X-Name': { contentType: 'application/json' } },
     )
@@ -404,28 +431,28 @@ describe('applyHeaderStyles', () => {
   })
 
   test('escapes non-ASCII characters in a JSON header so it stays a valid header value', () => {
-    const result = applyHeaderStyles({ 'X-Meta': { name: '日本' } }, { 'X-Meta': { contentType: 'application/json' } }) as Array<[string, string]>
+    const result = serializeHeaders({ 'X-Meta': { name: '日本' } }, { 'X-Meta': { contentType: 'application/json' } }) as Array<[string, string]>
     expect(result[0]?.[1]).toBe('{"name":"\\u65e5\\u672c"}')
     expect(JSON.parse(result[0]?.[1] ?? '')).toStrictEqual({ name: '日本' })
   })
 
   test('serializes array and object headers with the simple style', () => {
-    const result = applyHeaderStyles({ 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } }, { 'X-Ids': { explode: false }, 'X-Filter': { explode: true } })
+    const result = serializeHeaders({ 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } }, { 'X-Ids': { explode: false }, 'X-Filter': { explode: true } })
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Ids': '3,4', 'X-Filter': 'role=admin' })
   })
 
   test('serializes a Date header value as ISO-8601', () => {
-    const result = applyHeaderStyles({ 'X-Since': new Date('2020-01-02T03:04:05.000Z') }, { 'X-Since': {} })
+    const result = serializeHeaders({ 'X-Since': new Date('2020-01-02T03:04:05.000Z') }, { 'X-Since': {} })
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Since': '2020-01-02T03:04:05.000Z' })
   })
 
   test('passes primitives through and uses the simple style for headers without metadata', () => {
-    const result = applyHeaderStyles({ Authorization: 'Bearer x', 'X-Raw': [1, 2] }, { Authorization: { explode: true } })
+    const result = serializeHeaders({ Authorization: 'Bearer x', 'X-Raw': [1, 2] }, { Authorization: { explode: true } })
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ Authorization: 'Bearer x', 'X-Raw': '1,2' })
   })
 
   test('uses the simple style when the operation has no header styles', () => {
-    const result = applyHeaderStyles({ 'X-List': ['a', 'b'], 'X-Obj': { k: 'v' } }, undefined)
+    const result = serializeHeaders({ 'X-List': ['a', 'b'], 'X-Obj': { k: 'v' } }, undefined)
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-List': 'a,b', 'X-Obj': 'k,v' })
   })
 })
@@ -546,6 +573,19 @@ describe('createClientCore', () => {
     expect(calls[1]?.body).toBe('a')
   })
 
+  test('throws on cookie params without a cookie serializer, and keeps it when another serializer is set', async () => {
+    const { transport } = fakeTransport()
+    const bare = createCore<string, string>({ defaultTransport: transport })
+    await expect(bare({ method: 'GET', url: '/pet', cookies: { session: 'abc' } })).rejects.toThrow('register serializer.cookie')
+    await bare({ method: 'GET', url: '/pet', cookies: { session: undefined, theme: null } })
+
+    const { client, calls } = createClient()
+    client.setConfig({ serializer: { query: () => 'q=1' } })
+    await client({ method: 'GET', url: '/pet', cookies: { session: 'abc' } })
+    expect(calls[0]?.url).toBe('/pet?q=1')
+    expect(calls[0]?.headers['Cookie']).toBe('session=abc')
+  })
+
   test('serializes cookie params into the Cookie header', async () => {
     const { client, calls } = createClient()
     await client({ method: 'GET', url: '/pet', cookies: { session: 'abc', ids: [1, 2] } })
@@ -642,15 +682,24 @@ describe('createClientCore', () => {
       data: { id: 1 },
       error: undefined,
       contentType: 'application/json',
+      headers: expect.any(Headers),
       request: 'REQ',
       response: 'RES',
     })
+    expect(result.headers.get('content-type')).toBe('application/json')
   })
 
   test('throws a ResponseError for a non-2xx status by default', async () => {
     const { client } = createClient({ data: { message: 'invalid' }, status: 405, statusText: 'Method Not Allowed' })
     await expect(client({ method: 'POST', url: '/pet' })).rejects.toBeInstanceOf(ResponseError)
     await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 405, data: { message: 'invalid' } })
+  })
+
+  test('a ResponseError carries the response headers', async () => {
+    const { client } = createClient({ data: { message: 'slow down' }, status: 429, statusText: 'Too Many Requests' })
+    const error = await client({ method: 'GET', url: '/pet' }).catch((thrown: unknown) => thrown)
+    expect(ResponseError.is(error) && error.headers.get('content-type')).toBe('application/json')
+    expect(new ResponseError({ data: undefined, status: 500, statusText: '', request: 'REQ', response: 'RES' }).headers.get('x')).toBeNull()
   })
 
   test('names the method and URL in the ResponseError message, without the query', async () => {
@@ -798,7 +847,15 @@ describe('createClientCore', () => {
     const error = vi.fn(() => ({ parsed: true }))
     const result = await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })
     expect(error).toHaveBeenCalledTimes(1)
-    expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: 'application/json', request: 'REQ', response: 'RES' })
+    expect(result).toStrictEqual({
+      status: 405,
+      data: undefined,
+      error: { parsed: true },
+      contentType: 'application/json',
+      headers: expect.any(Headers),
+      request: 'REQ',
+      response: 'RES',
+    })
   })
 
   test('picks the error validator by status, then range, then default, and skips undeclared statuses', async () => {
@@ -811,7 +868,7 @@ describe('createClientCore', () => {
     })
     const call = (status: number, data: unknown, error: Record<string, ReturnType<typeof toCodeSchema>>) =>
       createClient({ data, status }).client({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error } })
-    const byStatus = { 404: toCodeSchema('not-found'), '5XX': toCodeSchema('upstream') }
+    const byStatus = { 404: toCodeSchema('not-found'), '5xx': toCodeSchema('upstream') }
 
     expect(await call(404, { code: 'not-found' }, byStatus)).toMatchObject({ status: 404, error: { checkedBy: 'not-found' } })
     await expect(call(404, { code: 'upstream' }, byStatus)).rejects.toMatchObject({ name: 'ParseError' })
@@ -1091,6 +1148,21 @@ describe('media types', () => {
     expect((form.data as FormData).get('a')).toBe('1')
   })
 
+  test('types and returns a JSON Lines variant next to JSON as the raw stream', async () => {
+    type Responses = { '200': { contentType: 'application/json'; data: { id: number } } | { contentType: 'application/jsonl'; data: { id: number } } }
+    const client = createClientCore<string, string>({
+      defaultTransport: answer('{"id":1}\n', { 'content-type': 'application/jsonl' }),
+      mediaTypes: streamMediaTypes,
+    })
+    const result = await client<Responses>({ method: 'GET', url: '/updates' })
+
+    expect(result.contentType).toBe('application/jsonl')
+    if (result.contentType === 'application/jsonl') {
+      const stream: ReadableStream<Uint8Array> = result.data
+      expect(stream).toBeInstanceOf(ReadableStream)
+    }
+  })
+
   test('gives no data for 204, 205, 304, a HEAD request, and an empty body', async () => {
     for (const status of [204, 205, 304]) expect((await call(answer(null, { 'content-type': 'application/json' }, status))).data).toBeUndefined()
     expect((await call(answer('{"a":1}', { 'content-type': 'application/json' }), { method: 'HEAD' })).data).toBeUndefined()
@@ -1303,7 +1375,7 @@ describe('client.stream', () => {
 })
 
 describe('isResponseError', () => {
-  type Responses = { '200': { id: number }; '404': { message: string }; '4XX': { code: string }; default: { fault: true } }
+  type Responses = { '200': { id: number }; '404': { message: string }; '4xx': { code: string }; default: { fault: true } }
 
   test('narrows data by status, a range key, and default', async () => {
     const { client } = createClient({ data: { message: 'gone' }, status: 404 })

@@ -16,6 +16,14 @@ client.setConfig({
 
 `auth` takes a token string or a function. The function can be async and returns a token, or `undefined` to skip that scheme. The runtime sends the first security requirement whose schemes all get a token. A requirement that needs an API key and a session cookie together sends both.
 
+## Read the schemes of the spec
+
+`.kubb/client.ts` exports the schemes of the spec by name as `securitySchemes`. A `mutualTLS` scheme is left out, since the client cannot send it. A generated operation points at its schemes there, and adds the scopes it needs:
+
+```typescript
+security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets'] }]
+```
+
 ## Return the right token per scheme
 
 Use the scheme passed to the resolver to select a credential:

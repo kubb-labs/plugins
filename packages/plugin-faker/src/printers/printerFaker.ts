@@ -1,4 +1,4 @@
-import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
+import { jsonContentSchema, mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
 import { ast, containsCircularRef, Diagnostics, syncSchemaRef } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
@@ -68,12 +68,44 @@ export type PrinterFakerFactory = ast.PrinterFactoryOptions<'faker', PrinterFake
 const integerFormats: ReadonlySet<string> = new Set(['int32', 'int64', 'uint64'])
 
 const maxInt32 = 2_147_483_647
+// The largest value of a 32-bit format, which faker's default `max` exceeds.
+const formatMax: Record<string, number> = { int32: maxInt32, uint32: 4_294_967_295 }
 
 /**
- * `faker.number.float()` or `faker.number.int()`, with `min` and `max` passed only when set.
+ * Whether a ref points back into its own cycle: at the schema being printed, or from one cyclic schema at another. Such a
+ * ref is left empty, so a mock of a recursive schema is finite and can be serialized.
  */
-function numberCall(kind: 'float' | 'int', min?: number, max?: number): string {
-  const args = [min !== undefined && `min: ${min}`, max !== undefined && `max: ${max}`].filter(Boolean).join(', ')
+function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: PrinterFakerOptions): boolean {
+  if (node.type !== 'ref' || !schemaName) return false
+  const refName = ast.resolveRefName(node)
+
+  return refName === schemaName || Boolean(refName && cyclicSchemas?.has(schemaName) && cyclicSchemas.has(refName))
+}
+
+/**
+ * `faker.number.float()`, `faker.number.int()` or `faker.number.bigInt()`, with `min` and `max` passed only when set,
+ * moved inside an exclusive bound, or needed so a lone bound does not contradict faker's default for the other.
+ */
+function numberCall(
+  kind: 'float' | 'int' | 'bigInt',
+  { min, max, exclusive, multipleOf }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive' | 'multipleOf'>,
+): string {
+  const whole = kind !== 'float'
+  // A whole-number bound moves to the next integer. Faker never returns a float's `max`, and its `min` only by chance.
+  // shortcut: a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
+  const lower = exclusive?.min === undefined ? min : Math.max(min ?? -Infinity, whole ? Math.floor(exclusive.min) + 1 : exclusive.min)
+  const upper = exclusive?.max === undefined ? max : Math.min(max ?? Infinity, whole ? Math.ceil(exclusive.max) - 1 : exclusive.max)
+  // Faker fills a missing bound with `0` (and `1` for a float's `max`), which a lone bound on the other side of it contradicts.
+  const maxValue = kind === 'float' && lower !== undefined && upper === undefined && lower >= 1 ? lower + 100 : upper
+  const minValue = maxValue !== undefined && lower === undefined && (whole ? maxValue < 0 : maxValue <= 0) ? maxValue - 100 : lower
+  const suffix = kind === 'bigInt' ? 'n' : ''
+  const args = [
+    minValue !== undefined && `min: ${minValue}${suffix}`,
+    maxValue !== undefined && `max: ${maxValue}${suffix}`,
+    multipleOf !== undefined && `multipleOf: ${multipleOf}${suffix}`,
+  ]
+    .filter(Boolean)
+    .join(', ')
 
   return `faker.number.${kind}(${args ? `{ ${args} }` : ''})`
 }
@@ -104,6 +136,15 @@ function dateTimeCall(
 
   return 'faker.date.anytime()'
 }
+
+// Formats `plugin-zod` checks with a dedicated constructor, which a random string fails.
+const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
+  ['jwt', 'faker.internet.jwt()'],
+  ['ulid', 'faker.string.ulid()'],
+  ['iban', 'faker.finance.iban()'],
+  ['duration', "'P1D'"],
+  ['hostname', 'faker.internet.domainName()'],
+])
 
 function matches(value: string, regexGenerator: 'faker' | 'randexp' = 'faker'): string {
   if (regexGenerator === 'randexp') {
@@ -161,6 +202,14 @@ function indexedTypeName(typeName: string, propertyName: string, nestedInUnion?:
 }
 
 /**
+ * Type expression for an array's items. In a union only some branches are arrays, and indexing the others with `number`
+ * is a TS2537 error, so a union member reads the items of its array branches.
+ */
+function itemTypeName(typeName: string, nestedInUnion?: boolean): string {
+  return nestedInUnion ? `Extract<NonNullable<${typeName}>, ReadonlyArray<unknown>>[number]` : `NonNullable<${typeName}>[number]`
+}
+
+/**
  * Creates a Faker printer that generates mock data generation code from schema nodes.
  * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
  */
@@ -193,19 +242,35 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           return node.format === 'int32' ? `faker.number.int({ max: ${maxInt32} }).toString()` : 'faker.number.bigInt().toString()'
         }
 
+        const formatCall = STRING_FORMAT_CALLS.get(node.format)
+        if (formatCall) return formatCall
+
+        const contentSchema = jsonContentSchema(node)
+        // The document is typed by its own schema, not by the string that holds it.
+        if (contentSchema) return `JSON.stringify(${printNested(contentSchema, { typeName: undefined, nestedInObject: true, nestedInUnion: false })})`
+
+        const encoding = node.content?.encoding?.toLowerCase()
+        if (encoding === 'base64') return 'btoa(faker.string.alpha())'
+        // Eight letters or digits are base64url as they are: no padding, and none of the characters base64 swaps.
+        if (encoding === 'base64url') return 'faker.string.alphanumeric(8)'
+
         const { min, max } = node
-        if (min !== undefined && max !== undefined) return `faker.string.alpha({ length: { min: ${min}, max: ${max} } })`
-        if (max !== undefined || min !== undefined) return `faker.string.alpha({ length: ${max ?? min} })`
+        // A string as long as a large `maxLength` makes a mock of megabytes, so the length stays within 100 of the minimum.
+        if (max !== undefined) return `faker.string.alpha({ length: { min: ${min ?? Math.min(1, max)}, max: ${Math.min(max, (min ?? 0) + 100)} } })`
+        if (min !== undefined) return `faker.string.alpha({ length: ${min} })`
 
         return 'faker.string.alpha()'
       },
       email: () => 'faker.internet.email()',
       url: () => 'faker.internet.url()',
       uuid: () => 'faker.string.uuid()',
-      number: (node) => numberCall('float', node.min, node.max),
-      integer: (node) => numberCall('int', node.min, node.max),
-      bigint: () => 'faker.number.bigInt()',
-      blob: () => 'faker.image.url() as unknown as Blob',
+      ipv4: () => 'faker.internet.ipv4()',
+      ipv6: () => 'faker.internet.ipv6()',
+      number: (node) => numberCall('float', node),
+      integer: (node) =>
+        numberCall('int', node.format && node.format in formatMax ? { ...node, max: Math.min(node.max ?? Infinity, formatMax[node.format]!) } : node),
+      bigint: (node) => numberCall('bigInt', node),
+      blob: () => 'new Blob([faker.string.alpha()])',
       datetime(node) {
         const parser = this.options.dateParser ?? 'faker'
         if (parser === 'faker') return 'faker.date.anytime().toISOString()'
@@ -236,7 +301,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           })
         }
 
-        if (this.options.schemaName && refName === this.options.schemaName) {
+        if (isCyclicRef(node, this.options)) {
           return this.options.typeName ? `undefined as unknown as ${this.options.typeName}` : 'undefined as unknown'
         }
 
@@ -258,13 +323,19 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           return JSON.stringify(values[0])
         }
 
-        return `faker.helpers.arrayElement${typeName ? `<${typeName}>` : ''}([${values.map(parseEnumValue).join(', ')}])`
+        // The values are asserted as the property's type, not checked against it. Inside an `allOf` or `oneOf` that type can be
+        // narrower than the enum, or `never`, and a type argument would then reject the values the schema itself lists.
+        return `faker.helpers.arrayElement([${values.map(parseEnumValue).join(', ')}]${typeName ? ` as Array<${typeName}>` : ''})`
       },
       union(node): string {
         const { discriminatorPropertyName } = node
         const baseTypeName = this.options.typeName
 
-        const items: Array<string> = mapSchemaMembers(node, (member) => {
+        // A member that points back into the cycle would print `undefined`, so the mock picks among the others.
+        const acyclic = (node.members ?? []).filter((member) => !isCyclicRef(member, this.options))
+        const members = acyclic.length ? acyclic : node.members
+
+        const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) => {
           // For a discriminated union, narrow each variant to its own branch so nested
           // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
           const discriminator = discriminatorPropertyName ? getDiscriminator(member, discriminatorPropertyName) : undefined
@@ -290,10 +361,15 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       intersection(node): string {
         const objectMembers = (node.members ?? []).filter((member) => isObjectSchema(member))
-        const members = objectMembers.length ? objectMembers : node.members
+        // A union spreads after the plain objects, so a sibling base object cannot overwrite its discriminator.
+        const members = objectMembers.length
+          ? [...objectMembers.filter((member) => member.type !== 'union'), ...objectMembers.filter((member) => member.type === 'union')]
+          : node.members
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
           printNested(member, {
             nestedInObject: true,
+            // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
+            ...(member.type === 'ref' && ast.resolveRefName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
           }),
         )
           .map(({ output }) => output)
@@ -306,9 +382,12 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return !objectMembers.length || items.length === 1 ? items.at(-1)! : `{...${items.join(', ...')}}`
       },
       array(node): string {
+        // An array of items that would recurse stays empty, which is valid where a list of `undefined` is not.
+        if (node.items?.length === 1 && isCyclicRef(node.items[0]!, this.options)) return this.options.typeName ? `[] as ${this.options.typeName}` : '[]'
+
         const items: Array<string> = mapSchemaItems(node, (member) =>
           printNested(member, {
-            typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
+            typeName: this.options.typeName ? itemTypeName(this.options.typeName, this.options.nestedInUnion) : undefined,
             nestedInObject: true,
           }),
         )
@@ -321,9 +400,15 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
         const { min, max } = node
         const item = items[0]
-        if (min !== undefined && max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: ${min}, max: ${max} }})`
+        // Like a string, a list stays within 100 items of its minimum, however large `maxItems` is.
+        if (node.unique) {
+          // `uniqueArray` takes a fixed length and compares like the zod `Set` check. It returns fewer items when the generator runs out of values.
+          const count = max !== undefined ? `faker.number.int({ min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} })` : (min ?? 3)
+
+          return `faker.helpers.uniqueArray(() => (${item}), ${count})`
+        }
+        if (max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} }})`
         if (min !== undefined) return `faker.helpers.multiple(() => (${item}), { count: ${min} })`
-        if (max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: 0, max: ${max} }})`
 
         return `faker.helpers.multiple(() => (${item}))`
       },
@@ -350,7 +435,17 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
                 .filter((key): key is string => typeof key === 'string' && !node.properties.some((property) => property.name === key))
                 .map((name) => ast.factory.createProperty({ name, schema: valueSchema }))
             : []
-        const entries = [...node.properties, ...recordProperties].map((property): string => {
+        const properties = [...node.properties, ...recordProperties]
+        // `maxProperties` keeps the required properties first.
+        const kept = node.max === undefined ? properties : properties.toSorted((a, b) => Number(b.required) - Number(a.required)).slice(0, node.max)
+        // `minProperties` adds keys from `additionalProperties`, skipping any name a declared property uses.
+        const names = new Set(properties.map((property) => property.name))
+        const extras: typeof kept = []
+        for (let index = 1; typeof valueSchema === 'object' && kept.length + extras.length < (node.min ?? 0); index++) {
+          const name = `additionalProperty${index}`
+          if (!names.has(name)) extras.push(ast.factory.createProperty({ name, schema: valueSchema }))
+        }
+        const entries = [...kept, ...extras].map((property): string => {
           const value: string =
             printNested(property.schema, {
               typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,

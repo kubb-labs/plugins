@@ -43,7 +43,7 @@ export function resolveResponseValidator(validator: ValidatorOptions | undefined
 
 /**
  * Builds the `validator.error` map of a call, one plugin-zod `<operation>StatusNNNSchema` per non-2xx response with a
- * schema, such as `{ 404: getPetStatus404Schema, '5XX': getPetStatus5XXSchema }`. Returns `null` without one.
+ * schema, such as `{ 404: getPetStatus404Schema, '5xx': getPetStatus5xxSchema }`. Returns `null` without one.
  */
 export function buildZodErrorParse(node: ast.OperationNode, zodResolver: ResolverZod): { literal: string; names: Array<string> } | null {
   const entries = node.responses

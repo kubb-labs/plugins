@@ -1,5 +1,5 @@
 import { getOperationParameters } from '@internals/shared'
-import { isValidVarName } from '@internals/utils'
+import { isValidVarName, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
@@ -16,18 +16,26 @@ function toKey(name: string): string {
 /**
  * Serializes one parameter's metadata into a `{ style, explode, allowReserved, contentType }`
  * literal, or `null` when the parameter carries none. Path and query carry the serialization
- * `style`; header and cookie use a fixed style (`simple` and `form`), so only `explode` is emitted
- * for them. `allowReserved` only applies to query parameters, and `contentType` to every location
- * except path.
+ * `style`. Header and cookie have a fixed style (`simple` and `form`), so they emit only `explode`,
+ * plus `style: 'cookie'` when a cookie parameter sets the OpenAPI 3.2 `cookie` style.
+ * `allowReserved` only applies to query parameters, and `contentType` to every location except path.
  */
 function serializeParameter(parameter: ast.ParameterNode): string | null {
   const parts: Array<string> = []
   if ((parameter.in === 'path' || parameter.in === 'query') && parameter.style) parts.push(`style: '${parameter.style}'`)
+  if (parameter.in === 'cookie' && parameter.style === 'cookie') parts.push(`style: 'cookie'`)
   if (parameter.explode !== undefined) parts.push(`explode: ${parameter.explode}`)
   if (parameter.in === 'query' && parameter.allowReserved !== undefined) parts.push(`allowReserved: ${parameter.allowReserved}`)
-  if (parameter.in !== 'path' && parameter.contentType) parts.push(`contentType: '${parameter.contentType}'`)
+  if (parameter.in !== 'path' && parameter.contentType) parts.push(`contentType: ${singleQuote(parameter.contentType)}`)
   if (parameter.in === 'querystring') parts.push('querystring: true')
   return parts.length > 0 ? `{ ${parts.join(', ')} }` : null
+}
+
+/**
+ * Whether a query parameter of the operation has a style entry, so the call needs the styled query serializer.
+ */
+export function hasQueryStyles(node: ast.OperationNode): boolean {
+  return ast.isHttpOperationNode(node) && getOperationParameters(node).query.some((parameter) => serializeParameter(parameter) !== null)
 }
 
 /**
@@ -48,12 +56,23 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
   })
 }
 
+function serializePartsEncoding(node: ast.HttpOperationNode): Array<string> {
+  // Only the `multipart/mixed` media type reads `parts`, whichever position it has among the request content types.
+  const entry = node.requestBody?.content?.find((content) => content.contentType.split(';')[0]!.trim().toLowerCase() === 'multipart/mixed')
+  const part = (encoding: ast.EncodingNode) => (encoding.contentType ? `{ contentType: ${singleQuote(encoding.contentType)} }` : '{}')
+  return [
+    ...(entry?.prefixEncoding?.length ? [`prefix: [${entry.prefixEncoding.map(part).join(', ')}]`] : []),
+    ...(entry?.itemEncoding?.contentType ? [`item: ${part(entry.itemEncoding)}`] : []),
+  ]
+}
+
 /**
  * Builds the per-operation `styles` literal from the operation's parameters, grouped by location.
  * Entries are keyed by the spec name of the parameter.
  * Only parameters whose source defines `style`, `explode`, `allowReserved`, or `contentType` are
  * emitted, so calls without serialization metadata keep the runtime defaults and existing output
- * is unchanged. A form request body adds a `body` group keyed by property name from its `encoding`.
+ * is unchanged. A form request body adds a `body` group keyed by property name from its `encoding`,
+ * and a `multipart/mixed` body a `parts` group with its `prefix` and `item` encoding.
  * Returns `null` when nothing carries metadata.
  *
  * With `merge`, the literal spreads `config.styles` per parameter, so a per-call entry overrides the generated one for
@@ -68,7 +87,14 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
 export function buildStyles({ node, merge }: { node: ast.OperationNode; merge?: boolean }): string | null {
   if (!ast.isHttpOperationNode(node)) return null
 
-  const groups: Record<StyledLocation | 'body', Array<string>> = { path: [], query: [], header: [], cookie: [], body: serializeBodyEncoding(node) }
+  const groups: Record<StyledLocation | 'body' | 'parts', Array<string>> = {
+    path: [],
+    query: [],
+    header: [],
+    cookie: [],
+    body: serializeBodyEncoding(node),
+    parts: serializePartsEncoding(node),
+  }
 
   for (const [location, parameters] of Object.entries(getOperationParameters(node)) as Array<[StyledLocation, Array<ast.ParameterNode>]>) {
     for (const parameter of parameters) {

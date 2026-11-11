@@ -11,10 +11,10 @@ export function createApiError(data?: Partial<ApiError>): ApiError {
   return (data ??
     faker.helpers.arrayElement([
       {
-        error: faker.helpers.arrayElement<(NonNullable<ApiError> & Record<'error', unknown>)['error']>(['not_found']),
+        error: faker.helpers.arrayElement(['not_found'] as Array<(NonNullable<ApiError> & Record<'error', unknown>)['error']>),
       },
       {
-        error: faker.helpers.arrayElement<(NonNullable<ApiError> & Record<'error', unknown>)['error']>(['rate_limited']),
+        error: faker.helpers.arrayElement(['rate_limited'] as Array<(NonNullable<ApiError> & Record<'error', unknown>)['error']>),
       },
     ])) as ApiError
 }

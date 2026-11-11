@@ -7,11 +7,39 @@
 import type { GetCookiesOptions, GetCookiesResponse } from './GetCookies'
 
 export function getCookies({ headers, cookies }: GetCookiesOptions = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetCookiesResponse> {
-  const cookie = Object.entries(cookies ?? {})
+  const rawCookie = (value: unknown): string => {
+    if (Array.isArray(value))
+      return value
+        .filter((item) => item != null)
+        .map(rawCookie)
+        .join(',')
+    if (typeof value === 'object' && value !== null && !(value instanceof Date))
+      return Object.entries(value)
+        .filter(([, item]) => item != null)
+        .flat()
+        .map(rawCookie)
+        .join(',')
+    const text = value instanceof Date ? value.toISOString() : String(value)
+    if (!/^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/.test(text))
+      throw new TypeError('A cookie has characters the cookie style cannot send, escape it first.')
+    return text
+  }
+  const explodeCookie = (name: string, value: unknown): Array<string> => {
+    if (Array.isArray(value)) return value.filter((item) => item != null).map((item) => `${name}=${rawCookie(item)}`)
+    if (typeof value === 'object' && value !== null && !(value instanceof Date))
+      return Object.entries(value)
+        .filter(([, item]) => item != null)
+        .map(([key, item]) => `${rawCookie(key)}=${rawCookie(item)}`)
+    return [`${name}=${rawCookie(value)}`]
+  }
+  const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>)
     .filter(([, value]) => value != null)
-    .map(
-      ([name, value]) =>
-        `${name}=${encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))}`,
+    .flatMap(([name, value]) =>
+      ['tags'].includes(name)
+        ? explodeCookie(name, value)
+        : [
+            `${name}=${['sid'].includes(name) ? rawCookie(value) : encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))}`,
+          ],
     )
     .join('; ')
   return cy

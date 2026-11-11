@@ -1,4 +1,5 @@
 import * as core from './core'
+import { defaultConfig } from './config'
 import { createClientCore, createLazyClient, toRequestInit } from './core'
 export * from './core'
 
@@ -52,6 +53,22 @@ export type DecodedResponse<TData = unknown, TRequest = NativeRequest, TResponse
 export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
+export type StreamResult<
+  TResponses,
+  ThrowOnError extends boolean = true,
+  TEvent = core.ServerSentEvent<core.SuccessOf<TResponses>>,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+> = core.StreamResult<TResponses, ThrowOnError, TEvent, TRequest, TResponse>
+export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown> = core.ResponseErrorOf<
+  TResponses,
+  TRequest,
+  TResponse,
+  THeaders
+>
+export const isResponseError = core.isResponseError as <TResponses = unknown, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown>(
+  error: unknown,
+) => error is ResponseErrorOf<TResponses, TRequest, TResponse, THeaders>
 
 export const defaultTransport = async (request: core.ResolvedRequest): Promise<TransportResult> => {
   const nativeRequest = new Request(request.url, toRequestInit(request))
@@ -65,9 +82,12 @@ export const defaultTransport = async (request: core.ResolvedRequest): Promise<T
 /**
  * The client every generated operation uses unless a call passes its own. It is created on first use.
  */
-export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
+export const client: ClientInstance = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
+client.setConfig(defaultConfig)
 
-export const createClient = client.createClient
+export const createClient: ClientInstance['createClient'] = client.createClient
 
-import { formMediaTypes } from './mediaTypes.ts'
-client.setConfig({ mediaTypes: { ...formMediaTypes } })
+/**
+ * The security schemes from the spec by name. A generated call sends one of them to the `auth` resolver.
+ */
+export const securitySchemes = { petstore_auth: { type: 'oauth2', flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } }, api_key: { type: 'apiKey', name: 'api_key', in: 'header' } } as const

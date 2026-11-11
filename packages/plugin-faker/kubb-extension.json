@@ -19,7 +19,7 @@
   ],
   "dependencies": ["plugin-ts"],
   "compatibility": {
-    "kubb": ">=5.16.0",
+    "kubb": ">=5.18.0",
     "node": ">=22.22"
   },
   "options": [

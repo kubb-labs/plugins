@@ -8,6 +8,10 @@ import { updatePetHandler } from './pet/updatePet'
 import { updatePetWithFormHandler } from './pet/updatePetWithForm'
 import { uploadFileHandler } from './pet/uploadFile'
 import { createPetsHandler } from './pets/createPets'
+import { createPaymentHandler } from './store/payment/createPayment'
+import { createPaymentBatchHandler } from './store/payment/createPaymentBatch'
+import { getPaymentByIdHandler } from './store/payment/getPaymentById'
+import { listPaymentsHandler } from './store/payment/listPayments'
 import { addFilesBodySchema, addFilesStatus200Schema } from '../zod/pet/addFilesSchema'
 import { addPetBodySchema } from '../zod/pet/addPetSchema'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/pet/deletePetSchema'
@@ -36,6 +40,15 @@ import {
   createPetsQueryOffsetSchema,
   createPetsStatus201Schema,
 } from '../zod/pets/createPetsSchema'
+import { createPaymentBatchBodySchema, createPaymentBatchStatus204Schema } from '../zod/store/payment/createPaymentBatchSchema'
+import { createPaymentBodySchema, createPaymentStatus201Schema } from '../zod/store/payment/createPaymentSchema'
+import { getPaymentByIdPathPaymentIdSchema, getPaymentByIdStatus200Schema } from '../zod/store/payment/getPaymentByIdSchema'
+import {
+  listPaymentsCookieSessionSchema,
+  listPaymentsQueryFilterSchema,
+  listPaymentsQueryStatusSchema,
+  listPaymentsStatus2xxSchema,
+} from '../zod/store/payment/listPaymentsSchema'
 import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
@@ -185,6 +198,61 @@ export function getServer() {
     },
     async ({ path, query, body }, ctx) => {
       return uploadFileHandler({ path, query, body }, ctx)
+    },
+  )
+
+  server.registerTool(
+    'listPayments',
+    {
+      title: 'List payments',
+      description: 'Make a GET request to /store/payments',
+      outputSchema: z.object({ data: listPaymentsStatus2xxSchema }),
+      inputSchema: z.object({
+        query: z.object({ status: listPaymentsQueryStatusSchema, filter: listPaymentsQueryFilterSchema }),
+        cookies: z.object({ session: listPaymentsCookieSessionSchema }),
+      }),
+    },
+    async ({ query, cookies }, ctx) => {
+      return listPaymentsHandler({ query, cookies }, ctx)
+    },
+  )
+
+  server.registerTool(
+    'createPayment',
+    {
+      title: 'Pay for an order',
+      description: 'Make a POST request to /store/payments',
+      outputSchema: z.object({ data: createPaymentStatus201Schema }),
+      inputSchema: z.object({ body: createPaymentBodySchema }),
+    },
+    async ({ body }, ctx) => {
+      return createPaymentHandler({ body }, ctx)
+    },
+  )
+
+  server.registerTool(
+    'createPaymentBatch',
+    {
+      title: 'Pay for several orders at once',
+      description: 'Make a POST request to /store/payments/batch',
+      outputSchema: z.object({ data: createPaymentBatchStatus204Schema }),
+      inputSchema: z.object({ body: createPaymentBatchBodySchema }),
+    },
+    async ({ body }, ctx) => {
+      return createPaymentBatchHandler({ body }, ctx)
+    },
+  )
+
+  server.registerTool(
+    'getPaymentById',
+    {
+      title: 'Find a payment by ID',
+      description: 'Make a GET request to /store/payments/{paymentId}',
+      outputSchema: z.object({ data: getPaymentByIdStatus200Schema }),
+      inputSchema: z.object({ path: z.object({ paymentId: getPaymentByIdPathPaymentIdSchema }) }),
+    },
+    async ({ path }, ctx) => {
+      return getPaymentByIdHandler({ path }, ctx)
     },
   )
 

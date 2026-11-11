@@ -95,7 +95,9 @@ export default defineConfig({
           },
         },
       ],
-      group: { type: 'tag' },
+      // A custom name keeps one folder per tag. Without it the `payment` tag nests under its `parent` tag `store`, and the
+      // relative `query.importPath` below fits one folder depth only.
+      group: { type: 'tag', name: ({ group }) => group },
       query: {
         importPath: '../../../../tanstack-query-hook',
       },

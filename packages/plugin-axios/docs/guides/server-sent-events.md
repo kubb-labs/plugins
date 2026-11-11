@@ -33,7 +33,7 @@ For one payload on every event, such as a feed of pet changes. The item declares
 
 ### Describe it
 
-In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `const` on `event`. Point `data` at the payload schema with `$ref`. Kubb does not read `contentMediaType` or `contentSchema`, so `data` described with them stays a string:
+In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `const` on `event`. Point `data` at the payload schema with `$ref`. A `data` string described with `contentMediaType: application/json` and `contentSchema` is typed and parsed as that schema too:
 
 ```yaml
 /chat:
@@ -226,13 +226,13 @@ for await (const entry of await streamLogs()) {
 
 Pass these on the call, next to its request params:
 
-| Option         | What it does                                                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `terminator`   | Ends the stream when `data` equals this value, such as `[DONE]`. Without it, the sentinel reaches your loop.                    |
-| `transform`    | Maps each event before validation, for example to camelCase its keys.                                                           |
-| `maxEventSize` | Largest event in characters. A larger one throws a `RangeError`. Defaults to `16 * 1024 * 1024`. Set `Infinity` to turn it off. |
-| `signal`       | An `AbortSignal` that ends the request and the loop.                                                                            |
-| `eventShape`   | What the validator checks: `data` for the payload, `event` for the whole event. Generated calls set it.                         |
+| Option         | What it does                                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `terminator`   | Ends the stream when `data` equals this value, such as `[DONE]`. Without it, the sentinel reaches your loop, or fails the `validator` when it does not match the event schema. |
+| `transform`    | Maps each event before validation, for example to camelCase its keys.                                                                                                          |
+| `maxEventSize` | Largest event in characters. A larger one throws a `RangeError`. Defaults to `16 * 1024 * 1024`. Set `Infinity` to turn it off.                                                |
+| `signal`       | An `AbortSignal` that ends the request and the loop.                                                                                                                           |
+| `eventShape`   | What the validator checks: `data` for the payload, `event` for the whole event. Generated calls set it.                                                                        |
 
 To stop reading, `break` out of the loop. The runtime then cancels the reader and releases the connection.
 

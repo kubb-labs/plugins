@@ -52,5 +52,5 @@ export function createPlaceOrderPatchBody(data?: Partial<PlaceOrderPatchBody>): 
 }
 
 export function createPlaceOrderPatchResponse(data?: Partial<PlaceOrderPatchResponse>): PlaceOrderPatchResponse {
-  return (data ?? faker.helpers.arrayElement([createPlaceOrderPatchStatus200(), createPlaceOrderPatchStatus405()])) as PlaceOrderPatchResponse
+  return createPlaceOrderPatchStatus200(data) as PlaceOrderPatchResponse
 }

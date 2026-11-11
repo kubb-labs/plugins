@@ -4,6 +4,7 @@ import {
   getPerContentTypeName,
   resolveContentTypeVariants,
   resolveOperationFile,
+  toRequestContent,
   toResponseContent,
 } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
@@ -80,7 +81,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       typeFilePath: meta.typeFile.path,
     })
 
-    const imports = resolver.imports({ node, root, output, group: group ?? undefined })
+    const imports = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
     const usedImports = filterUsedImports(imports, fakerText)
 
     return (
@@ -182,7 +183,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ),
     )
     const dataUnits = expandContentUnits(
-      node.requestBody?.content ?? [],
+      (node.requestBody?.content ?? []).map(toRequestContent),
       resolver.response.body(node),
       tsResolver.response.body(node),
       node.requestBody?.description,
@@ -216,7 +217,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     } as const
 
     function resolveMockImports(schema: ast.SchemaNode) {
-      return resolver.imports({ node: schema, root, output, group: group ?? undefined }).filter((entry) => entry.path !== meta.file.path)
+      return resolver.imports({ node: schema, root, output, group: group ?? undefined, checks: true }).filter((entry) => entry.path !== meta.file.path)
     }
 
     function renderEntry({ schema, name, typeName, description, keysToOmit, skipImportNames = [] }: RenderUnit) {

@@ -8,8 +8,8 @@ import type { HttpResponseResolver } from 'msw/http'
 import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
-export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+export function placeOrderHandlerResponse200(data?: PlaceOrderResponse) {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -18,7 +18,7 @@ export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
 }
 
 export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 405,
   })
 }
@@ -27,11 +27,6 @@ export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolv
   return http.post<Record<string, string>, PlaceOrderBody extends DefaultBodyType ? PlaceOrderBody : DefaultBodyType>(`${options?.baseURL ?? ''}/store/order`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+      return placeOrderHandlerResponse200(data)
     })
 }

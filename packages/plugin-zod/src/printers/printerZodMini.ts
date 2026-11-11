@@ -114,6 +114,7 @@ const miniDialect: ZodDialect<PrinterZodMiniOptions> = {
   coercedNumber: (schema) => `z.pipe(z.coerce.number(), ${schema})`,
   catchall: (object, value) => `z.catchall(${object}, ${value})`,
   nullable: (value) => `z.nullable(${value})`,
+  refine: (value, check) => `${value}.check(z.refine(${check}))`,
   unique: (array) => `${array}.check(z.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" }))`,
   extend: (base, shape) => `z.extend(${base}, ${shape})`,
   intersection: (left, right) => `z.intersection(${left}, ${right})`,

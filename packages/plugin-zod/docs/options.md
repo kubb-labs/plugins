@@ -175,7 +175,7 @@ Emits `z.xor([...])`, which passes only when exactly one member matches, as `one
 
 ::
 
-A `oneOf` with a discriminator, where every member is an object, prints `z.discriminatedUnion(...)` with either value. An `anyOf` always prints `z.union(...)`.
+A `oneOf` with a discriminator, where every member is an object, prints `z.discriminatedUnion(...)` with either value, and its members keep extra keys the spec allows. An `anyOf` always prints `z.union(...)`.
 
 ### compile
 
@@ -287,6 +287,7 @@ type ResolverZodPatch = {
   }
   response?: {
     status?(node: OperationNode, statusCode: StatusCode): string
+    headers?(node: OperationNode, statusCode: StatusCode): string
     body?(node: OperationNode): string
     responses?(node: OperationNode): string
     response?(node: OperationNode): string

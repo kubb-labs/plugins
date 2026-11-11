@@ -2,7 +2,7 @@
 
 import type { Options, Unwrappable, RequestResult } from './.kubb/client'
 import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
-import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from './.kubb/client'
 
 /**
  * `GET /pet/{petId}`
@@ -16,10 +16,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
     apiClient<GetPetByIdResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/{petId}',
-      security: [
-        { type: 'oauth2', scopes: ['read:pets'] },
-        { type: 'apiKey', name: 'api_key', in: 'header' },
-      ],
+      security: [{ ...securitySchemes.petstore_auth, scopes: ['read:pets'] }, securitySchemes.api_key],
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),

@@ -67,5 +67,5 @@ export function createAddPetBody(data?: Partial<AddPetBody>): AddPetBody {
 }
 
 export function createAddPetResponse(data?: Partial<AddPetResponse>): AddPetResponse {
-  return (data ?? faker.helpers.arrayElement([createAddPetStatus200(), createAddPetStatus405()])) as AddPetResponse
+  return (data ?? faker.helpers.arrayElement([createPet(), faker.string.alpha()])) as AddPetResponse
 }

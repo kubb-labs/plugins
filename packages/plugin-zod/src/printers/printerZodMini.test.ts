@@ -34,6 +34,26 @@ describe('printerZodMini', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.string()')
     })
 
+    test('string with a JSON contentSchema checks the parsed document', () => {
+      const code = printer.print(
+        ast.factory.createSchema({
+          type: 'string',
+          content: {
+            mediaType: 'application/json',
+            schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'integer' })] }),
+          },
+        }),
+      )!
+      const schema = new Function('z', `return ${code}`)(z) as z.ZodMiniType
+
+      expect(code).toMatchInlineSnapshot(
+        `"z.string().check(z.refine((value) => { try { return z.array(z.int()).safeParse(JSON.parse(value)).success } catch { return false } }, { message: "String must hold JSON that matches its content schema" }))"`,
+      )
+      expect(z.parse(schema, '[1]')).toBe('[1]')
+      expect(z.safeParse(schema, '["1"]').success).toBe(false)
+      expect(z.safeParse(schema, '[').success).toBe(false)
+    })
+
     test('string with length checks', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string', min: 1, max: 10 }))).toBe('z.string().check(z.minLength(1), z.maxLength(10))')
     })
@@ -873,6 +893,29 @@ describe('printerZodMini', () => {
   })
 
   describe('intersection', () => {
+    test('keeps the discriminator literal of a oneOf base over a sibling string property', () => {
+      const typeProperty = (schema: ast.SchemaNode) => ast.factory.createProperty({ name: 'type', required: true, schema })
+      const dog = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [
+          typeProperty(ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] })),
+          ast.factory.createProperty({ name: 'bark', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+      })
+      const node = ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'type', members: [dog] }),
+          ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [typeProperty(ast.factory.createSchema({ type: 'string' }))] }),
+        ],
+      })
+      const schema = new Function('z', `return ${printer.print(node)}`)(z) as z.ZodMiniType
+
+      expect(schema.safeParse({ type: 'dog' }).success).toBe(true)
+      expect(schema.safeParse({ type: 'cat' }).success).toBe(false)
+    })
+
     test('ref with string min and max constraints', () => {
       const node = ast.factory.createSchema({
         type: 'intersection',
@@ -1068,6 +1111,21 @@ describe('printerZodMini', () => {
       `)
     })
 
+    test('discriminated oneOf keeps open members, so extra keys the spec allows still parse', () => {
+      const event = (name: string) =>
+        ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) })],
+        })
+      const node = ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'event', members: [event('ping'), event('done')] })
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(z) as z.ZodMiniType
+
+      expect(code).toMatch(/^z\.discriminatedUnion\('event', \[\s+z\.object\(/)
+      expect(schema.safeParse({ event: 'ping', id: '1' }).success).toBe(true)
+    })
+
     test('discriminated union flattens allOf variants with z.extend() so they discriminate', () => {
       const node = ast.factory.createSchema({
         type: 'union',
@@ -1081,7 +1139,9 @@ describe('printerZodMini', () => {
               ast.factory.createSchema({
                 type: 'object',
                 primitive: 'object',
-                properties: [ast.factory.createProperty({ name: 'petType', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+                properties: [
+                  ast.factory.createProperty({ name: 'petType', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] }) }),
+                ],
               }),
             ],
           }),
@@ -1092,9 +1152,24 @@ describe('printerZodMini', () => {
       expect(printer.print(node)).toBe(`z.discriminatedUnion('petType', [
   Cat,
   z.extend(BasePet, {
-    petType: z.string(),
+    petType: z.enum(['dog']),
   }),
 ])`)
+    })
+
+    test('falls back to z.union when a member types the discriminator as a plain string', () => {
+      const member = (name: string, schema: ast.SchemaNode) =>
+        ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [ast.factory.createProperty({ name, required: true, schema })] })
+      const node = ast.factory.createSchema({
+        type: 'union',
+        discriminatorPropertyName: 'petType',
+        members: [
+          member('petType', ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] })),
+          member('petType', ast.factory.createSchema({ type: 'string' })),
+        ],
+      })
+
+      expect(printer.print(node)).toMatch(/^z\.union\(/)
     })
 
     test('falls back to z.union when a cyclic variant cannot flatten to an object', () => {
