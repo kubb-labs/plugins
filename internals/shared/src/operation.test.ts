@@ -345,11 +345,13 @@ describe('getOperationParameters', () => {
         ast.factory.createProperty({ name: 'limit', schema: ast.factory.createSchema({ type: 'number' }) }),
       ],
     })
-    // `encoding` is not on the pinned `ParameterNode` yet, so it is added to the node as the adapter will.
-    const parameter = {
-      ...ast.factory.createParameter({ name: 'q', in: 'querystring', schema: filter, contentType: 'application/x-www-form-urlencoded' }),
+    const parameter = ast.factory.createParameter({
+      name: 'q',
+      in: 'querystring',
+      schema: filter,
+      contentType: 'application/x-www-form-urlencoded',
       encoding: { tags: { style: 'form', explode: false } },
-    } as ast.ParameterNode
+    })
     const node = ast.factory.createOperation({ operationId: 'search', method: 'GET', path: '/search', parameters: [parameter] })
 
     const [tags, limit] = getOperationParameters(node).query
