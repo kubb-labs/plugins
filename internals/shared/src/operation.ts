@@ -490,29 +490,6 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
 const operationParameterGroupsByNode = new WeakMap<ast.OperationNode, OperationParameterGroups>()
 
 /**
- * An OpenAPI 3.2 `querystring` parameter is the whole query string, so a form-encoded object becomes one query parameter
- * per property, typed and serialized like any other, with the `style` and `explode` its `encoding` entry declares.
- * Another content type, such as JSON, stays one parameter named after it, and the runtime sends its value as the whole query string.
- */
-function spreadQuerystring(param: ast.ParameterNode): Array<ast.ParameterNode> {
-  const schema = param.schema.type === 'ref' ? param.schema.schema : param.schema
-  const formEncoded = !param.contentType || ast.mediaType.base(param.contentType) === 'application/x-www-form-urlencoded'
-  if (schema?.type !== 'object' || !formEncoded) return [param]
-  return schema.properties.map((property) => {
-    const { style, explode, allowReserved } = param.encoding?.[property.name] ?? {}
-    return ast.factory.createParameter({
-      name: property.name,
-      in: 'query',
-      schema: property.schema,
-      required: param.required && property.required,
-      ...(style !== undefined && { style }),
-      ...(explode !== undefined && { explode }),
-      ...(allowReserved !== undefined && { allowReserved }),
-    })
-  })
-}
-
-/**
  * Groups an operation's parameters by location (`path`/`query`/`header`/`cookie`), deduping each
  * group by name. Every plugin generator visiting the same `OperationNode` shares one AST instance
  * (see `KubbDriver`), so the result is cached per node to avoid re-filtering and re-deduping the
@@ -523,14 +500,6 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
   if (cached) return cached
 
   const groups = ast.http.parameters(node)
-  // shortcut: the OpenAPI 3.2 `querystring` spread stays here until adapter-oas emits plain query parameters.
-  const names = new Set(groups.query.map((param) => param.name))
-  for (const param of node.parameters.filter((param) => param.in === 'querystring').flatMap(spreadQuerystring)) {
-    if (names.has(param.name)) continue
-    names.add(param.name)
-    groups.query.push(param)
-  }
-
   operationParameterGroupsByNode.set(node, groups)
   return groups
 }
