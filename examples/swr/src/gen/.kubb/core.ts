@@ -1035,8 +1035,10 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     if (streaming && resultSuccess && !readsItems && result.data != null) {
       // Release the connection, since nobody reads this body.
       if (rawStream) await (result.data as ReadableStream).cancel().catch(() => {})
-      // `cause` is assigned, since the constructor option needs the ES2022 library.
-      throw Object.assign(new TypeError(`Expected a streamed body, got ${result.contentType ?? 'a body without a content type'}`), { cause: result.data })
+      // `cause` is set afterwards, since the constructor option needs the ES2022 library.
+      const error: TypeError & { cause?: unknown } = new TypeError(`Expected a streamed body, got ${result.contentType ?? 'a body without a content type'}`)
+      error.cause = result.data
+      throw error
     }
 
     const data = rawStream ? result.data : await runValidator({ validator: validatorFor, value: result.data, context: validationContext, onValidationError })
