@@ -1,7 +1,7 @@
 import type { MediaType } from '../mediaTypes'
 import type { BodyEncoding } from '../serializers'
 import { isEncodedBody } from '../mediaTypes'
-import { jsonReplacer, toValue } from '../serializers'
+import { isJsonMediaType, jsonReplacer, toValue } from '../serializers'
 
 function appendFormDataValue({
   formData,
@@ -19,7 +19,8 @@ function appendFormDataValue({
     formData.append(key, value)
     return
   }
-  if (typeof value === 'object' && !(value instanceof Date)) {
+  // A JSON part sends a scalar as JSON too, so a string arrives quoted.
+  if ((typeof value === 'object' && !(value instanceof Date)) || isJsonMediaType(contentType)) {
     const encoded = JSON.stringify(value, jsonReplacer)
     // A part's media type can only be set by wrapping the value in a typed Blob.
     formData.append(key, contentType ? new Blob([encoded], { type: contentType }) : encoded)
@@ -34,8 +35,12 @@ function toFormData(body: Record<string, unknown>, encoding: Record<string, Body
   const formData = new FormData()
   for (const [key, value] of Object.entries(body)) {
     const { contentType, style, explode } = encoding?.[key] ?? {}
-    // `explode: false` sends an array of scalars as one part, its items joined by the style's delimiter.
-    if (Array.isArray(value) && explode === false && value.every((item) => typeof item !== 'object' || item === null || item instanceof Date)) {
+    // `explode: false`, the default for the delimited styles, sends an array of scalars as one part, its items joined by the style's delimiter.
+    if (
+      Array.isArray(value) &&
+      !(explode ?? (style !== 'spaceDelimited' && style !== 'pipeDelimited')) &&
+      value.every((item) => typeof item !== 'object' || item === null || item instanceof Date)
+    ) {
       const delimiter = formDelimiters[style ?? 'form'] ?? ','
       formData.append(
         key,

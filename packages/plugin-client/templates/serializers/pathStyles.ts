@@ -25,5 +25,7 @@ export const serializeStyledPath: PathSerializer = ({ name, value, options }) =>
     if (label) return `.${members.join(explode ? '.' : ',')}`
     return explode ? members.map((member) => `;${member}`).join('') : `;${name}=${members.join(',')}`
   }
-  return label ? `.${encode(value)}` : `;${name}=${encode(value)}`
+  const encoded = encode(value)
+  // RFC 6570 drops the `=` of an empty matrix value: `;color`.
+  return label ? `.${encoded}` : encoded ? `;${name}=${encoded}` : `;${name}`
 }
