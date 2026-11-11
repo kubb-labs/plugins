@@ -48,7 +48,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
 
     // `mcpGenerator` emits no handler for a stream operation, so it gets no tool either.
     const operationsMapped = nodes
-      .filter(ast.isHttpOperationNode)
+      .filter(ast.http.is)
       .filter((node) => !isEventStream(node) && !hasStreamVariant(node))
       .map((node) => {
         const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)

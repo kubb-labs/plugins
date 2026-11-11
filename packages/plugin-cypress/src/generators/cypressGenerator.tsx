@@ -14,7 +14,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
   name: 'cypress',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    if (!ast.isHttpOperationNode(node)) return null
+    if (!ast.http.is(node)) return null
     const { config, resolver, driver, root } = ctx
     const { output, baseURL, group } = ctx.options
 

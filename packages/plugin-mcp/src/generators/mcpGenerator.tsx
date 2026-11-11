@@ -15,7 +15,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
   name: 'mcp',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    if (!ast.isHttpOperationNode(node)) return null
+    if (!ast.http.is(node)) return null
     // A stream has no single JSON body to return as tool output, like the query plugins skip it.
     if (isEventStream(node) || hasStreamVariant(node)) return null
     const { resolver, driver, root, config } = ctx

@@ -29,7 +29,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   const { output, group } = ctx.options
 
   return nodes.reduce((acc, operationNode) => {
-    if (!ast.isHttpOperationNode(operationNode)) return acc
+    if (!ast.http.is(operationNode)) return acc
     const tag = operationNode.tags[0]
     const name = tag ? ensureValidVarName(resolver.groupName(tag)) : resolver.className('ApiClient')
     // `group.name` names the folder and file, never the class.

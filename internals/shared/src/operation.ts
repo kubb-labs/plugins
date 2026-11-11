@@ -129,7 +129,7 @@ export type ResolveOperationTypeNameOptions = {
  * The operation's method and path as plain text, such as `` `GET /pet/{petId}` ``. A path is not a valid `{@link}` target.
  */
 function getOperationRequestLine(node: ast.OperationNode): string | null {
-  return ast.isHttpOperationNode(node) && node.path ? `\`${node.method.toUpperCase()} ${node.path}\`` : null
+  return ast.http.is(node) && node.path ? `\`${node.method.toUpperCase()} ${node.path}\`` : null
 }
 
 /**

@@ -36,7 +36,7 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
  * Whether a query parameter of the operation has a style entry, so the call needs the styled query serializer.
  */
 export function hasQueryStyles(node: ast.OperationNode): boolean {
-  return ast.isHttpOperationNode(node) && getOperationParameters(node).query.some((parameter) => serializeParameter(parameter) !== null)
+  return ast.http.is(node) && getOperationParameters(node).query.some((parameter) => serializeParameter(parameter) !== null)
 }
 
 /**
@@ -75,7 +75,7 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
  * ```
  */
 export function buildStyles({ node, merge }: { node: ast.OperationNode; merge?: boolean }): string | null {
-  if (!ast.isHttpOperationNode(node)) return null
+  if (!ast.http.is(node)) return null
 
   const groups: Record<StyledLocation | 'body', Array<string>> = { path: [], query: [], header: [], cookie: [], body: serializeBodyEncoding(node) }
 

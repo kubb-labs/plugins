@@ -152,7 +152,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     )
   },
   operation(node, ctx) {
-    if (!ast.isHttpOperationNode(node)) return null
+    if (!ast.http.is(node)) return null
     const { adapter, config, resolver, root } = ctx
     const { output, coercion, guidType, regexType, oneOfType, compile, mini, inferred, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
