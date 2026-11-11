@@ -170,7 +170,7 @@ describe('serializeQuery and serializeStyledQuery', () => {
 
   test('spaceDelimited and pipeDelimited join arrays without explode', () => {
     expect(serializeStyledQuery({ id: [3, 4, 5] }, { id: { style: 'spaceDelimited', explode: false } })).toBe('id=3%204%205')
-    expect(serializeStyledQuery({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } })).toBe('id=3|4|5')
+    expect(serializeStyledQuery({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } })).toBe('id=3%7C4%7C5')
   })
 
   test('form style with explode expands objects into top-level keys', () => {
@@ -529,7 +529,7 @@ describe('createClientCore', () => {
       query: { id: [3, 4], filter: { a: 1 } },
       styles: { query: { id: { style: 'pipeDelimited', explode: false }, filter: { style: 'deepObject' } } },
     })
-    expect(calls[0]?.url).toBe('/pets?id=3|4&filter%5Ba%5D=1')
+    expect(calls[0]?.url).toBe('/pets?id=3%7C4&filter%5Ba%5D=1')
   })
 
   test('JSON-encodes a string body and sets Content-Type', async () => {

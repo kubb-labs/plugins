@@ -32,7 +32,9 @@ async function fromMultipartMixed(response: Response): Promise<Array<unknown>> {
   const boundary = /boundary="?([^";]+)"?/i.exec(response.headers.get('content-type') ?? '')?.[1]
   if (!boundary) throw new TypeError('Expected a boundary in the Content-Type of a multipart/mixed response')
   // shortcut: parts are read as text, so a binary part does not keep its bytes; read the bytes when a spec returns one.
-  const sections = (await response.text()).split(`--${boundary}`).slice(1, -1)
+  // RFC 2046: a delimiter is `--boundary` at the start of a line, so the same text inside a part does not split it.
+  const delimiter = new RegExp(`(?:^|\\r?\\n)--${boundary.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`)
+  const sections = (await response.text()).split(delimiter).slice(1, -1)
   return sections.map((section) => {
     const [, head = '', body = ''] = /^([\s\S]*?)\r?\n\r?\n([\s\S]*)$/.exec(section) ?? []
     const value = body.replace(/\r?\n$/, '')

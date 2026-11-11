@@ -1,11 +1,18 @@
-import { encodeComponent, isJsonMediaType, isRecord, jsonReplacer, notNullish, serializeDefaultQueryParam, toValue } from '../serializers.ts'
+import { baseContentType, encodeComponent, isJsonMediaType, isRecord, jsonReplacer, notNullish, serializeDefaultQueryParam, toValue } from '../serializers.ts'
 import type { QueryParamStyle, QuerySerializer, QueryStyle } from '../serializers.ts'
 
-const queryDelimiters: Record<QueryStyle, string> = { form: ',', spaceDelimited: '%20', pipeDelimited: '|', deepObject: ',' }
+const queryDelimiters: Record<QueryStyle, string> = { form: ',', spaceDelimited: '%20', pipeDelimited: '%7C', deepObject: ',' }
 
-// `allowReserved` keeps reserved characters, but `#`, `&`, and `+` would end the query or change a form value.
+// `allowReserved` keeps reserved characters and percent-encoded triples, but `#`, `&`, and `+` would end the query or change a form value.
 function encodeReserved(value: unknown): string {
-  return encodeURI(toValue(value)).replace(/[#&+]/g, encodeURIComponent)
+  return encodeURI(toValue(value))
+    .replace(/%25([0-9A-Fa-f]{2})/g, '%$1')
+    .replace(/[#&+]/g, encodeURIComponent)
+}
+
+// OpenAPI defaults `explode` to false for the delimited styles. A deepObject array of scalars, which OpenAPI leaves undefined, keeps repeating its key.
+function defaultExplode(options: QueryParamStyle): boolean {
+  return options.style !== 'spaceDelimited' && options.style !== 'pipeDelimited'
 }
 
 function serializeDeepObject({ key, value, encode }: { key: string; value: unknown; encode: (value: unknown) => string }): Array<string> {
@@ -31,7 +38,7 @@ function serializeStyledQueryArray({
   encode: (value: unknown) => string
 }): Array<string> {
   const items = value.filter(notNullish)
-  if (options.explode ?? true) return items.map((item) => `${encode(key)}=${encode(item)}`)
+  if (options.explode ?? defaultExplode(options)) return items.map((item) => `${encode(key)}=${encode(item)}`)
   return [`${encode(key)}=${items.map(encode).join(queryDelimiters[options.style ?? 'form'])}`]
 }
 
@@ -48,12 +55,12 @@ function serializeStyledQueryObject({
 }): Array<string> {
   if ((options.style ?? 'form') === 'deepObject') return serializeDeepObject({ key, value, encode })
   const entries = Object.entries(value).filter(([, item]) => notNullish(item))
-  if (options.explode ?? true) return entries.map(([prop, item]) => `${encode(prop)}=${encode(item)}`)
+  if (options.explode ?? defaultExplode(options)) return entries.map(([prop, item]) => `${encode(prop)}=${encode(item)}`)
   return [
     `${encode(key)}=${entries
       .flatMap(([prop, item]) => [prop, item])
       .map(encode)
-      .join(',')}`,
+      .join(queryDelimiters[options.style ?? 'form'])}`,
   ]
 }
 
@@ -81,6 +88,11 @@ export const serializeStyledQuery: QuerySerializer = (params, options) => {
     if (notNullish(value) && isJsonMediaType(paramOptions?.contentType)) {
       const json = encodeComponent(JSON.stringify(value, jsonReplacer))
       parts.push(paramOptions?.querystring ? json : `${encodeComponent(key)}=${json}`)
+      continue
+    }
+    // A string querystring is already in its media type, so it only needs percent-encoding, which form-urlencoded has.
+    if (paramOptions?.querystring && typeof value === 'string') {
+      parts.push(baseContentType(paramOptions.contentType) === 'application/x-www-form-urlencoded' ? value : encodeComponent(value))
       continue
     }
     const styled = paramOptions ?? (isRecord(value) ? {} : undefined)
