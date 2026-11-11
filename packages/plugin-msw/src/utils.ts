@@ -148,7 +148,11 @@ export function getExampleBody(response: ast.ResponseNode | null | undefined): s
   if (!entry || !example) return null
   if (example.value !== undefined) return toLiteral(example.value)
   // `responseReturn` sends raw text only for a text response. For a binary one the example would go out JSON-encoded.
-  if (!isJson(entry.contentType)) return getTextContentType(response) === entry.contentType ? toLiteral(example.serializedValue) : null
+  // A serialized SSE example is already events, which `responseReturn` sends as is when the body is `undefined`.
+  if (!isJson(entry.contentType)) {
+    const text = baseContentType(entry.contentType) !== 'text/event-stream' && getTextContentType(response) === entry.contentType
+    return text ? toLiteral(example.serializedValue) : null
+  }
   // `responseReturn` encodes a JSON body itself, so a serialized JSON example is parsed first.
   try {
     return toLiteral(JSON.parse(example.serializedValue!))

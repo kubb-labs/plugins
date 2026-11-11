@@ -91,18 +91,33 @@ function numberCall(
   { min, max, exclusive, multipleOf }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive' | 'multipleOf'>,
 ): string {
   const whole = kind !== 'float'
-  // A whole-number bound moves to the next integer. Faker never returns a float's `max`, and its `min` only by chance.
-  // shortcut: a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
-  const lower = exclusive?.min === undefined ? min : Math.max(min ?? -Infinity, whole ? Math.floor(exclusive.min) + 1 : exclusive.min)
-  const upper = exclusive?.max === undefined ? max : Math.min(max ?? Infinity, whole ? Math.ceil(exclusive.max) - 1 : exclusive.max)
-  // Faker fills a missing bound with `0` (and `1` for a float's `max`), which a lone bound on the other side of it contradicts.
-  const maxValue = kind === 'float' && lower !== undefined && upper === undefined && lower >= 1 ? lower + 100 : upper
-  const minValue = maxValue !== undefined && lower === undefined && (whole ? maxValue < 0 : maxValue <= 0) ? maxValue - 100 : lower
+  // Faker's `int` and `bigInt` reject a fractional `multipleOf`.
+  const grid = whole && !Number.isInteger(multipleOf) ? undefined : multipleOf
+  // Faker returns points of the `multipleOf` grid, ends included, so an exclusive bound moves to the next point. A whole number's grid is 1.
+  // shortcut: without a grid a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
+  const step = grid ?? (whole ? 1 : undefined)
+  const above = (bound: number) => (step ? (Math.floor(bound / step) + 1) * step : bound)
+  const below = (bound: number) => (step ? (Math.ceil(bound / step) - 1) * step : bound)
+  // A bound past `Number.MAX_SAFE_INTEGER`, such as int64's, prints as a rounded or invalid literal, so it is left out.
+  const usable = (bound: number) => !whole || Number.isSafeInteger(bound)
+  const lowers = [min !== undefined && whole ? Math.ceil(min) : min, exclusive?.min === undefined ? undefined : above(exclusive.min)].filter(
+    (bound): bound is number => bound !== undefined && usable(bound),
+  )
+  const uppers = [max !== undefined && whole ? Math.floor(max) : max, exclusive?.max === undefined ? undefined : below(exclusive.max)].filter(
+    (bound): bound is number => bound !== undefined && usable(bound),
+  )
+  const lower = lowers.length ? Math.max(...lowers) : undefined
+  const upper = uppers.length ? Math.min(...uppers) : undefined
+  // Faker fills a missing `min` with `0`, and a float's missing `max` with `1`, which a lone bound on the other side contradicts.
+  // The span holds grid points, so faker always finds a multiple.
+  const span = 100 * (grid ?? 1)
+  const maxValue = kind === 'float' && lower !== undefined && upper === undefined && (lower >= 1 || grid !== undefined) ? lower + span : upper
+  const minValue = maxValue !== undefined && lower === undefined && (whole ? maxValue < 0 : maxValue <= 0) ? maxValue - span : lower
   const suffix = kind === 'bigInt' ? 'n' : ''
   const args = [
     minValue !== undefined && `min: ${minValue}${suffix}`,
     maxValue !== undefined && `max: ${maxValue}${suffix}`,
-    multipleOf !== undefined && `multipleOf: ${multipleOf}${suffix}`,
+    grid !== undefined && `multipleOf: ${grid}${suffix}`,
   ]
     .filter(Boolean)
     .join(', ')

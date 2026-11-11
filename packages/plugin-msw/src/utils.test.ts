@@ -38,6 +38,20 @@ describe('getExampleBody', () => {
     expect(getExampleBody(response('application/xml'))).toBe("'<pet/>'")
     expect(getExampleBody(response('application/octet-stream'))).toBeNull()
   })
+
+  test('leaves a serialized SSE example to the stream mock, so its events are not wrapped twice', () => {
+    const response = ast.factory.createResponse({
+      statusCode: '200',
+      content: [
+        ast.factory.createContent({
+          contentType: 'text/event-stream',
+          schema: ast.factory.createSchema({ type: 'string' }),
+          examples: [{ serializedValue: 'data: hi\n\n' }],
+        }),
+      ],
+    })
+    expect(getExampleBody(response)).toBeNull()
+  })
 })
 
 describe('getMockHeaders', () => {
