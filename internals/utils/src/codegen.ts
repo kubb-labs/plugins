@@ -1,4 +1,4 @@
-import { code } from '@kubb/kit'
+import { text } from '@kubb/kit'
 import { isIdentifier } from './reserved.ts'
 
 /**
@@ -51,7 +51,7 @@ export function buildJSDoc(
  */
 export function buildObject(entries: Array<string>): string {
   if (entries.length === 0) return '{}'
-  const body = entries.map((entry) => `${code.indent({ text: entry })},`).join('\n')
+  const body = entries.map((entry) => `${text.indent({ text: entry })},`).join('\n')
 
   return `{\n${body}\n}`
 }
@@ -72,7 +72,7 @@ export function buildList(items: Array<string>, brackets: [open: string, close: 
   const [open, close] = brackets
   if (items.length === 0) return `${open}${close}`
   if (!items.some((item) => item.includes('\n'))) return `${open}${items.join(', ')}${close}`
-  const body = items.map((item) => `${code.indent({ text: item })},`).join('\n')
+  const body = items.map((item) => `${text.indent({ text: item })},`).join('\n')
 
   return `${open}\n${body}\n${close}`
 }
@@ -101,7 +101,7 @@ export function lazyGetter({ name, body }: { name: string; body: string }): stri
  * ```
  */
 export function objectKey(name: string): string {
-  return isIdentifier(name) ? name : code.string(name)
+  return isIdentifier(name) ? name : text.quote(name)
 }
 
 /**
@@ -113,7 +113,7 @@ export function objectKey(name: string): string {
  * ```
  */
 export function toLiteral(value: unknown): string {
-  if (typeof value === 'string') return code.string(value)
+  if (typeof value === 'string') return text.quote(value)
   if (Array.isArray(value)) return `[${value.map(toLiteral).join(', ')}]`
   if (value && typeof value === 'object') {
     return `{ ${Object.entries(value)

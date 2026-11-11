@@ -1,5 +1,5 @@
 import { jsDocEscape } from '@internals/utils'
-import { ast, code } from '@kubb/kit'
+import { ast, text } from '@kubb/kit'
 import { getEnumNames } from './components/Enum.tsx'
 import type { PluginTs, ResolverTs } from './types.ts'
 
@@ -122,7 +122,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
     !isArray && !isObject && meta && 'max' in meta && meta.max !== undefined ? `@${isNumeric ? 'maximum' : 'maxLength'} ${meta.max}` : null,
     meta && 'pattern' in meta && meta.pattern ? `@pattern ${meta.pattern}` : null,
     meta && 'default' in meta && meta.default !== undefined
-      ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? code.string(meta.default) : formatExample(meta.default)}`
+      ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? text.quote(meta.default) : formatExample(meta.default)}`
       : null,
     ...exampleValues.map((example) => `@example ${formatExample(example)}`),
     meta?.externalDocs ? `@see ${jsDocEscape([meta.externalDocs.url, meta.externalDocs.description].filter(Boolean).join(' '))}` : null,

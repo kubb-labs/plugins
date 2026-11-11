@@ -1,5 +1,5 @@
 import { isValidVarName } from '@internals/utils'
-import { ast, code } from '@kubb/kit'
+import { ast, text } from '@kubb/kit'
 
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
 
@@ -25,7 +25,7 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
     parameter.in === 'cookie' && parameter.style === 'cookie' && `style: 'cookie'`,
     parameter.explode !== undefined && `explode: ${parameter.explode}`,
     parameter.in === 'query' && parameter.allowReserved !== undefined && `allowReserved: ${parameter.allowReserved}`,
-    parameter.in !== 'path' && parameter.contentType && `contentType: ${code.string(parameter.contentType)}`,
+    parameter.in !== 'path' && parameter.contentType && `contentType: ${text.quote(parameter.contentType)}`,
     parameter.in === 'querystring' && 'querystring: true',
   ].filter(Boolean)
   return parts.length > 0 ? `{ ${parts.join(', ')} }` : null

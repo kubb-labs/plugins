@@ -1,5 +1,5 @@
 import { isValidVarName, objectKey, toLiteral } from '@internals/utils'
-import { ast, code } from '@kubb/kit'
+import { ast, text } from '@kubb/kit'
 
 /**
  * A resolved security scheme. The runtime calls the configured `auth` resolver with this object and places the
@@ -34,7 +34,7 @@ const inlineAuthKeys = ['type', 'scheme', 'name', 'in', 'scopes', 'flows', 'meta
 function serializeScheme({ ref, ...auth }: OperationAuth): string {
   const scopes = auth.scopes?.length ? auth.scopes : undefined
   if (ref) {
-    const schemeRef = isValidVarName(ref) ? `securitySchemes.${ref}` : `securitySchemes[${code.string(ref)}]`
+    const schemeRef = isValidVarName(ref) ? `securitySchemes.${ref}` : `securitySchemes[${text.quote(ref)}]`
     return scopes ? `{ ...${schemeRef}, scopes: ${toLiteral(scopes)} }` : schemeRef
   }
   const entries = inlineAuthKeys.flatMap((key) => {

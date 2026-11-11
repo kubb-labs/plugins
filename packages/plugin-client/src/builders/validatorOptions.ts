@@ -1,4 +1,4 @@
-import { ast, code } from '@kubb/kit'
+import { ast, text } from '@kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorOptions } from '../types.ts'
 
@@ -48,6 +48,6 @@ export function buildZodErrorParse(node: ast.OperationNode, zodResolver: Resolve
     .filter((res) => !ast.http.status.isSuccess(res) && res.content?.some((entry) => entry.schema))
     .map((res) => ({ key: String(res.statusCode), name: zodResolver.response.status(node, res.statusCode) }))
   if (!entries.length) return null
-  const literal = entries.map(({ key, name }) => `${/^\d+$/.test(key) ? key : code.string(key)}: ${name}`).join(', ')
+  const literal = entries.map(({ key, name }) => `${/^\d+$/.test(key) ? key : text.quote(key)}: ${name}`).join(', ')
   return { literal: `{ ${literal} }`, names: entries.map(({ name }) => name) }
 }

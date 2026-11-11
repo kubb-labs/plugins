@@ -1,4 +1,4 @@
-import { code } from '@kubb/kit'
+import { text } from '@kubb/kit'
 
 // `\p{`, `\P{` or `\u{` behind an odd number of backslashes, or a character outside the BMP: both need the `u` flag.
 const NEEDS_UNICODE = /(?<!\\)(?:\\\\)*\\[pPu]\{|[\u{10000}-\u{10FFFF}]/u
@@ -47,8 +47,8 @@ function toRegExp(pattern: string, flags: string | undefined): RegExp {
  * toRegExpString('^(?im)foo', null) // '/^foo/im'
  * ```
  */
-export function toRegExpString(text: string, func: string | null = 'RegExp'): string {
-  const raw = code.unquote(text)
+export function toRegExpString(pattern: string, func: string | null = 'RegExp'): string {
+  const raw = text.unquote(pattern)
 
   const match = raw.match(/^\^(\(\?([igmsuy]+)\))/i)
   const replacementTarget = match?.[1] ?? ''

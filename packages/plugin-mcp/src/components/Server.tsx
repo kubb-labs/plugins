@@ -1,5 +1,5 @@
 import type { ast } from '@kubb/kit'
-import { code } from '@kubb/kit'
+import { text } from '@kubb/kit'
 import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
@@ -122,8 +122,8 @@ server.registerTool(${JSON.stringify(tool.name)}, {
       <File.Source name="getServer" isExportable isIndexable>
         <Function name="getServer" export>
           {`const server = new McpServer({
-  name: ${code.string(serverName)},
-  version: ${code.string(serverVersion)},
+  name: ${text.quote(serverName)},
+  version: ${text.quote(serverVersion)},
 })
 ${registrations}
 return server`}

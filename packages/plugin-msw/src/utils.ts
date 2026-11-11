@@ -1,7 +1,7 @@
 import { isValidVarName, toLiteral } from '@internals/utils'
 import { toResponseContent } from '@internals/shared'
 
-import { ast, code } from '@kubb/kit'
+import { ast, text } from '@kubb/kit'
 
 // Headers use the `simple` style, so an array or object is sent comma-separated.
 function toSimpleStyle(value: unknown): string {
@@ -167,8 +167,8 @@ export function getMswMethod(node: ast.HttpOperationNode): string {
  */
 function headersBlock(contentType: string | null, headers: Array<[string, string]>): string {
   const entries = [
-    ...(contentType ? [`'Content-Type': ${code.string(contentType)}`] : []),
-    ...headers.map(([name, value]) => `${code.string(name)}: ${code.string(value)}`),
+    ...(contentType ? [`'Content-Type': ${text.quote(contentType)}`] : []),
+    ...headers.map(([name, value]) => `${text.quote(name)}: ${text.quote(value)}`),
   ]
   return entries.length ? `\n      headers: {\n        ${entries.join(',\n        ')}\n      },` : ''
 }

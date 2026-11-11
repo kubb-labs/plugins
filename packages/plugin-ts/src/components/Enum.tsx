@@ -1,5 +1,5 @@
 import { ensureValidVarName } from '@internals/utils'
-import { casing, code } from '@kubb/kit'
+import { casing, text } from '@kubb/kit'
 import type { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -53,8 +53,8 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
   const [nameNode, typeNode] = factory.createEnumDeclaration({
     name: enumName,
     typeName,
-    enums: (node.namedEnumValues?.map((v) => [code.unquote(v.name.toString()), v.value, v.description]) ??
-      node.enumValues?.filter((v): v is NonNullable<typeof v> => v !== null && v !== undefined).map((v) => [code.unquote(v.toString()), v]) ??
+    enums: (node.namedEnumValues?.map((v) => [text.unquote(v.name.toString()), v.value, v.description]) ??
+      node.enumValues?.filter((v): v is NonNullable<typeof v> => v !== null && v !== undefined).map((v) => [text.unquote(v.toString()), v]) ??
       []) as Array<[string | number, string | number | boolean, string?]>,
     type: enumOptions.type,
     enumKeyCasing: enumOptions.keyCasing,

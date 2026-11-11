@@ -1,5 +1,5 @@
 import { buildObject, objectKey, toRegExpString } from '@internals/utils'
-import { ast, code, Diagnostics } from '@kubb/kit'
+import { ast, Diagnostics, text } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema, isObjectSchema } from '../utils.ts'
 
@@ -202,7 +202,7 @@ function matches(value: string, regexGenerator: 'faker' | 'randexp' = 'faker'): 
 
 function parseEnumValue(value: string | number | boolean | null | undefined) {
   if (typeof value === 'string') {
-    return code.string(value)
+    return text.quote(value)
   }
 
   return value

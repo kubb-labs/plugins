@@ -11,7 +11,7 @@
 '@kubb/plugin-zod': patch
 ---
 
-Use the shared `ast`, `casing` and `code` helpers from `@kubb/kit`. Generated code stays the same, except:
+Use the shared `ast`, `casing` and `text` helpers from `@kubb/kit`. Generated code stays the same, except:
 
 - `@kubb/plugin-msw` mocks a `text/json` response as JSON.
 - `@kubb/plugin-zod` prints bigint bounds as inclusive, such as `.min(1n)` for `exclusiveMinimum: 0`.
