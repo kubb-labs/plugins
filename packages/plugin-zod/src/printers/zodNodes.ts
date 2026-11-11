@@ -426,10 +426,9 @@ type Handler<TOptions extends ZodNodeOptions, K extends ast.SchemaType> = (
  * Wraps each handler so its output first checks the raw input, see {@link inputChecks}.
  */
 export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.PrinterPartial<string, TOptions>): ast.PrinterPartial<string, TOptions> {
-  const checkedHandlers: ast.PrinterPartial<string, TOptions> = {}
-  const wrapHandler = <K extends ast.SchemaType>(type: K) => {
+  const wrapHandler = <K extends ast.SchemaType>(type: K): Array<[K, Handler<TOptions, K>]> => {
     const handler: Handler<TOptions, K> | undefined = nodes[type]
-    if (!handler) return
+    if (!handler) return []
     const checkedHandler: Handler<TOptions, K> = function (node) {
       const output = handler.call(this, node)
       if (!output || !hasInputChecks(node)) return output
@@ -443,10 +442,8 @@ export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.Prin
         ),
       })
     }
-    // TypeScript cannot relate `checkedHandlers[type]` to `K` on a write, so the key and its handler are assigned together.
-    Object.assign(checkedHandlers, { [type]: checkedHandler })
+    return [[type, checkedHandler]]
   }
-  Object.values(ast.schemaTypes).forEach(wrapHandler)
 
-  return checkedHandlers
+  return Object.fromEntries(Object.values(ast.schemaTypes).flatMap(wrapHandler))
 }
