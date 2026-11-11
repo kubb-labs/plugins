@@ -7,7 +7,7 @@ import type { OfficeWeatherstoryResponse } from '../types/OfficeWeatherstoryOper
 import { http, HttpResponse } from 'msw/http'
 
 export function officeWeatherstoryHandlerResponse200(data: OfficeWeatherstoryResponse) {
-  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -19,7 +19,7 @@ export function officeWeatherstoryHandler(data?: OfficeWeatherstoryResponse | ((
   return http.get(`${options?.baseURL ?? ''}/stories`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
+      return new HttpResponse<string>(JSON.stringify(data), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'

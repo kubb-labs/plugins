@@ -5,7 +5,7 @@ export function streamPetEventsHandlerResponse200(data: PetEvent) {
   return new HttpResponse<string>(
     data === undefined
       ? ''
-      : `${(typeof data === 'string' ? data : JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)))
+      : `${(typeof data === 'string' ? data : JSON.stringify(data))
           .split('\n')
           .map((line) => `data: ${line}`)
           .join('\n')}\n\n`,
@@ -28,7 +28,7 @@ export function streamPetEventsHandler(
     return new HttpResponse<string>(
       data === undefined
         ? ''
-        : `${(typeof data === 'string' ? data : JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)))
+        : `${(typeof data === 'string' ? data : JSON.stringify(data))
             .split('\n')
             .map((line) => `data: ${line}`)
             .join('\n')}\n\n`,

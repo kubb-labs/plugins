@@ -8,15 +8,12 @@ import type { GetThingResponse } from './GetThing'
 import { http, HttpResponse } from 'msw/http'
 
 export function getThingHandlerResponse200(data: GetThingResponse) {
-  return new HttpResponse<string>(
-    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+  return new HttpResponse<string>(JSON.stringify(data), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
     },
-  )
+  })
 }
 
 export function getThingHandler(
@@ -26,14 +23,11 @@ export function getThingHandler(
   return http.get(`${options?.baseURL ?? ''}/thing`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(
-      JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    return new HttpResponse<string>(JSON.stringify(data), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+    })
   })
 }

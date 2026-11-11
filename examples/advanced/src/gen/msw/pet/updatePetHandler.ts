@@ -18,15 +18,12 @@ export function updatePetHandlerResponse200(
       },
     })
 
-  return new HttpResponse<string>(
-    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+  return new HttpResponse<string>(JSON.stringify(data), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
     },
-  )
+  })
 }
 
 export function updatePetHandlerResponse202(
@@ -36,15 +33,12 @@ export function updatePetHandlerResponse202(
         id?: number
       },
 ) {
-  return new HttpResponse<string>(
-    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-    {
-      status: 202,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+  return new HttpResponse<string>(JSON.stringify(data), {
+    status: 202,
+    headers: {
+      'Content-Type': 'application/json',
     },
-  )
+  })
 }
 
 export function updatePetHandlerResponse400(data?: unknown) {
@@ -98,15 +92,12 @@ export function updatePetHandler(
           },
         })
 
-      return new HttpResponse<string>(
-        JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-        {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      return new HttpResponse<string>(JSON.stringify(data), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
+      })
     },
   )
 }

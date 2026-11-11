@@ -10,7 +10,7 @@ import { createUploadFileResponse } from '../faker/createUploadFile'
 import { http, HttpResponse } from 'msw/http'
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {
-  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -22,7 +22,7 @@ export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolv
   return http.post<Record<string, string>, UploadFileBody extends DefaultBodyType ? UploadFileBody : DefaultBodyType>(`${options?.baseURL ?? ''}/pet/:petId/uploadImage`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data ?? createUploadFileResponse(), (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
+      return new HttpResponse<string>(JSON.stringify(data ?? createUploadFileResponse()), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'
