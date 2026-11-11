@@ -99,15 +99,12 @@ function numberCall(
   const above = (bound: number) => (step ? (Math.floor(bound / step) + 1) * step : bound)
   const below = (bound: number) => (step ? (Math.ceil(bound / step) - 1) * step : bound)
   // A bound past `Number.MAX_SAFE_INTEGER`, such as int64's, prints as a rounded or invalid literal, so it is left out.
-  const usable = (bound: number) => !whole || Number.isSafeInteger(bound)
-  const lowers = [min !== undefined && whole ? Math.ceil(min) : min, exclusive?.min === undefined ? undefined : above(exclusive.min)].filter(
-    (bound): bound is number => bound !== undefined && usable(bound),
-  )
-  const uppers = [max !== undefined && whole ? Math.floor(max) : max, exclusive?.max === undefined ? undefined : below(exclusive.max)].filter(
-    (bound): bound is number => bound !== undefined && usable(bound),
-  )
-  const lower = lowers.length ? Math.max(...lowers) : undefined
-  const upper = uppers.length ? Math.min(...uppers) : undefined
+  const tightest = (pick: (...bounds: Array<number>) => number, bounds: Array<number | undefined>) => {
+    const usable = bounds.filter((bound): bound is number => bound !== undefined && (!whole || Number.isSafeInteger(bound)))
+    return usable.length ? pick(...usable) : undefined
+  }
+  const lower = tightest(Math.max, [min !== undefined && whole ? Math.ceil(min) : min, exclusive?.min === undefined ? undefined : above(exclusive.min)])
+  const upper = tightest(Math.min, [max !== undefined && whole ? Math.floor(max) : max, exclusive?.max === undefined ? undefined : below(exclusive.max)])
   // Faker fills a missing `min` with `0`, and a float's missing `max` with `1`, which a lone bound on the other side contradicts.
   // The span holds grid points, so faker always finds a multiple.
   const span = 100 * (grid ?? 1)
@@ -152,6 +149,12 @@ function dateTimeCall(
   return 'faker.date.anytime()'
 }
 
+// Eight letters or digits are base64url as they are: no padding, and none of the characters base64 swaps.
+const ENCODING_CALLS = new Map<string | undefined, string>([
+  ['base64', 'btoa(faker.string.alpha())'],
+  ['base64url', 'faker.string.alphanumeric(8)'],
+])
+
 // Formats `plugin-zod` checks with a dedicated constructor, which a random string fails.
 const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
   ['jwt', 'faker.internet.jwt()'],
@@ -161,8 +164,12 @@ const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
   ['hostname', 'faker.internet.domainName()'],
 ])
 
-// Punctuation `faker.helpers.fromRegExp` reads inside a character class.
-const FAKER_CLASS_CHARACTERS = new Set('-!@#$&()`.+,"')
+// The members an escape becomes inside a character class: `\d` and `\w`, and the punctuation `faker.helpers.fromRegExp` reads there.
+const FAKER_CLASS_ESCAPES = new Map<string, string>([
+  ['d', '0-9'],
+  ['w', 'A-Za-z0-9_'],
+  ...Array.from('-!@#$&()`.+,"', (char): [string, string] => [char, char]),
+])
 
 /**
  * Rewrites a pattern into the grammar `faker.helpers.fromRegExp` reads: `\d` and `\w` become character classes, an escaped
@@ -185,14 +192,15 @@ function toFakerPattern(pattern: string): string {
         if (result[classStart] !== '-') result = `${result.slice(0, classStart)}-${result.slice(classStart)}`
         continue
       }
-      const set = next === 'd' ? '0-9' : next === 'w' ? 'A-Za-z0-9_' : FAKER_CLASS_CHARACTERS.has(next) ? next : undefined
-      result += set === undefined ? `\\${next}` : inClass ? set : `[${set}]`
+      const set = FAKER_CLASS_ESCAPES.get(next)
+      if (set === undefined) result += `\\${next}`
+      if (set !== undefined) result += inClass ? set : `[${set}]`
       continue
     }
     if (char === '[' && !inClass) {
       inClass = true
-      result += pattern[index + 1] === '^' ? '[^' : '['
-      if (pattern[index + 1] === '^') index++
+      result += next === '^' ? '[^' : '['
+      if (next === '^') index++
       classStart = result.length
       continue
     }
@@ -306,10 +314,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // The document is typed by its own schema, not by the string that holds it.
         if (contentSchema) return `JSON.stringify(${printNested(contentSchema, { typeName: undefined, nestedInObject: true, nestedInUnion: false })})`
 
-        const encoding = node.content?.encoding?.toLowerCase()
-        if (encoding === 'base64') return 'btoa(faker.string.alpha())'
-        // Eight letters or digits are base64url as they are: no padding, and none of the characters base64 swaps.
-        if (encoding === 'base64url') return 'faker.string.alphanumeric(8)'
+        const encodingCall = ENCODING_CALLS.get(node.content?.encoding?.toLowerCase())
+        if (encodingCall) return encodingCall
 
         const { min, max } = node
         // A string as long as a large `maxLength` makes a mock of megabytes, so the length stays within 100 of the minimum.
@@ -461,13 +467,10 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const { min, max } = node
         const item = items[0]
         // Like a string, a list stays within 100 items of its minimum, however large `maxItems` is.
-        if (node.unique) {
-          // `uniqueArray` takes a fixed length and compares like the zod `Set` check. It returns fewer items when the generator runs out of values.
-          const count = max !== undefined ? `faker.number.int({ min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} })` : (min ?? 3)
-
-          return `faker.helpers.uniqueArray(() => (${item}), ${count})`
-        }
-        if (max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} }})`
+        const range = max === undefined ? undefined : `{ min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} }`
+        // `uniqueArray` takes a fixed length and compares like the zod `Set` check. It returns fewer items when the generator runs out of values.
+        if (node.unique) return `faker.helpers.uniqueArray(() => (${item}), ${range ? `faker.number.int(${range})` : (min ?? 3)})`
+        if (range) return `faker.helpers.multiple(() => (${item}), { count: ${range}})`
         if (min !== undefined) return `faker.helpers.multiple(() => (${item}), { count: ${min} })`
 
         return `faker.helpers.multiple(() => (${item}))`
