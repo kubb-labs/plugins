@@ -450,6 +450,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
             printNested(property.schema, {
               typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,
               nestedInObject: true,
+              // A required ref to another schema stays, since `undefined` would fail it: the lazy getter keeps the mock finite,
+              // and the cycle is cut where it is optional, in a union, or in an array.
+              ...(property.required && property.schema.type === 'ref' ? { cyclicSchemas: undefined } : {}),
             }) ?? 'undefined'
 
           // When the property's schema transitively references a schema that is
