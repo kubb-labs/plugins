@@ -24,7 +24,7 @@ export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusRespons
 }
 
 export function findPetsByStatusHandlerResponse400(data?: FindPetsByStatusStatus400) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 400,
   })
 }
