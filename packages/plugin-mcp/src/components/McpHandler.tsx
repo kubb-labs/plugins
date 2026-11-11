@@ -1,4 +1,10 @@
-import { buildOperationComments, buildRequestParamsSignature, castToClientOptions, getPrimarySuccessResponse, hasRequestContentTypeChoice } from '@internals/shared'
+import {
+  buildOperationComments,
+  buildRequestParamsSignature,
+  castToClientOptions,
+  getPrimarySuccessResponse,
+  hasRequestContentTypeChoice,
+} from '@internals/shared'
 import { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
