@@ -322,7 +322,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !unionsWithSiblings.has(node)
       const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && isStrict && dialect.strictMember ? dialect.strictMember(output, schema, cyclicSchemas) : output))
-        .map((output, index) => (isDiscriminated ? output : printNullable(nodeMembers[index]!, output)))
+        .map((output, index) => printNullable(nodeMembers[index]!, output))
         .filter(Boolean)
       if (members.length === 0) return ''
       if (members.length === 1) return members[0]!
@@ -388,7 +388,7 @@ type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
  */
 function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
   if (min === 0 && max === undefined) return null
-  const bounds = [`count >= ${min}`, max !== undefined ? `count <= ${max}` : null].filter(Boolean).join(' && ')
+  const bounds = [`count >= ${min}`, max !== undefined && `count <= ${max}`].filter(Boolean).join(' && ')
   const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
   const matches = ctx.transform(schema) ?? 'z.unknown()'
 
@@ -405,7 +405,6 @@ function matchesCondition(ctx: PrinterContext, schema: ast.SchemaNode | undefine
   const keys =
     object?.properties.filter((property) => property.required && property.schema.type === ast.schemaTypes.unknown).map((property) => property.name) ?? []
   const rest = object ? { ...object, properties: object.properties.filter((property) => !keys.includes(property.name)) } : schema
-  const conditions = keys.length ? [`typeof value === "object" && value !== null && ${JSON.stringify(keys)}.every((key) => key in value)`] : []
   // An object with no properties left still means "is an object", so only a key check stands alone.
   const isOnlyKeys =
     keys.length > 0 &&
@@ -415,9 +414,13 @@ function matchesCondition(ctx: PrinterContext, schema: ast.SchemaNode | undefine
     !rest.patternProperties &&
     !rest.propertyNames &&
     !hasInputChecks(rest)
-  if (!isOnlyKeys) conditions.push(`${ctx.transform(rest) ?? 'z.unknown()'}.safeParse(value).success`)
 
-  return conditions.join(' && ')
+  return [
+    keys.length > 0 && `typeof value === "object" && value !== null && ${JSON.stringify(keys)}.every((key) => key in value)`,
+    !isOnlyKeys && `${ctx.transform(rest) ?? 'z.unknown()'}.safeParse(value).success`,
+  ]
+    .filter(Boolean)
+    .join(' && ')
 }
 
 type Handler<TOptions extends ZodNodeOptions, K extends ast.SchemaType> = (
