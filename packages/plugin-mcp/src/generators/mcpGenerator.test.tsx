@@ -56,7 +56,7 @@ describe("mcpGenerator — the client plugin's returnType", () => {
     responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Pets' })],
   })
 
-  async function renderHandler(returnType: 'full' | 'data' | undefined) {
+  async function renderHandler(returnType: 'full' | 'data' | undefined, operation: ast.HttpOperationNode = node) {
     const axiosPlugin = createMockedPlugin({
       name: 'plugin-axios',
       options: { output: { path: './clients', mode: 'directory' }, group: null, returnType } as unknown as PluginTs['resolvedOptions'],
@@ -65,7 +65,7 @@ describe("mcpGenerator — the client plugin's returnType", () => {
     const driver = driverFor('getPets', axiosPlugin)
     const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
 
-    await renderGeneratorOperation(mcpGenerator, node, {
+    await renderGeneratorOperation(mcpGenerator, operation, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -83,6 +83,23 @@ describe("mcpGenerator — the client plugin's returnType", () => {
     expect(source).toContain('text: JSON.stringify(res)')
     expect(source).toContain('structuredContent: { data: res }')
     expect(source).not.toContain('res.data')
+  })
+
+  test('sends a bigint result as JSON, since JSON.stringify throws on one', async () => {
+    const id = ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'bigint' }) })
+    const bigintNode = ast.factory.createOperation({
+      operationId: 'getPets',
+      method: 'GET',
+      path: '/pets',
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [id] }) })],
+    })
+    const source = await renderHandler('full', bigintNode)
+    const replacer = source.match(/JSON\.stringify\(res\.data, (\(_key, value\) => .*\))\)\n/)?.[1]
+
+    expect(replacer).toBeDefined()
+    const toJson = new Function('data', `return JSON.stringify(data, ${replacer})`) as (data: unknown) => string
+    expect(toJson({ id: 1n, big: 2n ** 64n })).toBe('{"id":1,"big":"18446744073709551616"}')
+    expect(source).toContain('structuredContent: { data: text === undefined ? undefined : JSON.parse(text) }')
   })
 })
 
