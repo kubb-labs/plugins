@@ -256,7 +256,13 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
 export function containsDirectionalNode({ node, printerOptions }: { node: ast.SchemaNode | undefined; printerOptions: PrinterZodOptions }): boolean {
   if (!node) return false
 
-  return ast.schema.find(node, { predicate: (schema) => variesByDirection({ node: schema, printerOptions }), followRefs: true }) !== undefined
+  return (
+    ast.schema.find(node, {
+      predicate: (schema) => variesByDirection({ node: schema, printerOptions }),
+      followRefs: true,
+      cache: printerOptions.resolver?.memo('zod:directionalNodes', () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>()),
+    }) !== undefined
+  )
 }
 
 /**
