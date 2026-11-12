@@ -1,5 +1,100 @@
 # @kubb/plugin-zod
 
+## 5.9.0
+
+### Minor Changes
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read the OpenAPI 3.1 and 3.2 fields that Kubb 5.18 adds, which needs Kubb 5.18.4 or later.
+  
+  - Treat a status range such as `2XX` as a success response.
+  - Write a range in lower case: `ListPetsStatus2XX` becomes `ListPetsStatus2xx`, and the `'2XX'` key becomes `'2xx'`.
+  - Add `@see` from an operation's `externalDocs` to its JSDoc.
+  
+  After you regenerate, rename imports of the `…Status2XX` names. An upper-case range key such as `'2XX'` or `'5XX'` in a hand-written responses record or `validator.error` map is no longer read, so write it in lower case.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a schema for response headers, check the JSON Schema 2020-12 keywords, and fix exclusive bounds in zod/mini.
+  
+  - Add a schema for a response's `headers`, such as `listPetsStatus200HeadersSchema`. It holds the spec's types, so it does not parse a fetch `Headers` object.
+  - Move a `2XX` range from `<name>ErrorSchema` to `<name>ResponseSchema`.
+  - Print `exclusiveMinimum` and `exclusiveMaximum` as `z.gt` and `z.lt` in zod/mini. The old output did not compile.
+  - Check `if`/`then`/`else`, `dependentRequired` and `dependentSchemas` with one `z.refine` each. A `dependentRequired` key is checked for presence, so `{ creditCard: ['billingAddress'] }` fails when `creditCard` is set without `billingAddress`.
+  - Count the items that match `contains`, within `minContains` and `maxContains`.
+  - Check `propertyNames` on an object that also declares `properties` or `patternProperties`. It used to be checked only on a map.
+  - Set `min`, `max` and `exclusive` on a custom node. The deprecated `minProperties`, `maxProperties`, `exclusiveMinimum` and `exclusiveMaximum` are no longer read.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Check and mock the document a string holds, from `contentMediaType`, `contentSchema` and `contentEncoding`.
+  
+  - Zod checks a string with a JSON `contentMediaType` and a `contentSchema`: it must parse as JSON that passes the schema. The value stays a string.
+  - Zod prints `contentEncoding: base64` as `z.base64()` and `base64url` as `z.base64url()`.
+  - Faker mocks such a string as `JSON.stringify(...)` of a mock of the `contentSchema`, and an encoded string as valid base64 or base64url.
+  - A string with both an encoding and a `contentSchema` is checked and mocked for its encoding only.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Nest a tag group in the folders of its OpenAPI 3.2 `parent` tags.
+  
+  With `group: { type: 'tag' }`, a `payment` tag whose `parent` is `store` now writes to `store/payment/` instead of `payment/`. Tags without a `parent` keep their folder.
+  
+  ```diff
+  - import { listPayments } from './gen/clients/payment/listPayments'
+  + import { listPayments } from './gen/clients/store/payment/listPayments'
+  ```
+  
+  Pass `group.name` to keep one folder per tag: `group: { type: 'tag', name: ({ group }) => group }`.
+
+### Patch Changes
+
+- [#1448](https://github.com/kubb-labs/plugins/pull/1448) [`65c6ba1`](https://github.com/kubb-labs/plugins/commit/65c6ba11a703783fd35f3511b0683a1391a47b43) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use the shared `ast`, `casing` and `text` helpers from `@kubb/kit`. Generated code stays the same, except:
+  
+  - `@kubb/plugin-msw` mocks a `text/json` response as JSON.
+  - `@kubb/plugin-zod` prints bigint bounds as inclusive, such as `.min(1n)` for `exclusiveMinimum: 0`.
+  - A `group: { type: 'path' }` folder is the camelCased first path segment, such as `petStore` for `/pet-store/{id}`.
+
+- [#1350](https://github.com/kubb-labs/plugins/pull/1350) [`00cfe4e`](https://github.com/kubb-labs/plugins/commit/00cfe4edfaa752c6d67491dd45cb83bc9d867ea7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add an optional `cookies` option for `in: cookie` parameters to the types, Zod schemas, Faker mocks, clients, query hooks, MCP tools, and Cypress requests.
+  
+  - Query keys leave `cookies` out, as they do headers, since keys end up in SSR payloads and caches.
+  - `validator: 'zod'` checks `cookies` when the call passes them.
+  
+  ```ts
+  await getSession({ cookies: { session_id: 'abc' } })
+  ```
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep operation names and files apart from each other and from schemas.
+  
+  - Give an operation file an `Operation` suffix when a schema file has the same name, ignoring case. Operation `point` goes to `types/PointOperation.ts`, next to schema `Point`. The exported names stay the same.
+  - Name an operation the same in every plugin when a `macros` entry changes its `method` or `path`. The MSW handler no longer imports `FindPetsByStatusResponse2`.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix bugs found on real OpenAPI 3.0, 3.1 and 3.2 specs.
+  
+  - Escape a `'` in a path, media type, method or MCP server name, and JSDoc tags inside `@see` text.
+  - Prefer an exact success code such as `200` over a `2XX` range listed before it.
+  - Keep an OpenAPI 3.0 `nullable: true` on an array item or a `oneOf`/`anyOf` member in the types and Zod schemas.
+  - Accept a custom OpenAPI 3.2 method such as `COPY`, and stop importing a `<operation>ResponseSchema` that does not exist.
+  - Type a stream variant next to another content type as `ReadableStream` and keep string event `data` as text.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Make generated response types match what the client returns at runtime.
+  
+  - Type an XML, YAML or CSV response as `string`. An operation that returns JSON and XML has `data: Pet | string`, so narrow on `result.contentType`.
+  - Type an image, audio, video, PDF or `application/octet-stream` response as `Blob`, even when its schema says `type: string`.
+  - Type `result.contentType` as the bare media type, such as `'text/html'`, so a `switch` on it matches.
+  - Match the new types in Zod schemas, Faker mocks, Cypress requests and MSW handlers.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix edge cases in the OpenAPI 3.1 and 3.2 support.
+  
+  - A `Date` header passed per call goes out as ISO text, also when the spec declares no header parameters.
+  - An empty exploded cookie adds no empty `; ` segment.
+  - `RequestResult` and `UnwrappedResult` from `.kubb/client.ts` take the headers type argument.
+  - Faker keeps exclusive and filled-in bounds on the `multipleOf` grid, and leaves out bigint bounds past the safe integer range.
+  - Zod leaves out bigint bounds past the safe integer range, which printed as `1e+21n` or a rounded literal.
+  - MSW sends a serialized Server-Sent Events example once, without wrapping it in `data:` again.
+  - The primary success response is one with a body, so a `204` next to a `2xx` range no longer hides the body from MCP.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix schemas that did not compile or were too strict.
+  
+  - Print a tuple with its rest items, so `prefixItems` with `items` gives `z.tuple([a], b)`, and keep a `null` example in `.meta({ examples })`.
+  - Print `z.union` for a discriminated `oneOf` with a plain-string member, such as a `defaultMapping`, and keep the discriminator literal of one with sibling properties.
+  - Stop making members of a `z.discriminatedUnion` strict, so a Server-Sent Events item accepts the standard `id` and `retry` fields.
+  - Annotate a recursive schema as `z.ZodMiniType` with `mini: true`, and keep the bounds of an `int64`.
+  - Drop a spec `default` on a binary schema, since a `Blob` has no literal.
+
 ## 5.8.3
 
 ### Patch Changes

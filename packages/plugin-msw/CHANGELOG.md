@@ -1,5 +1,83 @@
 # @kubb/plugin-msw
 
+## 6.2.0
+
+### Minor Changes
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Mock exclusive bounds in Faker, and response headers and spec examples in MSW.
+  
+  - Faker keeps a number inside `exclusiveMinimum` and `exclusiveMaximum`.
+  - Faker fills in the other bound when its default contradicts a lone one. `minimum: 5` on a number used to throw.
+  - MSW mocks a `2XX` range as a `200` response.
+  - MSW sends each declared response header that has an `example` or a `default`.
+  - With `parser: 'data'`, an MSW handler called without `data` sends the response's first spec example.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read the OpenAPI 3.1 and 3.2 fields that Kubb 5.18 adds, which needs Kubb 5.18.4 or later.
+  
+  - Treat a status range such as `2XX` as a success response.
+  - Write a range in lower case: `ListPetsStatus2XX` becomes `ListPetsStatus2xx`, and the `'2XX'` key becomes `'2xx'`.
+  - Add `@see` from an operation's `externalDocs` to its JSDoc.
+  
+  After you regenerate, rename imports of the `…Status2XX` names. An upper-case range key such as `'2XX'` or `'5XX'` in a hand-written responses record or `validator.error` map is no longer read, so write it in lower case.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Nest a tag group in the folders of its OpenAPI 3.2 `parent` tags.
+  
+  With `group: { type: 'tag' }`, a `payment` tag whose `parent` is `store` now writes to `store/payment/` instead of `payment/`. Tags without a `parent` keep their folder.
+  
+  ```diff
+  - import { listPayments } from './gen/clients/payment/listPayments'
+  + import { listPayments } from './gen/clients/store/payment/listPayments'
+  ```
+  
+  Pass `group.name` to keep one folder per tag: `group: { type: 'tag', name: ({ group }) => group }`.
+
+### Patch Changes
+
+- [#1448](https://github.com/kubb-labs/plugins/pull/1448) [`65c6ba1`](https://github.com/kubb-labs/plugins/commit/65c6ba11a703783fd35f3511b0683a1391a47b43) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use the shared `ast`, `casing` and `text` helpers from `@kubb/kit`. Generated code stays the same, except:
+  
+  - `@kubb/plugin-msw` mocks a `text/json` response as JSON.
+  - `@kubb/plugin-zod` prints bigint bounds as inclusive, such as `.min(1n)` for `exclusiveMinimum: 0`.
+  - A `group: { type: 'path' }` folder is the camelCased first path segment, such as `petStore` for `/pet-store/{id}`.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix handlers that threw or did not compile on real OpenAPI documents.
+  
+  - Register a handler for a custom method or `TRACE` with `http.all`.
+  - Send a `text/event-stream` mock as `event:`, `id:`, `retry:` and `data:` lines.
+  - Generate a `<name>Response2xx` helper for a status range, and make the `data` argument of every response helper optional.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep operation names and files apart from each other and from schemas.
+  
+  - Give an operation file an `Operation` suffix when a schema file has the same name, ignoring case. Operation `point` goes to `types/PointOperation.ts`, next to schema `Point`. The exported names stay the same.
+  - Name an operation the same in every plugin when a `macros` entry changes its `method` or `path`. The MSW handler no longer imports `FindPetsByStatusResponse2`.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix bugs found on real OpenAPI 3.0, 3.1 and 3.2 specs.
+  
+  - Escape a `'` in a path, media type, method or MCP server name, and JSDoc tags inside `@see` text.
+  - Prefer an exact success code such as `200` over a `2XX` range listed before it.
+  - Keep an OpenAPI 3.0 `nullable: true` on an array item or a `oneOf`/`anyOf` member in the types and Zod schemas.
+  - Accept a custom OpenAPI 3.2 method such as `COPY`, and stop importing a `<operation>ResponseSchema` that does not exist.
+  - Type a stream variant next to another content type as `ReadableStream` and keep string event `data` as text.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Make generated response types match what the client returns at runtime.
+  
+  - Type an XML, YAML or CSV response as `string`. An operation that returns JSON and XML has `data: Pet | string`, so narrow on `result.contentType`.
+  - Type an image, audio, video, PDF or `application/octet-stream` response as `Blob`, even when its schema says `type: string`.
+  - Type `result.contentType` as the bare media type, such as `'text/html'`, so a `switch` on it matches.
+  - Match the new types in Zod schemas, Faker mocks, Cypress requests and MSW handlers.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix edge cases in the OpenAPI 3.1 and 3.2 support.
+  
+  - A `Date` header passed per call goes out as ISO text, also when the spec declares no header parameters.
+  - An empty exploded cookie adds no empty `; ` segment.
+  - `RequestResult` and `UnwrappedResult` from `.kubb/client.ts` take the headers type argument.
+  - Faker keeps exclusive and filled-in bounds on the `multipleOf` grid, and leaves out bigint bounds past the safe integer range.
+  - Zod leaves out bigint bounds past the safe integer range, which printed as `1e+21n` or a rounded literal.
+  - MSW sends a serialized Server-Sent Events example once, without wrapping it in `data:` again.
+  - The primary success response is one with a body, so a `204` next to a `2xx` range no longer hides the body from MCP.
+- Updated dependencies [[`65c6ba1`](https://github.com/kubb-labs/plugins/commit/65c6ba11a703783fd35f3511b0683a1391a47b43), [`00cfe4e`](https://github.com/kubb-labs/plugins/commit/00cfe4edfaa752c6d67491dd45cb83bc9d867ea7), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237)]:
+  - @kubb/plugin-faker@5.4.0
+  - @kubb/plugin-ts@5.5.0
+
 ## 6.1.2
 
 ### Patch Changes

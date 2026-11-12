@@ -1,5 +1,160 @@
 # @kubb/plugin-axios
 
+## 6.0.0
+
+### Major Changes
+
+- [#1350](https://github.com/kubb-labs/plugins/pull/1350) [`00cfe4e`](https://github.com/kubb-labs/plugins/commit/00cfe4edfaa752c6d67491dd45cb83bc9d867ea7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Run the fetch and axios clients on one core with the same interceptors and client factory.
+  
+  - Import types from `templates/client.ts` and the runtime from `@kubb/plugin-client/templates/*`. `templates/fetch.ts` and `templates/axios.ts` are gone.
+  - `FetchOptions` and `AxiosOptions` are now `NativeOptions`.
+  - Rename `codecs` to `mediaTypes`, `serialize` to `encode`, and `deserialize` to `decode`, and move a custom `serializer.body` into a `mediaTypes` entry.
+  - Replace `responseType` with `parseAs`, and catch the `ParseError` that invalid JSON now throws.
+  - Replace `toEventStream(call, { shape })` with `client.stream({ ...config, eventShape })`, and name its result `StreamResult` with the event type, such as `StreamResult<Responses, true, ServerSentEvent<Pet>>`. `EventStreamResult` is gone.
+  - Return a web `Response` from a custom transport, built with `toRequestInit(request)`.
+  - Narrow `client.interceptors.error` handlers with `ResponseError.is`, since they now also get network and validation errors.
+  - On axios, `client.interceptors` handlers get the core objects. Put native handlers on `getAxiosInstance().interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
+  - Make a custom client (`importPath`) generic and add a `stream` method.
+  - With `sdk` tag classes, rename `new pet(config)` to `new PetClient(config)`.
+  - Use the `servers` entry on a path or operation as that operation's default `baseURL`. A `baseURL` on the call still wins.
+  
+  ```diff
+  - import { client, defaultTransport } from './gen/.kubb/client'
+  + import { client, createAxiosTransport, getAxiosInstance } from './gen/.kubb/client'
+  
+  - defaultTransport.defaults.timeout = 10_000
+  - client.setConfig({ transport: axios.create({ baseURL }) })
+  + getAxiosInstance().defaults.timeout = 10_000
+  + client.setConfig({ transport: createAxiosTransport(axios.create({ baseURL })) })
+  ```
+  
+  To upgrade, regenerate, run `tsc --noEmit`, and follow your plugin's "Migrate to v6" guide. The query plugins work with v5 and v6.
+
+### Minor Changes
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Write a serializer or form media type into `.kubb/` only when the spec needs it.
+  
+  - Kubb writes `.kubb/config.ts` with the serializers and media types of the spec, and `setConfig({ serializer })` merges per key.
+  - The serializers live in `.kubb/serializers/`. `defaultQuerySerializer`, `defaultPathSerializer` and `applyHeaderStyles` are now `serializeQuery`, `serializePath` and `serializeHeaders`, and `serializer.header` and `serializer.cookie` are new config keys.
+  - The form media types live in `.kubb/mediaTypes/` as `multipartFormData` and `urlencoded`. `formMediaTypes` is gone.
+  - Each security scheme is written once, as `securitySchemes` in `.kubb/client.ts`.
+  - A client built with `createClientCore` needs its serializers passed in `serializer`.
+
+- [#1378](https://github.com/kubb-labs/plugins/pull/1378) [`a48c2ee`](https://github.com/kubb-labs/plugins/commit/a48c2ee9c3b1e949287d0aca5160727df43d66ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Stream a JSON Lines response, such as `application/jsonl`, `application/x-ndjson`, or `application/json-seq`, one parsed item per line.
+  
+  - An operation whose only success content type is JSON Lines returns `StreamResult` with one item per line, like a `text/event-stream` operation. It used to return the whole body as one string.
+  - The call sends the media type in `Accept`, and `validator: 'zod'` checks each line.
+  - `.kubb/sse.ts` adds `parseJsonLines`, and a custom client's `toEventStream` gets `{ shape: 'line' }`. An `application/json-seq` record must fit on one line.
+  - React Query, Vue Query, and SWR skip hooks for these operations, as they do for event streams.
+  
+  ```ts
+  for await (const entry of await streamLogs()) {
+    console.info(entry.message) // LogEntry
+  }
+  ```
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Return the response headers on every result, and support the OpenAPI 3.2 cookie style and named servers.
+  
+  - Return the response's `Headers` as `headers` on every result and on a thrown `ResponseError`. For a response that declares headers, `headers.get` suggests their names once `status` is narrowed.
+  - Type the declared headers of a `text/event-stream` or JSON Lines response too. Such a call returns `StreamResultWithHeaders`, or `UnwrappedStreamResultWithHeaders` with `returnType: 'data'`, and `StreamResult`, `UnwrappedStreamResult` and `client.stream` take the headers record as an optional last type argument.
+  - Send a `style: cookie` parameter without percent-encoding, with `explode` on by default. A value it cannot send, such as one with `;`, throws a `TypeError`.
+  - Pass an `oauth2` scheme's `flows` and `metadataUrl`, and an `openIdConnect` scheme's `url`, to the `auth` resolver.
+  - Export the servers that have a `name` as `servers` from `.kubb/client.ts`.
+  
+  ```ts
+  import { client, servers } from './gen/.kubb/client'
+  
+  client.setConfig({ baseURL: servers.staging })
+  ```
+  
+  `server.index` no longer counts a server without a `url`. A custom client (`importPath`) gets no typed headers. It must accept `flows`, `metadataUrl` and `url` in a `security` entry and `style: 'cookie'` in `styles`, as the "Write your client" guide shows.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read the OpenAPI 3.1 and 3.2 fields that Kubb 5.18 adds, which needs Kubb 5.18.4 or later.
+  
+  - Treat a status range such as `2XX` as a success response.
+  - Write a range in lower case: `ListPetsStatus2XX` becomes `ListPetsStatus2xx`, and the `'2XX'` key becomes `'2xx'`.
+  - Add `@see` from an operation's `externalDocs` to its JSDoc.
+  
+  After you regenerate, rename imports of the `…Status2XX` names. An upper-case range key such as `'2XX'` or `'5XX'` in a hand-written responses record or `validator.error` map is no longer read, so write it in lower case.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Nest a tag group in the folders of its OpenAPI 3.2 `parent` tags.
+  
+  With `group: { type: 'tag' }`, a `payment` tag whose `parent` is `store` now writes to `store/payment/` instead of `payment/`. Tags without a `parent` keep their folder.
+  
+  ```diff
+  - import { listPayments } from './gen/clients/payment/listPayments'
+  + import { listPayments } from './gen/clients/store/payment/listPayments'
+  ```
+  
+  Pass `group.name` to keep one folder per tag: `group: { type: 'tag', name: ({ group }) => group }`.
+
+### Patch Changes
+
+- [#1392](https://github.com/kubb-labs/plugins/pull/1392) [`f003a3a`](https://github.com/kubb-labs/plugins/commit/f003a3aed5056d2447404f08bc3237a67c6a0dd9) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Export `resolveClientOptions`, `setupClient`, `clientDependencies`, `resolverClient`, and the `ClientOptions` and `ClientResolvedOptions` types from `@kubb/plugin-client`. `@kubb/plugin-fetch` and `@kubb/plugin-axios` now use them, and a transport plugin of your own can too.
+  
+  Drop the undocumented `clientGenerator` export from `@kubb/plugin-fetch` and `@kubb/plugin-axios`.
+
+- [#1452](https://github.com/kubb-labs/plugins/pull/1452) [`298daf9`](https://github.com/kubb-labs/plugins/commit/298daf9e415bfd047202f1df0848089a8ce00fb7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Rewrite the "Migrate to v6" guides for the client, fetch, and axios plugins from the changes on `main`. They now cover JSON Lines streams, response headers, cookie styles, the new serializer and media type files, generated file paths, and error validators per status, and drop exports that 5.x never had.
+
+- [#1350](https://github.com/kubb-labs/plugins/pull/1350) [`00cfe4e`](https://github.com/kubb-labs/plugins/commit/00cfe4edfaa752c6d67491dd45cb83bc9d867ea7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Make the fetch and axios clients handle headers, bodies, errors and streams the same way.
+  
+  - Send an object query parameter without a `style` as `name=odie&age=3` and an array header as `X-Ids: 3,4`, the OpenAPI defaults. Set `style: deepObject` to keep `filter[name]=odie`.
+  - Send `body: null` as the JSON document `null`, return `undefined` for an empty body, and report `{ status, statusText }` as `error` for a failed call without a body.
+  - Check an error body against the schema of its own status with a `validator.error` map, such as `{ 404: getPetStatus404Schema, '5xx': getPetStatus5xxSchema }`. A status the document leaves out resolves with its body as `error`.
+  - Send `Accept: text/event-stream` on a stream call, and reject an aborted call or stream with the signal's reason.
+  - Type-check the `.kubb/` runtime with `exactOptionalPropertyTypes`, `noPropertyAccessFromIndexSignature`, `isolatedDeclarations` and `@total-typescript/ts-reset`.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix request serialization that did not match the OpenAPI style examples.
+  
+  - Send an array of objects with `style: deepObject` as indexed keys, such as `items[0][price]=p_1`, instead of `items=[object Object]`.
+  - Default `explode` to `false` for `spaceDelimited` and `pipeDelimited`, so an array goes out as `ids=1%7C2`.
+  - Keep `#`, `&`, `+` and `%20` intact with `allowReserved`, and send a space as `%20` instead of `+`.
+  - Follow the `encoding` of a form body property: a JSON `contentType` sends one JSON value, and `explode: false` sends a multipart array as one part.
+  - Stop writing `//` before the path when `baseURL` ends in `/`.
+  
+  The serialization guides now list how each `style` and `explode` combination is encoded.
+
+- [#1350](https://github.com/kubb-labs/plugins/pull/1350) [`00cfe4e`](https://github.com/kubb-labs/plugins/commit/00cfe4edfaa752c6d67491dd45cb83bc9d867ea7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add an optional `cookies` option for `in: cookie` parameters to the types, Zod schemas, Faker mocks, clients, query hooks, MCP tools, and Cypress requests.
+  
+  - Query keys leave `cookies` out, as they do headers, since keys end up in SSR payloads and caches.
+  - `validator: 'zod'` checks `cookies` when the call passes them.
+  
+  ```ts
+  await getSession({ cookies: { session_id: 'abc' } })
+  ```
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep operation names and files apart from each other and from schemas.
+  
+  - Give an operation file an `Operation` suffix when a schema file has the same name, ignoring case. Operation `point` goes to `types/PointOperation.ts`, next to schema `Point`. The exported names stay the same.
+  - Name an operation the same in every plugin when a `macros` entry changes its `method` or `path`. The MSW handler no longer imports `FindPetsByStatusResponse2`.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix bugs found on real OpenAPI 3.0, 3.1 and 3.2 specs.
+  
+  - Escape a `'` in a path, media type, method or MCP server name, and JSDoc tags inside `@see` text.
+  - Prefer an exact success code such as `200` over a `2XX` range listed before it.
+  - Keep an OpenAPI 3.0 `nullable: true` on an array item or a `oneOf`/`anyOf` member in the types and Zod schemas.
+  - Accept a custom OpenAPI 3.2 method such as `COPY`, and stop importing a `<operation>ResponseSchema` that does not exist.
+  - Type a stream variant next to another content type as `ReadableStream` and keep string event `data` as text.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Make generated response types match what the client returns at runtime.
+  
+  - Type an XML, YAML or CSV response as `string`. An operation that returns JSON and XML has `data: Pet | string`, so narrow on `result.contentType`.
+  - Type an image, audio, video, PDF or `application/octet-stream` response as `Blob`, even when its schema says `type: string`.
+  - Type `result.contentType` as the bare media type, such as `'text/html'`, so a `switch` on it matches.
+  - Match the new types in Zod schemas, Faker mocks, Cypress requests and MSW handlers.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix edge cases in the OpenAPI 3.1 and 3.2 support.
+  
+  - A `Date` header passed per call goes out as ISO text, also when the spec declares no header parameters.
+  - An empty exploded cookie adds no empty `; ` segment.
+  - `RequestResult` and `UnwrappedResult` from `.kubb/client.ts` take the headers type argument.
+  - Faker keeps exclusive and filled-in bounds on the `multipleOf` grid, and leaves out bigint bounds past the safe integer range.
+  - Zod leaves out bigint bounds past the safe integer range, which printed as `1e+21n` or a rounded literal.
+  - MSW sends a serialized Server-Sent Events example once, without wrapping it in `data:` again.
+  - The primary success response is one with a body, so a `204` next to a `2xx` range no longer hides the body from MCP.
+- Updated dependencies [[`65c6ba1`](https://github.com/kubb-labs/plugins/commit/65c6ba11a703783fd35f3511b0683a1391a47b43), [`f003a3a`](https://github.com/kubb-labs/plugins/commit/f003a3aed5056d2447404f08bc3237a67c6a0dd9), [`298daf9`](https://github.com/kubb-labs/plugins/commit/298daf9e415bfd047202f1df0848089a8ce00fb7), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`00cfe4e`](https://github.com/kubb-labs/plugins/commit/00cfe4edfaa752c6d67491dd45cb83bc9d867ea7), [`00cfe4e`](https://github.com/kubb-labs/plugins/commit/00cfe4edfaa752c6d67491dd45cb83bc9d867ea7), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`00cfe4e`](https://github.com/kubb-labs/plugins/commit/00cfe4edfaa752c6d67491dd45cb83bc9d867ea7), [`a48c2ee`](https://github.com/kubb-labs/plugins/commit/a48c2ee9c3b1e949287d0aca5160727df43d66ac), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`73a7053`](https://github.com/kubb-labs/plugins/commit/73a7053c25e73212b12d1107a8cac38f5a7e1408), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237)]:
+  - @kubb/plugin-client@6.0.0
+
 ## 5.13.2
 
 ### Patch Changes

@@ -1,5 +1,84 @@
 # @kubb/plugin-react-query
 
+## 5.10.0
+
+### Minor Changes
+
+- [#1389](https://github.com/kubb-labs/plugins/pull/1389) [`e52d77f`](https://github.com/kubb-labs/plugins/commit/e52d77f3958a611ccf5f6f0bcd1570d05c09f656) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Type the hooks' `client` option as `RequestConfig` without the fields the hook sets.
+  
+  - Remove `throwOnError` from `client`. The hook always sets it to `true`.
+  - Pass `contentType` for a mutation with several request media types on the mutation variables, not on `client`.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Nest a tag group in the folders of its OpenAPI 3.2 `parent` tags.
+  
+  With `group: { type: 'tag' }`, a `payment` tag whose `parent` is `store` now writes to `store/payment/` instead of `payment/`. Tags without a `parent` keep their folder.
+  
+  ```diff
+  - import { listPayments } from './gen/clients/payment/listPayments'
+  + import { listPayments } from './gen/clients/store/payment/listPayments'
+  ```
+  
+  Pass `group.name` to keep one folder per tag: `group: { type: 'tag', name: ({ group }) => group }`.
+
+### Patch Changes
+
+- [#1448](https://github.com/kubb-labs/plugins/pull/1448) [`65c6ba1`](https://github.com/kubb-labs/plugins/commit/65c6ba11a703783fd35f3511b0683a1391a47b43) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use the shared `ast`, `casing` and `text` helpers from `@kubb/kit`. Generated code stays the same, except:
+  
+  - `@kubb/plugin-msw` mocks a `text/json` response as JSON.
+  - `@kubb/plugin-zod` prints bigint bounds as inclusive, such as `.min(1n)` for `exclusiveMinimum: 0`.
+  - A `group: { type: 'path' }` folder is the camelCased first path segment, such as `petStore` for `/pet-store/{id}`.
+
+- [#1350](https://github.com/kubb-labs/plugins/pull/1350) [`00cfe4e`](https://github.com/kubb-labs/plugins/commit/00cfe4edfaa752c6d67491dd45cb83bc9d867ea7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add an optional `cookies` option for `in: cookie` parameters to the types, Zod schemas, Faker mocks, clients, query hooks, MCP tools, and Cypress requests.
+  
+  - Query keys leave `cookies` out, as they do headers, since keys end up in SSR payloads and caches.
+  - `validator: 'zod'` checks `cookies` when the call passes them.
+  
+  ```ts
+  await getSession({ cookies: { session_id: 'abc' } })
+  ```
+
+- [#1378](https://github.com/kubb-labs/plugins/pull/1378) [`a48c2ee`](https://github.com/kubb-labs/plugins/commit/a48c2ee9c3b1e949287d0aca5160727df43d66ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Stream a JSON Lines response, such as `application/jsonl`, `application/x-ndjson`, or `application/json-seq`, one parsed item per line.
+  
+  - An operation whose only success content type is JSON Lines returns `StreamResult` with one item per line, like a `text/event-stream` operation. It used to return the whole body as one string.
+  - The call sends the media type in `Accept`, and `validator: 'zod'` checks each line.
+  - `.kubb/sse.ts` adds `parseJsonLines`, and a custom client's `toEventStream` gets `{ shape: 'line' }`. An `application/json-seq` record must fit on one line.
+  - React Query, Vue Query, and SWR skip hooks for these operations, as they do for event streams.
+  
+  ```ts
+  for await (const entry of await streamLogs()) {
+    console.info(entry.message) // LogEntry
+  }
+  ```
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read the OpenAPI 3.1 and 3.2 fields that Kubb 5.18 adds, which needs Kubb 5.18.4 or later.
+  
+  - Treat a status range such as `2XX` as a success response.
+  - Write a range in lower case: `ListPetsStatus2XX` becomes `ListPetsStatus2xx`, and the `'2XX'` key becomes `'2xx'`.
+  - Add `@see` from an operation's `externalDocs` to its JSDoc.
+  
+  After you regenerate, rename imports of the `…Status2XX` names. An upper-case range key such as `'2XX'` or `'5XX'` in a hand-written responses record or `validator.error` map is no longer read, so write it in lower case.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep operation names and files apart from each other and from schemas.
+  
+  - Give an operation file an `Operation` suffix when a schema file has the same name, ignoring case. Operation `point` goes to `types/PointOperation.ts`, next to schema `Point`. The exported names stay the same.
+  - Name an operation the same in every plugin when a `macros` entry changes its `method` or `path`. The MSW handler no longer imports `FindPetsByStatusResponse2`.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix the hooks' runtime import and result types.
+  
+  - Stop importing `@kubb/plugin-zod` at runtime. The built plugins imported it without declaring it as a dependency, which broke strict installs such as Yarn Plug'n'Play.
+  - Type the declared response headers on a hook's `returnType: 'full'` result, so `data.headers.get` suggests their names. A custom client module keeps untyped headers.
+  - Type a hook's data for a response with a stream variant as the body or the stream, as the client does.
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix bugs found on real OpenAPI 3.0, 3.1 and 3.2 specs.
+  
+  - Escape a `'` in a path, media type, method or MCP server name, and JSDoc tags inside `@see` text.
+  - Prefer an exact success code such as `200` over a `2XX` range listed before it.
+  - Keep an OpenAPI 3.0 `nullable: true` on an array item or a `oneOf`/`anyOf` member in the types and Zod schemas.
+  - Accept a custom OpenAPI 3.2 method such as `COPY`, and stop importing a `<operation>ResponseSchema` that does not exist.
+  - Type a stream variant next to another content type as `ReadableStream` and keep string event `data` as text.
+- Updated dependencies [[`65c6ba1`](https://github.com/kubb-labs/plugins/commit/65c6ba11a703783fd35f3511b0683a1391a47b43), [`00cfe4e`](https://github.com/kubb-labs/plugins/commit/00cfe4edfaa752c6d67491dd45cb83bc9d867ea7), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237), [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237)]:
+  - @kubb/plugin-ts@5.5.0
+
 ## 5.9.1
 
 ### Patch Changes
