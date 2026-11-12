@@ -1453,4 +1453,17 @@ describe('containsDirectionalNode', () => {
 
     expect(containsDirectionalNode({ node, printerOptions: {} })).toBe(false)
   })
+
+  test('does not share cached answers across printer options that change them', () => {
+    const memos = new Map<string, unknown>()
+    const resolver = {
+      memo: (key: string, compute: () => unknown) => (memos.has(key) ? memos.get(key) : memos.set(key, compute()).get(key)),
+    } as unknown as ResolverZod
+    const node = ast.factory.createSchema({ type: 'array', items: [dateNode] })
+    const sameEitherWay = { date: () => 'z.date()' }
+
+    expect(containsDirectionalNode({ node, printerOptions: { resolver, nodes: sameEitherWay } })).toBe(false)
+    expect(containsDirectionalNode({ node, printerOptions: { resolver } })).toBe(true)
+    expect(containsDirectionalNode({ node, printerOptions: { resolver } })).toBe(true)
+  })
 })

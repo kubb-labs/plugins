@@ -256,13 +256,21 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
 export function containsDirectionalNode({ node, printerOptions }: { node: ast.SchemaNode | undefined; printerOptions: PrinterZodOptions }): boolean {
   if (!node) return false
 
-  return (
-    ast.schema.find(node, {
-      predicate: (schema) => variesByDirection({ node: schema, printerOptions }),
-      followRefs: true,
-      cache: printerOptions.resolver?.memo('zod:directionalNodes', () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>()),
-    }) !== undefined
-  )
+  const key = printerOptionsKey(printerOptions)
+  const cache =
+    key === undefined ? undefined : printerOptions.resolver?.memo(`zod:directionalNodes:${key}`, () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>())
+
+  return ast.schema.find(node, { predicate: (schema) => variesByDirection({ node: schema, printerOptions }), followRefs: true, cache }) !== undefined
+}
+
+/**
+ * Memo key for the printer options that decide what a handler prints. `undefined` when `nodes`
+ * overrides or `keysToOmit` make the output depend on more than these options, so nothing is shared.
+ */
+export function printerOptionsKey({ nodes, keysToOmit, coercion, guidType, regexType, oneOfType, dateType }: PrinterZodOptions): string | undefined {
+  if (nodes || keysToOmit?.length) return undefined
+  const coerce = (['dates', 'strings', 'numbers'] as const).map((type) => shouldCoerce(coercion, type))
+  return [...coerce, guidType, regexType, oneOfType, dateType].join(':')
 }
 
 /**
