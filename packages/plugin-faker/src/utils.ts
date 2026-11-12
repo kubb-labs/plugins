@@ -4,13 +4,7 @@ import { ensureValidVarName, getRelativePath } from '@internals/utils'
 import { ast, casing } from '@kubb/kit'
 import type { ResolverFaker } from './types.ts'
 
-/**
- * The identifier a `dateParser` module is imported and called under, since a module name such as `@scope/lib` is not one.
- *
- * @example
- * `dateParserName('dayjs') // 'dayjs'`
- * `dateParserName('my-date-lib') // 'myDateLib'`
- */
+/** The identifier a `dateParser` module is imported and called under: `my-date-lib` becomes `myDateLib`. */
 export function dateParserName(dateParser: string): string {
   return ensureValidVarName(casing.camel(dateParser))
 }

@@ -3,10 +3,7 @@ import type { ClientOptions, ClientResolvedOptions as ResolvedOptions, ResolverC
 
 export type { ClientResolvedOptions as ResolvedOptions, ResolverClient } from '@kubb/plugin-client'
 
-/**
- * The shared client options. `returnType: 'plain'` is left out: it is the shape `@kubb/plugin-client`
- * emits for a client module you own, and it does not typecheck against the bundled runtime.
- */
+/** The shared client options, without `returnType: 'plain'`, which only fits a client module `@kubb/plugin-client` calls. */
 export type Options = ClientOptions & { returnType?: 'full' | 'data' }
 
 /**

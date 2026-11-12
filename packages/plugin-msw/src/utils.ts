@@ -90,9 +90,7 @@ const bigintReplacer = `(_key, value) => {
       return Number(value)
     }`
 
-/**
- * The `JSON.stringify` call for `body`. `JSON.stringify` throws on a `bigint`, so a response with an `int64` field gets a replacer.
- */
+/** The `JSON.stringify` call for `body`, with a replacer when the response holds an `int64`, which `JSON.stringify` throws on. */
 function stringify(body: string, response: ast.ResponseNode | null | undefined): string {
   const hasBigint = (response?.content ?? []).some(
     (entry) => entry.schema && ast.schema.find(entry.schema, { predicate: (schema) => schema.type === 'bigint', followRefs: true }) !== undefined,
