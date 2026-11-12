@@ -263,7 +263,7 @@ export function containsDirectionalNode({ node, printerOptions }: { node: ast.Sc
  * Names of the `$ref` schemas the generator should route to their input (encode) variant.
  */
 export function collectDirectionalRefNames({ node, printerOptions }: { node: ast.SchemaNode; printerOptions: PrinterZodOptions }): Array<string> {
-  return ast.collect<string>(node, {
+  return ast.node.collect<string>(node, {
     schema: (n) =>
       n.type === ast.schema.types.ref && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.ref.getName(n) ?? undefined) : undefined,
   })

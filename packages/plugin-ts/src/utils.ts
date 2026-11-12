@@ -17,7 +17,7 @@ export function resolveInlineEnumNames({
   resolver: ResolverTs
   enumOptions: PluginTs['resolvedOptions']['enum']
 }): ast.SchemaNode {
-  return ast.transform(node, {
+  return ast.node.transform(node, {
     schema(child) {
       if (child === node || child.type !== 'enum' || !child.name) return
       const name = resolver.resolveName({
