@@ -22,23 +22,23 @@
    npx tsc --noEmit
    ```
 
-4. Fix each error with its row in [What to change](#what-to-change). Then read [Behavior changes](#behavior-changes), which the type checker does not catch.
+4. Fix each error with its row in [What to change](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#what-to-change). Then read [Behavior changes](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#behavior-changes), which the type checker does not catch.
 
 ## What to change
 
-| Your code                                                                                       | What to do                                                                                   |
-| ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Calls generated functions, SDK methods, or hooks                                                | Regenerate. Then check [Behavior changes](#behavior-changes).                                |
-| Imports from `@kubb/plugin-fetch/templates/fetch.ts` or `templates/core.ts`                     | Change the import path. See [Template imports](#template-imports).                           |
-| Uses `FetchOptions`, `defaultQuerySerializer`, `toEventStream`, or another removed export       | Use the replacement. See [Renamed and removed exports](#renamed-and-removed-exports).        |
-| Sets `codecs`, `serializer.body`, or `responseType`                                             | Use `mediaTypes` and `parseAs`. See [Media types](#media-types).                             |
-| Streams Server-Sent Events, or names `EventStreamResult`                                        | Use `client.stream` and `StreamResult`. See [Streams](#streams).                             |
-| Writes a `transport`                                                                            | Return a web `Response`. See [Transports](#transports).                                      |
-| Registers `client.interceptors.error` handlers                                                  | Narrow the error first. See [Error interceptors](#error-interceptors).                       |
-| Imports a `…Status2XX` type, or writes a `'2XX'` key                                            | Write the range in lower case. See [Status ranges](#status-ranges).                          |
-| Imports generated files by path, and groups by tag or has a schema and an operation of one name | Update the import paths. See [Generated file paths](#generated-file-paths).                  |
-| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                       | Use the new names, such as `new PetClient(config)`. See [SDK class names](#sdk-class-names). |
-| Comes from 5.12 or earlier and uses streams                                                     | Check [From 5.12 or earlier](#from-5-12-or-earlier).                                         |
+| Your code                                                                                       | What to do                                                                                                                                                          |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Calls generated functions, SDK methods, or hooks                                                | Regenerate. Then check [Behavior changes](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#behavior-changes).                                |
+| Imports from `@kubb/plugin-fetch/templates/fetch.ts` or `templates/core.ts`                     | Change the import path. See [Template imports](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#template-imports).                           |
+| Uses `FetchOptions`, `defaultQuerySerializer`, `toEventStream`, or another removed export       | Use the replacement. See [Renamed and removed exports](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#renamed-and-removed-exports).        |
+| Sets `codecs`, `serializer.body`, or `responseType`                                             | Use `mediaTypes` and `parseAs`. See [Media types](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#media-types).                             |
+| Streams Server-Sent Events, or names `EventStreamResult`                                        | Use `client.stream` and `StreamResult`. See [Streams](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#streams).                             |
+| Writes a `transport`                                                                            | Return a web `Response`. See [Transports](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#transports).                                      |
+| Registers `client.interceptors.error` handlers                                                  | Narrow the error first. See [Error interceptors](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#error-interceptors).                       |
+| Imports a `…Status2XX` type, or writes a `'2XX'` key                                            | Write the range in lower case. See [Status ranges](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#status-ranges).                          |
+| Imports generated files by path, and groups by tag or has a schema and an operation of one name | Update the import paths. See [Generated file paths](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#generated-file-paths).                  |
+| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                       | Use the new names, such as `new PetClient(config)`. See [SDK class names](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#sdk-class-names). |
+| Comes from 5.12 or earlier and uses streams                                                     | Check [From 5.12 or earlier](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#from-5-12-or-earlier).                                         |
 
 ## Template imports
 
@@ -58,18 +58,18 @@ The package exports `templates/client.ts` for its types only. Runtime values suc
 
 ## Renamed and removed exports
 
-| Before                                                             | After                                                                                         |
-| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| `FetchOptions`                                                     | `NativeOptions`, the same type: `RequestInit` plus Next.js's `next`.                          |
-| `defaultQuerySerializer`                                           | `serializeQuery`, or `serializeStyledQuery` for a styled query parameter or a urlencoded body |
-| `defaultPathSerializer`                                            | `serializePath`, plus `serializeStyledPath` for a `label` or `matrix` parameter               |
-| `applyHeaderStyles`                                                | `serializeHeaders`                                                                            |
-| `toEventStream`, `EventStreamCall`, `EventStreamResult`            | `client.stream` and `StreamResult`. See [Streams](#streams).                                  |
-| `Codec`, `Deserializer`, `ContentBodySerializer`, `BodySerializer` | `MediaType`. See [Media types](#media-types).                                                 |
-| `defaultBodySerializer`, `isDefaultJsonBody`                       | A `mediaTypes` entry, or `defaultMediaTypes`.                                                 |
-| `ResponseType`, `ResponseTypeMap`, `resolveResponseType`           | `ParseAs` and `parseAs`.                                                                      |
-| `CallResult`, `isStreamed`, `getResponseContentType`               | Removed. Read `result.contentType`.                                                           |
-| `clientGenerator` from `@kubb/plugin-fetch`                        | Removed. Build on `setupClient` and `clientDependencies` from `@kubb/plugin-client`.          |
+| Before                                                             | After                                                                                                                               |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `FetchOptions`                                                     | `NativeOptions`, the same type: `RequestInit` plus Next.js's `next`.                                                                |
+| `defaultQuerySerializer`                                           | `serializeQuery`, or `serializeStyledQuery` for a styled query parameter or a urlencoded body                                       |
+| `defaultPathSerializer`                                            | `serializePath`, plus `serializeStyledPath` for a `label` or `matrix` parameter                                                     |
+| `applyHeaderStyles`                                                | `serializeHeaders`                                                                                                                  |
+| `toEventStream`, `EventStreamCall`, `EventStreamResult`            | `client.stream` and `StreamResult`. See [Streams](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#streams). |
+| `Codec`, `Deserializer`, `ContentBodySerializer`, `BodySerializer` | `MediaType`. See [Media types](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/migrate-to-v6#media-types).                |
+| `defaultBodySerializer`, `isDefaultJsonBody`                       | A `mediaTypes` entry, or `defaultMediaTypes`.                                                                                       |
+| `ResponseType`, `ResponseTypeMap`, `resolveResponseType`           | `ParseAs` and `parseAs`.                                                                                                            |
+| `CallResult`, `isStreamed`, `getResponseContentType`               | Removed. Read `result.contentType`.                                                                                                 |
+| `clientGenerator` from `@kubb/plugin-fetch`                        | Removed. Build on `setupClient` and `clientDependencies` from `@kubb/plugin-client`.                                                |
 
 The serializers now live in one file each under `.kubb/serializers/`, and Kubb writes a file only when the document needs it. `.kubb/config.ts` registers them, and `setConfig({ serializer })` merges per key, so setting `serializer.query` keeps the others. A client you build with `createClientCore` gets none, so pass them in its `serializer` config. `serializer.header` and `serializer.cookie` are new keys.
 
