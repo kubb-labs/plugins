@@ -22,7 +22,7 @@ export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] 
  */
 export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
   if (!node) return false
-  const resolved = ast.ref.sync(node)
+  const resolved = ast.ref.mergeSchema(node)
   if (resolved.type === 'enum') return true
   if (resolved.type === 'union') {
     const members = resolved.members ?? []
@@ -70,7 +70,7 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
   if (node.type === 'ref') {
     const refName = ast.ref.getName(node)
     if (refName && cyclicSchemas?.has(refName)) return false
-    const resolved = ast.ref.sync(node)
+    const resolved = ast.ref.mergeSchema(node)
     // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's
     // prior optimism that only a resolved intersection blocks a discriminated union).
     return resolved.type === 'ref' || isObjectSchemaNode(resolved, cyclicSchemas)
@@ -107,7 +107,7 @@ export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Arra
   }): boolean => {
     if (seen.has(node)) return false
     seen.add(node)
-    const resolved = ast.ref.sync(node)
+    const resolved = ast.ref.mergeSchema(node)
     const composition = ast.narrowSchema(resolved, ast.schemaTypes.intersection) ?? ast.narrowSchema(resolved, ast.schemaTypes.union)
     // Property lookup skips unions, but a single-member union prints as its member.
     if (composition) {
@@ -164,7 +164,7 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   // A `null` default is invalid on a non-nullable schema and redundant on a nullish one, and emitting
   // it produces a bare `.default()` (no argument). Drop it.
   if (value === null) return null
-  const resolved = node ? ast.ref.sync(node) : undefined
+  const resolved = node ? ast.ref.mergeSchema(node) : undefined
   // A binary schema parses to a `Blob`, which a spec default, a string, cannot be.
   if (resolved?.type === 'blob') return null
   if (resolved && ast.narrowSchema(resolved, 'bigint')) {
@@ -532,7 +532,7 @@ export function buildObjectShape(
     value: string
     schema: ast.SchemaNode
     required?: boolean
-    meta: ReturnType<typeof ast.ref.sync>
+    meta: ReturnType<typeof ast.ref.mergeSchema>
     cyclic: boolean
   }) => string,
 ): string {
@@ -554,7 +554,7 @@ export function buildObjectShape(
   const entries = objectNode.properties.map((property, index) => {
     const { name, schema } = property
     const value = transformed[index]!
-    return renderProperty({ name, value, schema, required: property.required, meta: ast.ref.sync(schema), cyclic: isCyclic(schema) })
+    return renderProperty({ name, value, schema, required: property.required, meta: ast.ref.mergeSchema(schema), cyclic: isCyclic(schema) })
   })
 
   return buildObject(entries)
@@ -566,7 +566,7 @@ export function buildObjectShape(
 export function printWithOmit(
   ctx: { transform: (node: ast.SchemaNode) => string | null; options: { keysToOmit?: Array<string> | null } },
   node: ast.SchemaNode,
-  modify: (value: string, meta: ReturnType<typeof ast.ref.sync>) => string,
+  modify: (value: string, meta: ReturnType<typeof ast.ref.mergeSchema>) => string,
   mini = false,
 ): string | null {
   const { keysToOmit } = ctx.options
@@ -574,7 +574,7 @@ export function printWithOmit(
   const transformed = ctx.transform(node)
   if (!transformed) return null
 
-  const meta = ast.ref.sync(node)
+  const meta = ast.ref.mergeSchema(node)
 
   const base = (() => {
     if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed

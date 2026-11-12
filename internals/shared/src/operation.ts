@@ -200,7 +200,7 @@ export function isEventStream(node: ast.OperationNode): boolean {
 // A stream without a schema is a `blob` with a string primitive, so it keeps the JSON-parse default.
 function isTextSchema(schema: ast.SchemaNode | null | undefined): boolean {
   if (!schema) return false
-  const resolved = ast.ref.resolve(schema)
+  const resolved = ast.ref.getSchema(schema)
   return resolved.type !== 'blob' && resolved.primitive === 'string'
 }
 
@@ -215,7 +215,7 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
   if (!entry || (shape !== 'data' && shape !== 'event')) return false
   if (shape === 'data') return isTextSchema(entry.stream?.schema ?? entry.schema)
 
-  const item = entry.stream?.schema ? ast.ref.resolve(entry.stream.schema) : undefined
+  const item = entry.stream?.schema ? ast.ref.getSchema(entry.stream.schema) : undefined
   if (!item) return false
   const events = item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : [item]
   // A discriminator makes each event an intersection of its `$ref` and the pinned `event`, so every part is read.
@@ -226,7 +226,7 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
   })
   if (textEvents.length === events.length) return events.length > 0
 
-  const eventNames = textEvents.map((event) => propertySchemas(event, 'event').flatMap((schema) => ast.schema.getLiterals(ast.ref.resolve(schema))))
+  const eventNames = textEvents.map((event) => propertySchemas(event, 'event').flatMap((schema) => ast.schema.getLiterals(ast.ref.getSchema(schema))))
   return eventNames.length > 0 && eventNames.every((values) => values.length > 0) && [...new Set(eventNames.flat().map(String))]
 }
 
@@ -325,7 +325,7 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
   if (!schema || entry.stream) return entry
 
   const baseType = ast.mediaType.getBase(contentType)
-  const resolved = ast.ref.resolve(schema)
+  const resolved = ast.ref.getSchema(schema)
   if (isBinaryContentType(baseType)) {
     return resolved.type === 'blob' ? entry : { ...entry, schema: ast.factory.createSchema({ type: 'blob' }), keysToOmit: null }
   }

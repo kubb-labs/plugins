@@ -486,7 +486,7 @@ export function buildPropertyType(
   optional?: boolean,
 ): TsNode {
   const addsUndefined = optionalType === 'undefined' || optionalType === 'questionTokenAndUndefined'
-  const meta = ast.ref.sync(schema)
+  const meta = ast.ref.mergeSchema(schema)
 
   return wrapNullableOptional(baseType, !!meta.nullable, addsUndefined && !!(optional || meta.nullish || meta.optional))
 }

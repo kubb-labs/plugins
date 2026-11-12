@@ -101,7 +101,7 @@ function getLiteralUnion({
  */
 function hasCoercedDiscriminator({ member, propertyName, options }: { member: ast.SchemaNode; propertyName: string; options: ZodNodeOptions }): boolean {
   return ast.schema.findProperties({ node: member, propertyName }).some(({ schema }) => {
-    const resolved = ast.ref.sync(schema)
+    const resolved = ast.ref.mergeSchema(schema)
     return resolved.type === 'union' && !!getLiteralUnion({ node: resolved, options })?.coerce
   })
 }
@@ -109,7 +109,7 @@ function hasCoercedDiscriminator({ member, propertyName, options }: { member: as
 // `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
 function hasPlainDiscriminator({ member, propertyName }: { member: ast.SchemaNode; propertyName: string }): boolean {
   const schemas = ast.schema.findProperties({ node: member, propertyName })
-  return schemas.length > 0 && !schemas.some(({ schema }) => ast.schema.getLiterals(ast.ref.sync(schema)).length > 0)
+  return schemas.length > 0 && !schemas.some(({ schema }) => ast.schema.getLiterals(ast.ref.mergeSchema(schema)).length > 0)
 }
 
 /**

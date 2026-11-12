@@ -40,7 +40,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
       return node.nullable ? `data !== undefined ? data : ${fakerText}` : `data ?? ${fakerText}`
     }
     // A nullable ref to a scalar calls the referenced factory, whose `data` does not take `null`.
-    if (canOverride && node.type === 'ref' && node.nullable && SCALAR_TYPES.has(ast.ref.resolve(node).type)) {
+    if (canOverride && node.type === 'ref' && node.nullable && SCALAR_TYPES.has(ast.ref.getSchema(node).type)) {
       return `data === null ? data : ${fakerText}`
     }
     return fakerText
@@ -55,7 +55,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     const returnType = resolvedReturnType
 
     // `as` binds tighter than `??`/`?:`, so tuple/union need parens or `data`'s own type leaks through.
-    const needsCast = canOverride && !!returnType && ((node.type === 'ref' && !SCALAR_TYPES.has(ast.ref.resolve(node).type)) || isArray || isTuple || isUnion)
+    const needsCast = canOverride && !!returnType && ((node.type === 'ref' && !SCALAR_TYPES.has(ast.ref.getSchema(node).type)) || isArray || isTuple || isUnion)
     const needsParens = isTuple || isUnion
     const returnExpression = needsCast ? `${needsParens ? `(${fakerTextWithOverride})` : fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
 

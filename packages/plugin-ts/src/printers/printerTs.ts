@@ -304,7 +304,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       object(node) {
         const { transform, options } = this
 
-        const keySchema = node.propertyNames && ast.ref.sync(node.propertyNames)
+        const keySchema = node.propertyNames && ast.ref.mergeSchema(node.propertyNames)
         if (
           !node.properties.length &&
           !Object.keys(node.patternProperties ?? {}).length &&
@@ -327,7 +327,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           const baseType = output ?? factory.keywordTypeNodes.unknown
           const optional = !property.required || !!property.schema.optional || !!property.schema.nullish
           const type = factory.buildPropertyType(property.schema, baseType, options.optionalType, optional)
-          const propMeta = ast.ref.sync(property.schema)
+          const propMeta = ast.ref.mergeSchema(property.schema)
 
           const propertyNode = factory.createPropertySignature({
             questionToken: optional ? addsQuestionToken : false,
@@ -362,7 +362,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       if (!transformed) return null
 
       // For ref nodes, structural metadata lives on node.schema rather than the ref node itself.
-      const meta = ast.ref.sync(node)
+      const meta = ast.ref.mergeSchema(node)
 
       // Without name, apply modifiers inline and return.
       if (!name) {

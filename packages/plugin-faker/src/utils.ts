@@ -50,7 +50,7 @@ export function canOverrideSchema(node: ast.SchemaNode): boolean {
  * Whether a schema can supply object properties when merging faker values.
  */
 export function isObjectSchema(node: ast.SchemaNode, seen = new Set<ast.SchemaNode>()): boolean {
-  const resolved = ast.ref.resolve(node)
+  const resolved = ast.ref.getSchema(node)
   if (seen.has(resolved)) return false
   seen.add(resolved)
 
@@ -204,7 +204,7 @@ export function resolveFakerTypeUsage(
   usesTypeName: boolean
 } {
   // A nullable scalar inlines its primitive, so reapply the nullability the type plugin emitted.
-  const resolvedNode = ast.ref.resolve(node)
+  const resolvedNode = ast.ref.getSchema(node)
   const scalarType = SCALAR_TYPES.has(resolvedNode.type)
     ? `${getScalarType(resolvedNode, typeName)}${node.nullable || resolvedNode.nullable ? ' | null' : ''}`
     : undefined

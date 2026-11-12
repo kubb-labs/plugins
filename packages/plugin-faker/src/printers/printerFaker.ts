@@ -353,7 +353,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // emitted with resolver output and should not be transformed twice.
         const resolvedName = node.ref ? this.options.resolver.name(refName) : refName
 
-        if (!this.options.nestedInObject && canOverrideSchema(ast.ref.resolve(node))) {
+        if (!this.options.nestedInObject && canOverrideSchema(ast.ref.getSchema(node))) {
           return `${resolvedName}(data)`
         }
 
@@ -470,7 +470,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       object(node): string {
         const cyclicSchemas = this.options.cyclicSchemas
-        const keySchema = node.propertyNames && ast.ref.sync(node.propertyNames)
+        const keySchema = node.propertyNames && ast.ref.mergeSchema(node.propertyNames)
         const valueSchema = node.additionalProperties
         const recordProperties =
           keySchema?.type === 'enum' && typeof valueSchema === 'object'

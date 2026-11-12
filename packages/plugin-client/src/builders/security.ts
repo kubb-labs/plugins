@@ -88,7 +88,7 @@ export function getOperationSecurity({
   schemes: Array<ast.AuthScheme> | undefined
   hoist?: boolean
 }): Array<SecurityRequirement> | undefined {
-  const security = ast.auth.resolve({ auth, schemes }).flatMap((requirement): Array<SecurityRequirement> => {
+  const security = ast.auth.getSchemes({ auth, schemes }).flatMap((requirement): Array<SecurityRequirement> => {
     const resolved = requirement.map(({ name, credential, scopes }) => {
       const entry = resolveCredential(credential)
       return entry && { ...entry, ...(scopes.length ? { scopes } : {}), ...(hoist ? { ref: name } : {}) }

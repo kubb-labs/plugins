@@ -131,7 +131,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
       return member
     }
 
-    const schema = ast.ref.sync(node)
+    const schema = ast.ref.mergeSchema(node)
 
     if (schema.nullable || schema.optional || node.nullable || node.optional) {
       return member
@@ -204,7 +204,7 @@ function recursiveGetterType({
   const base = baseType(schema)
   if (!base) return undefined
 
-  const meta = ast.ref.sync(schema)
+  const meta = ast.ref.mergeSchema(schema)
   const optional = schema.optional || required === false
   const wrapped = (() => {
     if (schema.nullish || (meta.nullable && optional)) return `z.ZodOptional<z.ZodNullable<${base}>>`

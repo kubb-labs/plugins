@@ -81,8 +81,8 @@ function formatExample(value: unknown): string {
  * Whether a schema is binary, or an array of binary items, so its TypeScript type is `Blob` or `Blob[]`.
  */
 export function isBinarySchema(schema: ast.SchemaNode): boolean {
-  const meta = ast.ref.sync(schema)
-  const isBlob = (node: ast.SchemaNode) => ast.ref.sync(node)?.type === 'blob'
+  const meta = ast.ref.mergeSchema(schema)
+  const isBlob = (node: ast.SchemaNode) => ast.ref.mergeSchema(node)?.type === 'blob'
   return !!meta && (isBlob(meta) || (meta.type === 'array' && 'items' in meta && (meta.items ?? []).some(isBlob)))
 }
 
@@ -93,7 +93,7 @@ export function isBinarySchema(schema: ast.SchemaNode): boolean {
  * `@maxLength`, `@pattern`, `@default`, `@example`, `@see` and `@type`.
  */
 export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
-  const meta = ast.ref.sync(schema)
+  const meta = ast.ref.mergeSchema(schema)
 
   const isArray = meta?.primitive === 'array'
   // An object's `min`/`max` count properties, which no JSDoc tag describes.
