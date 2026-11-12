@@ -47,7 +47,7 @@ The `integer` handler controls `int32` fields separately. To change integer repr
 
 ## Remove descriptions
 
-Use the [description-removal macro](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#remove-descriptions) with `pluginZod({ macros: [dropDescriptions] })`. Generated schemas omit description metadata.
+Use the [description-removal macro](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#remove-descriptions) with `pluginZod({ macros: [dropDescriptions] })`. Component schemas omit their `.describe()` calls. An operation schema that aliases a described component keeps one, such as `addPetBodySchema = petSchema.describe('A pet')`.
 
 ## Encode custom types
 
@@ -64,7 +64,7 @@ const nodes: PrinterZodNodes = {
   },
 }
 
-pluginZod({ inferred: true, printer: { nodes } })
+pluginZod({ inferred: 'codec', printer: { nodes } })
 ```
 
 Use a runtime that provides `Temporal`, or add its polyfill through a generated import or banner. Match the OpenAPI format: `time`, `date`, and `date-time` use `time`, `date`, and `datetime` handlers.
@@ -82,9 +82,9 @@ export const slotInputSchema = z.object({
 ```
 
 > [!IMPORTANT]
-> Use `inferred: true` without `pluginTs` so the client types follow these conversions. Types from `pluginTs` describe the wire format.
+> Use `inferred: 'codec'` so the client types follow these conversions. With `inferred: true`, a request type is the encoded string, not `Temporal.PlainTime`. Types from `pluginTs` describe the wire format.
 
-For built-in date conversion, set `dateType: 'date'` on the adapter. Generated response schemas convert ISO datetimes to `Date`. Request schemas convert them back with `toISOString()`.
+For built-in date conversion, set `dateType: 'date'` on the adapter. Generated response schemas convert ISO datetimes to `Date`. Request schemas convert them back with `toISOString()`. With `mini: true`, both print a plain `z.date()` without the conversion.
 
 ## Import a custom codec
 
@@ -120,8 +120,9 @@ Generated files import `myCodec` from `my-codec/zod`. Leave `root` unset on this
 | `integer`                                              | `z.int()`                             | `z.int()`                             | Coerces to `z.coerce.number().int()` when `coercion.numbers` is enabled         |
 | `integer`, `format: int32`                             | `z.int32()`                           | `z.int32()`                           | 32-bit signed integer                                                           |
 | `integer`, `format: uint32`                            | `z.uint32()`                          | `z.uint32()`                          | 32-bit unsigned integer                                                         |
-| `integer`, `format: int64`                             | `z.bigint()`                          | `z.bigint()`                          | 64-bit integer                                                                  |
-| `string`, `format: byte` / `base64`                    | `z.base64()`                          | `z.base64()`                          | Base64 string validation                                                        |
+| `integer`, `format: int64`                             | `z.coerce.bigint()`                   | `z.coerce.bigint()`                   | 64-bit integer, always coerced because JSON holds a number                      |
+| `string`, `format: base64`                             | `z.base64()`                          | `z.base64()`                          | Base64 string validation                                                        |
+| `string`, `format: byte` / `binary`                    | `z.instanceof(Blob)`                  | `z.instanceof(Blob)`                  | Binary payload                                                                  |
 | `string`, `format: base64url`                          | `z.base64url()`                       | `z.base64url()`                       | URL-safe base64 string validation                                               |
 | `string`, `contentEncoding: base64` / `base64url`      | `z.base64()` / `z.base64url()`        | `z.base64()` / `z.base64url()`        | Same checks as the formats. Other encodings stay `z.string()`                   |
 | `string`, JSON `contentMediaType` with `contentSchema` | `z.string().refine(...)`              | `z.string().check(z.refine(...))`     | The string must parse as JSON that passes the content schema. It stays a string |

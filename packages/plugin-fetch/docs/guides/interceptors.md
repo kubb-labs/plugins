@@ -88,5 +88,5 @@ import { client } from './gen/.kubb/client'
 
 const admin = client.extend({ headers: { 'X-Role': 'admin' } })
 admin.interceptors.request.use((request) => request) // runs after the handlers on client
-await getPetById({ path: { petId: 1 }, client: admin })
+await getPetById({ path: { petId: 1n }, client: admin })
 ```

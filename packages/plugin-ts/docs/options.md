@@ -63,7 +63,7 @@ Emits a named union type with no runtime value.
 :::
 
 :::field{name="'inlineLiteral'"}
-Emits the same union as `'literal'` but inlines it at each usage site instead of naming it.
+Emits the same union as `'literal'` and inlines it at each usage site for an enum declared on a property. A component enum that a `$ref` points to keeps its named type.
 :::
 
 ::
@@ -118,7 +118,7 @@ Names the const `PetStatus`, matching the schema name.
 
 #### enum.typeSuffix
 
-Suffix on the companion type alias when `type` is `'asConst'`. It never changes the const object name. Set it to `''` to drop the suffix, which with `constCasing: 'pascalCase'` merges the const and the type under one name, `PetStatus`.
+Suffix on the companion type alias when `type` is `'asConst'`. The suffix never changes the const object name. Set it to `''` to drop the suffix, which with `constCasing: 'pascalCase'` merges the const and the type under one name, `PetStatus`.
 
 |          |          |
 | -------- | -------- |
@@ -236,7 +236,7 @@ Uses `tags: Array<string>`, which reads better for complex elements like `Array<
 
 ### operations
 
-Whether each operation gets its own types file (`AddPetOptions`, `AddPetResponses`, `AddPetStatus200`, `AddPetPath`). A response that declares `headers` also gets a type for them, such as `ListPetsStatus200Headers`.
+Whether each operation gets its own types file (`AddPetOptions`, `AddPetResponses`, `AddPetStatus200`, `AddPetPath`). A response that declares `headers` also gets a type for them, such as `ListPetsStatus200Headers`. Cookie parameters get a type such as `ListPetsCookies`.
 
 |          |                        |
 | -------- | ---------------------- |
@@ -251,7 +251,7 @@ Emits one file per operation with its aliases and aggregates, for example `expor
 :::
 
 :::field{name="'inline'"}
-Emits only the schema types. Clients, query hooks, MSW handlers, Faker mocks, Cypress requests, and MCP handlers reference those directly and print the rest inline, for example `Options<{ body: Order; path?: never; query?: never; headers?: never }>` and `mutationOptions<Order, ResponseErrorConfig<unknown>, …>`. An enum declared inside an operation becomes a literal union such as `'available' | 'pending' | 'sold'`. Kubb moves each operation type into the files that use it, so this needs a Kubb version with inline sources.
+Emits only the schema types. Clients, query hooks, MSW handlers, Faker mocks, Cypress requests, and MCP handlers reference those directly and print the rest inline, for example `Options<{ body: Order; path?: never; query?: never; headers?: never }>` and `mutationOptions<Order, ResponseErrorConfig<unknown>, …>`. An enum declared inside an operation becomes a literal union such as `'available' | 'pending' | 'sold'`. Kubb moves each operation type into the files that use it, so `'inline'` needs a Kubb version with inline sources.
 :::
 
 ::
@@ -275,6 +275,7 @@ type ResolverTsPatch = {
     path?(node: OperationNode, param: ParameterNode): string     // → 'GetPetByIdPath'
     query?(node: OperationNode, param: ParameterNode): string    // → 'FindPetsByStatusQuery'
     headers?(node: OperationNode, param: ParameterNode): string  // → 'DeletePetHeaders'
+    cookies?(node: OperationNode, param: ParameterNode): string  // → 'GetCookiesCookies'
   }
   response?: {
     status?(node: OperationNode, statusCode: StatusCode): string // → 'ListPetsStatus200'
@@ -294,7 +295,7 @@ type ResolverTsPatch = {
 
 ### printer
 
-Replaces the node handler for a schema type such as `'integer'` or `'date'` with one that builds its TypeScript AST node. Use `this.transform` to recurse into nested nodes and `this.options` to read printer options. The [printer guide](https://kubb.dev/docs/5.x/how-to/printers) covers the handler context and how overrides compose with macros.
+Replaces the handler for a schema type such as `'integer'` or `'date'`. Each handler returns the TypeScript type as a string. Inside a handler, `this.transform(node)` returns the printed type of a nested node and `this.options` holds the printer options. A handler that returns a TypeScript compiler node is deprecated. The [printer guide](https://kubb.dev/docs/5.x/how-to/printers) covers the handler context and how overrides compose with macros.
 
 |          |                              |
 | -------- | ---------------------------- |

@@ -62,7 +62,7 @@ const testClient = createClient({
   transport: async () => Response.json({ id: 1, name: 'Fluffy' }),
 })
 
-const { data } = await getPetById({ path: { petId: 1 }, client: testClient })
+const { data } = await getPetById({ path: { petId: 1n }, client: testClient })
 //      ^ { id: 1, name: 'Fluffy' }
 ```
 

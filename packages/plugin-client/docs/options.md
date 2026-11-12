@@ -68,7 +68,7 @@ Shape of the value a generated operation resolves to.
 
 ```typescript
 pluginClient({ importPath: '../../client', returnType: 'full' })
-// const pet = await getPetById({ path: { petId: 1 } }).unwrap()
+// const pet = await getPetById({ path: { petId: 1n } }).unwrap()
 ```
 
 The setting applies to the whole plugin, so you cannot set it in `override`.
@@ -94,7 +94,7 @@ Passes the response and error schemas.
 :::
 
 :::field{name="{ request?: 'zod', params?: 'zod', response?: 'zod' }"}
-Opts in per direction. `request` passes the request body schema, `params` the path, query, and header params schemas, and `response` the response and error schemas.
+Opts in per direction. `request` passes the request body schema, `params` the path, query, header, and cookie params schemas, and `response` the response and error schemas.
 :::
 
 ::

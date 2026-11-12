@@ -41,7 +41,7 @@ Factories in a schema cycle use the declared model as their base return type to 
 :::
 
 :::field{name="'schema'"}
-Accepts `Partial<Model>` and returns the declared model type, including optional and nullable fields. Use it for fixtures you modify after creation.
+Accepts `Partial<Model>` and returns the declared model type, including optional and nullable fields. Use it for fixtures that change after creation.
 :::
 
 ::
@@ -78,7 +78,9 @@ pluginFaker({
 
 ### dateParser
 
-Library used to format `date` and `time` fields represented as strings. Pick a value other than `'faker'` when your project already uses a date library, and install that library in the consuming app. Generated `date` and `time` strings use `YYYY-MM-DD` and `HH:mm:ss`, and `date-time` values keep the ISO string.
+Library used to format `date`, `time`, and `date-time` fields represented as strings. Pick a value other than `'faker'` when the project already uses a date library, and install that library in the consuming app.
+
+Generated `date` and `time` strings use `YYYY-MM-DD` and `HH:mm:ss`. A `date-time` string is `toISOString()` output with `'faker'`. Any other parser formats it as `YYYY-MM-DDTHH:mm:ss[Z]`, without the `Z` for a local date-time and with a numeric offset when the schema declares one.
 
 |          |                                            |
 | -------- | ------------------------------------------ |
@@ -101,7 +103,7 @@ Renders it as `moment(faker.date.anytime()).format('YYYY-MM-DD')`.
 :::
 
 :::field{name="Custom module"}
-Pass a module name that exports a default formatting function. Kubb adds the import to generated files.
+Pass the name of a module whose default export has the dayjs API, because generated code calls `name(faker.date.anytime()).format('YYYY-MM-DD')`. Kubb imports the default export under the module name, so the name must be a valid JavaScript identifier.
 :::
 
 ::
@@ -123,7 +125,7 @@ Default value. Generates `faker.helpers.fromRegExp(/pattern/)` without an extra 
 :::
 
 :::field{name="'randexp'"}
-Generates `new RandExp(pattern).gen()`. Supports a wider regex grammar and requires the `randexp` runtime dependency.
+Generates `new RandExp(pattern).gen()`. Supports a wider regex grammar and needs `randexp` installed in the consuming app.
 :::
 
 ::
@@ -140,7 +142,7 @@ Faker locale code. It switches the named import to `fakerXX` from `@faker-js/fak
 
 ### seed
 
-Kubb passes this value to `faker.seed(...)` at the top of each factory, so every run returns the same data. Use it for snapshot tests. Pass a single number or an array of numbers. Factories still accept overrides, such as `createPet({ name: 'Rex' })`.
+Kubb passes this value to `faker.seed(...)` once at the top of each generated file, so every run returns the same sequence of data. A second call to the same factory returns the next values in that sequence. Use it for snapshot tests. Pass a single number or an array of numbers. Factories still accept overrides, such as `createPet({ name: 'Rex' })`.
 
 |          |                      |
 | -------- | -------------------- |
@@ -167,16 +169,17 @@ type ResolverFakerPatch = {
   }
   imports?(options: ResolveImportsOptions): Array<ImportNode>
   param?: {
-    name?(node: OperationNode, param: ParameterNode): string    // → 'showPetByIdPathPetId'
+    name?(node: OperationNode, param: ParameterNode): string    // → 'createShowPetByIdPathPetId'
     path?(node: OperationNode, param: ParameterNode): string     // → 'createShowPetByIdPath'
     query?(node: OperationNode, param: ParameterNode): string    // → 'createListPetsQuery'
     headers?(node: OperationNode, param: ParameterNode): string  // → 'createDeletePetHeaders'
+    cookies?(node: OperationNode, param: ParameterNode): string  // → 'createGetSessionCookies'
   }
   response?: {
-    status?(node: OperationNode, statusCode: StatusCode): string // → 'listPetsStatus200'
-    body?(node: OperationNode): string                           // → 'createPetsBody'
-    response?(node: OperationNode): string                       // → 'listPetsResponse'
-    responses?(node: OperationNode): string                      // → 'listPetsResponses'
+    status?(node: OperationNode, statusCode: StatusCode): string // → 'createListPetsStatus200'
+    body?(node: OperationNode): string                           // → 'createCreatePetsBody'
+    response?(node: OperationNode): string                       // → 'createListPetsResponse'
+    responses?(node: OperationNode): string                      // → 'createListPetsResponses'
   }
 }
 ```

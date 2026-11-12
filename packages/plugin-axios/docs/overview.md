@@ -2,12 +2,12 @@
 
 The Axios plugin turns each operation in your OpenAPI spec into a typed async function that sends the request with axios. Each function takes grouped `path`, `query`, `headers`, and `body` parameters and returns a result keyed by status code.
 
-The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, and `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call these functions. The plugin also copies its runtime files (`client.ts`, `serializers.ts`, and `standardSchema.ts`) to `.kubb/` in the root output folder.
+The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, and `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call these functions. The plugin also copies its runtime files to `.kubb/` in the root output folder. Import the client from `.kubb/client.ts`.
 
 ## Setup
 
 - Add `@kubb/plugin-ts` for the operation types, or `@kubb/plugin-zod` with `inferred: true`.
-- Add `@kubb/plugin-zod` when you set `validator`, and install `zod` v4. Without the plugin, `validator` does nothing.
+- Add `@kubb/plugin-zod` when you set `validator`, and install `zod` v4. Generation fails without the plugin.
 - Install `axios` 1.20 or a later v1 release in the app that uses the generated code.
 
 ## Options worth knowing

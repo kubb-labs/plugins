@@ -39,26 +39,33 @@ export const server = setupServer(
 
 ## Generate mock data
 
-Add `pluginFaker` and change the MSW [`parser`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#parser) to `'faker'`.
+Add `pluginFaker` and change the MSW [`parser`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#parser) to `'faker'`. Set `integerType: 'number'` on the adapter, because the default types `int64` fields as `bigint`, which `JSON.stringify` cannot serialize in a response body.
 
 ```typescript [kubb.config.ts]
+import { defineConfig } from 'kubb/config'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMsw } from '@kubb/plugin-msw'
 
-const plugins = [
-  pluginTs(),
-  pluginFaker(),
-  pluginMsw({
-    output: { path: 'handlers', mode: 'directory' },
-    baseURL: 'http://localhost:3000',
-    parser: 'faker',
-    handlers: true,
-  }),
-]
+export default defineConfig({
+  input: './petStore.yaml',
+  output: { path: './src/gen' },
+  adapter: adapterOas({ integerType: 'number' }),
+  plugins: [
+    pluginTs(),
+    pluginFaker(),
+    pluginMsw({
+      output: { path: 'handlers', mode: 'directory' },
+      baseURL: 'http://localhost:3000',
+      parser: 'faker',
+      handlers: true,
+    }),
+  ],
+})
 ```
 
-Use this array as `defineConfig.plugins`. Calling `getPetByIdHandler()` without data now uses generated Faker values.
+Calling `getPetByIdHandler()` without data now uses generated Faker values.
 
 ## Register the handler collection
 

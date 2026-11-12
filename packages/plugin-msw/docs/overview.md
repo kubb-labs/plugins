@@ -8,7 +8,7 @@ Each handler returns the data you pass to it. With `parser: 'faker'`, a handler 
 
 - Add `@kubb/plugin-ts` for the request and response types.
 - Add `@kubb/plugin-faker` when you set `parser: 'faker'`, and install `@faker-js/faker` v10. The default `data` parser does not need it.
-- Install `msw` v2 in the app that uses the generated code.
+- Install `msw` v3 in the app that uses the generated code.
 
 ## Options worth knowing
 

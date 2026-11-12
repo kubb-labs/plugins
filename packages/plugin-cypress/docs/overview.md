@@ -18,16 +18,18 @@ See [Options](https://kubb.dev/extensions/kubb-labs/plugin-cypress/options) for 
 
 ## Example
 
-The config below writes the helpers to `src/gen/cypress`.
+The config below writes the helpers to `src/gen/cypress`. The Petstore spec declares JSON and XML for most responses, so `contentType` keeps the JSON one. Without it, a response body is typed as `Pet | string`.
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginCypress } from '@kubb/plugin-cypress'
 
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
+  adapter: adapterOas({ contentType: 'application/json' }),
   plugins: [
     pluginTs(),
     pluginCypress({ output: { path: 'cypress', mode: 'directory' } }),

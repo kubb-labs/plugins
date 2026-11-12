@@ -77,7 +77,7 @@ import { getPetById } from './gen/clients/getPetById'
 
 const staging = createClient({ baseURL: 'https://staging.petstore.swagger.io/v2' })
 
-const { data } = await getPetById({ path: { petId: 1 }, client: staging })
+const { data } = await getPetById({ path: { petId: 1n }, client: staging })
 ```
 
 Pass `baseURL` on a single call to override the client for that one request:
@@ -85,7 +85,7 @@ Pass `baseURL` on a single call to override the client for that one request:
 ```typescript
 import { getPetById } from './gen/clients/getPetById'
 
-const { data } = await getPetById({ path: { petId: 1 }, baseURL: 'https://localhost:3000' })
+const { data } = await getPetById({ path: { petId: 1n }, baseURL: 'https://localhost:3000' })
 ```
 
 ## Which base URL a call uses

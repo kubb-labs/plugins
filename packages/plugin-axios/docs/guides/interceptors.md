@@ -88,7 +88,7 @@ import { client } from './gen/.kubb/client'
 
 const admin = client.extend({ headers: { 'X-Role': 'admin' } })
 admin.interceptors.request.use((request) => request) // runs after the handlers on client
-await getPetById({ path: { petId: 1 }, client: admin })
+await getPetById({ path: { petId: 1n }, client: admin })
 ```
 
 ## Native axios interceptors
@@ -104,4 +104,4 @@ getAxiosInstance().interceptors.request.use((config) => {
 })
 ```
 
-They run after the `client.interceptors` request handlers, in reverse order of registration, and response interceptors see the raw bytes. An instance you wrap with `createAxiosTransport` keeps its own interceptors. See [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport).
+Native axios interceptors run after the `client.interceptors` request handlers, in reverse order of registration, and response interceptors see the raw bytes. An instance you wrap with `createAxiosTransport` keeps its own interceptors. See [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport).

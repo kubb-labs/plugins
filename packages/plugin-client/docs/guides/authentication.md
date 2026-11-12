@@ -62,12 +62,12 @@ setAuth(async () => readTokenFromSecretsStore())
 
 ## Sign requests or use several auth methods
 
-Read `config.security` and pick per operation, or pass a different `client` on a call. This works for request signing, such as AWS SigV4, and for services that use different credentials:
+Read `config.security` and pick per operation, or pass a different `client` on a call. Both ways work for request signing, such as AWS SigV4, and for services that use different credentials:
 
 ```typescript
 import { createSignedClient } from './clients/iam'
 
-await getPetById({ path: { petId: 1 }, client: createSignedClient() })
+await getPetById({ path: { petId: 1n }, client: createSignedClient() })
 ```
 
 A client passed on a call replaces the default for that call only.

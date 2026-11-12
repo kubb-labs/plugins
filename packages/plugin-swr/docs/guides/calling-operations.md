@@ -52,7 +52,7 @@ Each generated hook calls the client function with `throwOnError: true`. A faile
 
 ## Skip requests until ready
 
-Set `shouldFetch: false` to give SWR a `null` key and skip the request. Enable it once the required parameters are available. Mutation hooks accept the same switch, and a `null` key stops `trigger` from firing.
+Set `shouldFetch: false` to give SWR a `null` key and skip the request. Pass `true` once the required parameters are available. Mutation hooks accept the same option. With a `null` key, calling `trigger` throws a missing-key error.
 
 ```typescript [usage.ts]
 import { useGetPetById } from './gen/hooks/useGetPetById'

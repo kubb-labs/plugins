@@ -92,7 +92,7 @@ Kubb generates one union member per event name:
 
 ```typescript
 export type StreamChatStatus200 =
-  | { data?: MessageDelta; event: 'message_delta'; id?: string; retry?: number }
+  | { data: MessageDelta; event: 'message_delta'; id?: string; retry?: number }
   | { data?: string; event: 'ping'; id?: string; retry?: number }
 ```
 
@@ -106,7 +106,7 @@ const { stream } = await streamChat({ body: { prompt: 'Hi' } })
 for await (const event of stream) {
   switch (event.event) {
     case 'message_delta':
-      render(event.data?.text) // MessageDelta
+      render(event.data.text) // MessageDelta
       break
     case 'ping':
       break
@@ -168,7 +168,7 @@ Read `data` straight from each event. The result also holds the native `response
 ```typescript
 import { streamPetEvents } from './gen/clients/streamPetEvents'
 
-const { stream, response } = await streamPetEvents({ path: { petId: 1 } })
+const { stream, response } = await streamPetEvents({ path: { petId: 1n } })
 console.info(response.status) // 200
 
 for await (const { data } of stream) {
@@ -178,7 +178,7 @@ for await (const { data } of stream) {
 
 ## JSON Lines
 
-An operation whose only success content type is a JSON sequence, such as `application/jsonl`, `application/x-ndjson`, or `application/json-seq`, streams one item per line. Each line is parsed as JSON, so the loop gets each item as soon as its line arrives instead of waiting for the whole body. An `application/json-seq` record must fit on one line; a record that spans several lines fails to parse.
+An operation whose only success content type is a JSON sequence, such as `application/jsonl`, `application/x-ndjson`, or `application/json-seq`, streams one item per line. Each line is parsed as JSON, so the loop gets each item as soon as its line arrives instead of waiting for the whole body. An `application/json-seq` record must fit on one line. A record that spans several lines fails to parse.
 
 ### Describe it
 
@@ -264,7 +264,7 @@ console.info(result.headers.get('X-Request-ID'))
 
 ## Resume after a drop
 
-A dropped connection ends the loop with the transport's error. The result's `lastEventId` is the `id` of the last event the server completed, so a new call with a `Last-Event-ID` header continues where the stream stopped. The runtime does not reconnect by itself, because many streams, such as a chat completion, end on purpose, and the retry policy belongs to your app:
+A dropped connection ends the loop with the transport's error. The result's `lastEventId` is the `id` of the last event the server completed, so a new call with a `Last-Event-ID` header continues where the stream stopped. Declare `Last-Event-ID` as a header parameter of the operation, so the call accepts it in `headers`. The runtime does not reconnect by itself, because many streams, such as a chat completion, end on purpose, and the retry policy belongs to your app:
 
 ```typescript
 let lastEventId = ''
@@ -351,7 +351,7 @@ for await (const event of result) render(event.data)
 
 ```typescript
 import { client, type SuccessOf } from './gen/.kubb/client'
-import type { StreamLogsResponses } from './gen/models/StreamLogs'
+import type { StreamLogsResponses } from './gen/types/StreamLogs'
 
 const result = await client.stream<StreamLogsResponses, true, SuccessOf<StreamLogsResponses>>({ method: 'GET', url: '/logs' })
 ```
@@ -370,16 +370,16 @@ pluginAxios({ returnType: 'data' })
 
 Both modes read the same events. The table compares them for one call:
 
-|                                                | `returnType: 'full'` (default)                                 | `returnType: 'data'`                                           |
-| ---------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
-| The call returns                               | `Unwrappable<StreamResult<…>>`                                 | `Promise<UnwrappedStreamResult<…>>`                            |
-| Call it                                        | `const result = await streamPetEvents({ path: { petId: 1 } })` | `const events = await streamPetEvents({ path: { petId: 1 } })` |
-| Loop over the events                           | `for await (const event of result.stream)`                     | `for await (const event of events)`                            |
-| Other ways to loop                             | `result`, `result.data`, or `.unwrap()`                        | none                                                           |
-| `event.data`                                   | `PetEvent`                                                     | `PetEvent`                                                     |
-| A failed call, by default                      | throws a `ResponseError`                                       | throws a `ResponseError`                                       |
-| With `throwOnError: false`                     | the full result                                                | the full result, as in `'full'`                                |
-| `status`, `headers`, `response`, `lastEventId` | available                                                      | only with `throwOnError: false`                                |
+|                                                | `returnType: 'full'` (default)                                  | `returnType: 'data'`                                            |
+| ---------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
+| The call returns                               | `Unwrappable<StreamResult<…>>`                                  | `Promise<UnwrappedStreamResult<…>>`                             |
+| Call it                                        | `const result = await streamPetEvents({ path: { petId: 1n } })` | `const events = await streamPetEvents({ path: { petId: 1n } })` |
+| Loop over the events                           | `for await (const event of result.stream)`                      | `for await (const event of events)`                             |
+| Other ways to loop                             | `result`, `result.data`, or `.unwrap()`                         | none                                                            |
+| `event.data`                                   | `PetEvent`                                                      | `PetEvent`                                                      |
+| A failed call, by default                      | throws a `ResponseError`                                        | throws a `ResponseError`                                        |
+| With `throwOnError: false`                     | the full result                                                 | the full result, as in `'full'`                                 |
+| `status`, `headers`, `response`, `lastEventId` | available                                                       | only with `throwOnError: false`                                 |
 
 Loop over the events the call resolves to:
 
@@ -387,13 +387,13 @@ Loop over the events the call resolves to:
 import { streamOrderEvents } from './gen/clients/streamOrderEvents'
 import { streamPetEvents } from './gen/clients/streamPetEvents'
 
-const events = await streamOrderEvents({ path: { orderId: 7 } })
+const events = await streamOrderEvents({ path: { orderId: 7n } })
 
 for await (const event of events) {
   if (event.event === 'order_placed') render(event.data) // Order
 }
 
-for await (const { data } of await streamPetEvents({ path: { petId: 1 } })) {
+for await (const { data } of await streamPetEvents({ path: { petId: 1n } })) {
   console.info(data.type) // PetEvent
 }
 ```
@@ -404,7 +404,7 @@ A failed call throws a `ResponseError` before the first event, and a dropped con
 import { ResponseError } from './gen/.kubb/client'
 
 try {
-  for await (const event of await streamPetEvents({ path: { petId: 1 } })) render(event)
+  for await (const event of await streamPetEvents({ path: { petId: 1n } })) render(event)
 } catch (error) {
   if (!ResponseError.is(error)) throw error
   console.error('stream rejected', error.status)
@@ -414,7 +414,7 @@ try {
 With `throwOnError: false`, the call returns the full result instead, as a regular call does in this mode. The events are its `data` on a 2xx response, and checking `status` narrows `error`:
 
 ```typescript
-const result = await streamPetEvents({ path: { petId: 1 }, throwOnError: false })
+const result = await streamPetEvents({ path: { petId: 1n }, throwOnError: false })
 
 if (!result.data) console.error('stream rejected', result.status, result.error)
 else for await (const event of result.data) render(event)
@@ -424,7 +424,7 @@ The events alone carry no `response` or `lastEventId`. To resume a dropped strea
 
 ## The runtime files
 
-`.kubb/sse.ts` holds `parseEventStream`, `parseJsonLines`, and the `eventStream`, `jsonLines`, and `streamMediaTypes` media types. The `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, `StreamOptions`, `StreamResult`, and `StreamResultWithHeaders` types live in `.kubb/core.ts`. A stream operation takes `StreamOptions` and returns `StreamResult`, or `StreamResultWithHeaders` when the response declares headers, the stream versions of `Options`, `RequestResult`, and `RequestResultWithHeaders`. `.kubb/client.ts` re-exports `sse.ts`, so everything imports from the client. Kubb regenerates these files on each run, so do not edit them:
+`.kubb/sse.ts` holds `parseEventStream`, `parseJsonLines`, and the `eventStream`, `jsonLines`, and `streamMediaTypes` media types. The `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, `StreamOptions`, `StreamResult`, and `StreamResultWithHeaders` types live in `.kubb/core.ts`. A stream operation takes `StreamOptions` and returns `StreamResult`, or `StreamResultWithHeaders` when the response declares headers. These types are the stream versions of `Options`, `RequestResult`, and `RequestResultWithHeaders`. `.kubb/client.ts` re-exports `sse.ts`, so everything imports from the client. Kubb regenerates these files on each run, so do not edit them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/client'

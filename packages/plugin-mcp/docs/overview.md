@@ -13,7 +13,8 @@ Each tool handler calls the function a client plugin generates for that operatio
 
 ## Options worth knowing
 
-- `client` picks `fetch` or `axios` when both client plugins are registered. A single client is detected automatically.
+- `client` picks `fetch`, `axios`, or `client` when several client plugins are registered. A single client is detected automatically.
+- `exclude` skips operations. Use it for operations with a binary request body, because one such tool makes the server fail every `tools/list` request.
 - `output.path` must be a folder name, such as the default `mcp`, because single-file output has no place for `server.ts`, `start.ts`, and `.mcp.json`.
 
 The `args` path in `.mcp.json` points at `start.ts` relative to the Kubb `root`, because MCP clients start the command from their own working directory. Use an absolute path for a client that starts in another folder, or point it at your own entry file to run setup code before `startServer()`.
@@ -22,10 +23,11 @@ See [Options](https://kubb.dev/extensions/kubb-labs/plugin-mcp/options) for ever
 
 ## Example
 
-The config below generates an MCP server whose tools call the Petstore API through `@kubb/plugin-fetch`.
+The config below generates an MCP server whose tools call the Petstore API through `@kubb/plugin-fetch`. The adapter sets `integerType: 'number'` because the default types `int64` fields as `bigint`. A `bigint` or a binary request body in any tool schema makes the server fail every `tools/list` request. `exclude` skips `uploadFile`, the one Petstore operation with a binary body.
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { pluginFetch } from '@kubb/plugin-fetch'
@@ -34,11 +36,15 @@ import { pluginMcp } from '@kubb/plugin-mcp'
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
+  adapter: adapterOas({ integerType: 'number' }),
   plugins: [
     pluginTs(),
     pluginZod(),
     pluginFetch({ baseURL: 'https://petstore.swagger.io/v2' }),
-    pluginMcp({ output: { path: 'mcp', mode: 'directory' } }),
+    pluginMcp({
+      output: { path: 'mcp', mode: 'directory' },
+      exclude: [{ type: 'operationId', pattern: 'uploadFile' }],
+    }),
   ],
 })
 ```

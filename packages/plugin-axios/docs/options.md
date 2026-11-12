@@ -32,7 +32,7 @@ Base URL prepended to every request. When omitted, each request uses the operati
 
 ### throwOnErrorDefault
 
-Set `throwOnErrorDefault: false` to return documented error responses as values by default. It sets the fallback on each generated request and the default `ThrowOnError` type parameter on functions and SDK methods. It applies to the whole plugin, so `override` cannot set it. A call that passes `throwOnError` still wins. With `throwOnError: true`, a non-2xx response throws and the return type narrows to successful responses. Query hooks always pass `throwOnError: true`.
+Set `throwOnErrorDefault: false` to return documented error responses as values by default. The option sets the fallback on each generated request and the default `ThrowOnError` type parameter on functions and SDK methods. The option applies to the whole plugin, so `override` cannot set it. A call that passes `throwOnError` still wins. With `throwOnError: true`, a non-2xx response throws and the return type narrows to successful responses. Query hooks always pass `throwOnError: true`.
 
 |          |           |
 | -------- | --------- |
@@ -42,13 +42,13 @@ Set `throwOnErrorDefault: false` to return documented error responses as values 
 
 ```typescript
 // with pluginAxios({ throwOnErrorDefault: false })
-const result = await getPetById({ path: { petId: 1 } })
+const result = await getPetById({ path: { petId: 1n } })
 if (result.status !== 200) console.error(result.status, result.error)
 ```
 
 ### validator
 
-Validates request bodies, path, query, and header params, and response bodies with schemas from `@kubb/plugin-zod`, so add `pluginZod()` too. An invalid value makes the generated function throw a `ParseError`.
+Validates request bodies, the path, query, header, and cookie params, and response bodies with schemas from `@kubb/plugin-zod`, so add `pluginZod()` too. An invalid value makes the generated function throw a `ParseError`.
 
 |          |                                                                           |
 | -------- | ------------------------------------------------------------------------- |
@@ -89,9 +89,9 @@ export default defineConfig({
 })
 ```
 
-`params` runs each group through its generated `<operation>PathSchema`, `QuerySchema`, or `HeadersSchema`, and sends what the schema returns. A codec param such as a `Date` goes out in its wire form, and an invalid param fails before the request. Values added by `auth` are not validated.
+`params` runs each group through its generated `<operation>PathSchema`, `QuerySchema`, `HeadersSchema`, or `CookiesSchema`, and sends what the schema returns. A codec param such as a `Date` goes out in its wire form, and an invalid param fails before the request. Values added by `auth` are not validated.
 
-Only the params your OpenAPI spec declares are sent. Path and query keys the spec does not declare are stripped, so a key such as an undocumented filter or a cache-buster never reaches the URL. Declare it in the spec, or leave `params` off. Headers are the exception: client-level `headers` (such as `Authorization` or tracing headers) are merged with the call's headers before validation, so headers the spec does not declare pass through unchanged, and declared header params match in any casing.
+Only the params your OpenAPI spec declares are sent. Path and query keys the spec does not declare are stripped, so a key such as an undocumented filter or a cache-buster never reaches the URL. Declare it in the spec, or leave `params` off. Headers are the exception. Client-level `headers`, such as `Authorization` or tracing headers, are merged with the call's headers before validation. Headers the spec does not declare pass through unchanged, and declared header params match in any casing.
 
 Pair `request` and `params` with `pluginZod({ inferred: 'codec' })` when the schemas use codecs, so the request types accept the domain values (such as a `Date`) that the validators encode. See [`inferred`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#inferred).
 
@@ -122,7 +122,7 @@ Methods take the same grouped options and return the same result as the standalo
 
 ```typescript
 const pet = new PetClient({ baseURL: 'https://petstore.swagger.io/v2' })
-const { data } = await pet.getPetById({ path: { petId: 1 } })
+const { data } = await pet.getPetById({ path: { petId: 1n } })
 ```
 
 Each SDK class exposes its client as the read-only `client` field. Interceptors on the root class's `client` apply to every tag:
@@ -130,7 +130,7 @@ Each SDK class exposes its client as the read-only `client` field. Interceptors 
 ```typescript
 const api = new PetStore({ baseURL: 'https://petstore.swagger.io/v2' })
 api.client.interceptors.request.use((request) => request)
-await api.pet.getPetById({ path: { petId: 1 } })
+await api.pet.getPetById({ path: { petId: 1n } })
 ```
 
 A tag class also accepts an existing client, as in `new PetClient(api.client)`.
@@ -160,10 +160,10 @@ Returns the success body when `throwOnError` is `true`. With `throwOnError: fals
 ```typescript
 pluginAxios({ returnType: 'data' })
 
-const pet = await getPetById({ path: { petId: 1 } }) // Pet, not { status, data, ... }
+const pet = await getPetById({ path: { petId: 1n } }) // Pet, not { status, data, ... }
 ```
 
-It applies to the functions and the SDK. The query plugins and `@kubb/plugin-mcp` read it too, including a per-operation value set through [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override). To read headers such as `ETag` under `'data'`, pass `throwOnError: false` and read `result.response.headers`.
+`returnType` applies to the functions and the SDK. The query plugins and `@kubb/plugin-mcp` read it too, including a per-operation value set through [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override). To read headers such as `ETag` under `'data'`, pass `throwOnError: false` and read `result.response.headers`.
 
 ### resolver
 

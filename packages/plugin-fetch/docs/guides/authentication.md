@@ -72,7 +72,7 @@ const tenant = createClient({
   auth: () => tenantToken,
 })
 
-const { data } = await getPetById({ path: { petId: 1 }, client: tenant })
+const { data } = await getPetById({ path: { petId: 1n }, client: tenant })
 ```
 
 To override the client for one request, pass `auth` on that single call, which suits a one-off token refresh. A header you set yourself always wins over the resolved token: client-level `headers`, or `headers` on a call to an operation that declares header parameters.

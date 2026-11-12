@@ -9,7 +9,7 @@ Pass parameters under `path`, `query`, `headers`, `cookies`, or `body`, matching
 ```typescript
 import { getPetById } from './gen/clients/getPetById'
 
-const { data } = await getPetById({ path: { petId: 1 } })
+const { data } = await getPetById({ path: { petId: 1n } })
 //      ^ the parsed pet, typed from the 200 response
 ```
 
@@ -31,7 +31,7 @@ await updatePet({
 })
 ```
 
-Each key is optional and only appears when the operation declares it. Call an operation with no parameters with an empty object: `getStatus({})`.
+Each key only appears when the operation declares it. You can call an operation without required parameters with no argument: `getStatus()`.
 
 ## Read the result
 
@@ -43,6 +43,7 @@ type RequestResult = {
   data: TData // the parsed success body, undefined on an error result
   error: TError // the parsed error body, undefined on a success result
   contentType: string | undefined // the negotiated response media type
+  headers: Headers // the response headers
   request: AxiosRequestConfig // the native request config
   response: AxiosResponse // the native response
 }
@@ -52,7 +53,7 @@ When `throwOnError` is `true` (the generated default), a resolved call is always
 read `data` straight away:
 
 ```typescript
-const { data, status, response } = await getPetById({ path: { petId: 1 } })
+const { data, status, response } = await getPetById({ path: { petId: 1n } })
 
 console.info(status) // 200
 console.info(response.headers['x-ratelimit-remaining'])
@@ -62,10 +63,10 @@ When an operation documents more than one success status, narrow on `status` to 
 for that case, and TypeScript follows the check:
 
 ```typescript
-const result = await getPetById({ path: { petId: 1 } })
+const result = await getPetById({ path: { petId: 1n } })
 
 if (result.status === 200) {
-  console.info(result.data.name)
+  console.info(result.data)
 }
 ```
 
@@ -76,7 +77,7 @@ Call `.unwrap()` to return the success body. Awaiting the operation directly ret
 ```typescript
 import { getPetById } from './gen/clients/getPetById'
 
-const pet = await getPetById({ path: { petId: 1 } }).unwrap()
+const pet = await getPetById({ path: { petId: 1n } }).unwrap()
 //    ^ the parsed pet, not the full RequestResult
 ```
 
@@ -84,7 +85,7 @@ With `throwOnError: true`, a non-2xx response throws the same `ResponseError` a 
 
 ```typescript
 try {
-  const pet = await getPetById({ path: { petId: 1 }, throwOnError: false }).unwrap()
+  const pet = await getPetById({ path: { petId: 1n }, throwOnError: false }).unwrap()
 } catch (error) {
   // the parsed error body, not a ResponseError
   console.error(error)
@@ -119,7 +120,7 @@ Pass `options` on an operation for native axios settings, such as `timeout`, `pr
 ```typescript [src/app.ts]
 import { getPetById } from './gen/clients/getPetById'
 
-await getPetById({ path: { petId: 1 }, options: { timeout: 5_000 } })
+await getPetById({ path: { petId: 1n }, options: { timeout: 5_000 } })
 ```
 
 Set `client.setConfig({ options })` for shared defaults. Per-call options take precedence. Kubb keeps control of serialization and HTTP error handling. See [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport).

@@ -43,9 +43,9 @@ pluginTs({
 })
 ```
 
-Handlers that return TypeScript compiler nodes still work when your project installs `@kubb/parser-ts`, plus `typescript` 5 or 6 or `@typescript/typescript6` next to TypeScript 7. All are optional peer dependencies. If `@kubb/parser-ts` is missing, the build stops with an error that tells you to install it. That form is deprecated and is removed in the next major.
+The example maps `date` fields to `Date` and `int32` integers to `bigint`. The separate `bigint` handler controls `int64` fields, which already use `bigint` by default. A `date-time` field uses the `datetime` handler.
 
-This maps `date` fields to `Date` and `int32` integers to `bigint`. The separate `bigint` handler controls `int64` fields, which already use `bigint` by default. A `date-time` field uses the `datetime` handler.
+Handlers that return TypeScript compiler nodes are deprecated and are removed in the next major. They still work when your project installs `@kubb/parser-ts`, plus `typescript` 5 or 6 or `@typescript/typescript6` next to TypeScript 7. All are optional peer dependencies. If `@kubb/parser-ts` is missing, the build stops with an error that tells you to install it.
 
 ## Remove descriptions
 
@@ -67,4 +67,4 @@ const dropDescriptions = defineMacro({
 pluginTs({ macros: [dropDescriptions] })
 ```
 
-The generated types omit description JSDoc. The OpenAPI document stays unchanged. The same macro works with `pluginZod`.
+The generated types omit description JSDoc. The OpenAPI document stays unchanged. The same macro works with `pluginZod`, with [one exception](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization#remove-descriptions).

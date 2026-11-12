@@ -9,8 +9,8 @@ import { getPetById } from './gen/clients/getPetById'
 import { ResponseError } from './gen/.kubb/client'
 
 try {
-  const { data } = await getPetById({ path: { petId: 1 } })
-  console.info(data.name)
+  const { data } = await getPetById({ path: { petId: 1n } })
+  console.info(data)
 } catch (error) {
   if (ResponseError.is(error)) {
     console.error(error.status) // 404
@@ -30,6 +30,7 @@ class ResponseError extends Error {
   status: number
   statusText: string
   contentType: string | undefined
+  headers: Headers
   request: AxiosRequestConfig
   response: AxiosResponse
 }
@@ -43,10 +44,10 @@ Each generated package bundles its own `ResponseError` class, so narrow with `Re
 
 ```typescript
 import { isResponseError } from './gen/.kubb/client'
-import type { GetPetByIdResponses } from './gen/models/GetPetById'
+import type { GetPetByIdResponses } from './gen/types/GetPetById'
 
 try {
-  await getPetById({ path: { petId: 7 } })
+  await getPetById({ path: { petId: 7n } })
 } catch (error) {
   if (isResponseError<GetPetByIdResponses>(error) && error.status === 404) {
     console.error(error.data) // GetPetById404
@@ -68,10 +69,10 @@ Check `data` before you read it. A check on `status` narrows `data` too, unless 
 declares a `default` response, whose status can be any number:
 
 ```typescript
-const result = await getPetById({ path: { petId: 1 }, throwOnError: false })
+const result = await getPetById({ path: { petId: 1n }, throwOnError: false })
 
 if (result.data !== undefined) {
-  console.info(result.data.name)
+  console.info(result.data)
 } else {
   console.error(result.status, result.error)
 }
@@ -91,7 +92,7 @@ pluginAxios({ throwOnErrorDefault: false })
 const list = await searchPets({ query: { status: 'available' } })
 
 // opt one call back into throwing
-const pet = await getPetById({ path: { petId: 1 }, throwOnError: true })
+const pet = await getPetById({ path: { petId: 1n }, throwOnError: true })
 ```
 
 `client.setConfig({ throwOnError })` does not change this default, because each generated
@@ -107,7 +108,7 @@ operation passes its own value. Set it on the plugin.
 
 ```typescript
 try {
-  const { data } = await getPetById({ path: { petId: 1 }, throwOnError: false })
+  const { data } = await getPetById({ path: { petId: 1n }, throwOnError: false })
   use(data)
 } catch (error) {
   // not a ResponseError: the request never completed
@@ -126,7 +127,7 @@ When you turn on the `validator` option, a body that does not match its Zod sche
 import { ParseError } from './gen/.kubb/standardSchema'
 
 try {
-  const { data } = await getPetById({ path: { petId: 1 } })
+  const { data } = await getPetById({ path: { petId: 1n } })
   use(data)
 } catch (error) {
   if (error instanceof ParseError) {
@@ -135,7 +136,7 @@ try {
 }
 ```
 
-A `ParseError` reports schema validation issues. A `ResponseError` reports a non-2xx status. With `throwOnError: false`, the error body is checked against the schema of its status, then of its range such as `5xx`, then of `default`. A status the document leaves out, such as a `502` from a gateway, resolves with the body unchecked.
+A `ParseError` reports schema validation issues. A `ResponseError` reports a non-2xx status. The error body of a non-2xx response is checked against the schema of its status, then of its range such as `5xx`, then of `default`. An error body that fails its schema throws a `ParseError` in place of the `ResponseError`, also with `throwOnError: false`. A status the document leaves out, such as a `502` from a gateway, keeps its body unchecked.
 
 Calling `.unwrap()` on a `throwOnError: false` call turns that same `error` into a rejection, so a
 `try`/`catch` works there too.
@@ -150,10 +151,10 @@ import { client } from './gen/.kubb/client'
 client.setConfig({ validate: import.meta.env.DEV })
 ```
 
-`validate: false` skips every schema. An object skips only the directions set to `false`: `request` (the body), `params` (path, query, and header params), `response`, and `error`:
+`validate: false` skips every schema. An object skips only the directions set to `false`: `request` (the body), `params` (path, query, header, and cookie params), `response`, and `error`:
 
 ```typescript
 client.setConfig({ validate: { response: false } })
 ```
 
-A per-call `validate` overrides the client setting, such as `getPetById({ path: { petId: 1 }, validate: true })`. The default is `true`.
+A per-call `validate` overrides the client setting, such as `getPetById({ path: { petId: 1n }, validate: true })`. The default is `true`.

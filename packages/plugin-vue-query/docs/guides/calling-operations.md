@@ -101,17 +101,16 @@ pluginVueQuery({
 ```
 
 ```typescript [usage.ts]
-import { useInfiniteQuery } from '@tanstack/vue-query'
-import { findPetsByTagsInfiniteQueryOptions } from './gen/hooks/useFindPetsByTagsInfinite'
+import { useFindPetsByTagsInfinite } from './gen/hooks/useFindPetsByTagsInfinite'
 
-const { data, fetchNextPage, hasNextPage } = useInfiniteQuery(
-  findPetsByTagsInfiniteQueryOptions({ query: () => ({ tags: ['dog'] }) }),
-)
+const { data, fetchNextPage, hasNextPage } = useFindPetsByTagsInfinite({
+  query: () => ({ tags: ['dog'] }),
+})
 ```
 
 ::
 
-`nextParam` takes dot notation or an array of keys. Change it to match your API's response. Without `getNextPageParam`, `nextParam` or `cursorParam`, the generated options increment the page number until a page returns an empty array.
+`nextParam` takes dot notation or an array of keys. Change it to match your API's response, and give `initialPageParam` the same type as the query parameter. Without `getNextPageParam`, `nextParam` or `cursorParam`, the generated options increment the page number until a page returns an empty array.
 
 ## Refetch when parameters change
 
