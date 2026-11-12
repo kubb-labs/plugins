@@ -153,7 +153,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
               isTypeOnly
             />
 
-            {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
+            {validator === 'zod' && ops.some((op) => ast.http.requestBody.getSchema(op.node) != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
             {Array.from(typeNamesByPath.entries()).map(([filePath, set]) => (
               <File.Import key={filePath} name={Array.from(set)} root={file.path} path={typeFilesByPath.get(filePath)!.path} isTypeOnly />

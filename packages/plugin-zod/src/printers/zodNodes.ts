@@ -168,7 +168,7 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
     ipv6: () => 'z.ipv6()',
     blob: () => 'z.instanceof(Blob)',
     enum(node) {
-      const values = node.namedEnumValues?.map((v) => v.value) ?? node.enumValues ?? []
+      const values = ast.schema.getLiterals(node)
       const nonNullValues = values.filter((v): v is string | number | boolean => v !== null)
 
       // asConst-style enum: use z.union([z.literal(…), …])

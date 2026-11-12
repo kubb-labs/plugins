@@ -48,7 +48,7 @@ export function buildValidatorHooks({
   validator: ValidatorOptions | undefined
   zodResolver: ResolverZod | null | undefined
 }): ValidatorHooks {
-  const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
+  const hasRequestBody = Boolean(ast.http.requestBody.getSchema(node))
   const parsesResponse = zodResolver && resolveResponseValidator(validator) === 'zod'
 
   // Success responses validate with the success-only `<operation>ResponseSchema`; error bodies with the schema of their status.

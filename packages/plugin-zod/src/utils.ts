@@ -180,7 +180,7 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   // default agrees with the schema, or drop a default that matches no member.
   const enumNode = resolved ? ast.schema.narrow(resolved, 'enum') : undefined
   if (enumNode) {
-    const values = enumNode.namedEnumValues?.map((member) => member.value) ?? enumNode.enumValues ?? []
+    const values = ast.schema.getLiterals(enumNode)
     if (values.length) {
       const match = values.find((member) => member === value || String(member) === String(value))
       return match != null ? formatDefault(match) : null

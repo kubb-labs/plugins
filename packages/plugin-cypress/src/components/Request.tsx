@@ -84,7 +84,8 @@ ${compositeLines}  const text = value instanceof Date ? value.toISOString() : St
   const cookieLine = `${rawCookieLine}${explodeCookieLine}${formCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null)${toCookies}.join('; ')\n`
 
   // Cypress types a body as a string or an object, so a body that is one number or has no schema type is cast.
-  const bodySchema = node.requestBody?.content?.[0]?.schema && ast.ref.getSchema(node.requestBody.content[0].schema)
+  const requestSchema = ast.http.requestBody.getSchema(node)
+  const bodySchema = requestSchema && ast.ref.getSchema(requestSchema)
   const castBody = bodySchema && (['number', 'integer'].includes(bodySchema.primitive ?? '') || ['unknown', 'any'].includes(bodySchema.type))
 
   const requestOptions = [

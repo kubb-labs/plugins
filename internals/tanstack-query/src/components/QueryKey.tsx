@@ -52,7 +52,7 @@ export const queryKeyTransformer: Transformer = ({ node, variant }) => {
   const result = [`{ ${urlFields.join(', ')} }`]
   if (query.length > 0) result.push('...(query ? [query] : [])')
   // A falsy body (`''`, `0`, `false`, `null`) is still an input, so only an absent one is left out.
-  if (node.requestBody?.content?.[0]?.schema) result.push('...(body !== undefined ? [body] : [])')
+  if (ast.http.requestBody.getSchema(node)) result.push('...(body !== undefined ? [body] : [])')
 
   return result
 }

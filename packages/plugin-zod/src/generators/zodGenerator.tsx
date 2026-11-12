@@ -230,11 +230,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       // Collect import names from the response schemas to detect naming collisions. When a response
       // is a $ref to a component schema whose resolved name matches `name`, skip generation to avoid
       // redeclaration errors.
-      const importedNames = new Set(
-        responses.flatMap((res) =>
-          (res.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.getImportedNames(entry.schema).map((refName) => resolver.name(refName)) : [])),
-        ),
-      )
+      const importedNames = new Set(ast.http.responses.getImportedNames(responses).map((refName) => resolver.name(refName)))
 
       if (importedNames.has(name)) {
         return null

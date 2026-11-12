@@ -63,7 +63,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           group: pluginZod.options?.group ?? undefined,
         })
 
-        const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.response.body(node) : null
+        const requestName = ast.http.requestBody.getSchema(node) ? zodResolver.response.body(node) : null
         const successStatus = ast.http.responses.findPrimary(node)?.statusCode
         const responseName = successStatus ? zodResolver.response.status(node, successStatus) : null
 

@@ -290,6 +290,7 @@ function isBinaryContentType(baseType: string): boolean {
  * (e.g. `application/json` → `Json`, `application/xml` → `Xml`, `multipart/form-data` → `FormData`).
  */
 function getContentTypeSuffix(contentType: string): string {
+  // Keeps the original case, unlike ast.mediaType.getBase, so generated names stay stable.
   const baseType = contentType.split(';')[0]!.trim()
   if (baseType === 'application/json') return 'Json'
   if (baseType === 'multipart/form-data') return 'FormData'
@@ -423,7 +424,7 @@ export function getRequestGroups(node: ast.OperationNode): RequestGroups {
   return {
     path: path.length > 0,
     query: query.length > 0,
-    body: Boolean(node.requestBody?.content?.[0]?.schema),
+    body: Boolean(ast.http.requestBody.getSchema(node)),
     headers: header.length > 0,
     cookies: cookie.length > 0,
   }
@@ -543,7 +544,7 @@ export function castToClientOptions(callArg: string, clientName: string, returnT
  */
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver, { pairContentTypes = false } = {}): ast.SchemaNode {
   const { path, query, header, cookie } = ast.http.groupParameters(node)
-  const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
+  const hasBody = Boolean(ast.http.requestBody.getSchema(node))
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
     { name: 'path', params: path, resolve: resolver.param.path },
@@ -690,11 +691,11 @@ export function buildResponses(
 }
 
 export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses.filter((response) => ast.http.status.isError(response)).map((response) => resolver.response.status(node, response.statusCode))
+  return ast.http.responses.filterError(node).map((response) => resolver.response.status(node, response.statusCode))
 }
 
 export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses.filter((response) => ast.http.status.isSuccess(response)).map((response) => resolver.response.status(node, response.statusCode))
+  return ast.http.responses.filterSuccess(node).map((response) => resolver.response.status(node, response.statusCode))
 }
 
 export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
@@ -729,7 +730,7 @@ export function resolveOperationTypeNames(
             ...header.map((param) => resolver.param.headers(node, param)),
             ...cookie.map((param) => resolver.param.cookies(node, param)),
           ]
-    const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.response.body(node) : null, resolver.response.response(node)]
+    const bodyAndResponseNames = [ast.http.requestBody.getSchema(node) ? resolver.response.body(node) : null, resolver.response.response(node)]
     const names =
       options.order === 'body-response-first'
         ? [...bodyAndResponseNames, ...paramNames, ...responseStatusNames]

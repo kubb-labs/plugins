@@ -399,7 +399,7 @@ export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: I
   if (!usesDefault) return null
 
   const content = ast.http.responses.findPrimary(node)?.content
-  const jsonContent = content?.find((item) => item.contentType?.includes('json')) ?? content?.[0]
+  const jsonContent = content?.find((item) => ast.mediaType.isJson(item)) ?? content?.[0]
   const schema = jsonContent?.schema
 
   let resolved: ast.SchemaNode | null | undefined = schema

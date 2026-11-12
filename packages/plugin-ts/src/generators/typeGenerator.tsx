@@ -244,11 +244,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       const responseName = resolver.response.response(node)
 
       const responsesWithSchema = node.responses.filter(hasSchema)
-      const importedNames = new Set(
-        responsesWithSchema.flatMap((res) =>
-          (res.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.getImportedNames(entry.schema).map(importName) : [])),
-        ),
-      )
+      const importedNames = new Set(ast.http.responses.getImportedNames(responsesWithSchema).map(importName))
 
       if (importedNames.has(responseName)) {
         return null

@@ -61,9 +61,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     }
 
     const successResponses = ast.http.responses.filterSuccess(node)
-    const referencedNames = node.responses.flatMap((response) =>
-      (response.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.getImportedNames(entry.schema) : [])),
-    )
+    const referencedNames = ast.http.responses.getImportedNames(node.responses)
     const enumOptions = pluginTs.options?.enum
     const enumNames = getEnumNames(ctx)
     const hasResponseNameCollision = referencedNames.some((name) => {
@@ -90,7 +88,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         ? `${mock.name}Response${primaryResponse.statusCode}`
         : undefined
 
-    const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.response.body(node) : null
+    const requestName = ast.http.requestBody.getSchema(node) ? tsResolver.response.body(node) : null
 
     return (
       <File
