@@ -45,7 +45,7 @@ async function renderHookOptionsSource(options: PluginReactQuery['resolvedOption
     resolver: resolverReactQuery,
   })
 
-  return driver.fileManager.files.flatMap((file) => file.sources.flatMap((source) => ast.extractStringsFromNodes(source.nodes ?? []))).join('\n')
+  return driver.fileManager.files.flatMap((file) => file.sources.flatMap((source) => ast.getNodeText(source.nodes ?? []))).join('\n')
 }
 
 describe('hookOptionsGenerator operations', () => {
