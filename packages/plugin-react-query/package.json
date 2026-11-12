@@ -97,7 +97,7 @@
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
     "@kubb/plugin-client": "workspace:*",
-    "@tanstack/react-query": "^5.106.1"
+    "@tanstack/react-query": "^5.107.1"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.82.0"

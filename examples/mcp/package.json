@@ -23,7 +23,7 @@
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@modelcontextprotocol/server": "^2.4.0",
-    "axios": "^1.21.0",
+    "axios": "^1.21.1",
     "kubb": "catalog:",
     "zod": "^4.6.7"
   },
