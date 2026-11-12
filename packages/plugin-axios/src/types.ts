@@ -1,7 +1,13 @@
 import type { PluginType } from '@kubb/kit'
-import type { ClientOptions as Options, ClientResolvedOptions as ResolvedOptions, ResolverClient } from '@kubb/plugin-client'
+import type { ClientOptions, ClientResolvedOptions as ResolvedOptions, ResolverClient } from '@kubb/plugin-client'
 
-export type { ClientOptions as Options, ClientResolvedOptions as ResolvedOptions, ResolverClient } from '@kubb/plugin-client'
+export type { ClientResolvedOptions as ResolvedOptions, ResolverClient } from '@kubb/plugin-client'
+
+/**
+ * The shared client options. `returnType: 'plain'` is left out: it is the shape `@kubb/plugin-client`
+ * emits for a client module you own, and it does not typecheck against the bundled runtime.
+ */
+export type Options = ClientOptions & { returnType?: 'full' | 'data' }
 
 /**
  * The plugin factory type for `@kubb/plugin-axios`. Shares the options surface, resolver, and

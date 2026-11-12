@@ -106,6 +106,52 @@ function hasCoercedDiscriminator({ member, propertyName, options }: { member: as
   })
 }
 
+/**
+ * Whether `z.compile(schema, { strict: true })` throws for the node. Zod runs an unsupported schema below an object
+ * property or an array, tuple or record item on its runtime parser, so only a coerced scalar or a `z.xor` that compiles
+ * inline with the root throws: the node itself, or one reached through refs and union or intersection members.
+ * `siblings` resolves a generated ref, which names another schema of the same file and carries no target.
+ *
+ * Mirrors the built-in handlers, so a type with a `printer.nodes` override is judged as if it printed the built-in output.
+ */
+export function throwsOnStrictCompile({
+  node,
+  options,
+  siblings,
+  seen = new Set(),
+}: {
+  node: ast.SchemaNode | undefined
+  options: ZodNodeOptions
+  siblings?: ReadonlyMap<string, ast.SchemaNode>
+  seen?: Set<ast.SchemaNode>
+}): boolean {
+  if (!node || seen.has(node)) return false
+  seen.add(node)
+  const throws = (child: ast.SchemaNode | undefined) => throwsOnStrictCompile({ node: child, options, siblings, seen })
+
+  switch (node.type) {
+    case ast.schema.types.ref:
+      return throws(node.schema ?? (node.ref || !node.name ? undefined : siblings?.get(node.name)))
+    case ast.schema.types.union:
+      // Every `oneOf` counts under `xor`, also the ones that print as `z.discriminatedUnion`.
+      if (node.strategy === 'one' && options.oneOfType === 'xor') return true
+      return !!getLiteralUnion({ node, options })?.coerce || (node.members ?? []).some(throws)
+    case ast.schema.types.intersection:
+      return (node.members ?? []).some(throws)
+    case ast.schema.types.bigint:
+      return true
+    case ast.schema.types.string:
+      return shouldCoerce(options.coercion, 'strings')
+    case ast.schema.types.number:
+    case ast.schema.types.integer:
+      return shouldCoerce(options.coercion, 'numbers')
+    case ast.schema.types.date:
+      return node.representation === 'date' && options.direction !== 'encode' && shouldCoerce(options.coercion, 'dates')
+    default:
+      return false
+  }
+}
+
 // `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
 function hasPlainDiscriminator({ member, propertyName }: { member: ast.SchemaNode; propertyName: string }): boolean {
   const schemas = ast.schema.findProperties({ node: member, propertyName })

@@ -15,6 +15,29 @@ import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 
+/**
+ * Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.
+ * A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.
+ */
+function toolSchema<T extends z.ZodType>(schema: T) {
+  const standard = schema['~standard']
+  const convert = (io: 'input' | 'output') => (options: Parameters<typeof standard.jsonSchema.input>[0]) =>
+    standard.jsonSchema[io]({
+      ...options,
+      libraryOptions: {
+        unrepresentable: 'any',
+        override: ({ zodSchema, jsonSchema }: { zodSchema: z.core.$ZodType; jsonSchema: Record<string, unknown> }) => {
+          if (zodSchema._zod.def.type === 'bigint') {
+            jsonSchema.type = 'integer'
+            jsonSchema.format = 'int64'
+          }
+        },
+      },
+    })
+
+  return { '~standard': { ...standard, jsonSchema: { input: convert('input'), output: convert('output') } } }
+}
+
 export function getServer() {
   const server = new McpServer({
     name: 'Operation name collisions',
@@ -23,28 +46,28 @@ export function getServer() {
 
   server.registerTool("pet.list", {
     description: "Make a GET request to /pets/first",
-    outputSchema: z.object({ data: petListStatus200Schema }),
+    outputSchema: toolSchema(z.object({ data: petListStatus200Schema })),
   }, async (ctx) => {
     return petListHandler(ctx)
   })
 
   server.registerTool("pet-list", {
     description: "Make a GET request to /pets/second",
-    outputSchema: z.object({ data: petListStatus200Schema2 }),
+    outputSchema: toolSchema(z.object({ data: petListStatus200Schema2 })),
   }, async (ctx) => {
     return petListHandler2(ctx)
   })
 
   server.registerTool("pet.create", {
     description: "Make a POST request to /pets/create-first",
-    outputSchema: z.object({ data: petCreateStatus200Schema }),
+    outputSchema: toolSchema(z.object({ data: petCreateStatus200Schema })),
   }, async (ctx) => {
     return petCreateHandler(ctx)
   })
 
   server.registerTool("pet-create", {
     description: "Make a POST request to /pets/create-second",
-    outputSchema: z.object({ data: petCreateStatus200Schema2 }),
+    outputSchema: toolSchema(z.object({ data: petCreateStatus200Schema2 })),
   }, async (ctx) => {
     return petCreateHandler2(ctx)
   })

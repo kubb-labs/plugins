@@ -72,11 +72,13 @@ Returns the success body.
 ```ts
 pluginSwr({ returnType: 'full' })
 
-const { data: result } = useGetPetById({ path: { petId: 1n } })
+const { data: result } = useGetPetById({ path: { petId: 1 } })
 
 const etag = result?.response.headers.get('ETag')
 const pet = result?.data
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 ### query
 

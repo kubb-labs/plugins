@@ -103,7 +103,7 @@ Renders it as `moment(faker.date.anytime()).format('YYYY-MM-DD')`.
 :::
 
 :::field{name="Custom module"}
-Pass the name of a module whose default export has the dayjs API, because generated code calls `name(faker.date.anytime()).format('YYYY-MM-DD')`. Kubb imports the default export under the module name, so the name must be a valid JavaScript identifier.
+Pass the name of a module whose default export has the dayjs API, because generated code calls `name(faker.date.anytime()).format('YYYY-MM-DD')`. Kubb imports the default export under the camelCased module name, so `'my-date-lib'` becomes `myDateLib` and `'@scope/lib'` becomes `scopeLib`.
 :::
 
 ::

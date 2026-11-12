@@ -6,7 +6,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import { buildResponseUnionSchema, canOverrideSchema, localeToFakerImport, resolveTypeReference } from '../utils.ts'
+import { buildResponseUnionSchema, canOverrideSchema, dateParserName, localeToFakerImport, resolveTypeReference } from '../utils.ts'
 
 type RenderUnit = {
   schema: ast.SchemaNode | null
@@ -86,12 +86,12 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
-        {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
+        {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParserName(dateParser)} />}
         {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[meta.typeName]} />}
         {usedImports.map((imp) => (
           <File.Import key={[schemaName, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
         ))}
-        {seed ? <File.Source name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</File.Source> : undefined}
+        {seed !== undefined ? <File.Source name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</File.Source> : undefined}
         <Faker
           name={meta.name}
           typeName={typeReference.typeName}
@@ -272,8 +272,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
-        {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
-        {seed ? <File.Source name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</File.Source> : undefined}
+        {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParserName(dateParser)} />}
+        {seed !== undefined ? <File.Source name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</File.Source> : undefined}
         {paramGroups.map((group) => renderEntry(group))}
         {responseUnits.map((unit) => renderEntry(unit))}
         {dataUnits.map((unit) => renderEntry(unit))}

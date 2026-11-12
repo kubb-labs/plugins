@@ -42,9 +42,11 @@ Set `throwOnErrorDefault: false` to return documented error responses as values 
 
 ```typescript
 // with pluginFetch({ throwOnErrorDefault: false })
-const result = await getPetById({ path: { petId: 1n } })
+const result = await getPetById({ path: { petId: 1 } })
 if (result.status !== 200) console.error(result.status, result.error)
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 ### validator
 
@@ -122,7 +124,7 @@ Methods take the same grouped options and return the same result as the standalo
 
 ```typescript
 const pet = new PetClient({ baseURL: 'https://petstore.swagger.io/v2' })
-const { data } = await pet.getPetById({ path: { petId: 1n } })
+const { data } = await pet.getPetById({ path: { petId: 1 } })
 ```
 
 Each SDK class exposes its client as the read-only `client` field. Interceptors on the root class's `client` apply to every tag:
@@ -130,7 +132,7 @@ Each SDK class exposes its client as the read-only `client` field. Interceptors 
 ```typescript
 const api = new PetStore({ baseURL: 'https://petstore.swagger.io/v2' })
 api.client.interceptors.request.use((request) => request)
-await api.pet.getPetById({ path: { petId: 1n } })
+await api.pet.getPetById({ path: { petId: 1 } })
 ```
 
 A tag class also accepts an existing client, as in `new PetClient(api.client)`.
@@ -160,7 +162,7 @@ Returns the success body when `throwOnError` is `true`. With `throwOnError: fals
 ```typescript
 pluginFetch({ returnType: 'data' })
 
-const pet = await getPetById({ path: { petId: 1n } }) // Pet, not { status, data, ... }
+const pet = await getPetById({ path: { petId: 1 } }) // Pet, not { status, data, ... }
 ```
 
 `returnType` applies to the functions and the SDK. The query plugins and `@kubb/plugin-mcp` read it too, including a per-operation value set through [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override). To read headers such as `ETag` under `'data'`, pass `throwOnError: false` and call `result.response.headers.get('etag')`.

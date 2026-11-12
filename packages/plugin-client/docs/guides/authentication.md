@@ -67,7 +67,9 @@ Read `config.security` and pick per operation, or pass a different `client` on a
 ```typescript
 import { createSignedClient } from './clients/iam'
 
-await getPetById({ path: { petId: 1n }, client: createSignedClient() })
+await getPetById({ path: { petId: 1 }, client: createSignedClient() })
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 A client passed on a call replaces the default for that call only.

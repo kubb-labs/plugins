@@ -26,12 +26,14 @@ The config below generates a Fetch client that sends every request to the Petsto
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginFetch } from '@kubb/plugin-fetch'
 
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
+  adapter: adapterOas({ integerType: 'number' }),
   plugins: [
     pluginTs(),
     pluginFetch({ baseURL: 'https://petstore.swagger.io/v2' }),

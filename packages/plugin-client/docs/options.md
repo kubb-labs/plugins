@@ -68,8 +68,10 @@ Shape of the value a generated operation resolves to.
 
 ```typescript
 pluginClient({ importPath: '../../client', returnType: 'full' })
-// const pet = await getPetById({ path: { petId: 1n } }).unwrap()
+// const pet = await getPetById({ path: { petId: 1 } }).unwrap()
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 The setting applies to the whole plugin, so you cannot set it in `override`.
 

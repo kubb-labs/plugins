@@ -26,12 +26,14 @@ The config below generates an axios client that sends every request to the Petst
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginAxios } from '@kubb/plugin-axios'
 
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
+  adapter: adapterOas({ integerType: 'number' }),
   plugins: [
     pluginTs(),
     pluginAxios({ baseURL: 'https://petstore.swagger.io/v2' }),

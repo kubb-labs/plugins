@@ -12,8 +12,10 @@ A query composable takes grouped request parameters as its first argument. Param
 ```typescript [usage.ts]
 import { useGetPetById } from './gen/hooks/useGetPetById'
 
-const { data, error, isLoading } = useGetPetById({ path: { petId: 1n } })
+const { data, error, isLoading } = useGetPetById({ path: { petId: 1 } })
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 The second argument has two optional groups. `query` takes any TanStack Query option, and `query.client` sets the `QueryClient` to use. The top-level `client` takes request config for this call, such as `baseURL`:
 
@@ -59,7 +61,7 @@ const { mutate } = useUpdatePetWithForm({
   mutation: { onSuccess: () => queryClient.invalidateQueries() },
 })
 
-mutate({ path: { petId: 1n }, query: { name: 'Fluffy' } })
+mutate({ path: { petId: 1 }, query: { name: 'Fluffy' } })
 ```
 
 ## Errors and transport

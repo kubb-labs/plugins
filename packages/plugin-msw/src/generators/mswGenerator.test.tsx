@@ -362,6 +362,33 @@ describe('mswGenerator body encoding', () => {
     expect(await getBody(operation('streamNoPet', 'text/event-stream'), undefined)).toBe('')
   })
 
+  test('sends an int64 field as a JSON number, and rejects one a number cannot hold', async () => {
+    const int64Operation = (operationId: string, contentType: string) =>
+      ast.factory.createOperation({
+        operationId,
+        method: 'GET',
+        path: `/${operationId}`,
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            content: [
+              ast.factory.createContent({
+                contentType,
+                schema: ast.factory.createSchema({
+                  type: 'object',
+                  properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'bigint' }) })],
+                }),
+              }),
+            ],
+          }),
+        ],
+      })
+
+    expect(await getBody(int64Operation('bigPet', 'application/json'), { id: 12n })).toBe('{"id":12}')
+    expect(await getBody(int64Operation('streamBigPet', 'text/event-stream'), { id: 12n })).toBe('data: {"id":12}\n\n')
+    await expect(getBody(int64Operation('unsafePet', 'application/json'), { id: 2n ** 60n })).rejects.toThrow('losing precision')
+  })
+
   const eventOperation = (operationId: string, examples?: Array<ast.ExampleNode>) =>
     ast.factory.createOperation({
       operationId,

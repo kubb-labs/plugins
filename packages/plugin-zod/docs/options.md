@@ -207,8 +207,8 @@ Passes `{ strict: true }` to `z.compile(...)`. Zod then throws when a part of th
 
 Schemas with circular references (`z.lazy`) and bare `$ref` response aliases stay uncompiled to prevent runtime errors. An alias that adds a description, such as `petSchema.describe('A pet')`, is compiled.
 
-> [!WARNING]
-> `z.compile` cannot compile `z.coerce`. With `strict: true`, the generated module throws `ZodCompileUnsupportedError` when it loads if a schema is coerced. Every `format: int64` field is coerced, and so is every field that [`coercion`](#coercion) covers. For `int64`, set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter or [replace the `bigint` handler](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization#use-numbers-for-int64-fields).
+> [!NOTE]
+> `z.compile` cannot compile `z.coerce` or `z.xor`. With `strict: true`, a schema that is one of them stays uncompiled, so the generated module loads without a `ZodCompileUnsupportedError`. The same goes for a union with such a member, and for a schema that reaches a circular one through a `$ref`. Every `format: int64` schema is coerced, and so is every schema that [`coercion`](#coercion) covers. An object or array that holds a coerced field is still compiled, and Zod runs that field on its interpreter. To compile an `int64` schema, set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter.
 
 ### mini
 

@@ -15,7 +15,11 @@ export function getPetByIdHandlerResponse200(data?: GetPetByIdResponse) {
     },
   })
 
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => {
+    if (typeof value !== 'bigint') return value
+    if (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER) throw new TypeError(`Cannot serialize ${value}n as JSON without losing precision.`)
+    return Number(value)
+  }), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'

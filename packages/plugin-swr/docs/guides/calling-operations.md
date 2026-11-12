@@ -9,8 +9,10 @@ A query hook takes the operation's grouped request config (`path`, `query`, `hea
 ```typescript
 import { useGetPetById } from './gen/hooks/useGetPetById'
 
-const { data, error, isLoading } = useGetPetById({ path: { petId: 1n } })
+const { data, error, isLoading } = useGetPetById({ path: { petId: 1 } })
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 The second argument takes `query` (any `SWRConfiguration`), `client` (request config for this call, such as `baseURL`), and the Kubb options `shouldFetch` and `immutable`, covered in [Skip requests until ready](#skip-requests-until-ready) and [Fetch immutable data](#fetch-immutable-data):
 
@@ -18,7 +20,7 @@ The second argument takes `query` (any `SWRConfiguration`), `client` (request co
 import { useGetPetById } from './gen/hooks/useGetPetById'
 
 useGetPetById(
-  { path: { petId: 1n } },
+  { path: { petId: 1 } },
   {
     query: { refreshInterval: 30_000 },
     client: { baseURL: 'https://api.example.com/v1' },
@@ -57,9 +59,9 @@ Set `shouldFetch: false` to give SWR a `null` key and skip the request. Pass `tr
 ```typescript [usage.ts]
 import { useGetPetById } from './gen/hooks/useGetPetById'
 
-export function useSelectedPet(petId: bigint | undefined) {
+export function useSelectedPet(petId: number | undefined) {
   return useGetPetById(
-    { path: { petId: petId ?? 0n } },
+    { path: { petId: petId ?? 0 } },
     { shouldFetch: petId != null },
   )
 }
@@ -73,7 +75,7 @@ Set `immutable: true` on a query hook for data that stays unchanged. It sets `re
 import { useGetPetById } from './gen/hooks/useGetPetById'
 
 const { data, error } = useGetPetById(
-  { path: { petId: 1n } },
+  { path: { petId: 1 } },
   { immutable: true },
 )
 ```

@@ -8,11 +8,8 @@ Generate and start an MCP server with typed tools and an HTTP client.
 
 Register TypeScript types, Zod schemas, and an Axios or Fetch client alongside `pluginMcp`. A single registered client is detected automatically.
 
-The adapter sets `integerType: 'number'` because the default types `int64` fields as `bigint`. A `bigint` or a binary request body in any tool schema makes the server fail every `tools/list` request. `exclude` skips `uploadFile`, the one Petstore operation with a binary body.
-
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
-import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { pluginAxios } from '@kubb/plugin-axios'
@@ -21,20 +18,16 @@ import { pluginMcp } from '@kubb/plugin-mcp'
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
-  adapter: adapterOas({ integerType: 'number' }),
   plugins: [
     pluginTs({ output: { path: 'types', mode: 'directory' } }),
     pluginZod(),
     pluginAxios({ baseURL: 'https://petstore.swagger.io/v2' }),
-    pluginMcp({
-      output: { path: 'mcp', mode: 'directory' },
-      exclude: [{ type: 'operationId', pattern: 'uploadFile' }],
-    }),
+    pluginMcp({ output: { path: 'mcp', mode: 'directory' } }),
   ],
 })
 ```
 
-Run `kubb generate`. The plugin writes tool handlers, `server.ts`, `start.ts`, and `.mcp.json`. Each generated handler calls its HTTP operation, forwards the cancellation signal, and throws for non-2xx responses. Tool results include text content and structured response data. `server.ts` registers tools with Zod input and output schemas, and `start.ts` calls its `startServer()` to serve them over stdio. Operations that stream their response, such as `text/event-stream` or JSON Lines, get no tool, because a tool returns one JSON result.
+Run `kubb generate`. The plugin writes tool handlers, `server.ts`, `start.ts`, and `.mcp.json`. Each generated handler calls its HTTP operation, forwards the cancellation signal, and throws for non-2xx responses. Tool results include text content and structured response data. `server.ts` registers tools with Zod input and output schemas, and `start.ts` calls its `startServer()` to serve them over stdio. The tool list shows an `int64` field as an integer and a binary field as a value without a type, because `bigint` and `Blob` have no JSON Schema form. Operations that stream their response, such as `text/event-stream` or JSON Lines, get no tool, because a tool returns one JSON result.
 
 ## Start the server
 

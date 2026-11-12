@@ -16,4 +16,11 @@ describe('pluginFetch setup', () => {
       diagnostic: { code: 'KUBB_MISSING_DEPENDENCY', message: 'Plugin "plugin-zod" is required by "plugin-fetch" but not found.' },
     })
   })
+
+  test("returnType: 'plain' is rejected by the Options type", () => {
+    // @ts-expect-error 'plain' belongs to plugin-client, the bundled runtime does not typecheck with it
+    const options: Options = { returnType: 'plain' }
+
+    expect(options).toBeDefined()
+  })
 })

@@ -17,8 +17,7 @@
       "github": "stijnvanhulle"
     }
   ],
-  "dependencies": ["plugin-ts"],
-  "optionalDependencies": ["plugin-zod"],
+  "optionalDependencies": ["plugin-ts", "plugin-zod"],
   "compatibility": {
     "kubb": ">=5.18.4",
     "node": ">=22.22"
@@ -97,7 +96,7 @@
       "key": "client",
       "path": ["client"],
       "label": "Client",
-      "description": "HTTP client the generated hooks call. Only needed to disambiguate when both plugin-fetch and plugin-axios are enabled",
+      "description": "HTTP client the generated hooks call. Only needed to disambiguate when more than one of plugin-fetch, plugin-axios and plugin-client is enabled",
       "type": "select",
       "default": null,
       "choices": [
@@ -112,6 +111,10 @@
         {
           "label": "axios",
           "value": "axios"
+        },
+        {
+          "label": "client",
+          "value": "client"
         }
       ]
     },
@@ -167,9 +170,9 @@
       "key": "queryMethods",
       "path": ["query", "methods"],
       "label": "Query Methods",
-      "description": "Comma-separated HTTP methods treated as queries (default: GET)",
+      "description": "Comma-separated HTTP methods treated as queries (default: GET, QUERY)",
       "type": "list",
-      "default": ["GET"],
+      "default": ["GET", "QUERY"],
       "itemCase": "upper"
     },
     {

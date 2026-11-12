@@ -44,12 +44,14 @@ Pass `baseURL` to `pluginFetch` to set the generated default. Add `pluginTs` for
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginFetch } from '@kubb/plugin-fetch'
 
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
+  adapter: adapterOas({ integerType: 'number' }),
   plugins: [
     pluginTs(),
     pluginFetch({ baseURL: 'https://localhost:8080/api/v1' }),
@@ -77,7 +79,7 @@ import { getPetById } from './gen/clients/getPetById'
 
 const staging = createClient({ baseURL: 'https://staging.petstore.swagger.io/v2' })
 
-const { data } = await getPetById({ path: { petId: 1n }, client: staging })
+const { data } = await getPetById({ path: { petId: 1 }, client: staging })
 ```
 
 Pass `baseURL` on a single call to override the client for that one request:
@@ -85,7 +87,7 @@ Pass `baseURL` on a single call to override the client for that one request:
 ```typescript
 import { getPetById } from './gen/clients/getPetById'
 
-const { data } = await getPetById({ path: { petId: 1n }, baseURL: 'https://localhost:3000' })
+const { data } = await getPetById({ path: { petId: 1 }, baseURL: 'https://localhost:3000' })
 ```
 
 ## Which base URL a call uses

@@ -9,10 +9,18 @@ describe('printerFaker', () => {
     [{}, 'dayjs', 'dayjs(faker.date.anytime()).format("YYYY-MM-DDTHH:mm:ss[Z]")'],
     [{ offset: true }, 'dayjs', 'dayjs(faker.date.anytime()).format("YYYY-MM-DDTHH:mm:ssZ")'],
     [{ local: true }, 'moment', 'moment(faker.date.anytime()).format("YYYY-MM-DDTHH:mm:ss")'],
+    // A module name that is not an identifier is called by the name it is imported under.
+    [{}, 'my-date-lib', 'myDateLib(faker.date.anytime()).format("YYYY-MM-DDTHH:mm:ss[Z]")'],
   ] as const)('prints datetime %o with dateParser %s', (flags, dateParser, expected) => {
     const node = ast.factory.createSchema({ type: 'datetime', ...flags })
 
     expect(printerFaker({ resolver: resolverFaker, dateParser }).print(node)).toBe(expected)
+  })
+
+  test('calls a dateParser with a scoped module name by its import name', () => {
+    const node = ast.factory.createSchema({ type: 'date', representation: 'string' })
+
+    expect(printerFaker({ resolver: resolverFaker, dateParser: '@scope/lib' }).print(node)).toBe('scopeLib(faker.date.anytime()).format("YYYY-MM-DD")')
   })
 
   test.each([

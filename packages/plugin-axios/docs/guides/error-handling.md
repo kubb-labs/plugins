@@ -9,7 +9,7 @@ import { getPetById } from './gen/clients/getPetById'
 import { ResponseError } from './gen/.kubb/client'
 
 try {
-  const { data } = await getPetById({ path: { petId: 1n } })
+  const { data } = await getPetById({ path: { petId: 1 } })
   console.info(data)
 } catch (error) {
   if (ResponseError.is(error)) {
@@ -18,6 +18,8 @@ try {
   }
 }
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 The `message` holds the HTTP method and the URL without its query string, so query credentials stay out of logs. For example: `GET https://api.example.com/pets/1 failed with status 404 Not Found`.
 
@@ -47,7 +49,7 @@ import { isResponseError } from './gen/.kubb/client'
 import type { GetPetByIdResponses } from './gen/types/GetPetById'
 
 try {
-  await getPetById({ path: { petId: 7n } })
+  await getPetById({ path: { petId: 7 } })
 } catch (error) {
   if (isResponseError<GetPetByIdResponses>(error) && error.status === 404) {
     console.error(error.data) // GetPetById404
@@ -69,7 +71,7 @@ Check `data` before you read it. A check on `status` narrows `data` too, unless 
 declares a `default` response, whose status can be any number:
 
 ```typescript
-const result = await getPetById({ path: { petId: 1n }, throwOnError: false })
+const result = await getPetById({ path: { petId: 1 }, throwOnError: false })
 
 if (result.data !== undefined) {
   console.info(result.data)
@@ -92,7 +94,7 @@ pluginAxios({ throwOnErrorDefault: false })
 const list = await searchPets({ query: { status: 'available' } })
 
 // opt one call back into throwing
-const pet = await getPetById({ path: { petId: 1n }, throwOnError: true })
+const pet = await getPetById({ path: { petId: 1 }, throwOnError: true })
 ```
 
 `client.setConfig({ throwOnError })` does not change this default, because each generated
@@ -108,7 +110,7 @@ operation passes its own value. Set it on the plugin.
 
 ```typescript
 try {
-  const { data } = await getPetById({ path: { petId: 1n }, throwOnError: false })
+  const { data } = await getPetById({ path: { petId: 1 }, throwOnError: false })
   use(data)
 } catch (error) {
   // not a ResponseError: the request never completed
@@ -127,7 +129,7 @@ When you turn on the `validator` option, a body that does not match its Zod sche
 import { ParseError } from './gen/.kubb/standardSchema'
 
 try {
-  const { data } = await getPetById({ path: { petId: 1n } })
+  const { data } = await getPetById({ path: { petId: 1 } })
   use(data)
 } catch (error) {
   if (error instanceof ParseError) {
@@ -157,4 +159,4 @@ client.setConfig({ validate: import.meta.env.DEV })
 client.setConfig({ validate: { response: false } })
 ```
 
-A per-call `validate` overrides the client setting, such as `getPetById({ path: { petId: 1n }, validate: true })`. The default is `true`.
+A per-call `validate` overrides the client setting, such as `getPetById({ path: { petId: 1 }, validate: true })`. The default is `true`.

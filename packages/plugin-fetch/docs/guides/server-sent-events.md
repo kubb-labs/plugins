@@ -168,13 +168,15 @@ Read `data` straight from each event. The result also holds the native `response
 ```typescript
 import { streamPetEvents } from './gen/clients/streamPetEvents'
 
-const { stream, response } = await streamPetEvents({ path: { petId: 1n } })
+const { stream, response } = await streamPetEvents({ path: { petId: 1 } })
 console.info(response.status) // 200
 
 for await (const { data } of stream) {
   console.info(data.type, data.pet.name) // PetEvent
 }
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 ## JSON Lines
 
@@ -370,16 +372,16 @@ pluginFetch({ returnType: 'data' })
 
 Both modes read the same events. The table compares them for one call:
 
-|                                                | `returnType: 'full'` (default)                                  | `returnType: 'data'`                                            |
-| ---------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
-| The call returns                               | `Unwrappable<StreamResult<…>>`                                  | `Promise<UnwrappedStreamResult<…>>`                             |
-| Call it                                        | `const result = await streamPetEvents({ path: { petId: 1n } })` | `const events = await streamPetEvents({ path: { petId: 1n } })` |
-| Loop over the events                           | `for await (const event of result.stream)`                      | `for await (const event of events)`                             |
-| Other ways to loop                             | `result`, `result.data`, or `.unwrap()`                         | none                                                            |
-| `event.data`                                   | `PetEvent`                                                      | `PetEvent`                                                      |
-| A failed call, by default                      | throws a `ResponseError`                                        | throws a `ResponseError`                                        |
-| With `throwOnError: false`                     | the full result                                                 | the full result, as in `'full'`                                 |
-| `status`, `headers`, `response`, `lastEventId` | available                                                       | only with `throwOnError: false`                                 |
+|                                                | `returnType: 'full'` (default)                                 | `returnType: 'data'`                                           |
+| ---------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
+| The call returns                               | `Unwrappable<StreamResult<…>>`                                 | `Promise<UnwrappedStreamResult<…>>`                            |
+| Call it                                        | `const result = await streamPetEvents({ path: { petId: 1 } })` | `const events = await streamPetEvents({ path: { petId: 1 } })` |
+| Loop over the events                           | `for await (const event of result.stream)`                     | `for await (const event of events)`                            |
+| Other ways to loop                             | `result`, `result.data`, or `.unwrap()`                        | none                                                           |
+| `event.data`                                   | `PetEvent`                                                     | `PetEvent`                                                     |
+| A failed call, by default                      | throws a `ResponseError`                                       | throws a `ResponseError`                                       |
+| With `throwOnError: false`                     | the full result                                                | the full result, as in `'full'`                                |
+| `status`, `headers`, `response`, `lastEventId` | available                                                      | only with `throwOnError: false`                                |
 
 Loop over the events the call resolves to:
 
@@ -387,13 +389,13 @@ Loop over the events the call resolves to:
 import { streamOrderEvents } from './gen/clients/streamOrderEvents'
 import { streamPetEvents } from './gen/clients/streamPetEvents'
 
-const events = await streamOrderEvents({ path: { orderId: 7n } })
+const events = await streamOrderEvents({ path: { orderId: 7 } })
 
 for await (const event of events) {
   if (event.event === 'order_placed') render(event.data) // Order
 }
 
-for await (const { data } of await streamPetEvents({ path: { petId: 1n } })) {
+for await (const { data } of await streamPetEvents({ path: { petId: 1 } })) {
   console.info(data.type) // PetEvent
 }
 ```
@@ -404,7 +406,7 @@ A failed call throws a `ResponseError` before the first event, and a dropped con
 import { ResponseError } from './gen/.kubb/client'
 
 try {
-  for await (const event of await streamPetEvents({ path: { petId: 1n } })) render(event)
+  for await (const event of await streamPetEvents({ path: { petId: 1 } })) render(event)
 } catch (error) {
   if (!ResponseError.is(error)) throw error
   console.error('stream rejected', error.status)
@@ -414,7 +416,7 @@ try {
 With `throwOnError: false`, the call returns the full result instead, as a regular call does in this mode. The events are its `data` on a 2xx response, and checking `status` narrows `error`:
 
 ```typescript
-const result = await streamPetEvents({ path: { petId: 1n }, throwOnError: false })
+const result = await streamPetEvents({ path: { petId: 1 }, throwOnError: false })
 
 if (!result.data) console.error('stream rejected', result.status, result.error)
 else for await (const event of result.data) render(event)

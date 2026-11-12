@@ -84,13 +84,13 @@ export function Server({ serverName, serverVersion, operations }: Props): KubbRe
       }
 
       const destructured = `{ ${entries.map((e) => e.key).join(', ')} }`
-      const inputSchema = entries.length ? `z.object({ ${entries.map((e) => `${e.key}: ${e.value}`).join(', ')} })` : null
+      const inputSchema = entries.length ? `toolSchema(z.object({ ${entries.map((e) => `${e.key}: ${e.value}`).join(', ')} }))` : null
       const outputSchema = zod.responseName
 
       const config = [
         tool.title ? `title: ${JSON.stringify(tool.title)}` : null,
         `description: ${JSON.stringify(tool.description)}`,
-        outputSchema ? `outputSchema: z.object({ data: ${outputSchema} })` : null,
+        outputSchema ? `outputSchema: toolSchema(z.object({ data: ${outputSchema} }))` : null,
       ]
         .filter(Boolean)
         .join(',\n  ')
@@ -119,6 +119,37 @@ server.registerTool(${JSON.stringify(tool.name)}, {
 
   return (
     <>
+      <File.Source name="toolSchema">
+        <Function
+          name="toolSchema"
+          generics="T extends z.ZodType"
+          params="schema: T"
+          JSDoc={{
+            comments: [
+              'Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.',
+              'A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.',
+            ],
+          }}
+        >
+          {`const standard = schema['~standard']
+const convert = (io: 'input' | 'output') => (options: Parameters<typeof standard.jsonSchema.input>[0]) =>
+  standard.jsonSchema[io]({
+    ...options,
+    libraryOptions: {
+      unrepresentable: 'any',
+      override: ({ zodSchema, jsonSchema }: { zodSchema: z.core.$ZodType; jsonSchema: Record<string, unknown> }) => {
+        if (zodSchema._zod.def.type === 'bigint') {
+          jsonSchema.type = 'integer'
+          jsonSchema.format = 'int64'
+        }
+      },
+    },
+  })
+
+return { '~standard': { ...standard, jsonSchema: { input: convert('input'), output: convert('output') } } }`}
+        </Function>
+      </File.Source>
+
       <File.Source name="getServer" isExportable isIndexable>
         <Function name="getServer" export>
           {`const server = new McpServer({

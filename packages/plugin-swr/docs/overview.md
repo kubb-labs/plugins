@@ -25,6 +25,7 @@ The config below generates `useSWR` and `useSWRMutation` hooks that call the Fet
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginFetch } from '@kubb/plugin-fetch'
 import { pluginSwr } from '@kubb/plugin-swr'
@@ -32,6 +33,7 @@ import { pluginSwr } from '@kubb/plugin-swr'
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
+  adapter: adapterOas({ integerType: 'number' }),
   plugins: [
     pluginTs(),
     pluginFetch(),

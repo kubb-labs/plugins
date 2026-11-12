@@ -17,8 +17,7 @@
       "github": "stijnvanhulle"
     }
   ],
-  "dependencies": ["plugin-ts"],
-  "optionalDependencies": ["plugin-zod"],
+  "optionalDependencies": ["plugin-ts", "plugin-zod"],
   "compatibility": {
     "kubb": ">=5.18.4",
     "node": ">=22.22"
@@ -164,6 +163,25 @@
         "type": "tag",
         "pattern": "$item"
       }
+    },
+    {
+      "key": "returnType",
+      "path": ["returnType"],
+      "label": "Return Type",
+      "description": "What a generated function resolves to. plain is what your client returns, full is the whole result with status and error, and data is only the success body when it throws. full and data need the unwrap helpers exported from your client module",
+      "type": "select",
+      "default": "plain",
+      "choices": [
+        {
+          "value": "plain"
+        },
+        {
+          "value": "full"
+        },
+        {
+          "value": "data"
+        }
+      ]
     },
     {
       "key": "throwOnErrorDefault",

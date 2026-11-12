@@ -39,11 +39,10 @@ export const server = setupServer(
 
 ## Generate mock data
 
-Add `pluginFaker` and change the MSW [`parser`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#parser) to `'faker'`. Set `integerType: 'number'` on the adapter, because the default types `int64` fields as `bigint`, which `JSON.stringify` cannot serialize in a response body.
+Add `pluginFaker` and change the MSW [`parser`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#parser) to `'faker'`. A handler sends an `int64` field, which Faker generates as a `bigint`, as a JSON number. A value outside the safe-integer range throws instead of losing precision.
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
-import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMsw } from '@kubb/plugin-msw'
@@ -51,7 +50,6 @@ import { pluginMsw } from '@kubb/plugin-msw'
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
-  adapter: adapterOas({ integerType: 'number' }),
   plugins: [
     pluginTs(),
     pluginFaker(),

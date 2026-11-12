@@ -25,6 +25,7 @@ The config below generates `useQuery` and `useMutation` composables that call th
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginFetch } from '@kubb/plugin-fetch'
 import { pluginVueQuery } from '@kubb/plugin-vue-query'
@@ -32,6 +33,7 @@ import { pluginVueQuery } from '@kubb/plugin-vue-query'
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
+  adapter: adapterOas({ integerType: 'number' }),
   plugins: [
     pluginTs(),
     pluginFetch(),

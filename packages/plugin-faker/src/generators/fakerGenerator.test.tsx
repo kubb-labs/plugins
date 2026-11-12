@@ -13,6 +13,7 @@ import {
   createMockedPluginDriver,
   format,
   matchFiles,
+  rawSources,
   renderGeneratorOperation,
   renderGeneratorSchema,
   testConfig,
@@ -918,8 +919,12 @@ body.id
 })
 
 describe('fakerGenerator — custom imports', () => {
-  test('a dateParser other than faker imports it in schema and operation files', async () => {
-    const options: PluginFaker['resolvedOptions'] = { ...defaultOptions, dateParser: 'dayjs' }
+  test.each([
+    ['dayjs', 'dayjs'],
+    ['my-date-lib', 'myDateLib'],
+    ['@scope/lib', 'scopeLib'],
+  ])('a dateParser %s is imported as %s in schema and operation files', async (dateParser, importName) => {
+    const options: PluginFaker['resolvedOptions'] = { ...defaultOptions, dateParser }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options, resolver: resolverFaker })
     const driver = createMockedPluginDriver({
       name: 'dateParser',
@@ -943,8 +948,43 @@ describe('fakerGenerator — custom imports', () => {
     )
 
     expect(driver.fileManager.files).toHaveLength(2)
-    for (const file of driver.fileManager.files) {
-      expect(file.imports.map((imp) => imp.path)).toContain('dayjs')
+    for (const source of rawSources(driver.fileManager.files)) {
+      expect(source).toMatch(new RegExp(`import ${importName} from ['"]${dateParser}['"]`))
+      expect(source).toContain(`${importName}(faker.date.anytime())`)
+    }
+  })
+
+  test.each([
+    [0, 'faker.seed(0)'],
+    [[1, 2], 'faker.seed([1,2])'],
+    [undefined, null],
+  ])('seed %j writes %s in schema and operation files', async (seed, expected) => {
+    const options: PluginFaker['resolvedOptions'] = { ...defaultOptions, seed }
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({
+      name: 'seed',
+      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+    const context = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverFaker }
+
+    await renderGeneratorSchema(fakerGenerator, ast.factory.createSchema({ type: 'string', name: 'Name' }), context)
+    await renderGeneratorOperation(
+      fakerGenerator,
+      ast.factory.createOperation({
+        operationId: 'getName',
+        method: 'GET',
+        path: '/name',
+        tags: [],
+        responses: [ast.factory.createResponse({ statusCode: '200', description: 'OK', schema: ast.factory.createSchema({ type: 'string' }) })],
+      }),
+      context,
+    )
+
+    const sources = rawSources(driver.fileManager.files)
+    expect(sources).toHaveLength(2)
+    for (const source of sources) {
+      if (expected) expect(source).toContain(expected)
+      else expect(source).not.toContain('faker.seed')
     }
   })
 

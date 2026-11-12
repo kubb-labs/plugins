@@ -29,7 +29,7 @@ import { pluginCypress } from '@kubb/plugin-cypress'
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
-  adapter: adapterOas({ contentType: 'application/json' }),
+  adapter: adapterOas({ contentType: 'application/json', integerType: 'number' }),
   plugins: [
     pluginTs(),
     pluginCypress({ output: { path: 'cypress', mode: 'directory' } }),
@@ -37,14 +37,14 @@ export default defineConfig({
 })
 ```
 
-A test then calls a helper and gets a typed response body. `petId` is an `int64`, which the default adapter types as `bigint`.
+A test then calls a helper and gets a typed response body. `petId` is an `int64`, which `integerType: 'number'` types as `number` instead of the default `bigint`.
 
 ```typescript [cypress/e2e/pet.cy.ts]
 import { getPetById } from '../../src/gen/cypress/getPetById'
 
 describe('Pet API', () => {
   it('returns the pet by id', () => {
-    getPetById({ path: { petId: 1n } }).then((pet) => {
+    getPetById({ path: { petId: 1 } }).then((pet) => {
       expect(pet.name).to.be.a('string')
     })
   })

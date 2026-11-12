@@ -64,11 +64,16 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
 
     if (fs.existsSync(file.path)) return null
 
+    // Same path `hookOptionsGenerator` writes the type to, so the import resolves without a root barrel.
+    const hookOptionsPath = resolver
+      .file({ name: hookOptionsName, extname: '.ts', root, output, group: group ?? undefined })
+      .path.replace(/[^/\\]+\.ts$/, `${hookOptionsName}.ts`)
+
     return (
       <File baseName={file.baseName} path={file.path}>
         <File.Import name={['QueryClient']} path={reactQueryImportPath} isTypeOnly />
         <File.Import name={['useQueryClient']} path={reactQueryImportPath} />
-        <File.Import name={[hookOptionsName]} root={file.path} path={path.resolve(root, './index.ts')} />
+        <File.Import name={[hookOptionsName]} root={file.path} path={hookOptionsPath} isTypeOnly />
         <File.Source name={name} isExportable isIndexable>
           <Function name={customHookOptionsName} params="{ queryClient }: { queryClient: QueryClient }" returnType={`Partial<${hookOptionsName}>`}>
             {`return {

@@ -72,8 +72,10 @@ const tenant = createClient({
   auth: () => tenantToken,
 })
 
-const { data } = await getPetById({ path: { petId: 1n }, client: tenant })
+const { data } = await getPetById({ path: { petId: 1 }, client: tenant })
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 To override the client for one request, pass `auth` on that single call, which suits a one-off token refresh. A header you set yourself always wins over the resolved token: client-level `headers`, or `headers` on a call to an operation that declares header parameters.
 

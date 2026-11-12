@@ -166,7 +166,8 @@ export type ResolverZod = Resolver & {
 export type CompileOptions = {
   /**
    * Throw an error if any part of the schema cannot be compiled into flat JavaScript,
-   * preventing silent fallback to the standard interpreter.
+   * preventing silent fallback to the standard interpreter. A schema Zod refuses to
+   * compile, such as a coerced scalar or a `z.xor`, is left uncompiled.
    *
    * @default false
    */

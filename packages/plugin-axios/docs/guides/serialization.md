@@ -150,11 +150,13 @@ const { data } = await getReport({ path: { id: '123' }, parseAs: 'text' })
 The generated types follow what the built-in media types return. A response read as text, such as `application/xml`, `application/yaml`, or `text/csv`, is typed `string`, even when the document gives it an object schema. A vendor type such as `application/vnd.github.object` keeps its schema type, because the client parses its JSON body. A media type you register changes the value but not that type, so narrow or cast `data` to what it returns:
 
 ```typescript
-const result = await getPetById({ path: { petId: 1n }, contentType: { response: 'application/xml' } })
+const result = await getPetById({ path: { petId: 1 }, contentType: { response: 'application/xml' } })
 if (result.contentType === 'application/xml') {
   const pet = result.data as unknown as Pet
 }
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 [Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events) covers stream media types and `client.stream`.
 

@@ -47,7 +47,7 @@ The `integer` handler controls `int32` fields separately. To change integer repr
 
 ## Remove descriptions
 
-Use the [description-removal macro](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#remove-descriptions) with `pluginZod({ macros: [dropDescriptions] })`. Component schemas omit their `.describe()` calls. An operation schema that aliases a described component keeps one, such as `addPetBodySchema = petSchema.describe('A pet')`.
+Use the [description-removal macro](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#remove-descriptions) with `pluginZod({ macros: [dropDescriptions] })`. Schemas omit their own `.describe()` calls. A `$ref` to a described component keeps one, such as `addPetBodySchema = petSchema.describe('A pet')` or the property `owner: ownerSchema.describe('An owner')`, because a macro does not visit the schema a `$ref` points to.
 
 ## Encode custom types
 

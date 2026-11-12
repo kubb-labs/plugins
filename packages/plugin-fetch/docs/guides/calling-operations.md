@@ -9,9 +9,11 @@ Pass parameters under `path`, `query`, `headers`, `cookies`, or `body`, matching
 ```typescript
 import { getPetById } from './gen/clients/getPetById'
 
-const { data } = await getPetById({ path: { petId: 1n } })
+const { data } = await getPetById({ path: { petId: 1 } })
 //      ^ the parsed pet, typed from the 200 response
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 Query, header, and cookie parameters sit under their own keys, and a request body goes under
 `body`:
@@ -53,7 +55,7 @@ When `throwOnError` is `true` (the generated default), a resolved call is always
 read `data` straight away:
 
 ```typescript
-const { data, status, response } = await getPetById({ path: { petId: 1n } })
+const { data, status, response } = await getPetById({ path: { petId: 1 } })
 
 console.info(status) // 200
 console.info(response.headers.get('x-ratelimit-remaining'))
@@ -63,7 +65,7 @@ When an operation documents more than one success status, narrow on `status` to 
 for that case, and TypeScript follows the check:
 
 ```typescript
-const result = await getPetById({ path: { petId: 1n } })
+const result = await getPetById({ path: { petId: 1 } })
 
 if (result.status === 200) {
   console.info(result.data)
@@ -77,7 +79,7 @@ Call `.unwrap()` to return the success body. Awaiting the operation directly ret
 ```typescript
 import { getPetById } from './gen/clients/getPetById'
 
-const pet = await getPetById({ path: { petId: 1n } }).unwrap()
+const pet = await getPetById({ path: { petId: 1 } }).unwrap()
 //    ^ the parsed pet, not the full RequestResult
 ```
 
@@ -85,7 +87,7 @@ With `throwOnError: true`, a non-2xx response throws the same `ResponseError` a 
 
 ```typescript
 try {
-  const pet = await getPetById({ path: { petId: 1n }, throwOnError: false }).unwrap()
+  const pet = await getPetById({ path: { petId: 1 }, throwOnError: false }).unwrap()
 } catch (error) {
   // the parsed error body, not a ResponseError
   console.error(error)
@@ -120,7 +122,7 @@ Pass `options` on an operation for native fetch settings, such as `cache`, `mode
 ```typescript [src/app.ts]
 import { getPetById } from './gen/clients/getPetById'
 
-await getPetById({ path: { petId: 1n }, options: { cache: 'no-store' } })
+await getPetById({ path: { petId: 1 }, options: { cache: 'no-store' } })
 ```
 
 Set `client.setConfig({ options })` for shared defaults. Per-call options take precedence. Kubb keeps control of serialization and HTTP error handling. See [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/transport).

@@ -88,5 +88,7 @@ import { client } from './gen/.kubb/client'
 
 const admin = client.extend({ headers: { 'X-Role': 'admin' } })
 admin.interceptors.request.use((request) => request) // runs after the handlers on client
-await getPetById({ path: { petId: 1n }, client: admin })
+await getPetById({ path: { petId: 1 }, client: admin })
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
