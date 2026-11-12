@@ -47,7 +47,7 @@ type Props = {
  * the source.
  */
 export function Operation({ name, node, types, validatorHooks, returnType, throwOnErrorDefault, security, baseURL }: Props): KubbReactNode {
-  if (!ast.isHttpOperationNode(node)) return null
+  if (!ast.http.isOperation(node)) return null
 
   const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault })
 

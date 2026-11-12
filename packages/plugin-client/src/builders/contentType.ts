@@ -1,6 +1,5 @@
 import { getContentTypeInfo, getResponseContentTypeInfo, hasEventStreamContent, isEventStream } from '@internals/shared'
-import { singleQuote } from '@internals/utils'
-import type { ast } from '@kubb/kit'
+import { ast, text } from '@kubb/kit'
 
 /**
  * Builds the `contentType` entry baked into the call config. It holds the request default when the operation has a body
@@ -12,20 +11,20 @@ import type { ast } from '@kubb/kit'
  */
 export function buildContentType({ node }: { node: ast.HttpOperationNode }): { literal: string | null; merge: boolean } {
   const { defaultContentType } = getContentTypeInfo(node)
-  const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
+  const hasRequestBody = Boolean(ast.http.requestBody.getSchema(node))
   // The first declared type is the default; the caller overrides it on `contentType`.
   const requestContentType = hasRequestBody ? defaultContentType : null
   // A stream asks for its own media type, and a response that offers events next to JSON asks for the events, so a client whose
   // default `Accept` prefers JSON, such as axios, gets the stream. The caller picks another type with `contentType.response`.
-  const streamType = isEventStream(node) ? getResponseContentTypeInfo(node).defaultContentType.split(';')[0]!.trim() : null
-  const response = streamType || hasEventStreamContent(node) ? `response: ${singleQuote(streamType ?? 'text/event-stream')}` : null
+  const streamType = isEventStream(node) ? ast.mediaType.getBase(getResponseContentTypeInfo(node).defaultContentType) : null
+  const response = streamType || hasEventStreamContent(node) ? `response: ${text.quote(streamType ?? 'text/event-stream')}` : null
 
   if (!requestContentType) return { literal: response && `contentType: { ${response} }`, merge: false }
 
   // When the caller can also pick a response content type, or a stream must keep its `Accept`, a partial `contentType` would
   // replace the baked default through `...config`, so merge the caller's choice over it instead.
   const merge = Boolean(response) || getResponseContentTypeInfo(node).isMultipleContentTypes
-  const defaults = [`request: ${singleQuote(requestContentType)}`, response].filter(Boolean).join(', ')
+  const defaults = [`request: ${text.quote(requestContentType)}`, response].filter(Boolean).join(', ')
 
   return {
     merge,

@@ -1,6 +1,5 @@
 import { createRequire } from 'node:module'
-import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
-import { ast, Diagnostics, isStringType, syncSchemaRef } from '@kubb/kit'
+import { ast, createPrinter, Diagnostics } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isBinarySchema, isInlineConstEnum } from '../utils.ts'
@@ -188,7 +187,7 @@ function toNodeHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial<f
  * const declaration = printer.print(schemaNode) // 'export type MyType = …'
  * ```
  */
-export const printerTs = ast.createPrinter<PrinterTs>((options) => {
+export const printerTs = createPrinter<PrinterTs>((options) => {
   const addsUndefined = options.optionalType === 'undefined' || options.optionalType === 'questionTokenAndUndefined'
 
   return {
@@ -224,8 +223,8 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           return null
         }
         // `node.name` may have been overridden (e.g. by the single-member allOf flatten using the
-        // property-derived child name), so resolve the target through `resolveRefName` instead.
-        const refName = ast.resolveRefName(node)
+        // property-derived child name), so resolve the target through `ast.ref.getName` instead.
+        const refName = ast.ref.getName(node)
         if (!refName) {
           return null
         }
@@ -244,7 +243,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         return factory.createTypeReferenceNode(name)
       },
       enum(node) {
-        const values = ast.getSchemaLiteralValues(node)
+        const values = ast.schema.getLiterals(node)
 
         if (values.some((value) => value !== null && typeof value === 'object')) {
           return factory.createUnionDeclaration({ nodes: values.map((value) => factory.constToTypeNode(value)) })
@@ -269,16 +268,16 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         const members = node.members ?? []
 
         const hasStringLiteral = members.some((m) => {
-          const enumNode = ast.narrowSchema(m, ast.schemaTypes.enum)
+          const enumNode = ast.schema.narrow(m, ast.schema.types.enum)
           return enumNode?.primitive === 'string'
         })
-        const hasPlainString = members.some((m) => isStringType(m))
+        const hasPlainString = members.some((m) => ast.schema.isString(m))
 
         if (hasStringLiteral && hasPlainString) {
           const memberNodes = members
             .map((m) => {
               const print = (node: ast.SchemaNode) =>
-                isStringType(node)
+                ast.schema.isString(node)
                   ? factory.createIntersectionDeclaration({ nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])] })
                   : this.transform(node)
 
@@ -295,9 +294,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         return factory.createIntersectionDeclaration({ nodes: factory.buildMemberNodes(node.members, this.transform) })
       },
       array(node) {
-        const itemNodes = mapSchemaItems(node, (item) => printNullable(item, this.transform))
-          .map(({ output }) => output)
-          .filter(isNonNullable)
+        const itemNodes = (node.items ?? []).map((item) => printNullable(item, this.transform)).filter(isNonNullable)
 
         return factory.createArrayDeclaration({ nodes: itemNodes, arrayType: this.options.arrayType })
       },
@@ -307,7 +304,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       object(node) {
         const { transform, options } = this
 
-        const keySchema = node.propertyNames && syncSchemaRef(node.propertyNames)
+        const keySchema = node.propertyNames && ast.ref.mergeSchema(node.propertyNames)
         if (
           !node.properties.length &&
           !Object.keys(node.patternProperties ?? {}).length &&
@@ -324,11 +321,13 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
 
         const addsQuestionToken = options.optionalType === 'questionToken' || options.optionalType === 'questionTokenAndUndefined'
 
-        const propertyNodes: Array<factory.TsNode> = mapSchemaProperties(node, (schema) => transform(schema)).map(({ name, property, output }) => {
+        const propertyNodes: Array<factory.TsNode> = node.properties.map((property) => {
+          const { name } = property
+          const output = transform(property.schema)
           const baseType = output ?? factory.keywordTypeNodes.unknown
           const optional = !property.required || !!property.schema.optional || !!property.schema.nullish
           const type = factory.buildPropertyType(property.schema, baseType, options.optionalType, optional)
-          const propMeta = syncSchemaRef(property.schema)
+          const propMeta = ast.ref.mergeSchema(property.schema)
 
           const propertyNode = factory.createPropertySignature({
             questionToken: optional ? addsQuestionToken : false,
@@ -363,7 +362,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       if (!transformed) return null
 
       // For ref nodes, structural metadata lives on node.schema rather than the ref node itself.
-      const meta = syncSchemaRef(node)
+      const meta = ast.ref.mergeSchema(node)
 
       // Without name, apply modifiers inline and return.
       if (!name) {

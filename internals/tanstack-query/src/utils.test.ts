@@ -20,8 +20,13 @@ describe('classifyOperation', () => {
       responses: [
         ast.factory.createResponse({
           statusCode: '200',
-          mediaType: 'text/event-stream; charset=utf-8',
-          schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+          content: [
+            ast.factory.createContent({
+              contentType: 'text/event-stream; charset=utf-8',
+              schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+              stream: {},
+            }),
+          ],
         }),
       ],
     })

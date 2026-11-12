@@ -1,11 +1,4 @@
-import {
-  getCircularNames,
-  getOperationParameters,
-  getPerContentTypeName,
-  resolveContentTypeVariants,
-  resolveOperationFile,
-  toResponseContent,
-} from '@internals/shared'
+import { getCircularNames, getPerContentTypeName, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { ast, defineGenerator } from '@kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -45,7 +38,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
     const schemaName = node.name
-    const isEnumSchema = !!ast.narrowSchema(node, ast.schemaTypes.enum)
+    const isEnumSchema = !!ast.schema.narrow(node, ast.schema.types.enum)
     const schemaTypeName = enumTypeName({ resolver: tsResolver, name: schemaName, enumOptions: pluginTs.options?.enum, isEnum: isEnumSchema })
     const meta = {
       name: resolver.name(schemaName),
@@ -118,7 +111,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)
+    const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
     const paramGroups = (
       [
         { params: pathParams, name: resolver.param.path, typeName: tsResolver.param.path },
@@ -189,11 +182,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       (schema) => ({ ...schema, description: node.requestBody?.description ?? schema.description }),
     )
     const responseName = resolver.response.response(node)
-    const importedResponseNames = new Set(
-      node.responses.flatMap((response) =>
-        (response.content ?? []).flatMap((entry) => (entry.schema ? ast.collectImportedRefNames(entry.schema).map((name) => resolver.name(name)) : [])),
-      ),
-    )
+    const importedResponseNames = new Set(ast.http.responses.getImportedNames(node.responses).map((name) => resolver.name(name)))
     const hasResponseNameCollision = importedResponseNames.has(responseName)
     const localHelperNames = new Set([
       ...paramGroups.map((group) => group.name),
@@ -224,7 +213,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         return null
       }
 
-      if (schema.type === ast.schemaTypes.object && keysToOmit?.length) {
+      if (schema.type === ast.schema.types.object && keysToOmit?.length) {
         schema = { ...schema, properties: schema.properties.filter((property) => !keysToOmit?.includes(property.name)) }
         keysToOmit = undefined
       }

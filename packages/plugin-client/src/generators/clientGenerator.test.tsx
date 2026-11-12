@@ -200,8 +200,9 @@ const streamEventsNode = ast.factory.createOperation({
   responses: [
     ast.factory.createResponse({
       statusCode: '200',
-      mediaType: 'text/event-stream',
-      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      content: [
+        ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object', properties: [] }), stream: {} }),
+      ],
       description: 'event stream',
     }),
   ],

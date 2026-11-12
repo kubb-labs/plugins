@@ -13,7 +13,7 @@ describe('buildCallConfig', () => {
           statusCode: '200',
           content: [
             ast.factory.createContent({ contentType: 'audio/mpeg', schema: ast.factory.createSchema({ type: 'blob' }) }),
-            ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }),
+            ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object', properties: [] }), stream: {} }),
           ],
         }),
       ],
@@ -53,7 +53,10 @@ describe('buildCallConfig', () => {
       method: 'GET',
       path: '/events',
       responses: [
-        ast.factory.createResponse({ statusCode: '200', content: [ast.factory.createContent({ contentType: 'text/event-stream', schema, stream: {} })] }),
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: 'text/event-stream', schema: schema, stream: {} })],
+        }),
       ],
     })
 

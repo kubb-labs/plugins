@@ -1,6 +1,4 @@
-import { screamingSnakeCase, snakeCase } from '@internals/utils'
-import { camelCase, pascalCase, syncSchemaRef } from '@kubb/kit'
-import type { ast } from '@kubb/kit'
+import { ast, casing, text } from '@kubb/kit'
 import { generate } from 'yuku-codegen'
 
 /**
@@ -56,16 +54,6 @@ function isValidIdentifier(name: string): boolean {
  */
 function propertyName(name: string): TsNode {
   return isValidIdentifier(name) ? identifier(name) : literal(name)
-}
-
-/**
- * Indents every non-empty line of `text` by two spaces.
- */
-function indent(text: string): string {
-  return text
-    .split('\n')
-    .map((line) => (line ? `  ${line}` : line))
-    .join('\n')
 }
 
 /**
@@ -232,21 +220,21 @@ function valueToExpression(value: string | number | boolean, asNumber = isNumber
 /**
  * Apply casing transformation to enum keys
  */
-function applyEnumKeyCasing(key: string, casing: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none' = 'none'): string {
-  if (casing === 'none') {
+function applyEnumKeyCasing(key: string, keyCasing: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none' = 'none'): string {
+  if (keyCasing === 'none') {
     return key
   }
-  if (casing === 'screamingSnakeCase') {
-    return screamingSnakeCase(key)
+  if (keyCasing === 'screamingSnakeCase') {
+    return casing.screamingSnake(key)
   }
-  if (casing === 'snakeCase') {
-    return snakeCase(key)
+  if (keyCasing === 'snakeCase') {
+    return casing.snake(key)
   }
-  if (casing === 'pascalCase') {
-    return pascalCase(key)
+  if (keyCasing === 'pascalCase') {
+    return casing.pascal(key)
   }
-  if (casing === 'camelCase') {
-    return camelCase(key)
+  if (keyCasing === 'camelCase') {
+    return casing.camel(key)
   }
   return key
 }
@@ -362,7 +350,7 @@ export function createEnumDeclaration({
   const query = { type: 'TSTypeQuery', exprName: identifier(identifierName), typeArguments: null }
 
   return [
-    `export const ${identifierName} = {\n${properties.map(indent).join(',\n')},\n} as const;`,
+    `export const ${identifierName} = {\n${properties.map((property) => text.indent({ text: property })).join(',\n')},\n} as const;`,
     typeAlias({
       type: 'TSIndexedAccessType',
       objectType: { type: 'TSParenthesizedType', typeAnnotation: query },
@@ -498,7 +486,7 @@ export function buildPropertyType(
   optional?: boolean,
 ): TsNode {
   const addsUndefined = optionalType === 'undefined' || optionalType === 'questionTokenAndUndefined'
-  const meta = syncSchemaRef(schema)
+  const meta = ast.ref.mergeSchema(schema)
 
   return wrapNullableOptional(baseType, !!meta.nullable, addsUndefined && !!(optional || meta.nullish || meta.optional))
 }

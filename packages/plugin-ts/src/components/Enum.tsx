@@ -1,5 +1,5 @@
-import { ensureValidVarName, trimQuotes } from '@internals/utils'
-import { camelCase } from '@kubb/kit'
+import { ensureValidVarName } from '@internals/utils'
+import { casing, text } from '@kubb/kit'
 import type { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -30,7 +30,7 @@ export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.
   typeName: string
 } {
   const resolved = resolver.name(node.name!)
-  const enumName = enumOptions.constCasing === 'pascalCase' ? resolved : ensureValidVarName(camelCase(node.name!))
+  const enumName = enumOptions.constCasing === 'pascalCase' ? resolved : ensureValidVarName(casing.camel(node.name!))
   const typeName = enumOptions.type === 'asConst' ? resolver.enum.keyName(node, enumOptions.typeSuffix) : resolved
 
   return { enumName, typeName }
@@ -53,8 +53,8 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
   const [nameNode, typeNode] = factory.createEnumDeclaration({
     name: enumName,
     typeName,
-    enums: (node.namedEnumValues?.map((v) => [trimQuotes(v.name.toString()), v.value, v.description]) ??
-      node.enumValues?.filter((v): v is NonNullable<typeof v> => v !== null && v !== undefined).map((v) => [trimQuotes(v.toString()), v]) ??
+    enums: (node.namedEnumValues?.map((v) => [text.unquote(v.name.toString()), v.value, v.description]) ??
+      node.enumValues?.filter((v): v is NonNullable<typeof v> => v !== null && v !== undefined).map((v) => [text.unquote(v.toString()), v]) ??
       []) as Array<[string | number, string | number | boolean, string?]>,
     type: enumOptions.type,
     enumKeyCasing: enumOptions.keyCasing,

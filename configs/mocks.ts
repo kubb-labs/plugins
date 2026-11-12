@@ -15,7 +15,7 @@ import type {
   Plugin,
   PluginType,
 } from '@kubb/kit'
-import { ast, camelCase, Diagnostics, Hookable, memoryStorage } from '@kubb/kit'
+import { ast, casing, Diagnostics, Hookable, memoryStorage } from '@kubb/kit'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'
@@ -172,7 +172,7 @@ async function renderNode<TOptions extends PluginType, TNode extends ast.SchemaN
   generate: (node: TNode, ctx: GeneratorContext<TOptions>) => ReturnType<NonNullable<Generator<TOptions>['schema']>>
 }): Promise<void> {
   const ctx = { ...createMockedPluginContext(opts), options: opts.options }
-  const transformedNode = opts.plugin.macros?.length ? ast.applyMacros(node, opts.plugin.macros) : node
+  const transformedNode = opts.plugin.macros?.length ? ast.macro.apply(node, opts.plugin.macros) : node
   const matches = generator.match ? await generator.match(transformedNode, ctx) : true
   if (!matches) return
   await opts.driver.fileManager.dispatch({ result: await generate(transformedNode, ctx), renderer: generator.renderer })
@@ -212,7 +212,7 @@ export async function renderGeneratorOperations<TOptions extends PluginType>(
 ): Promise<void> {
   if (!generator.operations) return
   const context = createMockedPluginContext(opts)
-  const transformedNodes = opts.plugin.macros?.length ? nodes.map((node) => ast.applyMacros(node, opts.plugin.macros!)) : nodes
+  const transformedNodes = opts.plugin.macros?.length ? nodes.map((node) => ast.macro.apply(node, opts.plugin.macros!)) : nodes
   const result = await generator.operations(transformedNodes, { ...context, options: opts.options })
   await opts.driver.fileManager.dispatch({ result, renderer: generator.renderer })
 }
@@ -237,7 +237,7 @@ async function matchFilesBase(
     const code = file.baseName.endsWith('.json') || !format ? parsed : await format(parsed)
     processed.set(file.path, code)
 
-    const snapshotPath = path.join('__snapshots__', ...(pre ? [camelCase(pre)] : []), file.baseName)
+    const snapshotPath = path.join('__snapshots__', ...(pre ? [casing.camel(pre)] : []), file.baseName)
     await expect(code).toMatchFileSnapshot(snapshotPath)
   }
 

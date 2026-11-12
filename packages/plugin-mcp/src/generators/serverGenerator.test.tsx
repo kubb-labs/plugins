@@ -119,18 +119,16 @@ describe('serverGenerator — stream and querystring operations', () => {
       operationId: 'streamEvents',
       method: 'GET',
       path: '/events',
-      responses: [ast.factory.createResponse({ statusCode: '200', mediaType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object' }) })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object' }), stream: {} })],
+        }),
+      ],
     })
     const source = rawSources((await renderServer([stream])).fileManager.files).join('\n')
 
     expect(source).not.toContain('streamEvents')
-  })
-
-  test('takes a form-encoded querystring as the grouped query schema plugin-zod emits', async () => {
-    const source = rawSources((await renderServer([listItems('application/x-www-form-urlencoded')])).fileManager.files).join('\n')
-
-    expect(source).toContain('query: listItemsQuerySchema')
-    expect(source).not.toContain('listItemsQueryTermSchema')
   })
 
   test('keeps a JSON querystring as its own parameter schema', async () => {

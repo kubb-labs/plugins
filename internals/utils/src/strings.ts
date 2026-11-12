@@ -1,112 +1,4 @@
-// A raw line break would end the literal.
-const singleQuoteEscapes = new Map([
-  ['\\', '\\\\'],
-  ["'", "\\'"],
-  ['\n', '\\n'],
-  ['\r', '\\r'],
-])
-
-/**
- * Wraps a value in single quotes for emitting a single-quoted JavaScript string literal, escaping
- * any backslash or single quote in the content.
- *
- * @example
- * ```ts
- * singleQuote('foo')      // "'foo'"
- * singleQuote("o'clock")  // "'o\\'clock'"
- * ```
- */
-export function singleQuote(value: string | number | boolean | undefined | null): string {
-  if (value === undefined || value === null) return "''"
-  const escaped = Array.from(String(value), (char) => singleQuoteEscapes.get(char) ?? char).join('')
-
-  return `'${escaped}'`
-}
-
-/**
- * Strips a single matching pair of `"..."`, `'...'`, or `` `...` `` from both ends of `text`.
- * Returns the string unchanged when no balanced quote pair is found.
- *
- * @example
- * ```ts
- * trimQuotes('"hello"') // 'hello'
- * trimQuotes('hello')   // 'hello'
- * ```
- */
-export function trimQuotes(text: string): string {
-  if (text.length >= 2) {
-    const first = text[0]
-    const last = text[text.length - 1]
-    if ((first === '"' && last === '"') || (first === "'" && last === "'") || (first === '`' && last === '`')) {
-      return text.slice(1, -1)
-    }
-  }
-  return text
-}
-
-/**
- * Serializes a primitive to a single-quoted string literal, stripping any surrounding quotes first.
- *
- * Escaping runs through `JSON.stringify`, then the result switches to single quotes so the generated
- * code matches the repo style without a formatter.
- *
- * @example
- * ```ts
- * stringify('hello')   // "'hello'"
- * stringify('"hello"') // "'hello'"
- * ```
- */
-export function stringify(value: string | number | boolean | undefined): string {
-  if (value === undefined || value === null) return "''"
-  const json = JSON.stringify(trimQuotes(value.toString()))
-  const inner = json.slice(1, -1).replace(/\\"/g, '"').replace(/'/g, "\\'")
-  return `'${inner}'`
-}
-
-/**
- * Escapes an `@` at the start of a line, so a multi-line description can't start a new JSDoc tag.
- * Editors render `\@` as `@` in hovers.
- *
- * @example
- * ```ts
- * jsDocEscape('intro\n@example value') // 'intro\n\\@example value'
- * ```
- */
-export function jsDocEscape(input: unknown): string {
-  return `${input}`.replace(/^(\s*)@/gm, '$1\\@')
-}
-
-/**
- * Escapes characters that are not allowed inside JS string literals, covering quotes, backslashes,
- * and the Unicode line terminators U+2028 and U+2029.
- *
- * @see http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.4
- *
- * @example
- * ```ts
- * jsStringEscape('say "hi"\nbye') // 'say \\"hi\\"\\nbye'
- * ```
- */
-export function jsStringEscape(input: unknown): string {
-  return `${input}`.replace(/["'\\\n\r\u2028\u2029]/g, (character) => {
-    switch (character) {
-      case '"':
-      case "'":
-      case '\\':
-        return `\\${character}`
-      case '\n':
-        return '\\n'
-      case '\r':
-        return '\\r'
-      case '\u2028':
-        return '\\u2028'
-      case '\u2029':
-        return '\\u2029'
-      default:
-        return ''
-    }
-  })
-}
+import { text } from '@kubb/kit'
 
 // `\p{`, `\P{` or `\u{` behind an odd number of backslashes, or a character outside the BMP: both need the `u` flag.
 const NEEDS_UNICODE = /(?<!\\)(?:\\\\)*\\[pPu]\{|[\u{10000}-\u{10FFFF}]/u
@@ -155,8 +47,8 @@ function toRegExp(pattern: string, flags: string | undefined): RegExp {
  * toRegExpString('^(?im)foo', null) // '/^foo/im'
  * ```
  */
-export function toRegExpString(text: string, func: string | null = 'RegExp'): string {
-  const raw = trimQuotes(text)
+export function toRegExpString(pattern: string, func: string | null = 'RegExp'): string {
+  const raw = text.unquote(pattern)
 
   const match = raw.match(/^\^(\(\?([igmsuy]+)\))/i)
   const replacementTarget = match?.[1] ?? ''
@@ -187,4 +79,17 @@ export function getNestedAccessor(param: string | Array<string>, accessor: strin
   const parts = Array.isArray(param) ? param : param.split('.')
   if (parts.length === 0 || (parts.length === 1 && parts[0] === '')) return null
   return `${accessor}?.['${`${parts.join("']?.['")}']`}`
+}
+
+/**
+ * Escapes an `@` at the start of a line, so a multi-line description can't start a new JSDoc tag.
+ * Editors render `\@` as `@` in hovers.
+ *
+ * @example
+ * ```ts
+ * jsDocEscape('intro\n@example value') // 'intro\n\\@example value'
+ * ```
+ */
+export function jsDocEscape(input: unknown): string {
+  return `${input}`.replace(/^(\s*)@/gm, '$1\\@')
 }

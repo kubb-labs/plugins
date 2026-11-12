@@ -1,12 +1,12 @@
 import { ensureValidVarName, toFilePath } from '@internals/utils'
-import { ast, camelCase } from '@kubb/kit'
+import { ast, casing } from '@kubb/kit'
 import type { GeneratorContext, Resolver, ResolverFile } from '@kubb/kit'
 
 /**
  * The shared top-level `name` of the operation plugins, computed once per operation name and build.
  */
 export function resolveOperationName(this: Resolver, name: string): string {
-  return this.memo(`operation:${name}`, () => ensureValidVarName(camelCase(name)))
+  return this.memo(`operation:${name}`, () => ensureValidVarName(casing.camel(name)))
 }
 
 /**
@@ -148,7 +148,7 @@ type SchemaIndexContext = Pick<GeneratorContext, 'memo' | 'driver'>
  * Names of the schemas in a circular reference chain, computed once per build.
  */
 export function getCircularNames(ctx: SchemaIndexContext): ReadonlySet<string> {
-  return ctx.memo('circularNames:set', () => ast.findCircularSchemas(ctx.driver.inputNode?.schemas ?? []))
+  return ctx.memo('circularNames:set', () => ast.graph.getCircularNames(ctx.driver.inputNode?.schemas ?? []))
 }
 
 /**

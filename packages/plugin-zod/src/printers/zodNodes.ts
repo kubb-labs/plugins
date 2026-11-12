@@ -1,6 +1,5 @@
-import { jsonContentSchema, mapSchemaItems, mapSchemaMembers } from '@internals/shared'
-import { buildList, stringify } from '@internals/utils'
-import { ast, syncSchemaRef } from '@kubb/kit'
+import { buildList } from '@internals/utils'
+import { ast, text } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   buildEnum,
@@ -87,7 +86,7 @@ function getLiteralUnion({
 }): { values: Array<string | number | boolean>; coerce: boolean } | undefined {
   if ((node.strategy === 'one' && options.oneOfType === 'xor') || options.nodes?.enum) return undefined
   const values = (node.members ?? []).map((member) => {
-    const enumNode = ast.narrowSchema(member, ast.schemaTypes.enum)
+    const enumNode = ast.schema.narrow(member, ast.schema.types.enum)
     return enumNode && !enumNode.name && !enumNode.nullable && !enumNode.namedEnumValues && enumNode.enumValues?.length === 1
       ? enumNode.enumValues[0]
       : undefined
@@ -101,16 +100,16 @@ function getLiteralUnion({
  * Whether a discriminated union member's discriminator property prints as a coerced literal union.
  */
 function hasCoercedDiscriminator({ member, propertyName, options }: { member: ast.SchemaNode; propertyName: string; options: ZodNodeOptions }): boolean {
-  return ast.resolveSchemaProperties({ node: member, propertyName }).some(({ schema }) => {
-    const resolved = syncSchemaRef(schema)
+  return ast.schema.findProperties({ node: member, propertyName }).some(({ schema }) => {
+    const resolved = ast.ref.mergeSchema(schema)
     return resolved.type === 'union' && !!getLiteralUnion({ node: resolved, options })?.coerce
   })
 }
 
 // `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
 function hasPlainDiscriminator({ member, propertyName }: { member: ast.SchemaNode; propertyName: string }): boolean {
-  const schemas = ast.resolveSchemaProperties({ node: member, propertyName })
-  return schemas.length > 0 && !schemas.some(({ schema }) => ast.getSchemaLiteralValues(syncSchemaRef(schema)).length > 0)
+  const schemas = ast.schema.findProperties({ node: member, propertyName })
+  return schemas.length > 0 && !schemas.some(({ schema }) => ast.schema.getLiterals(ast.ref.mergeSchema(schema)).length > 0)
 }
 
 /**
@@ -132,7 +131,7 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
       const pattern = node.pattern ?? integerFormatPattern(node.format)
       const value = `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
 
-      const contentNode = jsonContentSchema(node)
+      const contentNode = ast.schema.getEmbeddedJson(node)
       if (!contentNode) return value
       // The string holds wire JSON whichever way the string itself travels, so its schema always decodes.
       const direction = this.options.direction
@@ -169,7 +168,7 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
     ipv6: () => 'z.ipv6()',
     blob: () => 'z.instanceof(Blob)',
     enum(node) {
-      const values = node.namedEnumValues?.map((v) => v.value) ?? node.enumValues ?? []
+      const values = ast.schema.getLiterals(node)
       const nonNullValues = values.filter((v): v is string | number | boolean => v !== null)
 
       // asConst-style enum: use z.union([z.literal(…), …])
@@ -205,7 +204,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
     ...buildScalarNodes(dialect),
     ref(node) {
       if (!node.name) return null
-      const refName = ast.resolveRefName(node)
+      const refName = ast.ref.getName(node)
       if (!refName) return null
 
       // In the input direction, a component whose fields print differently by direction resolves
@@ -250,7 +249,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
           return catchallType ? dialect.catchall(objectBase, catchallType) : objectBase
         }
         if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema && !isStrict) {
-          const unknownType = this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
+          const unknownType = this.transform(ast.factory.createSchema({ type: ast.schema.types.unknown }))!
           return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
         }
         if (node.additionalProperties === true) return objectBase
@@ -260,7 +259,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         // reject the declared keys, so fall back to a catchall (value validated, key pattern not).
         if (patterns.length > 0) {
           const values = patterns.map(([, valueSchema]) => {
-            const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
+            const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: ast.schema.types.unknown }))!
             return valueSchema.nullable ? dialect.nullable(valueType) : valueType
           })
           const distinct = [...new Set(values)]
@@ -276,10 +275,8 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       return result
     },
     array(node) {
-      const items = mapSchemaItems(node, (item) => printNullable(item, this.transform(item)))
-        .map(({ output }) => output)
-        .filter(Boolean)
-      const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
+      const items = (node.items ?? []).map((item) => printNullable(item, this.transform(item))).filter(Boolean)
+      const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schema.types.unknown }))!
       const base = `z.array(${inner})${dialect.lengths({ ...node, regexType: this.options.regexType })}`
       const unique = node.unique ? dialect.unique(base) : base
       const contains = node.contains && containsCheck(this, node.contains)
@@ -287,9 +284,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       return contains ? dialect.refine(unique, contains) : unique
     },
     tuple(node) {
-      const items = mapSchemaItems(node, (item) => printNullable(item, this.transform(item)))
-        .map(({ output }) => output)
-        .filter(Boolean)
+      const items = (node.items ?? []).map((item) => printNullable(item, this.transform(item))).filter(Boolean)
 
       // OpenAPI 3.1 `items` next to `prefixItems` types the elements after the positional ones.
       const rest = node.rest ? this.transform(node.rest) : undefined
@@ -320,14 +315,17 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       // `z.xor` already rejects a value matching several members, and the discriminator already picks one
       // member of a `z.discriminatedUnion`, so their members stay as declared.
       const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !unionsWithSiblings.has(node)
-      const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
-        .map(({ schema, output }) => (output && isStrict && dialect.strictMember ? dialect.strictMember(output, schema, cyclicSchemas) : output))
+      const members = (node.members ?? [])
+        .map((memberNode) => {
+          const output = this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode)
+          return output && isStrict && dialect.strictMember ? dialect.strictMember(output, memberNode, cyclicSchemas) : output
+        })
         .map((output, index) => printNullable(nodeMembers[index]!, output))
         .filter(Boolean)
       if (members.length === 0) return ''
       if (members.length === 1) return members[0]!
       if (isDiscriminated) {
-        return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
+        return `z.discriminatedUnion(${text.quote(node.discriminatorPropertyName)}, ${buildList(members)})`
       }
       if (isXor) return `z.xor(${buildList(members)})`
 
@@ -336,7 +334,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
     intersection(node) {
       const members = node.members ?? []
       if (members.length === 0) return ''
-      const hasSiblingProperties = members.some((member) => member.type === ast.schemaTypes.object && member.properties.length > 0)
+      const hasSiblingProperties = members.some((member) => member.type === ast.schema.types.object && member.properties.length > 0)
       const transform = (member: ast.SchemaNode) => {
         if (!hasSiblingProperties) return this.transform(member)
         unionsWithSiblings.add(member)
@@ -358,11 +356,11 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemas)) {
         // A discriminated `oneOf` base already pins its discriminator to a literal; a sibling
         // `type: string` extended after it would widen that literal back to any string.
-        const discriminator = ast.narrowSchema(first, ast.schemaTypes.union)?.discriminatorPropertyName
+        const discriminator = ast.schema.narrow(first, ast.schema.types.union)?.discriminatorPropertyName
         return preserveRequiredProperties(members)
           .slice(1)
           .reduce((acc, member) => {
-            const object = ast.narrowSchema(member, ast.schemaTypes.object)
+            const object = ast.schema.narrow(member, ast.schema.types.object)
             if (!discriminator || !object?.properties.some((property) => property.name === discriminator)) {
               return dialect.extend(acc, dialect.objectShape(this, member))
             }
@@ -389,15 +387,15 @@ function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullabl
   const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
   const itemSchema = ctx.transform(schema) ?? 'z.unknown()'
 
-  return `(items) => { const count = items.filter((item) => ${itemSchema}.safeParse(item).success).length; return ${countBounds} }, { message: ${stringify(message)} }`
+  return `(items) => { const count = items.filter((item) => ${itemSchema}.safeParse(item).success).length; return ${countBounds} }, { message: ${text.quote(message)} }`
 }
 
 // A required `unknown` property means "the key is present", which a Zod object would accept as missing, so those keys are checked with `in`.
 function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
   if (!schema) return 'true'
-  const object = ast.narrowSchema(schema, ast.schemaTypes.object)
+  const object = ast.schema.narrow(schema, ast.schema.types.object)
   const keyOnlyNames =
-    object?.properties.filter((property) => property.required && property.schema.type === ast.schemaTypes.unknown).map((property) => property.name) ?? []
+    object?.properties.filter((property) => property.required && property.schema.type === ast.schema.types.unknown).map((property) => property.name) ?? []
   const restSchema = object ? { ...object, properties: object.properties.filter((property) => !keyOnlyNames.includes(property.name)) } : schema
   // An object with no properties left still means "is an object", so only a key check stands alone.
   const isOnlyKeys =
@@ -445,5 +443,5 @@ export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.Prin
     return [[type, checkedHandler]]
   }
 
-  return Object.fromEntries(Object.values(ast.schemaTypes).flatMap(wrapHandler))
+  return Object.fromEntries(Object.values(ast.schema.types).flatMap(wrapHandler))
 }

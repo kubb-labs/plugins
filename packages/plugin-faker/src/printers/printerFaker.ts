@@ -1,6 +1,5 @@
-import { jsonContentSchema, mapSchemaItems, mapSchemaMembers } from '@internals/shared'
-import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
-import { ast, containsCircularRef, Diagnostics, syncSchemaRef } from '@kubb/kit'
+import { buildObject, objectKey, toRegExpString } from '@internals/utils'
+import { ast, createPrinter, Diagnostics, text } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema, isObjectSchema } from '../utils.ts'
 
@@ -74,7 +73,7 @@ const maxValueByFormat: Record<string, number> = { int32: maxInt32, uint32: 4_29
 // A ref back into its own cycle is left empty, so a mock of a recursive schema is finite and can be serialized.
 function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: PrinterFakerOptions): boolean {
   if (node.type !== 'ref' || !schemaName) return false
-  const refName = ast.resolveRefName(node)
+  const refName = ast.ref.getName(node)
 
   return refName === schemaName || Boolean(refName && cyclicSchemas?.has(schemaName) && cyclicSchemas.has(refName))
 }
@@ -90,18 +89,9 @@ function numberCall(
   const isWhole = kind !== 'float'
   // Faker's `int` and `bigInt` reject a fractional `multipleOf`.
   const grid = isWhole && !Number.isInteger(multipleOf) ? undefined : multipleOf
-  // Faker returns points of the `multipleOf` grid, ends included, so an exclusive bound moves to the next point. A whole number's grid is 1.
+  // Faker returns points of the `multipleOf` grid, ends included, so an exclusive bound moves to the next point.
   // shortcut: without a grid a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
-  const step = grid ?? (isWhole ? 1 : undefined)
-  const above = (bound: number) => (step ? (Math.floor(bound / step) + 1) * step : bound)
-  const below = (bound: number) => (step ? (Math.ceil(bound / step) - 1) * step : bound)
-  // A bound past `Number.MAX_SAFE_INTEGER`, such as int64's, prints as a rounded or invalid literal, so it is left out.
-  const tightestBound = (pick: (...bounds: Array<number>) => number, bounds: Array<number | undefined>) => {
-    const safeBounds = bounds.filter((bound): bound is number => bound !== undefined && (!isWhole || Number.isSafeInteger(bound)))
-    return safeBounds.length ? pick(...safeBounds) : undefined
-  }
-  const lower = tightestBound(Math.max, [min !== undefined && isWhole ? Math.ceil(min) : min, exclusive?.min === undefined ? undefined : above(exclusive.min)])
-  const upper = tightestBound(Math.min, [max !== undefined && isWhole ? Math.floor(max) : max, exclusive?.max === undefined ? undefined : below(exclusive.max)])
+  const { min: lower, max: upper } = ast.schema.getNumberBounds({ min, max, exclusive, integer: isWhole, step: grid })
   // Faker fills a missing `min` with `0`, and a float's missing `max` with `1`, which a lone bound on the other side contradicts.
   // The span holds grid points, so faker always finds a multiple.
   const span = 100 * (grid ?? 1)
@@ -212,7 +202,7 @@ function matches(value: string, regexGenerator: 'faker' | 'randexp' = 'faker'): 
 
 function parseEnumValue(value: string | number | boolean | null | undefined) {
   if (typeof value === 'string') {
-    return stringify(value)
+    return text.quote(value)
   }
 
   return value
@@ -229,8 +219,8 @@ function getDiscriminator(
   member: ast.SchemaNode,
   discriminatorPropertyName: string,
 ): { value: string | number | boolean | null; required: boolean } | undefined {
-  for (const property of ast.resolveSchemaProperties({ node: member, propertyName: discriminatorPropertyName })) {
-    const values = ast.getSchemaLiteralValues(property.schema)
+  for (const property of ast.schema.findProperties({ node: member, propertyName: discriminatorPropertyName })) {
+    const values = ast.schema.getLiterals(property.schema)
     if (values.length === 1) {
       return { value: values[0]!, required: property.required }
     }
@@ -266,7 +256,7 @@ function itemTypeName(typeName: string, nestedInUnion?: boolean): string {
  * Creates a Faker printer that generates mock data generation code from schema nodes.
  * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
  */
-export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = ast.createPrinter<PrinterFakerFactory>((options) => {
+export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = createPrinter<PrinterFakerFactory>((options) => {
   const printNested = (node: ast.SchemaNode, overrideOptions: Partial<PrinterFakerOptions> = {}): string => {
     return (
       printerFaker({
@@ -298,7 +288,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const formatCall = stringFormatCalls.get(node.format)
         if (formatCall) return formatCall
 
-        const contentSchema = jsonContentSchema(node)
+        const contentSchema = ast.schema.getEmbeddedJson(node)
         // The document is typed by its own schema, not by the string that holds it.
         if (contentSchema) return `JSON.stringify(${printNested(contentSchema, { typeName: undefined, nestedInObject: true, nestedInUnion: false })})`
 
@@ -340,11 +330,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return dateTimeCall(node.representation ?? 'string', { format: 'HH:mm:ss', substring: '11, 19' }, this.options.dateParser, this.options.schemaName)
       },
       ref(node) {
-        // `resolveRefName` prefers the node's `targetName` (set for collision or macro renames),
+        // `ast.ref.getName` prefers the node's `targetName` (set for collision or macro renames),
         // then the $ref path segment, since node.name may have been overridden (e.g. by
         // single-member allOf flatten using the property-derived child name). Inline refs
         // (without $ref) from faker utils already carry resolved helper names.
-        const refName = ast.resolveRefName(node)
+        const refName = ast.ref.getName(node)
 
         if (!refName) {
           throw new Diagnostics.Error({
@@ -363,7 +353,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // emitted with resolver output and should not be transformed twice.
         const resolvedName = node.ref ? this.options.resolver.name(refName) : refName
 
-        if (!this.options.nestedInObject && canOverrideSchema(ast.resolveRef(node))) {
+        if (!this.options.nestedInObject && canOverrideSchema(ast.ref.getSchema(node))) {
           return `${resolvedName}(data)`
         }
 
@@ -371,7 +361,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       enum(node) {
         const { typeName } = this.options
-        const values = ast.getSchemaLiteralValues(node)
+        const values = ast.schema.getLiterals(node)
 
         if (values.length === 1 && values[0] !== null && typeof values[0] === 'object') {
           return JSON.stringify(values[0])
@@ -392,26 +382,26 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const acyclicMembers = (node.members ?? []).filter((member) => !isCyclicMember(member))
         const members = acyclicMembers.length ? acyclicMembers : node.members
 
-        const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) => {
-          // For a discriminated union, narrow each variant to its own branch so nested
-          // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
-          const discriminator = discriminatorPropertyName ? getDiscriminator(member, discriminatorPropertyName) : undefined
+        const items: Array<string> = (members ?? [])
+          .map((member) => {
+            // For a discriminated union, narrow each variant to its own branch so nested
+            // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
+            const discriminator = discriminatorPropertyName ? getDiscriminator(member, discriminatorPropertyName) : undefined
 
-          if (baseTypeName && discriminator) {
-            // An optional discriminator (`strategy?: 'a'`) does not extend `{ strategy: 'a' }`,
-            // so match it as optional too.
-            const key = `${JSON.stringify(discriminatorPropertyName)}${discriminator.required ? '' : '?'}`
-            const typeName = `Extract<NonNullable<${baseTypeName}>, { ${key}: ${parseEnumValue(discriminator.value)} }>`
+            if (baseTypeName && discriminator) {
+              // An optional discriminator (`strategy?: 'a'`) does not extend `{ strategy: 'a' }`,
+              // so match it as optional too.
+              const key = `${JSON.stringify(discriminatorPropertyName)}${discriminator.required ? '' : '?'}`
+              const typeName = `Extract<NonNullable<${baseTypeName}>, { ${key}: ${parseEnumValue(discriminator.value)} }>`
 
-            return printNested(member, { typeName, nestedInObject: true, nestedInUnion: true })
-          }
+              return printNested(member, { typeName, nestedInObject: true, nestedInUnion: true })
+            }
 
-          // Without a discriminator, keep the union type but guard each indexed access (see
-          // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
-          // rather than erroring with TS2339.
-          return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
-        })
-          .map(({ output }) => output)
+            // Without a discriminator, keep the union type but guard each indexed access (see
+            // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
+            // rather than erroring with TS2339.
+            return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
+          })
           .filter((item): item is string => Boolean(item))
 
         return `faker.helpers.arrayElement([${items.join(', ')}])`
@@ -422,14 +412,14 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // an extension or a discriminator sets.
         const memberRank = (member: ast.SchemaNode) => (member.type === 'ref' ? 0 : member.type === 'union' ? 2 : 1)
         const members = objectMembers.length ? objectMembers.toSorted((a, b) => memberRank(a) - memberRank(b)) : node.members
-        const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
-          printNested(member, {
-            nestedInObject: true,
-            // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
-            ...(member.type === 'ref' && ast.resolveRefName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
-          }),
-        )
-          .map(({ output }) => output)
+        const items: Array<string> = (members ?? [])
+          .map((member) =>
+            printNested(member, {
+              nestedInObject: true,
+              // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
+              ...(member.type === 'ref' && ast.ref.getName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
+            }),
+          )
           // An `allOf` member with no shape (any/unknown/void → 'undefined') adds no
           // constraint. Keeping it would spread `...undefined` into the merged object.
           .filter((item): item is string => Boolean(item) && item !== 'undefined')
@@ -442,13 +432,13 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // An array of items that would recurse stays empty, which is valid where a list of `undefined` is not.
         if (node.items?.length === 1 && isCyclicRef(node.items[0]!, this.options)) return this.options.typeName ? `[] as ${this.options.typeName}` : '[]'
 
-        const items: Array<string> = mapSchemaItems(node, (member) =>
-          printNested(member, {
-            typeName: this.options.typeName ? itemTypeName(this.options.typeName, this.options.nestedInUnion) : undefined,
-            nestedInObject: true,
-          }),
-        )
-          .map(({ output }) => output)
+        const items: Array<string> = (node.items ?? [])
+          .map((member) =>
+            printNested(member, {
+              typeName: this.options.typeName ? itemTypeName(this.options.typeName, this.options.nestedInUnion) : undefined,
+              nestedInObject: true,
+            }),
+          )
           .filter((item): item is string => Boolean(item))
 
         if (items.length > 1) {
@@ -480,12 +470,12 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       object(node): string {
         const cyclicSchemas = this.options.cyclicSchemas
-        const keySchema = node.propertyNames && syncSchemaRef(node.propertyNames)
+        const keySchema = node.propertyNames && ast.ref.mergeSchema(node.propertyNames)
         const valueSchema = node.additionalProperties
         const recordProperties =
           keySchema?.type === 'enum' && typeof valueSchema === 'object'
-            ? ast
-                .getSchemaLiteralValues(keySchema)
+            ? ast.schema
+                .getLiterals(keySchema)
                 .filter((key): key is string => typeof key === 'string' && !node.properties.some((property) => property.name === key))
                 .map((name) => ast.factory.createProperty({ name, schema: valueSchema }))
             : []
@@ -514,7 +504,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           // emit a memoizing lazy getter. On first access it computes the value,
           // replaces itself with a plain data property via Object.defineProperty,
           // and returns the cached value, so every subsequent read is stable.
-          if (cyclicSchemas && containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
+          if (cyclicSchemas && ast.graph.containsCircular(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
             return `get ${objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
           }
 

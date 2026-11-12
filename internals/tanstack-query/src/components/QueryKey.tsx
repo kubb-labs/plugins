@@ -1,5 +1,4 @@
-import { getOperationParameters } from '@internals/shared'
-import { type ast, Url } from '@kubb/kit'
+import { ast, Url } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
@@ -41,7 +40,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
  */
 export const queryKeyTransformer: Transformer = ({ node, variant }) => {
   if (!node.path) return []
-  const { path, query } = getOperationParameters(node)
+  const { path, query } = ast.http.groupParameters(node)
   // Embedding `infinite: true` inside the URL segment separates infinite queries in the cache
   // while preserving TanStack Query partial matching for base URL invalidation.
   const isInfinite = variant === 'infiniteQuery' || variant === 'suspenseInfiniteQuery'
@@ -53,7 +52,7 @@ export const queryKeyTransformer: Transformer = ({ node, variant }) => {
   const result = [`{ ${urlFields.join(', ')} }`]
   if (query.length > 0) result.push('...(query ? [query] : [])')
   // A falsy body (`''`, `0`, `false`, `null`) is still an input, so only an absent one is left out.
-  if (node.requestBody?.content?.[0]?.schema) result.push('...(body !== undefined ? [body] : [])')
+  if (ast.http.requestBody.getSchema(node)) result.push('...(body !== undefined ? [body] : [])')
 
   return result
 }

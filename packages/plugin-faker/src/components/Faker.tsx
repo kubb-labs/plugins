@@ -1,5 +1,5 @@
 import { jsDocEscape, objectKey } from '@internals/utils'
-import { ast, containsCircularRef } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
@@ -22,8 +22,8 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
   const imports = printer.drainImports().map((imp) => <File.Import key={[name, imp.path, imp.name].join('-')} {...imp} />)
 
   const isArray = node.type === 'array'
-  const isObject = !!ast.narrowSchema(node, ast.schemaTypes.object) || (node.type === ast.schemaTypes.intersection && isObjectSchema(node))
-  const isValueIntersection = node.type === ast.schemaTypes.intersection && !isObject
+  const isObject = !!ast.schema.narrow(node, ast.schema.types.object) || (node.type === ast.schema.types.intersection && isObjectSchema(node))
+  const isValueIntersection = node.type === ast.schema.types.intersection && !isObject
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
   const isUnion = node.type === 'union'
@@ -40,7 +40,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
       return node.nullable ? `data !== undefined ? data : ${fakerText}` : `data ?? ${fakerText}`
     }
     // A nullable ref to a scalar calls the referenced factory, whose `data` does not take `null`.
-    if (canOverride && node.type === 'ref' && node.nullable && SCALAR_TYPES.has(ast.resolveRef(node).type)) {
+    if (canOverride && node.type === 'ref' && node.nullable && SCALAR_TYPES.has(ast.ref.getSchema(node).type)) {
       return `data === null ? data : ${fakerText}`
     }
     return fakerText
@@ -55,7 +55,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     const returnType = resolvedReturnType
 
     // `as` binds tighter than `??`/`?:`, so tuple/union need parens or `data`'s own type leaks through.
-    const needsCast = canOverride && !!returnType && ((node.type === 'ref' && !SCALAR_TYPES.has(ast.resolveRef(node).type)) || isArray || isTuple || isUnion)
+    const needsCast = canOverride && !!returnType && ((node.type === 'ref' && !SCALAR_TYPES.has(ast.ref.getSchema(node).type)) || isArray || isTuple || isUnion)
     const needsParens = isTuple || isUnion
     const returnExpression = needsCast ? `${needsParens ? `(${fakerTextWithOverride})` : fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
 
@@ -91,7 +91,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
   const hasGetters =
     node.type === 'object' &&
     !!cyclicSchemas &&
-    (node.properties ?? []).some((p) => containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
+    (node.properties ?? []).some((p) => ast.graph.containsCircular(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
 
   // A non-object root (such as an `allOf` with a `oneOf` member) or an object padded up to `minProperties` gives
   // `defaultFakeData` a type TypeScript does not relate to the `Omit` of it.

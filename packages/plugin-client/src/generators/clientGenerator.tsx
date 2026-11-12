@@ -21,7 +21,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       return <ClientRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
     },
     operation(node, ctx) {
-      if (!ast.isHttpOperationNode(node)) return null
+      if (!ast.http.isOperation(node)) return null
 
       const { config, driver, resolver, root } = ctx
       const { output, returnType, throwOnErrorDefault, group, importPath } = ctx.options

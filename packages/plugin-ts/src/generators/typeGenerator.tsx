@@ -1,12 +1,4 @@
-import {
-  buildOptionsSchema,
-  buildResponses,
-  getEnumNames,
-  getOperationParameters,
-  resolveContentTypeVariants,
-  resolveOperationFile,
-  toResponseContent,
-} from '@internals/shared'
+import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -38,7 +30,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const imports = resolver.imports({ node, root, output, group: group ?? undefined, name: importName })
 
-    const enumNode = ast.narrowSchema(node, ast.schemaTypes.enum)
+    const enumNode = ast.schema.narrow(node, ast.schema.types.enum)
     // An inline `const` (single-value enum the adapter did not register) renders as a literal type,
     // so it keeps its plain name instead of the suffixed enum-key name.
     const isEnumSchema = !!enumNode && !isInlineConstEnum(enumNode, enumSchemaNames)
@@ -171,7 +163,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       )
     }
 
-    const { path, query, header, cookie } = getOperationParameters(node)
+    const { path, query, header, cookie } = ast.http.groupParameters(node)
 
     const paramGroupTypes = (
       [
@@ -252,11 +244,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       const responseName = resolver.response.response(node)
 
       const responsesWithSchema = node.responses.filter(hasSchema)
-      const importedNames = new Set(
-        responsesWithSchema.flatMap((res) =>
-          (res.content ?? []).flatMap((entry) => (entry.schema ? ast.collectImportedRefNames(entry.schema).map(importName) : [])),
-        ),
-      )
+      const importedNames = new Set(ast.http.responses.getImportedNames(responsesWithSchema).map(importName))
 
       if (importedNames.has(responseName)) {
         return null

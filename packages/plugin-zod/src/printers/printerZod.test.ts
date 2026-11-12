@@ -262,7 +262,7 @@ describe('printerZod', () => {
     test('bigint keeps its bounds as bigint literals', () => {
       const output = printer.print(ast.factory.createSchema({ type: 'bigint', max: 10, exclusive: { min: 0 } }))
 
-      expect(output).toBe('z.coerce.bigint().max(10n).gt(0n)')
+      expect(output).toBe('z.coerce.bigint().min(1n).max(10n)')
       const schema = new Function('z', `return ${output}`)(z) as z.ZodType
       expect(schema.safeParse(5).success).toBe(true)
       expect(schema.safeParse(0).success).toBe(false)

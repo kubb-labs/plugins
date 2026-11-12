@@ -97,7 +97,7 @@ describe('buildParams', () => {
         examples: [{ value: 'settled' }, { serializedValue: 'status=settled' }],
       }),
     ]
-    const examples = (schema: ast.SchemaNode) => ast.narrowSchema(schema, 'object')?.properties?.[0]?.schema.examples
+    const examples = (schema: ast.SchemaNode) => ast.schema.narrow(schema, 'object')?.properties?.[0]?.schema.examples
 
     expect(examples(buildParams({ params }))).toStrictEqual(['settled'])
     expect(examples(buildParams({ params, serializedExamples: true }))).toStrictEqual(['settled', '<caption>Serialized</caption> status=settled'])
