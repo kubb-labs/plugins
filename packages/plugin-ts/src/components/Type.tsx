@@ -40,7 +40,7 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
     )
   }
 
-  const enumSchemaNodes = ast.collectSync<ast.EnumSchemaNode>(node, {
+  const enumSchemaNodes = ast.collect<ast.EnumSchemaNode>(node, {
     schema(n): ast.EnumSchemaNode | undefined {
       const enumNode = ast.narrowSchema(n, ast.schemaTypes.enum)
       // Skip an inline `const` (single-value enum the adapter did not register): it renders as a
