@@ -1313,6 +1313,145 @@ describe('zodGenerator — Compile Option', () => {
     expect(source).not.toContain('z.compile(')
     expect(source).toContain('export const treeNodeSchema')
   })
+
+  test.each([
+    { mini: false, importPath: 'zod' },
+    { mini: true, importPath: 'zod/mini' },
+  ])('compile with { strict: true } leaves schemas Zod cannot compile uncompiled (mini: $mini)', async ({ mini, importPath }) => {
+    const bigint = () => ast.factory.createSchema({ type: ast.schema.types.bigint })
+    const operation = ast.factory.createOperation({
+      operationId: 'getPet',
+      method: 'GET',
+      path: '/pets/{petId}',
+      tags: ['pets'],
+      parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: bigint(), required: true })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          schema: ast.factory.createSchema({
+            type: ast.schema.types.object,
+            primitive: ast.schema.types.object,
+            properties: [ast.factory.createProperty({ name: 'id', required: true, schema: bigint() })],
+          }),
+        }),
+        ast.factory.createResponse({
+          statusCode: '201',
+          schema: ast.factory.createSchema({ type: ast.schema.types.ref, name: 'PetId', ref: '#/components/schemas/PetId', nullable: true, schema: bigint() }),
+        }),
+      ],
+    })
+
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: { strict: true }, mini, importPath }
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
+    const driver = createMockedPluginDriver({ name: 'compileStrictCoerced' })
+
+    await renderGeneratorOperation(zodGenerator, operation, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    // A coerced root, a ref to one and a union with one throw under strict.
+    expect(source).toContain('export const getPetPathPetIdSchema = z.coerce.bigint()')
+    expect(source).toContain(`export const getPetStatus201Schema = ${mini ? 'z.nullable(petIdSchema)' : 'petIdSchema.nullable()'}`)
+    expect(source).toContain('export const getPetResponseSchema = z.union([getPetStatus200Schema, getPetStatus201Schema])')
+    // Zod runs a coerced property on its runtime parser, so the object still compiles.
+    expect(source).toContain('export const getPetStatus200Schema = z.compile(z.object(')
+    expect(source).toContain('export const getPetPathSchema = z.compile(z.object(')
+
+    const body = source.slice(source.indexOf('export const')).replaceAll('export const', 'const')
+    expect(() => new Function('z', 'petIdSchema', body)(mini ? zMini : z, (mini ? zMini : z).coerce.bigint())).not.toThrow()
+  })
+
+  test('compile with { strict: true } skips schemas that reach a cycle through a ref', async () => {
+    const treeRef = ast.factory.createSchema({ type: ast.schema.types.ref, name: 'TreeNode', ref: '#/components/schemas/TreeNode' })
+    const treeNode = ast.factory.createSchema({
+      type: ast.schema.types.object,
+      name: 'TreeNode',
+      primitive: ast.schema.types.object,
+      properties: [ast.factory.createProperty({ name: 'parent', schema: treeRef })],
+    })
+    const forest = ast.factory.createSchema({
+      type: ast.schema.types.object,
+      name: 'Forest',
+      primitive: ast.schema.types.object,
+      properties: [ast.factory.createProperty({ name: 'root', schema: treeRef })],
+    })
+    const operation = ast.factory.createOperation({
+      operationId: 'getForest',
+      method: 'GET',
+      path: '/forest',
+      tags: ['forest'],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          schema: ast.factory.createSchema({ type: ast.schema.types.ref, name: 'Forest', ref: '#/components/schemas/Forest', nullable: true, schema: forest }),
+        }),
+        ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: ast.schema.types.string }) }),
+      ],
+    })
+
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: { strict: true } }
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
+    const driver = createMockedPluginDriver({ name: 'compileStrictReachesCycle' })
+    driver.inputNode = ast.factory.createInput({ schemas: [treeNode, forest] })
+
+    await renderGeneratorOperation(zodGenerator, operation, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('export const getForestStatus200Schema = forestSchema.nullable()')
+    expect(source).toContain('export const getForestStatus201Schema = z.compile(z.string(), { strict: true })')
+    expect(source).toContain('export const getForestResponseSchema = z.union([getForestStatus200Schema, getForestStatus201Schema])')
+  })
+
+  test.each([
+    { name: 'a coerced scalar', schema: integerSchema, options: { coercion: true }, compiled: false },
+    { name: 'an object with coerced properties', schema: objectSchema, options: { coercion: true }, compiled: true },
+    {
+      name: 'a z.xor',
+      schema: ast.factory.createSchema({
+        type: ast.schema.types.union,
+        name: 'PetRef',
+        strategy: 'one',
+        members: [ast.factory.createSchema({ type: ast.schema.types.string }), ast.factory.createSchema({ type: ast.schema.types.boolean })],
+      }),
+      options: { oneOfType: 'xor' },
+      compiled: false,
+    },
+  ] as const)('compile with { strict: true } on $name', async ({ schema, options: overrides, compiled }) => {
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, ...overrides, compile: { strict: true } }
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
+    const driver = createMockedPluginDriver({ name: 'compileStrictUnsupported' })
+
+    await renderGeneratorSchema(zodGenerator, schema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver,
+    })
+
+    const expression = rawSources(driver.fileManager.files)
+      .join('\n')
+      .replace(/^[^]*?export const \w+ = /, '')
+    expect(expression.startsWith('z.compile(')).toBe(compiled)
+    expect(() => new Function('z', `return ${expression}`)(z)).not.toThrow()
+  })
 })
 
 describe('custom imports', () => {

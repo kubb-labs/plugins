@@ -1,9 +1,11 @@
+import { stripTypeScriptTypes } from 'node:module'
 import { ast } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import type { PluginZod } from '@kubb/plugin-zod'
 import { resolverZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
+import { z } from 'zod'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderGeneratorOperations, testConfig } from '#mocks'
 import { resolverMcp } from '../resolvers/resolverMcp.ts'
 import type { PluginMcp } from '../types.ts'
@@ -67,6 +69,27 @@ describe('serverGenerator — Operations', () => {
     const driver = await renderServer(nodes)
 
     await matchFiles(driver.fileManager.files, 'showPetById')
+  })
+})
+
+describe('serverGenerator — tool schemas', () => {
+  test('lists a tool whose schema holds a bigint or a Blob', async () => {
+    const source = rawSources(
+      (await renderServer([ast.factory.createOperation({ operationId: 'ping', method: 'GET', path: '/ping', responses: [] })])).fileManager.files,
+    ).join('\n')
+    const helper = source.slice(source.indexOf('function toolSchema'), source.indexOf('export function getServer'))
+    const toolSchema = new Function('z', `${stripTypeScriptTypes(helper)}\nreturn toolSchema`)(z) as (schema: z.ZodType) => z.ZodType
+    const schema = z.object({ path: z.object({ petId: z.coerce.bigint() }), body: z.instanceof(Blob).optional() })
+
+    expect(() => schema['~standard'].jsonSchema.input({ target: 'draft-2020-12' })).toThrow('BigInt cannot be represented in JSON Schema')
+
+    const tool = toolSchema(schema)['~standard']
+
+    expect(tool.jsonSchema.input({ target: 'draft-2020-12' })).toMatchObject({
+      properties: { path: { properties: { petId: { type: 'integer', format: 'int64' } }, required: ['petId'] }, body: {} },
+      required: ['path'],
+    })
+    expect(tool.validate({ path: { petId: 3 } })).toEqual({ value: { path: { petId: 3n } } })
   })
 })
 

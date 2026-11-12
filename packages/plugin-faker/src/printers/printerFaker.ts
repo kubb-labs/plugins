@@ -1,7 +1,7 @@
 import { buildObject, objectKey, toRegExpString } from '@internals/utils'
 import { ast, createPrinter, Diagnostics, text } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
-import { canOverrideSchema, isObjectSchema } from '../utils.ts'
+import { canOverrideSchema, dateParserName, isObjectSchema } from '../utils.ts'
 
 /**
  * Partial map of node-type overrides for the Faker printer. Each key is a
@@ -119,7 +119,9 @@ function dateTimeCall(
   schemaName?: string,
 ): string {
   if (representation === 'string') {
-    return parser !== 'faker' ? `${parser}(faker.date.anytime()).format("${format}")` : `faker.date.anytime().toISOString().substring(${substring})`
+    return parser !== 'faker'
+      ? `${dateParserName(parser)}(faker.date.anytime()).format("${format}")`
+      : `faker.date.anytime().toISOString().substring(${substring})`
   }
 
   if (parser !== 'faker') {
@@ -321,7 +323,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // ISO 8601 that matches the node: no zone when local, a numeric offset, or UTC `Z`.
         const format = node.local ? 'YYYY-MM-DDTHH:mm:ss' : node.offset ? 'YYYY-MM-DDTHH:mm:ssZ' : 'YYYY-MM-DDTHH:mm:ss[Z]'
 
-        return `${parser}(faker.date.anytime()).format("${format}")`
+        return `${dateParserName(parser)}(faker.date.anytime()).format("${format}")`
       },
       date(node) {
         return dateTimeCall(node.representation ?? 'string', { format: 'YYYY-MM-DD', substring: '0, 10' }, this.options.dateParser, this.options.schemaName)

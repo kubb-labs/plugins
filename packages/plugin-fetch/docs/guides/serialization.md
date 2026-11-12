@@ -156,6 +156,8 @@ if (result.contentType === 'application/xml') {
 }
 ```
 
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
+
 [Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/server-sent-events) covers stream media types and `client.stream`.
 
 > [!NOTE]

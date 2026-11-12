@@ -16,7 +16,7 @@ export type ResolverFaker = Resolver & {
      * Resolves the faker function name for an individual parameter.
      *
      * @example Individual parameter name
-     * `resolver.param.name(node, param) // -> 'showPetByIdPathPetId'`
+     * `resolver.param.name(node, param) // -> 'createShowPetByIdPathPetId'`
      */
     name(node: ast.OperationNode, param: ast.ParameterNode): string
     /**
@@ -56,28 +56,28 @@ export type ResolverFaker = Resolver & {
      * Resolves the faker function name for a response by status code.
      *
      * @example Response status name
-     * `resolver.response.status(node, 200) // -> 'listPetsStatus200'`
+     * `resolver.response.status(node, 200) // -> 'createListPetsStatus200'`
      */
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**
      * Resolves the faker function name for a request body.
      *
      * @example Request body name
-     * `resolver.response.body(node) // -> 'createPetsBody'`
+     * `resolver.response.body(node) // -> 'createCreatePetsBody'`
      */
     body(node: ast.OperationNode): string
     /**
      * Resolves the faker function name for the response union.
      *
      * @example Response union name
-     * `resolver.response.response(node) // -> 'listPetsResponse'`
+     * `resolver.response.response(node) // -> 'createListPetsResponse'`
      */
     response(node: ast.OperationNode): string
     /**
      * Resolves the faker function name for the response collection.
      *
      * @example Responses collection name
-     * `resolver.response.responses(node) // -> 'listPetsResponses'`
+     * `resolver.response.responses(node) // -> 'createListPetsResponses'`
      */
     responses(node: ast.OperationNode): string
   }

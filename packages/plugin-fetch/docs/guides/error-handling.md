@@ -10,7 +10,7 @@ import { ResponseError } from './gen/.kubb/client'
 
 try {
   const { data } = await getPetById({ path: { petId: 1 } })
-  console.info(data.name)
+  console.info(data)
 } catch (error) {
   if (ResponseError.is(error)) {
     console.error(error.status) // 404
@@ -18,6 +18,8 @@ try {
   }
 }
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 The `message` holds the HTTP method and the URL without its query string, so query credentials stay out of logs. For example: `GET https://api.example.com/pets/1 failed with status 404 Not Found`.
 
@@ -30,6 +32,7 @@ class ResponseError extends Error {
   status: number
   statusText: string
   contentType: string | undefined
+  headers: Headers
   request: Request
   response: Response
 }
@@ -43,7 +46,7 @@ Each generated package bundles its own `ResponseError` class, so narrow with `Re
 
 ```typescript
 import { isResponseError } from './gen/.kubb/client'
-import type { GetPetByIdResponses } from './gen/models/GetPetById'
+import type { GetPetByIdResponses } from './gen/types/GetPetById'
 
 try {
   await getPetById({ path: { petId: 7 } })
@@ -71,7 +74,7 @@ declares a `default` response, whose status can be any number:
 const result = await getPetById({ path: { petId: 1 }, throwOnError: false })
 
 if (result.data !== undefined) {
-  console.info(result.data.name)
+  console.info(result.data)
 } else {
   console.error(result.status, result.error)
 }
@@ -135,7 +138,7 @@ try {
 }
 ```
 
-A `ParseError` reports schema validation issues. A `ResponseError` reports a non-2xx status. With `throwOnError: false`, the error body is checked against the schema of its status, then of its range such as `5xx`, then of `default`. A status the document leaves out, such as a `502` from a gateway, resolves with the body unchecked.
+A `ParseError` reports schema validation issues. A `ResponseError` reports a non-2xx status. The error body of a non-2xx response is checked against the schema of its status, then of its range such as `5xx`, then of `default`. An error body that fails its schema throws a `ParseError` in place of the `ResponseError`, also with `throwOnError: false`. A status the document leaves out, such as a `502` from a gateway, keeps its body unchecked.
 
 Calling `.unwrap()` on a `throwOnError: false` call turns that same `error` into a rejection, so a
 `try`/`catch` works there too.
@@ -150,7 +153,7 @@ import { client } from './gen/.kubb/client'
 client.setConfig({ validate: import.meta.env.DEV })
 ```
 
-`validate: false` skips every schema. An object skips only the directions set to `false`: `request` (the body), `params` (path, query, and header params), `response`, and `error`:
+`validate: false` skips every schema. An object skips only the directions set to `false`: `request` (the body), `params` (path, query, header, and cookie params), `response`, and `error`:
 
 ```typescript
 client.setConfig({ validate: { response: false } })

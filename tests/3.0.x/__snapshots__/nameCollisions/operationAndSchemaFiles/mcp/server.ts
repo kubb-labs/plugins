@@ -11,6 +11,29 @@ import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 
+/**
+ * Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.
+ * A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.
+ */
+function toolSchema<T extends z.ZodType>(schema: T) {
+  const standard = schema['~standard']
+  const convert = (io: 'input' | 'output') => (options: Parameters<typeof standard.jsonSchema.input>[0]) =>
+    standard.jsonSchema[io]({
+      ...options,
+      libraryOptions: {
+        unrepresentable: 'any',
+        override: ({ zodSchema, jsonSchema }: { zodSchema: z.core.$ZodType; jsonSchema: Record<string, unknown> }) => {
+          if (zodSchema._zod.def.type === 'bigint') {
+            jsonSchema.type = 'integer'
+            jsonSchema.format = 'int64'
+          }
+        },
+      },
+    })
+
+  return { '~standard': { ...standard, jsonSchema: { input: convert('input'), output: convert('output') } } }
+}
+
 export function getServer() {
   const server = new McpServer({
     name: 'File name collisions',
@@ -19,15 +42,15 @@ export function getServer() {
 
   server.registerTool("point", {
     description: "Make a GET request to /points/{id}",
-    outputSchema: z.object({ data: pointStatus200Schema }),
-    inputSchema: z.object({ path: z.object({ "id": pointPathIdSchema }) }),
+    outputSchema: toolSchema(z.object({ data: pointStatus200Schema })),
+    inputSchema: toolSchema(z.object({ path: z.object({ "id": pointPathIdSchema }) })),
   }, async ({ path }, ctx) => {
     return pointHandler({ path }, ctx)
   })
 
   server.registerTool("office_weatherstory", {
     description: "Make a GET request to /stories",
-    outputSchema: z.object({ data: officeWeatherstoryStatus200Schema }),
+    outputSchema: toolSchema(z.object({ data: officeWeatherstoryStatus200Schema })),
   }, async (ctx) => {
     return officeWeatherstoryHandler(ctx)
   })

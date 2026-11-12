@@ -84,9 +84,9 @@ export type ClientOptions = OutputOptions & {
   validator?: ValidatorOptions
   /**
    * Shape of the value a generated operation function resolves to. Applies to the standalone
-   * functions and the class-based SDK; not to the query-hook plugins (`@kubb/plugin-react-query`,
-   * `@kubb/plugin-vue-query`, `@kubb/plugin-swr`), which keep calling the client directly and
-   * expect the full result.
+   * functions and the class-based SDK. The query-hook plugins (`@kubb/plugin-react-query`,
+   * `@kubb/plugin-vue-query`, `@kubb/plugin-swr`) and `@kubb/plugin-mcp` read it to unwrap the
+   * call they make, and their own `returnType` sets what a hook resolves to.
    *
    * @default 'full'
    * @example

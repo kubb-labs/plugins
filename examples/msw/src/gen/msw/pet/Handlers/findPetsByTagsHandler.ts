@@ -15,12 +15,20 @@ export function findPetsByTagsHandlerResponse200(data?: FindPetsByTagsResponse) 
       },
     })
 
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => {
+      if (typeof value !== 'bigint') return value
+      if (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER)
+        throw new TypeError(`Cannot serialize ${value}n as JSON without losing precision.`)
+      return Number(value)
+    }),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     },
-  })
+  )
 }
 
 export function findPetsByTagsHandlerResponse400(data?: FindPetsByTagsStatus400) {

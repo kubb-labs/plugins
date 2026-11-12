@@ -62,12 +62,14 @@ setAuth(async () => readTokenFromSecretsStore())
 
 ## Sign requests or use several auth methods
 
-Read `config.security` and pick per operation, or pass a different `client` on a call. This works for request signing, such as AWS SigV4, and for services that use different credentials:
+Read `config.security` and pick per operation, or pass a different `client` on a call. Both ways work for request signing, such as AWS SigV4, and for services that use different credentials:
 
 ```typescript
 import { createSignedClient } from './clients/iam'
 
 await getPetById({ path: { petId: 1 }, client: createSignedClient() })
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 A client passed on a call replaces the default for that call only.

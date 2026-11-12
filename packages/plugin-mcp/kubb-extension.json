@@ -18,7 +18,8 @@
       "github": "stijnvanhulle"
     }
   ],
-  "dependencies": ["plugin-ts", "plugin-zod"],
+  "dependencies": ["plugin-zod"],
+  "optionalDependencies": ["plugin-ts"],
   "compatibility": {
     "kubb": ">=5.18.4",
     "node": ">=22.22"
@@ -76,28 +77,10 @@
       ]
     },
     {
-      "key": "outputMode",
-      "path": ["output", "mode"],
-      "label": "Output Mode",
-      "description": "How the plugin consolidates its code into files. File mode writes everything into a single file, so the output path must include a file extension and cannot be grouped.",
-      "type": "select",
-      "default": "directory",
-      "choices": [
-        {
-          "label": "directory (one file per schema)",
-          "value": "directory"
-        },
-        {
-          "label": "file (single file)",
-          "value": "file"
-        }
-      ]
-    },
-    {
       "key": "client",
       "path": ["client"],
       "label": "Client",
-      "description": "HTTP client the generated handlers call. Only needed to disambiguate when both plugin-fetch and plugin-axios are enabled",
+      "description": "HTTP client the generated handlers call. Only needed to disambiguate when several client plugins are enabled",
       "type": "select",
       "default": null,
       "choices": [
@@ -112,6 +95,10 @@
         {
           "label": "axios",
           "value": "axios"
+        },
+        {
+          "label": "client",
+          "value": "client"
         }
       ]
     },

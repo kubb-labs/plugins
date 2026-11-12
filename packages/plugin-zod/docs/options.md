@@ -76,7 +76,7 @@ export type PutEventBodySchemaType = z.input<typeof putEventBodySchema>
 
 Pair `'codec'` with `validator: { request: 'zod', params: 'zod' }` in [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#validator) or [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator). Without request validation, the client sends the domain value unencoded.
 
-It also writes a `ResponsesSchema` for each operation (one schema per status code) and its inferred type. [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) and [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) key their `RequestResult` on it when `@kubb/plugin-ts` is absent.
+`inferred` also writes a `ResponsesSchema` for each operation (one schema per status code) and its inferred type. [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) and [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) key their `RequestResult` on it when `@kubb/plugin-ts` is absent.
 
 ### coercion
 
@@ -106,6 +106,8 @@ Chooses which primitives to coerce.
 
 > [!NOTE]
 > `numbers` also coerces an enum whose schema has a numeric `format`, such as `type: integer, format: int32`. Other enums are not coerced. When such an enum is the discriminator of a `oneOf`, the union prints as `z.union` instead of `z.discriminatedUnion`, which cannot read coerced values.
+>
+> `strings` replaces the `base64`, `base64url`, `jwt`, `ulid`, `iban`, and `duration` validators with `z.coerce.string()`, so those formats are no longer checked. Fields with `format: email`, `uri`, `uuid`, `ipv4`, or `ipv6` keep their validator and are not coerced. `numbers` prints every integer as `z.coerce.number().int()`, which drops the `int32` and `uint32` range checks.
 >
 > `dates` coerces only `Date`-typed fields (from `dateType: 'date'`). ISO-string fields are never coerced, and neither are `format: time` fields, because `new Date()` cannot parse a bare `HH:mm:ss`. For a time-of-day type such as `Temporal.PlainTime`, see [Encode custom types](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization#encode-custom-types).
 
@@ -148,14 +150,14 @@ Emits a regex literal, such as `.regex(/^[a-z]+$/)`.
 :::
 
 :::field{name="'constructor'"}
-Emits the `RegExp` constructor, such as `.regex(new RegExp('^[a-z]+$'))`.
+Emits the `RegExp` constructor, such as `.regex(new RegExp("^[a-z]+$"))`.
 :::
 
 ::
 
 ### oneOfType
 
-Controls how a `oneOf` is validated. Use `'xor'` when values may carry extra keys, or when members have no `required` keys.
+Controls how a `oneOf` is validated. Use `'xor'` when values may carry extra keys. With `'xor'`, members need `required` keys that tell them apart. When every key is optional, an object matches several members and `z.xor` rejects it.
 
 |          |                    |
 | -------- | ------------------ |
@@ -198,16 +200,19 @@ Compiles schemas using `z.compile(...)`.
 :::
 
 :::field{name="{ strict: true }"}
-Passes `{ strict: true }` to `z.compile(...)`, which throws when any part of the schema cannot be compiled into flat JavaScript instead of falling back to the interpreter.
+Passes `{ strict: true }` to `z.compile(...)`. Zod then throws when a part of the schema cannot be compiled into flat JavaScript, where `true` falls back to the interpreter.
 :::
 
 ::
 
-Schemas with circular references (`z.lazy`) and bare `$ref` response aliases stay uncompiled to prevent runtime errors.
+Schemas with circular references (`z.lazy`) and bare `$ref` response aliases stay uncompiled to prevent runtime errors. An alias that adds a description, such as `petSchema.describe('A pet')`, is compiled.
+
+> [!NOTE]
+> `z.compile` cannot compile `z.coerce` or `z.xor`. With `strict: true`, a schema that is one of them stays uncompiled, so the generated module loads without a `ZodCompileUnsupportedError`. The same goes for a union with such a member, and for a schema that reaches a circular one through a `$ref`. Every `format: int64` schema is coerced, and so is every schema that [`coercion`](#coercion) covers. An object or array that holds a coerced field is still compiled, and Zod runs that field on its interpreter. To compile an `int64` schema, set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter.
 
 ### mini
 
-Generates [Zod Mini](https://zod.dev/packages/mini) schemas. They use functions (`z.optional(z.string())`) instead of method chains (`z.string().optional()`), so bundlers can drop unused validators. Also sets the `importPath` default to `'zod/mini'`.
+Generates [Zod Mini](https://zod.dev/packages/mini) schemas. They use functions (`z.optional(z.string())`) instead of method chains (`z.string().optional()`), so bundlers can drop unused validators. `mini` also sets the `importPath` default to `'zod/mini'`.
 
 |          |           |
 | -------- | --------- |
@@ -236,7 +241,7 @@ Generates both `is<Schema>` type guards and `assert<Schema>` assertion functions
 :::
 
 :::field{name="{ is?: boolean; assert?: boolean }"}
-Enables type guards or assertions separately.
+Turns type guards or assertions off separately. Both default to `true`, so `{ assert: false }` generates only the `is*` guards.
 :::
 
 ::
@@ -284,6 +289,7 @@ type ResolverZodPatch = {
     path?(node: OperationNode, param: ParameterNode): string
     query?(node: OperationNode, param: ParameterNode): string
     headers?(node: OperationNode, param: ParameterNode): string
+    cookies?(node: OperationNode, param: ParameterNode): string
   }
   response?: {
     status?(node: OperationNode, statusCode: StatusCode): string

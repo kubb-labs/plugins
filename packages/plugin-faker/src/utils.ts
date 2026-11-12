@@ -1,8 +1,13 @@
 import { posix } from 'node:path'
 import { toResponseContent } from '@internals/shared'
-import { getRelativePath } from '@internals/utils'
-import { ast } from '@kubb/kit'
+import { ensureValidVarName, getRelativePath } from '@internals/utils'
+import { ast, casing } from '@kubb/kit'
 import type { ResolverFaker } from './types.ts'
+
+/** The identifier a `dateParser` module is imported and called under: `my-date-lib` becomes `myDateLib`. */
+export function dateParserName(dateParser: string): string {
+  return ensureValidVarName(casing.camel(dateParser))
+}
 
 /**
  * Returns the `@faker-js/faker` named export for a locale code.

@@ -12,6 +12,29 @@ import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 
+/**
+ * Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.
+ * A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.
+ */
+function toolSchema<T extends z.ZodType>(schema: T) {
+  const standard = schema['~standard']
+  const convert = (io: 'input' | 'output') => (options: Parameters<typeof standard.jsonSchema.input>[0]) =>
+    standard.jsonSchema[io]({
+      ...options,
+      libraryOptions: {
+        unrepresentable: 'any',
+        override: ({ zodSchema, jsonSchema }: { zodSchema: z.core.$ZodType; jsonSchema: Record<string, unknown> }) => {
+          if (zodSchema._zod.def.type === 'bigint') {
+            jsonSchema.type = 'integer'
+            jsonSchema.format = 'int64'
+          }
+        },
+      },
+    })
+
+  return { '~standard': { ...standard, jsonSchema: { input: convert('input'), output: convert('output') } } }
+}
+
 export function getServer() {
   const server = new McpServer({
     name: 'server',
@@ -22,8 +45,8 @@ export function getServer() {
     'showPetById',
     {
       description: 'Make a GET request to /pets/{petId}',
-      outputSchema: z.object({ data: showPetByIdStatus200Schema }),
-      inputSchema: z.object({ path: z.object({ petId: showPetByIdPathPetIdSchema }) }),
+      outputSchema: toolSchema(z.object({ data: showPetByIdStatus200Schema })),
+      inputSchema: toolSchema(z.object({ path: z.object({ petId: showPetByIdPathPetIdSchema }) })),
     },
     async ({ path }, ctx) => {
       return showPetByIdHandler({ path }, ctx)
@@ -34,8 +57,8 @@ export function getServer() {
     'getCookies',
     {
       description: 'Make a GET request to /cookies',
-      outputSchema: z.object({ data: getCookiesStatus200Schema }),
-      inputSchema: z.object({ cookies: z.object({ session: getCookiesCookieSessionSchema }) }),
+      outputSchema: toolSchema(z.object({ data: getCookiesStatus200Schema })),
+      inputSchema: toolSchema(z.object({ cookies: z.object({ session: getCookiesCookieSessionSchema }) })),
     },
     async ({ cookies }, ctx) => {
       return getCookiesHandler({ cookies }, ctx)

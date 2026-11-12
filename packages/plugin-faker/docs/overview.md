@@ -12,9 +12,9 @@ Use the factories in tests, Storybook, and local development without a running b
 
 ## Options worth knowing
 
-- `seed` passes a fixed seed to `faker.seed(...)`, so every run returns the same data.
+- `seed` passes a fixed seed to `faker.seed(...)`, so every run returns the same sequence of data.
 - `locale` sets the Faker locale. The default is `en`.
-- `dateParser` formats `date` and `time` strings with `faker` (default), `dayjs`, or `moment`. `date-time` values always use Faker. `dayjs` and `moment` do not work when the adapter types a date or time as `Date`, for example with `dateType: 'date'`.
+- `dateParser` formats `date`, `time`, and `date-time` strings with `faker` (default), `dayjs`, or `moment`. Generation fails with `dayjs` or `moment` when the adapter types a date or time as `Date`, for example with `dateType: 'date'`.
 - `regexGenerator` turns a `pattern` into a string with `faker` (default) or `randexp`.
 - `typeMode` sets the factory types: `inferred` (default) derives them from the generated values, and `schema` uses the declared model type.
 

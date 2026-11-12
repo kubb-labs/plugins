@@ -17,8 +17,7 @@
       "github": "stijnvanhulle"
     }
   ],
-  "dependencies": ["plugin-ts"],
-  "optionalDependencies": ["plugin-zod"],
+  "optionalDependencies": ["plugin-ts", "plugin-zod"],
   "compatibility": {
     "kubb": ">=5.18.4",
     "node": ">=22.22"
@@ -199,7 +198,7 @@
       "key": "returnType",
       "path": ["returnType"],
       "label": "Return Type",
-      "description": "What a generated function resolves to. full is the whole result with status and error, data is only the success body when it throws, and plain is the client's own promise",
+      "description": "What a generated function resolves to. full is the whole result with status and error, and data is only the success body when it throws",
       "type": "select",
       "default": "full",
       "choices": [
@@ -208,9 +207,6 @@
         },
         {
           "value": "data"
-        },
-        {
-          "value": "plain"
         }
       ]
     },

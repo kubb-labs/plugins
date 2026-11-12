@@ -47,6 +47,29 @@ import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 
+/**
+ * Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.
+ * A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.
+ */
+function toolSchema<T extends z.ZodType>(schema: T) {
+  const standard = schema['~standard']
+  const convert = (io: 'input' | 'output') => (options: Parameters<typeof standard.jsonSchema.input>[0]) =>
+    standard.jsonSchema[io]({
+      ...options,
+      libraryOptions: {
+        unrepresentable: 'any',
+        override: ({ zodSchema, jsonSchema }: { zodSchema: z.core.$ZodType; jsonSchema: Record<string, unknown> }) => {
+          if (zodSchema._zod.def.type === 'bigint') {
+            jsonSchema.type = 'integer'
+            jsonSchema.format = 'int64'
+          }
+        },
+      },
+    })
+
+  return { '~standard': { ...standard, jsonSchema: { input: convert('input'), output: convert('output') } } }
+}
+
 export function getServer() {
   const server = new McpServer({
     name: 'Swagger PetStore - OpenAPI 3.0',
@@ -58,13 +81,15 @@ export function getServer() {
     {
       title: 'Create a pet',
       description: 'Make a POST request to /pets/{uuid}',
-      outputSchema: z.object({ data: createPetsStatus201Schema }),
-      inputSchema: z.object({
-        path: z.object({ uuid: createPetsPathUuidSchema }),
-        query: z.object({ offset: createPetsQueryOffsetSchema }),
-        headers: z.object({ 'X-EXAMPLE': createPetsHeaderXEXAMPLESchema }),
-        body: createPetsBodySchema,
-      }),
+      outputSchema: toolSchema(z.object({ data: createPetsStatus201Schema })),
+      inputSchema: toolSchema(
+        z.object({
+          path: z.object({ uuid: createPetsPathUuidSchema }),
+          query: z.object({ offset: createPetsQueryOffsetSchema }),
+          headers: z.object({ 'X-EXAMPLE': createPetsHeaderXEXAMPLESchema }),
+          body: createPetsBodySchema,
+        }),
+      ),
     },
     async ({ path, query, headers, body }, ctx) => {
       return createPetsHandler({ path, query, headers, body }, ctx)
@@ -76,8 +101,8 @@ export function getServer() {
     {
       title: 'Update an existing pet',
       description: 'Update an existing pet by Id',
-      outputSchema: z.object({ data: updatePetStatus200Schema }),
-      inputSchema: z.object({ body: updatePetBodySchema }),
+      outputSchema: toolSchema(z.object({ data: updatePetStatus200Schema })),
+      inputSchema: toolSchema(z.object({ body: updatePetBodySchema })),
     },
     async ({ body }, ctx) => {
       return updatePetHandler({ body }, ctx)
@@ -89,8 +114,8 @@ export function getServer() {
     {
       title: 'Add a new pet to the store',
       description: 'Add a new pet to the store',
-      outputSchema: z.object({ data: addPetStatus200Schema }),
-      inputSchema: z.object({ body: addPetBodySchema }),
+      outputSchema: toolSchema(z.object({ data: addPetStatus200Schema })),
+      inputSchema: toolSchema(z.object({ body: addPetBodySchema })),
     },
     async ({ body }, ctx) => {
       return addPetHandler({ body }, ctx)
@@ -102,8 +127,8 @@ export function getServer() {
     {
       title: 'Finds Pets by status',
       description: 'Multiple status values can be provided with comma separated strings',
-      outputSchema: z.object({ data: findPetsByStatusStatus200Schema }),
-      inputSchema: z.object({ path: z.object({ step_id: findPetsByStatusPathStepIdSchema }) }),
+      outputSchema: toolSchema(z.object({ data: findPetsByStatusStatus200Schema })),
+      inputSchema: toolSchema(z.object({ path: z.object({ step_id: findPetsByStatusPathStepIdSchema }) })),
     },
     async ({ path }, ctx) => {
       return findPetsByStatusHandler({ path }, ctx)
@@ -115,11 +140,13 @@ export function getServer() {
     {
       title: 'Finds Pets by tags',
       description: 'Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.',
-      outputSchema: z.object({ data: findPetsByTagsStatus200Schema }),
-      inputSchema: z.object({
-        query: z.object({ tags: findPetsByTagsQueryTagsSchema, page: findPetsByTagsQueryPageSchema, pageSize: findPetsByTagsQueryPageSizeSchema }),
-        headers: z.object({ 'X-EXAMPLE': findPetsByTagsHeaderXEXAMPLESchema }),
-      }),
+      outputSchema: toolSchema(z.object({ data: findPetsByTagsStatus200Schema })),
+      inputSchema: toolSchema(
+        z.object({
+          query: z.object({ tags: findPetsByTagsQueryTagsSchema, page: findPetsByTagsQueryPageSchema, pageSize: findPetsByTagsQueryPageSizeSchema }),
+          headers: z.object({ 'X-EXAMPLE': findPetsByTagsHeaderXEXAMPLESchema }),
+        }),
+      ),
     },
     async ({ query, headers }, ctx) => {
       return findPetsByTagsHandler({ query, headers }, ctx)
@@ -131,8 +158,8 @@ export function getServer() {
     {
       title: 'Find pet by ID',
       description: 'Returns a single pet',
-      outputSchema: z.object({ data: getPetByIdStatus200Schema }),
-      inputSchema: z.object({ path: z.object({ petId: getPetByIdPathPetIdSchema }) }),
+      outputSchema: toolSchema(z.object({ data: getPetByIdStatus200Schema })),
+      inputSchema: toolSchema(z.object({ path: z.object({ petId: getPetByIdPathPetIdSchema }) })),
     },
     async ({ path }, ctx) => {
       return getPetByIdHandler({ path }, ctx)
@@ -144,10 +171,12 @@ export function getServer() {
     {
       title: 'Updates a pet in the store with form data',
       description: 'Make a POST request to /pet/{petId}',
-      inputSchema: z.object({
-        path: z.object({ petId: updatePetWithFormPathPetIdSchema }),
-        query: z.object({ name: updatePetWithFormQueryNameSchema, status: updatePetWithFormQueryStatusSchema }),
-      }),
+      inputSchema: toolSchema(
+        z.object({
+          path: z.object({ petId: updatePetWithFormPathPetIdSchema }),
+          query: z.object({ name: updatePetWithFormQueryNameSchema, status: updatePetWithFormQueryStatusSchema }),
+        }),
+      ),
     },
     async ({ path, query }, ctx) => {
       return updatePetWithFormHandler({ path, query }, ctx)
@@ -159,7 +188,7 @@ export function getServer() {
     {
       title: 'Deletes a pet',
       description: 'delete a pet',
-      inputSchema: z.object({ path: z.object({ petId: deletePetPathPetIdSchema }), headers: z.object({ api_key: deletePetHeaderApiKeySchema }) }),
+      inputSchema: toolSchema(z.object({ path: z.object({ petId: deletePetPathPetIdSchema }), headers: z.object({ api_key: deletePetHeaderApiKeySchema }) })),
     },
     async ({ path, headers }, ctx) => {
       return deletePetHandler({ path, headers }, ctx)
@@ -171,8 +200,8 @@ export function getServer() {
     {
       title: 'Place an file for a pet',
       description: 'Place a new file in the store',
-      outputSchema: z.object({ data: addFilesStatus200Schema }),
-      inputSchema: z.object({ body: addFilesBodySchema }),
+      outputSchema: toolSchema(z.object({ data: addFilesStatus200Schema })),
+      inputSchema: toolSchema(z.object({ body: addFilesBodySchema })),
     },
     async ({ body }, ctx) => {
       return addFilesHandler({ body }, ctx)
@@ -184,7 +213,7 @@ export function getServer() {
     {
       title: 'Returns pet inventories by status',
       description: 'Returns a map of status codes to quantities',
-      outputSchema: z.object({ data: getInventoryStatus200Schema }),
+      outputSchema: toolSchema(z.object({ data: getInventoryStatus200Schema })),
     },
     async (ctx) => {
       return getInventoryHandler(ctx)
@@ -196,8 +225,8 @@ export function getServer() {
     {
       title: 'Place an order for a pet',
       description: 'Place a new order in the store',
-      outputSchema: z.object({ data: placeOrderStatus200Schema }),
-      inputSchema: z.object({ body: placeOrderBodySchema }),
+      outputSchema: toolSchema(z.object({ data: placeOrderStatus200Schema })),
+      inputSchema: toolSchema(z.object({ body: placeOrderBodySchema })),
     },
     async ({ body }, ctx) => {
       return placeOrderHandler({ body }, ctx)
@@ -209,8 +238,8 @@ export function getServer() {
     {
       title: 'Place an order for a pet with patch',
       description: 'Place a new order in the store with patch',
-      outputSchema: z.object({ data: placeOrderPatchStatus200Schema }),
-      inputSchema: z.object({ body: placeOrderPatchBodySchema }),
+      outputSchema: toolSchema(z.object({ data: placeOrderPatchStatus200Schema })),
+      inputSchema: toolSchema(z.object({ body: placeOrderPatchBodySchema })),
     },
     async ({ body }, ctx) => {
       return placeOrderPatchHandler({ body }, ctx)
@@ -222,8 +251,8 @@ export function getServer() {
     {
       title: 'Find purchase order by ID',
       description: 'For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.',
-      outputSchema: z.object({ data: getOrderByIdStatus200Schema }),
-      inputSchema: z.object({ path: z.object({ orderId: getOrderByIdPathOrderIdSchema }) }),
+      outputSchema: toolSchema(z.object({ data: getOrderByIdStatus200Schema })),
+      inputSchema: toolSchema(z.object({ path: z.object({ orderId: getOrderByIdPathOrderIdSchema }) })),
     },
     async ({ path }, ctx) => {
       return getOrderByIdHandler({ path }, ctx)
@@ -235,7 +264,7 @@ export function getServer() {
     {
       title: 'Delete purchase order by ID',
       description: 'For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors',
-      inputSchema: z.object({ path: z.object({ orderId: deleteOrderPathOrderIdSchema }) }),
+      inputSchema: toolSchema(z.object({ path: z.object({ orderId: deleteOrderPathOrderIdSchema }) })),
     },
     async ({ path }, ctx) => {
       return deleteOrderHandler({ path }, ctx)

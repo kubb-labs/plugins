@@ -12,8 +12,10 @@ A query hook takes the operation's grouped request config (`path`, `query`, `hea
 ```typescript
 import { useGetPetById } from './gen/hooks/useGetPetById'
 
-const { data, error, isLoading } = useGetPetById({ path: { petId: 1n } })
+const { data, error, isLoading } = useGetPetById({ path: { petId: 1 } })
 ```
+
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
 The second argument has two optional groups. `query` takes any TanStack Query option, and `query.client` sets the `QueryClient` to use. The top-level `client` takes request config for this call, such as `baseURL` or `signal`:
 
@@ -21,7 +23,7 @@ The second argument has two optional groups. `query` takes any TanStack Query op
 import { useGetPetById } from './gen/hooks/useGetPetById'
 
 useGetPetById(
-  { path: { petId: 1n } },
+  { path: { petId: 1 } },
   {
     query: { staleTime: 60_000 },
     client: { baseURL: 'https://api.example.com/v1' },
@@ -39,8 +41,8 @@ import { getPetByIdQueryKey, getPetByIdQueryOptions } from './gen/hooks/useGetPe
 
 const queryClient = useQueryClient()
 
-await queryClient.prefetchQuery(getPetByIdQueryOptions({ path: { petId: 1n } }))
-queryClient.invalidateQueries({ queryKey: getPetByIdQueryKey({ path: { petId: 1n } }) })
+await queryClient.prefetchQuery(getPetByIdQueryOptions({ path: { petId: 1 } }))
+queryClient.invalidateQueries({ queryKey: getPetByIdQueryKey({ path: { petId: 1 } }) })
 ```
 
 ## Mutations
@@ -57,7 +59,7 @@ const { mutate } = useDeletePet({
   mutation: { onSuccess: () => queryClient.invalidateQueries() },
 })
 
-mutate({ path: { petId: 1n } })
+mutate({ path: { petId: 1 } })
 ```
 
 Each mutation also exports a `mutationOptions` factory and a `mutationKey` helper.
@@ -111,7 +113,7 @@ const { data, fetchNextPage, hasNextPage } = useInfiniteQuery(
 
 ::
 
-`nextParam` takes dot notation or an array of keys. Change it to match your API's response. Without `getNextPageParam`, `nextParam` or `cursorParam`, the generated options increment the page number until a page returns an empty array.
+`nextParam` takes dot notation or an array of keys. Change it to match your API's response, and give `initialPageParam` the same type as the query parameter. Without `getNextPageParam`, `nextParam` or `cursorParam`, the generated options increment the page number until a page returns an empty array.
 
 ## Use suspense
 
@@ -128,7 +130,7 @@ pluginReactQuery({ hooks: true, suspense: {} })
 ```typescript [usage.ts]
 import { useGetPetByIdSuspense } from './gen/hooks/useGetPetByIdSuspense'
 
-const { data } = useGetPetByIdSuspense({ path: { petId: 1n } })
+const { data } = useGetPetByIdSuspense({ path: { petId: 1 } })
 ```
 
 ::

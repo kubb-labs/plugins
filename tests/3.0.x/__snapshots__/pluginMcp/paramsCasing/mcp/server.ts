@@ -9,6 +9,29 @@ import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 
+/**
+ * Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.
+ * A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.
+ */
+function toolSchema<T extends z.ZodType>(schema: T) {
+  const standard = schema['~standard']
+  const convert = (io: 'input' | 'output') => (options: Parameters<typeof standard.jsonSchema.input>[0]) =>
+    standard.jsonSchema[io]({
+      ...options,
+      libraryOptions: {
+        unrepresentable: 'any',
+        override: ({ zodSchema, jsonSchema }: { zodSchema: z.core.$ZodType; jsonSchema: Record<string, unknown> }) => {
+          if (zodSchema._zod.def.type === 'bigint') {
+            jsonSchema.type = 'integer'
+            jsonSchema.format = 'int64'
+          }
+        },
+      },
+    })
+
+  return { '~standard': { ...standard, jsonSchema: { input: convert('input'), output: convert('output') } } }
+}
+
 export function getServer() {
   const server = new McpServer({
     name: 'Params Casing Test',
@@ -17,8 +40,8 @@ export function getServer() {
 
   server.registerTool("updatePet", {
     description: "Make a POST request to /pets/{pet_id}",
-    outputSchema: z.object({ data: updatePetStatus200Schema }),
-    inputSchema: z.object({ path: z.object({ "pet_id": updatePetPathPetIdSchema }), query: z.object({ "include_deleted": updatePetQueryIncludeDeletedSchema, "request_source": updatePetQueryRequestSourceSchema }), headers: z.object({ "X-Request-ID": updatePetHeaderXRequestIDSchema }), body: updatePetBodySchema }),
+    outputSchema: toolSchema(z.object({ data: updatePetStatus200Schema })),
+    inputSchema: toolSchema(z.object({ path: z.object({ "pet_id": updatePetPathPetIdSchema }), query: z.object({ "include_deleted": updatePetQueryIncludeDeletedSchema, "request_source": updatePetQueryRequestSourceSchema }), headers: z.object({ "X-Request-ID": updatePetHeaderXRequestIDSchema }), body: updatePetBodySchema })),
   }, async ({ path, query, headers, body }, ctx) => {
     return updatePetHandler({ path, query, headers, body }, ctx)
   })

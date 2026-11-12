@@ -18,16 +18,18 @@ See [Options](https://kubb.dev/extensions/kubb-labs/plugin-cypress/options) for 
 
 ## Example
 
-The config below writes the helpers to `src/gen/cypress`.
+The config below writes the helpers to `src/gen/cypress`. The Petstore spec declares JSON and XML for most responses, so `contentType` keeps the JSON one. Without it, a response body is typed as `Pet | string`.
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginCypress } from '@kubb/plugin-cypress'
 
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
+  adapter: adapterOas({ contentType: 'application/json', integerType: 'number' }),
   plugins: [
     pluginTs(),
     pluginCypress({ output: { path: 'cypress', mode: 'directory' } }),
@@ -35,14 +37,14 @@ export default defineConfig({
 })
 ```
 
-A test then calls a helper and gets a typed response body. `petId` is an `int64`, which the default adapter types as `bigint`.
+A test then calls a helper and gets a typed response body. `petId` is an `int64`, which `integerType: 'number'` types as `number` instead of the default `bigint`.
 
 ```typescript [cypress/e2e/pet.cy.ts]
 import { getPetById } from '../../src/gen/cypress/getPetById'
 
 describe('Pet API', () => {
   it('returns the pet by id', () => {
-    getPetById({ path: { petId: 1n } }).then((pet) => {
+    getPetById({ path: { petId: 1 } }).then((pet) => {
       expect(pet.name).to.be.a('string')
     })
   })

@@ -44,7 +44,7 @@ To reuse the runtime of the fetch and axios clients instead of writing your own 
 
 ```typescript
 import type { Options, RequestResult } from '../../../client'
-import type { GetPetByIdOptions, GetPetByIdResponses } from '../../models/pet/GetPetById'
+import type { GetPetByIdOptions, GetPetByIdResponses } from '../../types/GetPetById'
 import { client } from '../../../client'
 
 export function getPetById<ThrowOnError extends boolean = true>(

@@ -13,7 +13,8 @@ Each tool handler calls the function a client plugin generates for that operatio
 
 ## Options worth knowing
 
-- `client` picks `fetch` or `axios` when both client plugins are registered. A single client is detected automatically.
+- `client` picks `fetch`, `axios`, or `client` when several client plugins are registered. A single client is detected automatically.
+- `exclude` skips operations. Use it for operations with a binary request body, because an MCP client sends JSON and cannot send a file.
 - `output.path` must be a folder name, such as the default `mcp`, because single-file output has no place for `server.ts`, `start.ts`, and `.mcp.json`.
 
 The `args` path in `.mcp.json` points at `start.ts` relative to the Kubb `root`, because MCP clients start the command from their own working directory. Use an absolute path for a client that starts in another folder, or point it at your own entry file to run setup code before `startServer()`.

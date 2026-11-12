@@ -151,6 +151,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const cyclicSchemas = getCircularNames(ctx)
     const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    // The schemas of this file by name, so a union of them can tell what its members print.
+    const siblings = new Map<string, ast.SchemaNode>()
 
     function renderSchemaEntry({
       schema,
@@ -164,6 +166,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       direction?: 'encode' | 'decode'
     }) {
       if (!schema) return null
+      siblings.set(name, schema)
 
       const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
       const schemaPrinter = getPrinter(resolver, { ...printerOptions, keysToOmit }, mini, direction)
@@ -193,6 +196,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             inferKind={aliasKind(inferred, direction)}
             cyclic={false}
             compile={compile}
+            siblings={siblings}
           />
         </>
       )

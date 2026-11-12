@@ -13,6 +13,8 @@ const { data } = await getPetById({ path: { petId: 1 } })
 //      ^ the parsed pet, typed from the 200 response
 ```
 
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
+
 Query, header, and cookie parameters sit under their own keys, and a request body goes under
 `body`:
 
@@ -31,7 +33,7 @@ await updatePet({
 })
 ```
 
-Each key is optional and only appears when the operation declares it. Call an operation with no parameters with an empty object: `getStatus({})`.
+Each key only appears when the operation declares it. You can call an operation without required parameters with no argument: `getStatus()`.
 
 ## Read the result
 
@@ -43,6 +45,7 @@ type RequestResult = {
   data: TData // the parsed success body, undefined on an error result
   error: TError // the parsed error body, undefined on a success result
   contentType: string | undefined // the negotiated response media type
+  headers: Headers // the response headers
   request: AxiosRequestConfig // the native request config
   response: AxiosResponse // the native response
 }
@@ -65,7 +68,7 @@ for that case, and TypeScript follows the check:
 const result = await getPetById({ path: { petId: 1 } })
 
 if (result.status === 200) {
-  console.info(result.data.name)
+  console.info(result.data)
 }
 ```
 

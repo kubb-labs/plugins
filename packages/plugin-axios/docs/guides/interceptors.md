@@ -91,6 +91,8 @@ admin.interceptors.request.use((request) => request) // runs after the handlers 
 await getPetById({ path: { petId: 1 }, client: admin })
 ```
 
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
+
 ## Native axios interceptors
 
 To get the native `InternalAxiosRequestConfig`, `AxiosResponse`, or `AxiosError`, register an axios interceptor on `getAxiosInstance()`:
@@ -104,4 +106,4 @@ getAxiosInstance().interceptors.request.use((config) => {
 })
 ```
 
-They run after the `client.interceptors` request handlers, in reverse order of registration, and response interceptors see the raw bytes. An instance you wrap with `createAxiosTransport` keeps its own interceptors. See [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport).
+Native axios interceptors run after the `client.interceptors` request handlers, in reverse order of registration, and response interceptors see the raw bytes. An instance you wrap with `createAxiosTransport` keeps its own interceptors. See [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport).

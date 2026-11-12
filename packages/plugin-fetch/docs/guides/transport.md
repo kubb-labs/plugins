@@ -66,6 +66,8 @@ const { data } = await getPetById({ path: { petId: 1 }, client: testClient })
 //      ^ { id: 1, name: 'Fluffy' }
 ```
 
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
+
 Pass the isolated client per operation or to a query plugin.
 
 ## Where to set it

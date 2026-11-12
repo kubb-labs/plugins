@@ -92,4 +92,21 @@ describe('customHookOptionsFileGenerator operations', () => {
     expect(files).toHaveLength(1)
     expect(files.at(0)?.path).toBe(path.resolve(testConfig.root, testConfig.output.path, 'hooks', 'custom', 'useOptions.ts'))
   })
+
+  test('imports HookOptions from the file that declares it, not from the root barrel', async () => {
+    const files = await renderCustomHookOptionsFile(
+      createOptions({
+        customOptions: { importPath: './custom/useOptions', name: 'useMyHookOptions' },
+        output: { path: 'hooks', mode: 'directory' },
+      }),
+    )
+
+    expect(files.at(0)?.imports).toContainEqual(
+      expect.objectContaining({
+        name: ['HookOptions'],
+        path: path.resolve(testConfig.root, testConfig.output.path, 'hooks', 'HookOptions.ts'),
+        isTypeOnly: true,
+      }),
+    )
+  })
 })

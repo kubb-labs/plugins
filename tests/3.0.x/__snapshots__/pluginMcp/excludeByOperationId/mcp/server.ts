@@ -17,6 +17,29 @@ import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 
+/**
+ * Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.
+ * A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.
+ */
+function toolSchema<T extends z.ZodType>(schema: T) {
+  const standard = schema['~standard']
+  const convert = (io: 'input' | 'output') => (options: Parameters<typeof standard.jsonSchema.input>[0]) =>
+    standard.jsonSchema[io]({
+      ...options,
+      libraryOptions: {
+        unrepresentable: 'any',
+        override: ({ zodSchema, jsonSchema }: { zodSchema: z.core.$ZodType; jsonSchema: Record<string, unknown> }) => {
+          if (zodSchema._zod.def.type === 'bigint') {
+            jsonSchema.type = 'integer'
+            jsonSchema.format = 'int64'
+          }
+        },
+      },
+    })
+
+  return { '~standard': { ...standard, jsonSchema: { input: convert('input'), output: convert('output') } } }
+}
+
 export function getServer() {
   const server = new McpServer({
     name: 'Swagger PetStore - OpenAPI 3.0',
@@ -26,8 +49,8 @@ export function getServer() {
   server.registerTool("findPetsByStatus", {
     title: "Finds Pets by status",
     description: "Multiple status values can be provided with comma separated strings",
-    outputSchema: z.object({ data: findPetsByStatusStatus200Schema }),
-    inputSchema: z.object({ query: z.object({ "status": findPetsByStatusQueryStatusSchema }) }),
+    outputSchema: toolSchema(z.object({ data: findPetsByStatusStatus200Schema })),
+    inputSchema: toolSchema(z.object({ query: z.object({ "status": findPetsByStatusQueryStatusSchema }) })),
   }, async ({ query }, ctx) => {
     return findPetsByStatusHandler({ query }, ctx)
   })
@@ -35,8 +58,8 @@ export function getServer() {
   server.registerTool("getPetById", {
     title: "Find pet by ID",
     description: "Returns a single pet",
-    outputSchema: z.object({ data: getPetByIdStatus200Schema }),
-    inputSchema: z.object({ path: z.object({ "petId": getPetByIdPathPetIdSchema }) }),
+    outputSchema: toolSchema(z.object({ data: getPetByIdStatus200Schema })),
+    inputSchema: toolSchema(z.object({ path: z.object({ "petId": getPetByIdPathPetIdSchema }) })),
   }, async ({ path }, ctx) => {
     return getPetByIdHandler({ path }, ctx)
   })
@@ -44,8 +67,8 @@ export function getServer() {
   server.registerTool("uploadFile", {
     title: "uploads an image",
     description: "Make a POST request to /pet/{petId}/uploadImage",
-    outputSchema: z.object({ data: uploadFileStatus200Schema }),
-    inputSchema: z.object({ path: z.object({ "petId": uploadFilePathPetIdSchema }), query: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }), body: uploadFileBodySchema }),
+    outputSchema: toolSchema(z.object({ data: uploadFileStatus200Schema })),
+    inputSchema: toolSchema(z.object({ path: z.object({ "petId": uploadFilePathPetIdSchema }), query: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }), body: uploadFileBodySchema })),
   }, async ({ path, query, body }, ctx) => {
     return uploadFileHandler({ path, query, body }, ctx)
   })
@@ -53,7 +76,7 @@ export function getServer() {
   server.registerTool("getInventory", {
     title: "Returns pet inventories by status",
     description: "Returns a map of status codes to quantities",
-    outputSchema: z.object({ data: getInventoryStatus200Schema }),
+    outputSchema: toolSchema(z.object({ data: getInventoryStatus200Schema })),
   }, async (ctx) => {
     return getInventoryHandler(ctx)
   })
@@ -61,8 +84,8 @@ export function getServer() {
   server.registerTool("placeOrder", {
     title: "Place an order for a pet",
     description: "Place a new order in the store",
-    outputSchema: z.object({ data: placeOrderStatus200Schema }),
-    inputSchema: z.object({ body: placeOrderBodySchema }),
+    outputSchema: toolSchema(z.object({ data: placeOrderStatus200Schema })),
+    inputSchema: toolSchema(z.object({ body: placeOrderBodySchema })),
   }, async ({ body }, ctx) => {
     return placeOrderHandler({ body }, ctx)
   })
