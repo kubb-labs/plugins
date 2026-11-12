@@ -93,7 +93,7 @@
     "@kubb/plugin-client": "workspace:^"
   },
   "devDependencies": {
-    "axios": "^1.21.0",
+    "axios": "^1.21.1",
     "typescript": "catalog:"
   },
   "peerDependencies": {
