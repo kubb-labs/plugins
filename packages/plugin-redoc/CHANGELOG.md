@@ -1,5 +1,11 @@
 # @kubb/plugin-redoc
 
+## 5.2.1
+
+### Patch Changes
+
+- [#1446](https://github.com/kubb-labs/plugins/pull/1446) [`88dd567`](https://github.com/kubb-labs/plugins/commit/88dd5676dd9f35f5e2820f7656e2bf4aafaf2237) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Declare `kubb >=5.18.4`, the version its `@kubb/kit` and `@kubb/adapter-oas` dependencies need.
+
 ## 5.2.0
 
 ### Minor Changes
