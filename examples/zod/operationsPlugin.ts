@@ -91,7 +91,7 @@ export const pluginZodOperations = defineExtension({
             const zodImport = ast.factory.createImport({ name: isNamespaceImport ? 'z' : ['z'], path: importPath, isNameSpace: isNamespaceImport })
 
             const operationsFile = resolver.file({ name: 'operations', extname: '.ts', root: gctx.root, output, group })
-            const transformed = nodes.filter(ast.isHttpOperationNode).map((node) => ({ node, data: buildSchemaNames(node, resolver) }))
+            const transformed = nodes.filter(ast.http.isOperation).map((node) => ({ node, data: buildSchemaNames(node, resolver) }))
 
             const imports = transformed.flatMap(({ node, data }) => {
               const names = [data.request, ...Object.values(data.responses), ...Object.values(data.parameters)].filter(Boolean) as Array<string>

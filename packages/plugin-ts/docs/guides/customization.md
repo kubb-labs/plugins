@@ -53,9 +53,9 @@ Clear schema descriptions with a [macro](https://kubb.dev/docs/5.x/reference/plu
 
 ```typescript [kubb.config.ts]
 import { pluginTs } from '@kubb/plugin-ts'
-import { ast } from 'kubb/kit'
+import { defineMacro } from 'kubb/kit'
 
-const dropDescriptions = ast.defineMacro({
+const dropDescriptions = defineMacro({
   name: 'drop-descriptions',
   schema(node) {
     return 'description' in node && node.description
