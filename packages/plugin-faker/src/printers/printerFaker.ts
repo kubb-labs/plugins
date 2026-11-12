@@ -474,8 +474,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const valueSchema = node.additionalProperties
         const recordProperties =
           keySchema?.type === 'enum' && typeof valueSchema === 'object'
-            ? ast
-                .getSchemaLiteralValues(keySchema)
+            ? ast.schema
+                .getLiterals(keySchema)
                 .filter((key): key is string => typeof key === 'string' && !node.properties.some((property) => property.name === key))
                 .map((name) => ast.factory.createProperty({ name, schema: valueSchema }))
             : []

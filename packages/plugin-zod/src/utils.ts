@@ -114,8 +114,8 @@ export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Arra
       if (composition.type === ast.schema.types.union && composition.members?.length !== 1) return false
       return composition.members?.some((child) => hasRequiredProperty({ node: child, propertyName, seen })) ?? false
     }
-    return ast
-      .resolveSchemaProperties({ node: resolved, propertyName })
+    return ast.schema
+      .findProperties({ node: resolved, propertyName })
       .some((property) => property.required !== false && !property.schema.optional && !property.schema.nullish)
   }
 
