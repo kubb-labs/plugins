@@ -1,4 +1,4 @@
-import { ast, createResolver, pascalCase } from '@kubb/kit'
+import { ast, casing, createResolver } from '@kubb/kit'
 import type { Group, Memo, Output, PluginType, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import {
@@ -8,15 +8,12 @@ import {
   getContentTypeInfo,
   hasRequestContentTypeChoice,
   getEventStream,
-  getOperationParameters,
-  getPrimarySuccessResponse,
+  getStreamFraming,
+  hasTextEventData,
   getRequestGroupOptionality,
   hasEventStreamContent,
   hasStreamVariant,
-  hasTextEventData,
-  isErrorStatusCode,
   isEventStream,
-  isSuccessStatusCode,
   resolveErrorNames,
   resolveOperationFile,
   resolveOperationTypeNames,
@@ -121,7 +118,7 @@ describe('buildOptionsSchema with several request content types', () => {
     if (schema.type !== 'union') throw new Error('expected a union')
 
     const contentTypes = (schema.members ?? []).map((member) => {
-      const props = ast.narrowSchema(member, 'object')?.properties ?? []
+      const props = ast.schema.narrow(member, 'object')?.properties ?? []
       return { required: props.find((p) => p.name === 'contentType')?.required, body: props.find((p) => p.name === 'body')?.schema.type }
     })
 
@@ -234,44 +231,6 @@ describe('response status helpers', () => {
     ],
   })
 
-  test('detects success and error status codes', () => {
-    expect(isSuccessStatusCode('201')).toBe(true)
-    expect(isSuccessStatusCode('400')).toBe(false)
-    expect(isErrorStatusCode('400')).toBe(true)
-    expect(isErrorStatusCode('default')).toBe(false)
-  })
-
-  test('reads status ranges such as 2xx', () => {
-    expect(isSuccessStatusCode('2xx')).toBe(true)
-    expect(isSuccessStatusCode('4xx')).toBe(false)
-    expect(isErrorStatusCode('4xx')).toBe(true)
-    expect(isErrorStatusCode('5xx')).toBe(true)
-    expect(isErrorStatusCode('3xx')).toBe(false)
-  })
-
-  test('prefers an exact success code over a range listed before it', () => {
-    const ranged = ast.factory.createOperation({
-      operationId: 'listPets',
-      method: 'GET',
-      path: '/pets',
-      responses: [ast.factory.createResponse({ statusCode: '2xx' }), ast.factory.createResponse({ statusCode: '200' })],
-    })
-
-    expect(getPrimarySuccessResponse(ranged)?.statusCode).toBe('200')
-  })
-
-  test('prefers a success response with a body over an exact code without one', () => {
-    const content = [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'bigint' }) })]
-    const node = ast.factory.createOperation({
-      operationId: 'listPets',
-      method: 'GET',
-      path: '/pets',
-      responses: [ast.factory.createResponse({ statusCode: '204' }), ast.factory.createResponse({ statusCode: '2xx', content })],
-    })
-
-    expect(getPrimarySuccessResponse(node)?.statusCode).toBe('2xx')
-  })
-
   test('resolves error, success, and all response status names', () => {
     expect(resolveErrorNames(node, resolver)).toStrictEqual(['Status400'])
     expect(resolveSuccessNames(node, resolver)).toStrictEqual(['Status201'])
@@ -287,128 +246,11 @@ describe('response status helpers', () => {
   })
 })
 
-describe('getOperationParameters', () => {
-  test('groups parameters by location, keeping every name exactly as in the OpenAPI spec', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'showPet',
-      method: 'GET',
-      path: '/pets/{pet-id}',
-      parameters: [
-        ast.factory.createParameter({ name: 'pet-id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }) }),
-        ast.factory.createParameter({ name: 'page-size', in: 'query', schema: ast.factory.createSchema({ type: 'number' }) }),
-        ast.factory.createParameter({ name: 'x-api-key', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
-        ast.factory.createParameter({ name: 'session-id', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
-      ],
-    })
-
-    const grouped = getOperationParameters(node)
-
-    expect(grouped.path.map((param) => param.name)).toStrictEqual(['pet-id'])
-    expect(grouped.query.map((param) => param.name)).toStrictEqual(['page-size'])
-    expect(grouped.header.map((param) => param.name)).toStrictEqual(['x-api-key'])
-    expect(grouped.cookie.map((param) => param.name)).toStrictEqual(['session-id'])
-  })
-
-  test('drops parameters that share a name within one location, keeping the first', () => {
-    const query = (name: string) => ast.factory.createParameter({ name, in: 'query', schema: ast.factory.createSchema({ type: 'string' }) })
-    const node = ast.factory.createOperation({
-      operationId: 'listUploads',
-      method: 'GET',
-      path: '/uploads',
-      parameters: [query('max-uploads'), query('prefix'), query('max-uploads'), query('MaxUploads')],
-    })
-
-    expect(getOperationParameters(node).query.map((param) => param.name)).toStrictEqual(['max-uploads', 'prefix', 'MaxUploads'])
-  })
-
-  test('spreads a form-encoded querystring object into one query parameter per property', () => {
-    const filter = ast.factory.createSchema({
-      type: 'object',
-      properties: [
-        ast.factory.createProperty({ name: 'status', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
-        ast.factory.createProperty({ name: 'limit', schema: ast.factory.createSchema({ type: 'number' }) }),
-      ],
-    })
-    const querystring = (contentType?: string) =>
-      ast.factory.createOperation({
-        operationId: 'findPets',
-        method: 'GET',
-        path: '/pets',
-        parameters: [ast.factory.createParameter({ name: 'filter', in: 'querystring', schema: filter, required: true, contentType })],
-      })
-
-    const spread = getOperationParameters(querystring('application/x-www-form-urlencoded')).query
-    expect(spread.map(({ name, in: location, required }) => ({ name, location, required }))).toStrictEqual([
-      { name: 'status', location: 'query', required: true },
-      { name: 'limit', location: 'query', required: false },
-    ])
-    expect(getOperationParameters(querystring('application/json')).query.map((param) => param.name)).toStrictEqual(['filter'])
-  })
-
-  test('gives a querystring property the style and explode of its encoding entry', () => {
-    const filter = ast.factory.createSchema({
-      type: 'object',
-      properties: [
-        ast.factory.createProperty({
-          name: 'tags',
-          schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
-        }),
-        ast.factory.createProperty({ name: 'limit', schema: ast.factory.createSchema({ type: 'number' }) }),
-      ],
-    })
-    const parameter = ast.factory.createParameter({
-      name: 'q',
-      in: 'querystring',
-      schema: filter,
-      contentType: 'application/x-www-form-urlencoded',
-      encoding: { tags: { style: 'form', explode: false } },
-    })
-    const node = ast.factory.createOperation({ operationId: 'search', method: 'GET', path: '/search', parameters: [parameter] })
-
-    const [tags, limit] = getOperationParameters(node).query
-    expect(tags).toMatchObject({ name: 'tags', style: 'form', explode: false })
-    expect(limit).not.toHaveProperty('style')
-    expect(limit).not.toHaveProperty('explode')
-  })
-
-  test('keeps the first of a query parameter and a querystring property with the same name', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'findPets',
-      method: 'GET',
-      path: '/pets',
-      parameters: [
-        ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
-        ast.factory.createParameter({
-          name: 'filter',
-          in: 'querystring',
-          schema: ast.factory.createSchema({
-            type: 'object',
-            properties: [ast.factory.createProperty({ name: 'status', schema: ast.factory.createSchema({ type: 'number' }) })],
-          }),
-        }),
-      ],
-    })
-
-    expect(getOperationParameters(node).query.map((param) => [param.name, param.in])).toStrictEqual([['status', 'query']])
-  })
-
-  test('caches the grouped result per node so repeat calls for the same operation skip re-grouping', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'showPet',
-      method: 'GET',
-      path: '/pets/{petId}',
-      parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }) })],
-    })
-
-    expect(getOperationParameters(node)).toBe(getOperationParameters(node))
-  })
-})
-
 describe('buildOptionsSchema', () => {
   test('marks body, path, query, and headers as never when the operation has none of them', () => {
     const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-    const schema = ast.narrowSchema(buildOptionsSchema(node, resolver), 'object')!
+    const schema = ast.schema.narrow(buildOptionsSchema(node, resolver), 'object')!
 
     expect(schema.type).toBe('object')
     expect(schema.primitive).toBe('object')
@@ -435,7 +277,7 @@ describe('buildOptionsSchema', () => {
       },
     })
 
-    const schema = ast.narrowSchema(buildOptionsSchema(node, resolver), 'object')!
+    const schema = ast.schema.narrow(buildOptionsSchema(node, resolver), 'object')!
 
     expect(schema.properties?.find((property) => property.name === 'body')?.required).toBe(expected)
     // With no required parameter, the whole options argument follows the body.
@@ -512,7 +354,9 @@ describe('toResponseContent', () => {
       ['application/*', pet],
       ['application/vnd.github.object', pet],
     ] as const) {
-      expect(typeOf(contentType, schema).schema).toBe(schema)
+      expect(toResponseContent({ ...ast.factory.createContent({ contentType: contentType, schema: schema, stream: {} }), keysToOmit: ['id'] }).schema).toBe(
+        schema,
+      )
     }
   })
 
@@ -553,7 +397,12 @@ describe('isEventStream', () => {
       operationId: 'streamEvents',
       method: 'GET',
       path: '/events',
-      responses: [ast.factory.createResponse({ statusCode: '200', mediaType, schema: ast.factory.createSchema({ type: 'object' }) })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: mediaType, schema: ast.factory.createSchema({ type: 'object' }), stream: {} })],
+        }),
+      ],
     })
   }
 
@@ -628,7 +477,12 @@ describe('isEventStream', () => {
       operationId: 'streamLines',
       method: 'GET',
       path: '/lines',
-      responses: [ast.factory.createResponse({ statusCode: '200', mediaType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'string' }) })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'string' }), stream: {} })],
+        }),
+      ],
     })
     const member = (name: string, data: ast.SchemaNode) =>
       ast.factory.createSchema({
@@ -711,7 +565,12 @@ describe('isEventStream', () => {
       operationId: 'streamLogs',
       method: 'GET',
       path: '/logs',
-      responses: [ast.factory.createResponse({ statusCode: '200', content: [ast.factory.createContent({ contentType, schema, stream: { schema } })] })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: contentType, schema: schema, stream: { schema } })],
+        }),
+      ],
     })
 
     expect(getEventStream(node)).toBe(shape)
@@ -743,7 +602,7 @@ function nodeWithResponseContents(entries: Array<{ contentType: string; schemaTy
       ast.factory.createResponse({
         statusCode: '200',
         content: entries.map((entry) =>
-          ast.factory.createContent({ contentType: entry.contentType, schema: ast.factory.createSchema({ type: entry.schemaType }) }),
+          ast.factory.createContent({ contentType: entry.contentType, schema: ast.factory.createSchema({ type: entry.schemaType }), stream: {} }),
         ),
       }),
     ],
@@ -813,7 +672,7 @@ describe('resolveOperationFile', () => {
   })
 
   describe('when an operation file matches a schema file', () => {
-    const pascalResolver = createResolver<PluginType<'plugin-ts'>>({ pluginName: 'plugin-ts', file: createCasedFile(pascalCase) })
+    const pascalResolver = createResolver<PluginType<'plugin-ts'>>({ pluginName: 'plugin-ts', file: createCasedFile(casing.pascal) })
     const output = { path: 'types', mode: 'directory' } as const
     const schemas = (...names: Array<string>) => names.map((name) => ast.factory.createSchema({ type: 'object', name }))
     const resolve = (operationId: string, options: { schemas: ReturnType<typeof schemas>; output?: Output; group?: Group }) =>
@@ -849,5 +708,16 @@ describe('resolveOperationFile', () => {
     test('keeps the single output file when every declaration shares it', () => {
       expect(resolve('point', { schemas: schemas('Point'), output: { path: 'types.ts', mode: 'file' } })).toBe('/root/types.ts')
     })
+  })
+})
+
+describe('getStreamFraming', () => {
+  test.each([
+    ['text/event-stream without framing', { contentType: 'text/event-stream; charset=utf-8' }, 'events'],
+    ['JSON Lines without framing', { contentType: 'application/jsonl', stream: {} }, 'lines'],
+    ['multipart/mixed with an item schema', { contentType: 'multipart/mixed', stream: {} }, undefined],
+    ['plain JSON', { contentType: 'application/json' }, undefined],
+  ] as const)('%s', (_, entry, expected) => {
+    expect(getStreamFraming(entry)).toBe(expected)
   })
 })

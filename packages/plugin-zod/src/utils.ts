@@ -1,6 +1,5 @@
-import { buildObject, stringify, toRegExpString } from '@internals/utils'
-import { mapSchemaProperties } from '@internals/shared'
-import { ast, containsCircularRef, syncSchemaRef } from '@kubb/kit'
+import { buildObject, toRegExpString } from '@internals/utils'
+import { ast, text } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
 
 /**
@@ -23,7 +22,7 @@ export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] 
  */
 export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
   if (!node) return false
-  const resolved = syncSchemaRef(node)
+  const resolved = ast.ref.mergeSchema(node)
   if (resolved.type === 'enum') return true
   if (resolved.type === 'union') {
     const members = resolved.members ?? []
@@ -69,9 +68,9 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
   }
 
   if (node.type === 'ref') {
-    const refName = ast.resolveRefName(node)
+    const refName = ast.ref.getName(node)
     if (refName && cyclicSchemas?.has(refName)) return false
-    const resolved = syncSchemaRef(node)
+    const resolved = ast.ref.mergeSchema(node)
     // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's
     // prior optimism that only a resolved intersection blocks a discriminated union).
     return resolved.type === 'ref' || isObjectSchemaNode(resolved, cyclicSchemas)
@@ -108,20 +107,20 @@ export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Arra
   }): boolean => {
     if (seen.has(node)) return false
     seen.add(node)
-    const resolved = syncSchemaRef(node)
-    const composition = ast.narrowSchema(resolved, ast.schemaTypes.intersection) ?? ast.narrowSchema(resolved, ast.schemaTypes.union)
+    const resolved = ast.ref.mergeSchema(node)
+    const composition = ast.schema.narrow(resolved, ast.schema.types.intersection) ?? ast.schema.narrow(resolved, ast.schema.types.union)
     // Property lookup skips unions, but a single-member union prints as its member.
     if (composition) {
-      if (composition.type === ast.schemaTypes.union && composition.members?.length !== 1) return false
+      if (composition.type === ast.schema.types.union && composition.members?.length !== 1) return false
       return composition.members?.some((child) => hasRequiredProperty({ node: child, propertyName, seen })) ?? false
     }
-    return ast
-      .resolveSchemaProperties({ node: resolved, propertyName })
+    return ast.schema
+      .findProperties({ node: resolved, propertyName })
       .some((property) => property.required !== false && !property.schema.optional && !property.schema.nullish)
   }
 
   return members.map((member, index) => {
-    const object = ast.narrowSchema(member, ast.schemaTypes.object)
+    const object = ast.schema.narrow(member, ast.schema.types.object)
     if (!object || index === 0) return member
 
     return {
@@ -146,7 +145,7 @@ export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Arra
  * representation, strings are quoted.
  */
 export function formatDefault(value: unknown): string {
-  if (typeof value === 'string') return stringify(value)
+  if (typeof value === 'string') return text.quote(value)
   if (typeof value === 'object' && value !== null) return JSON.stringify(value)
 
   return String(value ?? '')
@@ -165,23 +164,23 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   // A `null` default is invalid on a non-nullable schema and redundant on a nullish one, and emitting
   // it produces a bare `.default()` (no argument). Drop it.
   if (value === null) return null
-  const resolved = node ? syncSchemaRef(node) : undefined
+  const resolved = node ? ast.ref.mergeSchema(node) : undefined
   // A binary schema parses to a `Blob`, which a spec default, a string, cannot be.
   if (resolved?.type === 'blob') return null
-  if (resolved && ast.narrowSchema(resolved, 'bigint')) {
+  if (resolved && ast.schema.narrow(resolved, 'bigint')) {
     if (typeof value === 'bigint') return `BigInt(${value})`
     if (typeof value === 'number' && Number.isInteger(value)) return `BigInt(${value})`
     return null
   }
-  if (resolved && ast.narrowSchema(resolved, 'array')) {
+  if (resolved && ast.schema.narrow(resolved, 'array')) {
     return Array.isArray(value) ? JSON.stringify(value) : null
   }
   // An enum/literal schema narrows to its members (e.g. `1 | 3`), but the spec default may not match
   // that type (`default: '1'` on a numeric enum). Emit the matching member's typed literal so the
   // default agrees with the schema, or drop a default that matches no member.
-  const enumNode = resolved ? ast.narrowSchema(resolved, 'enum') : undefined
+  const enumNode = resolved ? ast.schema.narrow(resolved, 'enum') : undefined
   if (enumNode) {
-    const values = enumNode.namedEnumValues?.map((member) => member.value) ?? enumNode.enumValues ?? []
+    const values = ast.schema.getLiterals(enumNode)
     if (values.length) {
       const match = values.find((member) => member === value || String(member) === String(value))
       return match != null ? formatDefault(match) : null
@@ -324,21 +323,10 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
 }
 
 /**
- * Rounds numeric bounds to whole numbers so they print as bigint literals without loosening them.
- * A fractional exclusive bound becomes the nearest inclusive one; a fractional `multipleOf` is left out.
+ * Numeric bounds for a bigint: the inclusive, whole, safe bounds faker mocks against, and a whole, safe `multipleOf`.
  */
 export function bigintConstraints({ min, max, exclusive, multipleOf }: NumericConstraints): NumericConstraints {
-  const fractional = (bound: number | undefined): bound is number => bound !== undefined && !Number.isInteger(bound)
-  // A bound past `Number.MAX_SAFE_INTEGER`, such as int64's, prints as a rounded or invalid literal (`1e+21n`), so it is left out.
-  const safe = (bound: number | undefined) => (Number.isSafeInteger(bound) ? bound : undefined)
-  const lower = [min, fractional(exclusive?.min) ? exclusive.min : undefined].filter((bound) => bound !== undefined).map(Math.ceil)
-  const upper = [max, fractional(exclusive?.max) ? exclusive.max : undefined].filter((bound) => bound !== undefined).map(Math.floor)
-  return {
-    min: safe(lower.length ? Math.max(...lower) : undefined),
-    max: safe(upper.length ? Math.min(...upper) : undefined),
-    exclusive: { min: safe(exclusive?.min), max: safe(exclusive?.max) },
-    multipleOf: safe(multipleOf),
-  }
+  return { ...ast.schema.getNumberBounds({ min, max, exclusive, integer: true }), multipleOf: Number.isSafeInteger(multipleOf) ? multipleOf : undefined }
 }
 
 /**
@@ -425,7 +413,7 @@ export function applyModifiers({ value, schema, nullable, optional, nullish, def
   })()
   const literal = defaultValue !== undefined ? defaultLiteral(schema, defaultValue) : null
   const withDefault = literal !== null ? `${withModifier}.default(${literal})` : withModifier
-  const withDescription = description ? `${withDefault}.describe(${stringify(description)})` : withDefault
+  const withDescription = description ? `${withDefault}.describe(${text.quote(description)})` : withDefault
   return examples?.length
     ? `${withDescription}.meta({ examples: [${examples.map((example) => (example === null ? 'null' : formatDefault(example))).join(', ')}] })`
     : withDescription
@@ -448,7 +436,7 @@ function modifierDepth(schema: ast.SchemaNode): number {
  * `.unwrap()`, so its printer passes `._zod.def.innerType` as the `step`.
  */
 export function omitUnwrapChain(node: ast.SchemaNode, step = '.unwrap()'): string {
-  const ref = ast.narrowSchema(node, 'ref')
+  const ref = ast.schema.narrow(node, 'ref')
   if (!ref) return ''
 
   const target = ref.schema ?? ref
@@ -521,11 +509,11 @@ export function getMemberConstraint({
   numbers: (constraints: NumericConstraints) => string
 }): string | undefined {
   // Checks a suffix cannot carry stay on the member's own schema.
-  if (hasInputChecks(member) || ast.narrowSchema(member, 'array')?.contains) return undefined
-  if (member.primitive === 'string') return lengths({ ...(ast.narrowSchema(member, 'string') ?? {}), regexType }) || undefined
+  if (hasInputChecks(member) || ast.schema.narrow(member, 'array')?.contains) return undefined
+  if (member.primitive === 'string') return lengths({ ...(ast.schema.narrow(member, 'string') ?? {}), regexType }) || undefined
   if (member.primitive === 'number' || member.primitive === 'integer')
-    return numbers(ast.narrowSchema(member, 'number') ?? ast.narrowSchema(member, 'integer') ?? {}) || undefined
-  if (member.primitive === 'array') return lengths({ ...(ast.narrowSchema(member, 'array') ?? {}), regexType }) || undefined
+    return numbers(ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer') ?? {}) || undefined
+  if (member.primitive === 'array') return lengths({ ...(ast.schema.narrow(member, 'array') ?? {}), regexType }) || undefined
 }
 
 type PrinterContext = {
@@ -544,17 +532,17 @@ export function buildObjectShape(
     value: string
     schema: ast.SchemaNode
     required?: boolean
-    meta: ReturnType<typeof syncSchemaRef>
+    meta: ReturnType<typeof ast.ref.mergeSchema>
     cyclic: boolean
   }) => string,
 ): string {
-  const objectNode = ast.narrowSchema(node, 'object')
+  const objectNode = ast.schema.narrow(node, 'object')
   if (!objectNode) return '{}'
 
   const isCyclic = (schema: ast.SchemaNode): boolean =>
-    ctx.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
+    ctx.options.cyclicSchemas != null && ast.graph.containsCircular(schema, { circularSchemas: ctx.options.cyclicSchemas })
 
-  const entries = mapSchemaProperties(objectNode, (schema) => {
+  const transformed = objectNode.properties.map(({ schema }) => {
     // A getter defers evaluation, so clear cyclicSchemas to skip z.lazy() on nested refs.
     const hasSelfRef = isCyclic(schema)
     const savedCyclicSchemas = ctx.options.cyclicSchemas
@@ -562,9 +550,11 @@ export function buildObjectShape(
     const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
     if (hasSelfRef) ctx.options.cyclicSchemas = savedCyclicSchemas
     return baseOutput
-  }).map(({ name, property, output: value }) => {
-    const { schema } = property
-    return renderProperty({ name, value, schema, required: property.required, meta: syncSchemaRef(schema), cyclic: isCyclic(schema) })
+  })
+  const entries = objectNode.properties.map((property, index) => {
+    const { name, schema } = property
+    const value = transformed[index]!
+    return renderProperty({ name, value, schema, required: property.required, meta: ast.ref.mergeSchema(schema), cyclic: isCyclic(schema) })
   })
 
   return buildObject(entries)
@@ -576,7 +566,7 @@ export function buildObjectShape(
 export function printWithOmit(
   ctx: { transform: (node: ast.SchemaNode) => string | null; options: { keysToOmit?: Array<string> | null } },
   node: ast.SchemaNode,
-  modify: (value: string, meta: ReturnType<typeof syncSchemaRef>) => string,
+  modify: (value: string, meta: ReturnType<typeof ast.ref.mergeSchema>) => string,
   mini = false,
 ): string | null {
   const { keysToOmit } = ctx.options
@@ -584,7 +574,7 @@ export function printWithOmit(
   const transformed = ctx.transform(node)
   if (!transformed) return null
 
-  const meta = syncSchemaRef(node)
+  const meta = ast.ref.mergeSchema(node)
 
   const base = (() => {
     if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed
@@ -608,21 +598,4 @@ export function printWithOmit(
   })()
 
   return modify(base, meta)
-}
-
-const identifierChars: ReadonlySet<string> = new Set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$')
-
-/**
- * Whether `text` uses `name` as a whole identifier, so `petSchema` does not match inside `petSchemaList`.
- */
-export function containsIdentifier(text: string, name: string): boolean {
-  // `indexOf('')` never returns -1, so an empty name would loop forever.
-  if (!name) return false
-  for (let index = text.indexOf(name); index !== -1; index = text.indexOf(name, index + 1)) {
-    const before = text[index - 1]
-    const after = text[index + name.length]
-    if ((before === undefined || !identifierChars.has(before)) && (after === undefined || !identifierChars.has(after))) return true
-  }
-
-  return false
 }

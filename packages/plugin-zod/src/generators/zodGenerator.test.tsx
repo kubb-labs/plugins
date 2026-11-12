@@ -49,87 +49,87 @@ const defaultOptions: PluginZod['resolvedOptions'] = {
   compile: false,
 }
 
-const stringSchema = ast.factory.createSchema({ type: ast.schemaTypes.string, name: 'PetName' })
+const stringSchema = ast.factory.createSchema({ type: ast.schema.types.string, name: 'PetName' })
 
-const numberSchema = ast.factory.createSchema({ type: ast.schemaTypes.number, name: 'PetAge' })
+const numberSchema = ast.factory.createSchema({ type: ast.schema.types.number, name: 'PetAge' })
 
-const integerSchema = ast.factory.createSchema({ type: ast.schemaTypes.integer, name: 'PetId' })
+const integerSchema = ast.factory.createSchema({ type: ast.schema.types.integer, name: 'PetId' })
 
-const booleanSchema = ast.factory.createSchema({ type: ast.schemaTypes.boolean, name: 'IsActive' })
+const booleanSchema = ast.factory.createSchema({ type: ast.schema.types.boolean, name: 'IsActive' })
 
 const enumSchema = ast.factory.createSchema({
-  type: ast.schemaTypes.enum,
+  type: ast.schema.types.enum,
   name: 'PetStatus',
-  primitive: ast.schemaTypes.string,
+  primitive: ast.schema.types.string,
   enumValues: ['available', 'pending', 'sold'],
 })
 
 const objectSchema = ast.factory.createSchema({
-  type: ast.schemaTypes.object,
-  primitive: ast.schemaTypes.object,
+  type: ast.schema.types.object,
+  primitive: ast.schema.types.object,
   name: 'Pet',
   properties: [
-    ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.integer }) }),
-    ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
-    ast.factory.createProperty({ name: 'status', schema: ast.factory.createSchema({ type: ast.schemaTypes.string, optional: true }) }),
+    ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.integer }) }),
+    ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) }),
+    ast.factory.createProperty({ name: 'status', schema: ast.factory.createSchema({ type: ast.schema.types.string, optional: true }) }),
     ast.factory.createProperty({
       name: 'tags',
-      schema: ast.factory.createSchema({ type: ast.schemaTypes.array, items: [ast.factory.createSchema({ type: ast.schemaTypes.string })] }),
+      schema: ast.factory.createSchema({ type: ast.schema.types.array, items: [ast.factory.createSchema({ type: ast.schema.types.string })] }),
     }),
   ],
 })
 
 const arraySchema = ast.factory.createSchema({
-  type: ast.schemaTypes.array,
+  type: ast.schema.types.array,
   name: 'PetList',
-  items: [ast.factory.createSchema({ type: ast.schemaTypes.string })],
+  items: [ast.factory.createSchema({ type: ast.schema.types.string })],
 })
 
 const unionSchema = ast.factory.createSchema({
-  type: ast.schemaTypes.union,
+  type: ast.schema.types.union,
   name: 'PetOrCat',
-  members: [ast.factory.createSchema({ type: ast.schemaTypes.string }), ast.factory.createSchema({ type: ast.schemaTypes.number })],
+  members: [ast.factory.createSchema({ type: ast.schema.types.string }), ast.factory.createSchema({ type: ast.schema.types.number })],
 })
 
 const discriminatedUnionSchema = ast.factory.createSchema({
-  type: ast.schemaTypes.union,
+  type: ast.schema.types.union,
   name: 'Payment',
   discriminatorPropertyName: 'method',
   members: [
-    ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'CardPayment', ref: '#/components/schemas/CardPayment' }),
-    ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'WalletPayment', ref: '#/components/schemas/WalletPayment' }),
+    ast.factory.createSchema({ type: ast.schema.types.ref, name: 'CardPayment', ref: '#/components/schemas/CardPayment' }),
+    ast.factory.createSchema({ type: ast.schema.types.ref, name: 'WalletPayment', ref: '#/components/schemas/WalletPayment' }),
   ],
 })
 
 const intersectionSchema = ast.factory.createSchema({
-  type: ast.schemaTypes.intersection,
+  type: ast.schema.types.intersection,
   name: 'PetAndOwner',
   members: [
     ast.factory.createSchema({
-      type: ast.schemaTypes.object,
-      primitive: ast.schemaTypes.object,
-      properties: [ast.factory.createProperty({ name: 'petName', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) })],
+      type: ast.schema.types.object,
+      primitive: ast.schema.types.object,
+      properties: [ast.factory.createProperty({ name: 'petName', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) })],
     }),
     ast.factory.createSchema({
-      type: ast.schemaTypes.object,
-      primitive: ast.schemaTypes.object,
-      properties: [ast.factory.createProperty({ name: 'ownerName', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) })],
+      type: ast.schema.types.object,
+      primitive: ast.schema.types.object,
+      properties: [ast.factory.createProperty({ name: 'ownerName', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) })],
     }),
   ],
 })
 
 const schemaWithPattern = ast.factory.createSchema({
-  type: ast.schemaTypes.string,
+  type: ast.schema.types.string,
   name: 'SlugField',
   pattern: '^[a-z0-9-]+$',
 })
 
 const additionalPropertiesObjectSchema = ast.factory.createSchema({
-  type: ast.schemaTypes.object,
-  primitive: ast.schemaTypes.object,
+  type: ast.schema.types.object,
+  primitive: ast.schema.types.object,
   name: 'MetaMap',
-  properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.integer }) })],
-  additionalProperties: ast.factory.createSchema({ type: ast.schemaTypes.string }),
+  properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.integer }) })],
+  additionalProperties: ast.factory.createSchema({ type: ast.schema.types.string }),
 })
 
 describe('zodGenerator — Schema', () => {
@@ -187,26 +187,26 @@ describe('zodGenerator — Schema', () => {
     { name: 'object', node: objectSchema },
     { name: 'array', node: arraySchema },
     // dateType — printer renders based on representation, integration tests cover adapter-level dateType option
-    { name: 'dateType string', node: ast.factory.createSchema({ type: ast.schemaTypes.date, name: 'DateField', representation: 'string' }) },
-    { name: 'dateType date', node: ast.factory.createSchema({ type: ast.schemaTypes.date, name: 'DateField', representation: 'date' }) },
+    { name: 'dateType string', node: ast.factory.createSchema({ type: ast.schema.types.date, name: 'DateField', representation: 'string' }) },
+    { name: 'dateType date', node: ast.factory.createSchema({ type: ast.schema.types.date, name: 'DateField', representation: 'date' }) },
     // a component whose only convertible field is a `time` still needs an input (encode) variant
     {
       name: 'timeType date object',
       node: ast.factory.createSchema({
-        type: ast.schemaTypes.object,
-        primitive: ast.schemaTypes.object,
+        type: ast.schema.types.object,
+        primitive: ast.schema.types.object,
         name: 'Slot',
         properties: [
           ast.factory.createProperty({
             name: 'startsAt',
             required: true,
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.time, representation: 'date' }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.time, representation: 'date' }),
           }),
         ],
       }),
     },
     // guidType options
-    { name: 'guidType guid', node: ast.factory.createSchema({ type: ast.schemaTypes.uuid, name: 'GuidField' }), options: { guidType: 'guid' } },
+    { name: 'guidType guid', node: ast.factory.createSchema({ type: ast.schema.types.uuid, name: 'GuidField' }), options: { guidType: 'guid' } },
     // coercion options
     { name: 'coercion true', node: objectSchema, options: { coercion: true } },
     // inferred
@@ -215,11 +215,11 @@ describe('zodGenerator — Schema', () => {
     {
       name: 'inferred all-uppercase',
       node: ast.factory.createSchema({
-        type: ast.schemaTypes.object,
-        primitive: ast.schemaTypes.object,
+        type: ast.schema.types.object,
+        primitive: ast.schema.types.object,
         name: 'SUV',
         properties: [
-          ast.factory.createProperty({ name: 'offroadCapability', schema: ast.factory.createSchema({ type: ast.schemaTypes.boolean, optional: true }) }),
+          ast.factory.createProperty({ name: 'offroadCapability', schema: ast.factory.createSchema({ type: ast.schema.types.boolean, optional: true }) }),
         ],
       }),
       options: { inferred: true },
@@ -233,12 +233,12 @@ describe('zodGenerator — Schema', () => {
     {
       name: 'printer base wrap',
       node: ast.factory.createSchema({
-        type: ast.schemaTypes.object,
-        primitive: ast.schemaTypes.object,
+        type: ast.schema.types.object,
+        primitive: ast.schema.types.object,
         name: 'WrappedPet',
         properties: [
-          ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
-          ast.factory.createProperty({ name: 'age', schema: ast.factory.createSchema({ type: ast.schemaTypes.integer, optional: true }) }),
+          ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) }),
+          ast.factory.createProperty({ name: 'age', schema: ast.factory.createSchema({ type: ast.schema.types.integer, optional: true }) }),
         ],
       }),
       options: {
@@ -280,34 +280,34 @@ describe('zodGenerator — Schema', () => {
   // Indirect/polymorphic circular reference scenario from issue #3172:
   // Pet (union) → Cat → Pet → ... causes runtime stack overflow without lazy getter support.
   const petPolySchema = ast.factory.createSchema({
-    type: ast.schemaTypes.union,
+    type: ast.schema.types.union,
     name: 'Pet',
     members: [
-      ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'Cat', ref: '#/components/schemas/Cat' }),
-      ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'Dog', ref: '#/components/schemas/Dog' }),
+      ast.factory.createSchema({ type: ast.schema.types.ref, name: 'Cat', ref: '#/components/schemas/Cat' }),
+      ast.factory.createSchema({ type: ast.schema.types.ref, name: 'Dog', ref: '#/components/schemas/Dog' }),
     ],
   })
 
   const catCycleSchema = ast.factory.createSchema({
-    type: ast.schemaTypes.object,
+    type: ast.schema.types.object,
     name: 'Cat',
     properties: [
-      ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.integer }) }),
+      ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.integer }) }),
       ast.factory.createProperty({
         name: 'archEnemy',
         schema: ast.factory.createSchema({
-          type: ast.schemaTypes.union,
+          type: ast.schema.types.union,
           members: [
-            ast.factory.createSchema({ type: ast.schemaTypes.null }),
-            ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'Pet', ref: '#/components/schemas/Pet' }),
+            ast.factory.createSchema({ type: ast.schema.types.null }),
+            ast.factory.createSchema({ type: ast.schema.types.ref, name: 'Pet', ref: '#/components/schemas/Pet' }),
           ],
         }),
       }),
       ast.factory.createProperty({
         name: 'friends',
         schema: ast.factory.createSchema({
-          type: ast.schemaTypes.array,
-          items: [ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'Pet', ref: '#/components/schemas/Pet' })],
+          type: ast.schema.types.array,
+          items: [ast.factory.createSchema({ type: ast.schema.types.ref, name: 'Pet', ref: '#/components/schemas/Pet' })],
         }),
       }),
     ],
@@ -355,11 +355,11 @@ describe('zodGenerator — Schema', () => {
   // errorDetailsSchema) is implicitly `any` under strict (TS7022), so it must be annotated
   // `: z.ZodType`. This is the inverse of catCycle, whose object getters defer the self-reference.
   const errorDetailsSchema = ast.factory.createSchema({
-    type: ast.schemaTypes.union,
+    type: ast.schema.types.union,
     name: 'ErrorDetails',
     members: [
-      ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'ErrorDetails', ref: '#/components/schemas/ErrorDetails' }),
-      ast.factory.createSchema({ type: ast.schemaTypes.string }),
+      ast.factory.createSchema({ type: ast.schema.types.ref, name: 'ErrorDetails', ref: '#/components/schemas/ErrorDetails' }),
+      ast.factory.createSchema({ type: ast.schema.types.string }),
     ],
   })
 
@@ -390,7 +390,7 @@ describe('zodGenerator — Schema', () => {
     [false, true].flatMap((required) => [{}, { nullable: true }, { optional: true }, { nullish: true }].map((itemModifiers) => ({ required, itemModifiers }))),
   )('nullable recursive object typechecks and validates with required=$required and itemModifiers=$itemModifiers', async ({ required, itemModifiers }) => {
     const node = ast.factory.createSchema({
-      type: ast.schemaTypes.object,
+      type: ast.schema.types.object,
       name: 'Foo',
       nullable: true,
       description: 'This is Foo schema.',
@@ -399,9 +399,9 @@ describe('zodGenerator — Schema', () => {
           name: 'baz',
           required,
           schema: ast.factory.createSchema({
-            type: ast.schemaTypes.array,
+            type: ast.schema.types.array,
             description: 'This is baz property.',
-            items: [ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'Foo', ref: '#/components/schemas/Foo', ...itemModifiers })],
+            items: [ast.factory.createSchema({ type: ast.schema.types.ref, name: 'Foo', ref: '#/components/schemas/Foo', ...itemModifiers })],
           }),
         }),
       ],
@@ -457,16 +457,16 @@ describe('zodGenerator — Operation', () => {
         method: 'GET',
         path: '/pets',
         tags: ['pets'],
-        parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: ast.schemaTypes.integer }) })],
+        parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: ast.schema.types.integer }) })],
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'A paged array of pets',
           }),
           ast.factory.createResponse({
             statusCode: 'default',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Unexpected error',
           }),
         ],
@@ -480,17 +480,17 @@ describe('zodGenerator — Operation', () => {
         path: '/pets/{petId}',
         tags: ['pets'],
         parameters: [
-          ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: ast.schemaTypes.string }), required: true }),
+          ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: ast.schema.types.string }), required: true }),
         ],
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Expected response',
           }),
           ast.factory.createResponse({
             statusCode: 'default',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Unexpected error',
           }),
         ],
@@ -507,19 +507,19 @@ describe('zodGenerator — Operation', () => {
           content: [
             ast.factory.createContent({
               contentType: 'application/json',
-              schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+              schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             }),
           ],
         },
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Successful operation',
           }),
           ast.factory.createResponse({
             statusCode: '405',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Invalid input',
           }),
         ],
@@ -533,10 +533,10 @@ describe('zodGenerator — Operation', () => {
         path: '/pets/{petId}',
         tags: ['pets'],
         parameters: [
-          ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: ast.schemaTypes.string }), required: true }),
+          ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: ast.schema.types.string }), required: true }),
         ],
         responses: [
-          ast.factory.createResponse({ statusCode: '204', description: 'No content', schema: ast.factory.createSchema({ type: ast.schemaTypes.void }) }),
+          ast.factory.createResponse({ statusCode: '204', description: 'No content', schema: ast.factory.createSchema({ type: ast.schema.types.void }) }),
         ],
       }),
     },
@@ -551,13 +551,13 @@ describe('zodGenerator — Operation', () => {
           ast.factory.createParameter({
             name: 'status',
             in: 'query',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.enum, primitive: ast.schemaTypes.string, enumValues: ['available', 'pending', 'sold'] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.enum, primitive: ast.schema.types.string, enumValues: ['available', 'pending', 'sold'] }),
           }),
         ],
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Successful operation',
           }),
         ],
@@ -571,15 +571,15 @@ describe('zodGenerator — Operation', () => {
         path: '/store/order/:orderId',
         tags: ['store'],
         parameters: [
-          ast.factory.createParameter({ name: 'orderId', in: 'path', schema: ast.factory.createSchema({ type: ast.schemaTypes.integer }), required: true }),
+          ast.factory.createParameter({ name: 'orderId', in: 'path', schema: ast.factory.createSchema({ type: ast.schema.types.integer }), required: true }),
         ],
         requestBody: {
           content: [
             ast.factory.createContent({
               contentType: 'application/json',
               schema: ast.factory.createSchema({
-                type: ast.schemaTypes.object,
-                primitive: ast.schemaTypes.object,
+                type: ast.schema.types.object,
+                primitive: ast.schema.types.object,
                 properties: [],
                 description: 'Order payload',
               }),
@@ -589,12 +589,12 @@ describe('zodGenerator — Operation', () => {
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Successful operation',
           }),
           ast.factory.createResponse({
             statusCode: '405',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Invalid input',
           }),
         ],
@@ -610,7 +610,7 @@ describe('zodGenerator — Operation', () => {
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Config',
           }),
         ],
@@ -627,15 +627,15 @@ describe('zodGenerator — Operation', () => {
           ast.factory.createParameter({
             name: 'X-Request-Id',
             in: 'header',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.string }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.string }),
             required: true,
           }),
-          ast.factory.createParameter({ name: 'X-Correlation-Id', in: 'header', schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
+          ast.factory.createParameter({ name: 'X-Correlation-Id', in: 'header', schema: ast.factory.createSchema({ type: ast.schema.types.string }) }),
         ],
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Pets',
           }),
         ],
@@ -649,13 +649,13 @@ describe('zodGenerator — Operation', () => {
         path: '/cookies',
         tags: ['cookies'],
         parameters: [
-          ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: ast.schemaTypes.string }), required: true }),
-          ast.factory.createParameter({ name: 'theme', in: 'cookie', schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
+          ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: ast.schema.types.string }), required: true }),
+          ast.factory.createParameter({ name: 'theme', in: 'cookie', schema: ast.factory.createSchema({ type: ast.schema.types.string }) }),
         ],
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'The cookies the request sent',
           }),
         ],
@@ -673,9 +673,9 @@ describe('zodGenerator — Operation', () => {
             ast.factory.createContent({
               contentType: 'application/json',
               schema: ast.factory.createSchema({
-                type: ast.schemaTypes.object,
-                primitive: ast.schemaTypes.object,
-                properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) })],
+                type: ast.schema.types.object,
+                primitive: ast.schema.types.object,
+                properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) })],
               }),
             }),
           ],
@@ -683,7 +683,7 @@ describe('zodGenerator — Operation', () => {
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Created',
           }),
         ],
@@ -697,11 +697,11 @@ describe('zodGenerator — Operation', () => {
         method: 'GET',
         path: '/pets',
         tags: ['pets'],
-        parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: ast.schemaTypes.integer }) })],
+        parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: ast.schema.types.integer }) })],
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Pets list',
           }),
         ],
@@ -720,11 +720,11 @@ describe('zodGenerator — Operation', () => {
             ast.factory.createContent({
               contentType: 'application/json',
               schema: ast.factory.createSchema({
-                type: ast.schemaTypes.object,
-                primitive: ast.schemaTypes.object,
+                type: ast.schema.types.object,
+                primitive: ast.schema.types.object,
                 properties: [
-                  ast.factory.createProperty({ name: 'age', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.number }) }),
-                  ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
+                  ast.factory.createProperty({ name: 'age', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.number }) }),
+                  ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) }),
                 ],
               }),
             }),
@@ -733,7 +733,7 @@ describe('zodGenerator — Operation', () => {
         responses: [
           ast.factory.createResponse({
             statusCode: '201',
-            schema: ast.factory.createSchema({ type: ast.schemaTypes.object, primitive: ast.schemaTypes.object, properties: [] }),
+            schema: ast.factory.createSchema({ type: ast.schema.types.object, primitive: ast.schema.types.object, properties: [] }),
             description: 'Created',
           }),
         ],
@@ -754,13 +754,13 @@ describe('zodGenerator — Operation', () => {
             ast.factory.createContent({
               contentType: 'application/json',
               schema: ast.factory.createSchema({
-                type: ast.schemaTypes.object,
-                primitive: ast.schemaTypes.object,
+                type: ast.schema.types.object,
+                primitive: ast.schema.types.object,
                 properties: [
                   ast.factory.createProperty({
                     name: 'startsAt',
                     required: true,
-                    schema: ast.factory.createSchema({ type: ast.schemaTypes.time, representation: 'string' }),
+                    schema: ast.factory.createSchema({ type: ast.schema.types.time, representation: 'string' }),
                   }),
                 ],
               }),
@@ -771,13 +771,13 @@ describe('zodGenerator — Operation', () => {
           ast.factory.createResponse({
             statusCode: '201',
             schema: ast.factory.createSchema({
-              type: ast.schemaTypes.object,
-              primitive: ast.schemaTypes.object,
+              type: ast.schema.types.object,
+              primitive: ast.schema.types.object,
               properties: [
                 ast.factory.createProperty({
                   name: 'startsAt',
                   required: true,
-                  schema: ast.factory.createSchema({ type: ast.schemaTypes.time, representation: 'string' }),
+                  schema: ast.factory.createSchema({ type: ast.schema.types.time, representation: 'string' }),
                 }),
               ],
             }),
@@ -802,10 +802,10 @@ describe('zodGenerator — Operation', () => {
               ast.factory.createContent({
                 contentType,
                 schema: ast.factory.createSchema({
-                  type: ast.schemaTypes.object,
-                  primitive: ast.schemaTypes.object,
+                  type: ast.schema.types.object,
+                  primitive: ast.schema.types.object,
                   properties: [
-                    ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
+                    ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) }),
                   ],
                 }),
               }),
@@ -866,7 +866,7 @@ describe('zodGenerator — transformers', () => {
     const integerToString: ast.Macro = {
       name: 'integer-to-string',
       schema(node) {
-        if (node.type === ast.schemaTypes.integer) return { ...node, type: ast.schemaTypes.string }
+        if (node.type === ast.schema.types.integer) return { ...node, type: ast.schema.types.string }
         return node
       },
     }
@@ -875,13 +875,13 @@ describe('zodGenerator — transformers', () => {
     const driver = createMockedPluginDriver({ name: 'transformers integerToString' })
 
     const schemaWithInteger = ast.factory.createSchema({
-      type: ast.schemaTypes.object,
-      primitive: ast.schemaTypes.object,
+      type: ast.schema.types.object,
+      primitive: ast.schema.types.object,
       name: 'Order',
       properties: [
-        ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.integer }) }),
-        ast.factory.createProperty({ name: 'quantity', schema: ast.factory.createSchema({ type: ast.schemaTypes.integer, optional: true }) }),
-        ast.factory.createProperty({ name: 'status', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
+        ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.integer }) }),
+        ast.factory.createProperty({ name: 'quantity', schema: ast.factory.createSchema({ type: ast.schema.types.integer, optional: true }) }),
+        ast.factory.createProperty({ name: 'status', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) }),
       ],
     })
 
@@ -904,14 +904,14 @@ describe('zodGenerator — inferred aliases', () => {
   })
 
   const slotSchema = ast.factory.createSchema({
-    type: ast.schemaTypes.object,
-    primitive: ast.schemaTypes.object,
+    type: ast.schema.types.object,
+    primitive: ast.schema.types.object,
     name: 'Slot',
     properties: [
       ast.factory.createProperty({
         name: 'startsAt',
         required: true,
-        schema: ast.factory.createSchema({ type: ast.schemaTypes.time, representation: 'string' }),
+        schema: ast.factory.createSchema({ type: ast.schema.types.time, representation: 'string' }),
       }),
     ],
   })
@@ -921,7 +921,7 @@ describe('zodGenerator — inferred aliases', () => {
     method: 'POST',
     path: '/slots/{day}',
     tags: ['slots'],
-    parameters: [ast.factory.createParameter({ name: 'day', in: 'path', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) })],
+    parameters: [ast.factory.createParameter({ name: 'day', in: 'path', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) })],
     requestBody: { content: [ast.factory.createContent({ contentType: 'application/json', schema: slotSchema })] },
     responses: [ast.factory.createResponse({ statusCode: '200', schema: slotSchema, description: 'ok' })],
   })
@@ -976,16 +976,16 @@ describe('zodGenerator — inferred aliases', () => {
     path: '/resources/{resource}',
     tags: ['resources'],
     parameters: [
-      ast.factory.createParameter({ name: 'resource', in: 'path', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.url }) }),
+      ast.factory.createParameter({ name: 'resource', in: 'path', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.url }) }),
     ],
     responses: [
       ast.factory.createResponse({
         statusCode: '200',
         description: 'ok',
         schema: ast.factory.createSchema({
-          type: ast.schemaTypes.object,
-          primitive: ast.schemaTypes.object,
-          properties: [ast.factory.createProperty({ name: 'resource', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.url }) })],
+          type: ast.schema.types.object,
+          primitive: ast.schema.types.object,
+          properties: [ast.factory.createProperty({ name: 'resource', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.url }) })],
         }),
       }),
     ],
@@ -1040,12 +1040,12 @@ describe('zodGenerator — inferred aliases', () => {
 
 describe('zodGenerator — Type Guards', () => {
   const testSchema = ast.factory.createSchema({
-    type: ast.schemaTypes.object,
-    primitive: ast.schemaTypes.object,
+    type: ast.schema.types.object,
+    primitive: ast.schema.types.object,
     name: 'Pet',
     properties: [
-      ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.integer }) }),
-      ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
+      ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.integer }) }),
+      ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) }),
     ],
   })
 
@@ -1209,20 +1209,20 @@ describe('zodGenerator — Compile Option', () => {
       path: '/pets/{petId}',
       tags: ['pets'],
       parameters: [
-        ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: ast.schemaTypes.string }), required: true }),
+        ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: ast.schema.types.string }), required: true }),
       ],
       responses: [
         ast.factory.createResponse({
           statusCode: '200',
-          schema: ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'Pet', ref: '#/components/schemas/Pet' }),
+          schema: ast.factory.createSchema({ type: ast.schema.types.ref, name: 'Pet', ref: '#/components/schemas/Pet' }),
           description: 'A pet ref',
         }),
         ast.factory.createResponse({
           statusCode: '400',
           schema: ast.factory.createSchema({
-            type: ast.schemaTypes.object,
-            primitive: ast.schemaTypes.object,
-            properties: [ast.factory.createProperty({ name: 'message', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) })],
+            type: ast.schema.types.object,
+            primitive: ast.schema.types.object,
+            properties: [ast.factory.createProperty({ name: 'message', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) })],
           }),
           description: 'Error',
         }),
@@ -1278,16 +1278,16 @@ describe('zodGenerator — Compile Option', () => {
 
   test('compile with { strict: true } skips cyclic schemas', async () => {
     const cyclicNodeSchema: ast.SchemaNode = ast.factory.createSchema({
-      type: ast.schemaTypes.object,
+      type: ast.schema.types.object,
       name: 'TreeNode',
-      primitive: ast.schemaTypes.object,
+      primitive: ast.schema.types.object,
       properties: [
-        ast.factory.createProperty({ name: 'value', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
+        ast.factory.createProperty({ name: 'value', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.string }) }),
         ast.factory.createProperty({
           name: 'children',
           schema: ast.factory.createSchema({
-            type: ast.schemaTypes.array,
-            items: [ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'TreeNode', ref: '#/components/schemas/TreeNode' })],
+            type: ast.schema.types.array,
+            items: [ast.factory.createSchema({ type: ast.schema.types.ref, name: 'TreeNode', ref: '#/components/schemas/TreeNode' })],
           }),
         }),
       ],
@@ -1317,7 +1317,7 @@ describe('zodGenerator — Compile Option', () => {
 
 describe('custom imports', () => {
   const codecImport = ast.factory.createImport({ name: ['myCodec'], path: 'my-codec/zod' })
-  const bigintSchema = ast.factory.createSchema({ type: ast.schemaTypes.bigint, name: 'Counter' })
+  const bigintSchema = ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' })
 
   async function render(schema: ast.SchemaNode, options: Partial<PluginZod['resolvedOptions']>) {
     const resolved: PluginZod['resolvedOptions'] = { ...defaultOptions, ...options }
@@ -1353,7 +1353,7 @@ describe('custom imports', () => {
   })
 
   test('files whose schema does not reach the handler get no import', async () => {
-    const files = await render(ast.factory.createSchema({ type: ast.schemaTypes.string, name: 'PetName' }), {
+    const files = await render(ast.factory.createSchema({ type: ast.schema.types.string, name: 'PetName' }), {
       printer: {
         nodes: {
           bigint() {

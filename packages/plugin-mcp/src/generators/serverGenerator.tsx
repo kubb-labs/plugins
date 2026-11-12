@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getOperationParameters, getPrimarySuccessResponse, hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
+import { hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -48,10 +48,10 @@ export const serverGenerator = defineGenerator<PluginMcp>({
 
     // `mcpGenerator` emits no handler for a stream operation, so it gets no tool either.
     const operationsMapped = nodes
-      .filter(ast.isHttpOperationNode)
+      .filter(ast.http.isOperation)
       .filter((node) => !isEventStream(node) && !hasStreamVariant(node))
       .map((node) => {
-        const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)
+        const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
 
         const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
         const zodFile = resolveOperationFile({
@@ -63,14 +63,12 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           group: pluginZod.options?.group ?? undefined,
         })
 
-        const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.response.body(node) : null
-        const successStatus = getPrimarySuccessResponse(node)?.statusCode
+        const requestName = ast.http.requestBody.getSchema(node) ? zodResolver.response.body(node) : null
+        const successStatus = ast.http.responses.findPrimary(node)?.statusCode
         const responseName = successStatus ? zodResolver.response.status(node, successStatus) : null
 
         const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.param.name(node, p) }))
         const resolveOptional = (params: typeof pathParams) => (params.length ? resolveParams(params) : null)
-        // plugin-zod emits no per-param schema for the properties of a spread form-encoded `querystring`, only the grouped query schema.
-        const isQuerystringSpread = queryParams.some((p) => !node.parameters.includes(p))
 
         return {
           tool: {
@@ -84,7 +82,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           },
           zod: {
             pathParams: resolveParams(pathParams),
-            queryParams: isQuerystringSpread ? zodResolver.param.query(node, queryParams[0]!) : resolveOptional(queryParams),
+            queryParams: resolveOptional(queryParams),
             headerParams: resolveOptional(headerParams),
             cookieParams: resolveOptional(cookieParams),
             requestName,

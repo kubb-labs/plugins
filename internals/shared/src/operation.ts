@@ -112,12 +112,6 @@ export type BuildOperationCommentsOptions = {
   splitLines?: boolean
 }
 
-type ResponseLike = {
-  statusCode: ast.StatusCode | number | string
-}
-
-export type OperationParameterGroups = Record<Exclude<ast.ParameterNode['in'], 'querystring'>, Array<ast.ParameterNode>>
-
 export type ResolveOperationTypeNameOptions = {
   responseStatusNames?: boolean | 'error'
   exclude?: ReadonlyArray<string | undefined>
@@ -133,7 +127,7 @@ export type ResolveOperationTypeNameOptions = {
  * The operation's method and path as plain text, such as `` `GET /pet/{petId}` ``. A path is not a valid `{@link}` target.
  */
 function getOperationRequestLine(node: ast.OperationNode): string | null {
-  return ast.isHttpOperationNode(node) && node.path ? `\`${node.method.toUpperCase()} ${node.path}\`` : null
+  return ast.http.isOperation(node) && node.path ? `\`${node.method.toUpperCase()} ${node.path}\`` : null
 }
 
 /**
@@ -161,29 +155,12 @@ export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
  * whether several are present, so the client can let a caller pick which one to accept.
  */
 export function getResponseContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
-  return buildContentTypeInfo(getPrimarySuccessResponse(node)?.content?.map((e) => e.contentType) ?? [])
+  return buildContentTypeInfo(ast.http.responses.findPrimary(node)?.content?.map((e) => e.contentType) ?? [])
 }
 
 type ResponseType = 'blob' | 'text' | 'stream'
 
-/**
- * The media type without its parameters, in lower case: `Text/Plain; charset=utf-8` gives `text/plain`.
- */
-export function baseContentType(contentType: string): string {
-  return contentType.split(';')[0]!.trim().toLowerCase()
-}
-
 type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | null; stream?: ast.ContentNode['stream'] }
-
-/**
- * Whether a content entry is a sequence of JSON values the adapter marks as a stream, such as `application/jsonl`,
- * `application/x-ndjson` or `application/json-seq`.
- */
-function isJsonLines(entry: ResponseContentEntry): boolean {
-  const baseType = baseContentType(entry.contentType)
-  // `multipart/mixed` is a stream of parts, not of JSON values.
-  return Boolean(entry.stream) && baseType !== 'text/event-stream' && isStreamContentType(baseType)
-}
 
 /**
  * How an operation streams its primary success response item by item, when that response declares one content type:
@@ -195,11 +172,21 @@ function isJsonLines(entry: ResponseContentEntry): boolean {
  * call with its query hooks.
  */
 export function getEventStream(node: ast.OperationNode): 'event' | 'data' | 'line' | null {
-  const content = getPrimarySuccessResponse(node)?.content ?? []
+  const content = ast.http.responses.findPrimary(node)?.content ?? []
   if (content.length !== 1) return null
   const entry = content[0]!
-  if (baseContentType(entry.contentType) === 'text/event-stream') return entry.stream?.shape ?? 'data'
-  return isJsonLines(entry) ? 'line' : null
+  const framing = getStreamFraming(entry)
+  if (framing === 'events') return entry.stream?.shape ?? 'data'
+  return framing === 'lines' ? 'line' : null
+}
+
+/**
+ * How a content entry is framed as a stream: `'events'` for Server-Sent Events, `'lines'` for JSON Lines.
+ */
+export function getStreamFraming(entry: Pick<ast.ContentNode, 'contentType' | 'stream'>): 'events' | 'lines' | undefined {
+  if (ast.mediaType.getBase(entry) === 'text/event-stream') return 'events'
+  // `multipart/mixed` with an `itemSchema` also has `stream`, but it is a stream of parts, not of JSON values.
+  return entry.stream && ast.mediaType.isStream(entry) ? 'lines' : undefined
 }
 
 /**
@@ -213,7 +200,7 @@ export function isEventStream(node: ast.OperationNode): boolean {
 // A stream without a schema is a `blob` with a string primitive, so it keeps the JSON-parse default.
 function isTextSchema(schema: ast.SchemaNode | null | undefined): boolean {
   if (!schema) return false
-  const resolved = ast.resolveRef(schema)
+  const resolved = ast.ref.getSchema(schema)
   return resolved.type !== 'blob' && resolved.primitive === 'string'
 }
 
@@ -224,23 +211,22 @@ function isTextSchema(schema: ast.SchemaNode | null | undefined): boolean {
  */
 export function hasTextEventData(node: ast.OperationNode): boolean | Array<string> {
   const shape = getEventStream(node)
-  const entry = getPrimarySuccessResponse(node)?.content?.[0]
+  const entry = ast.http.responses.findPrimary(node)?.content?.[0]
   if (!entry || (shape !== 'data' && shape !== 'event')) return false
   if (shape === 'data') return isTextSchema(entry.stream?.schema ?? entry.schema)
 
-  const item = entry.stream?.schema ? ast.resolveRef(entry.stream.schema) : undefined
+  const item = entry.stream?.schema ? ast.ref.getSchema(entry.stream.schema) : undefined
   if (!item) return false
-  const events = item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : [item]
+  const events = item.type === 'union' ? (ast.schema.narrow(item, 'union')?.members ?? []) : [item]
   // A discriminator makes each event an intersection of its `$ref` and the pinned `event`, so every part is read.
-  const propertySchemas = (event: ast.SchemaNode, propertyName: string) =>
-    ast.resolveSchemaProperties({ node: event, propertyName }).map(({ schema }) => schema)
+  const propertySchemas = (event: ast.SchemaNode, propertyName: string) => ast.schema.findProperties({ node: event, propertyName }).map(({ schema }) => schema)
   const textEvents = events.filter((event) => {
     const dataSchemas = propertySchemas(event, 'data')
     return dataSchemas.length > 0 && dataSchemas.every(isTextSchema)
   })
   if (textEvents.length === events.length) return events.length > 0
 
-  const eventNames = textEvents.map((event) => propertySchemas(event, 'event').flatMap((schema) => ast.getSchemaLiteralValues(ast.resolveRef(schema))))
+  const eventNames = textEvents.map((event) => propertySchemas(event, 'event').flatMap((schema) => ast.schema.getLiterals(ast.ref.getSchema(schema))))
   return eventNames.length > 0 && eventNames.every((values) => values.length > 0) && [...new Set(eventNames.flat().map(String))]
 }
 
@@ -249,16 +235,9 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
  * for the stream by default and ships the `sse.ts` runtime, so a mixed response can be read as events too.
  */
 export function hasEventStreamContent(node: ast.OperationNode): boolean {
-  const entries = getPrimarySuccessResponse(node)?.content ?? []
+  const entries = ast.http.responses.findPrimary(node)?.content ?? []
   // Next to another type, a stream without a schema gets no typed variant, so it keeps the plain call.
-  return entries.some((entry) => baseContentType(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
-}
-
-// The media types the client runtime reads as a stream. Keep in sync with `streamMediaTypes` in the client's `sse.ts`.
-const streamContentTypes = new Set(['text/event-stream', 'application/jsonl', 'application/x-ndjson', 'application/json-seq'])
-
-function isStreamContentType(baseType: string): boolean {
-  return streamContentTypes.has(baseType) || (baseType.startsWith('application/') && baseType.endsWith('+json-seq'))
+  return entries.some((entry) => getStreamFraming(entry) === 'events' && (entries.length === 1 || Boolean(entry.schema)))
 }
 
 /**
@@ -266,9 +245,9 @@ function isStreamContentType(baseType: string): boolean {
  * body as a `ReadableStream`, so the stream runtime is registered and a hook's data type includes the stream.
  */
 export function hasStreamVariant(node: ast.OperationNode): boolean {
-  return getSuccessResponses(node.responses).some((response) => {
+  return ast.http.responses.filterSuccess(node).some((response) => {
     const variants = (response.content ?? []).filter((entry) => entry.schema)
-    return variants.length > 1 && variants.some((entry) => isStreamContentType(baseContentType(entry.contentType)))
+    return variants.length > 1 && variants.some((entry) => ast.mediaType.isStream(entry))
   })
 }
 
@@ -279,25 +258,8 @@ const formContentTypes = ['multipart/form-data', 'application/x-www-form-urlenco
  * which the client needs a handler for.
  */
 export function getFormContentTypes(node: ast.OperationNode): Array<(typeof formContentTypes)[number]> {
-  const request = new Set((node.requestBody?.content ?? []).map((entry) => baseContentType(entry.contentType)))
+  const request = new Set((node.requestBody?.content ?? []).map((entry) => ast.mediaType.getBase(entry)))
   return formContentTypes.filter((contentType) => request.has(contentType))
-}
-
-const jsonContentTypes = new Set(['application/json', 'text/json'])
-
-function isJsonContentType(baseType: string): boolean {
-  return jsonContentTypes.has(baseType) || baseType.endsWith('+json')
-}
-
-/**
- * The schema of the JSON document a string holds (`contentMediaType` with `contentSchema`), or `undefined` when the
- * string holds no JSON or has no schema for it.
- */
-export function jsonContentSchema({ content }: ast.StringSchemaNode): ast.SchemaNode | undefined {
-  // shortcut: an encoded document (`contentEncoding`) is not decoded, so only its encoding is checked; decode it once a spec needs both.
-  if (!content?.schema || content.encoding || !content.mediaType) return undefined
-
-  return isJsonContentType(baseContentType(content.mediaType)) ? content.schema : undefined
 }
 
 /**
@@ -309,10 +271,10 @@ export function jsonContentSchema({ content }: ast.StringSchemaNode): ast.Schema
  * `image/*`, `audio/*`, and `video/*` are blobs.
  */
 function responseTypeForContent(entry: ResponseContentEntry): ResponseType | undefined {
-  const baseType = baseContentType(entry.contentType)
+  const baseType = ast.mediaType.getBase(entry)
   if (!baseType) return undefined
-  if (baseType === 'text/event-stream' || isJsonLines(entry)) return 'stream'
-  if (isJsonContentType(baseType)) return undefined
+  if (getStreamFraming(entry)) return 'stream'
+  if (ast.mediaType.isJson(baseType)) return undefined
   if (entry.schema?.type === 'blob') return 'blob'
   if (baseType.startsWith('text/')) return 'text'
   if (isBinaryContentType(baseType)) return 'blob'
@@ -328,6 +290,7 @@ function isBinaryContentType(baseType: string): boolean {
  * (e.g. `application/json` → `Json`, `application/xml` → `Xml`, `multipart/form-data` → `FormData`).
  */
 function getContentTypeSuffix(contentType: string): string {
+  // Keeps the original case, unlike ast.mediaType.getBase, so generated names stay stable.
   const baseType = contentType.split(';')[0]!.trim()
   if (baseType === 'application/json') return 'Json'
   if (baseType === 'multipart/form-data') return 'FormData'
@@ -362,12 +325,12 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
   const { contentType, schema } = entry
   if (!schema || entry.stream) return entry
 
-  const baseType = baseContentType(contentType)
-  const resolved = ast.resolveRef(schema)
+  const baseType = ast.mediaType.getBase(contentType)
+  const resolved = ast.ref.getSchema(schema)
   if (isBinaryContentType(baseType)) {
     return resolved.type === 'blob' ? entry : { ...entry, schema: ast.factory.createSchema({ type: 'blob' }), keysToOmit: null }
   }
-  const isPlainMediaType = Boolean(baseType) && !isJsonContentType(baseType) && !baseType.includes('*')
+  const isPlainMediaType = Boolean(baseType) && !ast.mediaType.isJson(baseType) && !baseType.includes('*')
   if (resolved.type === 'blob') {
     // shortcut: an error response never gets `parseAs`, so a lone binary schema there reads as text too but stays `Blob`.
     const readsAsText = isPlainMediaType && !entries.every((item) => item.schema?.type === 'blob')
@@ -457,11 +420,11 @@ export type RequestGroups = {
  * Which of the grouped request options an operation carries.
  */
 export function getRequestGroups(node: ast.OperationNode): RequestGroups {
-  const { path, query, header, cookie } = getOperationParameters(node)
+  const { path, query, header, cookie } = ast.http.groupParameters(node)
   return {
     path: path.length > 0,
     query: query.length > 0,
-    body: Boolean(node.requestBody?.content?.[0]?.schema),
+    body: Boolean(ast.http.requestBody.getSchema(node)),
     headers: header.length > 0,
     cookies: cookie.length > 0,
   }
@@ -486,7 +449,7 @@ export type RequestGroupOptionality = {
  */
 export function getRequestGroupOptionality(node: ast.OperationNode): RequestGroupOptionality {
   const groups = getRequestGroups(node)
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header } = ast.http.groupParameters(node)
   const hasRequiredPath = path.some((param) => param.required)
   const hasRequiredQuery = query.some((param) => param.required)
   const hasRequiredHeader = header.some((param) => param.required)
@@ -557,65 +520,6 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
   return filteredComments.flatMap((text) => text.split(/\r?\n/).map((line) => line.trim())).filter((comment): comment is string => Boolean(comment))
 }
 
-const operationParameterGroupsByNode = new WeakMap<ast.OperationNode, OperationParameterGroups>()
-
-/**
- * An OpenAPI 3.2 `querystring` parameter is the whole query string, so a form-encoded object becomes one query parameter
- * per property, typed and serialized like any other, with the `style` and `explode` its `encoding` entry declares.
- * Another content type, such as JSON, stays one parameter named after it, and the runtime sends its value as the whole query string.
- */
-function spreadQuerystring(param: ast.ParameterNode): Array<ast.ParameterNode> {
-  const schema = param.schema.type === 'ref' ? param.schema.schema : param.schema
-  const formEncoded = !param.contentType || baseContentType(param.contentType) === 'application/x-www-form-urlencoded'
-  if (schema?.type !== 'object' || !formEncoded) return [param]
-  return schema.properties.map((property) => {
-    const { style, explode, allowReserved } = param.encoding?.[property.name] ?? {}
-    return ast.factory.createParameter({
-      name: property.name,
-      in: 'query',
-      schema: property.schema,
-      required: param.required && property.required,
-      ...(style !== undefined && { style }),
-      ...(explode !== undefined && { explode }),
-      ...(allowReserved !== undefined && { allowReserved }),
-    })
-  })
-}
-
-/**
- * Groups an operation's parameters by location (`path`/`query`/`header`/`cookie`), deduping each
- * group by name. Every plugin generator visiting the same `OperationNode` shares one AST instance
- * (see `KubbDriver`), so the result is cached per node to avoid re-filtering and re-deduping the
- * same parameters once per plugin.
- */
-export function getOperationParameters(node: ast.OperationNode): OperationParameterGroups {
-  const cached = operationParameterGroupsByNode.get(node)
-  if (cached) return cached
-
-  // A malformed spec can declare the same name twice within one location. Both would resolve to the
-  // same output property, so emitting both would yield an object type with a duplicate member,
-  // which TypeScript rejects. Keep the first.
-  const dedupe = (params: Array<ast.ParameterNode>) => {
-    const seen = new Set<string>()
-    return params.filter((param) => {
-      if (seen.has(param.name)) return false
-      seen.add(param.name)
-      return true
-    })
-  }
-  const group = (location: ast.ParameterNode['in']) => dedupe(node.parameters.filter((param) => param.in === location))
-
-  const groups: OperationParameterGroups = {
-    path: group('path'),
-    query: dedupe([...group('query'), ...group('querystring').flatMap(spreadQuerystring)]),
-    header: group('header'),
-    cookie: group('cookie'),
-  }
-
-  operationParameterGroupsByNode.set(node, groups)
-  return groups
-}
-
 /**
  * Whether the operation declares more than one request media type with a schema, so a caller must pick one on `contentType`.
  */
@@ -639,8 +543,8 @@ export function castToClientOptions(callArg: string, clientName: string, returnT
  * than a record.
  */
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver, { pairContentTypes = false } = {}): ast.SchemaNode {
-  const { path, query, header, cookie } = getOperationParameters(node)
-  const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
+  const { path, query, header, cookie } = ast.http.groupParameters(node)
+  const hasBody = Boolean(ast.http.requestBody.getSchema(node))
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
     { name: 'path', params: path, resolve: resolver.param.path },
@@ -741,13 +645,13 @@ function buildResponseRecordEntry(
             name: 'contentType',
             required: true,
             // The runtime reports the bare media type, without parameters such as `charset` or `profile`.
-            schema: ast.factory.createSchema({ type: 'enum', enumValues: [baseContentType(variant.contentType)] }),
+            schema: ast.factory.createSchema({ type: 'enum', enumValues: [ast.mediaType.getBase(variant)] }),
           }),
           ast.factory.createProperty({
             name: 'data',
             required: true,
             schema:
-              streamData && isSuccessStatusCode(res.statusCode) && isStreamContentType(baseContentType(variant.contentType))
+              streamData && ast.http.status.isSuccess(res) && ast.mediaType.isStream(variant)
                 ? streamData
                 : ast.factory.createSchema({ type: 'ref', name: variant.name }),
           }),
@@ -786,63 +690,12 @@ export function buildResponses(
   })
 }
 
-export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string): number | null {
-  const code = Number(statusCode)
-
-  return Number.isNaN(code) ? null : code
-}
-
-const statusClassByRange = new Map([
-  ['1xx', 1],
-  ['2xx', 2],
-  ['3xx', 3],
-  ['4xx', 4],
-  ['5xx', 5],
-])
-
-/**
- * The class digit of a status code or range, such as `2` for `201` and `2xx`, or `null` for `default`.
- */
-export function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
-  const rangeClass = statusClassByRange.get(String(statusCode))
-  if (rangeClass) return rangeClass
-  const code = getStatusCodeNumber(statusCode)
-
-  return code === null ? null : Math.floor(code / 100)
-}
-
-export function isSuccessStatusCode(statusCode: ast.StatusCode | number | string): boolean {
-  return getStatusClass(statusCode) === 2
-}
-
-export function isErrorStatusCode(statusCode: ast.StatusCode | number | string): boolean {
-  const statusClass = getStatusClass(statusCode)
-
-  return statusClass !== null && statusClass >= 4
-}
-
-export function getSuccessResponses<TResponse extends ResponseLike>(responses: ReadonlyArray<TResponse>): Array<TResponse> {
-  return responses.filter((response) => isSuccessStatusCode(response.statusCode))
-}
-
-export function getOperationSuccessResponses(node: ast.OperationNode): Array<ast.ResponseNode> {
-  return getSuccessResponses(node.responses)
-}
-
-export function getPrimarySuccessResponse(node: ast.OperationNode): ast.ResponseNode | null {
-  const responses = getOperationSuccessResponses(node)
-  // A response with a body wins over a `204`, then an exact code such as `200` over a `2xx` range the spec lists before it.
-  const withBody = responses.filter((response) => response.content?.length)
-  const candidates = withBody.length ? withBody : responses
-  return candidates.find((response) => getStatusCodeNumber(response.statusCode) !== null) ?? candidates[0] ?? null
-}
-
 export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses.filter((response) => isErrorStatusCode(response.statusCode)).map((response) => resolver.response.status(node, response.statusCode))
+  return ast.http.responses.filterError(node).map((response) => resolver.response.status(node, response.statusCode))
 }
 
 export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses.filter((response) => isSuccessStatusCode(response.statusCode)).map((response) => resolver.response.status(node, response.statusCode))
+  return ast.http.responses.filterSuccess(node).map((response) => resolver.response.status(node, response.statusCode))
 }
 
 export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
@@ -860,7 +713,7 @@ export function resolveOperationTypeNames(
 ): string[] {
   const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   return resolver.memo(`operationTypeNames:${key}`, () => {
-    const { path, query, header, cookie } = getOperationParameters(node)
+    const { path, query, header, cookie } = ast.http.groupParameters(node)
     const responseStatusNames =
       options.responseStatusNames === 'error'
         ? resolveErrorNames(node, resolver)
@@ -877,7 +730,7 @@ export function resolveOperationTypeNames(
             ...header.map((param) => resolver.param.headers(node, param)),
             ...cookie.map((param) => resolver.param.cookies(node, param)),
           ]
-    const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.response.body(node) : null, resolver.response.response(node)]
+    const bodyAndResponseNames = [ast.http.requestBody.getSchema(node) ? resolver.response.body(node) : null, resolver.response.response(node)]
     const names =
       options.order === 'body-response-first'
         ? [...bodyAndResponseNames, ...paramNames, ...responseStatusNames]
@@ -896,12 +749,12 @@ export function resolveResponseTypes(node: ast.OperationNode, resolver: Response
       continue
     }
 
-    const code = getStatusCodeNumber(response.statusCode)
-    if (code === null) {
+    const code = Number(response.statusCode)
+    if (Number.isNaN(code)) {
       continue
     }
 
-    types.push([code, isSuccessStatusCode(code) ? resolver.response.response(node) : resolver.response.status(node, response.statusCode)])
+    types.push([code, ast.http.status.isSuccess(code) ? resolver.response.response(node) : resolver.response.status(node, response.statusCode)])
   }
 
   return types

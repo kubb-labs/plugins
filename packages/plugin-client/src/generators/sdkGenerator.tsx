@@ -2,7 +2,7 @@ import path from 'node:path'
 import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
 import { isEventStream } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
-import { ast, camelCase, defineGenerator, Diagnostics } from '@kubb/kit'
+import { ast, defineGenerator, Diagnostics } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
@@ -29,11 +29,11 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   const { output, group } = ctx.options
 
   return nodes.reduce((acc, operationNode) => {
-    if (!ast.isHttpOperationNode(operationNode)) return acc
+    if (!ast.http.isOperation(operationNode)) return acc
     const tag = operationNode.tags[0]
     const name = tag ? ensureValidVarName(resolver.groupName(tag)) : resolver.className('ApiClient')
     // `group.name` names the folder and file, never the class.
-    const fileName = tag && group ? ensureValidVarName(group.name?.({ group: camelCase(tag) }) ?? camelCase(tag)) : name
+    const fileName = tag && group ? ensureValidVarName(path.basename(resolver.groupDir(group, tag))) : name
     const file = resolver.file({ name: fileName, extname: '.ts', tag, root, output, group: group ?? undefined })
     const operationData = resolveOperationData({ node: operationNode, ctx, types })
     const previous = acc.find((item) => item.file.path === file.path)
@@ -153,7 +153,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
               isTypeOnly
             />
 
-            {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
+            {validator === 'zod' && ops.some((op) => ast.http.requestBody.getSchema(op.node) != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
             {Array.from(typeNamesByPath.entries()).map(([filePath, set]) => (
               <File.Import key={filePath} name={Array.from(set)} root={file.path} path={typeFilesByPath.get(filePath)!.path} isTypeOnly />

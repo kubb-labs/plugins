@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
-import { ast, type Config, Diagnostics, type KubbHooks, fsStorage } from 'kubb/kit'
+import { ast, type Config, defineMacro, Diagnostics, type KubbHooks, fsStorage } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMsw } from '@kubb/plugin-msw'
@@ -157,9 +157,9 @@ describe(`plugin-msw options ${version}`, () => {
   test('a macro that changes the method on plugin-msw only keeps the plugin-ts and plugin-faker names', async () => {
     const tmpDir = path.join(os.tmpdir(), `kubb-test-mswMethodMacro-${Date.now()}`)
     const output = path.join(tmpDir, 'mswMethodMacro')
-    const getAsPost = ast.defineMacro({
+    const getAsPost = defineMacro({
       name: 'get-as-post',
-      operation: (node) => (ast.isHttpOperationNode(node) && node.method === 'GET' ? { ...node, method: 'POST' } : undefined),
+      operation: (node) => (ast.http.isOperation(node) && node.method === 'GET' ? { ...node, method: 'POST' } : undefined),
     })
     const { diagnostics } = await createKubb(
       {

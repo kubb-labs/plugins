@@ -1,5 +1,6 @@
 import { lazyGetter, objectKey } from '@internals/utils'
-import { ast } from '@kubb/kit'
+import type { ast } from '@kubb/kit'
+import { createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyMiniModifiers,
@@ -129,7 +130,7 @@ const miniDialect: ZodDialect<PrinterZodMiniOptions> = {
   intersection: (left, right) => `z.intersection(${left}, ${right})`,
 }
 
-export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options) => {
+export const printerZodMini = createPrinter<PrinterZodMiniFactory>((options) => {
   return {
     name: 'zod-mini',
     options,

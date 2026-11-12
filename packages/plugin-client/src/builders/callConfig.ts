@@ -1,6 +1,7 @@
-import { getEventStream, getPrimarySuccessResponse, hasTextEventData } from '@internals/shared'
-import { singleQuote, toLiteral } from '@internals/utils'
-import type { ast } from '@kubb/kit'
+import { toLiteral } from '@internals/utils'
+import { getEventStream, hasTextEventData } from '@internals/shared'
+
+import { ast, text } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
 import { buildSecurityMetadata, type SecurityRequirement } from './security.ts'
@@ -11,8 +12,7 @@ import { buildValidatorLiteral, type ValidatorHooks } from './validator.ts'
  * `parseAs: 'blob'` when every success content type is binary, so a download is a `Blob` whatever its media type, and
  * also when the server sends no `Content-Type`. Any other body is decoded by its media type at runtime.
  */
-function buildParseAsLiteral(node: ast.HttpOperationNode): string | null {
-  const content = getPrimarySuccessResponse(node)?.content ?? []
+function buildParseAsLiteral(content: Array<ast.ContentNode>): string | null {
   return content.length > 0 && content.every((entry) => entry.schema?.type === 'blob') ? `parseAs: 'blob'` : null
 }
 
@@ -43,6 +43,7 @@ export function buildCallConfig({
   returnType: ReturnTypeOption
 }): { callConfig: string; mergeContentType: boolean; eventStream: boolean } {
   const stream = getEventStream(node)
+  const content = ast.http.responses.findPrimary(node)?.content ?? []
   const securityLiteral = buildSecurityMetadata({ security })
   // A `'plain'` client is the user's own, which may type `styles` as `unknown`, so it keeps the generated styles as a default.
   const ownRuntime = returnType !== 'plain'
@@ -58,13 +59,13 @@ export function buildCallConfig({
 
   const rawData = hasTextEventData(node)
   const callConfig = `{ ${[
-    `method: ${singleQuote(node.method.toUpperCase())}`,
-    `url: ${singleQuote(node.path)}`,
+    `method: ${text.quote(node.method.toUpperCase())}`,
+    `url: ${text.quote(node.path)}`,
     baseURL ? `baseURL: ${JSON.stringify(baseURL)}` : null,
     securityLiteral ? `security: ${securityLiteral}` : null,
     ownRuntime ? null : styles,
     contentTypeLiteral,
-    buildParseAsLiteral(node),
+    buildParseAsLiteral(content),
     stream === 'event' || stream === 'data' ? `eventShape: '${stream}'` : null,
     rawData ? `rawData: ${toLiteral(rawData)}` : null,
     '...config',

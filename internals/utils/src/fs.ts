@@ -1,6 +1,5 @@
 import { posix } from 'node:path'
-import { camelCase } from '@kubb/kit'
-
+import { casing } from '@kubb/kit'
 function toSlash(p: string): string {
   if (p.startsWith('\\\\?\\')) return p
   return p.replaceAll('\\', '/')
@@ -41,10 +40,10 @@ export function getRelativePath(rootDir: string, filePath: string): string {
  * @example Suffix applied to the final segment only
  * `toFilePath('tag.tag', (part) => camelCase(part, { suffix: 'schema' })) // 'tag/tagSchema'`
  */
-export function toFilePath(name: string, caseLast: (part: string) => string = camelCase): string {
+export function toFilePath(name: string, caseLast: (part: string) => string = casing.camel): string {
   const parts = name.split(/\.(?=[a-zA-Z])/)
   return parts
-    .map((part, i) => (i === parts.length - 1 ? caseLast(part) : camelCase(part)))
+    .map((part, i) => (i === parts.length - 1 ? caseLast(part) : casing.camel(part)))
     .filter(Boolean)
     .join('/')
 }

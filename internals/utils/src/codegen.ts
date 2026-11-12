@@ -1,7 +1,5 @@
+import { text } from '@kubb/kit'
 import { isIdentifier } from './reserved.ts'
-import { singleQuote } from './strings.ts'
-
-const INDENT = '  '
 
 /**
  * Builds a JSDoc comment block from an array of lines. Returns `fallback` when there are no
@@ -41,50 +39,6 @@ export function buildJSDoc(
 }
 
 /**
- * Indents every non-empty line of `text` by one indent level, leaving blank lines empty.
- */
-function indentLines(text: string): string {
-  if (!text) return ''
-  return text
-    .split('\n')
-    .map((line) => (line.trim() ? `${INDENT}${line}` : ''))
-    .join('\n')
-}
-
-/**
- * Renders an object key, quoting it with single quotes only when it is not a valid identifier.
- * Reserved words and globals (`name`, `class`, …) are valid bare keys and stay unquoted.
- *
- * @example
- * ```ts
- * objectKey('name')    // 'name'
- * objectKey('x-total') // "'x-total'"
- * ```
- */
-export function objectKey(name: string): string {
-  return isIdentifier(name) ? name : singleQuote(name)
-}
-
-/**
- * A JSON value as a JavaScript literal, with single-quoted strings and identifier keys left unquoted.
- *
- * @example
- * ```ts
- * toLiteral({ id: 1, 'x-tag': ['a'] }) // "{ id: 1, 'x-tag': ['a'] }"
- * ```
- */
-export function toLiteral(value: unknown): string {
-  if (typeof value === 'string') return singleQuote(value)
-  if (Array.isArray(value)) return `[${value.map(toLiteral).join(', ')}]`
-  if (value && typeof value === 'object') {
-    return `{ ${Object.entries(value)
-      .map(([key, item]) => `${objectKey(key)}: ${toLiteral(item)}`)
-      .join(', ')} }`
-  }
-  return String(value)
-}
-
-/**
  * Assembles a multi-line object literal from already-rendered `entries`, indenting each entry one
  * level and closing the brace at column zero. Entries that are themselves multi-line objects indent
  * cumulatively. Each entry ends with a trailing comma to match the formatter's multi-line style.
@@ -97,7 +51,7 @@ export function toLiteral(value: unknown): string {
  */
 export function buildObject(entries: Array<string>): string {
   if (entries.length === 0) return '{}'
-  const body = entries.map((entry) => `${indentLines(entry)},`).join('\n')
+  const body = entries.map((entry) => `${text.indent({ text: entry })},`).join('\n')
 
   return `{\n${body}\n}`
 }
@@ -118,7 +72,7 @@ export function buildList(items: Array<string>, brackets: [open: string, close: 
   const [open, close] = brackets
   if (items.length === 0) return `${open}${close}`
   if (!items.some((item) => item.includes('\n'))) return `${open}${items.join(', ')}${close}`
-  const body = items.map((item) => `${indentLines(item)},`).join('\n')
+  const body = items.map((item) => `${text.indent({ text: item })},`).join('\n')
 
   return `${open}\n${body}\n${close}`
 }
@@ -136,4 +90,35 @@ export function buildList(items: Array<string>, brackets: [open: string, close: 
  */
 export function lazyGetter({ name, body }: { name: string; body: string }): string {
   return `get ${objectKey(name)}() { return ${body} }`
+}
+
+/**
+ * An object key, quoted only when it is not identifier-shaped. Reserved words such as `class` stay bare.
+ *
+ * @example
+ * ```ts
+ * objectKey('x-total') // "'x-total'"
+ * ```
+ */
+export function objectKey(name: string): string {
+  return isIdentifier(name) ? name : text.quote(name)
+}
+
+/**
+ * A JSON value as a JavaScript literal, with single-quoted strings and identifier keys left unquoted.
+ *
+ * @example
+ * ```ts
+ * toLiteral({ id: 1, 'x-tag': ['a'] }) // "{ id: 1, 'x-tag': ['a'] }"
+ * ```
+ */
+export function toLiteral(value: unknown): string {
+  if (typeof value === 'string') return text.quote(value)
+  if (Array.isArray(value)) return `[${value.map(toLiteral).join(', ')}]`
+  if (value && typeof value === 'object') {
+    return `{ ${Object.entries(value)
+      .map(([key, item]) => `${objectKey(key)}: ${toLiteral(item)}`)
+      .join(', ')} }`
+  }
+  return String(value)
 }

@@ -31,7 +31,7 @@ export function buildSdkMethod({
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
 }): string {
-  if (!ast.isHttpOperationNode(node)) return ''
+  if (!ast.http.isOperation(node)) return ''
 
   const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault })
   const generics = body.generics.length ? `<${body.generics.join(', ')}>` : ''

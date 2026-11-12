@@ -1,14 +1,7 @@
-import { baseContentType, getStatusClass, toResponseContent } from '@internals/shared'
-import { isValidVarName, singleQuote, toLiteral } from '@internals/utils'
-import { ast } from '@kubb/kit'
+import { isValidVarName, toLiteral } from '@internals/utils'
+import { toResponseContent } from '@internals/shared'
 
-/**
- * The status a mock responds with. A range such as `2xx` mocks the first code of its class, `200`, and `default` mocks `200`.
- */
-export function getMockStatus(statusCode: ast.StatusCode): number {
-  const code = Number(statusCode)
-  return Number.isNaN(code) ? (getStatusClass(statusCode) ?? 2) * 100 : code
-}
+import { ast, text } from '@kubb/kit'
 
 // Headers use the `simple` style, so an array or object is sent comma-separated.
 function toSimpleStyle(value: unknown): string {
@@ -76,13 +69,7 @@ function getResponseContentType(response: ast.ResponseNode | null | undefined): 
 
 function getResponseEntry(response: ast.ResponseNode | null | undefined): ast.ContentNode | undefined {
   const contents = response?.content ?? []
-  return contents.find((entry) => isJson(entry.contentType)) ?? contents[0]
-}
-
-function isJson(contentType: string | undefined): boolean {
-  if (!contentType) return false
-  const baseType = baseContentType(contentType)
-  return baseType === 'application/json' || baseType.endsWith('+json')
+  return contents.find((entry) => ast.mediaType.isJson(entry)) ?? contents[0]
 }
 
 /**
@@ -91,7 +78,7 @@ function isJson(contentType: string | undefined): boolean {
 function getTextContentType(response: ast.ResponseNode | null | undefined): string | null {
   const entry = (response?.content ?? []).find((entry) => {
     const schema = toResponseContent(entry, response?.content).schema
-    return !isJson(entry.contentType) && schema && ast.resolveRef(schema).primitive === 'string'
+    return !ast.mediaType.isJson(entry) && schema && ast.ref.getSchema(schema).primitive === 'string'
   })
   return entry?.contentType ?? null
 }
@@ -108,7 +95,7 @@ export function responseReturn(body: string, status: number, response: ast.Respo
   const prelude = name === body ? '' : `const body = ${body}\n    `
 
   // shortcut: one event per mock, upgrade when a mock needs to send several events.
-  if (contentType && baseContentType(contentType) === 'text/event-stream') {
+  if (contentType && ast.mediaType.getBase(contentType) === 'text/event-stream') {
     const entry = getResponseEntry(response)
     // Without a body, a spec example already serialized as SSE text goes out as it is.
     const serialized = entry?.examples?.find((example) => example.serializedValue !== undefined)?.serializedValue
@@ -152,8 +139,8 @@ export function getExampleBody(response: ast.ResponseNode | null | undefined): s
   if (example.value !== undefined) return toLiteral(example.value)
   // `responseReturn` sends raw text only for a text response. For a binary one the example would go out JSON-encoded.
   // A serialized SSE example is already events, which `responseReturn` sends as is when the body is `undefined`.
-  if (!isJson(entry.contentType)) {
-    const isTextBody = baseContentType(entry.contentType) !== 'text/event-stream' && getTextContentType(response) === entry.contentType
+  if (!ast.mediaType.isJson(entry)) {
+    const isTextBody = ast.mediaType.getBase(entry) !== 'text/event-stream' && getTextContentType(response) === entry.contentType
     return isTextBody ? toLiteral(example.serializedValue) : null
   }
   // `responseReturn` encodes a JSON body itself, so a serialized JSON example is parsed first.
@@ -180,8 +167,8 @@ export function getMswMethod(node: ast.HttpOperationNode): string {
  */
 function headersBlock(contentType: string | null, headers: Array<[string, string]>): string {
   const entries = [
-    ...(contentType ? [`'Content-Type': ${singleQuote(contentType)}`] : []),
-    ...headers.map(([name, value]) => `${singleQuote(name)}: ${singleQuote(value)}`),
+    ...(contentType ? [`'Content-Type': ${text.quote(contentType)}`] : []),
+    ...headers.map(([name, value]) => `${text.quote(name)}: ${text.quote(value)}`),
   ]
   return entries.length ? `\n      headers: {\n        ${entries.join(',\n        ')}\n      },` : ''
 }

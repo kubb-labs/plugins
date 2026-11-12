@@ -1,6 +1,6 @@
 import path from 'node:path'
 import type { Group } from '@kubb/kit'
-import { ast, camelCase, Resolver } from '@kubb/kit'
+import { ast, casing, Resolver } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import {
   createMockedAdapter,
@@ -576,7 +576,7 @@ describe('typeGenerator — Operation — group', () => {
     {
       group: {
         type: 'tag',
-        name: (ctx: { group: string }) => `${camelCase(ctx.group)}Controller`,
+        name: (ctx: { group: string }) => `${casing.camel(ctx.group)}Controller`,
       } satisfies Group,
       expectedBaseName: 'ListPets.ts',
       expectedDir: 'petsController',
@@ -621,7 +621,7 @@ describe('typeGenerator — Operation — group', () => {
       ...defaultOptions,
       group: {
         type: 'tag',
-        name: (ctx: { group: string }) => `${camelCase(ctx.group)}Controller`,
+        name: (ctx: { group: string }) => `${casing.camel(ctx.group)}Controller`,
       },
     }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
@@ -1234,7 +1234,7 @@ describe('typeGenerator — custom imports', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'customImports' })
 
-    await renderGeneratorSchema(typeGenerator, ast.factory.createSchema({ type: ast.schemaTypes.bigint, name: 'Counter' }), {
+    await renderGeneratorSchema(typeGenerator, ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' }), {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

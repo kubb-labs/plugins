@@ -1,6 +1,6 @@
 import { buildRequestParamsSignature } from '@internals/shared'
-import { singleQuote } from '@internals/utils'
-import { ast, Url } from '@kubb/kit'
+
+import { ast, text, Url } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -40,14 +40,14 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const rawParameters = node.parameters.filter((parameter) => parameter.in === 'cookie' && parameter.style === 'cookie')
   // Only an array or object needs the join and explode code. A value with one primitive type goes out as one cookie.
   const isComposite = (parameter: ast.ParameterNode) =>
-    !['string', 'number', 'integer', 'bigint', 'boolean'].includes(ast.resolveRef(parameter.schema).primitive ?? '')
+    !['string', 'number', 'integer', 'bigint', 'boolean'].includes(ast.ref.getSchema(parameter.schema).primitive ?? '')
   const isExploded = (parameter: ast.ParameterNode) => parameter.explode !== false && isComposite(parameter)
-  const explodedCookies = rawParameters.filter(isExploded).map((parameter) => singleQuote(parameter.name))
-  const joinedCookies = rawParameters.filter((parameter) => !isExploded(parameter)).map((parameter) => singleQuote(parameter.name))
+  const explodedCookies = rawParameters.filter(isExploded).map((parameter) => text.quote(parameter.name))
+  const joinedCookies = rawParameters.filter((parameter) => !isExploded(parameter)).map((parameter) => text.quote(parameter.name))
   // A `form` cookie explodes only when the spec sets `explode: true`, like the generated clients, and its items stay percent-encoded.
   const explodedFormCookies = node.parameters
     .filter((parameter) => parameter.in === 'cookie' && parameter.style !== 'cookie' && parameter.explode === true && isComposite(parameter))
-    .map((parameter) => singleQuote(parameter.name))
+    .map((parameter) => text.quote(parameter.name))
   const compositeLines = rawParameters.some(isComposite)
     ? `  if (Array.isArray(value)) return value.filter((item) => item != null).map(rawCookie).join(',')
   if (typeof value === 'object' && value !== null && !(value instanceof Date)) return Object.entries(value).filter(([, item]) => item != null).flat().map(rawCookie).join(',')\n`
@@ -84,11 +84,12 @@ ${compositeLines}  const text = value instanceof Date ? value.toISOString() : St
   const cookieLine = `${rawCookieLine}${explodeCookieLine}${formCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null)${toCookies}.join('; ')\n`
 
   // Cypress types a body as a string or an object, so a body that is one number or has no schema type is cast.
-  const bodySchema = node.requestBody?.content?.[0]?.schema && ast.resolveRef(node.requestBody.content[0].schema)
+  const requestSchema = ast.http.requestBody.getSchema(node)
+  const bodySchema = requestSchema && ast.ref.getSchema(requestSchema)
   const castBody = bodySchema && (['number', 'integer'].includes(bodySchema.primitive ?? '') || ['unknown', 'any'].includes(bodySchema.type))
 
   const requestOptions = [
-    `method: ${singleQuote(node.method)}`,
+    `method: ${text.quote(node.method)}`,
     `url: ${urlTemplate}`,
     groups.query && 'qs: query',
     groups.cookies ? `headers: { ${groups.headers ? '...headers, ' : ''}...(cookie ? { Cookie: cookie } : {}) }` : groups.headers && 'headers',

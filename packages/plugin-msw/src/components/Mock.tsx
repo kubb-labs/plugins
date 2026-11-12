@@ -1,10 +1,8 @@
-import { getPrimarySuccessResponse } from '@internals/shared'
-import { singleQuote } from '@internals/utils'
-import type { ast } from '@kubb/kit'
+import { ast, text } from '@kubb/kit'
 import { Url } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { getExampleBody, getMockStatus, getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
+import { getExampleBody, getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
 
 type Props = {
   name: string
@@ -22,9 +20,9 @@ type Props = {
 export function Mock({ baseURL = '', name, fakerName, responseName, typeName, requestTypeName, node }: Props): KubbReactNode {
   const method = getMswMethod(node)
   // `http.all` matches every method on the path, so a handler for a method MSW has no helper for lets the others pass through.
-  const methodGuard = method === 'all' ? `if (info.request.method !== ${singleQuote(node.method)}) return\n\n    ` : ''
-  const successResponse = getPrimarySuccessResponse(node)
-  const statusCode = successResponse ? getMockStatus(successResponse.statusCode) : 200
+  const methodGuard = method === 'all' ? `if (info.request.method !== ${text.quote(node.method)}) return\n\n    ` : ''
+  const successResponse = ast.http.responses.findPrimary(node)
+  const statusCode = successResponse ? ast.http.status.toCode(successResponse) : 200
   const url = Url.toPath(node.path)
 
   const responseHasSchema = hasResponseSchema(successResponse)

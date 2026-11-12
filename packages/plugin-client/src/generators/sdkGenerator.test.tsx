@@ -1,4 +1,3 @@
-import { createGroupConfig } from '@internals/shared'
 import type { Config, PluginType } from '@kubb/kit'
 import { ast, Diagnostics, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
@@ -104,7 +103,7 @@ describe('sdkGenerator operations', () => {
     // `group.name` names the folders; the classes keep `resolver.groupName`, and the root shares one client.
     {
       name: 'sdkTagGroupWithRoot',
-      options: { group: createGroupConfig({ type: 'tag' }), sdk: { mode: 'tag', name: 'petStore' } } as Partial<PluginFetch['resolvedOptions']>,
+      options: { group: { type: 'tag' }, sdk: { mode: 'tag', name: 'petStore' } } as Partial<PluginFetch['resolvedOptions']>,
     },
     // An operation-level `servers` entry wins over the path's and becomes that method's default `baseURL`.
     {

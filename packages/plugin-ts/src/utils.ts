@@ -1,6 +1,5 @@
-import { isSuccessStatusCode } from '@internals/shared'
-import { jsDocEscape, stringify } from '@internals/utils'
-import { ast, syncSchemaRef } from '@kubb/kit'
+import { jsDocEscape } from '@internals/utils'
+import { ast, text } from '@kubb/kit'
 import { getEnumNames } from './components/Enum.tsx'
 import type { PluginTs, ResolverTs } from './types.ts'
 
@@ -18,7 +17,7 @@ export function resolveInlineEnumNames({
   resolver: ResolverTs
   enumOptions: PluginTs['resolvedOptions']['enum']
 }): ast.SchemaNode {
-  return ast.transform(node, {
+  return ast.node.transform(node, {
     schema(child) {
       if (child === node || child.type !== 'enum' || !child.name) return
       const name = resolver.resolveName({
@@ -82,8 +81,8 @@ function formatExample(value: unknown): string {
  * Whether a schema is binary, or an array of binary items, so its TypeScript type is `Blob` or `Blob[]`.
  */
 export function isBinarySchema(schema: ast.SchemaNode): boolean {
-  const meta = syncSchemaRef(schema)
-  const isBlob = (node: ast.SchemaNode) => syncSchemaRef(node)?.type === 'blob'
+  const meta = ast.ref.mergeSchema(schema)
+  const isBlob = (node: ast.SchemaNode) => ast.ref.mergeSchema(node)?.type === 'blob'
   return !!meta && (isBlob(meta) || (meta.type === 'array' && 'items' in meta && (meta.items ?? []).some(isBlob)))
 }
 
@@ -94,7 +93,7 @@ export function isBinarySchema(schema: ast.SchemaNode): boolean {
  * `@maxLength`, `@pattern`, `@default`, `@example`, `@see` and `@type`.
  */
 export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
-  const meta = syncSchemaRef(schema)
+  const meta = ast.ref.mergeSchema(schema)
 
   const isArray = meta?.primitive === 'array'
   // An object's `min`/`max` count properties, which no JSDoc tag describes.
@@ -123,7 +122,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
     !isArray && !isObject && meta && 'max' in meta && meta.max !== undefined ? `@${isNumeric ? 'maximum' : 'maxLength'} ${meta.max}` : null,
     meta && 'pattern' in meta && meta.pattern ? `@pattern ${meta.pattern}` : null,
     meta && 'default' in meta && meta.default !== undefined
-      ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? stringify(meta.default) : formatExample(meta.default)}`
+      ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? text.quote(meta.default) : formatExample(meta.default)}`
       : null,
     ...exampleValues.map((example) => `@example ${formatExample(example)}`),
     meta?.externalDocs ? `@see ${jsDocEscape([meta.externalDocs.url, meta.externalDocs.description].filter(Boolean).join(' '))}` : null,
@@ -205,7 +204,7 @@ export function buildParams({ params, serializedExamples }: BuildParamsSchemaOpt
 export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode | null {
   const allWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
   // Only 2xx responses, so an `unknown` error body cannot erase the success typing. Falls back to all responses when no 2xx has a schema.
-  const successWithSchema = allWithSchema.filter((res) => isSuccessStatusCode(res.statusCode))
+  const successWithSchema = allWithSchema.filter((res) => ast.http.status.isSuccess(res))
   const responsesWithSchema = successWithSchema.length > 0 ? successWithSchema : allWithSchema
 
   if (responsesWithSchema.length === 0) {

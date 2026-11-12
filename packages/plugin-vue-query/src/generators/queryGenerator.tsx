@@ -16,7 +16,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    if (!ast.isHttpOperationNode(node)) return null
+    if (!ast.http.isOperation(node)) return null
     const { driver, resolver, root } = ctx
     const { output, query, mutation, client, group, hooks } = ctx.options
 
