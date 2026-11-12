@@ -118,7 +118,7 @@ describe('buildOptionsSchema with several request content types', () => {
     if (schema.type !== 'union') throw new Error('expected a union')
 
     const contentTypes = (schema.members ?? []).map((member) => {
-      const props = ast.narrowSchema(member, 'object')?.properties ?? []
+      const props = ast.schema.narrow(member, 'object')?.properties ?? []
       return { required: props.find((p) => p.name === 'contentType')?.required, body: props.find((p) => p.name === 'body')?.schema.type }
     })
 
@@ -250,7 +250,7 @@ describe('buildOptionsSchema', () => {
   test('marks body, path, query, and headers as never when the operation has none of them', () => {
     const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-    const schema = ast.narrowSchema(buildOptionsSchema(node, resolver), 'object')!
+    const schema = ast.schema.narrow(buildOptionsSchema(node, resolver), 'object')!
 
     expect(schema.type).toBe('object')
     expect(schema.primitive).toBe('object')
@@ -277,7 +277,7 @@ describe('buildOptionsSchema', () => {
       },
     })
 
-    const schema = ast.narrowSchema(buildOptionsSchema(node, resolver), 'object')!
+    const schema = ast.schema.narrow(buildOptionsSchema(node, resolver), 'object')!
 
     expect(schema.properties?.find((property) => property.name === 'body')?.required).toBe(expected)
     // With no required parameter, the whole options argument follows the body.

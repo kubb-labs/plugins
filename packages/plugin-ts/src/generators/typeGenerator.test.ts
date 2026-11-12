@@ -1234,7 +1234,7 @@ describe('typeGenerator — custom imports', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'customImports' })
 
-    await renderGeneratorSchema(typeGenerator, ast.factory.createSchema({ type: ast.schemaTypes.bigint, name: 'Counter' }), {
+    await renderGeneratorSchema(typeGenerator, ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' }), {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

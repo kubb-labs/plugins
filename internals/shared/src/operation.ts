@@ -217,7 +217,7 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
 
   const item = entry.stream?.schema ? ast.ref.getSchema(entry.stream.schema) : undefined
   if (!item) return false
-  const events = item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : [item]
+  const events = item.type === 'union' ? (ast.schema.narrow(item, 'union')?.members ?? []) : [item]
   // A discriminator makes each event an intersection of its `$ref` and the pinned `event`, so every part is read.
   const propertySchemas = (event: ast.SchemaNode, propertyName: string) => ast.schema.findProperties({ node: event, propertyName }).map(({ schema }) => schema)
   const textEvents = events.filter((event) => {

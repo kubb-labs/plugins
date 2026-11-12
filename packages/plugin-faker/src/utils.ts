@@ -54,12 +54,12 @@ export function isObjectSchema(node: ast.SchemaNode, seen = new Set<ast.SchemaNo
   if (seen.has(resolved)) return false
   seen.add(resolved)
 
-  if (ast.narrowSchema(resolved, ast.schemaTypes.object) || ast.narrowSchema(resolved, ast.schemaTypes.ref)) return true
-  const composition = ast.narrowSchema(resolved, ast.schemaTypes.intersection) ?? ast.narrowSchema(resolved, ast.schemaTypes.union)
+  if (ast.schema.narrow(resolved, ast.schema.types.object) || ast.schema.narrow(resolved, ast.schema.types.ref)) return true
+  const composition = ast.schema.narrow(resolved, ast.schema.types.intersection) ?? ast.schema.narrow(resolved, ast.schema.types.union)
   if (!composition) return false
 
   return (
-    (composition.type === ast.schemaTypes.intersection && !composition.members?.length) ||
+    (composition.type === ast.schema.types.intersection && !composition.members?.length) ||
     (composition.members ?? []).some((member) => isObjectSchema(member, seen))
   )
 }

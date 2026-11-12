@@ -108,10 +108,10 @@ export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Arra
     if (seen.has(node)) return false
     seen.add(node)
     const resolved = ast.ref.mergeSchema(node)
-    const composition = ast.narrowSchema(resolved, ast.schemaTypes.intersection) ?? ast.narrowSchema(resolved, ast.schemaTypes.union)
+    const composition = ast.schema.narrow(resolved, ast.schema.types.intersection) ?? ast.schema.narrow(resolved, ast.schema.types.union)
     // Property lookup skips unions, but a single-member union prints as its member.
     if (composition) {
-      if (composition.type === ast.schemaTypes.union && composition.members?.length !== 1) return false
+      if (composition.type === ast.schema.types.union && composition.members?.length !== 1) return false
       return composition.members?.some((child) => hasRequiredProperty({ node: child, propertyName, seen })) ?? false
     }
     return ast
@@ -120,7 +120,7 @@ export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Arra
   }
 
   return members.map((member, index) => {
-    const object = ast.narrowSchema(member, ast.schemaTypes.object)
+    const object = ast.schema.narrow(member, ast.schema.types.object)
     if (!object || index === 0) return member
 
     return {
@@ -167,18 +167,18 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   const resolved = node ? ast.ref.mergeSchema(node) : undefined
   // A binary schema parses to a `Blob`, which a spec default, a string, cannot be.
   if (resolved?.type === 'blob') return null
-  if (resolved && ast.narrowSchema(resolved, 'bigint')) {
+  if (resolved && ast.schema.narrow(resolved, 'bigint')) {
     if (typeof value === 'bigint') return `BigInt(${value})`
     if (typeof value === 'number' && Number.isInteger(value)) return `BigInt(${value})`
     return null
   }
-  if (resolved && ast.narrowSchema(resolved, 'array')) {
+  if (resolved && ast.schema.narrow(resolved, 'array')) {
     return Array.isArray(value) ? JSON.stringify(value) : null
   }
   // An enum/literal schema narrows to its members (e.g. `1 | 3`), but the spec default may not match
   // that type (`default: '1'` on a numeric enum). Emit the matching member's typed literal so the
   // default agrees with the schema, or drop a default that matches no member.
-  const enumNode = resolved ? ast.narrowSchema(resolved, 'enum') : undefined
+  const enumNode = resolved ? ast.schema.narrow(resolved, 'enum') : undefined
   if (enumNode) {
     const values = enumNode.namedEnumValues?.map((member) => member.value) ?? enumNode.enumValues ?? []
     if (values.length) {
@@ -436,7 +436,7 @@ function modifierDepth(schema: ast.SchemaNode): number {
  * `.unwrap()`, so its printer passes `._zod.def.innerType` as the `step`.
  */
 export function omitUnwrapChain(node: ast.SchemaNode, step = '.unwrap()'): string {
-  const ref = ast.narrowSchema(node, 'ref')
+  const ref = ast.schema.narrow(node, 'ref')
   if (!ref) return ''
 
   const target = ref.schema ?? ref
@@ -509,11 +509,11 @@ export function getMemberConstraint({
   numbers: (constraints: NumericConstraints) => string
 }): string | undefined {
   // Checks a suffix cannot carry stay on the member's own schema.
-  if (hasInputChecks(member) || ast.narrowSchema(member, 'array')?.contains) return undefined
-  if (member.primitive === 'string') return lengths({ ...(ast.narrowSchema(member, 'string') ?? {}), regexType }) || undefined
+  if (hasInputChecks(member) || ast.schema.narrow(member, 'array')?.contains) return undefined
+  if (member.primitive === 'string') return lengths({ ...(ast.schema.narrow(member, 'string') ?? {}), regexType }) || undefined
   if (member.primitive === 'number' || member.primitive === 'integer')
-    return numbers(ast.narrowSchema(member, 'number') ?? ast.narrowSchema(member, 'integer') ?? {}) || undefined
-  if (member.primitive === 'array') return lengths({ ...(ast.narrowSchema(member, 'array') ?? {}), regexType }) || undefined
+    return numbers(ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer') ?? {}) || undefined
+  if (member.primitive === 'array') return lengths({ ...(ast.schema.narrow(member, 'array') ?? {}), regexType }) || undefined
 }
 
 type PrinterContext = {
@@ -536,7 +536,7 @@ export function buildObjectShape(
     cyclic: boolean
   }) => string,
 ): string {
-  const objectNode = ast.narrowSchema(node, 'object')
+  const objectNode = ast.schema.narrow(node, 'object')
   if (!objectNode) return '{}'
 
   const isCyclic = (schema: ast.SchemaNode): boolean =>

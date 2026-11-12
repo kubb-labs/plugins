@@ -49,26 +49,30 @@ const nullableNameSchema = ast.factory.createSchema({
 })
 
 const primitiveAllOfSchema = ast.factory.createSchema({
-  type: ast.schemaTypes.intersection,
+  type: ast.schema.types.intersection,
   name: 'Both',
   members: [
-    ast.factory.createSchema({ type: ast.schemaTypes.ref, ref: '#/components/schemas/Id', schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
     ast.factory.createSchema({
-      type: ast.schemaTypes.ref,
+      type: ast.schema.types.ref,
+      ref: '#/components/schemas/Id',
+      schema: ast.factory.createSchema({ type: ast.schema.types.string }),
+    }),
+    ast.factory.createSchema({
+      type: ast.schema.types.ref,
       ref: '#/components/schemas/Code',
-      schema: ast.factory.createSchema({ type: ast.schemaTypes.string, max: 8 }),
+      schema: ast.factory.createSchema({ type: ast.schema.types.string, max: 8 }),
     }),
   ],
 })
 
 const primitiveEnumAllOfSchema = ast.factory.createSchema({
-  type: ast.schemaTypes.intersection,
+  type: ast.schema.types.intersection,
   name: 'Choice',
   members: [
-    ast.factory.createSchema({ type: ast.schemaTypes.string }),
+    ast.factory.createSchema({ type: ast.schema.types.string }),
     ast.factory.createSchema({
-      type: ast.schemaTypes.union,
-      members: ['a', 'b'].map((value) => ast.factory.createSchema({ type: ast.schemaTypes.enum, primitive: 'string', enumValues: [value] })),
+      type: ast.schema.types.union,
+      members: ['a', 'b'].map((value) => ast.factory.createSchema({ type: ast.schema.types.enum, primitive: 'string', enumValues: [value] })),
     }),
   ],
 })
@@ -962,7 +966,7 @@ describe('fakerGenerator — custom imports', () => {
       plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorSchema(fakerGenerator, ast.factory.createSchema({ type: ast.schemaTypes.bigint, name: 'Counter' }), {
+    await renderGeneratorSchema(fakerGenerator, ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' }), {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

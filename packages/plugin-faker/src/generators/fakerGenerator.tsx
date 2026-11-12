@@ -38,7 +38,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
     const schemaName = node.name
-    const isEnumSchema = !!ast.narrowSchema(node, ast.schemaTypes.enum)
+    const isEnumSchema = !!ast.schema.narrow(node, ast.schema.types.enum)
     const schemaTypeName = enumTypeName({ resolver: tsResolver, name: schemaName, enumOptions: pluginTs.options?.enum, isEnum: isEnumSchema })
     const meta = {
       name: resolver.name(schemaName),
@@ -217,7 +217,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         return null
       }
 
-      if (schema.type === ast.schemaTypes.object && keysToOmit?.length) {
+      if (schema.type === ast.schema.types.object && keysToOmit?.length) {
         schema = { ...schema, properties: schema.properties.filter((property) => !keysToOmit?.includes(property.name)) }
         keysToOmit = undefined
       }

@@ -30,7 +30,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const imports = resolver.imports({ node, root, output, group: group ?? undefined, name: importName })
 
-    const enumNode = ast.narrowSchema(node, ast.schemaTypes.enum)
+    const enumNode = ast.schema.narrow(node, ast.schema.types.enum)
     // An inline `const` (single-value enum the adapter did not register) renders as a literal type,
     // so it keeps its plain name instead of the suffixed enum-key name.
     const isEnumSchema = !!enumNode && !isInlineConstEnum(enumNode, enumSchemaNames)

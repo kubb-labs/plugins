@@ -268,7 +268,7 @@ export const printerTs = createPrinter<PrinterTs>((options) => {
         const members = node.members ?? []
 
         const hasStringLiteral = members.some((m) => {
-          const enumNode = ast.narrowSchema(m, ast.schemaTypes.enum)
+          const enumNode = ast.schema.narrow(m, ast.schema.types.enum)
           return enumNode?.primitive === 'string'
         })
         const hasPlainString = members.some((m) => ast.schema.isString(m))

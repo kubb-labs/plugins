@@ -86,7 +86,7 @@ function getLiteralUnion({
 }): { values: Array<string | number | boolean>; coerce: boolean } | undefined {
   if ((node.strategy === 'one' && options.oneOfType === 'xor') || options.nodes?.enum) return undefined
   const values = (node.members ?? []).map((member) => {
-    const enumNode = ast.narrowSchema(member, ast.schemaTypes.enum)
+    const enumNode = ast.schema.narrow(member, ast.schema.types.enum)
     return enumNode && !enumNode.name && !enumNode.nullable && !enumNode.namedEnumValues && enumNode.enumValues?.length === 1
       ? enumNode.enumValues[0]
       : undefined
@@ -249,7 +249,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
           return catchallType ? dialect.catchall(objectBase, catchallType) : objectBase
         }
         if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema && !isStrict) {
-          const unknownType = this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
+          const unknownType = this.transform(ast.factory.createSchema({ type: ast.schema.types.unknown }))!
           return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
         }
         if (node.additionalProperties === true) return objectBase
@@ -259,7 +259,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         // reject the declared keys, so fall back to a catchall (value validated, key pattern not).
         if (patterns.length > 0) {
           const values = patterns.map(([, valueSchema]) => {
-            const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
+            const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: ast.schema.types.unknown }))!
             return valueSchema.nullable ? dialect.nullable(valueType) : valueType
           })
           const distinct = [...new Set(values)]
@@ -276,7 +276,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
     },
     array(node) {
       const items = (node.items ?? []).map((item) => printNullable(item, this.transform(item))).filter(Boolean)
-      const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
+      const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schema.types.unknown }))!
       const base = `z.array(${inner})${dialect.lengths({ ...node, regexType: this.options.regexType })}`
       const unique = node.unique ? dialect.unique(base) : base
       const contains = node.contains && containsCheck(this, node.contains)
@@ -334,7 +334,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
     intersection(node) {
       const members = node.members ?? []
       if (members.length === 0) return ''
-      const hasSiblingProperties = members.some((member) => member.type === ast.schemaTypes.object && member.properties.length > 0)
+      const hasSiblingProperties = members.some((member) => member.type === ast.schema.types.object && member.properties.length > 0)
       const transform = (member: ast.SchemaNode) => {
         if (!hasSiblingProperties) return this.transform(member)
         unionsWithSiblings.add(member)
@@ -356,11 +356,11 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemas)) {
         // A discriminated `oneOf` base already pins its discriminator to a literal; a sibling
         // `type: string` extended after it would widen that literal back to any string.
-        const discriminator = ast.narrowSchema(first, ast.schemaTypes.union)?.discriminatorPropertyName
+        const discriminator = ast.schema.narrow(first, ast.schema.types.union)?.discriminatorPropertyName
         return preserveRequiredProperties(members)
           .slice(1)
           .reduce((acc, member) => {
-            const object = ast.narrowSchema(member, ast.schemaTypes.object)
+            const object = ast.schema.narrow(member, ast.schema.types.object)
             if (!discriminator || !object?.properties.some((property) => property.name === discriminator)) {
               return dialect.extend(acc, dialect.objectShape(this, member))
             }
@@ -393,9 +393,9 @@ function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullabl
 // A required `unknown` property means "the key is present", which a Zod object would accept as missing, so those keys are checked with `in`.
 function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
   if (!schema) return 'true'
-  const object = ast.narrowSchema(schema, ast.schemaTypes.object)
+  const object = ast.schema.narrow(schema, ast.schema.types.object)
   const keyOnlyNames =
-    object?.properties.filter((property) => property.required && property.schema.type === ast.schemaTypes.unknown).map((property) => property.name) ?? []
+    object?.properties.filter((property) => property.required && property.schema.type === ast.schema.types.unknown).map((property) => property.name) ?? []
   const restSchema = object ? { ...object, properties: object.properties.filter((property) => !keyOnlyNames.includes(property.name)) } : schema
   // An object with no properties left still means "is an object", so only a key check stands alone.
   const isOnlyKeys =
@@ -443,5 +443,5 @@ export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.Prin
     return [[type, checkedHandler]]
   }
 
-  return Object.fromEntries(Object.values(ast.schemaTypes).flatMap(wrapHandler))
+  return Object.fromEntries(Object.values(ast.schema.types).flatMap(wrapHandler))
 }

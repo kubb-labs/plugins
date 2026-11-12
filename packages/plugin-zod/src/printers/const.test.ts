@@ -34,7 +34,7 @@ describe('OpenAPI structural const values', () => {
       },
     })
     const foo = input.schemas.find((schema) => schema.name === 'Foo')
-    const object = foo && ast.narrowSchema(foo, 'object')
+    const object = foo && ast.schema.narrow(foo, 'object')
     const node = object?.properties[0]?.schema
     expect(node).toBeDefined()
     if (!node) throw new Error('Missing const property')

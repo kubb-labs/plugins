@@ -119,7 +119,7 @@ export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptio
 function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): string {
   // Inline objects are already strict through their node; only a ref needs the runtime call.
 
-  if (node.type === ast.schemaTypes.ref) {
+  if (node.type === ast.schema.types.ref) {
     if (member.startsWith('z.lazy(')) {
       return member
     }
@@ -137,7 +137,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
       return member
     }
 
-    if (schema.type === ast.schemaTypes.object && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
+    if (schema.type === ast.schema.types.object && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
       // Input checks print a `z.pipe(…)`, which has no `.strict()`, so its object output is made strict.
       // A ref with its own `conditionals` around a target with checks is a pipe in a pipe, which stays as it is.
       const checks = [node, node.schema].filter((entry) => entry && hasInputChecks(entry)).length
@@ -164,7 +164,7 @@ function buildZodObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: 
       // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
       // property override), skip applying the description from the ref target to avoid applying
       // metadata from a replaced schema.
-      description: schema.type !== ast.schemaTypes.ref && meta.type === ast.schemaTypes.ref ? undefined : meta.description,
+      description: schema.type !== ast.schema.types.ref && meta.type === ast.schema.types.ref ? undefined : meta.description,
       examples: meta.examples,
     })
     if (!cyclic) return `${objectKey(name)}: ${body}`
@@ -187,14 +187,14 @@ function recursiveGetterType({
 }): string | undefined {
   function baseType(schema: ast.SchemaNode): string | undefined {
     if (ctx.options.nodes?.[schema.type]) return undefined
-    if (schema.type === ast.schemaTypes.ref) {
+    if (schema.type === ast.schema.types.ref) {
       const saved = ctx.options.cyclicSchemas
       ctx.options.cyclicSchemas = undefined
       const name = ctx.transform(schema)
       ctx.options.cyclicSchemas = saved
       return name ? `typeof ${name}` : undefined
     }
-    if (schema.type === ast.schemaTypes.array && schema.items?.length === 1) {
+    if (schema.type === ast.schema.types.array && schema.items?.length === 1) {
       const item = baseType(schema.items[0]!)
       if (!item) return undefined
       return `z.ZodArray<${schema.items[0]!.nullable ? `z.ZodNullable<${item}>` : item}>`
@@ -220,12 +220,12 @@ function recursiveGetterType({
  * `direction` themselves, so {@link containsDirectionalNode} probes their children instead.
  */
 const CONTAINER_TYPES = new Set<ast.SchemaType>([
-  ast.schemaTypes.object,
-  ast.schemaTypes.array,
-  ast.schemaTypes.tuple,
-  ast.schemaTypes.union,
-  ast.schemaTypes.intersection,
-  ast.schemaTypes.ref,
+  ast.schema.types.object,
+  ast.schema.types.array,
+  ast.schema.types.tuple,
+  ast.schema.types.union,
+  ast.schema.types.intersection,
+  ast.schema.types.ref,
 ])
 
 type DirectionProbeContext = { options: PrinterZodOptions; transform: () => null; base: () => null; import: () => void }
@@ -256,7 +256,7 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
 export function containsDirectionalNode({ node, printerOptions }: { node: ast.SchemaNode | undefined; printerOptions: PrinterZodOptions }): boolean {
   if (!node) return false
 
-  return ast.findSchema(node, { predicate: (schema) => variesByDirection({ node: schema, printerOptions }), followRefs: true }) !== undefined
+  return ast.schema.find(node, { predicate: (schema) => variesByDirection({ node: schema, printerOptions }), followRefs: true }) !== undefined
 }
 
 /**
@@ -265,7 +265,7 @@ export function containsDirectionalNode({ node, printerOptions }: { node: ast.Sc
 export function collectDirectionalRefNames({ node, printerOptions }: { node: ast.SchemaNode; printerOptions: PrinterZodOptions }): Array<string> {
   return ast.collect<string>(node, {
     schema: (n) =>
-      n.type === ast.schemaTypes.ref && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.ref.getName(n) ?? undefined) : undefined,
+      n.type === ast.schema.types.ref && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.ref.getName(n) ?? undefined) : undefined,
   })
 }
 
