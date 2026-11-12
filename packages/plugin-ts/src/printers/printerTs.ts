@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module'
-import { ast, Diagnostics } from '@kubb/kit'
+import { ast, createPrinter, Diagnostics } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isBinarySchema, isInlineConstEnum } from '../utils.ts'
@@ -187,7 +187,7 @@ function toNodeHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial<f
  * const declaration = printer.print(schemaNode) // 'export type MyType = …'
  * ```
  */
-export const printerTs = ast.createPrinter<PrinterTs>((options) => {
+export const printerTs = createPrinter<PrinterTs>((options) => {
   const addsUndefined = options.optionalType === 'undefined' || options.optionalType === 'questionTokenAndUndefined'
 
   return {

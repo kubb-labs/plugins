@@ -1,5 +1,5 @@
 import { buildObject, objectKey, toRegExpString } from '@internals/utils'
-import { ast, Diagnostics, text } from '@kubb/kit'
+import { ast, createPrinter, Diagnostics, text } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema, isObjectSchema } from '../utils.ts'
 
@@ -256,7 +256,7 @@ function itemTypeName(typeName: string, nestedInUnion?: boolean): string {
  * Creates a Faker printer that generates mock data generation code from schema nodes.
  * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
  */
-export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = ast.createPrinter<PrinterFakerFactory>((options) => {
+export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = createPrinter<PrinterFakerFactory>((options) => {
   const printNested = (node: ast.SchemaNode, overrideOptions: Partial<PrinterFakerOptions> = {}): string => {
     return (
       printerFaker({

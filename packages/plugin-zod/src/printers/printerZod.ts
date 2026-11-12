@@ -1,5 +1,5 @@
 import { lazyGetter, objectKey } from '@internals/utils'
-import { ast } from '@kubb/kit'
+import { ast, createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyModifiers,
@@ -347,7 +347,7 @@ const scalarNodes: PrinterZodNodes = {
  * const code = printer.print(stringNode) // "z.string()"
  * ```
  */
-export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
+export const printerZod = createPrinter<PrinterZodFactory>((options) => {
   const nodes: PrinterZodNodes = withInputChecks({ ...buildZodNodes(standardDialect, options.cyclicSchemas), ...scalarNodes })
 
   return {
