@@ -256,7 +256,22 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
 export function containsDirectionalNode({ node, printerOptions }: { node: ast.SchemaNode | undefined; printerOptions: PrinterZodOptions }): boolean {
   if (!node) return false
 
-  return ast.schema.find(node, { predicate: (schema) => variesByDirection({ node: schema, printerOptions }), followRefs: true }) !== undefined
+  return (
+    ast.schema.find(node, {
+      predicate: (schema) => variesByDirection({ node: schema, printerOptions }),
+      followRefs: true,
+      cache: getDirectionalCache(printerOptions),
+    }) !== undefined
+  )
+}
+
+/**
+ * The `find` cache for {@link containsDirectionalNode}, one per plugin per build and per option set
+ * the probe reads. A `printer.nodes` override has no string key, so it searches without a cache.
+ */
+function getDirectionalCache({ resolver, nodes, coercion, dateType }: PrinterZodOptions) {
+  if (!resolver || nodes) return undefined
+  return resolver.memo(`zodDirectionalNodes:${shouldCoerce(coercion, 'dates')}:${dateType}`, () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>())
 }
 
 /**
