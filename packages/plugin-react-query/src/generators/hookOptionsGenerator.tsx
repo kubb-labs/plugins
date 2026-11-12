@@ -36,7 +36,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
     const hookOptions: Record<string, string> = {}
 
     for (const node of nodes) {
-      if (!ast.http.is(node)) continue
+      if (!ast.http.isOperation(node)) continue
       const opOverrides = resolveOperationOverrides(node, override)
       const nodeQuery: QueryOption = 'query' in opOverrides ? (opOverrides.query as QueryOption) : query
       const nodeMutation: MutationOption = 'mutation' in opOverrides ? (opOverrides.mutation as MutationOption) : mutation

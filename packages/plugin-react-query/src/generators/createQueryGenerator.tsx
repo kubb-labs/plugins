@@ -39,7 +39,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
     renderer: jsxRenderer,
     match(node, ctx) {
       const operationNode = node as ast.OperationNode
-      if (!ast.http.is(operationNode)) return false
+      if (!ast.http.isOperation(operationNode)) return false
       const { query, mutation, infinite: infiniteConfig, suspense: suspenseConfig, hooks } = ctx.options
       const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
       if (!isQuery || isMutation) return false
@@ -52,7 +52,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
       return !!infiniteOptions && matchesInfinite(operationNode, infiniteOptions)
     },
     operation(node, ctx) {
-      if (!ast.http.is(node)) return null
+      if (!ast.http.isOperation(node)) return null
       const { driver, resolver, root } = ctx
       const { output, query, infinite: infiniteConfig, client, group, customOptions, hooks } = ctx.options
 

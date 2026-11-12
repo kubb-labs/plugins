@@ -26,7 +26,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   renderer: jsxRenderer,
   match(node, ctx) {
     const operationNode = node as ast.OperationNode
-    if (!ast.http.is(operationNode)) return false
+    if (!ast.http.isOperation(operationNode)) return false
     const { query, mutation, infinite, hooks } = ctx.options
 
     const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
@@ -36,7 +36,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     return matchesInfinite(operationNode, infiniteOptions)
   },
   operation(node, ctx) {
-    if (!ast.http.is(node)) return null
+    if (!ast.http.isOperation(node)) return null
     const { driver, resolver, root } = ctx
     const { output, query, infinite, client, group } = ctx.options
 

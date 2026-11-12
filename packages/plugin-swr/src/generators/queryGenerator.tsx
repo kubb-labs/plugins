@@ -14,7 +14,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
   name: 'swr-query',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    if (!ast.http.is(node)) return null
+    if (!ast.http.isOperation(node)) return null
     const { driver, resolver, root } = ctx
     const { output, query, mutation, client, group } = ctx.options
 

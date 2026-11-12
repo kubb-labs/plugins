@@ -18,7 +18,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
   name: 'msw',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    if (!ast.http.is(node)) return null
+    if (!ast.http.isOperation(node)) return null
     const { driver, resolver, config, root } = ctx
     const { output, parser, baseURL, group } = ctx.options
 
