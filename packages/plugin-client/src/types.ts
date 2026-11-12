@@ -1,4 +1,5 @@
 import type { Override, PluginType } from '@kubb/kit'
+import type { ReturnTypeOption } from '@internals/client'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from './clientTypes.ts'
 
 export type * from './clientTypes.ts'
@@ -19,6 +20,18 @@ type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K>
  * ```
  */
 export type Options = DistributiveOmit<ClientOptions, 'sdk' | 'returnType' | 'baseURL' | 'override'> & {
+  /**
+   * Shape of the value a generated operation resolves to. `'full'` and `'data'` import `withUnwrap` or `unwrapResult`
+   * and their types from your `importPath` module, so that module must export them.
+   *
+   * @default 'plain'
+   * @example
+   * ```ts
+   * pluginClient({ importPath: '../../client', returnType: 'full' })
+   * // await getPetById({ path: { petId: 1 } }).unwrap()
+   * ```
+   */
+  returnType?: ReturnTypeOption
   /**
    * Applies different options to operations that match a pattern.
    * `sdk`, `returnType`, and `baseURL` are not available, because this plugin generates standalone operations and your client module owns the base URL.
