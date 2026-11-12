@@ -40,7 +40,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
  */
 export const queryKeyTransformer: Transformer = ({ node, variant }) => {
   if (!node.path) return []
-  const { path, query } = ast.http.parameters(node)
+  const { path, query } = ast.http.groupParameters(node)
   // Embedding `infinite: true` inside the URL segment separates infinite queries in the cache
   // while preserving TanStack Query partial matching for base URL invalidation.
   const isInfinite = variant === 'infiniteQuery' || variant === 'suspenseInfiniteQuery'

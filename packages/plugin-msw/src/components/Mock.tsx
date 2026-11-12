@@ -21,7 +21,7 @@ export function Mock({ baseURL = '', name, fakerName, responseName, typeName, re
   const method = getMswMethod(node)
   // `http.all` matches every method on the path, so a handler for a method MSW has no helper for lets the others pass through.
   const methodGuard = method === 'all' ? `if (info.request.method !== ${text.quote(node.method)}) return\n\n    ` : ''
-  const successResponse = ast.http.responses.primary(node)
+  const successResponse = ast.http.responses.findPrimary(node)
   const statusCode = successResponse ? ast.http.status.toCode(successResponse) : 200
   const url = Url.toPath(node.path)
 

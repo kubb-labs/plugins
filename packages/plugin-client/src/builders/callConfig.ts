@@ -43,7 +43,7 @@ export function buildCallConfig({
   returnType: ReturnTypeOption
 }): { callConfig: string; mergeContentType: boolean; eventStream: boolean } {
   const stream = getEventStream(node)
-  const content = ast.http.responses.primary(node)?.content ?? []
+  const content = ast.http.responses.findPrimary(node)?.content ?? []
   const securityLiteral = buildSecurityMetadata({ security })
   // A `'plain'` client is the user's own, which may type `styles` as `unknown`, so it keeps the generated styles as a default.
   const ownRuntime = returnType !== 'plain'

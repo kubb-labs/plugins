@@ -264,7 +264,7 @@ function resolveFallbackPageParamType(initialPageParam: Infinite['initialPagePar
  * so callers can reuse it when rewriting the paginated request.
  */
 export function resolvePageParamType(node: ast.OperationNode, { resolver, initialPageParam, queryParam }: ResolvePageParamTypeParams): PageParamType {
-  const firstQueryParam = ast.http.parameters(node).query[0]
+  const firstQueryParam = ast.http.groupParameters(node).query[0]
   const groupName = firstQueryParam ? resolver.param.query(node, firstQueryParam) : null
   const individualName = firstQueryParam ? resolver.param.name(node, firstQueryParam) : null
   const queryParamsTypeName = groupName !== individualName ? groupName : null
@@ -382,7 +382,7 @@ export function resolveInfiniteConfig(infinite: Partial<Infinite> | false): Requ
 export function matchesInfinite(node: ast.OperationNode, infinite: Infinite): boolean {
   if (!infinite.queryParam) return false
   // Strip trailing '?' which OpenAPI specs sometimes append to parameter names to denote optionality
-  return ast.http.parameters(node).query.some((param) => param.name.replace(/\?$/, '') === infinite.queryParam)
+  return ast.http.groupParameters(node).query.some((param) => param.name.replace(/\?$/, '') === infinite.queryParam)
 }
 
 /**
@@ -398,7 +398,7 @@ export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: I
     !infinite.cursorParam
   if (!usesDefault) return null
 
-  const content = ast.http.responses.primary(node)?.content
+  const content = ast.http.responses.findPrimary(node)?.content
   const jsonContent = content?.find((item) => item.contentType?.includes('json')) ?? content?.[0]
   const schema = jsonContent?.schema
 

@@ -155,7 +155,7 @@ export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
  * whether several are present, so the client can let a caller pick which one to accept.
  */
 export function getResponseContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
-  return buildContentTypeInfo(ast.http.responses.primary(node)?.content?.map((e) => e.contentType) ?? [])
+  return buildContentTypeInfo(ast.http.responses.findPrimary(node)?.content?.map((e) => e.contentType) ?? [])
 }
 
 type ResponseType = 'blob' | 'text' | 'stream'
@@ -172,7 +172,7 @@ type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | nul
  * call with its query hooks.
  */
 export function getEventStream(node: ast.OperationNode): 'event' | 'data' | 'line' | null {
-  const content = ast.http.responses.primary(node)?.content ?? []
+  const content = ast.http.responses.findPrimary(node)?.content ?? []
   if (content.length !== 1) return null
   const entry = content[0]!
   const framing = getStreamFraming(entry)
@@ -184,7 +184,7 @@ export function getEventStream(node: ast.OperationNode): 'event' | 'data' | 'lin
  * How a content entry is framed as a stream: `'events'` for Server-Sent Events, `'lines'` for JSON Lines.
  */
 export function getStreamFraming(entry: Pick<ast.ContentNode, 'contentType' | 'stream'>): 'events' | 'lines' | undefined {
-  if (ast.mediaType.base(entry) === 'text/event-stream') return 'events'
+  if (ast.mediaType.getBase(entry) === 'text/event-stream') return 'events'
   // `multipart/mixed` with an `itemSchema` also has `stream`, but it is a stream of parts, not of JSON values.
   return entry.stream && ast.mediaType.isStream(entry) ? 'lines' : undefined
 }
@@ -211,7 +211,7 @@ function isTextSchema(schema: ast.SchemaNode | null | undefined): boolean {
  */
 export function hasTextEventData(node: ast.OperationNode): boolean | Array<string> {
   const shape = getEventStream(node)
-  const entry = ast.http.responses.primary(node)?.content?.[0]
+  const entry = ast.http.responses.findPrimary(node)?.content?.[0]
   if (!entry || (shape !== 'data' && shape !== 'event')) return false
   if (shape === 'data') return isTextSchema(entry.stream?.schema ?? entry.schema)
 
@@ -219,14 +219,14 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
   if (!item) return false
   const events = item.type === 'union' ? (ast.narrowSchema(item, 'union')?.members ?? []) : [item]
   // A discriminator makes each event an intersection of its `$ref` and the pinned `event`, so every part is read.
-  const propertySchemas = (event: ast.SchemaNode, propertyName: string) => ast.schema.properties({ node: event, propertyName }).map(({ schema }) => schema)
+  const propertySchemas = (event: ast.SchemaNode, propertyName: string) => ast.schema.findProperties({ node: event, propertyName }).map(({ schema }) => schema)
   const textEvents = events.filter((event) => {
     const dataSchemas = propertySchemas(event, 'data')
     return dataSchemas.length > 0 && dataSchemas.every(isTextSchema)
   })
   if (textEvents.length === events.length) return events.length > 0
 
-  const eventNames = textEvents.map((event) => propertySchemas(event, 'event').flatMap((schema) => ast.schema.literalValues(ast.ref.resolve(schema))))
+  const eventNames = textEvents.map((event) => propertySchemas(event, 'event').flatMap((schema) => ast.schema.getLiterals(ast.ref.resolve(schema))))
   return eventNames.length > 0 && eventNames.every((values) => values.length > 0) && [...new Set(eventNames.flat().map(String))]
 }
 
@@ -235,7 +235,7 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
  * for the stream by default and ships the `sse.ts` runtime, so a mixed response can be read as events too.
  */
 export function hasEventStreamContent(node: ast.OperationNode): boolean {
-  const entries = ast.http.responses.primary(node)?.content ?? []
+  const entries = ast.http.responses.findPrimary(node)?.content ?? []
   // Next to another type, a stream without a schema gets no typed variant, so it keeps the plain call.
   return entries.some((entry) => getStreamFraming(entry) === 'events' && (entries.length === 1 || Boolean(entry.schema)))
 }
@@ -245,7 +245,7 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
  * body as a `ReadableStream`, so the stream runtime is registered and a hook's data type includes the stream.
  */
 export function hasStreamVariant(node: ast.OperationNode): boolean {
-  return ast.http.responses.success(node).some((response) => {
+  return ast.http.responses.filterSuccess(node).some((response) => {
     const variants = (response.content ?? []).filter((entry) => entry.schema)
     return variants.length > 1 && variants.some((entry) => ast.mediaType.isStream(entry))
   })
@@ -258,7 +258,7 @@ const formContentTypes = ['multipart/form-data', 'application/x-www-form-urlenco
  * which the client needs a handler for.
  */
 export function getFormContentTypes(node: ast.OperationNode): Array<(typeof formContentTypes)[number]> {
-  const request = new Set((node.requestBody?.content ?? []).map((entry) => ast.mediaType.base(entry)))
+  const request = new Set((node.requestBody?.content ?? []).map((entry) => ast.mediaType.getBase(entry)))
   return formContentTypes.filter((contentType) => request.has(contentType))
 }
 
@@ -271,7 +271,7 @@ export function getFormContentTypes(node: ast.OperationNode): Array<(typeof form
  * `image/*`, `audio/*`, and `video/*` are blobs.
  */
 function responseTypeForContent(entry: ResponseContentEntry): ResponseType | undefined {
-  const baseType = ast.mediaType.base(entry)
+  const baseType = ast.mediaType.getBase(entry)
   if (!baseType) return undefined
   if (getStreamFraming(entry)) return 'stream'
   if (ast.mediaType.isJson(baseType)) return undefined
@@ -324,7 +324,7 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
   const { contentType, schema } = entry
   if (!schema || entry.stream) return entry
 
-  const baseType = ast.mediaType.base(contentType)
+  const baseType = ast.mediaType.getBase(contentType)
   const resolved = ast.ref.resolve(schema)
   if (isBinaryContentType(baseType)) {
     return resolved.type === 'blob' ? entry : { ...entry, schema: ast.factory.createSchema({ type: 'blob' }), keysToOmit: null }
@@ -419,7 +419,7 @@ export type RequestGroups = {
  * Which of the grouped request options an operation carries.
  */
 export function getRequestGroups(node: ast.OperationNode): RequestGroups {
-  const { path, query, header, cookie } = ast.http.parameters(node)
+  const { path, query, header, cookie } = ast.http.groupParameters(node)
   return {
     path: path.length > 0,
     query: query.length > 0,
@@ -448,7 +448,7 @@ export type RequestGroupOptionality = {
  */
 export function getRequestGroupOptionality(node: ast.OperationNode): RequestGroupOptionality {
   const groups = getRequestGroups(node)
-  const { path, query, header } = ast.http.parameters(node)
+  const { path, query, header } = ast.http.groupParameters(node)
   const hasRequiredPath = path.some((param) => param.required)
   const hasRequiredQuery = query.some((param) => param.required)
   const hasRequiredHeader = header.some((param) => param.required)
@@ -542,7 +542,7 @@ export function castToClientOptions(callArg: string, clientName: string, returnT
  * than a record.
  */
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver, { pairContentTypes = false } = {}): ast.SchemaNode {
-  const { path, query, header, cookie } = ast.http.parameters(node)
+  const { path, query, header, cookie } = ast.http.groupParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
@@ -644,7 +644,7 @@ function buildResponseRecordEntry(
             name: 'contentType',
             required: true,
             // The runtime reports the bare media type, without parameters such as `charset` or `profile`.
-            schema: ast.factory.createSchema({ type: 'enum', enumValues: [ast.mediaType.base(variant)] }),
+            schema: ast.factory.createSchema({ type: 'enum', enumValues: [ast.mediaType.getBase(variant)] }),
           }),
           ast.factory.createProperty({
             name: 'data',
@@ -712,7 +712,7 @@ export function resolveOperationTypeNames(
 ): string[] {
   const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   return resolver.memo(`operationTypeNames:${key}`, () => {
-    const { path, query, header, cookie } = ast.http.parameters(node)
+    const { path, query, header, cookie } = ast.http.groupParameters(node)
     const responseStatusNames =
       options.responseStatusNames === 'error'
         ? resolveErrorNames(node, resolver)

@@ -51,7 +51,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       .filter(ast.http.is)
       .filter((node) => !isEventStream(node) && !hasStreamVariant(node))
       .map((node) => {
-        const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.parameters(node)
+        const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
 
         const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
         const zodFile = resolveOperationFile({
@@ -64,7 +64,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         })
 
         const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.response.body(node) : null
-        const successStatus = ast.http.responses.primary(node)?.statusCode
+        const successStatus = ast.http.responses.findPrimary(node)?.statusCode
         const responseName = successStatus ? zodResolver.response.status(node, successStatus) : null
 
         const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.param.name(node, p) }))

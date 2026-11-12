@@ -73,7 +73,7 @@ const maxValueByFormat: Record<string, number> = { int32: maxInt32, uint32: 4_29
 // A ref back into its own cycle is left empty, so a mock of a recursive schema is finite and can be serialized.
 function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: PrinterFakerOptions): boolean {
   if (node.type !== 'ref' || !schemaName) return false
-  const refName = ast.ref.name(node)
+  const refName = ast.ref.getName(node)
 
   return refName === schemaName || Boolean(refName && cyclicSchemas?.has(schemaName) && cyclicSchemas.has(refName))
 }
@@ -91,7 +91,7 @@ function numberCall(
   const grid = isWhole && !Number.isInteger(multipleOf) ? undefined : multipleOf
   // Faker returns points of the `multipleOf` grid, ends included, so an exclusive bound moves to the next point.
   // shortcut: without a grid a float's exclusive `min` is passed as is, so faker can return it by chance; nudge it up once a mock hits it.
-  const { min: lower, max: upper } = ast.schema.numberBounds({ min, max, exclusive, integer: isWhole, step: grid })
+  const { min: lower, max: upper } = ast.schema.getNumberBounds({ min, max, exclusive, integer: isWhole, step: grid })
   // Faker fills a missing `min` with `0`, and a float's missing `max` with `1`, which a lone bound on the other side contradicts.
   // The span holds grid points, so faker always finds a multiple.
   const span = 100 * (grid ?? 1)
@@ -219,8 +219,8 @@ function getDiscriminator(
   member: ast.SchemaNode,
   discriminatorPropertyName: string,
 ): { value: string | number | boolean | null; required: boolean } | undefined {
-  for (const property of ast.schema.properties({ node: member, propertyName: discriminatorPropertyName })) {
-    const values = ast.schema.literalValues(property.schema)
+  for (const property of ast.schema.findProperties({ node: member, propertyName: discriminatorPropertyName })) {
+    const values = ast.schema.getLiterals(property.schema)
     if (values.length === 1) {
       return { value: values[0]!, required: property.required }
     }
@@ -288,7 +288,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const formatCall = stringFormatCalls.get(node.format)
         if (formatCall) return formatCall
 
-        const contentSchema = ast.schema.jsonContent(node)
+        const contentSchema = ast.schema.getEmbeddedJson(node)
         // The document is typed by its own schema, not by the string that holds it.
         if (contentSchema) return `JSON.stringify(${printNested(contentSchema, { typeName: undefined, nestedInObject: true, nestedInUnion: false })})`
 
@@ -330,11 +330,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return dateTimeCall(node.representation ?? 'string', { format: 'HH:mm:ss', substring: '11, 19' }, this.options.dateParser, this.options.schemaName)
       },
       ref(node) {
-        // `ast.ref.name` prefers the node's `targetName` (set for collision or macro renames),
+        // `ast.ref.getName` prefers the node's `targetName` (set for collision or macro renames),
         // then the $ref path segment, since node.name may have been overridden (e.g. by
         // single-member allOf flatten using the property-derived child name). Inline refs
         // (without $ref) from faker utils already carry resolved helper names.
-        const refName = ast.ref.name(node)
+        const refName = ast.ref.getName(node)
 
         if (!refName) {
           throw new Diagnostics.Error({
@@ -361,7 +361,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       enum(node) {
         const { typeName } = this.options
-        const values = ast.schema.literalValues(node)
+        const values = ast.schema.getLiterals(node)
 
         if (values.length === 1 && values[0] !== null && typeof values[0] === 'object') {
           return JSON.stringify(values[0])
@@ -417,7 +417,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
             printNested(member, {
               nestedInObject: true,
               // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
-              ...(member.type === 'ref' && ast.ref.name(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
+              ...(member.type === 'ref' && ast.ref.getName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
             }),
           )
           // An `allOf` member with no shape (any/unknown/void → 'undefined') adds no

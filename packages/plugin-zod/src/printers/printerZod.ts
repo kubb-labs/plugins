@@ -126,7 +126,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
 
     // A cyclic ref is annotated `z.ZodType`, and a nullable/optional ref is wrapped in
     // ZodNullable/ZodOptional, and neither exposes `.strict()`. Only a bare `ZodObject` ref takes it.
-    const refName = ast.ref.name(node)
+    const refName = ast.ref.getName(node)
     if (refName && cyclicSchemas?.has(refName)) {
       return member
     }
@@ -265,7 +265,7 @@ export function containsDirectionalNode({ node, printerOptions }: { node: ast.Sc
 export function collectDirectionalRefNames({ node, printerOptions }: { node: ast.SchemaNode; printerOptions: PrinterZodOptions }): Array<string> {
   return ast.collectSync<string>(node, {
     schema: (n) =>
-      n.type === ast.schemaTypes.ref && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.ref.name(n) ?? undefined) : undefined,
+      n.type === ast.schemaTypes.ref && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.ref.getName(n) ?? undefined) : undefined,
   })
 }
 

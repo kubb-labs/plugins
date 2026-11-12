@@ -68,7 +68,7 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
   }
 
   if (node.type === 'ref') {
-    const refName = ast.ref.name(node)
+    const refName = ast.ref.getName(node)
     if (refName && cyclicSchemas?.has(refName)) return false
     const resolved = ast.ref.sync(node)
     // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's
@@ -326,7 +326,7 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
  * Numeric bounds for a bigint: the inclusive, whole, safe bounds faker mocks against, and a whole, safe `multipleOf`.
  */
 export function bigintConstraints({ min, max, exclusive, multipleOf }: NumericConstraints): NumericConstraints {
-  return { ...ast.schema.numberBounds({ min, max, exclusive, integer: true }), multipleOf: Number.isSafeInteger(multipleOf) ? multipleOf : undefined }
+  return { ...ast.schema.getNumberBounds({ min, max, exclusive, integer: true }), multipleOf: Number.isSafeInteger(multipleOf) ? multipleOf : undefined }
 }
 
 /**

@@ -111,7 +111,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.parameters(node)
+    const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
     const paramGroups = (
       [
         { params: pathParams, name: resolver.param.path, typeName: tsResolver.param.path },
@@ -184,7 +184,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const responseName = resolver.response.response(node)
     const importedResponseNames = new Set(
       node.responses.flatMap((response) =>
-        (response.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.importedNames(entry.schema).map((name) => resolver.name(name)) : [])),
+        (response.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.getImportedNames(entry.schema).map((name) => resolver.name(name)) : [])),
       ),
     )
     const hasResponseNameCollision = importedResponseNames.has(responseName)

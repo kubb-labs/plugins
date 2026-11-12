@@ -95,7 +95,7 @@ export function responseReturn(body: string, status: number, response: ast.Respo
   const prelude = name === body ? '' : `const body = ${body}\n    `
 
   // shortcut: one event per mock, upgrade when a mock needs to send several events.
-  if (contentType && ast.mediaType.base(contentType) === 'text/event-stream') {
+  if (contentType && ast.mediaType.getBase(contentType) === 'text/event-stream') {
     const entry = getResponseEntry(response)
     // Without a body, a spec example already serialized as SSE text goes out as it is.
     const serialized = entry?.examples?.find((example) => example.serializedValue !== undefined)?.serializedValue
@@ -140,7 +140,7 @@ export function getExampleBody(response: ast.ResponseNode | null | undefined): s
   // `responseReturn` sends raw text only for a text response. For a binary one the example would go out JSON-encoded.
   // A serialized SSE example is already events, which `responseReturn` sends as is when the body is `undefined`.
   if (!ast.mediaType.isJson(entry)) {
-    const isTextBody = ast.mediaType.base(entry) !== 'text/event-stream' && getTextContentType(response) === entry.contentType
+    const isTextBody = ast.mediaType.getBase(entry) !== 'text/event-stream' && getTextContentType(response) === entry.contentType
     return isTextBody ? toLiteral(example.serializedValue) : null
   }
   // `responseReturn` encodes a JSON body itself, so a serialized JSON example is parsed first.

@@ -9,7 +9,7 @@ import { hasQueryStyles } from '../builders/styles.ts'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 function buildServersExport(servers: Array<ast.InputServer> | undefined): string | null {
-  const named = ast.server.byName(servers)
+  const named = ast.server.groupByName(servers)
   if (!named.size) return null
   const entries = [...named].map(([name, { url }]) => `${objectKey(name)}: ${text.quote(url)}`)
   return `/**\n * The servers from the spec by name, for \`baseURL\`.\n */\nexport const servers = { ${entries.join(', ')} } as const`

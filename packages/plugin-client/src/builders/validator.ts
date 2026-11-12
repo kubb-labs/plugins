@@ -58,7 +58,7 @@ export function buildValidatorHooks({
   const errorParse = parsesResponse ? buildZodErrorParse(node, zodResolver) : null
   const request = zodResolver && resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.response.body(node) || null : null
 
-  const paramGroups = ast.http.parameters(node)
+  const paramGroups = ast.http.groupParameters(node)
   const resolveParamsName = (kind: 'path' | 'query' | 'headers' | 'cookies', params: Array<ast.ParameterNode>): string | null =>
     zodResolver && resolveParamsValidator(validator) === 'zod' && params.length > 0 ? zodResolver.param[kind](node, params[0]!) : null
   const path = resolveParamsName('path', paramGroups.path)

@@ -232,7 +232,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       // redeclaration errors.
       const importedNames = new Set(
         responses.flatMap((res) =>
-          (res.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.importedNames(entry.schema).map((refName) => resolver.name(refName)) : [])),
+          (res.content ?? []).flatMap((entry) => (entry.schema ? ast.graph.getImportedNames(entry.schema).map((refName) => resolver.name(refName)) : [])),
         ),
       )
 
@@ -328,7 +328,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     // Grouped path/query/headers/cookies schemas, one object per group: what a client's `validator.path` /
     // `query` / `headers` runs at request time, and what the options schema below references.
-    const { path, query, header, cookie } = ast.http.parameters(node)
+    const { path, query, header, cookie } = ast.http.groupParameters(node)
 
     const paramGroupSchemas = (
       [
