@@ -2,7 +2,7 @@ import path from 'node:path'
 import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
 import { isEventStream } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
-import { ast, defineGenerator, Diagnostics } from '@kubb/kit'
+import { ast, defineGenerator, Diagnostics, memo } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
@@ -55,8 +55,7 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
   ops.forEach((op) => {
     const { file, names } = pick(op)
     if (!file || names.length === 0) return
-    if (!namesByPath.has(file.path)) namesByPath.set(file.path, new Set())
-    const set = namesByPath.get(file.path)!
+    const set = memo(namesByPath, file.path, () => new Set<string>())
     names.forEach((n) => set.add(n))
     filesByPath.set(file.path, file)
   })
