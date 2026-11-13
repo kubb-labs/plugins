@@ -1,5 +1,4 @@
 export * from './.kubb/client'
-export * from './.kubb/core'
 export * from './.kubb/mediaTypes'
 export * from './.kubb/mediaTypes/formData'
 export * from './.kubb/mediaTypes/urlencoded'
