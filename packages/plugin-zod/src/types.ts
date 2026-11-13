@@ -334,6 +334,7 @@ declare global {
       typeName: string
       type: string
       zodPrinter: ReturnType<typeof printerZod> | ReturnType<typeof printerZodMini>
+      zodDirectionalNodes: WeakMap<ast.SchemaNode, ast.SchemaNode | null>
     }
   }
 }
