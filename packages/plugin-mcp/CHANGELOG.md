@@ -1,5 +1,16 @@
 # @kubb/plugin-mcp
 
+## 5.5.1
+
+### Patch Changes
+
+- [#1457](https://github.com/kubb-labs/plugins/pull/1457) [`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Correct the docs each plugin ships for kubb.dev. Examples now run and typecheck against the generated output, and option types, defaults, and generated names match the code.
+
+- [#1457](https://github.com/kubb-labs/plugins/pull/1457) [`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix the generated MCP server failing every `tools/list` request when a tool schema holds an `int64` field (`z.bigint()`) or a binary body (`z.instanceof(Blob)`). The tool list now shows an `int64` field as an integer and a binary field as a value without a type. The extension manifest adds the `client` choice for the `client` option, lists `plugin-ts` as optional, and drops the unsupported single-file output mode.
+- Updated dependencies [[`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982), [`96cd58f`](https://github.com/kubb-labs/plugins/commit/96cd58f40103c9ccbf2fef6e624efa2c1a3c1eed), [`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982)]:
+  - @kubb/plugin-ts@5.5.1
+  - @kubb/plugin-zod@5.9.1
+
 ## 5.5.0
 
 ### Minor Changes

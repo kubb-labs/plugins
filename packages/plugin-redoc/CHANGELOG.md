@@ -1,5 +1,15 @@
 # @kubb/plugin-redoc
 
+## 5.2.2
+
+### Patch Changes
+
+- [#1457](https://github.com/kubb-labs/plugins/pull/1457) [`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - `@kubb/plugin-react-query`: the `customOptions` starter file imports `HookOptions` from the generated `HookOptions.ts` file, so it no longer needs a root barrel.
+  
+  `@kubb/plugin-fetch` and `@kubb/plugin-axios`: `returnType: 'plain'` is no longer accepted or offered, because it generated code that did not typecheck. It stays available on `@kubb/plugin-client`.
+  
+  `kubb-extension.json` now matches the code: `query.methods` defaults to `GET` and `QUERY`, `client` offers `client`, `@kubb/plugin-ts` is an optional dependency, `@kubb/plugin-client` lists `returnType`, and `@kubb/plugin-redoc` no longer lists `banner` and `footer`.
+
 ## 5.2.1
 
 ### Patch Changes
