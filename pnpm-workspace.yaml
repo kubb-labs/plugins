@@ -14,17 +14,17 @@ allowBuilds:
 catalog:
   # Ranges, not pins: these end up in the published dependencies and peerDependencies of every
   # plugin, and a pin there conflicts with any newer Kubb release the user installs.
-  '@kubb/adapter-oas': ^5.18.6
-  '@kubb/core': ^5.18.6
-  '@kubb/kit': ^5.18.6
-  '@kubb/plugin-barrel': ^5.18.6
-  '@kubb/renderer-jsx': ^5.18.6
-  '@kubb/parser-ts': ^5.18.6
+  '@kubb/adapter-oas': ^5.18.8
+  '@kubb/core': ^5.18.8
+  '@kubb/kit': ^5.18.8
+  '@kubb/plugin-barrel': ^5.18.8
+  '@kubb/renderer-jsx': ^5.18.8
+  '@kubb/parser-ts': ^5.18.8
   '@types/node': 22.20.2
   '@types/react': ^19.3.0
   '@vitest/coverage-v8': ^5.1.0
   '@vitest/ui': ^5.1.0
-  kubb: ^5.18.6
+  kubb: ^5.18.8
   oxfmt: ^0.78.0
   oxlint: ^1.93.0
   prettier: ^3.9.10
