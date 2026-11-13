@@ -256,21 +256,22 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
 export function containsDirectionalNode({ node, printerOptions }: { node: ast.SchemaNode | undefined; printerOptions: PrinterZodOptions }): boolean {
   if (!node) return false
 
-  const key = printerOptionsKey(printerOptions)
-  const cache =
-    key === undefined ? undefined : printerOptions.resolver?.memo(`zod:directionalNodes:${key}`, () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>())
-
-  return ast.schema.find(node, { predicate: (schema) => variesByDirection({ node: schema, printerOptions }), followRefs: true, cache }) !== undefined
+  return (
+    ast.schema.find(node, {
+      predicate: (schema) => variesByDirection({ node: schema, printerOptions }),
+      followRefs: true,
+      cache: getDirectionalCache(printerOptions),
+    }) !== undefined
+  )
 }
 
 /**
- * Memo key for the printer options that decide what a handler prints. `undefined` when `nodes`
- * overrides or `keysToOmit` make the output depend on more than these options, so nothing is shared.
+ * The `find` cache for {@link containsDirectionalNode}, one per plugin per build and per option set
+ * the probe reads. A `printer.nodes` override has no string key, so it searches without a cache.
  */
-export function printerOptionsKey({ nodes, keysToOmit, coercion, guidType, regexType, oneOfType, dateType }: PrinterZodOptions): string | undefined {
-  if (nodes || keysToOmit?.length) return undefined
-  const coerce = (['dates', 'strings', 'numbers'] as const).map((type) => shouldCoerce(coercion, type))
-  return [...coerce, guidType, regexType, oneOfType, dateType].join(':')
+function getDirectionalCache({ resolver, nodes, coercion, dateType }: PrinterZodOptions) {
+  if (!resolver || nodes) return undefined
+  return resolver.memo(`zodDirectionalNodes:${shouldCoerce(coercion, 'dates')}:${dateType}`, () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>())
 }
 
 /**

@@ -10,11 +10,12 @@ import {
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Zod } from '../components/Zod.tsx'
-import { collectDirectionalRefNames, containsDirectionalNode, printerOptionsKey, printerZod } from '../printers/printerZod.ts'
+import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from '../printers/printerZod.ts'
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
+import { shouldCoerce } from '../utils.ts'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
@@ -37,9 +38,10 @@ type BuildResponseUnionParams = {
  */
 function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boolean, direction: 'encode' | 'decode') {
   const build = () => (mini ? printerZodMini(options as PrinterZodMiniOptions) : printerZod({ ...options, direction }))
-  const key = printerOptionsKey(options)
-  if (key === undefined) return build()
-  return resolver.memo(`zodPrinter:${[mini, direction, key].join(':')}`, build)
+  if (options.nodes || options.keysToOmit?.length) return build()
+  const { coercion, guidType, regexType, oneOfType, dateType } = options
+  const coerce = (['dates', 'strings', 'numbers'] as const).map((type) => shouldCoerce(coercion, type))
+  return resolver.memo(`zodPrinter:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
 }
 
 /**
