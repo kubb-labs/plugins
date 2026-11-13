@@ -91,10 +91,10 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.18.8",
+    "@kubb/kit": "^5.19.0",
     "@kubb/plugin-faker": "workspace:^",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/renderer-jsx": "^5.18.8"
+    "@kubb/renderer-jsx": "^5.19.0"
   },
   "devDependencies": {
     "@internals/shared": "workspace:*",
