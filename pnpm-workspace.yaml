@@ -32,6 +32,22 @@ catalog:
   typescript: ^7.0.2
   vitest: ^5.1.0
 
+# Kubb canary until the release with the store `memo` (kubb-labs/kubb#4612) is out. Remove then and raise the catalog.
+overrides:
+  '@kubb/adapter-oas': 0.0.0-canary-20261113005743
+  '@kubb/ast': 0.0.0-canary-20261113005743
+  '@kubb/cli': 0.0.0-canary-20261113005743
+  '@kubb/core': 0.0.0-canary-20261113005743
+  '@kubb/kit': 0.0.0-canary-20261113005743
+  '@kubb/mcp': 0.0.0-canary-20261113005743
+  '@kubb/plugin-barrel': 0.0.0-canary-20261113005743
+  '@kubb/parser-md': 0.0.0-canary-20261113005743
+  '@kubb/parser-ts': 0.0.0-canary-20261113005743
+  '@kubb/renderer-jsx': 0.0.0-canary-20261113005743
+  '@kubb/studio': 0.0.0-canary-20261113005743
+  kubb: 0.0.0-canary-20261113005743
+  unplugin-kubb: 0.0.0-canary-20261113005743
+
 #overrides:
 #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
 #  '@kubb/ast': link:../kubb/packages/ast
