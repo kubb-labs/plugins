@@ -1,5 +1,13 @@
 # @kubb/plugin-cypress
 
+## 5.3.1
+
+### Patch Changes
+
+- [#1457](https://github.com/kubb-labs/plugins/pull/1457) [`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Correct the docs each plugin ships for kubb.dev. Examples now run and typecheck against the generated output, and option types, defaults, and generated names match the code.
+- Updated dependencies [[`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982)]:
+  - @kubb/plugin-ts@5.5.1
+
 ## 5.3.0
 
 ### Minor Changes

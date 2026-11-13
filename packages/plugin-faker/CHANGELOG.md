@@ -1,5 +1,17 @@
 # @kubb/plugin-faker
 
+## 5.4.1
+
+### Patch Changes
+
+- [#1457](https://github.com/kubb-labs/plugins/pull/1457) [`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Correct the docs each plugin ships for kubb.dev. Examples now run and typecheck against the generated output, and option types, defaults, and generated names match the code.
+
+- [#1457](https://github.com/kubb-labs/plugins/pull/1457) [`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - `@kubb/plugin-msw`: a handler sends an `int64` (`bigint`) field as a JSON number, like the generated client does, instead of throwing `Do not know how to serialize a BigInt`. This makes `parser: 'faker'` work with the default `integerType`.
+  
+  `@kubb/plugin-faker`: `seed: 0` is no longer ignored, and a `dateParser` module name that is not an identifier, such as `'my-date-lib'` or `'@scope/lib'`, is imported and called under a camelCased name.
+- Updated dependencies [[`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982)]:
+  - @kubb/plugin-ts@5.5.1
+
 ## 5.4.0
 
 ### Minor Changes

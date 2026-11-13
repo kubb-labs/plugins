@@ -1,5 +1,15 @@
 # @kubb/plugin-zod
 
+## 5.9.1
+
+### Patch Changes
+
+- [#1457](https://github.com/kubb-labs/plugins/pull/1457) [`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Correct the docs each plugin ships for kubb.dev. Examples now run and typecheck against the generated output, and option types, defaults, and generated names match the code.
+
+- [#1460](https://github.com/kubb-labs/plugins/pull/1460) [`96cd58f`](https://github.com/kubb-labs/plugins/commit/96cd58f40103c9ccbf2fef6e624efa2c1a3c1eed) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Speed up the encode/decode detection on large specs by caching `ast.schema.find` answers for each build.
+
+- [#1457](https://github.com/kubb-labs/plugins/pull/1457) [`7eea6f2`](https://github.com/kubb-labs/plugins/commit/7eea6f2a2938769e3df7051c1e8977b8ef4a1982) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix `compile: { strict: true }` generating modules that throw `ZodCompileUnsupportedError` on import. A schema that Zod cannot compile, such as a coerced `int64` parameter, a `z.xor`, or one that reaches a circular schema through a `$ref`, is now left uncompiled.
+
 ## 5.9.0
 
 ### Minor Changes
