@@ -15,7 +15,7 @@ import type {
   Plugin,
   PluginType,
 } from '@kubb/kit'
-import { ast, casing, Diagnostics, Hookable, memoryStorage } from '@kubb/kit'
+import { ast, casing, Diagnostics, Hookable, memo, memoryStorage } from '@kubb/kit'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'
@@ -24,12 +24,7 @@ import { expect, vi } from 'vitest'
 // Test helpers copied from kubb's former `kubb/kit/testing` entry, so kubb ships no Vitest-backed API.
 
 function memoOn(store: Map<string, unknown>): Memo {
-  return ((key: string, compute: () => unknown) => {
-    if (store.has(key)) return store.get(key)
-    const value = compute()
-    store.set(key, value)
-    return value
-  }) as Memo
+  return ((key: string, compute: () => unknown) => memo(store, key, compute)) as Memo
 }
 
 function pluginNotFoundError({ pluginName, requiredBy }: { pluginName: string; requiredBy?: string }) {
