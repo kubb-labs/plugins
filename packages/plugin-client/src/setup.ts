@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { addGenerator, injectFile, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
+import { addGenerator, ast, injectFile, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { isValidatorEnabled } from './builders/validatorOptions.ts'
@@ -78,7 +78,13 @@ export function setupClient({
   ] as const
 
   for (const [baseName, copy] of files) {
-    injectFile({ baseName, path: path.resolve(root, '.kubb', baseName), copy })
+    injectFile({
+      baseName,
+      path: path.resolve(root, '.kubb', baseName),
+      copy,
+      // client.ts re-exports core with transport-specific types and must own the public exports.
+      sources: baseName === 'core.ts' ? [ast.factory.createSource({ isIndexable: false })] : undefined,
+    })
   }
 }
 

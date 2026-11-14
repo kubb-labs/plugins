@@ -62,6 +62,7 @@
   "packages/plugin-zod/src/printers/printerZod.test.ts": "Branchy printer: records, discriminated unions, cycles, omit unwrap (issue #567), coercion.",
   "packages/plugin-zod/src/printers/printerZodMini.test.ts": "Same branches for the separate Zod Mini printer, including the issue #1102 unwrap and runtime parses.",
   "packages/plugin-zod/src/utils.test.ts": "isObjectSchemaNode, isClosedKeySchema, omitUnwrapChain and defaultLiteral are branchy predicates deciding record vs object.",
+  "tests/3.0.x/clientBarrel.test.ts": "Regression: fetch and axios root barrels preserve runtime error exports and transport-specific types without re-exporting core twice.",
   "tests/3.0.x/codecParams.test.ts": "Golden path: runs the generated codec client end to end; only coverage of inferred codec encode and decode.",
   "tests/3.0.x/cypressPlugin.test.ts": "Golden path: only snapshot of plugin-cypress output for group, exclude, and include.",
   "tests/3.0.x/eventStream.test.ts": "Golden path: only coverage of the SSE runtime, stream hook skipping, OpenAPI 3.2 item schemas, and a response that offers JSON or an event stream.",
