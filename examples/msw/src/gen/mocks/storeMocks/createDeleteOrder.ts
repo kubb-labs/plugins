@@ -33,5 +33,5 @@ export function createDeleteOrderStatus404() {
 }
 
 export function createDeleteOrderResponse(data?: Partial<DeleteOrderResponse>): DeleteOrderResponse {
-  return faker.helpers.arrayElement([() => createDeleteOrderStatus400(), () => createDeleteOrderStatus404()])() as DeleteOrderResponse
+  return (data ?? faker.helpers.arrayElement([createDeleteOrderStatus400(), createDeleteOrderStatus404()])) as DeleteOrderResponse
 }

@@ -43,12 +43,15 @@ export function createPlaceOrderPatchBodyFormUrlEncoded(data?: Partial<PlaceOrde
 }
 
 export function createPlaceOrderPatchBody(data?: Partial<PlaceOrderPatchBody>): PlaceOrderPatchBody {
-  return (data ??
-    faker.helpers.arrayElement([
-      createPlaceOrderPatchBodyJson(),
-      createPlaceOrderPatchBodyXml(),
-      createPlaceOrderPatchBodyFormUrlEncoded(),
-    ])) as PlaceOrderPatchBody
+  return (
+    typeof data === 'object' && data !== null && !Array.isArray(data)
+      ? faker.helpers.arrayElement([
+          () => createPlaceOrderPatchBodyJson(data as Partial<PlaceOrderPatchBodyJson>),
+          () => createPlaceOrderPatchBodyXml(data as Partial<PlaceOrderPatchBodyXml>),
+          () => createPlaceOrderPatchBodyFormUrlEncoded(data as Partial<PlaceOrderPatchBodyFormUrlEncoded>),
+        ])()
+      : (data ?? faker.helpers.arrayElement([createPlaceOrderPatchBodyJson(), createPlaceOrderPatchBodyXml(), createPlaceOrderPatchBodyFormUrlEncoded()]))
+  ) as PlaceOrderPatchBody
 }
 
 export function createPlaceOrderPatchResponse(data?: Partial<PlaceOrderPatchResponse>): PlaceOrderPatchResponse {

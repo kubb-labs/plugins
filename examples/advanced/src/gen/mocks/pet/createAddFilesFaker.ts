@@ -54,7 +54,19 @@ export function createAddFilesBodyFaker(
       url: string
     }
   | Omit<NonNullable<Pet>, 'id'> {
-  return (data ?? faker.helpers.arrayElement([createAddFilesBodyFakerJson(), createAddFilesBodyFakerFormData()])) as
+  return (
+    typeof data === 'object' && data !== null && !Array.isArray(data)
+      ? faker.helpers.arrayElement([
+          () =>
+            createAddFilesBodyFakerJson(
+              data as Partial<{
+                url: string
+              }>,
+            ),
+          () => createAddFilesBodyFakerFormData(data as Partial<Omit<NonNullable<Pet>, 'id'>>),
+        ])()
+      : (data ?? faker.helpers.arrayElement([createAddFilesBodyFakerJson(), createAddFilesBodyFakerFormData()]))
+  ) as
     | {
         url: string
       }
