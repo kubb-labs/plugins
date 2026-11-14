@@ -45,9 +45,11 @@ export function createAddPetStatusDefaultFakerXml(data?: string): string {
  * @description Successful operation
  */
 export function createAddPetStatusDefaultFaker(data?: Partial<Omit<NonNullable<Pet>, 'name'> | string>): Omit<NonNullable<Pet>, 'name'> | string {
-  return (data ?? faker.helpers.arrayElement([createAddPetStatusDefaultFakerJson(), createAddPetStatusDefaultFakerXml()])) as
-    | Omit<NonNullable<Pet>, 'name'>
-    | string
+  return (
+    typeof data === 'object' && data !== null && !Array.isArray(data)
+      ? faker.helpers.arrayElement([() => createAddPetStatusDefaultFakerJson(data as Partial<Omit<NonNullable<Pet>, 'name'>>)])()
+      : (data ?? faker.helpers.arrayElement([createAddPetStatusDefaultFakerJson(), createAddPetStatusDefaultFakerXml()]))
+  ) as Omit<NonNullable<Pet>, 'name'> | string
 }
 
 /**
@@ -83,9 +85,15 @@ export function createAddPetBodyFakerFormUrlEncoded<TData extends Partial<Omit<N
  * @description Create a new pet in the store
  */
 export function createAddPetBodyFaker(data?: Partial<AddPetRequest | Omit<NonNullable<Pet>, 'id'>>): AddPetRequest | Omit<NonNullable<Pet>, 'id'> {
-  return (data ?? faker.helpers.arrayElement([createAddPetBodyFakerJson(), createAddPetBodyFakerXml(), createAddPetBodyFakerFormUrlEncoded()])) as
-    | AddPetRequest
-    | Omit<NonNullable<Pet>, 'id'>
+  return (
+    typeof data === 'object' && data !== null && !Array.isArray(data)
+      ? faker.helpers.arrayElement([
+          () => createAddPetBodyFakerJson(data as Partial<AddPetRequest>),
+          () => createAddPetBodyFakerXml(data as Partial<Omit<NonNullable<Pet>, 'id'>>),
+          () => createAddPetBodyFakerFormUrlEncoded(data as Partial<Omit<NonNullable<Pet>, 'id'>>),
+        ])()
+      : (data ?? faker.helpers.arrayElement([createAddPetBodyFakerJson(), createAddPetBodyFakerXml(), createAddPetBodyFakerFormUrlEncoded()]))
+  ) as AddPetRequest | Omit<NonNullable<Pet>, 'id'>
 }
 
 export function createAddPetResponseFaker(
@@ -102,7 +110,20 @@ export function createAddPetResponseFaker(
       message?: string
     }
   | (Omit<NonNullable<Pet>, 'name'> | string) {
-  return (data ?? faker.helpers.arrayElement([createAddPetStatus405Faker(), createAddPetStatusDefaultFaker()])) as
+  return (
+    typeof data === 'object' && data !== null && !Array.isArray(data)
+      ? faker.helpers.arrayElement([
+          () =>
+            createAddPetStatus405Faker(
+              data as Partial<{
+                code?: number
+                message?: string
+              }>,
+            ),
+          () => createAddPetStatusDefaultFaker(data as Partial<Omit<NonNullable<Pet>, 'name'> | string>),
+        ])()
+      : (data ?? faker.helpers.arrayElement([createAddPetStatus405Faker(), createAddPetStatusDefaultFaker()]))
+  ) as
     | {
         code?: number
         message?: string

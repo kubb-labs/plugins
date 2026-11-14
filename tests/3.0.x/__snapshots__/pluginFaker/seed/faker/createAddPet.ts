@@ -28,7 +28,7 @@ export function createAddPetStatus200Xml(data?: string): string {
  * @description Successful operation
  */
 export function createAddPetStatus200(data?: Partial<AddPetStatus200>): AddPetStatus200 {
-  return (data ?? faker.helpers.arrayElement([createAddPetStatus200Json(), createAddPetStatus200Xml()])) as AddPetStatus200
+  return (typeof data === 'object' && data !== null && !Array.isArray(data) ? faker.helpers.arrayElement([() => createAddPetStatus200Json(data as Partial<AddPetStatus200Json>)])() : data ?? faker.helpers.arrayElement([createAddPetStatus200Json(), createAddPetStatus200Xml()])) as AddPetStatus200
 }
 
 /**
@@ -63,9 +63,9 @@ export function createAddPetBodyFormUrlEncoded(data?: Partial<AddPetBodyFormUrlE
  * @description Create a new pet in the store
  */
 export function createAddPetBody(data?: Partial<AddPetBody>): AddPetBody {
-  return (data ?? faker.helpers.arrayElement([createAddPetBodyJson(), createAddPetBodyXml(), createAddPetBodyFormUrlEncoded()])) as AddPetBody
+  return (typeof data === 'object' && data !== null && !Array.isArray(data) ? faker.helpers.arrayElement([() => createAddPetBodyJson(data as Partial<AddPetBodyJson>), () => createAddPetBodyXml(data as Partial<AddPetBodyXml>), () => createAddPetBodyFormUrlEncoded(data as Partial<AddPetBodyFormUrlEncoded>)])() : data ?? faker.helpers.arrayElement([createAddPetBodyJson(), createAddPetBodyXml(), createAddPetBodyFormUrlEncoded()])) as AddPetBody
 }
 
 export function createAddPetResponse(data?: Partial<AddPetResponse>): AddPetResponse {
-  return (data ?? faker.helpers.arrayElement([createPet(), faker.string.alpha()])) as AddPetResponse
+  return createAddPetStatus200(data) as AddPetResponse
 }

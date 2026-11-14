@@ -41,7 +41,15 @@ export function createPlaceOrderBodyFormUrlEncoded(data?: Partial<PlaceOrderBody
 }
 
 export function createPlaceOrderBody(data?: Partial<PlaceOrderBody>): PlaceOrderBody {
-  return (data ?? faker.helpers.arrayElement([createPlaceOrderBodyJson(), createPlaceOrderBodyXml(), createPlaceOrderBodyFormUrlEncoded()])) as PlaceOrderBody
+  return (
+    typeof data === 'object' && data !== null && !Array.isArray(data)
+      ? faker.helpers.arrayElement([
+          () => createPlaceOrderBodyJson(data as Partial<PlaceOrderBodyJson>),
+          () => createPlaceOrderBodyXml(data as Partial<PlaceOrderBodyXml>),
+          () => createPlaceOrderBodyFormUrlEncoded(data as Partial<PlaceOrderBodyFormUrlEncoded>),
+        ])()
+      : (data ?? faker.helpers.arrayElement([createPlaceOrderBodyJson(), createPlaceOrderBodyXml(), createPlaceOrderBodyFormUrlEncoded()]))
+  ) as PlaceOrderBody
 }
 
 export function createPlaceOrderResponse(data?: Partial<PlaceOrderResponse>): PlaceOrderResponse {
