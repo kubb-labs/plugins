@@ -24,7 +24,7 @@ type RenderUnit = {
   description?: string
   keysToOmit?: Array<string> | null
   skipImportNames?: Array<string>
-  /** Factories a union unit picks from, forwarding `data` to the one it picks. */
+  /** Factories a union unit picks one of. */
   factories?: Array<RenderUnit>
 }
 
@@ -217,14 +217,12 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return resolver.imports({ node: schema, root, output, group: group ?? undefined, checks: true }).filter((entry) => entry.path !== meta.file.path)
     }
 
-    function renderEntry(unit: RenderUnit) {
-      let { schema, keysToOmit } = unit
-      const { name, typeName, description, skipImportNames = [] } = unit
+    function renderEntry({ schema, name, typeName, description, keysToOmit, skipImportNames = [], factories }: RenderUnit) {
       if (!schema) {
         return null
       }
-      if (unit.factories) {
-        return renderFactoryUnion(unit)
+      if (factories) {
+        return renderFactoryUnion({ name, typeName, description, factories }, schema)
       }
 
       if (schema.type === ast.schema.types.object && keysToOmit?.length) {
@@ -278,10 +276,13 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     // A union of local factories, such as one per status or per content type. `data ?? arrayElement([...])` alone
     // would return a partial object override as is, without the fields the picked factory generates.
-    function renderFactoryUnion({ schema, name, typeName, description, factories = [] }: RenderUnit) {
+    function renderFactoryUnion(
+      { name, typeName, description, factories }: Omit<RenderUnit, 'schema'> & { factories: Array<RenderUnit> },
+      schema: ast.SchemaNode,
+    ) {
       const reference = (unit: Pick<RenderUnit, 'name' | 'typeName'>, node: ast.SchemaNode) =>
         resolveTypeReference({ node, canOverride: true, name: unit.name, typeName: unit.typeName, filePath: meta.file.path, typeFilePath: meta.typeFile.path })
-      const typeReference = reference({ name, typeName }, schema ?? ast.factory.createSchema({ type: 'unknown' }))
+      const typeReference = reference({ name, typeName }, schema)
       // An object override merges into an object factory. Any other override (an array, a scalar) is complete, so it is returned as is.
       const objectMembers = factories.flatMap((unit) => {
         if (!unit.schema || !canOverrideSchema(unit.schema)) return []
@@ -315,10 +316,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const responseUnionSchema = hasResponseNameCollision ? null : buildResponseUnionSchema(node, resolver)
     // A union of status factories, not the inline union of a single response schema.
-    const statusUnits =
-      responseUnionSchema?.type === 'union'
-        ? (responseUnionSchema.members ?? []).map((member) => responseUnits.find((unit) => unit.name === ast.ref.getName(member)))
-        : []
+    const statusMembers = responseUnionSchema?.type === 'union' ? (responseUnionSchema.members ?? []) : []
+    const statusUnits = statusMembers.flatMap((member) => responseUnits.filter((unit) => unit.name === ast.ref.getName(member)))
 
     return (
       <File
@@ -340,7 +339,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
           name: responseName,
           typeName: tsResolver.response.response(node),
           skipImportNames: responseUnits.map((unit) => unit.name),
-          factories: statusUnits.length && statusUnits.every(Boolean) ? (statusUnits as Array<RenderUnit>) : undefined,
+          factories: statusMembers.length && statusUnits.length === statusMembers.length ? statusUnits : undefined,
         })}
       </File>
     )
