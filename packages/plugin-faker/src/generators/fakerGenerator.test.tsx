@@ -784,7 +784,12 @@ body.id
           ast.factory.createResponse({
             statusCode: '202',
             description: 'Pet ids',
-            schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+            schema: ast.factory.createSchema({
+              type: 'ref',
+              name: 'PetIds',
+              ref: '#/components/schemas/PetIds',
+              schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+            }),
           }),
         ],
       }),

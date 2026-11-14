@@ -286,7 +286,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       const objectMembers = factories.flatMap((unit) => {
         if (!unit.schema || !canOverrideSchema(unit.schema)) return []
         const target = ast.ref.getSchema(unit.schema).type
-        if (target === 'array' || target === 'tuple' || SCALAR_TYPES.has(target)) return []
+        // An unresolved ref has no known shape, so it could be an array factory that would throw on an object.
+        if (target === 'ref' || target === 'array' || target === 'tuple' || SCALAR_TYPES.has(target)) return []
         return [`() => ${unit.name}(data as ${resolveFakerTypeUsage(unit.schema, reference(unit, unit.schema).typeName, true).dataType})`]
       })
       const generated = `data ?? faker.helpers.arrayElement([${factories.map((unit) => `${unit.name}()`).join(', ')}])`

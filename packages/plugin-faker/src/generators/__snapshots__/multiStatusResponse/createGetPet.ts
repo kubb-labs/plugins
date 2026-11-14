@@ -5,6 +5,7 @@
  */
 
 import type { GetPetResponse, GetPetStatus200, GetPetStatus201, GetPetStatus202 } from './types/GetPet'
+import { createPetIds } from './createPetIds'
 import { faker } from '@faker-js/faker'
 
 /**
@@ -37,7 +38,7 @@ export function createGetPetStatus201<TData extends Partial<GetPetStatus201> = o
  * @description Pet ids
  */
 export function createGetPetStatus202(data?: Partial<GetPetStatus202>): GetPetStatus202 {
-  return [...faker.helpers.multiple(() => faker.string.alpha()), ...(data || []).filter((item) => item !== undefined)] as GetPetStatus202
+  return createPetIds(data) as GetPetStatus202
 }
 
 export function createGetPetResponse(data?: Partial<GetPetResponse>): GetPetResponse {
