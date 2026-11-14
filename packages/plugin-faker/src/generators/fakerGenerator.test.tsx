@@ -758,6 +758,39 @@ body.id
       options: {},
     },
     {
+      name: 'multiStatusResponse',
+      node: ast.factory.createOperation({
+        operationId: 'getPet',
+        method: 'GET',
+        path: '/pet',
+        tags: ['pets'],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'A pet',
+            schema: ast.factory.createSchema({
+              type: 'object',
+              properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+            }),
+          }),
+          ast.factory.createResponse({
+            statusCode: '201',
+            description: 'A created pet',
+            schema: ast.factory.createSchema({
+              type: 'object',
+              properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+            }),
+          }),
+          ast.factory.createResponse({
+            statusCode: '202',
+            description: 'Pet ids',
+            schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+          }),
+        ],
+      }),
+      options: {},
+    },
+    {
       name: 'inlineResponseUnion',
       node: ast.factory.createOperation({
         operationId: 'getPet',
