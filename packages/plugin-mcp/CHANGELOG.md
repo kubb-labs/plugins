@@ -1,5 +1,14 @@
 # @kubb/plugin-mcp
 
+## 5.5.2
+
+### Patch Changes
+
+- [#1463](https://github.com/kubb-labs/plugins/pull/1463) [`141ba03`](https://github.com/kubb-labs/plugins/commit/141ba03a41ce5655d00d98558c2c46b528a1f937) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.19.0. Most plugins use the store form of `memo` from `@kubb/kit`, which 5.19.0 added.
+- Updated dependencies [[`141ba03`](https://github.com/kubb-labs/plugins/commit/141ba03a41ce5655d00d98558c2c46b528a1f937)]:
+  - @kubb/plugin-ts@5.5.2
+  - @kubb/plugin-zod@5.9.2
+
 ## 5.5.1
 
 ### Patch Changes

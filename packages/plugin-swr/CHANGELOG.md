@@ -1,5 +1,15 @@
 # @kubb/plugin-swr
 
+## 5.9.2
+
+### Patch Changes
+
+- [#1463](https://github.com/kubb-labs/plugins/pull/1463) [`141ba03`](https://github.com/kubb-labs/plugins/commit/141ba03a41ce5655d00d98558c2c46b528a1f937) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.19.0. Most plugins use the store form of `memo` from `@kubb/kit`, which 5.19.0 added.
+
+- [#1466](https://github.com/kubb-labs/plugins/pull/1466) [`f552d00`](https://github.com/kubb-labs/plugins/commit/f552d00a05a44583c4731e0ce18e7e8fc226ebb8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Document `pathParamsCasing: 'camelcase'` from `@kubb/adapter-oas`, which turns a `{pet-id}` path key into `petId`.
+- Updated dependencies [[`141ba03`](https://github.com/kubb-labs/plugins/commit/141ba03a41ce5655d00d98558c2c46b528a1f937)]:
+  - @kubb/plugin-ts@5.5.2
+
 ## 5.9.1
 
 ### Patch Changes
