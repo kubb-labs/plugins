@@ -31,7 +31,11 @@ export function createGetPetStatus200Xml(data?: string): string {
  * @description A pet
  */
 export function createGetPetStatus200(data?: Partial<GetPetStatus200>): GetPetStatus200 {
-  return (data ?? faker.helpers.arrayElement([createGetPetStatus200Json(), createGetPetStatus200Xml()])) as GetPetStatus200
+  return (
+    typeof data === 'object' && data !== null && !Array.isArray(data)
+      ? faker.helpers.arrayElement([() => createGetPetStatus200Json(data as Partial<GetPetStatus200Json>)])()
+      : (data ?? faker.helpers.arrayElement([createGetPetStatus200Json(), createGetPetStatus200Xml()]))
+  ) as GetPetStatus200
 }
 
 /**
@@ -48,11 +52,5 @@ export function createGetPetStatus401<TData extends Partial<GetPetStatus401> = o
 }
 
 export function createGetPetResponse(data?: Partial<GetPetResponse>): GetPetResponse {
-  return (data ??
-    faker.helpers.arrayElement([
-      {
-        id: faker.string.alpha(),
-      },
-      faker.string.alpha(),
-    ])) as GetPetResponse
+  return createGetPetStatus200(data) as GetPetResponse
 }

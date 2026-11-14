@@ -65,5 +65,5 @@ export function createFindPetsByTagsStatus400Faker() {
 }
 
 export function createFindPetsByTagsResponseFaker(data?: Partial<Array<Pet> | string>): Array<Pet> | string {
-  return (data ?? faker.helpers.arrayElement([faker.helpers.multiple(() => createPetFaker()), faker.string.alpha()])) as Array<Pet> | string
+  return createFindPetsByTagsStatus200Faker(data) as Array<Pet> | string
 }

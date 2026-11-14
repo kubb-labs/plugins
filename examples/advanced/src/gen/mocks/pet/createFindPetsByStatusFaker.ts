@@ -48,8 +48,5 @@ export function createFindPetsByStatusStatus400Faker() {
 }
 
 export function createFindPetsByStatusResponseFaker(data?: Partial<Array<Pet> | string>): Array<Pet> | string {
-  return (data ??
-    faker.helpers.arrayElement([faker.helpers.uniqueArray(() => createPetFaker(), faker.number.int({ min: 1, max: 3 })), faker.string.alpha()])) as
-    | Array<Pet>
-    | string
+  return createFindPetsByStatusStatus200Faker(data) as Array<Pet> | string
 }

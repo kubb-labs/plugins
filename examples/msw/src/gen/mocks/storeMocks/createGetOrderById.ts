@@ -37,7 +37,11 @@ export function createGetOrderByIdStatus200Xml(data?: string): string {
  * @description successful operation
  */
 export function createGetOrderByIdStatus200(data?: Partial<GetOrderByIdStatus200>): GetOrderByIdStatus200 {
-  return (data ?? faker.helpers.arrayElement([createGetOrderByIdStatus200Json(), createGetOrderByIdStatus200Xml()])) as GetOrderByIdStatus200
+  return (
+    typeof data === 'object' && data !== null && !Array.isArray(data)
+      ? faker.helpers.arrayElement([() => createGetOrderByIdStatus200Json(data as Partial<GetOrderByIdStatus200Json>)])()
+      : (data ?? faker.helpers.arrayElement([createGetOrderByIdStatus200Json(), createGetOrderByIdStatus200Xml()]))
+  ) as GetOrderByIdStatus200
 }
 
 /**
@@ -55,5 +59,5 @@ export function createGetOrderByIdStatus404() {
 }
 
 export function createGetOrderByIdResponse(data?: Partial<GetOrderByIdResponse>): GetOrderByIdResponse {
-  return (data ?? faker.helpers.arrayElement([createOrder(), faker.string.alpha()])) as GetOrderByIdResponse
+  return createGetOrderByIdStatus200(data) as GetOrderByIdResponse
 }

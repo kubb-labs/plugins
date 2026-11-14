@@ -50,5 +50,5 @@ export function createFindPetsByStatusStatus400() {
 }
 
 export function createFindPetsByStatusResponse(data?: Partial<FindPetsByStatusResponse>): FindPetsByStatusResponse {
-  return (data ?? faker.helpers.arrayElement([faker.helpers.multiple(() => (createPet())), faker.string.alpha()])) as FindPetsByStatusResponse
+  return createFindPetsByStatusStatus200(data) as FindPetsByStatusResponse
 }
