@@ -15,6 +15,8 @@ const { data } = await getPetById({ path: { petId: 1 } })
 
 The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
 
+Path keys keep the names from the spec, so a `{pet-id}` placeholder is passed as `path: { 'pet-id': 1 }`. Set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing) on the adapter (`@kubb/adapter-oas` 5.20.0 or later) to pass `path: { petId: 1 }` instead, the name MSW handlers and query keys already use. The HTTP request stays the same.
+
 Query, header, and cookie parameters sit under their own keys, and a request body goes under
 `body`:
 
