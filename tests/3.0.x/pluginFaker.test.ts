@@ -393,6 +393,59 @@ for (const create of [createGetNotesResponse, createGetNotesStatus200]) {
   await promisify(execFile)(process.execPath, ['--experimental-strip-types', usagePath])
 })
 
+test.each(['inferred', 'schema'] as const)('merges object overrides into union factories in %s mode', async (typeMode) => {
+  const root = await fs.mkdtemp(path.join(__dirname, '.faker-union-'))
+  onTestFinished(() => fs.rm(root, { recursive: true, force: true }))
+
+  const pet = { type: 'object', required: ['id', 'name'], properties: { id: { type: 'integer' }, name: { type: 'string' } } }
+  const { diagnostics } = await createKubb({
+    root,
+    input: {
+      openapi: '3.0.0',
+      info: { title: 'Union overrides', version: '1' },
+      paths: {
+        '/pet': {
+          get: {
+            operationId: 'getPet',
+            responses: {
+              '200': {
+                description: 'ok',
+                content: { 'application/json': { schema: pet }, 'text/plain': { schema: { type: 'string' } } },
+              },
+              '202': { description: 'ids', content: { 'application/json': { schema: { type: 'array', items: { type: 'string' } } } } },
+            },
+          },
+        },
+      },
+    },
+    adapter: adapterOas(),
+    parsers: [parserTs()],
+    storage: fsStorage(),
+    output: { path: 'generated', clean: true, format: false, lint: false },
+    plugins: [pluginTs({ output: { path: 'types' } }), pluginFaker({ output: { path: 'mocks' }, typeMode })],
+  }).safeBuild()
+
+  expect(Diagnostics.hasError(diagnostics)).toBe(false)
+  const usagePath = path.join(root, 'usage.ts')
+  await fs.writeFile(
+    usagePath,
+    `import { createGetPetResponse, createGetPetStatus200 } from './generated/mocks/createGetPet.ts'
+
+for (let i = 0; i < 20; i++) {
+  for (const create of [createGetPetResponse, createGetPetStatus200]) {
+    const merged = create({ name: 'Fluffy' }) as { id?: unknown; name?: unknown }
+    if (merged.name !== 'Fluffy' || typeof merged.id !== 'number') throw new Error('Object override was not merged: ' + JSON.stringify(merged))
+    if (create('plain text') !== 'plain text') throw new Error('String override was not preserved')
+  }
+  if (JSON.stringify(createGetPetResponse(['a'])) !== JSON.stringify(['a'])) throw new Error('Array override was not preserved')
+}
+`,
+  )
+
+  expect(await typecheck(usagePath)).toStrictEqual([])
+  await promisify(execFile)(process.execPath, ['--experimental-strip-types', usagePath])
+})
+
 test('creates mutable schema-typed fixtures and rejects unknown overrides', async () => {
   const root = await fs.mkdtemp(path.join(__dirname, '.faker-schema-'))
   onTestFinished(() => fs.rm(root, { recursive: true, force: true }))

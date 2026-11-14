@@ -41,11 +41,12 @@ export function createGetPetStatus202(data?: Partial<GetPetStatus202>): GetPetSt
 }
 
 export function createGetPetResponse(data?: Partial<GetPetResponse>): GetPetResponse {
-  return faker.helpers.arrayElement(
-    data === undefined
-      ? [() => createGetPetStatus200(), () => createGetPetStatus201(), () => createGetPetStatus202()]
-      : Array.isArray(data)
-        ? [() => createGetPetStatus202(data as Partial<GetPetStatus202>)]
-        : [() => createGetPetStatus200(data as Partial<GetPetStatus200>), () => createGetPetStatus201(data as Partial<GetPetStatus201>)],
-  )() as GetPetResponse
+  return (
+    typeof data === 'object' && data !== null && !Array.isArray(data)
+      ? faker.helpers.arrayElement([
+          () => createGetPetStatus200(data as Partial<GetPetStatus200>),
+          () => createGetPetStatus201(data as Partial<GetPetStatus201>),
+        ])()
+      : (data ?? faker.helpers.arrayElement([createGetPetStatus200(), createGetPetStatus201(), createGetPetStatus202()]))
+  ) as GetPetResponse
 }
