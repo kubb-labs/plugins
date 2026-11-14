@@ -1,5 +1,11 @@
 # @kubb/plugin-faker
 
+## 5.4.4
+
+### Patch Changes
+
+- [#1470](https://github.com/kubb-labs/plugins/pull/1470) [`0a06833`](https://github.com/kubb-labs/plugins/commit/0a0683363bc60065e090de4dff5d9fd8208ae1c6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Merge object overrides into union factories: the response factory of an operation with more than one success status, and the factory of a response or request body with more than one content type. `createGetPetResponse({ name: 'Fluffy' })` now picks an object factory and passes `data` to it, so the mock keeps its other generated fields instead of returning `{ name: 'Fluffy' }` as is. An array or scalar override is still returned as is.
+
 ## 5.4.3
 
 ### Patch Changes
