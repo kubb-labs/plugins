@@ -123,7 +123,15 @@ export function createUpdatePetResponseFaker(
   | {
       id?: number
     } {
-  return (data ?? faker.helpers.arrayElement([createUpdatePetStatus200Faker(), createUpdatePetStatus202Faker()])) as
+  return faker.helpers.arrayElement([
+    () => createUpdatePetStatus200Faker(data as Partial<Omit<NonNullable<Pet>, 'name'> | string>),
+    () =>
+      createUpdatePetStatus202Faker(
+        data as Partial<{
+          id?: number
+        }>,
+      ),
+  ])() as
     | (Omit<NonNullable<Pet>, 'name'> | string)
     | {
         id?: number

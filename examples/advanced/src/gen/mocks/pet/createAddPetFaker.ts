@@ -102,7 +102,16 @@ export function createAddPetResponseFaker(
       message?: string
     }
   | (Omit<NonNullable<Pet>, 'name'> | string) {
-  return (data ?? faker.helpers.arrayElement([createAddPetStatus405Faker(), createAddPetStatusDefaultFaker()])) as
+  return faker.helpers.arrayElement([
+    () =>
+      createAddPetStatus405Faker(
+        data as Partial<{
+          code?: number
+          message?: string
+        }>,
+      ),
+    () => createAddPetStatusDefaultFaker(data as Partial<Omit<NonNullable<Pet>, 'name'> | string>),
+  ])() as
     | {
         code?: number
         message?: string
