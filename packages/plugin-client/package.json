@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-client",
-  "version": "6.0.2",
+  "version": "6.0.3",
   "description": "Generate typed API operations against your own client module.",
   "keywords": [
     "api-client",

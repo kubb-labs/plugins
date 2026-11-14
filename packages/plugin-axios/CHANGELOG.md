@@ -1,5 +1,13 @@
 # @kubb/plugin-axios
 
+## 6.0.3
+
+### Patch Changes
+
+- [#1467](https://github.com/kubb-labs/plugins/pull/1467) [`2d29402`](https://github.com/kubb-labs/plugins/commit/2d29402a87e11825634a00873e1411b06a8979a4) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use Kubb 5.20.1.
+- Updated dependencies [[`2d29402`](https://github.com/kubb-labs/plugins/commit/2d29402a87e11825634a00873e1411b06a8979a4)]:
+  - @kubb/plugin-client@6.0.3
+
 ## 6.0.2
 
 ### Patch Changes
