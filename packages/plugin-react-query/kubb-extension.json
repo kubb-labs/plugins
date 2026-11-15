@@ -19,7 +19,7 @@
   ],
   "optionalDependencies": ["plugin-ts", "plugin-zod"],
   "compatibility": {
-    "kubb": ">=5.18.4",
+    "kubb": ">=5.19.0",
     "node": ">=22.22"
   },
   "role": "consumer",
