@@ -8,7 +8,7 @@ Upgrade `@kubb/plugin-fetch` from v5 to v6, which runs on the shared client core
 
 ### Upgrade the packages
 
-Upgrade `kubb` and `@kubb/plugin-fetch` together. v6 needs Kubb 5.18.4 or later:
+Upgrade `kubb` and `@kubb/plugin-fetch` together. v6 needs Kubb 5.19.0 or later:
 
 ```bash
 npm install --save-dev kubb@latest @kubb/plugin-fetch@6
