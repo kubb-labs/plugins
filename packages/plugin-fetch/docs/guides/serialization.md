@@ -68,7 +68,7 @@ Cookies use the `form` style, or the OpenAPI 3.2 `cookie` style, joined into one
 
 ::
 
-For `allowReserved` and `explode: true` on delimited styles, see [Parameter serialization](EDGE:parameter-serialization).
+For `allowReserved` and `explode: true` on delimited styles, see [Delimited styles and allowReserved](#delimited-styles-and-allowreserved).
 
 ## Override parameter serialization
 
@@ -83,7 +83,7 @@ client.setConfig({
 })
 ```
 
-Kubb writes only the serializers a spec needs. See [Parameter serialization](EDGE:parameter-serialization) for which files it writes.
+Kubb writes only the serializers a spec needs. See [Serializer files](#serializer-files) for which files it writes.
 
 ## Built-in media types
 
@@ -106,7 +106,7 @@ For an operation with several request content types, set `contentType` on the ca
 - For a `FormData` body, the runtime removes `Content-Type`, so the transport sets it with the multipart boundary.
 - XML, YAML, and CSV have no built-in encoder, so an object under one throws a `TypeError`. Pass the encoded string, cast to the body type (`body: xml as unknown as AddPetBodyXml`), or add a media type.
 
-For `bigint` bodies, see [64-bit integers](EDGE:64-bit-integers).
+For `bigint` bodies, see [`bigint` request bodies](#bigint-request-bodies). For `int64` types, see [64-bit integers](https://kubb.dev/docs/5.x/topics/64-bit-integers#64-bit-integers).
 
 ## Add a media type
 
@@ -126,7 +126,7 @@ client.setConfig({
 })
 ```
 
-Handlers merge per key over the built-ins. For the merge order, see [Content types](EDGE:content-types). A streaming format adds `stream`, which reads a 2xx body item by item, and the runtime validates each item:
+Handlers merge per key over the built-ins. For the merge order, see [Media type merge order](#media-type-merge-order). A streaming format adds `stream`, which reads a 2xx body item by item, and the runtime validates each item:
 
 ```typescript
 client.setConfig({
@@ -144,7 +144,7 @@ The runtime decodes each body by the response `Content-Type`. A `switch (result.
 | Invalid JSON under a JSON media type                 | Throws a `ParseError`. Catch it, or register a lenient `application/json` handler. |
 | 2xx with `parseAs` set on the call                   | Read as `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`.              |
 
-For a 2xx without a `Content-Type`, binary downloads, and vendor types, see [Content types](EDGE:content-types).
+For a 2xx without a `Content-Type`, see [Default content types](#default-content-types). For binary downloads and vendor types, see [Binary and vendor responses](#binary-and-vendor-responses).
 
 XML, YAML, and CSV responses are typed `string`, even with an object schema. A media type you register changes the value but not the type, so cast `data`:
 
@@ -159,3 +159,68 @@ if (result.contentType === 'application/xml') {
 > With the adapter's default [`integerType: 'bigint'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype), an `int64` field is typed `bigint`, but `JSON.parse` returns a `number`. Set `integerType: 'number'`, or turn on [`validator: 'zod'`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#validator), which converts the field. `JSON.parse` loses precision above `Number.MAX_SAFE_INTEGER` either way, so declare an exact 64-bit ID as a string.
 
 Next, [Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/server-sent-events) covers the stream media types and `client.stream`.
+
+## Less common cases
+
+### Delimited styles and allowReserved
+
+When a [query parameter](#parameter-styles) uses `spaceDelimited` or `pipeDelimited`, or sets `allowReserved`:
+
+- `spaceDelimited` and `pipeDelimited` default `explode` to `false`. With `explode: true`, they repeat the key, like `form`.
+- With `allowReserved`, reserved characters stay as they are, except `#`, `&`, and `+`.
+
+### Serializer files
+
+When you look for a serializer in `.kubb/serializers/`, Kubb writes only the ones the spec needs and registers them in `.kubb/config.ts`. Set a key from the table to replace one, as [Override parameter serialization](#override-parameter-serialization) shows.
+
+| Key in `serializer` | File                                                           | Written for                    |
+| ------------------- | -------------------------------------------------------------- | ------------------------------ |
+| `query`             | `query.ts`, or `queryStyles.ts` with a styled query parameter  | every spec                     |
+| `path`              | `path.ts`, plus `pathStyles.ts` with a `label` or `matrix` one | every spec                     |
+| `header`            | `headers.ts`                                                   | a spec with a header parameter |
+| `cookie`            | `cookies.ts`                                                   | a spec with a cookie parameter |
+
+A call that needs a serializer the spec did not register throws a `TypeError` that names it, such as `serializer.cookie`. Without `serializer.header`, an array or object header value goes out as JSON.
+
+### Form and stream media types
+
+When a form or stream type from [Built-in media types](#built-in-media-types) has no handler, the spec does not use it:
+
+- `.kubb/config.ts` registers each form type only when the spec has a body of that type, from `.kubb/mediaTypes/formData.ts` and `.kubb/mediaTypes/urlencoded.ts`.
+- It registers the stream types, `streamMediaTypes` from `.kubb/sse.ts`, only when the spec streams.
+- `.kubb/client.ts` passes that config to `setConfig`.
+
+To send a type the spec does not declare, register a handler, as [Add a media type](#add-a-media-type) shows.
+
+### Default content types
+
+When a call sets no `contentType`:
+
+- An operation with one request content type has it built in. For one with several, set `contentType` on the call.
+- A 2xx response without a `Content-Type` decodes as the call's `contentType.response`, then as `*/*`.
+
+### `bigint` request bodies
+
+When a request body holds a `bigint`, it goes out as a JSON number. A value outside the safe-integer range throws a `TypeError` instead of losing precision, so register a media type to send it another way. For how `int64` fields are typed, see [64-bit integers](https://kubb.dev/docs/5.x/topics/64-bit-integers#64-bit-integers).
+
+### Media type merge order
+
+When you register a handler for a type that already has one, handlers merge per key over the built-ins and over earlier `setConfig` calls. A handler passed on one call merges over the client's. An entry with only `decode` still encodes through the next match, such as `*/*`.
+
+### Binary and vendor responses
+
+When an operation's success content is only binary, Kubb sets `parseAs: 'blob'` on it, so `data` is a `Blob` whatever its media type. The generated types follow what the built-in media types return. A vendor type such as `application/vnd.github.object` keeps its schema type.
+
+### Parameter validation
+
+When [`validator`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#validator) checks `params`, the call sends what each `<operation>PathSchema`, `QuerySchema`, `HeadersSchema`, or `CookiesSchema` returns:
+
+- A codec param such as a `Date` goes out in its wire form.
+- Path and query keys the spec does not declare are stripped, such as a cache-buster.
+- Undeclared headers pass through, and declared ones match in any casing. Client-level `headers` are checked too, and `auth` values are not.
+
+With codecs, pair `request` and `params` with [`pluginZod({ inferred: 'codec' })`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#inferred), so the request types accept domain values such as a `Date`. To skip the checks, [turn validation off at runtime](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/error-handling#turn-validation-off-at-runtime).
+
+### Error body validation
+
+When `validator` is on and a non-2xx response has a body, the runtime checks it against the schema of its status, then its range such as `5xx`, then `default`. A status the document leaves out keeps its body unchecked. An error body that fails its schema throws a `ParseError` instead of the `ResponseError`, also with `throwOnError: false`. To recover, see [Validation failures](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/error-handling#validation-failures).

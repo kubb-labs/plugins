@@ -262,7 +262,7 @@ Writes only the schema types. Plugins that use them, such as clients and MSW han
 
 ::
 
-See [Name collisions](EDGE:name-collisions).
+See [Name collisions](https://kubb.dev/docs/5.x/topics/name-collisions#name-collisions).
 
 ### printer
 

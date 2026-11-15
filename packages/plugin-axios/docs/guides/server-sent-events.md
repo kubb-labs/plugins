@@ -143,7 +143,7 @@ for await (const { data } of events) console.info(data.type)
 
 ::
 
-An event the document does not declare reaches the `default` of your `switch`, so declare heartbeat and `error` events too. For event names, IDs, and JSON Lines limits, see [Streaming](EDGE:streaming).
+An event the document does not declare reaches the `default` of your `switch`, so declare heartbeat and `error` events too. For event names, IDs, and JSON Lines limits, see [Event names, IDs, and JSON Lines](#event-names-ids-and-json-lines).
 
 With `validator: 'zod'`, the validator checks each item: the whole event for typed events, `data` for a payload, and each line for JSON Lines. To keep going past a failing item, return `{ value }` from `onValidationError`:
 
@@ -176,7 +176,7 @@ for (let attempt = 0; attempt < 3; attempt++) {
 }
 ```
 
-For cleared IDs and resuming with `returnType: 'data'`, see [Streaming](EDGE:streaming).
+For cleared IDs and resuming with `returnType: 'data'`, see [Event IDs when you resume](#event-ids-when-you-resume).
 
 ## Handle errors
 
@@ -230,3 +230,64 @@ const result = await client.stream<StreamLogsResponses, true, SuccessOf<StreamLo
 The item type defaults to `ServerSentEvent` around the success body. To stream another format, register a `stream` handler, as [Add a media type](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization#add-a-media-type) shows.
 
 Import the stream helpers and types from `.kubb/client`, and do not edit the `.kubb/` files: Kubb rewrites them on each run.
+
+## Less common cases
+
+### JSON in a `data` string
+
+When an event's `data` is a string with `contentMediaType: application/json` and a `contentSchema`, Kubb types and parses it as that schema. See [How Kubb detects a stream](#how-kubb-detects-a-stream) for the item schemas.
+
+### Stream calls in Node.js
+
+When a stream call runs in Node.js, the axios http adapter streams the body, with its proxy and agent settings. Only a browser call with the default adapters switches to the fetch adapter.
+
+### Stream result types
+
+When you type a variable that holds a stream result, the type depends on the response and on `returnType`:
+
+| Setting                                                 | The call returns                                                                              |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Default                                                 | `Unwrappable<StreamResult<…>>`                                                                |
+| The response declares headers                           | `Unwrappable<StreamResultWithHeaders<…>>`, so `headers.get` suggests their names              |
+| `returnType: 'data'`                                    | `Promise<UnwrappedStreamResult<…>>`: the items, or the full result with `throwOnError: false` |
+| `returnType: 'data'`, and the response declares headers | `Promise<UnwrappedStreamResultWithHeaders<…>>`                                                |
+
+In v5, a stream response that declared headers returned a plain `StreamResult`. [The generated function](#the-generated-function) shows the default signature.
+
+### Stream options Kubb sets
+
+When you call [`client.stream`](#stream-with-the-client) yourself, pass the options a generated stream call gets from the document:
+
+| Option       | What it does                                                                                                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `eventShape` | Whether the validator checks the whole event (`'event'`) or its `data` (`'data'`).                                                                                              |
+| `rawData`    | Keeps `data` as text, for every event or for a list of event names. Kubb sets it when the document types `data` as a string. Otherwise `data` is parsed as JSON when it parses. |
+
+### Event names, IDs, and JSON Lines
+
+When the server leaves a field out of an event, or sends JSON Lines:
+
+- An event takes `message` as its name when the server sends none.
+- The `id` carries over to later events, and `retry` holds the server's reconnect hint.
+- A JSON Lines stream has no event IDs, and `transform` does not apply to it.
+- An `application/json-seq` record must fit on one line.
+
+### Event IDs when you resume
+
+When you [resume a stream](#stop-abort-and-resume):
+
+- The runtime does not reconnect, because many streams end on purpose and the retry policy belongs to your app.
+- `lastEventId` is empty until the server sends an `id`, and an empty `id:` clears it.
+- The `||` fallback in the resume loop cannot tell a cleared ID from no ID, so after a clear the loop resends the previous ID.
+- With `returnType: 'data'`, the items alone carry no `lastEventId`, so pass `throwOnError: false` to get the full result.
+
+### Interceptors on a stream call
+
+When a response interceptor runs on a stream call, `data` in its `DecodedResponse` is the raw body stream. See [Add interceptors](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/configure-requests#add-interceptors).
+
+### Stream runtime files
+
+When you look for a stream helper or type, import it from `.kubb/client`:
+
+- `.kubb/sse.ts` holds `parseEventStream`, `parseJsonLines`, and the stream media types, and `.kubb/client.ts` re-exports it.
+- The stream types, such as `ServerSentEvent`, `TypedEvent`, `StreamOptions`, and `StreamResult`, live in `.kubb/core.ts`.

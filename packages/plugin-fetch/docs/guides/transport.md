@@ -25,7 +25,7 @@ type ResolvedRequest = {
 type TransportResult = { webResponse: Response; request: Request; response: Response }
 ```
 
-Return a `TransportResult` to set the native `request` and `response` that results and errors carry. See [Transport results](EDGE:transport-results) for what a plain `Response` gives.
+Return a `TransportResult` to set the native `request` and `response` that results and errors carry. See [Results from a plain `Response`](#results-from-a-plain-response).
 
 ## Send with another library
 
@@ -78,3 +78,16 @@ const { data } = await getPetById({ path: { petId: 1 }, client: testClient })
 | One call          | `transport` on the call           |
 
 A client from `createClient()` copies the shared `transport` at creation, so a later `client.setConfig({ transport })` does not reach it. Without a `transport`, it sends with the global `fetch`.
+
+## Less common cases
+
+### Results from a plain `Response`
+
+When a transport returns a plain `Response`, results and errors carry it as `response`. Their `request` is a `Request` built from the resolved request without its body, or the resolved request itself when `Request` cannot parse the URL, such as a relative URL in Node.js. Return a `TransportResult` to set both, as [Write a transport function](#write-a-transport-function) shows.
+
+### Why ky needs these settings
+
+When you [send with ky](#send-with-another-library), or another library that returns a `Response`:
+
+- The client splits success from error itself, so the library must not throw or retry on an error status.
+- ky's `timeout` only waits for the response headers and never ends a started body or stream. Turn it off and bound the whole call with `signal: AbortSignal.timeout(ms)`.

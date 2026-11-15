@@ -96,7 +96,7 @@ export default defineConfig({
 })
 ```
 
-See [Turn validation off at runtime](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/error-handling#turn-validation-off-at-runtime) and [Runtime validation](EDGE:runtime-validation).
+See [Turn validation off at runtime](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/error-handling#turn-validation-off-at-runtime) and [Parameter validation](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/serialization#parameter-validation).
 
 ### returnType
 
@@ -126,7 +126,7 @@ pluginFetch({ returnType: 'data' })
 const pet = await getPetById({ path: { petId: 1 } }) // Pet, not { status, data, ... }
 ```
 
-See [Read headers with returnType 'data'](EDGE:return-type-data).
+See [Read headers with `returnType: 'data'`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/error-handling#read-headers-with-returntype-data).
 
 ### sdk
 

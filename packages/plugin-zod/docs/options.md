@@ -95,7 +95,7 @@ export type PutEventBodySchemaType = z.input<typeof putEventBodySchema>
 > [!WARNING]
 > With `'codec'`, set `validator: { request: 'zod', params: 'zod' }` in [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#validator) or [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator). Without request validation, the client sends the domain value unencoded.
 
-See [Zod inferred types](EDGE:zod-inferred-types).
+See [Infer TypeScript types from Zod schemas](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/inferred-types).
 
 ### coercion
 
@@ -110,7 +110,7 @@ Wraps schemas in [`z.coerce`](https://zod.dev/?id=coercion-for-primitives), so i
 ::field-group
 
 :::field{name="false"}
-No coercion, except `format: int64` fields, which always use `z.coerce.bigint()`.
+No coercion, except `format: int64` fields, which use `z.coerce.bigint()` with the adapter's default `integerType: 'bigint'`.
 :::
 
 :::field{name="true"}
@@ -126,7 +126,7 @@ Coerces only the primitives you pick.
 > [!WARNING]
 > Coerced strings and numbers lose some format checks, such as `jwt` and the `int32` range. `dates` coerces only fields typed as `Date`, from the adapter's `dateType: 'date'`.
 
-See [Zod coercion](EDGE:zod-coercion).
+See [Coerce input with Zod](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/coercion).
 
 ### guidType
 
@@ -197,7 +197,7 @@ Writes `z.xor([...])`, which passes only when exactly one member matches. Member
 > [!WARNING]
 > With `'xor'`, give members `required` keys that tell them apart. An object that matches several members fails.
 
-See [Unions and oneOf](EDGE:unions-and-one-of).
+See [Unions and oneOf](https://kubb.dev/docs/5.x/topics/schema-shapes#unions-and-one-of).
 
 ### compile
 
@@ -228,7 +228,7 @@ Zod throws when a part cannot be compiled into flat JavaScript.
 > [!NOTE]
 > Circular schemas and coerced fields, including every `format: int64` field, run on the interpreter. To compile `int64` fields, set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter.
 
-See [Compiled Zod schemas](EDGE:zod-compile).
+See [Compile Zod schemas](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/compiled-schemas).
 
 ### mini
 
@@ -358,12 +358,8 @@ type ResolverZodPatch = {
 
 Kubb maps OpenAPI formats to the matching Zod v4 call, such as `format: email` to `z.email()`. Watch for these mappings:
 
-- `format: int64` always prints `z.coerce.bigint()`, because JSON holds a number.
+- `format: int64` prints `z.coerce.bigint()`, because JSON holds a number. With the adapter's `integerType: 'number'`, it prints `z.int()`.
 - `format: uuid` prints `z.uuid()` or `z.guid()`, set by [`guidType`](#guidtype).
 - Zod Mini prints `format: date-time` as `z.string()`.
 
-See [Zod format mappings](EDGE:zod-format-mappings).
-
-See [Additional properties](EDGE:additional-properties).
-
-See [JSON Schema keywords](EDGE:json-schema-keywords).
+See [Zod validators for OpenAPI formats](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/format-mappings) for every mapping and the [JSON Schema keywords](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/format-mappings#json-schema-keywords) that add a check. For dictionaries, see [Additional properties](https://kubb.dev/docs/5.x/topics/additional-properties#additional-properties).

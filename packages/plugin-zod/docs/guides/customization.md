@@ -69,7 +69,7 @@ id: z.int(),
 
 To change `int64` fields for every plugin, set the adapter's [`integerType`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) instead.
 
-See [64-bit integers](EDGE:64-bit-integers).
+See [64-bit integers](https://kubb.dev/docs/5.x/topics/64-bit-integers#64-bit-integers).
 
 ## Remove descriptions
 
@@ -86,7 +86,7 @@ A printer handler that reads `this.options.direction` decodes response values an
 
 ### Write a direction-aware handler
 
-Return one expression for `'encode'` (requests) and another for `'decode'` (responses). Set `inferred: 'codec'` so the client types follow the conversion, and set the client `validator` so the client runs it. Without request validation, the client sends the `Temporal.PlainTime` unencoded.
+Return one expression for `'encode'` (request bodies and parameters) and another for `'decode'` (responses). Set `inferred: 'codec'` so the client types follow the conversion, and set the client `validator` so the client runs it. Without request validation, the client sends the `Temporal.PlainTime` unencoded.
 
 ```typescript [kubb.config.ts]
 import { pluginZod, type PrinterZodNodes } from '@kubb/plugin-zod'
@@ -105,6 +105,8 @@ pluginFetch({ validator: { request: 'zod', params: 'zod', response: 'zod' } })
 ```
 
 The formats `time`, `date`, and `date-time` use the `time`, `date`, and `datetime` handlers.
+
+Type the handlers as `PrinterZodNodes`, because the inline `printer.nodes` type also covers Zod Mini, which has no `direction`.
 
 ### Check the generated schemas
 
@@ -131,7 +133,7 @@ Use a runtime that provides `Temporal`, or add its polyfill through a generated 
 
 For built-in `Date` conversion, set `dateType: 'date'` on the adapter instead.
 
-See [Dates and times](EDGE:dates-and-times).
+See [Dates and times](https://kubb.dev/docs/5.x/topics/dates-and-times#dates-and-times).
 
 ## Import a custom codec
 

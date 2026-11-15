@@ -82,7 +82,7 @@ The server name comes from `info.title` in your spec. The `args` path is relativ
 
 Each handler forwards the MCP cancellation signal to the client and throws for a non-2xx response, which the assistant sees as a tool error. Operations that stream their response get no tool.
 
-See [MCP tool calls and results](EDGE:mcp-tool-results).
+See [Tool calls and results](#tool-calls-and-results).
 
 ## Claude Desktop
 
@@ -159,3 +159,28 @@ const clients = [
 ```
 
 Add these entries next to `pluginTs` and `pluginZod` in `plugins`. The handlers then import from `clients-axios`.
+
+## Less common cases
+
+### Tool calls and results
+
+Configure transport settings such as `baseURL` on the client plugin. With `client: 'client'`, set them in your own client module, because `pluginClient` takes no `baseURL`.
+
+Each handler calls the client function with:
+
+- The grouped `path`, `query`, `headers`, `body`, and `cookies` options that the operation has.
+- The MCP cancellation signal.
+- `throwOnError: true`, so a non-2xx response throws and surfaces as a tool error, whatever the client's `throwOnErrorDefault`.
+
+The tool response body depends on the client's `returnType`:
+
+| Client `returnType`                                                         | Tool response body       |
+| --------------------------------------------------------------------------- | ------------------------ |
+| `'full'` (the client default), or the plain result of `@kubb/plugin-client` | `res.data`               |
+| `'data'`                                                                    | The resolved call result |
+
+In the tool list, an `int64` field shows as an integer and a binary field as a value without a type, because `bigint` and `Blob` have no JSON Schema form.
+
+### Streaming operations
+
+Operations that stream their response, such as `text/event-stream` or JSON Lines, get no tool, because a tool returns one JSON result.

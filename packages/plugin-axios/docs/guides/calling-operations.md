@@ -102,3 +102,9 @@ const url = client.getUrl({ url: '/pets/{petId}', path: { petId: 1 }, query: { f
 ```
 
 Next, [handle errors](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/error-handling), including `throwOnError: false`.
+
+## Less common cases
+
+### Path parameter casing
+
+When you set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing), the HTTP request stays the same, because path parameter names never reach the wire. The exception is the `matrix` style, which sends the name (`;group-id=42`), so an operation with a matrix path parameter keeps its spec names.

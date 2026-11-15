@@ -175,7 +175,7 @@ Send a stream request with `client.stream`. Its result is already the stream:
 + let result: StreamResult<StreamPetsResponses, true, ServerSentEvent<PetEvent>>
 ```
 
-An operation whose only success type is JSON Lines now returns a `StreamResult` with one parsed item per line, not the body as a string. For stream responses that declare headers, see [Streaming](EDGE:streaming).
+An operation whose only success type is JSON Lines now returns a `StreamResult` with one parsed item per line, not the body as a string. For stream responses that declare headers, see [Stream result types](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events#stream-result-types).
 
 ## Behavior changes
 
@@ -203,8 +203,31 @@ Also new in v6:
 - Serializers: each has its own file in `.kubb/serializers/`, and `setConfig({ serializer })` merges per key. A client you build with `createClientCore` gets no serializers, so pass them in its `serializer` config.
 - Servers: `server.index` no longer counts a server without a `url`.
 
-For new v6 features and upgrades from 5.12 or earlier, see [v6 upgrade notes](EDGE:v6-upgrade-notes).
+For new v6 features and upgrades from 5.12 or earlier, see [New in v6](#new-in-v6) and [From 5.12 or earlier](#from-512-or-earlier).
 
 ## Query plugins
 
 `@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`, and `@kubb/plugin-mcp` work with v5 and v6, so you can upgrade them separately. They skip hooks for JSON Lines operations, as they do for event streams.
+
+## Less common cases
+
+### New in v6
+
+When you upgrade, these v6 features need no change to your code:
+
+- Validation: `validator.error` takes a map by status, such as `{ 404: getPetStatus404Schema }`, to check an error body against the schema of its status.
+- Types: XML, YAML, and CSV responses are `string`, so JSON and XML together give `data: Pet | string`.
+- Serializers: `serializer.header` and `serializer.cookie` are new. See [Override parameter serialization](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization#override-parameter-serialization).
+- Servers: servers with a `name` are exported as `servers` from `.kubb/client.ts`. See [Named servers](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/configure-requests#named-servers).
+
+### From 5.12 or earlier
+
+When you upgrade from 5.12 or earlier, these changed in 5.13 and compile without errors:
+
+- A stream call keeps the adapter set on the call or on the instance, such as a mock adapter in tests. Only a browser call with the default adapters switches to the fetch adapter.
+- A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
+- An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
+
+### SDK root class
+
+When your SDK has a root class, add interceptors on `api.client`, because the root class shares one client with every tag. See [`sdk`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#sdk).

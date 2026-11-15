@@ -57,7 +57,7 @@ export default defineConfig({
 })
 ```
 
-See [64-bit integers](EDGE:64-bit-integers).
+See [64-bit integers](https://kubb.dev/docs/5.x/topics/64-bit-integers#64-bit-integers).
 
 ::::
 
@@ -126,3 +126,15 @@ export const server = setupServer(
 ```
 
 For every handler option, see the [MSW options](https://kubb.dev/extensions/kubb-labs/plugin-msw/options).
+
+## Less common cases
+
+### Examples from the spec
+
+With `parser: 'data'`, a handler called without `data` sends the first example of the success response, when the spec has one.
+
+- Kubb reads the example's `value`, else its `serializedValue`.
+- A `serializedValue` is parsed for a JSON response and sent as is for a text response.
+- Pass `null` to send a `null` body instead of the example.
+
+When you pass `data`, the handler returns it through `new HttpResponse(JSON.stringify(data), ...)`, typed with the `@kubb/plugin-ts` types.

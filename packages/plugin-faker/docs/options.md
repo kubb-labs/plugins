@@ -66,9 +66,9 @@ createOrder({ quantity: 2, foo: '' })
 
 ::
 
-To pick a mode for some schemas only, use [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override).
+To pick a mode for some schemas only, use [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override). See [Override patterns](https://kubb.dev/docs/5.x/topics/config-and-inputs#override-patterns).
 
-See [Circular schemas](EDGE:circular-schemas).
+See [Circular schemas](https://kubb.dev/docs/5.x/topics/schema-shapes#circular-schemas).
 
 ### dateParser
 
@@ -101,7 +101,7 @@ Any other module name works when its default export has the dayjs API. Kubb impo
 > [!WARNING]
 > A value other than `'faker'` fails generation when the adapter types dates as `Date`, such as with `dateType: 'date'`.
 
-See [Dates and times](EDGE:dates-and-times).
+See [Dates and times](https://kubb.dev/docs/5.x/topics/dates-and-times#dates-and-times).
 
 ### regexGenerator
 
@@ -125,7 +125,7 @@ Writes `new RandExp(pattern).gen()`, which supports a wider regex grammar. Insta
 
 ::
 
-See [Regex patterns](EDGE:regex-patterns).
+See [Regex patterns](https://kubb.dev/docs/5.x/topics/schema-shapes#regex-patterns).
 
 ### locale
 

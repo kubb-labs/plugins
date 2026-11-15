@@ -48,7 +48,7 @@ The `message` leaves out the query string, so query credentials stay out of logs
 
 ## Narrow a thrown error by status
 
-`isResponseError<Responses>(error)` narrows a caught error to one operation's `ResponseError`. A check on `status` then narrows `data`. For range keys such as `4xx`, see [Status ranges](EDGE:status-ranges):
+`isResponseError<Responses>(error)` narrows a caught error to one operation's `ResponseError`. A check on `status` then narrows `data`. For range keys such as `4xx`, see [Status ranges](#status-ranges):
 
 ```typescript
 import { isResponseError } from './gen/.kubb/client'
@@ -77,7 +77,7 @@ if (result.error !== undefined) console.error(result.status, result.error)
 else console.info(result.data)
 ```
 
-See [Error results](EDGE:error-handling) for empty error bodies and `default` responses.
+See [Empty error bodies and default responses](#empty-error-bodies-and-default-responses).
 
 ## Set the generated default
 
@@ -115,7 +115,7 @@ client.setConfig({
 })
 ```
 
-For which schema checks an error body, see [Runtime validation](EDGE:runtime-validation).
+For which schema checks an error body, see [Error body validation](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization#error-body-validation).
 
 ## Turn validation off at runtime
 
@@ -127,3 +127,25 @@ client.setConfig({ validate: { response: false } }) // skip one direction
 ```
 
 The default is `true`. The object form skips each direction set to `false`: `request` (the body), `params`, `response`, or `error`. A per-call `validate` overrides the client.
+
+## Less common cases
+
+### Status ranges
+
+When an operation declares a range key such as `4xx`, the range covers its statuses that have no entry of their own, and `default` covers the rest.
+
+### Empty error bodies and default responses
+
+When a failed call has an empty body, `error` is `{ status, statusText }`.
+
+When the operation declares a `default` response, a check on `status` does not narrow `data` and `error`, because a `default` status can be any number. To get the success body, call `.unwrap()`, which turns `error` into a rejection.
+
+### Where the `throwOnError` default comes from
+
+When you set `client.setConfig({ throwOnError })`, generated calls ignore it, because each generated function passes its own value: the call's `throwOnError`, or else [`throwOnErrorDefault`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#throwonerrordefault). That value is also the default of the function's `ThrowOnError` type parameter.
+
+### Read headers with `returnType: 'data'`
+
+When the plugin sets [`returnType: 'data'`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#returntype), a call resolves to the success body alone. To read a header such as `ETag`, pass `throwOnError: false` and call `result.headers.get('etag')`. For a stream call, see [Event IDs when you resume](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events#event-ids-when-you-resume).
+
+The query plugins and `@kubb/plugin-mcp` read `returnType` too, including a per-operation value from [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override).

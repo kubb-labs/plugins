@@ -28,7 +28,7 @@ Next to the handlers, the plugin writes three files at the root of its `output.p
 
 Operations that stream their response get no tool.
 
-See [Streaming](EDGE:streaming).
+See [Streaming operations](https://kubb.dev/extensions/kubb-labs/plugin-mcp/guides/server#streaming-operations).
 
 ## Example
 

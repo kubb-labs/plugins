@@ -42,7 +42,7 @@ A call uses the first base URL it finds:
 > [!NOTE]
 > The spec's top-level `servers` URL is never used, even with the `server` option of `adapterOas`.
 
-For which `servers` entry a call picks, and named servers, see [Server URLs](EDGE:server-urls).
+See [Which server a call picks](#which-server-a-call-picks) and [Named servers](#named-servers).
 
 ## Authenticate requests
 
@@ -69,7 +69,7 @@ Requests stay unauthenticated until `auth` is set. The scheme decides where the 
 > [!NOTE]
 > For basic auth, return the raw `username:password`. The runtime base64-encodes it and adds the `Basic` prefix.
 
-For a credential that no security scheme describes, such as a request signature, add a request interceptor. For several schemes, precedence, and mutual TLS, see [Security schemes](EDGE:security-schemes).
+For a credential that no security scheme describes, such as a request signature, add a request interceptor. See [Several security schemes](#several-security-schemes) and [Mutual TLS](#mutual-tls).
 
 ## Add interceptors
 
@@ -136,6 +136,71 @@ getAxiosInstance().interceptors.request.use((config) => {
 })
 ```
 
-For the order native and core handlers run in, see [Interceptor order](EDGE:interceptor-order).
+For the order native and core handlers run in, see [Interceptor order](#interceptor-order).
 
 Next, [use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport).
+
+## Less common cases
+
+### Which server a call picks
+
+When an operation or path has its own `servers`, the [`server.index`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#server) of `adapterOas` picks the entry, falling back to the first. A relative URL such as `/v2`, or one with `{variable}` placeholders, is skipped, so the call uses the next source in [Set the base URL](#set-the-base-url).
+
+The plugin's [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#baseurl) option is written into `.kubb/config.ts`, which `.kubb/client.ts` passes to `setConfig`.
+
+### Named servers
+
+When an OpenAPI 3.2 server has a `name`, `.kubb/client.ts` exports its URL in `servers`:
+
+::code-group
+
+```yaml [petStore.yaml]
+servers:
+  - url: https://api.example.com
+    name: production
+  - url: https://staging.example.com
+    name: staging
+```
+
+```typescript [src/api.ts]
+import { client, servers } from './gen/.kubb/client'
+
+client.setConfig({ baseURL: servers.staging })
+```
+
+::
+
+### Several security schemes
+
+When an operation lists several security requirements, the runtime sends the first one whose schemes all get a token. A requirement that needs an API key and a session cookie sends both. A header or query key you set yourself wins over the token. An `oauth2` scheme also passes `metadataUrl` to `auth` when the spec has one.
+
+`.kubb/client.ts` exports the spec's schemes by name as `securitySchemes`, and each generated call points at its own, with the scopes it needs:
+
+```typescript
+security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets'] }]
+```
+
+### Mutual TLS
+
+When the spec has a `mutualTLS` scheme, `securitySchemes` leaves it out, because its credential is a client certificate on the connection, not on the request. In Node.js, give an axios instance the certificate:
+
+```typescript
+import { readFileSync } from 'node:fs'
+import { Agent } from 'node:https'
+import axios from 'axios'
+import { client, createAxiosTransport } from './gen/.kubb/client'
+
+const instance = axios.create({ httpsAgent: new Agent({ cert: readFileSync('client.crt'), key: readFileSync('client.key') }) })
+
+client.setConfig({ transport: createAxiosTransport(instance) })
+```
+
+In the browser, the browser picks the client certificate itself.
+
+### Interceptor order
+
+When you register [native axios interceptors](#native-axios-interceptors) next to `client.interceptors`:
+
+- Native request interceptors run after the `client.interceptors.request` handlers, in reverse order of registration, as axios runs them.
+- Native response interceptors see the raw bytes, before Kubb decodes them.
+- An instance you pass to `createAxiosTransport` keeps its own interceptors.

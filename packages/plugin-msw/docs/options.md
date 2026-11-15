@@ -84,7 +84,7 @@ Falls back to a `@kubb/plugin-faker` value when `data` is `undefined` or `null` 
 
 ::
 
-See [Examples from the spec](EDGE:spec-examples).
+See [Examples from the spec](https://kubb.dev/extensions/kubb-labs/plugin-msw/guides/mock-api#examples-from-the-spec).
 
 ::code-group
 

@@ -88,7 +88,7 @@ Pass `options` for `fetch` settings such as `cache`, `mode`, `redirect`, `keepal
 await getPetById({ path: { petId: 1 }, options: { cache: 'no-store' } })
 ```
 
-`client.setConfig({ options })` sets shared defaults, and per-call options win. Kubb sets the method, headers, body, and signal over them, and keeps control of status handling. `fetch` rejects the `TRACE` method, so see [TRACE operations](EDGE:trace-operations) for a `trace` operation.
+`client.setConfig({ options })` sets shared defaults, and per-call options win. Kubb sets the method, headers, body, and signal over them, and keeps control of status handling. `fetch` rejects the `TRACE` method, so see [TRACE operations](#trace-operations) for a `trace` operation.
 
 ## Build a URL without sending
 
@@ -102,3 +102,13 @@ const url = client.getUrl({ url: '/pets/{petId}', path: { petId: 1 }, query: { f
 ```
 
 Next, [handle errors](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/error-handling), including `throwOnError: false`.
+
+## Less common cases
+
+### Path parameter casing
+
+When you set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing), the HTTP request stays the same, because path parameter names never reach the wire. The exception is the `matrix` style, which sends the name (`;group-id=42`), so an operation with a matrix path parameter keeps its spec names.
+
+### TRACE operations
+
+When the spec has a `trace` operation, Kubb generates a call for it, but `fetch` rejects the `TRACE` method. Use `@kubb/plugin-axios` or a [custom transport](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/transport) for it.

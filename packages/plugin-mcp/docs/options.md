@@ -48,7 +48,7 @@ The handlers call [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/
 > [!WARNING]
 > The build fails when no client plugin is registered, when several are registered and `client` is unset, or when `client` names a plugin that is not registered.
 
-See [MCP tool calls and results](EDGE:mcp-tool-results).
+See [Tool calls and results](https://kubb.dev/extensions/kubb-labs/plugin-mcp/guides/server#tool-calls-and-results).
 
 ## Resolver members
 
