@@ -1,5 +1,11 @@
 # @kubb/plugin-axios
 
+## 6.0.5
+
+### Patch Changes
+
+- [#1477](https://github.com/kubb-labs/plugins/pull/1477) [`a6ba0c1`](https://github.com/kubb-labs/plugins/commit/a6ba0c11463ff79fc583d8087b4fbb4ac8718d92) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Distinguish Axios and Fetch guide descriptions in search results.
+
 ## 6.0.4
 
 ### Patch Changes
