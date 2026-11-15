@@ -20,7 +20,7 @@ The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs
 | `client`                                      | Another client function for this call, such as a signed or per-tenant client.                                                     |
 | Any other key                                 | Passed to your client as is, such as `signal`.                                                                                    |
 
-Path keys keep their spec names unless you set [`pathParamsCasing`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing). See [Path parameter names](EDGE:path-parameter-names).
+Path keys keep their spec names unless you set [`pathParamsCasing`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing). See [Path parameter names](#path-parameter-names).
 
 ## Handle errors
 
@@ -34,3 +34,11 @@ else console.log('failed', result.response.status)
 ```
 
 Next, [validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses).
+
+## Less common cases
+
+### Path parameter names
+
+When the spec names a path parameter in kebab or snake case, such as `{pet-id}`, the path key keeps that name: pass `path: { 'pet-id': 1 }`.
+
+Set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing) on the adapter (`@kubb/adapter-oas` 5.20.0 or later) to pass `path: { petId: 1 }` instead. The HTTP request stays the same.

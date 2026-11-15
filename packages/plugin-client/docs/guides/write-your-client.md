@@ -35,7 +35,7 @@ Declare each `config` field your spec produces on `RequestConfig`, or the genera
 | `parseAs`                                     | Every success content type is binary                                   | `'blob'`                                                                                                                           |
 | `validator`                                   | The `validator` option is set                                          | See [Validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses). |
 
-A spec with Server-Sent Events or JSON Lines operations needs `client.stream` and more exports and fields. See [Streaming](EDGE:streaming).
+A spec with Server-Sent Events or JSON Lines operations needs `client.stream` and more exports and fields. See [Stream Server-Sent Events and JSON Lines](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/streaming).
 
 Other keys the caller passes, such as `signal`, arrive through `...config`. A generated function looks like this:
 
@@ -235,7 +235,7 @@ styles: {
 - A parameter without an entry uses its location's default: `form` for query and cookie, `simple` for path and header.
 - The shared runtime's `serializers.ts` applies every style.
 - A client written from scratch applies them itself, or ignores `styles` when the spec only uses the defaults.
-- See [Parameter serialization](EDGE:parameter-serialization) for the OpenAPI 3.2 `cookie` style.
+- See [Cookie parameters with the cookie style](#cookie-parameters-with-the-cookie-style) for the OpenAPI 3.2 `cookie` style.
 
 The [plugin-fetch serialization guide](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/serialization) shows the output of each style.
 
@@ -261,3 +261,17 @@ export default defineConfig({
 Run `npx kubb generate`, then `npx tsc --noEmit`. A missing export or `RequestConfig` field shows up as a compile error in the generated files. With a relative `importPath`, the query plugins resolve it from the same generated file, so one path serves both.
 
 ::
+
+## Less common cases
+
+### Cookie parameters with the cookie style
+
+When a cookie parameter sets the OpenAPI 3.2 `cookie` style, the call passes `style: 'cookie'` in `styles`:
+
+```typescript
+styles: { cookie: { session: { style: 'cookie' } } }
+```
+
+- Send its values without percent-encoding.
+- OpenAPI 3.2 defaults `explode` to `true` for this style.
+- The shared runtime throws a `TypeError` when a value has characters a cookie cannot carry.

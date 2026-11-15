@@ -57,7 +57,7 @@ client.stream = async <TResponses, ThrowOnError extends boolean = true, TEvent =
 }
 ```
 
-[Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client) lists every stream field. See [Streaming](EDGE:streaming) for JSON Lines.
+See [Stream Server-Sent Events and JSON Lines](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/streaming) for every stream field and for JSON Lines.
 
 ## New fields on the request config
 
@@ -80,7 +80,7 @@ export type RequestConfig = {
 ```
 
 > [!NOTE]
-> Browsers ignore a `Cookie` header set by script and send their own cookies. See [Parameter serialization](EDGE:parameter-serialization) for the OpenAPI 3.2 `cookie` style.
+> Browsers ignore a `Cookie` header set by script and send their own cookies. See [Cookie parameters with the cookie style](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client#cookie-parameters-with-the-cookie-style) for the OpenAPI 3.2 `cookie` style.
 
 ## Security requirements
 
