@@ -1,5 +1,15 @@
 # @kubb/plugin-react-query
 
+## 5.10.4
+
+### Patch Changes
+
+- [#1474](https://github.com/kubb-labs/plugins/pull/1474) [`bfe8dea`](https://github.com/kubb-labs/plugins/commit/bfe8dea27043776796296cee00e04a0e45f1bdfb) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Rewrite the docs each plugin ships for kubb.dev to lead with tables, steps, and examples instead of long prose. The axios and fetch plugins merge their base URL, authentication, and interceptor guides into one `configure-requests` guide, and the client plugin's authentication guide moves into `write-your-client`. Option types and defaults are checked against the code.
+
+- [#1474](https://github.com/kubb-labs/plugins/pull/1474) [`bfe8dea`](https://github.com/kubb-labs/plugins/commit/bfe8dea27043776796296cee00e04a0e45f1bdfb) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Declare Kubb 5.19.0 or later in `kubb-extension.json`. The plugins have needed 5.19.0 since they started using the store form of `memo`, but the manifest still allowed 5.18.4, so `kubb add` and the compatibility check accepted a Kubb version the plugins fail on.
+- Updated dependencies [[`bfe8dea`](https://github.com/kubb-labs/plugins/commit/bfe8dea27043776796296cee00e04a0e45f1bdfb), [`bfe8dea`](https://github.com/kubb-labs/plugins/commit/bfe8dea27043776796296cee00e04a0e45f1bdfb)]:
+  - @kubb/plugin-ts@5.5.4
+
 ## 5.10.3
 
 ### Patch Changes
