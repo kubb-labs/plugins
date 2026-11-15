@@ -128,8 +128,11 @@ export const settings = { baseURL: 'https://petstore3.swagger.io/api/v3' }
 async function send(config: RequestConfig) {
   const path: Record<string, unknown> = { ...config.path }
   const url = new URL((config.baseURL ?? settings.baseURL) + config.url.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(String(path[key]))))
+  // The default `form` style repeats the key for each array item. Other styles: see Serialize parameters.
   for (const [key, value] of Object.entries(config.query ?? {})) {
-    if (value !== undefined) url.searchParams.set(key, String(value))
+    for (const item of Array.isArray(value) ? value : [value]) {
+      if (item !== undefined) url.searchParams.append(key, String(item))
+    }
   }
   const cookie = Object.entries(config.cookies ?? {})
     .filter(([, value]) => value != null)
@@ -138,7 +141,8 @@ async function send(config: RequestConfig) {
   // `Headers` matches names in any case, so a caller's `content-type` or `authorization` still wins.
   const headers = new Headers(config.headers as Record<string, string>)
   if (config.body !== undefined && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
-  if (cookie) headers.set('Cookie', cookie)
+  // On the server this adds to the caller's cookies. Browsers drop a script-set `Cookie` header and send their own.
+  if (cookie) headers.set('Cookie', [headers.get('Cookie'), cookie].filter(Boolean).join('; '))
 
   const response = await fetch(url, {
     method: config.method,
