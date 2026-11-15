@@ -42,7 +42,7 @@ export function McpHandler({ name, clientName, node, resolver, returnType = 'ful
   content: [
     {
       type: 'text',
-      text: JSON.stringify(${body})
+      text: JSON.stringify(${body}) ?? ''
     }
   ],
   structuredContent: { data: ${body} }

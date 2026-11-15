@@ -19,7 +19,7 @@ export async function deleteOrderHandler({ path }: DeleteOrderOptions, ctx: Serv
     content: [
       {
         type: 'text',
-        text: JSON.stringify(res.data),
+        text: JSON.stringify(res.data) ?? '',
       },
     ],
     structuredContent: { data: res.data },

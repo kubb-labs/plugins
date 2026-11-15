@@ -19,7 +19,7 @@ export async function deletePetHandler({ path, headers }: DeletePetOptions, ctx:
     content: [
       {
         type: 'text',
-        text: JSON.stringify(res.data),
+        text: JSON.stringify(res.data) ?? '',
       },
     ],
     structuredContent: { data: res.data },

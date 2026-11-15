@@ -23,7 +23,7 @@ export async function createPaymentHandler(
     content: [
       {
         type: 'text',
-        text: JSON.stringify(res.data),
+        text: JSON.stringify(res.data) ?? '',
       },
     ],
     structuredContent: { data: res.data },

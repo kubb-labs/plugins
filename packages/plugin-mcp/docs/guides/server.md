@@ -72,13 +72,13 @@ The server name comes from `info.title` in your spec. The `args` path is relativ
 
 `server.ts` registers one tool per operation:
 
-| Tool field  | Comes from                                                                                                        |
-| ----------- | ----------------------------------------------------------------------------------------------------------------- |
-| Name        | The `operationId`                                                                                                 |
-| Title       | The operation `summary`                                                                                           |
-| Description | The operation `description`, or one built from the method and path, such as `Make a GET request to /pets/{petId}` |
-| Input       | The Zod schemas of the path, query, header, and cookie parameters and the request body                            |
-| Output      | The success body, as `{ data: body }` structured content and as the JSON text of `body`                           |
+| Tool field  | Comes from                                                                                                                        |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Name        | The `operationId`                                                                                                                 |
+| Title       | The operation `summary`                                                                                                           |
+| Description | The operation `description`, or one built from the method and path, such as `Make a GET request to /pets/{petId}`                 |
+| Input       | The Zod schemas of the path, query, header, and cookie parameters and the request body                                            |
+| Output      | The success body, as `{ data: body }` structured content and as the JSON text of `body`. A success with no body gives empty text. |
 
 Each handler forwards the MCP cancellation signal to the client and throws for a non-2xx response, which the assistant sees as a tool error. In the tool list, an `int64` field shows as an integer and a binary field as a value without a type, because `bigint` and `Blob` have no JSON Schema form. Operations that stream their response, such as `text/event-stream` or JSON Lines, get no tool.
 
