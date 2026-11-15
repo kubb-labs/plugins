@@ -32,10 +32,17 @@ Sets the input and return types of object and intersection factories. Both modes
 | Required | `false`                  |
 | Default  | `'inferred'`             |
 
-| Value                  | Factory takes                                 | Factory returns                                                                                                          |
-| ---------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `'inferred'` (default) | Any `Partial<Model>`, with literal types kept | The generated value types, merged with the override types. Optional and nullable fields keep their concrete value types. |
-| `'schema'`             | `Partial<Model>`                              | The declared model type, with optional and nullable fields. Use it for fixtures you change after creation.               |
+::field-group
+
+:::field{name="'inferred'"}
+The factory takes any `Partial<Model>` and keeps its literal types. It returns the generated value types, merged with the override types. Optional and nullable fields keep their concrete value types.
+:::
+
+:::field{name="'schema'"}
+The factory takes a `Partial<Model>` and returns the declared model type, with optional and nullable fields. Use it for fixtures you change after creation.
+:::
+
+::
 
 Factories in a schema cycle use the declared model as their base return type with `'inferred'` too, so TypeScript does not infer in a circle. Overrides still keep their types.
 
@@ -79,16 +86,25 @@ Library that formats `date`, `time`, and `date-time` fields typed as strings. Pi
 | Required | `false`                                    |
 | Default  | `'faker'`                                  |
 
-| Value               | A `date` field renders as                             |
-| ------------------- | ----------------------------------------------------- |
-| `'faker'` (default) | `faker.date.anytime().toISOString().substring(0, 10)` |
-| `'dayjs'`           | `dayjs(faker.date.anytime()).format("YYYY-MM-DD")`    |
-| `'moment'`          | `moment(faker.date.anytime()).format("YYYY-MM-DD")`   |
-| Any module name     | `name(faker.date.anytime()).format("YYYY-MM-DD")`     |
+::field-group
+
+:::field{name="'faker'"}
+Renders a `date` field as `faker.date.anytime().toISOString().substring(0, 10)`.
+:::
+
+:::field{name="'dayjs'"}
+Renders a `date` field as `dayjs(faker.date.anytime()).format("YYYY-MM-DD")`.
+:::
+
+:::field{name="'moment'"}
+Renders a `date` field as `moment(faker.date.anytime()).format("YYYY-MM-DD")`.
+:::
+
+::
 
 - `date` and `time` strings use `YYYY-MM-DD` and `HH:mm:ss`.
 - A `date-time` string is `toISOString()` output with `'faker'`. Any other parser formats it as `YYYY-MM-DDTHH:mm:ss[Z]`, without the `Z` for a local date-time and with a numeric offset when the schema declares one.
-- A custom module needs a default export with the dayjs API. Kubb imports it under the camelCased module name, so `'my-date-lib'` becomes `myDateLib` and `'@scope/lib'` becomes `scopeLib`.
+- Any other module name renders a `date` field as `name(faker.date.anytime()).format("YYYY-MM-DD")`. The module needs a default export with the dayjs API. Kubb imports it under the camelCased module name, so `'my-date-lib'` becomes `myDateLib` and `'@scope/lib'` becomes `scopeLib`.
 - A value other than `'faker'` fails generation when the adapter types dates as `Date`, such as with `dateType: 'date'`.
 
 ### regexGenerator
@@ -101,10 +117,17 @@ Library that generates strings matching a regex `pattern` in the spec.
 | Required | `false`                |
 | Default  | `'faker'`              |
 
-| Value               | Output                                | Notes                                                                                                                                                                                                       |
-| ------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `'faker'` (default) | `faker.helpers.fromRegExp(/pattern/)` | No extra dependency. Kubb rewrites `\d`, `\w`, escaped characters such as `\+`, and open-ended counts such as `{1,}` into a form faker reads. Faker does not support groups, alternation (`a\|b`), or `\s`. |
-| `'randexp'`         | `new RandExp(pattern).gen()`          | Supports a wider regex grammar. Needs `randexp` in the app.                                                                                                                                                 |
+::field-group
+
+:::field{name="'faker'"}
+Writes `faker.helpers.fromRegExp(/pattern/)` and needs no extra dependency. Kubb rewrites `\d`, `\w`, escaped characters such as `\+`, and open-ended counts such as `{1,}` into a form faker reads. Faker does not support groups, alternation (`a|b`), or `\s`.
+:::
+
+:::field{name="'randexp'"}
+Writes `new RandExp(pattern).gen()`, which supports a wider regex grammar. Needs `randexp` in the app.
+:::
+
+::
 
 ### locale
 

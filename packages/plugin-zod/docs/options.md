@@ -36,7 +36,19 @@ Module the generated files import `z` from. Point it at your own module to re-ex
 | Required | `false`                         |
 | Default  | `mini ? 'zod/mini' : 'zod'`     |
 
-`'zod'` and `'zod/mini'` are imported as `import * as z`. A custom module is imported as `import { z }`, so export `z` by name.
+::field-group
+
+:::field{name="'zod'"}
+Writes `import * as z from 'zod'`.
+:::
+
+:::field{name="'zod/mini'"}
+Writes `import * as z from 'zod/mini'`.
+:::
+
+::
+
+Any other module is imported as `import { z }`, so export `z` by name.
 
 ### inferred
 
@@ -118,10 +130,17 @@ Validator for OpenAPI properties with `format: uuid`.
 | Required | `false`            |
 | Default  | `'uuid'`           |
 
-| Value              | Output                                                        |
-| ------------------ | ------------------------------------------------------------- |
-| `'uuid'` (default) | `z.uuid()`, a standard RFC 4122 UUID                          |
-| `'guid'`           | `z.guid()`, which is looser and accepts Microsoft-style GUIDs |
+::field-group
+
+:::field{name="'uuid'"}
+Writes `z.uuid()`, which accepts a standard RFC 4122 UUID.
+:::
+
+:::field{name="'guid'"}
+Writes `z.guid()`, which is looser and accepts Microsoft-style GUIDs.
+:::
+
+::
 
 ### regexType
 
@@ -133,10 +152,17 @@ How an OpenAPI `pattern` is written inside `.regex(...)`. Use `'constructor'` wh
 | Required | `false`                      |
 | Default  | `'literal'`                  |
 
-| Value                 | Output                           |
-| --------------------- | -------------------------------- |
-| `'literal'` (default) | `.regex(/^[a-z]+$/)`             |
-| `'constructor'`       | `.regex(new RegExp("^[a-z]+$"))` |
+::field-group
+
+:::field{name="'literal'"}
+Writes `.regex(/^[a-z]+$/)`.
+:::
+
+:::field{name="'constructor'"}
+Writes `.regex(new RegExp("^[a-z]+$"))`.
+:::
+
+::
 
 ### oneOfType
 
@@ -148,10 +174,17 @@ How a `oneOf` is validated. Use `'xor'` when values may carry extra keys.
 | Required | `false`            |
 | Default  | `'union'`          |
 
-| Value               | Output           | Behavior                                                                                                                                                                                |
-| ------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `'union'` (default) | `z.union([...])` | Inline object members without `additionalProperties` print as `z.strictObject(...)`, so a value with another member's keys fails that member. Extra keys that the spec allows fail too. |
-| `'xor'`             | `z.xor([...])`   | Passes only when exactly one member matches, as `oneOf` requires. Members keep their own `additionalProperties`. Needs Zod 4.2 or later.                                                |
+::field-group
+
+:::field{name="'union'"}
+Writes `z.union([...])`. Inline object members without `additionalProperties` print as `z.strictObject(...)`, so a value with another member's keys fails that member. Extra keys that the spec allows fail too.
+:::
+
+:::field{name="'xor'"}
+Writes `z.xor([...])`, which passes only when exactly one member matches, as `oneOf` requires. Members keep their own `additionalProperties`. Needs Zod 4.2 or later.
+:::
+
+::
 
 With `'xor'`, members need `required` keys that tell them apart. When every key is optional, an object matches several members and `z.xor` rejects it.
 

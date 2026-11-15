@@ -114,10 +114,17 @@ Casing of the const object when `type` is `'asConst'`.
 | Required | `false`                       |
 | Default  | `'camelCase'`                 |
 
-| Value                   | Const name                   |
-| ----------------------- | ---------------------------- |
-| `'camelCase'` (default) | `petStatus`                  |
-| `'pascalCase'`          | `PetStatus`, the schema name |
+::field-group
+
+:::field{name="'camelCase'"}
+Names the const `petStatus`.
+:::
+
+:::field{name="'pascalCase'"}
+Names the const `PetStatus`, the same as the schema.
+:::
+
+::
 
 #### enum.typeSuffix
 
@@ -143,13 +150,31 @@ Casing of enum key names.
 | Required | `false`                                                                        |
 | Default  | `'none'`                                                                       |
 
-| Value                  | Key for `enum value`        |
-| ---------------------- | --------------------------- |
-| `'none'` (default)     | The raw value from the spec |
-| `'camelCase'`          | `enumValue`                 |
-| `'pascalCase'`         | `EnumValue`                 |
-| `'snakeCase'`          | `enum_value`                |
-| `'screamingSnakeCase'` | `ENUM_VALUE`                |
+For the enum value `enum value`, each casing writes this key:
+
+::field-group
+
+:::field{name="'none'"}
+Keeps the raw value from the spec.
+:::
+
+:::field{name="'camelCase'"}
+Writes `enumValue`.
+:::
+
+:::field{name="'pascalCase'"}
+Writes `EnumValue`.
+:::
+
+:::field{name="'snakeCase'"}
+Writes `enum_value`.
+:::
+
+:::field{name="'screamingSnakeCase'"}
+Writes `ENUM_VALUE`.
+:::
+
+::
 
 ### syntaxType
 
@@ -161,10 +186,17 @@ How object schemas are declared.
 | Required | `false`                 |
 | Default  | `'type'`                |
 
-| Value              | Output                                                                                                                                                                                    |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `'type'` (default) | `export type Pet = { name: string }`                                                                                                                                                      |
-| `'interface'`      | `export interface Pet { name: string }`. Use it when consumers need declaration merging. See [Type vs Interface](https://www.totaltypescript.com/type-vs-interface-which-should-you-use). |
+::field-group
+
+:::field{name="'type'"}
+Writes `export type Pet = { name: string }`.
+:::
+
+:::field{name="'interface'"}
+Writes `export interface Pet { name: string }`. Use it when consumers need declaration merging. See [Type vs Interface](https://www.totaltypescript.com/type-vs-interface-which-should-you-use).
+:::
+
+::
 
 ### optionalType
 
@@ -176,11 +208,21 @@ How optional properties are written.
 | Required | `false`                                                         |
 | Default  | `'questionToken'`                                               |
 
-| Value                         | Output                       | Meaning                                                   |
-| ----------------------------- | ---------------------------- | --------------------------------------------------------- |
-| `'questionToken'` (default)   | `type?: string`              | The property may be missing.                              |
-| `'undefined'`                 | `type: string \| undefined`  | The property must exist but may be `undefined`.           |
-| `'questionTokenAndUndefined'` | `type?: string \| undefined` | Either. Use it with `"exactOptionalPropertyTypes": true`. |
+::field-group
+
+:::field{name="'questionToken'"}
+Writes `type?: string`. The property may be missing.
+:::
+
+:::field{name="'undefined'"}
+Writes `type: string | undefined`. The property must exist but may be `undefined`.
+:::
+
+:::field{name="'questionTokenAndUndefined'"}
+Writes `type?: string | undefined`, so the property may be missing or `undefined`. Use it with `"exactOptionalPropertyTypes": true`.
+:::
+
+::
 
 ### arrayType
 
@@ -192,10 +234,17 @@ Syntax for array types.
 | Required | `false`                |
 | Default  | `'array'`              |
 
-| Value               | Output                                                                              |
-| ------------------- | ----------------------------------------------------------------------------------- |
-| `'array'` (default) | `tags: string[]`                                                                    |
-| `'generic'`         | `tags: Array<string>`, which reads better for elements like `Array<{ id: number }>` |
+::field-group
+
+:::field{name="'array'"}
+Writes `tags: string[]`.
+:::
+
+:::field{name="'generic'"}
+Writes `tags: Array<string>`, which reads better for elements like `Array<{ id: number }>`.
+:::
+
+::
 
 ### operations
 

@@ -29,12 +29,23 @@ Selects the registered client plugin that the handlers call. Configure transport
 | Type     | `'fetch' \| 'axios' \| 'client'` |
 | Required | `false`                          |
 
-| Value           | Handlers call                                                                |
-| --------------- | ---------------------------------------------------------------------------- |
-| Unset (default) | The only registered client plugin                                            |
-| `'fetch'`       | [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch)   |
-| `'axios'`       | [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios)   |
-| `'client'`      | [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client) |
+When `client` is unset, the handlers call the only registered client plugin.
+
+::field-group
+
+:::field{name="'fetch'"}
+The handlers call [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch).
+:::
+
+:::field{name="'axios'"}
+The handlers call [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios).
+:::
+
+:::field{name="'client'"}
+The handlers call [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client).
+:::
+
+::
 
 The build fails when no client plugin is registered, when several are registered and `client` is unset, or when `client` names a plugin that is not registered.
 
