@@ -135,11 +135,10 @@ async function send(config: RequestConfig) {
     .filter(([, value]) => value != null)
     .map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`)
     .join('; ')
-  const headers: Record<string, string> = {
-    ...(config.body === undefined ? {} : { 'Content-Type': 'application/json' }),
-    ...(config.headers as Record<string, string>),
-    ...(cookie ? { Cookie: cookie } : {}),
-  }
+  // `Headers` matches names in any case, so a caller's `content-type` or `authorization` still wins.
+  const headers = new Headers(config.headers as Record<string, string>)
+  if (config.body !== undefined && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
+  if (cookie) headers.set('Cookie', cookie)
 
   const response = await fetch(url, {
     method: config.method,
@@ -215,7 +214,7 @@ export function setAuth(resolve: GetToken) {
 // inside send(), after `headers` and before fetch(). This sends bearer tokens only, not API keys or basic credentials.
 const bearer = config.security?.flat().some((auth) => auth.type !== 'apiKey' && auth.scheme !== 'basic')
 const token = bearer ? await getToken?.() : undefined
-if (token) headers.Authorization ??= `Bearer ${token}`
+if (token && !headers.has('Authorization')) headers.set('Authorization', `Bearer ${token}`)
 ```
 
 ```typescript [src/index.ts]
