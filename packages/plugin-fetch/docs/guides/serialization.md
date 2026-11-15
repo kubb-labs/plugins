@@ -106,7 +106,7 @@ For an operation with several request content types, set `contentType` on the ca
 - For a `FormData` body, the runtime removes `Content-Type`, so the transport sets it with the multipart boundary.
 - XML, YAML, and CSV have no built-in encoder, so an object under one throws a `TypeError`. Pass the encoded string, cast to the body type (`body: xml as unknown as AddPetBodyXml`), or add a media type.
 
-For `bigint` bodies, see [`bigint` request bodies](#bigint-request-bodies). For `int64` types, see [64-bit integers](https://kubb.dev/docs/5.x/topics/64-bit-integers#64-bit-integers).
+For `bigint` bodies, see [`bigint` request bodies](#bigint-request-bodies).
 
 ## Add a media type
 
@@ -201,7 +201,7 @@ When a call sets no `contentType`:
 
 ### `bigint` request bodies
 
-When a request body holds a `bigint`, it goes out as a JSON number. A value outside the safe-integer range throws a `TypeError` instead of losing precision, so register a media type to send it another way. For how `int64` fields are typed, see [64-bit integers](https://kubb.dev/docs/5.x/topics/64-bit-integers#64-bit-integers).
+When a request body holds a `bigint`, it goes out as a JSON number. A value outside the safe-integer range throws a `TypeError` instead of losing precision, so register a media type to send it another way.
 
 ### Media type merge order
 

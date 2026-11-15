@@ -69,8 +69,6 @@ id: z.int(),
 
 To change `int64` fields for every plugin, set the adapter's [`integerType`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) instead.
 
-See [64-bit integers](https://kubb.dev/docs/5.x/topics/64-bit-integers#64-bit-integers).
-
 ## Remove descriptions
 
 Pass the [description-removal macro](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#remove-descriptions) to `pluginZod({ macros: [dropDescriptions] })`. Schemas then omit their own `.describe()` calls.
@@ -132,8 +130,6 @@ Use a runtime that provides `Temporal`, or add its polyfill through a generated 
 > With `inferred: true` instead of `'codec'`, a request type is the encoded string, not `Temporal.PlainTime`. Types from `pluginTs` describe the wire format.
 
 For built-in `Date` conversion, set `dateType: 'date'` on the adapter instead.
-
-See [Dates and times](https://kubb.dev/docs/5.x/topics/dates-and-times#dates-and-times).
 
 ## Import a custom codec
 

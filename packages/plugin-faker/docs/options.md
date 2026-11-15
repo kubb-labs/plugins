@@ -66,9 +66,24 @@ createOrder({ quantity: 2, foo: '' })
 
 ::
 
-To pick a mode for some schemas only, use [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override). See [Override patterns](https://kubb.dev/docs/5.x/topics/config-and-inputs#override-patterns).
+To pick a mode for some schemas only, use [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override). A string `pattern` is a regular expression, so `'Order'` also matches `OrderItem`. This sets `typeMode` for `Order` alone:
 
-See [Circular schemas](https://kubb.dev/docs/5.x/topics/schema-shapes#circular-schemas).
+```typescript [kubb.config.ts]
+import { defineConfig } from 'kubb/config'
+import { pluginFaker } from '@kubb/plugin-faker'
+import { pluginTs } from '@kubb/plugin-ts'
+
+export default defineConfig({
+  input: './petStore.yaml',
+  output: { path: './src/gen' },
+  plugins: [
+    pluginTs(),
+    pluginFaker({
+      override: [{ type: 'schemaName', pattern: '^Order$', options: { typeMode: 'schema' } }],
+    }),
+  ],
+})
+```
 
 ### dateParser
 
@@ -101,8 +116,6 @@ Any other module name works when its default export has the dayjs API. Kubb impo
 > [!WARNING]
 > A value other than `'faker'` fails generation when the adapter types dates as `Date`, such as with `dateType: 'date'`.
 
-See [Dates and times](https://kubb.dev/docs/5.x/topics/dates-and-times#dates-and-times).
-
 ### regexGenerator
 
 Library that generates strings matching a regex `pattern` in the spec.
@@ -124,8 +137,6 @@ Writes `new RandExp(pattern).gen()`, which supports a wider regex grammar. Insta
 :::
 
 ::
-
-See [Regex patterns](https://kubb.dev/docs/5.x/topics/schema-shapes#regex-patterns).
 
 ### locale
 

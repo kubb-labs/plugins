@@ -14,7 +14,7 @@ Look up the Zod v4 call Kubb writes for each OpenAPI type and format, such as `z
 | `integer`, `format: int64`          | `z.coerce.bigint()`           | `z.coerce.bigint()`                    | Always coerced, because JSON holds a number                                                                        |
 | `string`, `format: int32` / `int64` | `z.string().regex(/^-?\d+$/)` | `z.string().check(z.regex(/^-?\d+$/))` | An integer sent as a JSON string. `uint64` uses `/^\d+$/`. A `pattern` in the spec wins.                           |
 
-With [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, `format: int64` prints `z.int()`. See [64-bit integers](https://kubb.dev/docs/5.x/topics/64-bit-integers#64-bit-integers).
+With [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, `format: int64` prints `z.int()`.
 
 ## Strings
 
@@ -45,7 +45,7 @@ With [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas
 | `string`, `format: date-time` | `z.iso.datetime()` | `z.string()`   | ISO 8601 date-time |
 | `string`, `format: time`      | `z.iso.time()`     | `z.iso.time()` | ISO 8601 time      |
 
-These rows apply to the adapter's default `dateType: 'string'`. For `Date` values and offsets, see [Dates and times](https://kubb.dev/docs/5.x/topics/dates-and-times#dates-and-times).
+These rows apply to the adapter's default `dateType: 'string'`.
 
 ## Objects
 
@@ -54,8 +54,6 @@ These rows apply to the adapter's default `dateType: 'string'`. For `Date` value
 | `object`, `additionalProperties: <schema>` | `z.record(z.string(), schema)` | `z.record(z.string(), schema)` | Dictionary with no fixed properties |
 | `object`, `additionalProperties: true`     | `z.looseObject(shape)`         | `z.looseObject(shape)`         | Allows extra keys                   |
 | `object`, `additionalProperties: false`    | `z.strictObject(shape)`        | `z.strictObject(shape)`        | Rejects extra keys                  |
-
-For `propertyNames`, `patternProperties`, and fixed properties next to an `additionalProperties` schema, see [Additional properties](https://kubb.dev/docs/5.x/topics/additional-properties#additional-properties).
 
 ## JSON Schema keywords
 

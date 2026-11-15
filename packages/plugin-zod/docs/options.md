@@ -173,8 +173,6 @@ Writes `z.xor([...])`, which passes only when exactly one member matches. Needs 
 
 ::
 
-See [Unions and oneOf](https://kubb.dev/docs/5.x/topics/schema-shapes#unions-and-one-of).
-
 ### compile
 
 Wraps schemas in `z.compile(...)`, which generates validation code instead of interpreting the schema on each call. Needs Zod 4.5 or later.

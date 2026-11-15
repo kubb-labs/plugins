@@ -262,8 +262,6 @@ Writes only the schema types. Plugins that use them, such as clients and MSW han
 
 ::
 
-See [Name collisions](https://kubb.dev/docs/5.x/topics/name-collisions#name-collisions).
-
 ### printer
 
 Replaces the handler for a schema type such as `'integer'` or `'date'`. Each handler returns the TypeScript type as a string. Inside a handler, `this.transform(node)` prints a nested node, and `this.options` holds the printer options. See the [printer guide](https://kubb.dev/docs/5.x/how-to/customize#printers).

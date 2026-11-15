@@ -13,8 +13,6 @@ Each composable and its helpers live in a file named after the composable, such 
 | Infinite, with `infinite` and `hooks`       | `findPetsByTagsInfiniteQueryKey`, `findPetsByTagsInfiniteQueryOptions`, `useFindPetsByTagsInfinite` |
 | Server-Sent Events or JSON Lines            | Nothing. Call the client function directly.                                                         |
 
-See [Compare the query plugins](https://kubb.dev/docs/5.x/topics/query-plugins#query-plugins-compared) for the React Query and SWR exports.
-
 ## Call a composable
 
 The examples set `hooks: true`, and [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter so `petId` is a `number`. Path keys keep their spec names unless you set [`pathParamsCasing`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing).

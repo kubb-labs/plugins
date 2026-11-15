@@ -13,8 +13,6 @@ Each hook and its helpers live in a file named after the hook, such as `src/gen/
 | Infinite or suspense                        | Not generated                                                   |
 | Server-Sent Events or JSON Lines            | Nothing. Call the client function directly.                     |
 
-See [Compare the query plugins](https://kubb.dev/docs/5.x/topics/query-plugins#query-plugins-compared) for the React Query and Vue Query exports.
-
 ## Call a hook
 
 The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter so `petId` is a `number`. Path keys keep their spec names unless you set [`pathParamsCasing`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing).

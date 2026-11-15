@@ -57,8 +57,6 @@ export default defineConfig({
 })
 ```
 
-See [64-bit integers](https://kubb.dev/docs/5.x/topics/64-bit-integers#64-bit-integers).
-
 ::::
 
 :::
