@@ -14,7 +14,7 @@ Each hook and its helpers live in a file named after the hook, such as `src/gen/
 | Suspense, with `suspense` and `hooks`       | `useGetPetByIdSuspense`, plus `useFindPetsByTagsSuspenseInfinite` with `infinite`                   |
 | Server-Sent Events or JSON Lines            | Nothing. Call the client function directly.                                                         |
 
-See [Compare the query plugins](EDGE:query-plugins-compared) for the Vue Query and SWR exports.
+See [Compare the query plugins](https://kubb.dev/docs/5.x/topics/query-plugins#query-plugins-compared) for the Vue Query and SWR exports.
 
 ## Call a hook
 
@@ -57,7 +57,7 @@ mutate({ path: { petId: 1 } })
 
 :::tabs-item{label="Infinite"}
 
-Only operations that declare `infinite.queryParam` get an infinite hook. Point `nextParam` at the cursor in the response, and give `initialPageParam` the type of the query parameter.
+Only operations that declare `infinite.queryParam` get an infinite hook. Point `nextParam` at the cursor in the response, and give `initialPageParam` the type of the query parameter. See [Infinite queries](https://kubb.dev/extensions/kubb-labs/plugin-react-query/guides/infinite-queries).
 
 ```typescript [kubb.config.ts]
 pluginReactQuery({
@@ -100,7 +100,7 @@ await queryClient.prefetchQuery(getPetByIdQueryOptions({ path: { petId: 1 } }))
 queryClient.invalidateQueries({ queryKey: getPetByIdQueryKey({ path: { petId: 1 } }) })
 ```
 
-To change the keys, set [`queryKey`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#querykey) and [`mutationKey`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#mutationkey). To share options across hooks, set [`customOptions`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#customoptions).
+[TanStack Query keys](https://kubb.dev/extensions/kubb-labs/plugin-react-query/guides/query-keys) shows the default keys. To change them, set [`queryKey`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#querykey) and [`mutationKey`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#mutationkey). To share options across hooks, set [`customOptions`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#customoptions).
 
 ## Handle errors
 

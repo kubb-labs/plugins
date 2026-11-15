@@ -29,7 +29,7 @@ export default defineConfig({
 ```
 
 ```typescript [Generated]
-// src/gen/hooks/useFindPetsByTagsInfinite.ts, type arguments left out
+// src/gen/hooks/useFindPetsByTagsInfinite.ts, types left out
 export const findPetsByTagsInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'> = {}) =>
   [{ url: '/pet/findByTags', infinite: true }, ...(query ? [query] : [])] as const
 
@@ -69,7 +69,7 @@ The generated `getNextPageParam` comes from the first of these options you set:
 | [`cursorParam`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#infinitecursorparam)           | Deprecated. Reads that top-level field.                                                     |
 | None                                                                                                            | Counts pages up from `initialPageParam` until a page is an empty array.                     |
 
-`getPreviousPageParam`, `previousParam`, and `cursorParam` set the previous page in the same order. With [`returnType: 'full'`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#returntype), the generated code reads the cursor from `lastPage.data`.
+`getPreviousPageParam`, `previousParam`, and `cursorParam` set the previous page in the same order. With [`returnType: 'full'`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#returntype), the `nextParam` and `cursorParam` accessors read from `lastPage.data`.
 
 ## hasNextPage never turns false
 

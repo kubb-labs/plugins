@@ -89,7 +89,7 @@ Declare these fields on `RequestConfig`. The call passes them next to the [usual
 
 A JSON Lines call, such as `application/jsonl` or `application/x-ndjson`, passes the media type in `contentType.response` and expects one parsed item per line.
 
-The shared runtime's `sse.ts` exports `parseEventStream` and `parseJsonLines`, which handle both formats and `rawData`.
+The shared runtime's `sse.ts` exports both parsers: `parseEventStream` reads events and applies `rawData`, and `parseJsonLines` reads one item per line.
 
 ## Streams with full or data return types
 
@@ -100,6 +100,6 @@ With [`returnType`](https://kubb.dev/extensions/kubb-labs/plugin-client/options#
 | `'full'`     | `withUnwrap`, `resolveThrowOnError`, `Unwrappable`       | `StreamOptions`, `StreamResult`          |
 | `'data'`     | `unwrapResult`, `resolveThrowOnError`, `UnwrappedResult` | `StreamOptions`, `UnwrappedStreamResult` |
 
-Both need a `StreamResult` with `data` and `error`, so the minimal type above is not enough. `@kubb/plugin-client/templates/core.ts` exports all of these.
+`'full'` and `'data'` need a `StreamResult` with `data` and `error`, so the minimal type in [Add a stream method](#add-a-stream-method) is not enough. `@kubb/plugin-client/templates/core.ts` exports all of these.
 
 Next, build the client [on the shared runtime](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client#write-the-client), which ships `client.stream`.

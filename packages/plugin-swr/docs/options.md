@@ -123,7 +123,7 @@ Builds each query's SWR key from the operation `node` and `variant: 'query'`. Th
 > [!WARNING]
 > Returned strings are copied into the generated code as written. Wrap a string literal in `JSON.stringify(...)`.
 
-To extend the default, spread it. Single entries can change between releases. See [Query keys](EDGE:query-keys).
+To extend the default, spread it. Single entries can change between releases. See [SWR keys](https://kubb.dev/extensions/kubb-labs/plugin-swr/guides/query-keys).
 
 ```typescript
 import { queryKeyTransformer } from '@kubb/plugin-swr'

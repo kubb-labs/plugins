@@ -4,7 +4,7 @@ See the key each generated `useSWR` and `useSWRMutation` hook passes, revalidate
 
 ## The default key
 
-When you call SWR's `mutate` or read the cache, take the key from the `<operation>QueryKey` helper in each hook file. It builds `[{ url, params }, query, body]`, and the hook passes it to `useSWR`:
+When you call SWR's `mutate`, take the key from the `<operation>QueryKey` helper in each hook file. It builds `[{ url, params }, query, body]`, and the hook passes it to `useSWR`:
 
 ::code-group
 

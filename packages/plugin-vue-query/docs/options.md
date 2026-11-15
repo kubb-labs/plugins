@@ -132,7 +132,7 @@ Builds each query's `queryKey` from the operation `node` and the `variant`: `'qu
 > [!WARNING]
 > Returned strings are copied into the generated code as written. Wrap a string literal in `JSON.stringify(...)`.
 
-To extend the default, spread it. Single entries can change between releases. See [Query keys](EDGE:query-keys).
+To extend the default, spread it. Single entries can change between releases. See [TanStack Query keys](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/guides/query-keys).
 
 ```typescript
 import { queryKeyTransformer } from '@kubb/plugin-vue-query'
@@ -197,7 +197,7 @@ Adds `infiniteQueryOptions` and `useInfiniteQuery` to each query operation that 
 | Default  | `false`                      |
 
 > [!WARNING]
-> Set `nextParam` or `getNextPageParam`. Without a next-page source, the composable counts pages up from `initialPageParam` until a page is an empty array, which never happens for a non-array response. See [Infinite queries](EDGE:infinite-queries).
+> Set `nextParam` or `getNextPageParam`. Without a next-page source, the composable counts pages up from `initialPageParam` until a page is an empty array, which never happens for a non-array response. See [Infinite queries](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/guides/infinite-queries#hasnextpage-never-turns-false).
 
 #### infinite.queryParam
 

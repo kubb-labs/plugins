@@ -134,7 +134,7 @@ Builds each query's `queryKey` from the operation `node` and the `variant`: `'qu
 > [!WARNING]
 > Returned strings are copied into the generated code as written. Wrap a string literal in `JSON.stringify(...)`.
 
-To extend the default, spread it. Single entries can change between releases. See [Query keys](EDGE:query-keys).
+To extend the default, spread it. Single entries can change between releases. See [TanStack Query keys](https://kubb.dev/extensions/kubb-labs/plugin-react-query/guides/query-keys).
 
 ```typescript
 import { queryKeyTransformer } from '@kubb/plugin-react-query'
@@ -199,7 +199,7 @@ Adds `infiniteQueryOptions` and `useInfiniteQuery` to each query operation that 
 | Default  | `false`                      |
 
 > [!WARNING]
-> Set `nextParam` or `getNextPageParam`. Without a next-page source, the hook counts pages up from `initialPageParam` until a page is an empty array. That never ends for a non-array response, and generation warns. See [Infinite queries](EDGE:infinite-queries).
+> Set `nextParam` or `getNextPageParam`. Without a next-page source, the hook counts pages up from `initialPageParam` until a page is an empty array. That never ends for a non-array response, and generation warns. See [Infinite queries](https://kubb.dev/extensions/kubb-labs/plugin-react-query/guides/infinite-queries#hasnextpage-never-turns-false).
 
 #### infinite.queryParam
 

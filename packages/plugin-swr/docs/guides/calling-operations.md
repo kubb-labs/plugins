@@ -13,7 +13,7 @@ Each hook and its helpers live in a file named after the hook, such as `src/gen/
 | Infinite or suspense                        | Not generated                                                   |
 | Server-Sent Events or JSON Lines            | Nothing. Call the client function directly.                     |
 
-See [Compare the query plugins](EDGE:query-plugins-compared) for the React Query and Vue Query exports.
+See [Compare the query plugins](https://kubb.dev/docs/5.x/topics/query-plugins#query-plugins-compared) for the React Query and Vue Query exports.
 
 ## Call a hook
 
@@ -56,7 +56,7 @@ await trigger({ body: { name: 'Fluffy' } })
 
 ::
 
-Pass a `queryKey` helper to SWR's `mutate` to update or revalidate that entry. To change the keys, set [`queryKey`](https://kubb.dev/extensions/kubb-labs/plugin-swr/options#querykey) and [`mutationKey`](https://kubb.dev/extensions/kubb-labs/plugin-swr/options#mutationkey).
+Pass a `queryKey` helper to SWR's `mutate` to update or revalidate that entry. [SWR keys](https://kubb.dev/extensions/kubb-labs/plugin-swr/guides/query-keys) shows the default keys. To change them, set [`queryKey`](https://kubb.dev/extensions/kubb-labs/plugin-swr/options#querykey) and [`mutationKey`](https://kubb.dev/extensions/kubb-labs/plugin-swr/options#mutationkey).
 
 ## Skip requests until ready
 

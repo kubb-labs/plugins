@@ -13,7 +13,7 @@ Each composable and its helpers live in a file named after the composable, such 
 | Infinite, with `infinite` and `hooks`       | `findPetsByTagsInfiniteQueryKey`, `findPetsByTagsInfiniteQueryOptions`, `useFindPetsByTagsInfinite` |
 | Server-Sent Events or JSON Lines            | Nothing. Call the client function directly.                                                         |
 
-See [Compare the query plugins](EDGE:query-plugins-compared) for the React Query and SWR exports.
+See [Compare the query plugins](https://kubb.dev/docs/5.x/topics/query-plugins#query-plugins-compared) for the React Query and SWR exports.
 
 ## Call a composable
 
@@ -56,7 +56,7 @@ mutate({ path: { petId: 1 }, query: { name: 'Fluffy' } })
 
 :::tabs-item{label="Infinite"}
 
-Only operations that declare `infinite.queryParam` get an infinite composable. Point `nextParam` at the cursor in the response, and give `initialPageParam` the type of the query parameter.
+Only operations that declare `infinite.queryParam` get an infinite composable. Point `nextParam` at the cursor in the response, and give `initialPageParam` the type of the query parameter. See [Infinite queries](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/guides/infinite-queries).
 
 ```typescript [kubb.config.ts]
 pluginVueQuery({
@@ -101,7 +101,7 @@ await queryClient.prefetchQuery(findPetsByTagsQueryOptions({ query: { tags: ['do
 queryClient.invalidateQueries({ queryKey: findPetsByTagsQueryKey({ query: { tags: ['dog'] } }) })
 ```
 
-To change the keys, set [`queryKey`](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/options#querykey) and [`mutationKey`](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/options#mutationkey).
+[TanStack Query keys](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/guides/query-keys) shows the default keys. To change them, set [`queryKey`](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/options#querykey) and [`mutationKey`](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/options#mutationkey).
 
 ## Handle errors
 
