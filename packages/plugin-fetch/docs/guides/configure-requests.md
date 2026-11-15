@@ -1,6 +1,6 @@
 # Configure requests
 
-Set the base URL, credentials, shared headers, and interceptors on the generated client, for every call or for one.
+Set the base URL, credentials, shared headers, and interceptors on the generated Fetch client, for every call or for one.
 
 ## Where settings apply
 
