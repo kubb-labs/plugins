@@ -128,17 +128,22 @@ export const settings = { baseURL: 'https://petstore3.swagger.io/api/v3' }
 async function send(config: RequestConfig) {
   const path: Record<string, unknown> = { ...config.path }
   const url = new URL((config.baseURL ?? settings.baseURL) + config.url.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(String(path[key]))))
+  for (const [key, value] of Object.entries(config.query ?? {})) {
+    if (value !== undefined) url.searchParams.set(key, String(value))
+  }
   const cookie = Object.entries(config.cookies ?? {})
     .filter(([, value]) => value != null)
     .map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`)
     .join('; ')
+  const headers: Record<string, string> = {
+    ...(config.body === undefined ? {} : { 'Content-Type': 'application/json' }),
+    ...(config.headers as Record<string, string>),
+    ...(cookie ? { Cookie: cookie } : {}),
+  }
 
   const response = await fetch(url, {
     method: config.method,
-    headers: {
-      ...(config.headers as Record<string, string>),
-      ...(cookie ? { Cookie: cookie } : {}),
-    },
+    headers,
     body: config.body === undefined ? undefined : JSON.stringify(config.body),
     signal: config.signal,
   })
@@ -154,7 +159,7 @@ export const client = <TResponses, ThrowOnError extends boolean = true>(config: 
   send(config) as Promise<RequestResult<TResponses, ThrowOnError>>
 ```
 
-The [example project](https://github.com/kubb-labs/plugins/tree/main/examples/client) has a fuller version with a base URL setter, query handling, streams, and an async auth hook.
+The [example project](https://github.com/kubb-labs/plugins/tree/main/examples/client) has a fuller version with a base URL setter and an async auth hook.
 
 ::::
 
@@ -207,9 +212,10 @@ export function setAuth(resolve: GetToken) {
   getToken = resolve
 }
 
-// inside send(), before fetch()
-const token = config.security?.length ? await getToken?.() : undefined
-const headers = { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(config.headers as Record<string, string>) }
+// inside send(), after `headers` and before fetch(). This sends bearer tokens only, not API keys or basic credentials.
+const bearer = config.security?.flat().some((auth) => auth.type !== 'apiKey' && auth.scheme !== 'basic')
+const token = bearer ? await getToken?.() : undefined
+if (token) headers.Authorization ??= `Bearer ${token}`
 ```
 
 ```typescript [src/index.ts]

@@ -70,7 +70,7 @@ With `throwOnError: false`, the call resolves for every status. `data` is set on
 ```typescript
 const result = await getPetById({ path: { petId: 1 }, throwOnError: false })
 
-if (result.error) console.error(result.status, result.error)
+if (result.error !== undefined) console.error(result.status, result.error)
 else console.info(result.data)
 ```
 

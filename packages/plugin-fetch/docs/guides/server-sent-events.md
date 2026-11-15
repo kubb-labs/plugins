@@ -176,7 +176,7 @@ for (let attempt = 0; attempt < 3; attempt++) {
 }
 ```
 
-`lastEventId` is empty until the server sends an `id`, and an empty `id:` clears it. With `returnType: 'data'`, the items alone carry no `lastEventId`, so pass `throwOnError: false` to get the full result.
+`lastEventId` is empty until the server sends an `id`, and an empty `id:` clears it. The `||` fallback cannot tell a cleared ID from no ID, so after a clear the loop resends the previous ID. With `returnType: 'data'`, the items alone carry no `lastEventId`, so pass `throwOnError: false` to get the full result.
 
 ## Handle errors
 

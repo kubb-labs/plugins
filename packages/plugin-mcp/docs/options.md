@@ -22,7 +22,7 @@ Pass these options to `pluginMcp()`. Shared options link to [Shared plugin optio
 
 ### client
 
-Selects the registered client plugin that the handlers call. Configure transport settings such as `baseURL` on that client plugin.
+Selects the registered client plugin that the handlers call. Configure transport settings such as `baseURL` on that client plugin. With `'client'`, set them in your own client module, because `pluginClient` takes no `baseURL`.
 
 |          |                                  |
 | -------- | -------------------------------- |

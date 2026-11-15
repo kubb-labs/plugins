@@ -33,7 +33,7 @@ export default defineConfig({
 
 ::::tabs-item{label="Faker mock data"}
 
-Add `pluginFaker` and set [`parser`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#parser) to `'faker'`. A handler called without data then returns generated values.
+Add `pluginFaker` and set [`parser`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#parser) to `'faker'`. A handler called without data then returns generated values when the success response has a schema.
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'

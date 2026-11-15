@@ -16,7 +16,7 @@ Each hook and its helpers live in a file named after the hook, such as `src/gen/
 
 ## Call a composable
 
-The examples set `hooks: true` and [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. Path keys keep the names from the spec unless you set [`pathParamsCasing`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing).
+The examples set `hooks: true` on the plugin and [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. Path keys keep the names from the spec unless you set [`pathParamsCasing`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing).
 
 ::tabs
 
@@ -93,10 +93,8 @@ tags.value = ['cat'] // fetches the cat list
 The factories work without `hooks`, so you can prefetch or invalidate outside a component. The default key is the operation URL and path parameters, then the query or body values:
 
 ```typescript
-import { useQueryClient } from '@tanstack/vue-query'
 import { findPetsByTagsQueryKey, findPetsByTagsQueryOptions } from './gen/hooks/useFindPetsByTags'
-
-const queryClient = useQueryClient()
+import { queryClient } from './queryClient' // the QueryClient you pass to VueQueryPlugin
 
 await queryClient.prefetchQuery(findPetsByTagsQueryOptions({ query: { tags: ['dog'] } }))
 queryClient.invalidateQueries({ queryKey: findPetsByTagsQueryKey({ query: { tags: ['dog'] } }) })

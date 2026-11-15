@@ -65,7 +65,7 @@ Writes a TypeScript `enum`, which has JavaScript runtime code.
 :::
 
 :::field{name="'constEnum'"}
-Writes a `const enum`, inlined at compile time and incompatible with `--isolatedModules`.
+Writes a `const enum`, inlined at compile time. With `--isolatedModules`, code can use it from the generated source, but not through a `.d.ts` file, such as the types of a published package.
 :::
 
 :::field{name="'literal'"}

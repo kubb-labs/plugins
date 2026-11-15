@@ -51,7 +51,7 @@ The `throwOnError` a generated function or SDK method uses when the call leaves 
 ```typescript
 // with pluginFetch({ throwOnErrorDefault: false })
 const result = await getPetById({ path: { petId: 1 } })
-if (result.error) console.error(result.status, result.error)
+if (result.error !== undefined) console.error(result.status, result.error)
 ```
 
 ### validator

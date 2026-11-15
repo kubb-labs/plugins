@@ -205,7 +205,7 @@ Adds `infiniteQueryOptions` and `useInfiniteQuery` for each query operation that
 | Required | `false`                      |
 | Default  | `false`                      |
 
-Without `getNextPageParam`, `nextParam`, or `cursorParam`, the composable counts pages up from `initialPageParam` until a page is an empty array. That works only for array responses, so generation warns for any other response.
+Without `getNextPageParam`, `nextParam`, or `cursorParam`, the composable counts pages up from `initialPageParam` until a page is an empty array. That works only for array responses, so generation warns for any other response. It skips the warning when `previousParam` or `getPreviousPageParam` is set, though the count still never ends.
 
 #### infinite.queryParam
 

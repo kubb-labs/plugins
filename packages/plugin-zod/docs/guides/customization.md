@@ -84,10 +84,11 @@ A printer handler that reads `this.options.direction` decodes response values an
 
 ### Write a direction-aware handler
 
-Return one expression for `'encode'` (requests) and another for `'decode'` (responses). Use `inferred: 'codec'` so the client types follow these conversions.
+Return one expression for `'encode'` (requests) and another for `'decode'` (responses). Use `inferred: 'codec'` so the client types follow these conversions, and set the client `validator` so the client runs them. Without request validation, the client sends the `Temporal.PlainTime` unencoded.
 
 ```typescript [kubb.config.ts]
 import { pluginZod, type PrinterZodNodes } from '@kubb/plugin-zod'
+import { pluginFetch } from '@kubb/plugin-fetch'
 
 const nodes: PrinterZodNodes = {
   time() {
@@ -98,6 +99,7 @@ const nodes: PrinterZodNodes = {
 }
 
 pluginZod({ inferred: 'codec', printer: { nodes } })
+pluginFetch({ validator: { request: 'zod', params: 'zod', response: 'zod' } })
 ```
 
 Match the handler to the OpenAPI format: `time`, `date`, and `date-time` use the `time`, `date`, and `datetime` handlers.
