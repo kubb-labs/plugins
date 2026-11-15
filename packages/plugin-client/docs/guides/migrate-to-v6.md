@@ -1,6 +1,8 @@
 # Migrate to v6
 
-Update your client module for `@kubb/plugin-client` 6, which calls your client with type arguments and streams through `client.stream`. Find your code in the table, follow its section, then regenerate.
+Update your client module for `@kubb/plugin-client` 6, which calls your client with type arguments and streams through `client.stream`.
+
+Find your code in the table, follow its section, then regenerate.
 
 ## What to change
 

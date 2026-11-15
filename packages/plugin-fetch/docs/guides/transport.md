@@ -1,6 +1,8 @@
 # Use a custom transport
 
-Replace the network send with another HTTP library or your own function. The client still builds the URL, serializes parameters, resolves auth, runs interceptors, and decodes the result.
+Replace the network send of the generated fetch client with another HTTP library or your own function.
+
+The client still builds the URL, serializes parameters, resolves auth, runs interceptors, and decodes the result.
 
 ## Write a transport function
 

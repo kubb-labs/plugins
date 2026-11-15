@@ -1,6 +1,8 @@
 # Call operations
 
-Use the generated TanStack Query hooks and factories in React: queries, mutations, infinite lists, and suspense. Each one calls the function of your client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`).
+Use the generated TanStack Query hooks and factories in React: queries, mutations, infinite lists, and suspense.
+
+Each one calls the function of your client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`).
 
 ## What each plugin generates
 

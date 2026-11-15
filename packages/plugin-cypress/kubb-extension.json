@@ -4,7 +4,7 @@
   "name": "plugin-cypress",
   "export": "pluginCypress",
   "displayName": "Cypress",
-  "description": "Generates a typed cy.request() wrapper per OpenAPI operation so your Cypress tests call the API through generated helpers and catch broken calls at compile time.",
+  "description": "Generates a typed cy.request() wrapper per OpenAPI operation, so your Cypress tests call the API through helpers and catch broken calls at compile time.",
   "category": "testing",
   "icon": {
     "light": "https://kubb.dev/feature/cypress.svg"

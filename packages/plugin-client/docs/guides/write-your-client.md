@@ -1,6 +1,8 @@
 # Write your client
 
-Build the client module that every generated function imports through `importPath`, from the contract it must meet to the config that points at it. You own this module and its transport, auth, and error handling.
+Build the client module that every generated function imports through `importPath`, from the contract it must meet to the config that points at it.
+
+You own this module and its transport, auth, and error handling.
 
 ::steps{level="2"}
 

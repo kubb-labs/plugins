@@ -1,6 +1,8 @@
 # Use a custom transport
 
-Replace the network send with your own axios instance or function. The client still builds the URL, serializes parameters, resolves auth, runs interceptors, and decodes the result.
+Replace the network send of the generated axios client with your own axios instance or function.
+
+The client still builds the URL, serializes parameters, resolves auth, runs interceptors, and decodes the result.
 
 ## Write a transport function
 

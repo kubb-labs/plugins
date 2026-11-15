@@ -1,6 +1,8 @@
 # Validate requests and responses
 
-Pass Zod schemas from `@kubb/plugin-zod` to your client and run them there. `@kubb/plugin-client` does not validate on its own: with `validator` set, each generated call hands the schemas to your client on `config.validator`.
+Pass Zod schemas from `@kubb/plugin-zod` to your client and run them there.
+
+`@kubb/plugin-client` does not validate on its own: with `validator` set, each generated call hands the schemas to your client on `config.validator`.
 
 ::steps{level="2"}
 

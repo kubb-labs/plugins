@@ -1,6 +1,8 @@
 # Migrate to v6
 
-Upgrade `@kubb/plugin-fetch` from v5 to v6, which runs on the shared client core from `@kubb/plugin-client`, the same core as `@kubb/plugin-axios`. Code that only calls the generated functions, SDK classes, or hooks needs a regenerate. Code that configures `client`, adds media types, streams, or writes a transport needs the edits below.
+Upgrade `@kubb/plugin-fetch` from v5 to v6, which runs on the shared client core from `@kubb/plugin-client`, the same core as `@kubb/plugin-axios`.
+
+Code that only calls the generated functions, SDK classes, or hooks needs a regenerate. Code that configures `client`, adds media types, streams, or writes a transport needs the edits below.
 
 ## Upgrade steps
 

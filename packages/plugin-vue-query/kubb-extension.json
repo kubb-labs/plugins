@@ -4,7 +4,7 @@
   "name": "plugin-vue-query",
   "export": "pluginVueQuery",
   "displayName": "Vue Query",
-  "description": "Generates typed TanStack Query helpers for Vue from your OpenAPI spec: queryOptions factories with their query and mutation keys. Set hooks to also get useQuery and useMutation composables, plus useInfiniteQuery when infinite is set.",
+  "description": "Generates typed TanStack Query helpers for Vue from your OpenAPI spec: queryOptions factories with query and mutation keys, plus optional composables.",
   "category": "framework",
   "icon": {
     "light": "https://kubb.dev/feature/tanstack.svg"

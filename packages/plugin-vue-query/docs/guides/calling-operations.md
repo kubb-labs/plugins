@@ -1,6 +1,8 @@
 # Call operations
 
-Use the generated TanStack Query composables and factories in Vue: queries, mutations, and infinite lists with reactive parameters. Each one calls the function of your client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`).
+Use the generated TanStack Query composables and factories in Vue: queries, mutations, and infinite lists with reactive parameters.
+
+Each one calls the function of your client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`).
 
 ## What each plugin generates
 

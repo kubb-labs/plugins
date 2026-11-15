@@ -1,6 +1,8 @@
 # Migrate to v6
 
-Upgrade `@kubb/plugin-axios` from v5 to v6, which runs on the shared client core from `@kubb/plugin-client` with axios as the transport. Code that only calls the generated functions, SDK classes, or hooks needs a regenerate. Most other edits land in the file that configures `client`.
+Upgrade `@kubb/plugin-axios` from v5 to v6, which runs on the shared client core from `@kubb/plugin-client` with axios as the transport.
+
+Code that only calls the generated functions, SDK classes, or hooks needs a regenerate. Most other edits land in the file that configures `client`.
 
 ## Upgrade steps
 

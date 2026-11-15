@@ -1,6 +1,8 @@
 # Server-sent events
 
-Stream a `text/event-stream` or JSON Lines response as typed items, then stop, resume, and handle errors. Kubb types the items from the OpenAPI document, and `.kubb/sse.ts` parses events as the WHATWG event stream specification does.
+Stream a `text/event-stream` or JSON Lines response as typed items, then stop, resume, and handle errors.
+
+Kubb types the items from the OpenAPI document, and `.kubb/sse.ts` parses events as the WHATWG event stream specification does.
 
 ## How Kubb detects a stream
 

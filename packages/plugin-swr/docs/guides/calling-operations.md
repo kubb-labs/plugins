@@ -1,6 +1,8 @@
 # Call operations
 
-Use the generated `useSWR` and `useSWRMutation` hooks, and skip or freeze a request with the Kubb options. Each hook calls the function of your client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`).
+Use the generated `useSWR` and `useSWRMutation` hooks, and skip or freeze a request with the Kubb options.
+
+Each hook calls the function of your client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`).
 
 ## What each plugin generates
 
