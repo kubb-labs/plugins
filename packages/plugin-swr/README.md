@@ -29,12 +29,16 @@
 ## Installation
 
 ```bash
+npx kubb add plugin-swr
+# or
 bun add @kubb/plugin-swr
 # or
 pnpm add @kubb/plugin-swr
 # or
 npm install @kubb/plugin-swr
 ```
+
+`kubb add` installs the version the [Kubb registry](https://kubb.dev/registry) pins and adds `pluginSwr()` to your `kubb.config.ts`. Run `npx kubb init` first if you have no config.
 
 ## Documentation
 

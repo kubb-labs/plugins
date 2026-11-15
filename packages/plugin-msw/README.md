@@ -29,12 +29,16 @@
 ## Installation
 
 ```bash
+npx kubb add plugin-msw
+# or
 bun add @kubb/plugin-msw
 # or
 pnpm add @kubb/plugin-msw
 # or
 npm install @kubb/plugin-msw
 ```
+
+`kubb add` installs the version the [Kubb registry](https://kubb.dev/registry) pins and adds `pluginMsw()` to your `kubb.config.ts`. Run `npx kubb init` first if you have no config.
 
 ## Documentation
 
