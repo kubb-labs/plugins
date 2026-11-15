@@ -117,10 +117,13 @@ export const settings = { baseURL: 'https://petstore3.swagger.io/api/v3' }
 async function send(config: RequestConfig) {
   const path: Record<string, unknown> = { ...config.path }
   const url = new URL((config.baseURL ?? settings.baseURL) + config.url.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(String(path[key]))))
-  // The default `form` style repeats the key for each array item. Other styles: see Serialize parameters.
+  // The default `form` style repeats the key for each array item and sends each object property as its own parameter. Other styles: see Serialize parameters.
   for (const [key, value] of Object.entries(config.query ?? {})) {
-    for (const item of Array.isArray(value) ? value : [value]) {
-      if (item !== undefined) url.searchParams.append(key, String(item))
+    const isObject = typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Date)
+    for (const [name, entry] of isObject ? Object.entries(value) : [[key, value]]) {
+      for (const item of Array.isArray(entry) ? entry : [entry]) {
+        if (item !== undefined) url.searchParams.append(name, String(item))
+      }
     }
   }
   const cookie = Object.entries(config.cookies ?? {})
@@ -161,7 +164,7 @@ Reuse the request pipeline of the fetch and axios clients and write only the tra
 
 1. Copy `core.ts`, `mediaTypes.ts`, `serializers.ts`, `standardSchema.ts`, `sse.ts`, and the `mediaTypes/` and `serializers/` files your spec needs from `@kubb/plugin-client/templates` next to your `client.ts`.
 2. In `client.ts`, export the `NativeRequest`, `NativeResponse`, and `NativeOptions` types the core imports. On fetch they are `Request`, `Response`, and `RequestInit`.
-3. Write a `Transport` function that sends a `ResolvedRequest` and returns a web `Response`. Wrap other results in `new Response(bytes, { status, headers })`.
+3. Write a `Transport` function that sends a `ResolvedRequest` and returns a web `Response`. Wrap other results in `new Response(bytes, { status, headers })`. For a 204, 205, or 304 status, pass `null` as the body, or the constructor throws.
 4. Export `createLazyClient((config) => createClientCore({ defaultTransport, ...config }))` as `client`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
 5. Register what the core does not ship: `client.setConfig({ mediaTypes: { 'multipart/form-data': multipartFormData, ...streamMediaTypes }, serializer: { query: serializeQuery, path: serializePath } })`. Add `header` and `cookie` serializers when the spec has such parameters.
 

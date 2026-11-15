@@ -64,7 +64,7 @@ export type ListPetsResponsesSchemaType = z.infer<typeof listPetsResponsesSchema
 
 ## Type guards with inferred types
 
-With [`typeGuards`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#typeguards) and `inferred: true`, the guards narrow to the generated type, such as `PetSchemaType`. With [`mini: true`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#mini), they call `z.validate` and `z.parse`.
+With [`typeGuards`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#typeguards), which needs Zod 4.6 or later, and `inferred: true`, the guards narrow to the generated type, such as `PetSchemaType`. With [`mini: true`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#mini), they call `z.validate` and `z.parse`.
 
 ```typescript [src/gen/zod/petSchema.ts]
 export const isPet = (data: unknown): data is PetSchemaType => petSchema.validate(data)

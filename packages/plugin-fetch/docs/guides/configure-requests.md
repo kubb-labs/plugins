@@ -54,7 +54,7 @@ client.setConfig({
 })
 ```
 
-Requests stay unauthenticated until `auth` is set. The scheme decides where the token goes:
+By default, `auth` adds no credentials. The scheme decides where the token goes:
 
 | Scheme in the spec | `auth` gets                              | The token goes to               |
 | ------------------ | ---------------------------------------- | ------------------------------- |

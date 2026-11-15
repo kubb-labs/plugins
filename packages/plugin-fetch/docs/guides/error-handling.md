@@ -15,7 +15,7 @@ Only a non-2xx response depends on `throwOnError`:
 | Network or DNS failure                   | Rejects with the `TypeError` from `fetch`.                                                |
 | Aborted `signal`                         | Rejects with the signal's reason.                                                         |
 
-Every failure that rejects also reaches [`client.interceptors.error`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/configure-requests#add-interceptors).
+Every failure that rejects with an `Error` also reaches [`client.interceptors.error`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/configure-requests#add-interceptors). An abort whose reason is not an `Error`, such as `abort('canceled')`, skips it.
 
 ## Catch a ResponseError
 
@@ -44,7 +44,10 @@ class ResponseError extends Error {
 }
 ```
 
-The `message` leaves out the query string, so query credentials stay out of logs: `GET https://api.example.com/pets/1 failed with status 404 Not Found`.
+The `message` leaves out the query string: `GET https://api.example.com/pets/1 failed with status 404 Not Found`. `request` and `response` keep the full URL, so redact them before you log the whole error.
+
+> [!NOTE]
+> The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype). With the default `bigint`, an `int64` id takes `1n`.
 
 ## Narrow a thrown error by status
 
@@ -138,7 +141,7 @@ When an operation declares a range key such as `4xx`, the range covers its statu
 
 When a failed call has an empty body, `error` is `{ status, statusText }`.
 
-When the operation declares a `default` response, a check on `status` does not narrow `data` and `error`, because a `default` status can be any number. To get the success body, call `.unwrap()`, which turns `error` into a rejection.
+When the operation declares a `default` response, a check on `status` does not narrow `data` and `error`, because a `default` status can be any number. To get the success body with the default `returnType: 'full'`, call `.unwrap()`, which turns `error` into a rejection. With `returnType: 'data'`, the call returns a plain promise without `.unwrap()`.
 
 ### Where the `throwOnError` default comes from
 

@@ -60,10 +60,11 @@ client.stream = async <TResponses, ThrowOnError extends boolean = true, TEvent =
 
 Your module needs these on top of the [contract](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client#check-the-contract):
 
-| Export                          | Kind         | Needed when                                                           |
-| ------------------------------- | ------------ | --------------------------------------------------------------------- |
-| `client.stream`, `StreamResult` | method, type | The spec has Server-Sent Events or JSON Lines operations.             |
-| `SuccessOf`, `TypedEvent`       | type         | A stream names each event (both) or streams JSON Lines (`SuccessOf`). |
+| Export                          | Kind         | Needed when                                                                                                                                                                                                                                          |
+| ------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `client.stream`, `StreamResult` | method, type | The spec has Server-Sent Events or JSON Lines operations.                                                                                                                                                                                            |
+| `StreamResultWithHeaders`       | type         | A stream declares response headers. It replaces `StreamResult`. With `returnType: 'data'`, `UnwrappedStreamResultWithHeaders` replaces `UnwrappedStreamResult`. A stream that types only the payload also imports `SuccessOf` and `ServerSentEvent`. |
+| `SuccessOf`, `TypedEvent`       | type         | A stream names each event (both) or streams JSON Lines (`SuccessOf`).                                                                                                                                                                                |
 
 ## Type each item
 

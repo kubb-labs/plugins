@@ -5,6 +5,24 @@ The React Query plugin generates TanStack Query `queryOptions` and `mutationOpti
 - `hooks: true` adds `useQuery` and `useMutation` hooks, with suspense and infinite variants on request.
 - The plugin ships no HTTP client. Each helper calls a function from your client plugin.
 
+## Setup
+
+- Add `@kubb/plugin-ts`, or `pluginZod({ inferred: 'codec' })` with `zod` v4 in the app.
+- Add one client plugin: `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`. Leave `sdk` unset on it.
+- Install `@tanstack/react-query` 5.82 or a later v5 release in the app.
+- Set the base URL, auth, and validation on the client plugin. With `@kubb/plugin-client`, your client module owns them.
+
+## Options worth knowing
+
+| Option              | What it does                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------ |
+| `client`            | Picks `'fetch'`, `'axios'`, or `'client'` when several client plugins are registered.            |
+| `hooks`             | Adds the `use*` hooks. `infinite`, `suspense`, and `customOptions` need it.                      |
+| `query`, `mutation` | Which HTTP methods become queries and mutations. `false` skips them.                             |
+| `infinite`          | Adds infinite queries to operations with the `infinite.queryParam` parameter, `'id'` by default. |
+| `suspense`          | `{}` adds `useSuspenseQuery` hooks.                                                              |
+| `customOptions`     | Routes every hook through your function for shared options.                                      |
+
 ## Example
 
 This config generates hooks that call the Fetch client.
@@ -27,23 +45,5 @@ export default defineConfig({
   ],
 })
 ```
-
-## Setup
-
-- Add `@kubb/plugin-ts`, or `pluginZod({ inferred: 'codec' })` with `zod` v4 in the app.
-- Add one client plugin: `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`. Leave `sdk` unset on it.
-- Install `@tanstack/react-query` 5.82 or a later v5 release in the app.
-- Set the base URL, auth, and validation on the client plugin. With `@kubb/plugin-client`, your client module owns them.
-
-## Options worth knowing
-
-| Option              | What it does                                                                                     |
-| ------------------- | ------------------------------------------------------------------------------------------------ |
-| `client`            | Picks `'fetch'`, `'axios'`, or `'client'` when several client plugins are registered.            |
-| `hooks`             | Adds the `use*` hooks. `infinite`, `suspense`, and `customOptions` need it.                      |
-| `query`, `mutation` | Which HTTP methods become queries and mutations. `false` skips them.                             |
-| `infinite`          | Adds infinite queries to operations with the `infinite.queryParam` parameter, `'id'` by default. |
-| `suspense`          | `{}` adds `useSuspenseQuery` hooks.                                                              |
-| `customOptions`     | Routes every hook through your function for shared options.                                      |
 
 See [Options](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options) for every option. Next, [call operations](https://kubb.dev/extensions/kubb-labs/plugin-react-query/guides/calling-operations).

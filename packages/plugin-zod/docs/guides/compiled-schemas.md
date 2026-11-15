@@ -4,7 +4,7 @@ Set `compile` to wrap generated schemas in `z.compile(...)` for faster validatio
 
 ## Turn on compile
 
-Pass `true`, or `{ strict: true }` to make Zod throw when a part cannot be compiled.
+Pass `true`, or `{ strict: true }` to make Zod throw when a part cannot be compiled. The [schemas that stay uncompiled](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/compiled-schemas#schemas-that-stay-uncompiled) are not wrapped, so they raise no error.
 
 ::code-group
 
@@ -25,11 +25,11 @@ export const petSchema = z.compile(
 
 ::
 
-| Value              | Effect                                                                                                            |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `false` (default)  | Leaves schemas uncompiled.                                                                                        |
-| `true`             | Compiles schemas with `z.compile(...)`. A part that cannot be compiled falls back to the interpreter.             |
-| `{ strict: true }` | Passes `{ strict: true }` to `z.compile(...)`, so Zod throws when a part cannot be compiled into flat JavaScript. |
+| Value              | Effect                                                                                                                                                           |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `false` (default)  | Leaves schemas uncompiled.                                                                                                                                       |
+| `true`             | Compiles schemas with `z.compile(...)`. A part that cannot be compiled falls back to the interpreter.                                                            |
+| `{ strict: true }` | Passes `{ strict: true }` to `z.compile(...)`, so Zod throws when a part cannot be compiled into flat JavaScript. Schemas Kubb leaves uncompiled raise no error. |
 
 ## Schemas that stay uncompiled
 

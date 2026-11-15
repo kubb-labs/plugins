@@ -10,6 +10,18 @@ Each function takes grouped `path`, `query`, `headers`, `cookies`, and `body` op
 - Add `@kubb/plugin-zod` and install `zod` v4 when you set `validator`. Generation fails without the plugin.
 - No HTTP client package is needed. The generated code calls the global `fetch`.
 
+## Options worth knowing
+
+| Option                | Set it to                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| `baseURL`             | The starting host. The spec's top-level `servers` URL is not used.                         |
+| `validator`           | `'zod'` to check response bodies, or `{ request, params, response }` per part.             |
+| `throwOnErrorDefault` | `false` to return non-2xx responses as values.                                             |
+| `returnType`          | `'data'` to resolve to the success body instead of the full result.                        |
+| `sdk`                 | Classes instead of functions. Leave it unset for the query plugins and `@kubb/plugin-mcp`. |
+
+Next, [call operations](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/calling-operations), or see every option and its default in [Options](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options).
+
 ## Example
 
 ::code-group
@@ -46,15 +58,3 @@ src/gen/
 ::
 
 With [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype), an `int64` id such as `petId` is a `number`. With the default `bigint`, pass `1n`.
-
-## Options worth knowing
-
-| Option                | Set it to                                                                                  |
-| --------------------- | ------------------------------------------------------------------------------------------ |
-| `baseURL`             | The starting host. The spec's top-level `servers` URL is not used.                         |
-| `validator`           | `'zod'` to check response bodies, or `{ request, params, response }` per part.             |
-| `throwOnErrorDefault` | `false` to return non-2xx responses as values.                                             |
-| `returnType`          | `'data'` to resolve to the success body instead of the full result.                        |
-| `sdk`                 | Classes instead of functions. Leave it unset for the query plugins and `@kubb/plugin-mcp`. |
-
-Next, [call operations](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/calling-operations), or see every option and its default in [Options](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options).
