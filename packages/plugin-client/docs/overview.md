@@ -1,29 +1,15 @@
 # Client
 
-The Client plugin turns each operation in your OpenAPI spec into a typed function that calls a client module you write. The generated code has no Fetch, axios, or Kubb runtime dependency.
+The Client plugin turns each OpenAPI operation into a typed function that calls your own client module, with no Fetch, axios, or Kubb runtime dependency.
 
-Each function takes grouped `path`, `query`, `headers`, `cookies`, and `body` parameters and passes the operation's auth requirements to your client as `security`. A call can pass its own `client` to replace the default. For a ready-made client, use [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios). The query plugins and `@kubb/plugin-mcp` can call the generated functions too.
-
-## Setup
-
-- Set the required `importPath` to your client module. [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client) lists what the module must export.
-- Add `@kubb/plugin-ts` for the operation types, or `@kubb/plugin-zod` with `inferred: true`.
-- When you set `validator`, add `@kubb/plugin-zod` and install `zod` v4. Generation fails without the plugin.
-
-## Options worth knowing
-
-| Option                | What it does                                                                                                       |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `importPath`          | Written into every generated import as given, so it must resolve from the generated file.                          |
-| `returnType`          | `'plain'` returns what your `client` returns. `'full'` adds `.unwrap()`, and `'data'` resolves to the body.        |
-| `validator`           | `'zod'` passes response schemas to your client. `{ request: 'zod', response: 'zod' }` also passes request schemas. |
-| `throwOnErrorDefault` | The `throwOnError` value each call passes to your client. The default is `true`.                                   |
-
-See [Options](https://kubb.dev/extensions/kubb-labs/plugin-client/options) for every option and its default.
+- Each function takes grouped `path`, `query`, `headers`, `cookies`, and `body` parameters, and passes your client the operation's auth requirements as `security`.
+- A call can pass its own `client` to replace the default.
+- The query plugins and `@kubb/plugin-mcp` can call the generated functions.
+- For a ready-made client, use [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) instead.
 
 ## Example
 
-The config below groups the generated functions by tag and points them at the client module in `src/client.ts`.
+This config groups the functions by tag and points them at `src/client.ts`.
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
@@ -46,3 +32,20 @@ export default defineConfig({
   ],
 })
 ```
+
+## Setup
+
+- Set the required `importPath` to your client module.
+- Add `@kubb/plugin-ts` for the operation types, or `@kubb/plugin-zod` with `inferred: true`.
+- When you set `validator`, add `@kubb/plugin-zod` and install `zod` v4. Generation fails without the plugin.
+
+## Options worth knowing
+
+| Option                | What it does                                                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------- |
+| `importPath`          | Your client module, resolved from each generated file.                                                  |
+| `returnType`          | `'plain'` returns what your `client` returns. `'full'` adds `.unwrap()`. `'data'` resolves to the body. |
+| `validator`           | Passes Zod schemas to your client.                                                                      |
+| `throwOnErrorDefault` | The `throwOnError` value each call passes. Defaults to `true`.                                          |
+
+See [Options](https://kubb.dev/extensions/kubb-labs/plugin-client/options) for every option. Next, [write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).

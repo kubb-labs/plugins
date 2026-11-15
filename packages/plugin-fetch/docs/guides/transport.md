@@ -2,7 +2,7 @@
 
 Replace the network send of the generated fetch client with another HTTP library or your own function.
 
-The client still builds the URL, serializes parameters, resolves auth, runs interceptors, and decodes the result.
+The client still builds the URL, serializes parameters, resolves auth, runs interceptors, and decodes the result. `client.interceptors` handlers keep running, whatever the transport.
 
 ## Write a transport function
 
@@ -25,7 +25,7 @@ type ResolvedRequest = {
 type TransportResult = { webResponse: Response; request: Request; response: Response }
 ```
 
-Return a `TransportResult` to set the native `request` and `response` that results and errors carry. With a plain `Response`, `request` is a `Request` built from the resolved request without its body, or the resolved request itself for a relative URL.
+Return a `TransportResult` to set the native `request` and `response` that results and errors carry. See [Transport results](EDGE:transport-results) for what a plain `Response` gives.
 
 ## Send with another library
 
@@ -40,14 +40,12 @@ client.setConfig({
 })
 ```
 
-`client.interceptors` handlers keep running, whatever the transport.
-
 > [!NOTE]
-> The client splits success from error itself, so ky must not throw or retry on an error status. ky's `timeout` only waits for the response headers and never ends a started body or stream, so turn it off and bound the whole call with `signal: AbortSignal.timeout(ms)`. The library must hand back the body unread.
+> The library must not throw or retry on an error status, and must hand back the body unread. ky's `timeout` never ends a started body or stream, so turn it off and bound the call with `signal: AbortSignal.timeout(ms)`.
 
 ## Wrap the default transport
 
-`defaultTransport` is the `fetch`-based send the client uses when no transport is set. Wrap it to add tracing, timing, or headers and keep the built-in request and response handling:
+`defaultTransport` is the `fetch`-based send the client uses when no transport is set. Wrap it to add tracing, timing, or headers:
 
 ```typescript
 import { client, defaultTransport } from './gen/.kubb/client'
@@ -79,4 +77,4 @@ const { data } = await getPetById({ path: { petId: 1 }, client: testClient })
 | A separate client | `createClient({ transport })`     |
 | One call          | `transport` on the call           |
 
-A client from `createClient()` copies the shared `transport` when you create it, and a later `client.setConfig({ transport })` does not reach it. Without a `transport` on either, it sends with the global `fetch`.
+A client from `createClient()` copies the shared `transport` at creation, so a later `client.setConfig({ transport })` does not reach it. Without a `transport`, it sends with the global `fetch`.

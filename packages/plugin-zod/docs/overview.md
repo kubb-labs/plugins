@@ -1,11 +1,13 @@
 # Zod
 
-The Zod plugin generates a Zod v4 schema for every schema in your OpenAPI spec, plus the parameter, request, and response schemas of each operation. The client plugins `@kubb/plugin-fetch`, `@kubb/plugin-axios`, and `@kubb/plugin-client` use these schemas when you set their `validator` option.
+The Zod plugin generates a Zod v4 schema for every schema in your OpenAPI spec, plus the parameter, request, and response schemas of each operation.
+
+`@kubb/plugin-fetch`, `@kubb/plugin-axios`, and `@kubb/plugin-client` validate with these schemas when you set their `validator` option.
 
 ## Setup
 
 - No other plugins are needed.
-- Install `zod` v4 in the app that uses the generated code. Some options need a newer minor version:
+- Install `zod` v4 in the app that uses the generated code. Some options need a newer minor:
 
 | Option             | Needs            |
 | ------------------ | ---------------- |
@@ -15,21 +17,18 @@ The Zod plugin generates a Zod v4 schema for every schema in your OpenAPI spec, 
 
 ## Options worth knowing
 
-| Option                                                                              | Default     | What it does                                                                           |
-| ----------------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------- |
-| [`inferred`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#inferred)     | `false`     | Adds a `z.infer` type next to each schema, so you can skip `@kubb/plugin-ts`.          |
-| [`mini`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#mini)             | `false`     | Beta. Generates Zod Mini schemas for smaller bundles and imports from `zod/mini`.      |
-| [`importPath`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#importpath) | `'zod'`     | Module the generated files import `z` from.                                            |
-| [`coercion`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#coercion)     | `false`     | Wraps schemas in `z.coerce`. Pass an object to coerce only dates, strings, or numbers. |
-| [`oneOfType`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#oneoftype)   | `'union'`   | Validates a `oneOf` with `z.union` and strict members, or with `z.xor`.                |
-| [`typeGuards`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#typeguards) | `false`     | Adds `is*` type guards and `assert*` assertions.                                       |
-| [`compile`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#compile)       | `false`     | Wraps schemas in `z.compile` for faster validation. Circular schemas stay as they are. |
-| [`guidType`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#guidtype)     | `'uuid'`    | Uses `z.uuid()` or `z.guid()` for `format: uuid`.                                      |
-| [`regexType`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#regextype)   | `'literal'` | Writes a `pattern` as a regex literal or a `RegExp` constructor.                       |
+| Option                                                                              | Default   | What it does                                                                  |
+| ----------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------- |
+| [`inferred`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#inferred)     | `false`   | Adds a `z.infer` type next to each schema, so you can skip `@kubb/plugin-ts`. |
+| [`mini`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#mini)             | `false`   | Beta. Generates Zod Mini schemas for smaller bundles.                         |
+| [`coercion`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#coercion)     | `false`   | Coerces input before validation, such as query strings.                       |
+| [`oneOfType`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#oneoftype)   | `'union'` | Validates a `oneOf` with `z.union` or `z.xor`.                                |
+| [`typeGuards`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#typeguards) | `false`   | Adds `is*` type guards and `assert*` assertions.                              |
+| [`compile`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#compile)       | `false`   | Wraps schemas in `z.compile` for faster validation.                           |
 
 ## Example
 
-The config below generates the schemas with a `z.infer` type next to each one. For a `Pet` schema, the plugin writes `petSchema.ts`:
+This config generates the schemas with a `z.infer` type next to each one. For a `Pet` schema, the plugin writes `petSchema.ts`:
 
 ::code-group
 
@@ -58,3 +57,5 @@ export type PetSchemaType = z.infer<typeof petSchema>
 ```
 
 ::
+
+Next, [customize the generated schemas](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization).

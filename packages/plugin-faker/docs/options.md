@@ -1,12 +1,12 @@
 # Options
 
-Pass these options to `pluginFaker()`. All of them are optional. Shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options), and this page gives only their default here.
+Pass these options to `pluginFaker()`. Shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options), and this page gives only their default here.
 
 ## Options overview
 
 | Option                                                                    | Purpose                                                                              | Default                                        |
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- |
-| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written: `path`, `mode`, `barrel`, `banner`, `footer`.               | `{ path: 'mocks', barrel: { type: 'named' } }` |
+| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                                             | `{ path: 'mocks', barrel: { type: 'named' } }` |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                                         | None                                           |
 | [`typeMode`](#typemode)                                                   | Factory types from the generated values or the declared model.                       | `'inferred'`                                   |
 | [`dateParser`](#dateparser)                                               | Library that formats string date and time fields.                                    | `'faker'`                                      |
@@ -24,7 +24,7 @@ Pass these options to `pluginFaker()`. All of them are optional. Shared options 
 
 ### typeMode
 
-Sets the input and return types of object and intersection factories. Both modes generate the same values and apply overrides with a shallow merge.
+Sets the input and return types of object and intersection factories. Both modes generate the same values and shallow-merge the overrides.
 
 |          |                          |
 | -------- | ------------------------ |
@@ -35,16 +35,14 @@ Sets the input and return types of object and intersection factories. Both modes
 ::field-group
 
 :::field{name="'inferred'"}
-The factory takes any `Partial<Model>` and keeps its literal types. It returns the generated value types, merged with the override types. Optional and nullable fields keep their concrete value types.
+Takes any `Partial<Model>` and keeps its literal types. Returns the generated value types merged with the override types, so optional and nullable fields keep their concrete value types.
 :::
 
 :::field{name="'schema'"}
-The factory takes a `Partial<Model>` and returns the declared model type, with optional and nullable fields. Use it for fixtures you change after creation.
+Takes a `Partial<Model>` and returns the declared model type, with its optional and nullable fields. Use it for fixtures you change after creation.
 :::
 
 ::
-
-Factories in a schema cycle use the declared model as their base return type with `'inferred'` too, so TypeScript does not infer in a circle. Overrides still keep their types.
 
 ::code-group
 
@@ -68,17 +66,13 @@ createOrder({ quantity: 2, foo: '' })
 
 ::
 
-To pick a mode for some schemas only, use [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override). String patterns are regular expressions, so `'^Order$'` matches only the `Order` schema:
+To pick a mode for some schemas only, use [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override).
 
-```typescript [kubb.config.ts]
-pluginFaker({
-  override: [{ type: 'schemaName', pattern: '^Order$', options: { typeMode: 'schema' } }],
-})
-```
+See [Circular schemas](EDGE:circular-schemas).
 
 ### dateParser
 
-Library that formats `date`, `time`, and `date-time` fields typed as strings. Pick another value than `'faker'` when the project already uses a date library, and install that library in the app.
+Library that formats `date`, `time`, and `date-time` fields typed as strings. Install the library you pick in the app.
 
 |          |                                            |
 | -------- | ------------------------------------------ |
@@ -102,10 +96,12 @@ Renders a `date` field as `moment(faker.date.anytime()).format("YYYY-MM-DD")`.
 
 ::
 
-- `date` and `time` strings use `YYYY-MM-DD` and `HH:mm:ss`.
-- A `date-time` string is `toISOString()` output with `'faker'`. Any other parser formats it as `YYYY-MM-DDTHH:mm:ss[Z]`, without the `Z` for a local date-time and with a numeric offset when the schema declares one.
-- Any other module name renders a `date` field as `name(faker.date.anytime()).format("YYYY-MM-DD")`. The module needs a default export with the dayjs API. Kubb imports it under the camelCased module name, so `'my-date-lib'` becomes `myDateLib` and `'@scope/lib'` becomes `scopeLib`.
-- A value other than `'faker'` fails generation when the adapter types dates as `Date`, such as with `dateType: 'date'`.
+Any other module name works when its default export has the dayjs API. Kubb imports it under its camelCased name, so `'my-date-lib'` becomes `myDateLib`.
+
+> [!WARNING]
+> A value other than `'faker'` fails generation when the adapter types dates as `Date`, such as with `dateType: 'date'`.
+
+See [Dates and times](EDGE:dates-and-times).
 
 ### regexGenerator
 
@@ -120,18 +116,20 @@ Library that generates strings matching a regex `pattern` in the spec.
 ::field-group
 
 :::field{name="'faker'"}
-Writes `faker.helpers.fromRegExp(/pattern/)` and needs no extra dependency. Kubb rewrites `\d`, `\w`, escaped characters such as `\+`, and open-ended counts such as `{1,}` into a form faker reads. Faker does not support groups, alternation (`a|b`), or `\s`.
+Writes `faker.helpers.fromRegExp(/pattern/)` and needs no extra dependency. Faker does not support groups, alternation (`a|b`), or `\s`.
 :::
 
 :::field{name="'randexp'"}
-Writes `new RandExp(pattern).gen()`, which supports a wider regex grammar. Needs `randexp` in the app.
+Writes `new RandExp(pattern).gen()`, which supports a wider regex grammar. Install `randexp` in the app.
 :::
 
 ::
 
+See [Regex patterns](EDGE:regex-patterns).
+
 ### locale
 
-Faker locale code. Kubb imports the matching `fakerXX` export from `@faker-js/faker` as `faker`, so generated values fit the target region. See [Faker.js localization](https://fakerjs.dev/api/localization.html) for all codes.
+[Faker locale code](https://fakerjs.dev/api/localization.html). Kubb imports the matching `fakerXX` export from `@faker-js/faker` as `faker`, so generated values fit the target region.
 
 |          |          |
 | -------- | -------- |
@@ -139,15 +137,13 @@ Faker locale code. Kubb imports the matching `fakerXX` export from `@faker-js/fa
 | Required | `false`  |
 | Default  | `'en'`   |
 
-| Value            | Import                                               |
-| ---------------- | ---------------------------------------------------- |
-| `'en'` (default) | `import { fakerEN as faker } from '@faker-js/faker'` |
-| `'de'`           | `fakerDE`                                            |
-| `'de_AT'`        | `fakerDE_AT`                                         |
+```typescript [locale: 'de_AT']
+import { fakerDE_AT as faker } from '@faker-js/faker'
+```
 
 ### seed
 
-Kubb calls `faker.seed(...)` with this value once at the top of each generated file, so every run returns the same sequence of data. A second call to the same factory returns the next values in that sequence. Use it for snapshot tests.
+Kubb calls `faker.seed(...)` with this value at the top of each generated file, so every run returns the same data. Use it for snapshot tests. A second call to the same factory returns the next values in the sequence.
 
 |          |                      |
 | -------- | -------------------- |
@@ -156,7 +152,7 @@ Kubb calls `faker.seed(...)` with this value once at the top of each generated f
 
 ### printer
 
-Replaces the Faker handler for a schema type, such as `'integer'`, `'date'`, or `'string'`. Each handler returns the Faker expression as a string. Use `this.transform` to recurse into nested nodes and `this.options` to read the printer options. The [printer guide](https://kubb.dev/docs/5.x/how-to/customize#printers) covers how overrides compose with macros.
+Replaces the Faker handler for a schema type, such as `'integer'` or `'date'`. Each handler returns the Faker expression as a string. Inside a handler, `this.transform` recurses into nested nodes and `this.options` holds the printer options. See the [printer guide](https://kubb.dev/docs/5.x/how-to/customize#printers).
 
 |          |                                 |
 | -------- | ------------------------------- |
@@ -179,7 +175,7 @@ pluginFaker({
 
 ## Resolver members
 
-A `resolver` patch overrides generated names, such as adding a `Mock` suffix so factories do not clash with imported types. Members you leave out keep `resolverFaker`. Next to the shared `name`, `file`, and `imports` members described under [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverFaker` has these:
+A `resolver` patch can add a `Mock` suffix so factories do not clash with imported types. Members you leave out of the patch keep `resolverFaker`. Besides the shared `name`, `file`, and `imports` members of [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverFaker` has these:
 
 ::code-collapse{name="ResolverFaker patch members"}
 

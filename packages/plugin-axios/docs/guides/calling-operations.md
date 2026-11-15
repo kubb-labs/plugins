@@ -4,15 +4,7 @@ Call a generated function with grouped request options, read the typed result, a
 
 ## Call an operation
 
-Each request part has its own key. A key only exists when the operation declares that part:
-
-| Key       | Holds             | Example                              |
-| --------- | ----------------- | ------------------------------------ |
-| `path`    | Path parameters   | `path: { petId: 1 }`                 |
-| `query`   | Query parameters  | `query: { status: 'available' }`     |
-| `headers` | Header parameters | `headers: { 'X-Request-ID': 'r-1' }` |
-| `cookies` | Cookie parameters | `cookies: { session_id: 'abc' }`     |
-| `body`    | The request body  | `body: { name: 'Rex' }`              |
+Pass each request part under its own key: `path`, `query`, `headers`, `cookies`, or `body`. A key exists only when the operation declares that part:
 
 ```typescript
 import { getPetById } from './gen/clients/getPetById'
@@ -22,14 +14,14 @@ const { data } = await getPetById({ path: { petId: 1 } })
 //      ^ the parsed pet, typed from the 200 response
 
 await updatePet({ path: { petId: 1 }, headers: { 'X-Request-ID': 'r-1' }, body: { name: 'Rex', status: 'sold' } })
+
+await getStatus() // no required parameters, no argument
 ```
 
-An operation without required parameters takes no argument: `getStatus()`.
+Path keys keep the spec's names, so `{pet-id}` takes `path: { 'pet-id': 1 }`. Set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing) on the adapter (`@kubb/adapter-oas` 5.20.0 or later) to pass `petId` instead.
 
 > [!NOTE]
-> The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id is a `number`. With the default `bigint`, pass `1n`.
-
-Path keys keep the spec's names, so `{pet-id}` is passed as `path: { 'pet-id': 1 }`. Set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing) on the adapter (`@kubb/adapter-oas` 5.20.0 or later) to pass `path: { petId: 1 }`. The HTTP request stays the same.
+> The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype). With the default `bigint`, an `int64` id takes `1n`.
 
 ## Read the result
 
@@ -47,20 +39,18 @@ type RequestResult = {
 }
 ```
 
-With `throwOnError: true`, the default, a resolved call is always a success. When an operation documents several success statuses, narrow on `status`. For a response that declares headers, `headers.get` suggests their names:
+With the default `throwOnError: true`, a resolved call is always a success. Narrow on `status` when an operation has several success statuses:
 
 ```typescript
 const result = await getPetById({ path: { petId: 1 } })
 
-console.info(result.headers.get('x-ratelimit-remaining'))
+console.info(result.headers.get('x-ratelimit-remaining')) // suggests the declared header names
 if (result.status === 200) console.info(result.data)
 ```
 
-[Handle errors](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/error-handling) covers `throwOnError: false`.
-
 ## Unwrap the success body
 
-Call `.unwrap()` to get the success body without the result around it:
+Call `.unwrap()` to get only the success body:
 
 ```typescript
 const pet = await getPetById({ path: { petId: 1 } }).unwrap()
@@ -76,7 +66,7 @@ To get the body from every call, set [`returnType: 'data'`](https://kubb.dev/ext
 
 ## Set the content type
 
-An operation with one request content type has it built in. When it accepts or returns several, set `contentType` on the call:
+When an operation accepts or returns several content types, set `contentType` on the call. A string sets `Content-Type`, and `response` sets `Accept`:
 
 ::code-group
 
@@ -90,8 +80,6 @@ await getPet({ path: { petId: 1 }, contentType: { request: 'application/json', r
 
 ::
 
-A string sets the request `Content-Type`. The object form also sends `response` as the `Accept` header.
-
 ## Pass native axios options
 
 Pass `options` for axios settings such as `timeout`, `proxy`, `maxRedirects`, `decompress`, or `onUploadProgress`:
@@ -100,11 +88,11 @@ Pass `options` for axios settings such as `timeout`, `proxy`, `maxRedirects`, `d
 await getPetById({ path: { petId: 1 }, options: { timeout: 5_000 } })
 ```
 
-Set `client.setConfig({ options })` for shared defaults. Per-call options win. Kubb keeps control of the URL, method, headers, body, and status handling, as [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport) lists.
+`client.setConfig({ options })` sets shared defaults, and per-call options win. Kubb keeps control of the URL, method, headers, body, and status handling, as [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport) lists.
 
 ## Build a URL without sending
 
-`client.getUrl` builds a URL with the same base URL, path interpolation, and query serialization as a request:
+`client.getUrl` builds the URL a request would use, with the same base URL and serialization:
 
 ```typescript
 import { client } from './gen/.kubb/client'
@@ -112,3 +100,5 @@ import { client } from './gen/.kubb/client'
 const url = client.getUrl({ url: '/pets/{petId}', path: { petId: 1 }, query: { fields: 'name' } })
 // https://petstore.swagger.io/v2/pets/1?fields=name
 ```
+
+Next, [handle errors](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/error-handling), including `throwOnError: false`.

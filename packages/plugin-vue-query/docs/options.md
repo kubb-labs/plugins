@@ -1,43 +1,32 @@
 # Options
 
-Pass these options to `pluginVueQuery()`. Rows for shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options) and give this plugin's default.
+Pass these options to `pluginVueQuery()`. Shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options).
 
 ## Options overview
 
-| Option                                                                    | Purpose                                                                | Default                                                                              |
-| ------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [`client`](#client)                                                       | Which registered client plugin the composables call.                   | Auto-detected                                                                        |
-| [`returnType`](#returntype)                                               | Shape of the value the composables resolve to.                         | `'data'`                                                                             |
-| [`hooks`](#hooks)                                                         | Emit `use*` composables on top of the factories.                       | `false`                                                                              |
-| [`query`](#query)                                                         | Which operations become queries, or `false` to skip them.              | `{ methods: ['GET', 'QUERY'], importPath: '@tanstack/vue-query' }`                   |
-| [`query.methods`](#querymethods)                                          | HTTP methods treated as queries.                                       | `['GET', 'QUERY']`                                                                   |
-| [`query.importPath`](#queryimportpath)                                    | Module the query helpers import TanStack Query from.                   | `'@tanstack/vue-query'`                                                              |
-| [`queryKey`](#querykey)                                                   | Build the `queryKey` of each query.                                    | `queryKeyTransformer`                                                                |
-| [`mutation`](#mutation)                                                   | Which operations become mutations, or `false` to skip them.            | `{ methods: ['POST', 'PUT', 'PATCH', 'DELETE'], importPath: '@tanstack/vue-query' }` |
-| [`mutation.methods`](#mutationmethods)                                    | HTTP methods treated as mutations.                                     | `['POST', 'PUT', 'PATCH', 'DELETE']`                                                 |
-| [`mutation.importPath`](#mutationimportpath)                              | Module the mutation composables import TanStack Query from.            | `'@tanstack/vue-query'`                                                              |
-| [`mutationKey`](#mutationkey)                                             | Build the `mutationKey` of each mutation.                              | `mutationKeyTransformer`                                                             |
-| [`infinite`](#infinite)                                                   | Generate infinite queries for pagination.                              | `false`                                                                              |
-| [`infinite.queryParam`](#infinitequeryparam)                              | Query parameter that carries the page cursor.                          | `'id'`                                                                               |
-| [`infinite.initialPageParam`](#infiniteinitialpageparam)                  | `pageParam` of the first fetch.                                        | `0`                                                                                  |
-| [`infinite.nextParam`](#infinitenextparam)                                | Response path of the next cursor.                                      | `null`                                                                               |
-| [`infinite.previousParam`](#infinitepreviousparam)                        | Response path of the previous cursor.                                  | `null`                                                                               |
-| [`infinite.getNextPageParam`](#infinitegetnextpageparam)                  | Source of TanStack Query's `getNextPageParam`.                         | `null`                                                                               |
-| [`infinite.getPreviousPageParam`](#infinitegetpreviouspageparam)          | Source of TanStack Query's `getPreviousPageParam`.                     | `null`                                                                               |
-| [`infinite.cursorParam`](#infinitecursorparam)                            | Deprecated. Top-level response field of the cursor.                    | `null`                                                                               |
-| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written: `path`, `mode`, `barrel`, `banner`, `footer`. | `{ path: 'hooks', barrel: { type: 'named' } }`                                       |
-| [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path: `type`, `name`.                           | None                                                                                 |
-| [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                       | None                                                                                 |
-| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                            | `[]`                                                                                 |
-| [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                   | `[]`                                                                                 |
-| [`resolver`](#resolver)                                                   | Customize generated names and file paths.                              | `resolverVueQuery`                                                                   |
-| [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                                     | `[]`                                                                                 |
+| Option                                                                    | Purpose                                                  | Default                                                                              |
+| ------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [`client`](#client)                                                       | Which registered client plugin the composables call.     | Auto-detected                                                                        |
+| [`returnType`](#returntype)                                               | What the composables resolve to.                         | `'data'`                                                                             |
+| [`hooks`](#hooks)                                                         | Emit `use*` composables on top of the factories.         | `false`                                                                              |
+| [`query`](#query)                                                         | Which methods become queries, and the TanStack import.   | `{ methods: ['GET', 'QUERY'], importPath: '@tanstack/vue-query' }`                   |
+| [`queryKey`](#querykey)                                                   | Build the `queryKey` of each query.                      | `queryKeyTransformer`                                                                |
+| [`mutation`](#mutation)                                                   | Which methods become mutations, and the TanStack import. | `{ methods: ['POST', 'PUT', 'PATCH', 'DELETE'], importPath: '@tanstack/vue-query' }` |
+| [`mutationKey`](#mutationkey)                                             | Build the `mutationKey` of each mutation.                | `mutationKeyTransformer`                                                             |
+| [`infinite`](#infinite)                                                   | Generate infinite queries for pagination.                | `false`                                                                              |
+| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                 | `{ path: 'hooks', barrel: { type: 'named' } }`                                       |
+| [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                             | None                                                                                 |
+| [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                         | None                                                                                 |
+| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                              | `[]`                                                                                 |
+| [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                     | `[]`                                                                                 |
+| [`resolver`](#resolver)                                                   | Customize generated names and file paths.                | `resolverVueQuery`                                                                   |
+| [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                       | `[]`                                                                                 |
 
 ## Option details
 
 ### client
 
-Selects the registered client plugin whose functions the composables call. A single registered client plugin is detected, so set `client` only when several are registered. Generation fails when none is registered.
+The registered client plugin whose functions the composables call. A lone client plugin is detected, so set `client` only when several are registered. Generation fails when none is registered.
 
 |          |                                  |
 | -------- | -------------------------------- |
@@ -47,22 +36,22 @@ Selects the registered client plugin whose functions the composables call. A sin
 ::field-group
 
 :::field{name="'fetch'"}
-Calls the functions of [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch).
+Calls [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) functions.
 :::
 
 :::field{name="'axios'"}
-Calls the functions of [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios).
+Calls [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) functions.
 :::
 
 :::field{name="'client'"}
-Calls the functions of [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client). Your client module must also export the `RequestConfig` and `ResponseErrorConfig` types.
+Calls [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client) functions. Your client module must also export the `RequestConfig` and `ResponseErrorConfig` types.
 :::
 
 ::
 
 ### returnType
 
-Shape of the value the composables resolve to.
+What the composables resolve to.
 
 |          |                    |
 | -------- | ------------------ |
@@ -77,7 +66,7 @@ Default. Resolves to the success body.
 :::
 
 :::field{name="'full'"}
-Resolves to the client's whole `RequestResult`, such as `{ status, data, error, headers, response }`, so a composable can read the status and response headers. Infinite queries read the cursor from `lastPage.data`. Needs a client plugin with `returnType` `'full'` or `'plain'`, or generation stops with an error.
+Resolves to the client's whole `RequestResult`, so a composable can read the status and response headers. Infinite queries read the cursor from `lastPage.data`. Needs a client plugin with `returnType` `'full'` or `'plain'`, or generation stops with an error.
 :::
 
 ::
@@ -85,15 +74,14 @@ Resolves to the client's whole `RequestResult`, such as `{ status, data, error, 
 ```typescript
 pluginVueQuery({ returnType: 'full' })
 
+// with integerType: 'number' on the adapter
 const { data: result } = useGetPetById({ path: { petId: 1 } })
 const etag = result.value?.response.headers.get('ETag')
 ```
 
-The example sets [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter. With the default, an `int64` id such as `petId` is a `bigint` and takes `1n`.
-
 ### hooks
 
-With `false`, the plugin writes only the `queryOptions`, `queryKey`, and `mutationKey` helpers. Set `true` to also generate `useQuery` and `useMutation`. [`infinite`](#infinite) needs it. [Call operations](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/guides/calling-operations#what-each-plugin-generates) lists every generated helper.
+Set `true` to generate `useQuery` and `useMutation` composables on top of the `queryOptions` and key helpers. [`infinite`](#infinite) needs it. [Call operations](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/guides/calling-operations#what-each-plugin-generates) lists every export.
 
 |          |           |
 | -------- | --------- |
@@ -103,7 +91,7 @@ With `false`, the plugin writes only the `queryOptions`, `queryKey`, and `mutati
 
 ### query
 
-Which operations become queries and where TanStack Query is imported from. Pass `false` to skip query output for every operation.
+Which operations become queries and where TanStack Query is imported from. `false` skips query output.
 
 |          |                                                                    |
 | -------- | ------------------------------------------------------------------ |
@@ -113,7 +101,7 @@ Which operations become queries and where TanStack Query is imported from. Pass 
 
 #### query.methods
 
-HTTP methods treated as queries. An operation whose method is in neither `query.methods` nor `mutation.methods` gets no helper, so keep `'QUERY'` when you replace the list.
+HTTP methods treated as queries. A method in neither `query.methods` nor `mutation.methods` gets no helper, so keep `'QUERY'` when you replace the list.
 
 |          |                    |
 | -------- | ------------------ |
@@ -133,7 +121,7 @@ Module the query helpers import `queryOptions`, `useQuery`, and their infinite v
 
 ### queryKey
 
-Builds the `queryKey` of each query from the operation `node` and the `variant`: `'query'` or `'infiniteQuery'`. The returned strings are copied into the generated code as written, so wrap a string literal in `JSON.stringify(...)`.
+Builds each query's `queryKey` from the operation `node` and the `variant`: `'query'` or `'infiniteQuery'`. The default key is `[{ url, params }, query, body]`, with only the parts the operation has.
 
 |          |                                                        |
 | -------- | ------------------------------------------------------ |
@@ -141,7 +129,10 @@ Builds the `queryKey` of each query from the operation `node` and the `variant`:
 | Required | `false`                                                |
 | Default  | `queryKeyTransformer`                                  |
 
-The default key is `[{ url, params }, query, body]`, with `url` such as `'/pet/:petId'` and only the parts the operation has. Infinite variants add `infinite: true` to the first entry, so they never share a cache entry with the plain query. To extend the default, spread it instead of reading single entries, which can change between releases:
+> [!WARNING]
+> Returned strings are copied into the generated code as written. Wrap a string literal in `JSON.stringify(...)`.
+
+To extend the default, spread it. Single entries can change between releases. See [Query keys](EDGE:query-keys).
 
 ```typescript
 import { queryKeyTransformer } from '@kubb/plugin-vue-query'
@@ -151,7 +142,7 @@ queryKey: (props) => [JSON.stringify('v2'), ...queryKeyTransformer(props)]
 
 ### mutation
 
-Which operations become mutations and where TanStack Query is imported from. Pass `false` to skip mutation output for every operation.
+Which operations become mutations and where TanStack Query is imported from. `false` skips mutation output.
 
 |          |                                                                                      |
 | -------- | ------------------------------------------------------------------------------------ |
@@ -161,7 +152,7 @@ Which operations become mutations and where TanStack Query is imported from. Pas
 
 #### mutation.methods
 
-HTTP methods treated as mutations. A method that is also in `query.methods` stays a query.
+HTTP methods treated as mutations. A method also in `query.methods` stays a query.
 
 |          |                                      |
 | -------- | ------------------------------------ |
@@ -181,7 +172,7 @@ Module the mutation composables import `useMutation` from. Only used with [`hook
 
 ### mutationKey
 
-Builds the `mutationKey` of each mutation, for batched invalidations. It takes the same props as [`queryKey`](#querykey) with `variant: 'mutation'`, and copies strings the same way. The default key is `[{ url }]`.
+Builds each mutation's `mutationKey`, for batched invalidations. It takes the same props as [`queryKey`](#querykey) with `variant: 'mutation'`, and copies strings the same way. The default key is `[{ url }]`.
 
 |          |                                                        |
 | -------- | ------------------------------------------------------ |
@@ -197,7 +188,7 @@ mutationKey: (props) => [JSON.stringify('v2'), ...mutationKeyTransformer(props)]
 
 ### infinite
 
-Adds `infiniteQueryOptions` and `useInfiniteQuery` for each query operation that declares the query parameter named in [`infinite.queryParam`](#infinitequeryparam). Needs [`hooks: true`](#hooks).
+Adds `infiniteQueryOptions` and `useInfiniteQuery` to each query operation that takes the [`infinite.queryParam`](#infinitequeryparam) parameter. Needs [`hooks: true`](#hooks).
 
 |          |                              |
 | -------- | ---------------------------- |
@@ -205,7 +196,8 @@ Adds `infiniteQueryOptions` and `useInfiniteQuery` for each query operation that
 | Required | `false`                      |
 | Default  | `false`                      |
 
-Without `getNextPageParam`, `nextParam`, or `cursorParam`, the composable counts pages up from `initialPageParam` until a page is an empty array. That works only for array responses, so generation warns for any other response. It skips the warning when `previousParam` or `getPreviousPageParam` is set, though the count still never ends.
+> [!WARNING]
+> Set `nextParam` or `getNextPageParam`. Without a next-page source, the composable counts pages up from `initialPageParam` until a page is an empty array, which never happens for a non-array response. See [Infinite queries](EDGE:infinite-queries).
 
 #### infinite.queryParam
 
@@ -239,7 +231,7 @@ Path to the next cursor on the response, in dot notation (`'pagination.next.id'`
 
 #### infinite.previousParam
 
-Path to the previous cursor on the response, in dot notation or array form.
+Path to the previous cursor on the response, in the same forms as `nextParam`.
 
 |          |                                   |
 | -------- | --------------------------------- |
@@ -249,7 +241,7 @@ Path to the previous cursor on the response, in dot notation or array form.
 
 #### infinite.getNextPageParam
 
-Source of TanStack Query's `getNextPageParam`, copied into the generated code. Use it when the next page must be computed. It wins over `nextParam` and `cursorParam`.
+Source of TanStack Query's `getNextPageParam`, for a next page you must compute. Pass a string, a function, or `definePageParam`, which types the page and the page parameter. It wins over `nextParam` and `cursorParam`.
 
 |          |                                 |
 | -------- | ------------------------------- |
@@ -257,7 +249,8 @@ Source of TanStack Query's `getNextPageParam`, copied into the generated code. U
 | Required | `false`                         |
 | Default  | `null`                          |
 
-Pass a string, a function, or `definePageParam`, which types the page and the page parameter. Only the source is copied, so the function cannot use variables from the config file.
+> [!NOTE]
+> Only the function's source is copied into the generated code, so it cannot use variables from the config file.
 
 ```typescript [kubb.config.ts]
 import { definePageParam, pluginVueQuery } from '@kubb/plugin-vue-query'
@@ -285,7 +278,7 @@ Source of TanStack Query's `getPreviousPageParam`, in the same forms as `getNext
 
 #### infinite.cursorParam
 
-Deprecated. Name of a top-level response field that holds the cursor for both directions. Dot paths do not work. Use `nextParam` and `previousParam` instead.
+Deprecated. Use `nextParam` and `previousParam`. Names a top-level response field, not a dot path, that holds the cursor for both directions.
 
 |          |                  |
 | -------- | ---------------- |
@@ -295,7 +288,7 @@ Deprecated. Name of a top-level response field that holds the cursor for both di
 
 ### resolver
 
-Overrides generated file and symbol names. Members you leave out keep `resolverVueQuery`. The shared members (`name`, `file`, `imports`) are described under [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver).
+Overrides generated file and symbol names. Members you leave out keep `resolverVueQuery`. See [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) for the shared `name`, `file`, and `imports` members.
 
 |          |                                   |
 | -------- | --------------------------------- |

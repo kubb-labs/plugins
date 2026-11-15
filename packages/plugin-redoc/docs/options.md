@@ -13,7 +13,7 @@
 
 ### output
 
-Where the generated Redoc HTML file is written. Unlike the shared `output` option, it takes only `path`.
+Where the Redoc HTML file is written. Unlike the shared `output` option, it takes only `path`.
 
 |          |                         |
 | -------- | ----------------------- |
@@ -23,7 +23,7 @@ Where the generated Redoc HTML file is written. Unlike the shared `output` optio
 
 #### output.path
 
-File path of the HTML page, resolved against the root `output.path`. It names a single file, not a folder.
+File path of the HTML page, resolved against the root `output.path`. It names a file, not a folder.
 
 |          |               |
 | -------- | ------------- |

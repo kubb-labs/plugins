@@ -6,7 +6,7 @@ Pass these options to `pluginMsw()`. Shared options link to [Shared plugin optio
 
 | Option                                                                    | Purpose                                                                              | Default                                           |
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written: `path`, `mode`, `barrel`, `banner`, `footer`.               | `{ path: 'handlers', barrel: { type: 'named' } }` |
+| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                                             | `{ path: 'handlers', barrel: { type: 'named' } }` |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                                         | None                                              |
 | [`baseURL`](#baseurl)                                                     | Base URL prepended to every handler's path.                                          | None                                              |
 | [`handlers`](#handlers)                                                   | Write a `handlers.ts` that exports every handler.                                    | `false`                                           |
@@ -21,7 +21,7 @@ Pass these options to `pluginMsw()`. Shared options link to [Shared plugin optio
 
 ### baseURL
 
-Base URL prepended to the path each handler matches. Without it, a handler matches the operation's relative path from the spec. Set it to match a different environment than the spec. Leave off the trailing slash, because operation paths already start with `/`.
+Base URL prepended to the path each handler matches. Without it, a handler matches the operation's relative path. Leave off the trailing slash, because operation paths start with `/`.
 
 |          |          |
 | -------- | -------- |
@@ -34,11 +34,11 @@ Base URL prepended to the path each handler matches. Without it, a handler match
 | `'https://petstore.dev'`   | `https://petstore.dev/pets/:petId`                 |
 | `'${process.env.API_URL}'` | The value of `API_URL` when the handler is created |
 
-To set the base URL at runtime instead, pass `{ baseURL }` as a handler's second argument or to [`createHandlers`](#handlers).
+To set the base URL at runtime, pass `{ baseURL }` as a handler's second argument or to [`createHandlers`](#handlers).
 
 ### handlers
 
-Writes a `handlers.ts` file with every generated handler in operation order.
+Writes a `handlers.ts` with every handler in operation order.
 
 |          |           |
 | -------- | --------- |
@@ -46,10 +46,10 @@ Writes a `handlers.ts` file with every generated handler in operation order.
 | Required | `false`   |
 | Default  | `false`   |
 
-| Export                     | What it is                                                                                                             |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `handlers`                 | The collection with the configured `baseURL`. Spread it into `setupServer(...handlers)` or `setupWorker(...handlers)`. |
-| `createHandlers(options?)` | Builds the same collection with a `baseURL` passed at runtime.                                                         |
+| Export                     | What it is                                                                                                 |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `handlers`                 | Every handler with the configured `baseURL`, for `setupServer(...handlers)` or `setupWorker(...handlers)`. |
+| `createHandlers(options?)` | Builds the same list with a `baseURL` passed at runtime.                                                   |
 
 ```typescript [src/gen/handlers/handlers.ts]
 import { getPetHandler } from './getPetHandler'
@@ -75,14 +75,16 @@ Source of the response body each handler returns.
 ::field-group
 
 :::field{name="'data'"}
-Returns the data passed to the handler, typed with the `@kubb/plugin-ts` types, through `new HttpResponse(JSON.stringify(data), ...)`. Without `data`, the handler sends the first example of the success response, when the spec has one. It reads the example's `value`, else its `serializedValue`, which is parsed for a JSON response and sent as is for a text response. Pass `null` to send a `null` body.
+Returns the data you pass, typed with the `@kubb/plugin-ts` types. Without `data`, the handler sends the first example of the success response, when the spec has one. Pass `null` to send a `null` body.
 :::
 
 :::field{name="'faker'"}
-Falls back to a value from `@kubb/plugin-faker` when `data` is `undefined` or `null`. Other falsy values, such as `0`, `false`, or `''`, are sent as the body. Register `pluginFaker()` next to this plugin.
+Falls back to a `@kubb/plugin-faker` value when `data` is `undefined` or `null` and the success response has a schema. Other falsy values, such as `0`, are sent as the body. Register `pluginFaker()` next to this plugin.
 :::
 
 ::
+
+See [Examples from the spec](EDGE:spec-examples).
 
 ::code-group
 
@@ -96,7 +98,7 @@ return getPetHandlerResponse200(data ?? createGetPetResponse())
 
 ::
 
-Each handler file also exports one response helper per status code in the spec, such as `getPetHandlerResponse200(data)` and `getPetHandlerResponse404(data)`. Return a helper from the callback to mock another status:
+Each handler file also exports one response helper per status code, such as `getPetHandlerResponse404(data)`. Return a helper from the callback to mock that status:
 
 ```typescript [test-server.ts]
 getPetHandler(() => getPetHandlerResponse404())
@@ -104,7 +106,7 @@ getPetHandler(() => getPetHandlerResponse404())
 
 ## Resolver members
 
-A `resolver` patch overrides generated names. Members you leave out keep `resolverMsw`. Next to the shared `name`, `file`, and `imports` members described under [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverMsw` has these:
+Members you leave out of a `resolver` patch keep `resolverMsw`. Besides the shared `name`, `file`, and `imports` members of [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverMsw` has these:
 
 ```typescript [Partial override]
 type ResolverMswPatch = {

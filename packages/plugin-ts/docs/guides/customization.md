@@ -2,7 +2,7 @@
 
 Prefix TypeScript names, change how a schema type prints, and remove descriptions.
 
-Each change goes into `pluginTs()` in the [TypeScript plugin configuration](https://kubb.dev/extensions/kubb-labs/plugin-ts#example).
+Add each change to `pluginTs()` in the [TypeScript plugin configuration](https://kubb.dev/extensions/kubb-labs/plugin-ts#example).
 
 ## Prefix type names
 
@@ -32,7 +32,7 @@ export type ApiPet = { name: string }
 
 ::
 
-File names stay the same unless you also override the file resolver. The [options page](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#resolver-members) lists every resolver member.
+File names stay the same unless you also override `resolver.file`. See every [resolver member](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#resolver-members).
 
 ## Map schema types
 
@@ -73,7 +73,7 @@ export type Pet = {
 
 ::
 
-Pick the handler that matches the schema:
+Each schema has its own handler:
 
 | Schema                                  | Handler                               |
 | --------------------------------------- | ------------------------------------- |
@@ -83,7 +83,7 @@ Pick the handler that matches the schema:
 | `integer`, `format: int64`              | `bigint`, already `bigint` by default |
 
 > [!WARNING]
-> A handler that returns a TypeScript compiler node is deprecated and is removed in the next major. It still works when your project installs `@kubb/parser-ts`, plus `typescript` 5 or 6, or `@typescript/typescript6` next to TypeScript 7. All are optional peer dependencies. Without `@kubb/parser-ts`, the build stops with an error that tells you to install it.
+> A handler that returns a TypeScript compiler node is deprecated and is removed in the next major. Until then, it needs `@kubb/parser-ts`, plus `typescript` 5 or 6, or `@typescript/typescript6` next to TypeScript 7. Without `@kubb/parser-ts`, the build stops with an error that tells you to install it.
 
 ## Remove descriptions
 

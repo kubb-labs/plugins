@@ -2,20 +2,18 @@
 
 Update your client module for `@kubb/plugin-client` 6, which calls your client with type arguments and streams through `client.stream`.
 
-Find your code in the table, follow its section, then regenerate.
-
 ## What to change
 
-| Your code                                                                       | What to do                                                                                                                                                                   |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Exports a `client` that takes no type arguments                                 | Make it generic. See [A generic client call](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#a-generic-client-call).                                |
-| Exports `toEventStream` or `EventStreamResult`                                  | Add a `stream` method to `client`. See [A stream method](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#a-stream-method-instead-of-toeventstream). |
-| Declares `responseType` on `RequestConfig`, or lacks `contentType` or `cookies` | Add the new fields. See [New fields](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#new-fields-on-the-request-config).                             |
-| Reads `security` entries as single schemes                                      | Handle arrays and the new fields. See [Security requirements](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#security-requirements).               |
-| Imports a `…Status2XX` type, or writes a `'2XX'` key                            | Write the range in lower case. See [Status ranges](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#status-ranges).                                  |
-| Groups by tag in an OpenAPI 3.2 document whose tags set `parent`                | Update the import paths. See [Tag folders](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#tag-folders).                                            |
-| Has `servers` on a path or operation, or reads XML, YAML, CSV, or binary bodies | It compiles. Check [Behavior changes](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#behavior-changes).                                            |
-| Wants `.unwrap()` or a call that resolves to the body                           | Optional. See [Return type](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#return-type).                                                           |
+| Your code                                                                       | What to do                                                                                                                                |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Exports a `client` that takes no type arguments                                 | Make it [generic](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#a-generic-client-call).                        |
+| Exports `toEventStream` or `EventStreamResult`                                  | Add a [stream method](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#a-stream-method-instead-of-toeventstream). |
+| Declares `responseType` on `RequestConfig`, or lacks `contentType` or `cookies` | Add the [new fields](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#new-fields-on-the-request-config).          |
+| Reads `security` entries as single schemes                                      | Handle [arrays and the new fields](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#security-requirements).       |
+| Imports a `…Status2XX` type, or writes a `'2XX'` key                            | Write [ranges in lower case](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#status-ranges).                     |
+| Groups by tag in an OpenAPI 3.2 document whose tags set `parent`                | Update the [import paths](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#tag-folders).                          |
+| Has `servers` on a path or operation, or reads XML, YAML, CSV, or binary bodies | It compiles. Check the [behavior changes](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#behavior-changes).     |
+| Wants `.unwrap()` or a call that resolves to the body                           | Optional. Set [`returnType`](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/migrate-to-v6#return-type).                       |
 
 ## Upgrade steps
 
@@ -27,7 +25,7 @@ Find your code in the table, follow its section, then regenerate.
 
 2. Update your client module with the sections below.
 3. Regenerate with `npx kubb generate`.
-4. Run `npx tsc --noEmit`. A missing export or field in your client module shows up as a compile error in the generated files.
+4. Run `npx tsc --noEmit`. A missing export or field shows up as a compile error in the generated files.
 
 ## A generic client call
 
@@ -59,7 +57,7 @@ client.stream = async <TResponses, ThrowOnError extends boolean = true, TEvent =
 }
 ```
 
-A JSON Lines call, such as `application/jsonl` or `application/x-ndjson`, passes the media type in `contentType.response` and expects one parsed item per line. [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client) lists every stream field.
+[Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client) lists every stream field. See [Streaming](EDGE:streaming) for JSON Lines.
 
 ## New fields on the request config
 
@@ -81,11 +79,12 @@ export type RequestConfig = {
 }
 ```
 
-Browsers ignore a `Cookie` header set by script and send their own cookies. A cookie with the OpenAPI 3.2 `cookie` style passes `style: 'cookie'` in `styles`: send its values without percent-encoding. See [Serialize parameters](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client#serialize-parameters).
+> [!NOTE]
+> Browsers ignore a `Cookie` header set by script and send their own cookies. See [Parameter serialization](EDGE:parameter-serialization) for the OpenAPI 3.2 `cookie` style.
 
 ## Security requirements
 
-A `security` entry is an array when one requirement needs several schemes together, such as an API key and a session cookie. Send all of them, or skip the entry. An `oauth2` scheme now also passes `flows` and `metadataUrl`, and an `openIdConnect` scheme passes `url`:
+An entry is an array when one requirement needs several schemes together, such as an API key and a session cookie. Send all of them, or skip the entry. `oauth2` now also passes `flows` and `metadataUrl`, and `openIdConnect` passes `url`:
 
 ```typescript
 export type Auth = {
@@ -102,7 +101,7 @@ export type Auth = {
 
 ## Status ranges
 
-Generated names and keys write a status range in lower case. Rename the imports, and the range keys in a responses record or `validator.error` map you wrote by hand. An upper-case key such as `'2XX'` is no longer read:
+Generated names and keys write status ranges in lower case. Rename the imports and any range keys you wrote by hand in a responses record or `validator.error` map. An upper-case key such as `'2XX'` is no longer read:
 
 ```diff
 - import type { ListPetsStatus4XX } from './gen/types/ListPets'
@@ -111,7 +110,7 @@ Generated names and keys write a status range in lower case. Rename the imports,
 
 ## Tag folders
 
-With `group: { type: 'tag' }`, a tag whose OpenAPI 3.2 `parent` is `store` now writes to `store/payment/` instead of `payment/`. `importPath` is written into every file as given, so one relative path cannot serve two folder depths. Pass `group.name` to keep one folder per tag, or set `importPath` to a package name or alias:
+With `group: { type: 'tag' }`, a tag whose OpenAPI 3.2 `parent` is `store` now writes to `store/payment/`, not `payment/`. One relative `importPath` cannot serve both folder depths. Pass `group.name` to keep one folder per tag, or set `importPath` to a package name or alias:
 
 ```typescript
 pluginClient({ importPath: '../../../client', group: { type: 'tag', name: ({ group }) => group } })
@@ -121,20 +120,13 @@ pluginClient({ importPath: '../../../client', group: { type: 'tag', name: ({ gro
 
 These compile without errors, so check them by hand:
 
-| Change                                                                                                                                | What your client must do                                                                                           |
-| ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| A path or operation with its own `servers` passes that server as `baseURL`.                                                           | Use `config.baseURL` when it is set.                                                                               |
-| A `2xx` key is a success, and an exact code such as `200` wins over a range before it.                                                | Nothing, unless you read the responses record by hand.                                                             |
-| An XML, YAML, or CSV response is typed `string`. An image, audio, video, PDF, or `application/octet-stream` response is typed `Blob`. | Read the body as a `Blob` when the call passes `parseAs: 'blob'`, which it does when every success type is binary. |
-| An operation whose only success type is JSON Lines returns a `StreamResult`.                                                          | Parse one item per line in `client.stream`.                                                                        |
+| Change                                                                                                                          | What your client must do                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| A path or operation with its own `servers` passes that server as `baseURL`.                                                     | Use `config.baseURL` when set.                                                                         |
+| A `2xx` key is a success, and an exact code such as `200` wins over a range before it.                                          | Nothing, unless you read the responses record by hand.                                                 |
+| XML, YAML, and CSV responses are typed `string`. Image, audio, video, PDF, and `application/octet-stream` responses are `Blob`. | Read a `Blob` when the call passes `parseAs: 'blob'`, which it does when every success type is binary. |
+| An operation whose only success type is JSON Lines returns a `StreamResult`.                                                    | Parse one item per line in `client.stream`.                                                            |
 
 ## Return type
 
-`returnType` is new and defaults to `'plain'`, so existing code keeps working. `'full'` adds `.unwrap()`. `'data'` resolves to the body when `throwOnError` is `true`, and to the full result when it is `false`. Both import helpers from your module:
-
-| `returnType` | Extra exports                                            | Stream operations also import            |
-| ------------ | -------------------------------------------------------- | ---------------------------------------- |
-| `'full'`     | `withUnwrap`, `resolveThrowOnError`, `Unwrappable`       | `StreamOptions`, `StreamResult`          |
-| `'data'`     | `unwrapResult`, `resolveThrowOnError`, `UnwrappedResult` | `StreamOptions`, `UnwrappedStreamResult` |
-
-Both need a `StreamResult` with `data` and `error`, so the minimal type above is not enough. `@kubb/plugin-client/templates/core.ts` exports all of these. See [returnType](https://kubb.dev/extensions/kubb-labs/plugin-client/options#returntype).
+`returnType` is new and defaults to `'plain'`, so existing code keeps working. `'full'` adds `.unwrap()`, and `'data'` resolves to the body when `throwOnError` is `true`. Both `'full'` and `'data'` import extra helpers from your module. See [returnType](https://kubb.dev/extensions/kubb-labs/plugin-client/options#returntype).

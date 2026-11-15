@@ -2,7 +2,7 @@
 
 Replace the network send of the generated axios client with your own axios instance or function.
 
-The client still builds the URL, serializes parameters, resolves auth, runs interceptors, and decodes the result.
+The client still builds the URL, serializes parameters, resolves auth, runs interceptors, and decodes the result. `client.interceptors` handlers keep running, whatever the transport.
 
 ## Write a transport function
 
@@ -25,7 +25,7 @@ type ResolvedRequest = {
 type TransportResult = { webResponse: Response; request: AxiosRequestConfig; response: AxiosResponse }
 ```
 
-Return a `TransportResult` to set the native `request` and `response` that results and errors carry. With a plain `Response`, `request` is a `Request` built from the resolved request without its body, or the resolved request itself for a relative URL.
+Return a `TransportResult` to set the native `request` and `response` that results and errors carry. See [Transport results](EDGE:transport-results) for what a plain `Response` gives.
 
 ## Send through your own axios instance
 
@@ -45,14 +45,12 @@ instance.interceptors.response.use((response) => {
 client.setConfig({ transport: createAxiosTransport(instance) })
 ```
 
-`client.interceptors` handlers keep running, whatever the transport.
-
 > [!NOTE]
-> Kubb sets `url`, `method`, `headers`, `data`, `transformRequest`, `transformResponse`, `responseType`, and `validateStatus` for its own serialization and status handling, so leave those alone. For one call, pass `options`, such as `{ timeout }` or `{ onUploadProgress }`, instead of a new instance.
+> Kubb sets `url`, `method`, `headers`, `data`, `transformRequest`, `transformResponse`, `responseType`, and `validateStatus`, so leave those alone. For one call, pass `options`, such as `{ timeout }`, instead of a new instance.
 
 ## Wrap the default transport
 
-`defaultTransport` sends through the instance `getAxiosInstance()` returns. Configure that instance to keep the default transport, or wrap the transport to add tracing or timing:
+`defaultTransport` sends through the instance `getAxiosInstance()` returns. Configure that instance, or wrap the transport to add tracing or timing:
 
 ```typescript
 import { client, defaultTransport, getAxiosInstance } from './gen/.kubb/client'
@@ -86,4 +84,4 @@ const { data } = await getPetById({ path: { petId: 1 }, client: testClient })
 | A separate client | `createClient({ transport })`     |
 | One call          | `transport` on the call           |
 
-A client from `createClient()` copies the shared `transport` when you create it, and a later `client.setConfig({ transport })` does not reach it. Without a `transport` on either, it sends through `getAxiosInstance()`.
+A client from `createClient()` copies the shared `transport` at creation, so a later `client.setConfig({ transport })` does not reach it. Without a `transport`, it sends through `getAxiosInstance()`.

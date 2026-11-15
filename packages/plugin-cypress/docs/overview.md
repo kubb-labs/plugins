@@ -1,24 +1,26 @@
 # Cypress
 
-The Cypress plugin generates a typed `cy.request()` helper for each operation in your OpenAPI spec. Each helper takes grouped `path`, `query`, `headers`, `cookies`, and `body` parameters named after the spec, and it returns the response body typed as `Cypress.Chainable<{Operation}Response>`.
+The Cypress plugin generates a typed `cy.request()` helper for each operation in your OpenAPI spec. A helper returns `Cypress.Chainable<{Operation}Response>`.
+
+Each helper takes grouped `path`, `query`, `headers`, `cookies`, and `body` parameters named after the spec.
 
 ## Setup
 
 - Add `@kubb/plugin-ts` for the request and response types.
 - Install `cypress` v15 or v16 in the project that runs the tests.
-- Add `"types": ["cypress"]` to the tsconfig that covers the generated files, because the helpers use the global `Cypress` namespace.
+- Add `"types": ["cypress"]` to the tsconfig that covers the generated files. The helpers use the global `Cypress` namespace.
 
 ## Options worth knowing
 
-| Option                                                                            | Default | What it does                                                                                       |
-| --------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------- |
-| [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-cypress/options#baseurl) | None    | Prepends a host to every request. Without it, Cypress resolves the path against its own `baseUrl`. |
+| Option                                                                            | Default | What it does                                                                      |
+| --------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------- |
+| [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-cypress/options#baseurl) | None    | Prepends a host. Without it, Cypress resolves the path against its own `baseUrl`. |
 
 The other options are the [shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options).
 
 ## Example
 
-The config below writes the helpers to `src/gen/cypress`. The Petstore spec declares JSON and XML for most responses, so `contentType` keeps the JSON one. Without it, a response body is typed as `Pet | string`. `integerType: 'number'` types the `int64` `petId` as `number` instead of `bigint`.
+This config writes the helpers to `src/gen/cypress`. `contentType` keeps the JSON response of the Petstore spec, which also declares XML, so bodies are not typed as `Pet | string`. `integerType: 'number'` types the `int64` `petId` as `number`.
 
 ::code-group
 

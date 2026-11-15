@@ -26,7 +26,7 @@ npx kubb generate
 
 ### Run the type checker
 
-Most breaking changes show up as compile errors in your own code:
+Most breaking changes show up as compile errors:
 
 ```bash
 npx tsc --noEmit
@@ -34,106 +34,92 @@ npx tsc --noEmit
 
 ### Fix each error
 
-Find its row in [What to change](#what-to-change). Then read [Behavior changes](#behavior-changes), which the type checker does not catch.
+Find its row in [What to change](#what-to-change). Then check the [behavior changes](#behavior-changes), which the type checker does not catch.
 
 ::
 
 ## What to change
 
-| Your code                                                                    | Change                                                                            |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Only calls generated functions, SDK methods, or hooks                        | Regenerate, then check the [behavior changes](#behavior-changes).                 |
-| Registers handlers on `client.interceptors`                                  | [Move them to `getAxiosInstance()`, or rewrite them](#interceptors).              |
-| Passes an axios instance as `transport`, or sets `defaultTransport.defaults` | [Use `createAxiosTransport` and `getAxiosInstance()`](#axios-instance).           |
-| Imports from `templates/axios.ts` or `templates/core.ts`                     | [Change the import path](#template-imports).                                      |
-| Uses `AxiosOptions`, `defaultQuerySerializer`, or another removed export     | [Use the replacement](#renamed-and-removed-exports).                              |
-| Sets `codecs`, `serializer.body`, or `responseType`                          | [Use `mediaTypes` and `parseAs`](#media-types).                                   |
-| Streams with `toEventStream`, or names `EventStreamResult`                   | [Use `client.stream` and `StreamResult`](#streams).                               |
-| Writes a `transport` function                                                | [Return a web `Response`](#transports).                                           |
-| Registers `client.interceptors.error` handlers                               | [Narrow the error first](#error-interceptors).                                    |
-| Imports a `…Status2XX` type, or writes a `'2XX'` key                         | [Write the range in lower case](#status-ranges).                                  |
-| Imports generated files by path                                              | [Update paths for nested tags and the `Operation` suffix](#generated-file-paths). |
-| Uses SDK tag classes, such as `new pet(config)`                              | [Use `new PetClient(config)`](#sdk-class-names).                                  |
-| Comes from 5.12 or earlier and streams                                       | [Check the 5.13 changes](#from-512-or-earlier).                                   |
+| You used                                                                         | Now                                                                                                                                               |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@kubb/plugin-axios/templates/axios.ts`                                          | `@kubb/plugin-axios/templates/client.ts`. It exports types only.                                                                                  |
+| `@kubb/plugin-axios/templates/core.ts`, `serializers.ts`, or `standardSchema.ts` | `@kubb/plugin-client/templates/*`. These export types only.                                                                                       |
+| `client.interceptors` handlers that read axios objects                           | Move them to `getAxiosInstance()`, or rewrite them. See [Interceptors](#interceptors).                                                            |
+| An axios instance as `transport`                                                 | `createAxiosTransport(instance)`                                                                                                                  |
+| `defaultTransport.defaults`                                                      | `getAxiosInstance().defaults`. `defaultTransport` is now a function.                                                                              |
+| A `transport` that returns `{ data, status, ... }`                               | Return a web `Response`, or `{ webResponse, request, response }`. Response interceptors get a `DecodedResponse`, the shape `TransportResult` had. |
+| `client.interceptors.error` handlers that read `status`                          | Narrow with `ResponseError.is` first. They also get network errors (`AxiosError`), aborts, and validation errors.                                 |
+| `AxiosOptions`                                                                   | `NativeOptions`, the same type: `AxiosRequestConfig`.                                                                                             |
+| `validateStatus`                                                                 | Removed. The client splits success from error by status.                                                                                          |
+| `AxiosTransport`, `InterceptorChannel`                                           | Removed. `createClientCore`, `ClientInstance`, and `Interceptors` come from the core.                                                             |
+| `InterceptorFn`                                                                  | The core's `InterceptorFn<T>`, which gets the core objects.                                                                                       |
+| `defaultQuerySerializer`                                                         | `serializeQuery`, or `serializeStyledQuery` for a styled query parameter.                                                                         |
+| `defaultPathSerializer`                                                          | `serializePath`, plus `serializeStyledPath` for a `label` or `matrix` parameter.                                                                  |
+| `applyHeaderStyles`                                                              | `serializeHeaders`                                                                                                                                |
+| `codecs`                                                                         | `mediaTypes`. See [Media types](#media-types).                                                                                                    |
+| `Codec`, `Deserializer`, `ContentBodySerializer`, `BodySerializer`               | `MediaType`                                                                                                                                       |
+| `serializer.body`, `defaultBodySerializer`, `isDefaultJsonBody`                  | A `mediaTypes` entry, or `defaultMediaTypes`.                                                                                                     |
+| `responseType`, `ResponseType`, `ResponseTypeMap`, `resolveResponseType`         | `parseAs` and `ParseAs`, such as `parseAs: 'blob'`, or a media type.                                                                              |
+| `formMediaTypes`                                                                 | `multipartFormData` and `urlencoded`, written to `.kubb/mediaTypes/` when the spec has a form body.                                               |
+| `CallResult`, `isStreamed`, `getResponseContentType`                             | Removed. Read `result.contentType`.                                                                                                               |
+| `toEventStream`, `EventStreamCall`, `EventStreamResult`                          | `client.stream` and `StreamResult`. See [Streams](#streams).                                                                                      |
+| `ServerSentEvent`, `TypedEvent`, or `StreamResult` from `.kubb/sse.ts`           | Import them from `.kubb/client.ts`.                                                                                                               |
+| A `…Status2XX` type, or a `'2XX'` key in a responses record or `validator.error` | Lower case: `…Status2xx` and `'2xx'`. An upper-case key is no longer read.                                                                        |
+| `clients/payment/` for tag `payment` with `parent: store`                        | `clients/store/payment/`. To keep one folder per tag, pass `group: { type: 'tag', name: ({ group }) => group }`.                                  |
+| `types/Point.ts` for operation `point` next to schema `Point`                    | `types/PointOperation.ts`, whenever a schema file has the same name, in any case.                                                                 |
+| `new pet(config)` with `sdk` and `group: { type: 'tag' }`                        | `new PetClient(config)`. The files and the root class's fields, such as `pet`, stay the same.                                                     |
+| `clientGenerator` from `@kubb/plugin-axios`                                      | Removed. Build on `setupClient` and `clientDependencies` from `@kubb/plugin-client`.                                                              |
 
-## Template imports
+Runtime values such as `client` still come from the generated `.kubb/client.ts`. The common rewrites:
 
-`templates/axios.ts` is gone, and the package no longer publishes its own `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts`. Import the client types from `@kubb/plugin-axios/templates/client.ts` and the shared runtime from `@kubb/plugin-client/templates/*`:
+::code-group
 
-```diff
+```diff [Imports]
 - import type { RequestConfig } from '@kubb/plugin-axios/templates/axios.ts'
 - import type { ResolvedRequest } from '@kubb/plugin-axios/templates/core.ts'
 + import type { RequestConfig } from '@kubb/plugin-axios/templates/client.ts'
 + import type { ResolvedRequest } from '@kubb/plugin-client/templates/core.ts'
 ```
 
-These paths export types only. Runtime values such as `client` still come from the generated `.kubb/client.ts`.
+```diff [Axios instance]
+- import { client, defaultTransport } from './gen/.kubb/client'
++ import { client, createAxiosTransport, getAxiosInstance } from './gen/.kubb/client'
 
-## Renamed and removed exports
-
-| v5                                                                 | v6                                                                                    |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| `AxiosOptions`                                                     | `NativeOptions`, the same type: `AxiosRequestConfig`.                                 |
-| `validateStatus`                                                   | Removed. The client splits success from error by status.                              |
-| `AxiosTransport`, `InterceptorChannel`                             | Removed. `createClientCore`, `ClientInstance`, and `Interceptors` come from the core. |
-| `InterceptorFn`                                                    | The core's `InterceptorFn<T>`, which gets the core objects.                           |
-| `defaultQuerySerializer`                                           | `serializeQuery`, or `serializeStyledQuery` for a styled query parameter.             |
-| `defaultPathSerializer`                                            | `serializePath`, plus `serializeStyledPath` for a `label` or `matrix` parameter.      |
-| `applyHeaderStyles`                                                | `serializeHeaders`                                                                    |
-| `toEventStream`, `EventStreamCall`, `EventStreamResult`            | `client.stream` and `StreamResult`. See [Streams](#streams).                          |
-| `Codec`, `Deserializer`, `ContentBodySerializer`, `BodySerializer` | `MediaType`. See [Media types](#media-types).                                         |
-| `defaultBodySerializer`, `isDefaultJsonBody`                       | A `mediaTypes` entry, or `defaultMediaTypes`.                                         |
-| `ResponseType`, `ResponseTypeMap`, `resolveResponseType`           | `ParseAs` and `parseAs`.                                                              |
-| `CallResult`, `isStreamed`, `getResponseContentType`               | Removed. Read `result.contentType`.                                                   |
-| `clientGenerator` from `@kubb/plugin-axios`                        | Removed. Build on `setupClient` and `clientDependencies` from `@kubb/plugin-client`.  |
-
-Each serializer now has its own file in `.kubb/serializers/`, written only when the spec needs it, and `setConfig({ serializer })` merges per key. `serializer.header` and `serializer.cookie` are new. A client you build with `createClientCore` gets no serializers, so pass them in its `serializer` config. See [Override parameter serialization](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization#override-parameter-serialization).
-
-`ServerSentEvent`, `TypedEvent`, and `StreamResult` moved from `.kubb/sse.ts` to `.kubb/client.ts`.
-
-## Media types
-
-| v5                                                              | v6                                           | Migration                                                  |
-| --------------------------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------- |
-| `codecs`                                                        | `mediaTypes`                                 | Rename the key.                                            |
-| `codecs[type].serialize(body, contentType)`                     | `mediaTypes[type].encode(body, context)`     | Read `context.contentType`.                                |
-| `codecs[type].deserialize(raw, contentType)` with a parsed body | `mediaTypes[type].decode(response, context)` | Read the body yourself, such as `await response.text()`.   |
-| `serializer.body`                                               | Removed                                      | Move a custom body serializer into a `mediaTypes` entry.   |
-| `responseType` on a call, a string or a map                     | Removed                                      | Use `parseAs`, such as `parseAs: 'blob'`, or a media type. |
-
-```diff
-- client.setConfig({ codecs: { 'application/xml': { deserialize: (raw) => parseXml(raw as string) } } })
-+ client.setConfig({ mediaTypes: { 'application/xml': { decode: async (response) => parseXml(await response.text()) } } })
+- defaultTransport.defaults.timeout = 10_000
+- client.setConfig({ transport: axios.create({ baseURL }) })
++ getAxiosInstance().defaults.timeout = 10_000
++ client.setConfig({ transport: createAxiosTransport(axios.create({ baseURL })) })
 ```
 
-A key can be a pattern, such as `text/*`. `formMediaTypes` is gone: `multipartFormData` and `urlencoded` are written to `.kubb/mediaTypes/` when the spec has a form body. See [Built-in media types](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization#built-in-media-types).
-
-## Streams
-
-Send a stream request with `client.stream`. Its result is already the stream:
-
-```diff
-- const { stream } = await toEventStream(client({ method: 'GET', url: '/events', responseType: 'stream' }), { shape: 'data' })
-+ const { stream } = await client.stream({ method: 'GET', url: '/events', eventShape: 'data' })
+```diff [Transport]
+- transport: async () => ({ data: { id: 1 }, status: 200, statusText: 'OK', headers: new Headers(), request, response })
++ transport: async () => Response.json({ id: 1 })
 ```
 
-`StreamResult` and `UnwrappedStreamResult` take the responses record and the full event type. Wrap a payload in `ServerSentEvent`. A stream typed with `TypedEvent<…>` stays the same:
-
-```diff
-- let result: EventStreamResult<PetEvent>
-+ let result: StreamResult<StreamPetsResponses, true, ServerSentEvent<PetEvent>>
+```typescript [Error interceptors]
+client.interceptors.error.use((error) => {
+  if (ResponseError.is(error) && error.status === 401) refreshToken()
+  return error
+})
 ```
 
-| Change                                             | v5                         | v6                                                                                         |
-| -------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------ |
-| An operation whose only success type is JSON Lines | The whole body as a string | A `StreamResult` with one parsed item per line                                             |
-| A stream response that declares headers            | `StreamResult`             | `StreamResultWithHeaders`, or `UnwrappedStreamResultWithHeaders` with `returnType: 'data'` |
+```diff [Status ranges]
+- import type { ListPetsStatus4XX } from './gen/types/ListPets'
++ import type { ListPetsStatus4xx } from './gen/types/ListPets'
+```
 
-See [Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events).
+```diff [SDK classes]
+- import { pet } from './gen/sdk/pet/pet'
+- const api = new pet({ baseURL })
++ import { PetClient } from './gen/sdk/pet/pet'
++ const api = new PetClient({ baseURL })
+```
+
+::
 
 ## Interceptors
 
-`client.interceptors` handlers now get the core objects: the `ResolvedRequest`, the `DecodedResponse`, and the error. The quickest fix moves each handler to `getAxiosInstance()`, the instance v5 called `defaultTransport`, and keeps its body:
+`client.interceptors` handlers now get the core objects: the `ResolvedRequest`, the `DecodedResponse`, and the error. The quickest fix moves each handler, unchanged, to `getAxiosInstance()`, the instance v5 called `defaultTransport`:
 
 ::code-group
 
@@ -160,84 +146,40 @@ client.interceptors.request.use((request) => {
 
 ::
 
-Native response interceptors see the raw bytes, not the decoded body. The core form also runs on `@kubb/plugin-fetch`. See [Add interceptors](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/configure-requests#add-interceptors).
+Native response interceptors see the raw bytes, not the decoded body. The core form also runs on `@kubb/plugin-fetch`.
 
-## Axios instance
+## Media types
 
-`transport` takes a transport function. Wrap an axios instance with `createAxiosTransport`, and set defaults on `getAxiosInstance()`:
-
-```diff
-- import { client, defaultTransport } from './gen/.kubb/client'
-+ import { client, createAxiosTransport, getAxiosInstance } from './gen/.kubb/client'
-
-- defaultTransport.defaults.timeout = 10_000
-- client.setConfig({ transport: axios.create({ baseURL }) })
-+ getAxiosInstance().defaults.timeout = 10_000
-+ client.setConfig({ transport: createAxiosTransport(axios.create({ baseURL })) })
-```
-
-`defaultTransport` is now a function that sends through `getAxiosInstance()`.
-
-## Transports
-
-A transport function returns a web `Response`, or `{ webResponse, request, response }` to also set the native objects. The core decodes the body, and response interceptors get a `DecodedResponse`, the shape `TransportResult` had:
+Rename `codecs` to `mediaTypes`. `serialize(body, contentType)` becomes `encode(body, context)`, with the type in `context.contentType`. `deserialize` got a parsed body, but `decode(response, context)` gets the `Response`, so read the body yourself:
 
 ```diff
-- transport: async () => ({ data: { id: 1 }, status: 200, statusText: 'OK', headers: new Headers(), request, response })
-+ transport: async () => Response.json({ id: 1 })
+- client.setConfig({ codecs: { 'application/xml': { deserialize: (raw) => parseXml(raw as string) } } })
++ client.setConfig({ mediaTypes: { 'application/xml': { decode: async (response) => parseXml(await response.text()) } } })
 ```
 
-See [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport).
+A key can be a pattern, such as `text/*`. See [Built-in media types](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization#built-in-media-types).
 
-## Error interceptors
+## Streams
 
-`client.interceptors.error` handlers now also get network errors, aborts, and validation errors. A network error arrives as the native `AxiosError`. Narrow with `ResponseError.is` before you read `status`:
-
-```typescript
-client.interceptors.error.use((error) => {
-  if (ResponseError.is(error) && error.status === 401) refreshToken()
-  return error
-})
-```
-
-See [Handle errors](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/error-handling).
-
-## Status ranges
-
-Status ranges are lower case in generated names and keys. Rename the imports, and the range keys in a hand-written responses record or `validator.error` map. An upper-case key such as `'2XX'` is no longer read:
+Send a stream request with `client.stream`. Its result is already the stream:
 
 ```diff
-- import type { ListPetsStatus4XX } from './gen/types/ListPets'
-+ import type { ListPetsStatus4xx } from './gen/types/ListPets'
+- const { stream } = await toEventStream(client({ method: 'GET', url: '/events', responseType: 'stream' }), { shape: 'data' })
++ const { stream } = await client.stream({ method: 'GET', url: '/events', eventShape: 'data' })
 ```
 
-## Generated file paths
-
-Two changes move generated files. The exported names stay the same:
-
-| When                                                           | v5                 | v6                        |
-| -------------------------------------------------------------- | ------------------ | ------------------------- |
-| `group: { type: 'tag' }` and tag `payment` has `parent: store` | `clients/payment/` | `clients/store/payment/`  |
-| Operation `point` next to schema `Point`                       | `types/Point.ts`   | `types/PointOperation.ts` |
-
-To keep one folder per tag, pass `group.name`: `pluginAxios({ group: { type: 'tag', name: ({ group }) => group } })`. The `Operation` suffix applies when a schema file has the same name, in any case.
-
-## SDK class names
-
-With `sdk` and `group: { type: 'tag' }`, tag classes are named like `PetClient` instead of `pet`. The files and the root class's fields, such as `pet`, stay the same:
+`StreamResult` and `UnwrappedStreamResult` take the responses record and the full event type, so wrap a payload in `ServerSentEvent`. A `TypedEvent<…>` stays the same:
 
 ```diff
-- import { pet } from './gen/sdk/pet/pet'
-- const api = new pet({ baseURL })
-+ import { PetClient } from './gen/sdk/pet/pet'
-+ const api = new PetClient({ baseURL })
+- let result: EventStreamResult<PetEvent>
++ let result: StreamResult<StreamPetsResponses, true, ServerSentEvent<PetEvent>>
 ```
 
-The root class shares one client with every tag, so add interceptors on `api.client`.
+An operation whose only success type is JSON Lines now returns a `StreamResult` with one parsed item per line, not the body as a string. For stream responses that declare headers, see [Streaming](EDGE:streaming).
 
 ## Behavior changes
 
-These compile without errors, so check them by hand.
+These compile without errors, so check them by hand:
 
 | Area      | v5                                                                      | v6                                                                                                                                                                                  |
 | --------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -256,17 +198,12 @@ Also new in v6:
 
 - Requests: `body: null` goes out as the JSON document `null`. A stream call sends `Accept: text/event-stream`, or its JSON Lines media type. An auth requirement that needs several schemes sends all of them.
 - Responses: an empty body is `undefined` for every media type, text included. A failed call without a body reports `{ status, statusText }` as `error`. Every result, and a thrown `ResponseError`, has the response's `Headers` as `headers`.
-- Validation: `ResponseError.data` holds the validated body. `validator.error` takes a map by status, such as `{ 404: getPetStatus404Schema }`, to check an error body against the schema of its status.
-- Types: a `2xx` key is a success, range keys such as `4xx` type `status` as the numbers they cover, and an exact code such as `200` wins over a range. XML, YAML, and CSV responses are `string`, so JSON and XML together give `data: Pet | string`. Image, audio, video, PDF, and `application/octet-stream` responses are `Blob`, even with `type: string`. `result.contentType` is the bare media type, such as `'text/html'`.
-- Servers: `server.index` no longer counts a server without a `url`. Servers with a `name` are exported as `servers` from `.kubb/client.ts`.
+- Validation: `ResponseError.data` holds the validated body.
+- Types: a `2xx` key is a success, range keys such as `4xx` type `status` as the numbers they cover, and an exact code such as `200` wins over a range. XML, YAML, and CSV responses are `string`. Image, audio, video, PDF, and `application/octet-stream` responses are `Blob`, even with `type: string`. `result.contentType` is the bare media type, such as `'text/html'`.
+- Serializers: each has its own file in `.kubb/serializers/`, and `setConfig({ serializer })` merges per key. A client you build with `createClientCore` gets no serializers, so pass them in its `serializer` config.
+- Servers: `server.index` no longer counts a server without a `url`.
 
-## From 5.12 or earlier
-
-These changed in 5.13 and compile without errors:
-
-- A stream call keeps the adapter set on the call or on the instance, such as a mock adapter in tests. Only a browser call with the default adapters switches to the fetch adapter.
-- A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
-- An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
+For new v6 features and upgrades from 5.12 or earlier, see [v6 upgrade notes](EDGE:v6-upgrade-notes).
 
 ## Query plugins
 

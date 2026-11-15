@@ -4,13 +4,13 @@ Set the base URL, credentials, shared headers, and interceptors on the generated
 
 ## Where settings apply
 
-Every generated function sends through the shared `client` from `.kubb/client.ts`, unless a call passes its own. Pick the scope for a setting:
+Every generated function sends through the shared `client` from `.kubb/client.ts`, unless a call passes its own:
 
 | Scope             | How                         | Effect                                                                                  |
 | ----------------- | --------------------------- | --------------------------------------------------------------------------------------- |
 | Every call        | `client.setConfig({ ... })` | Merges into the shared config. `headers`, `mediaTypes`, and `serializer` merge per key. |
 | A separate client | `createClient({ ... })`     | Copies the shared config at creation, without its interceptors.                         |
-| A child client    | `client.extend({ ... })`    | Copies the shared config and runs the parent's interceptors before its own.             |
+| A child client    | `client.extend({ ... })`    | Copies the shared config and runs the parent's interceptors first.                      |
 | One call          | The same key on the call    | Wins over the client for that call.                                                     |
 
 The client takes `baseURL`, `headers`, `auth`, `credentials`, `options`, `transport`, `serializer`, `mediaTypes`, `validate`, and `onValidationError`:
@@ -39,31 +39,14 @@ A call uses the first base URL it finds:
 | 4     | `client.setConfig({ baseURL })`.                                                                     |
 | 5     | The plugin's [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#baseurl) option. |
 
-The spec's top-level `servers` URL is never used, even with the `server` option of `adapterOas`. For an operation or path with its own `servers`, the `server.index` of `adapterOas` picks the entry, falling back to the first. A relative URL such as `/v2`, or one with `{variable}` placeholders, is skipped.
+> [!NOTE]
+> The spec's top-level `servers` URL is never used, even with the `server` option of `adapterOas`.
 
-An OpenAPI 3.2 server with a `name` is exported from `.kubb/client.ts` in `servers`:
-
-::code-group
-
-```yaml [petStore.yaml]
-servers:
-  - url: https://api.example.com
-    name: production
-  - url: https://staging.example.com
-    name: staging
-```
-
-```typescript [src/api.ts]
-import { client, servers } from './gen/.kubb/client'
-
-client.setConfig({ baseURL: servers.staging })
-```
-
-::
+For which `servers` entry a call picks, and named servers, see [Server URLs](EDGE:server-urls).
 
 ## Authenticate requests
 
-Set `auth` to a token, or to a function that gets each [security scheme](https://spec.openapis.org/oas/v3.1.0#security-scheme-object) of the call and returns its token. The function can be async. Return `undefined` to skip a scheme:
+Set `auth` to a token, or to a sync or async function that gets each [security scheme](https://spec.openapis.org/oas/v3.1.0#security-scheme-object) of the call. It returns the token, or `undefined` to skip the scheme:
 
 ```typescript
 client.setConfig({
@@ -71,7 +54,7 @@ client.setConfig({
 })
 ```
 
-The runtime sends the first security requirement whose schemes all get a token, so a requirement that needs an API key and a session cookie sends both. Requests stay unauthenticated until `auth` is set. The scheme decides where the token goes:
+Requests stay unauthenticated until `auth` is set. The scheme decides where the token goes:
 
 | Scheme in the spec | `auth` gets                              | The token goes to               |
 | ------------------ | ---------------------------------------- | ------------------------------- |
@@ -86,40 +69,17 @@ The runtime sends the first security requirement whose schemes all get a token, 
 > [!NOTE]
 > For basic auth, return the raw `username:password`. The runtime base64-encodes it and adds the `Basic` prefix.
 
-A header or query key you set yourself wins over the token. An `oauth2` scheme also passes `metadataUrl` when the spec has one. `.kubb/client.ts` exports the spec's schemes by name as `securitySchemes`, and each generated call points at its own, with the scopes it needs:
-
-```typescript
-security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets'] }]
-```
-
-For a credential that no security scheme describes, such as a request signature, add a request interceptor.
-
-### Use mutual TLS
-
-A `mutualTLS` scheme is left out of `securitySchemes`, because its credential is a client certificate on the connection. In Node.js, give an axios instance the certificate:
-
-```typescript
-import { readFileSync } from 'node:fs'
-import { Agent } from 'node:https'
-import axios from 'axios'
-import { client, createAxiosTransport } from './gen/.kubb/client'
-
-const instance = axios.create({ httpsAgent: new Agent({ cert: readFileSync('client.crt'), key: readFileSync('client.key') }) })
-
-client.setConfig({ transport: createAxiosTransport(instance) })
-```
-
-In the browser, the browser picks the client certificate itself.
+For a credential that no security scheme describes, such as a request signature, add a request interceptor. For several schemes, precedence, and mutual TLS, see [Security schemes](EDGE:security-schemes).
 
 ## Add interceptors
 
 `client.interceptors` has three stacks. Each handler gets the value the one before it returned:
 
-| Stack      | Runs                                                                 | Gets              | Returns                                                       |
-| ---------- | -------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------- |
-| `request`  | After the URL, body, and auth are built, before the send.            | `ResolvedRequest` | The request.                                                  |
-| `response` | After the body is decoded, before the status check and validator.    | `DecodedResponse` | The result.                                                   |
-| `error`    | On any failure: `ResponseError`, network error, abort, `ParseError`. | The error         | Another error to throw instead, or nothing to keep the error. |
+| Stack      | Runs                                                                 | Gets              | Returns                                        |
+| ---------- | -------------------------------------------------------------------- | ----------------- | ---------------------------------------------- |
+| `request`  | After the URL, body, and auth are built, before the send.            | `ResolvedRequest` | The request.                                   |
+| `response` | After the body is decoded, before the status check and validator.    | `DecodedResponse` | The result.                                    |
+| `error`    | On any failure: `ResponseError`, network error, abort, `ParseError`. | The error         | Another error to throw, or nothing to keep it. |
 
 ::code-group
 
@@ -150,9 +110,9 @@ client.interceptors.error.use((error) => {
 
 ::
 
-`ResolvedRequest` has `url`, `method`, `headers`, `body`, `signal`, `credentials`, `options`, and `stream`. `DecodedResponse` has `data`, `status`, `statusText`, `headers`, `contentType`, `request`, and `response`. On a stream call, `data` is the raw body stream.
+`ResolvedRequest` has `url`, `method`, `headers`, `body`, `signal`, `credentials`, `options`, and `stream`. `DecodedResponse` has `data`, `status`, `statusText`, `headers`, `contentType`, `request`, and `response`.
 
-Handlers run in the order you register them. `use` returns an id for `eject`, which removes the handler, and `update`, which swaps it:
+Handlers run in the order you register them. `use` returns an id for `eject` and `update`:
 
 ```typescript
 const id = client.interceptors.request.use((request) => request)
@@ -161,11 +121,11 @@ client.interceptors.request.eject(id)
 ```
 
 > [!NOTE]
-> With `throwOnError: false`, a non-2xx response resolves, so no error handler runs for it. An error thrown inside a stream loop skips the error handlers too.
+> With `throwOnError: false`, a non-2xx response resolves, so no error handler runs for it.
 
 ### Native axios interceptors
 
-For the native `InternalAxiosRequestConfig`, `AxiosResponse`, or `AxiosError`, register on the axios instance that `getAxiosInstance()` returns:
+For the native `InternalAxiosRequestConfig`, `AxiosResponse`, or `AxiosError`, register on the axios instance that `getAxiosInstance()` returns. Native response interceptors see the raw bytes, before Kubb decodes them:
 
 ```typescript
 import { getAxiosInstance } from './gen/.kubb/client'
@@ -176,4 +136,6 @@ getAxiosInstance().interceptors.request.use((config) => {
 })
 ```
 
-Native request interceptors run after the `client.interceptors.request` handlers, in reverse order of registration, as axios runs them. Native response interceptors see the raw bytes, before Kubb decodes them. An instance you pass to `createAxiosTransport` keeps its own interceptors.
+For the order native and core handlers run in, see [Interceptor order](EDGE:interceptor-order).
+
+Next, [use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport).

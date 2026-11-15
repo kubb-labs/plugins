@@ -4,18 +4,22 @@ Catch a `ResponseError`, return errors as values with `throwOnError: false`, and
 
 ## What a call does
 
-| What happens                             | `throwOnError: true` (default)        | `throwOnError: false`                 |
-| ---------------------------------------- | ------------------------------------- | ------------------------------------- |
-| 2xx response                             | Resolves with `data`.                 | Resolves with `data`.                 |
-| Non-2xx response                         | Throws a `ResponseError`.             | Resolves with `error` and `status`.   |
-| A body fails its schema (`validator` on) | Throws a `ParseError`.                | Throws a `ParseError`.                |
-| Invalid JSON under a JSON media type     | Throws a `ParseError`.                | Throws a `ParseError`.                |
-| Network failure, DNS failure, or timeout | Rejects with the native `AxiosError`. | Rejects with the native `AxiosError`. |
-| Aborted `signal`                         | Rejects with the signal's reason.     | Rejects with the signal's reason.     |
+Only a non-2xx response depends on `throwOnError`:
+
+| What happens                             | Result                                                                                    |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 2xx response                             | Resolves with `data`.                                                                     |
+| Non-2xx response                         | Throws a `ResponseError`. With `throwOnError: false`, resolves with `error` and `status`. |
+| A body fails its schema (`validator` on) | Throws a `ParseError`.                                                                    |
+| Invalid JSON under a JSON media type     | Throws a `ParseError`.                                                                    |
+| Network failure, DNS failure, or timeout | Rejects with the native `AxiosError`.                                                     |
+| Aborted `signal`                         | Rejects with the signal's reason.                                                         |
 
 Every failure that rejects also reaches [`client.interceptors.error`](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/configure-requests#add-interceptors).
 
 ## Catch a ResponseError
+
+Narrow with `ResponseError.is(error)` instead of `instanceof`, because each generated package bundles its own `ResponseError` class:
 
 ```typescript
 import { getPetById } from './gen/clients/getPetById'
@@ -27,8 +31,6 @@ try {
   if (ResponseError.is(error)) console.error(error.status, error.data) // 404, the parsed error body
 }
 ```
-
-Each generated package bundles its own `ResponseError` class, so narrow with `ResponseError.is(error)`, which checks the error name, instead of `instanceof`.
 
 ```typescript
 class ResponseError extends Error {
@@ -42,11 +44,11 @@ class ResponseError extends Error {
 }
 ```
 
-The `message` names the method and the URL without its query string, so query credentials stay out of logs: `GET https://api.example.com/pets/1 failed with status 404 Not Found`.
+The `message` leaves out the query string, so query credentials stay out of logs: `GET https://api.example.com/pets/1 failed with status 404 Not Found`.
 
 ## Narrow a thrown error by status
 
-`isResponseError<Responses>(error)` narrows a caught error to one operation's `ResponseError`. A check on `status` then narrows `data` to that status's body:
+`isResponseError<Responses>(error)` narrows a caught error to one operation's `ResponseError`. A check on `status` then narrows `data`. For range keys such as `4xx`, see [Status ranges](EDGE:status-ranges):
 
 ```typescript
 import { isResponseError } from './gen/.kubb/client'
@@ -61,11 +63,12 @@ try {
 }
 ```
 
-A range key such as `4xx` covers its statuses that have no entry of their own, and `default` covers the rest. The type argument is not checked at runtime, so keep the `try` around one operation.
+> [!WARNING]
+> The type argument is not checked at runtime, so keep the `try` around one operation.
 
 ## Return the error instead
 
-With `throwOnError: false`, the call resolves for every status. `data` is set on success and `error` on failure. A failed call with an empty body sets `error` to `{ status, statusText }`:
+With `throwOnError: false`, the call resolves for every status. `data` is set on success and `error` on failure, and a check on `status` narrows both:
 
 ```typescript
 const result = await getPetById({ path: { petId: 1 }, throwOnError: false })
@@ -74,11 +77,11 @@ if (result.error !== undefined) console.error(result.status, result.error)
 else console.info(result.data)
 ```
 
-A check on `status` narrows `data` and `error` too, unless the operation declares a `default` response, whose status can be any number. `.unwrap()` on such a call turns `error` into a rejection.
+See [Error results](EDGE:error-handling) for empty error bodies and `default` responses.
 
 ## Set the generated default
 
-[`throwOnErrorDefault`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#throwonerrordefault) on the plugin sets what a call does when it leaves `throwOnError` out:
+[`throwOnErrorDefault`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#throwonerrordefault) on the plugin sets what a call does when it leaves `throwOnError` out. `client.setConfig({ throwOnError })` does not change it:
 
 ```typescript
 pluginAxios({ throwOnErrorDefault: false })
@@ -86,8 +89,6 @@ pluginAxios({ throwOnErrorDefault: false })
 const list = await searchPets({ query: { status: 'available' } }) // resolves with an error result
 const pet = await getPetById({ path: { petId: 1 }, throwOnError: true }) // throws
 ```
-
-`client.setConfig({ throwOnError })` does not change the default, because each generated function passes its own value.
 
 ## Validation failures
 
@@ -103,9 +104,7 @@ try {
 }
 ```
 
-The error body of a non-2xx response is checked against the schema of its status, then its range such as `5xx`, then `default`. A status the document leaves out keeps its body unchecked. An error body that fails its schema throws a `ParseError` instead of the `ResponseError`, also with `throwOnError: false`.
-
-Pass `onValidationError` on the call or the client to recover. Return `{ value }` to use that value, or nothing to throw the `ParseError`:
+To recover, pass `onValidationError` on the call or the client. Return `{ value }` to use that value, or nothing to throw the `ParseError`:
 
 ```typescript
 client.setConfig({
@@ -116,6 +115,8 @@ client.setConfig({
 })
 ```
 
+For which schema checks an error body, see [Runtime validation](EDGE:runtime-validation).
+
 ## Turn validation off at runtime
 
 `validator` decides at generation time which schemas a call carries. `validate` skips them at runtime, for example in production or in tests with partial fixtures:
@@ -125,4 +126,4 @@ client.setConfig({ validate: import.meta.env.DEV })
 client.setConfig({ validate: { response: false } }) // skip one direction
 ```
 
-`false` skips every schema. The object form skips the directions set to `false`: `request` (the body), `params`, `response`, and `error`. A per-call `validate` overrides the client. The default is `true`.
+The default is `true`. The object form skips each direction set to `false`: `request` (the body), `params`, `response`, or `error`. A per-call `validate` overrides the client.

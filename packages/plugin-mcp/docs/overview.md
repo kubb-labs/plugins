@@ -1,6 +1,8 @@
 # MCP
 
-The MCP plugin turns each operation into a typed MCP tool that AI assistants can call. Each tool validates its input and output with the Zod schemas from `@kubb/plugin-zod`, and its handler calls the function a client plugin generates for that operation.
+The MCP plugin turns each operation in your OpenAPI spec into a typed MCP tool that AI assistants can call, validated with `@kubb/plugin-zod` schemas.
+
+Each tool handler calls the function a client plugin generates for that operation.
 
 Next to the handlers, the plugin writes three files at the root of its `output.path`:
 
@@ -12,23 +14,25 @@ Next to the handlers, the plugin writes three files at the root of its `output.p
 
 ## Setup
 
-- Add `@kubb/plugin-zod`, a client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`), and `@kubb/plugin-ts`. `@kubb/plugin-ts` is optional with `pluginZod({ inferred: 'codec' })`. Leave `sdk` unset on the client plugin.
+- Add `@kubb/plugin-zod`, one client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`), and `@kubb/plugin-ts`. `@kubb/plugin-ts` is optional with `pluginZod({ inferred: 'codec' })`. Leave `sdk` unset on the client plugin.
 - Install `@modelcontextprotocol/server` v2 and `zod` 4.2 or a later v4 release in the app that runs the server. Add `axios` too when you use `@kubb/plugin-axios`.
 - Install a TypeScript runner such as `tsx`. The generated `.mcp.json` runs `npx tsx`, which downloads `tsx` from npm when it is missing.
 
 ## Options worth knowing
 
-| Option                                                                      | Default  | What it does                                                                                                 |
-| --------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
-| [`client`](https://kubb.dev/extensions/kubb-labs/plugin-mcp/options#client) | Detected | Picks `'fetch'`, `'axios'`, or `'client'` when several client plugins are registered.                        |
-| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)     | `[]`     | Skips operations. Use it for a binary request body, because an MCP client sends JSON and cannot send a file. |
-| [`output.path`](https://kubb.dev/docs/5.x/reference/plugin-options#output)  | `'mcp'`  | Must name a folder, because single-file output has no place for `server.ts`, `start.ts`, and `.mcp.json`.    |
+| Option                                                                      | Default  | What it does                                                                                               |
+| --------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| [`client`](https://kubb.dev/extensions/kubb-labs/plugin-mcp/options#client) | Detected | Picks `'fetch'`, `'axios'`, or `'client'` when several client plugins are registered.                      |
+| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)     | `[]`     | Skips operations, such as one with a binary request body. An MCP client sends JSON and cannot send a file. |
+| [`output.path`](https://kubb.dev/docs/5.x/reference/plugin-options#output)  | `'mcp'`  | Must name a folder for `server.ts`, `start.ts`, and `.mcp.json`.                                           |
 
-Operations that stream their response, such as `text/event-stream` or JSON Lines, get no tool, because a tool returns one JSON result.
+Operations that stream their response get no tool.
+
+See [Streaming](EDGE:streaming).
 
 ## Example
 
-The config below generates an MCP server whose tools call the Petstore API through `@kubb/plugin-fetch`. The `.mcp.json` names the server after the spec's `info.title`:
+This config generates an MCP server whose tools call the Petstore API through `@kubb/plugin-fetch`. The `.mcp.json` names the server after the spec's `info.title`:
 
 ::code-group
 
@@ -65,4 +69,4 @@ export default defineConfig({
 
 ::
 
-The `args` path points at `start.ts` relative to the Kubb `root`, because MCP clients start the command from their own working directory. The [Run an MCP server](https://kubb.dev/extensions/kubb-labs/plugin-mcp/guides/server) guide covers starting the server and connecting Claude Code or Claude Desktop.
+Next, [run the server](https://kubb.dev/extensions/kubb-labs/plugin-mcp/guides/server) and connect Claude Code or Claude Desktop.

@@ -23,7 +23,7 @@ For a query parameter named `id`:
 | `pipeDelimited`  | `false`   | `[3, 4, 5]`      | `id=3%7C4%7C5`   |
 | `deepObject`     | n/a       | `{ a: 1 }`       | `id%5Ba%5D=1`    |
 
-`spaceDelimited` and `pipeDelimited` default `explode` to `false`. With `explode: true` they repeat the key, like `form`. A space in a value goes out as `%20`. With `allowReserved`, reserved characters stay as they are, except `#`, `&`, and `+`.
+`spaceDelimited` and `pipeDelimited` default `explode` to `false`. A space in a value goes out as `%20`.
 
 :::
 
@@ -54,7 +54,7 @@ Headers always use the `simple` style. Only `explode` varies, and values are sen
 
 :::tabs-item{label="Cookie"}
 
-Cookies use the `form` style, or the OpenAPI 3.2 `cookie` style. The input is the call's `cookies` object, joined into one `Cookie` header.
+Cookies use the `form` style, or the OpenAPI 3.2 `cookie` style, joined into one `Cookie` header.
 
 | Style            | `explode` | Input                             | Sent                   |
 | ---------------- | --------- | --------------------------------- | ---------------------- |
@@ -68,18 +68,11 @@ Cookies use the `form` style, or the OpenAPI 3.2 `cookie` style. The input is th
 
 ::
 
+For `allowReserved` and `explode: true` on delimited styles, see [Parameter serialization](EDGE:parameter-serialization).
+
 ## Override parameter serialization
 
-Kubb writes the serializers a spec needs into `.kubb/serializers/` and registers them in `.kubb/config.ts`:
-
-| Key in `serializer` | File                                                           | Written for                    |
-| ------------------- | -------------------------------------------------------------- | ------------------------------ |
-| `query`             | `query.ts`, or `queryStyles.ts` with a styled query parameter  | every spec                     |
-| `path`              | `path.ts`, plus `pathStyles.ts` with a `label` or `matrix` one | every spec                     |
-| `header`            | `headers.ts`                                                   | a spec with a header parameter |
-| `cookie`            | `cookies.ts`                                                   | a spec with a cookie parameter |
-
-Set a key on the client to replace that serializer for every call, or on one call. The other keys keep theirs:
+Set a `serializer` key on the client to replace that serializer for every call, or on one call. The keys are `query`, `path`, `header`, and `cookie`, and the other keys keep theirs:
 
 ```typescript
 import qs from 'qs'
@@ -90,7 +83,7 @@ client.setConfig({
 })
 ```
 
-A call that needs a serializer the spec did not register throws a `TypeError` that names it, such as `serializer.cookie`. Without `serializer.header`, an array or object header value goes out as JSON.
+Kubb writes only the serializers a spec needs. See [Parameter serialization](EDGE:parameter-serialization) for which files it writes.
 
 ## Built-in media types
 
@@ -103,18 +96,17 @@ A call that needs a serializer the spec did not register throws a `TypeError` th
 | `text/event-stream`, `application/jsonl`, `application/x-ndjson`, `application/json-seq` |                                                   | text, or item by item with `client.stream` |
 | `*/*`                                                                                    | JSON for objects, strings and binary bodies as is | JSON, or text when the body is not JSON    |
 
-`.kubb/client.ts` registers the form types only when the spec has a body of that type, from `.kubb/mediaTypes/formData.ts` and `.kubb/mediaTypes/urlencoded.ts`. It registers the stream types, `streamMediaTypes` in `.kubb/sse.ts`, only when the spec streams.
-
-The runtime lower-cases a `Content-Type`, drops its parameters, and tries the exact type, then a suffix such as `application/*+json`, then a wildcard such as `text/*`, then `*/*`. Write your own keys in lower case.
+The runtime matches the lower-cased type without its parameters: the exact type, then a suffix such as `application/*+json`, then a wildcard such as `text/*`, then `*/*`. Write your own keys in lower case.
 
 ## Encode request bodies
 
-An operation with one request content type has it built in. For one with several, set `contentType` on the call. A body without a content type goes out as `application/json`, unless it is already encoded.
+For an operation with several request content types, set `contentType` on the call. A body without a content type goes out as `application/json`, unless it is already encoded.
 
 - An encoded body passes every built-in media type as is: `FormData`, `URLSearchParams`, `Blob`, `ArrayBuffer`, typed arrays, streams, and strings. Under a JSON media type, a string is JSON-encoded.
 - For a `FormData` body, the runtime removes `Content-Type`, so the transport sets it with the multipart boundary.
-- A `bigint` goes out as a JSON number. One past `Number.MAX_SAFE_INTEGER` throws a `TypeError` instead of losing precision.
 - XML, YAML, and CSV have no built-in encoder, so an object under one throws a `TypeError`. Pass the encoded string, cast to the body type (`body: xml as unknown as AddPetBodyXml`), or add a media type.
+
+For `bigint` bodies, see [64-bit integers](EDGE:64-bit-integers).
 
 ## Add a media type
 
@@ -134,7 +126,7 @@ client.setConfig({
 })
 ```
 
-Handlers merge per key over the built-ins and over earlier `setConfig` calls, and a handler passed on one call merges over the client's. An entry with only `decode` still encodes through the next match, such as `*/*`. A streaming format adds `stream`, which reads a 2xx body item by item, and the runtime validates each item:
+Handlers merge per key over the built-ins. For the merge order, see [Content types](EDGE:content-types). A streaming format adds `stream`, which reads a 2xx body item by item, and the runtime validates each item:
 
 ```typescript
 client.setConfig({
@@ -144,18 +136,17 @@ client.setConfig({
 
 ## Decode responses
 
-Axios reads every body as bytes, then the runtime decodes it by the response `Content-Type`. Native axios response interceptors see those bytes, so use `client.interceptors.response` to see the decoded body. The result's `contentType` holds the media type, so a `switch (result.contentType)` narrows `data` for an operation that returns several.
+Axios reads every body as bytes, then the runtime decodes it by the response `Content-Type`. Native axios response interceptors see those bytes, so use `client.interceptors.response` to see the decoded body. A `switch (result.contentType)` narrows `data` for an operation that returns several media types.
 
-| Response                                             | `data`                                                                |
-| ---------------------------------------------------- | --------------------------------------------------------------------- |
-| 2xx without a `Content-Type`                         | Decoded as the call's `contentType.response`, then `*/*`.             |
-| 204, 205, or 304, a `HEAD` request, or an empty body | `undefined`                                                           |
-| Invalid JSON under a JSON media type                 | Throws a `ParseError`.                                                |
-| 2xx with `parseAs` set on the call                   | Read as `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`. |
+| Response                                             | `data`                                                                             |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| 204, 205, or 304, a `HEAD` request, or an empty body | `undefined`                                                                        |
+| Invalid JSON under a JSON media type                 | Throws a `ParseError`. Catch it, or register a lenient `application/json` handler. |
+| 2xx with `parseAs` set on the call                   | Read as `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`.              |
 
-Kubb sets `parseAs: 'blob'` on an operation whose success content is only binary. Catch the `ParseError`, or register a lenient `application/json` handler.
+For a 2xx without a `Content-Type`, binary downloads, and vendor types, see [Content types](EDGE:content-types).
 
-The generated types follow what the built-in media types return. XML, YAML, and CSV responses are typed `string`, even with an object schema. A vendor type such as `application/vnd.github.object` keeps its schema type. A media type you register changes the value but not the type, so cast `data`:
+XML, YAML, and CSV responses are typed `string`, even with an object schema. A media type you register changes the value but not the type, so cast `data`:
 
 ```typescript
 const result = await getPetById({ path: { petId: 1 }, contentType: { response: 'application/xml' } })
@@ -167,4 +158,4 @@ if (result.contentType === 'application/xml') {
 > [!NOTE]
 > With the adapter's default [`integerType: 'bigint'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype), an `int64` field is typed `bigint`, but `JSON.parse` returns a `number`. Set `integerType: 'number'`, or turn on [`validator: 'zod'`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator), which converts the field. `JSON.parse` loses precision above `Number.MAX_SAFE_INTEGER` either way, so declare an exact 64-bit ID as a string.
 
-[Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events) covers the stream media types and `client.stream`.
+Next, [Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events) covers the stream media types and `client.stream`.

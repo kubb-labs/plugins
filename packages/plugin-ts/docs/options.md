@@ -6,7 +6,7 @@ Pass these options to `pluginTs()`. Shared options link to [Shared plugin option
 
 | Option                                                                    | Purpose                                                                              | Default                                                                               |
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written: `path`, `mode`, `barrel`, `banner`, `footer`.               | `{ path: 'types', barrel: { type: 'named' } }`                                        |
+| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                                             | `{ path: 'types', barrel: { type: 'named' } }`                                        |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                                         | None                                                                                  |
 | [`enum`](#enum)                                                           | How enums are generated and named.                                                   | `{ type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' }` |
 | ↳ [`enum.type`](#enumtype)                                                | Representation of each enum.                                                         | `'asConst'`                                                                           |
@@ -28,7 +28,7 @@ Pass these options to `pluginTs()`. Shared options link to [Shared plugin option
 
 ### enum
 
-How OpenAPI enums are represented in the generated TypeScript, and how their names are cased.
+How enums are generated and how their names are cased.
 
 |          |                                                                                       |
 | -------- | ------------------------------------------------------------------------------------- |
@@ -36,13 +36,7 @@ How OpenAPI enums are represented in the generated TypeScript, and how their nam
 | Required | `false`                                                                               |
 | Default  | `{ type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' }` |
 
-Which fields apply depends on `type`:
-
-| `type`                         | `constCasing` | `typeSuffix` | `keyCasing`     |
-| ------------------------------ | ------------- | ------------ | --------------- |
-| `'asConst'`                    | Yes           | Yes          | Yes             |
-| `'enum'`, `'constEnum'`        | No            | No           | Yes             |
-| `'literal'`, `'inlineLiteral'` | No            | No           | No, values only |
+`constCasing` and `typeSuffix` apply only to `'asConst'`. `keyCasing` also applies to `'enum'` and `'constEnum'`.
 
 #### enum.type
 
@@ -61,11 +55,11 @@ Writes an `as const` object and a union type of its values. Bundlers drop the ob
 :::
 
 :::field{name="'enum'"}
-Writes a TypeScript `enum`, which has JavaScript runtime code.
+Writes a TypeScript `enum`, which emits JavaScript runtime code.
 :::
 
 :::field{name="'constEnum'"}
-Writes a `const enum`, inlined at compile time. With `--isolatedModules`, code can use it from the generated source, but not through a `.d.ts` file, such as the types of a published package.
+Writes a `const enum`, inlined at compile time. With `--isolatedModules`, code cannot use it through a `.d.ts` file, such as the types of a published package.
 :::
 
 :::field{name="'literal'"}
@@ -73,7 +67,7 @@ Writes a named union type with no runtime value.
 :::
 
 :::field{name="'inlineLiteral'"}
-Writes the same union as `'literal'` and inlines it at each use for an enum declared on a property. A component enum that a `$ref` points to keeps its named type.
+Inlines the `'literal'` union of an enum declared on a property. A component enum reached through a `$ref` keeps its named type.
 :::
 
 ::
@@ -128,7 +122,7 @@ Names the const `PetStatus`, the same as the schema.
 
 #### enum.typeSuffix
 
-Suffix on the companion type when `type` is `'asConst'`. It never changes the const object name. `''` drops the suffix, and with `constCasing: 'pascalCase'` the const and the type then share one name, `PetStatus`.
+Suffix of the companion type when `type` is `'asConst'`. The const name never changes. Set `''` with `constCasing: 'pascalCase'` to give the const and the type one name, `PetStatus`.
 
 |          |          |
 | -------- | -------- |
@@ -193,7 +187,7 @@ Writes `export type Pet = { name: string }`.
 :::
 
 :::field{name="'interface'"}
-Writes `export interface Pet { name: string }`. Use it when consumers need declaration merging. See [Type vs Interface](https://www.totaltypescript.com/type-vs-interface-which-should-you-use).
+Writes `export interface Pet { name: string }`. Use it when consumers need [declaration merging](https://www.totaltypescript.com/type-vs-interface-which-should-you-use).
 :::
 
 ::
@@ -219,7 +213,7 @@ Writes `type: string | undefined`. The property must exist but may be `undefined
 :::
 
 :::field{name="'questionTokenAndUndefined'"}
-Writes `type?: string | undefined`, so the property may be missing or `undefined`. Use it with `"exactOptionalPropertyTypes": true`.
+Writes `type?: string | undefined`. The property may be missing or `undefined`. Use it with `"exactOptionalPropertyTypes": true`.
 :::
 
 ::
@@ -241,14 +235,14 @@ Writes `tags: string[]`.
 :::
 
 :::field{name="'generic'"}
-Writes `tags: Array<string>`, which reads better for elements like `Array<{ id: number }>`.
+Writes `tags: Array<string>`, which reads better for complex elements.
 :::
 
 ::
 
 ### operations
 
-Whether each operation gets its own types file, with types such as `AddPetOptions`, `AddPetResponses`, `AddPetStatus200`, and `AddPetPath`. A response that declares `headers` also gets a type such as `ListPetsStatus200Headers`, and cookie parameters get one such as `ListPetsCookies`.
+Whether each operation gets its own types file, with types such as `AddPetOptions`, `AddPetResponses`, and `AddPetStatus200`.
 
 |          |                        |
 | -------- | ---------------------- |
@@ -259,29 +253,32 @@ Whether each operation gets its own types file, with types such as `AddPetOption
 ::field-group
 
 :::field{name="'export'"}
-Writes one file per operation with its aliases and aggregates, such as `export type AddPetStatus200 = Pet`. When an operation file would have the same name as a schema file, ignoring case, it gets an `Operation` suffix: operation `point` goes to `PointOperation.ts` next to schema `Point.ts`. `plugin-zod` and `plugin-faker` name their operation files the same way.
+Writes one file per operation with its aliases and aggregates, such as `export type AddPetStatus200 = Pet`.
 :::
 
 :::field{name="'inline'"}
-Writes only the schema types. Clients, query hooks, MSW handlers, Faker mocks, Cypress requests, and MCP handlers reference those directly and print the rest inline, such as `Options<{ body: Order; path?: never; query?: never; headers?: never }>`. An enum declared inside an operation becomes a literal union such as `'available' | 'pending' | 'sold'`. Kubb moves each operation type into the files that use it, so `'inline'` needs a Kubb version with inline sources.
+Writes only the schema types. Plugins that use them, such as clients and MSW handlers, print the operation types inline, such as `Options<{ body: Order; path?: never; query?: never; headers?: never }>`. An enum declared inside an operation becomes a literal union. Needs a Kubb version with inline sources.
 :::
 
 ::
 
+See [Name collisions](EDGE:name-collisions).
+
 ### printer
 
-Replaces the handler for a schema type such as `'integer'` or `'date'`. Each handler returns the TypeScript type as a string. Inside a handler, `this.transform(node)` returns the printed type of a nested node, and `this.options` holds the printer options. The [printer guide](https://kubb.dev/docs/5.x/how-to/customize#printers) covers the handler context and how overrides compose with macros.
+Replaces the handler for a schema type such as `'integer'` or `'date'`. Each handler returns the TypeScript type as a string. Inside a handler, `this.transform(node)` prints a nested node, and `this.options` holds the printer options. See the [printer guide](https://kubb.dev/docs/5.x/how-to/customize#printers).
 
 |          |                              |
 | -------- | ---------------------------- |
 | Type     | `{ nodes?: PrinterTsNodes }` |
 | Required | `false`                      |
 
-A handler that returns a TypeScript compiler node is deprecated. See [Map schema types](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#map-schema-types) for an example.
+> [!WARNING]
+> Returning a TypeScript compiler node is deprecated. See [Map schema types](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#map-schema-types) for an example of a string handler.
 
 ## Resolver members
 
-A `resolver` patch overrides generated names. Members you leave out keep `resolverTs`. Next to the shared `name`, `file`, and `imports` members described under [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverTs` has these:
+Members you leave out of a `resolver` patch keep `resolverTs`. Besides the shared `name`, `file`, and `imports` members of [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverTs` has these:
 
 ::code-collapse{name="ResolverTs patch members"}
 

@@ -1,36 +1,33 @@
 # Options
 
-Pass these options to `pluginSwr()`, all of them optional. Rows for shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options) and give this plugin's default.
+Pass these options to `pluginSwr()`. Shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options).
 
 ## Options overview
 
-| Option                                                                    | Purpose                                                                  | Default                                                                       |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| [`client`](#client)                                                       | Which registered client plugin the hooks call.                           | Auto-detected                                                                 |
-| [`returnType`](#returntype)                                               | Shape of the value the hooks resolve to.                                 | `'data'`                                                                      |
-| [`query`](#query)                                                         | Which operations become `useSWR` hooks, or `false` to skip them.         | `{ methods: ['GET', 'QUERY'], importPath: 'swr' }`                            |
-| [`query.methods`](#querymethods)                                          | HTTP methods treated as queries.                                         | `['GET', 'QUERY']`                                                            |
-| [`query.importPath`](#queryimportpath)                                    | Module `useSWR` is imported from.                                        | `'swr'`                                                                       |
-| [`queryKey`](#querykey)                                                   | Build the SWR key of each query.                                         | `queryKeyTransformer`                                                         |
-| [`mutation`](#mutation)                                                   | Which operations become `useSWRMutation` hooks, or `false` to skip them. | `{ methods: ['POST', 'PUT', 'PATCH', 'DELETE'], importPath: 'swr/mutation' }` |
-| [`mutation.methods`](#mutationmethods)                                    | HTTP methods treated as mutations.                                       | `['POST', 'PUT', 'PATCH', 'DELETE']`                                          |
-| [`mutation.importPath`](#mutationimportpath)                              | Module `useSWRMutation` is imported from.                                | `'swr/mutation'`                                                              |
-| [`mutationKey`](#mutationkey)                                             | Build the SWR key of each mutation.                                      | `mutationKeyTransformer`                                                      |
-| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written: `path`, `mode`, `barrel`, `banner`, `footer`.   | `{ path: 'hooks', barrel: { type: 'named' } }`                                |
-| [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path: `type`, `name`.                             | None                                                                          |
-| [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                         | None                                                                          |
-| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                              | `[]`                                                                          |
-| [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                     | `[]`                                                                          |
-| [`resolver`](#resolver)                                                   | Customize generated names and file paths.                                | `resolverSwr`                                                                 |
-| [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                                       | `[]`                                                                          |
+| Option                                                                    | Purpose                                                      | Default                                                                       |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| [`client`](#client)                                                       | Which registered client plugin the hooks call.               | Auto-detected                                                                 |
+| [`returnType`](#returntype)                                               | What the hooks resolve to.                                   | `'data'`                                                                      |
+| [`query`](#query)                                                         | Which methods become `useSWR` hooks, and the import.         | `{ methods: ['GET', 'QUERY'], importPath: 'swr' }`                            |
+| [`queryKey`](#querykey)                                                   | Build the SWR key of each query.                             | `queryKeyTransformer`                                                         |
+| [`mutation`](#mutation)                                                   | Which methods become `useSWRMutation` hooks, and the import. | `{ methods: ['POST', 'PUT', 'PATCH', 'DELETE'], importPath: 'swr/mutation' }` |
+| [`mutationKey`](#mutationkey)                                             | Build the SWR key of each mutation.                          | `mutationKeyTransformer`                                                      |
+| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                     | `{ path: 'hooks', barrel: { type: 'named' } }`                                |
+| [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                 | None                                                                          |
+| [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                             | None                                                                          |
+| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                  | `[]`                                                                          |
+| [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                         | `[]`                                                                          |
+| [`resolver`](#resolver)                                                   | Customize generated names and file paths.                    | `resolverSwr`                                                                 |
+| [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                           | `[]`                                                                          |
 
-The plugin always generates hooks, so it has no `hooks` option, and it does not generate `useSWRInfinite` or suspense hooks.
+> [!NOTE]
+> The plugin always generates hooks, so it has no `hooks` option. It does not generate `useSWRInfinite` or suspense hooks.
 
 ## Option details
 
 ### client
 
-Selects the registered client plugin whose functions the hooks call. A single registered client plugin is detected, so set `client` only when several are registered. Generation fails when none is registered.
+The registered client plugin whose functions the hooks call. A lone client plugin is detected, so set `client` only when several are registered. Generation fails when none is registered.
 
 |          |                                  |
 | -------- | -------------------------------- |
@@ -40,22 +37,22 @@ Selects the registered client plugin whose functions the hooks call. A single re
 ::field-group
 
 :::field{name="'fetch'"}
-Calls the functions of [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch).
+Calls [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) functions.
 :::
 
 :::field{name="'axios'"}
-Calls the functions of [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios).
+Calls [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) functions.
 :::
 
 :::field{name="'client'"}
-Calls the functions of [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client). Your client module must also export the `RequestConfig` and `ResponseErrorConfig` types.
+Calls [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client) functions. Your client module must also export the `RequestConfig` and `ResponseErrorConfig` types.
 :::
 
 ::
 
 ### returnType
 
-Shape of the value the hooks resolve to.
+What the hooks resolve to.
 
 |          |                    |
 | -------- | ------------------ |
@@ -70,7 +67,7 @@ Default. Resolves to the success body.
 :::
 
 :::field{name="'full'"}
-Resolves to the client's whole `RequestResult`, such as `{ status, data, error, headers, response }`, so a hook can read the status and response headers. Needs a client plugin with `returnType` `'full'` or `'plain'`, or generation stops with an error.
+Resolves to the client's whole `RequestResult`, so a hook can read the status and response headers. Needs a client plugin with `returnType` `'full'` or `'plain'`, or generation stops with an error.
 :::
 
 ::
@@ -78,15 +75,14 @@ Resolves to the client's whole `RequestResult`, such as `{ status, data, error, 
 ```typescript
 pluginSwr({ returnType: 'full' })
 
+// with integerType: 'number' on the adapter
 const { data: result } = useGetPetById({ path: { petId: 1 } })
 const etag = result?.response.headers.get('ETag')
 ```
 
-The example sets [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter. With the default, an `int64` id such as `petId` is a `bigint` and takes `1n`.
-
 ### query
 
-Which operations become `useSWR` hooks and where `useSWR` is imported from. Pass `false` to skip query output for every operation.
+Which operations become `useSWR` hooks and where `useSWR` is imported from. `false` skips query output.
 
 |          |                                                    |
 | -------- | -------------------------------------------------- |
@@ -96,7 +92,7 @@ Which operations become `useSWR` hooks and where `useSWR` is imported from. Pass
 
 #### query.methods
 
-HTTP methods treated as queries. An operation whose method is in neither `query.methods` nor `mutation.methods` gets no hook, so keep `'QUERY'` when you replace the list.
+HTTP methods treated as queries. A method in neither `query.methods` nor `mutation.methods` gets no hook, so keep `'QUERY'` when you replace the list.
 
 |          |                    |
 | -------- | ------------------ |
@@ -116,7 +112,7 @@ Module of the default `useSWR` import, written as `import useSWR from '<importPa
 
 ### queryKey
 
-Builds the SWR key of each query from the operation `node` and `variant: 'query'`. The returned strings are copied into the generated code as written, so wrap a string literal in `JSON.stringify(...)`.
+Builds each query's SWR key from the operation `node` and `variant: 'query'`. The default key is `[{ url, params }, query, body]`, with only the parts the operation has.
 
 |          |                                                        |
 | -------- | ------------------------------------------------------ |
@@ -124,7 +120,10 @@ Builds the SWR key of each query from the operation `node` and `variant: 'query'
 | Required | `false`                                                |
 | Default  | `queryKeyTransformer`                                  |
 
-The default key is `[{ url, params }, query, body]`, with `url` such as `'/pet/:petId'` and only the parts the operation has. To extend the default, spread it instead of reading single entries, which can change between releases:
+> [!WARNING]
+> Returned strings are copied into the generated code as written. Wrap a string literal in `JSON.stringify(...)`.
+
+To extend the default, spread it. Single entries can change between releases. See [Query keys](EDGE:query-keys).
 
 ```typescript
 import { queryKeyTransformer } from '@kubb/plugin-swr'
@@ -134,7 +133,7 @@ queryKey: (props) => [JSON.stringify('v2'), ...queryKeyTransformer(props)]
 
 ### mutation
 
-Which operations become `useSWRMutation` hooks and where `useSWRMutation` is imported from. Pass `false` to skip mutation output for every operation.
+Which operations become `useSWRMutation` hooks and where `useSWRMutation` is imported from. `false` skips mutation output.
 
 |          |                                                                               |
 | -------- | ----------------------------------------------------------------------------- |
@@ -144,7 +143,7 @@ Which operations become `useSWRMutation` hooks and where `useSWRMutation` is imp
 
 #### mutation.methods
 
-HTTP methods treated as mutations. A method that is also in `query.methods` stays a query.
+HTTP methods treated as mutations. A method also in `query.methods` stays a query.
 
 |          |                                      |
 | -------- | ------------------------------------ |
@@ -164,7 +163,7 @@ Module of the default `useSWRMutation` import, written as `import useSWRMutation
 
 ### mutationKey
 
-Builds the SWR key of each mutation, for matching keys in SWR's global `mutate`. It takes the same props as [`queryKey`](#querykey) with `variant: 'mutation'`, and copies strings the same way. The default key is `[{ url }]`.
+Builds each mutation's SWR key, for matching keys in SWR's global `mutate`. It takes the same props as [`queryKey`](#querykey) with `variant: 'mutation'`, and copies strings the same way. The default key is `[{ url }]`.
 
 |          |                                                        |
 | -------- | ------------------------------------------------------ |
@@ -180,7 +179,7 @@ mutationKey: (props) => [JSON.stringify('v2'), ...mutationKeyTransformer(props)]
 
 ### resolver
 
-Overrides generated file and symbol names. Members you leave out keep `resolverSwr`. The shared members (`name`, `file`, `imports`) are described under [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver).
+Overrides generated file and symbol names. Members you leave out keep `resolverSwr`. See [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) for the shared `name`, `file`, and `imports` members.
 
 |          |                              |
 | -------- | ---------------------------- |

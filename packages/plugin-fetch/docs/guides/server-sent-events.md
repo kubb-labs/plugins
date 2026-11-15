@@ -6,14 +6,15 @@ Kubb types the items from the OpenAPI document, and `.kubb/sse.ts` parses events
 
 ## How Kubb detects a stream
 
-Kubb reads the content types of the operation's success response:
+Kubb generates a stream call when the success response declares only a stream content type:
 
-| The success response declares                                                                   | Kubb generates                                                          | Each item                                        |
-| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------ |
-| Only `text/event-stream`, and the item schema declares `event` or `data`                        | A stream call                                                           | `TypedEvent<Item>`, narrowed by `event.event`    |
-| Only `text/event-stream`, with any other item schema                                            | A stream call                                                           | `ServerSentEvent<Item>`, with `Item` in `data`   |
-| Only `application/jsonl`, `application/x-ndjson`, `application/json-seq`, or a `+json-seq` type | A stream call                                                           | `Item`, one per line                             |
-| `text/event-stream` next to another content type                                                | A normal call. See [JSON or an event stream](#json-or-an-event-stream). | A `RequestResult`, with the raw stream as `data` |
+| The success response declares                                                              | Each item                                      |
+| ------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| `text/event-stream`, and the item schema declares `event` or `data`                        | `TypedEvent<Item>`, narrowed by `event.event`  |
+| `text/event-stream`, with any other item schema                                            | `ServerSentEvent<Item>`, with `Item` in `data` |
+| `application/jsonl`, `application/x-ndjson`, `application/json-seq`, or a `+json-seq` type | `Item`, one per line                           |
+
+With `text/event-stream` next to another content type, Kubb generates a normal call instead. See [JSON or an event stream](#json-or-an-event-stream).
 
 The item schema is `itemSchema` in OpenAPI 3.2. In OpenAPI 3.0 and 3.1, `schema` describes one event or one line:
 
@@ -76,7 +77,7 @@ The item schema is `itemSchema` in OpenAPI 3.2. In OpenAPI 3.0 and 3.1, `schema`
 
 ::
 
-For typed events in OpenAPI 3.0 and 3.1, put the same `oneOf` on `schema`, with a `discriminator` on `event`. A `data` string with `contentMediaType: application/json` and a `contentSchema` is typed and parsed as that schema.
+For typed events in OpenAPI 3.0 and 3.1, put the same `oneOf` on `schema`, with a `discriminator` on `event`.
 
 ## The generated function
 
@@ -86,22 +87,16 @@ export function streamChat<ThrowOnError extends boolean = true>(
 ): Unwrappable<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>>
 ```
 
-| Setting                       | The call returns                                                                              |
-| ----------------------------- | --------------------------------------------------------------------------------------------- |
-| Default                       | `Unwrappable<StreamResult<…>>`                                                                |
-| The response declares headers | `Unwrappable<StreamResultWithHeaders<…>>`, so `headers.get` suggests their names              |
-| `returnType: 'data'`          | `Promise<UnwrappedStreamResult<…>>`: the items, or the full result with `throwOnError: false` |
+A `StreamResult` has the fields of a `RequestResult` for the first connection, plus `stream` and `lastEventId`. The result iterates its items, which are also in `stream` and `data`. With `returnType: 'data'`, the call resolves to the items.
 
-A `StreamResult` has the fields of a `RequestResult`, so `status`, `headers`, and `response` describe the first connection. It adds `stream` and `lastEventId`. The items are in `stream` and in `data`, and the result itself iterates them. Pass these stream options next to the request params:
+Pass these stream options next to the request params:
 
-| Option         | What it does                                                                                                                                                               |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `terminator`   | Ends the stream when an event's `data`, or a JSON line, equals this value, such as `[DONE]`.                                                                               |
-| `transform`    | Maps each Server-Sent Event before validation, for example to camelCase its keys.                                                                                          |
-| `maxEventSize` | The most characters in one event or line. A larger one throws a `RangeError`. Default `16 * 1024 * 1024`, `Infinity` turns it off.                                         |
-| `signal`       | An `AbortSignal` that ends the request and the loop.                                                                                                                       |
-| `eventShape`   | Set by Kubb: whether the validator checks the whole event (`'event'`) or its `data` (`'data'`).                                                                            |
-| `rawData`      | Set by Kubb when the document types `data` as a string, for every event or for a list of event names, so it stays text. Otherwise `data` is parsed as JSON when it parses. |
+| Option         | What it does                                                                                   |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| `terminator`   | Ends the stream when an event's `data`, or a JSON line, equals this value, such as `[DONE]`.   |
+| `transform`    | Maps each Server-Sent Event before validation, for example to camelCase its keys.              |
+| `maxEventSize` | The most characters in one event or line. Default `16 * 1024 * 1024`. `Infinity` turns it off. |
+| `signal`       | An `AbortSignal` that ends the request and the loop.                                           |
 
 ## Consume items
 
@@ -145,7 +140,7 @@ for await (const { data } of events) console.info(data.type)
 
 ::
 
-An event the document does not declare reaches the `default` of your `switch`, so declare heartbeat and `error` events too. An event takes `message` as its name when the server sends none. The `id` carries over to later events, and `retry` holds the server's reconnect hint. A JSON Lines stream has no event IDs, and `transform` does not apply to it. An `application/json-seq` record must fit on one line.
+An event the document does not declare reaches the `default` of your `switch`, so declare heartbeat and `error` events too. For event names, IDs, and JSON Lines limits, see [Streaming](EDGE:streaming).
 
 With `validator: 'zod'`, the validator checks each item: the whole event for typed events, `data` for a payload, and each line for JSON Lines. To keep going past a failing item, return `{ value }` from `onValidationError`:
 
@@ -157,7 +152,7 @@ const { stream } = await streamChat({ body, onValidationError: (error, { value }
 
 - `break` out of the loop to stop. The runtime cancels the reader and releases the connection.
 - Pass `signal` to stop from outside. The call or the loop rejects with the signal's reason.
-- A dropped connection ends the loop with the transport's error. The runtime does not reconnect, because many streams end on purpose and the retry policy belongs to your app.
+- A dropped connection ends the loop with the transport's error. The runtime does not reconnect, so the retry policy is up to your app.
 
 To resume, send a new call with a `Last-Event-ID` header. `lastEventId` is the `id` of the last event the server completed. Declare `Last-Event-ID` as a header parameter, so the call accepts it in `headers`:
 
@@ -178,7 +173,7 @@ for (let attempt = 0; attempt < 3; attempt++) {
 }
 ```
 
-`lastEventId` is empty until the server sends an `id`, and an empty `id:` clears it. The `||` fallback cannot tell a cleared ID from no ID, so after a clear the loop resends the previous ID. With `returnType: 'data'`, the items alone carry no `lastEventId`, so pass `throwOnError: false` to get the full result.
+For cleared IDs and resuming with `returnType: 'data'`, see [Streaming](EDGE:streaming).
 
 ## Handle errors
 
@@ -204,7 +199,7 @@ An error thrown from the loop skips `client.interceptors.error`. `.unwrap()` res
 
 ## JSON or an event stream
 
-When the success response declares `text/event-stream` next to another type, such as `application/json`, Kubb generates a normal call that returns a `RequestResult`. It sends `Accept: text/event-stream`. Pass `contentType: { response: 'application/json' }` to ask for JSON. When the server streams, `data` is the raw `ReadableStream<Uint8Array>`, so read it with `parseEventStream`:
+When the success response declares `text/event-stream` next to another type, such as `application/json`, Kubb generates a normal call that sends `Accept: text/event-stream`. Pass `contentType: { response: 'application/json' }` to ask for JSON. When the server streams, `data` is the raw `ReadableStream<Uint8Array>`, so read it with `parseEventStream`, or `parseJsonLines({ stream })` for JSON Lines:
 
 ```typescript
 import { parseEventStream } from './gen/.kubb/client'
@@ -218,11 +213,9 @@ if (result.contentType === 'text/event-stream') {
 }
 ```
 
-`parseJsonLines({ stream })` does the same for a JSON Lines body.
-
 ## Stream with the client
 
-`client.stream(config)` sends a stream request by hand. It runs the same interceptors and transport as `client(config)`, validates each item with `validator.response`, and throws a `TypeError` when a 2xx answer cannot stream. Type it with the responses record, `ThrowOnError`, and the item type:
+`client.stream(config)` sends a stream request by hand. It runs the same interceptors and transport as `client(config)`, and validates each item with `validator.response`. Type it with the responses record, `ThrowOnError`, and the item type:
 
 ```typescript
 import { client, type SuccessOf } from './gen/.kubb/client'
@@ -233,4 +226,4 @@ const result = await client.stream<StreamLogsResponses, true, SuccessOf<StreamLo
 
 The item type defaults to `ServerSentEvent` around the success body. To stream another format, register a `stream` handler, as [Add a media type](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/serialization#add-a-media-type) shows.
 
-`.kubb/sse.ts` holds `parseEventStream`, `parseJsonLines`, and the stream media types, and `.kubb/client.ts` re-exports it. The stream types, such as `ServerSentEvent`, `TypedEvent`, `StreamOptions`, and `StreamResult`, live in `.kubb/core.ts`. Import everything from `.kubb/client`, and do not edit these files: Kubb rewrites them on each run.
+Import the stream helpers and types from `.kubb/client`, and do not edit the `.kubb/` files: Kubb rewrites them on each run.

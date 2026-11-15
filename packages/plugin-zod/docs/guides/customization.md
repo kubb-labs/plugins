@@ -2,11 +2,11 @@
 
 Prefix inferred types, change Zod validators, and encode custom request types.
 
-Each change goes into `pluginZod()` in the [Zod plugin configuration](https://kubb.dev/extensions/kubb-labs/plugin-zod#example). The [options page](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#format-and-type-mappings) lists how each OpenAPI format maps to Zod.
+Add each change to `pluginZod()` in the [Zod plugin configuration](https://kubb.dev/extensions/kubb-labs/plugin-zod#example). [Format and type mappings](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#format-and-type-mappings) covers the default Zod calls.
 
 ## Prefix inferred types
 
-Turn on `inferred` and override `resolver.schema.typeName`. The callback receives the schema name, such as `Pet`, and its return value replaces the default `PetSchemaType`.
+Turn on `inferred` and override `resolver.schema.typeName`. The callback receives the schema name, such as `Pet`, and returns the type name.
 
 ::code-group
 
@@ -67,14 +67,16 @@ id: z.int(),
 
 ::
 
-The `integer` handler controls `int32` fields on its own. To change the integer type for every plugin, set the adapter's [`integerType`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) instead.
+To change `int64` fields for every plugin, set the adapter's [`integerType`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) instead.
+
+See [64-bit integers](EDGE:64-bit-integers).
 
 ## Remove descriptions
 
 Pass the [description-removal macro](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#remove-descriptions) to `pluginZod({ macros: [dropDescriptions] })`. Schemas then omit their own `.describe()` calls.
 
 > [!NOTE]
-> A `$ref` to a described component keeps its description, such as `addPetBodySchema = petSchema.describe('A pet')` or the property `owner: ownerSchema.describe('An owner')`, because a macro does not visit the schema a `$ref` points to.
+> A `$ref` to a described component keeps its `.describe()` call, such as `owner: ownerSchema.describe('An owner')`, because a macro does not visit the schema a `$ref` points to.
 
 ## Encode custom types
 
@@ -84,7 +86,7 @@ A printer handler that reads `this.options.direction` decodes response values an
 
 ### Write a direction-aware handler
 
-Return one expression for `'encode'` (requests) and another for `'decode'` (responses). Use `inferred: 'codec'` so the client types follow these conversions, and set the client `validator` so the client runs them. Without request validation, the client sends the `Temporal.PlainTime` unencoded.
+Return one expression for `'encode'` (requests) and another for `'decode'` (responses). Set `inferred: 'codec'` so the client types follow the conversion, and set the client `validator` so the client runs it. Without request validation, the client sends the `Temporal.PlainTime` unencoded.
 
 ```typescript [kubb.config.ts]
 import { pluginZod, type PrinterZodNodes } from '@kubb/plugin-zod'
@@ -102,11 +104,11 @@ pluginZod({ inferred: 'codec', printer: { nodes } })
 pluginFetch({ validator: { request: 'zod', params: 'zod', response: 'zod' } })
 ```
 
-Match the handler to the OpenAPI format: `time`, `date`, and `date-time` use the `time`, `date`, and `datetime` handlers.
+The formats `time`, `date`, and `date-time` use the `time`, `date`, and `datetime` handlers.
 
 ### Check the generated schemas
 
-The generator writes a response schema and an input schema, also for schemas reached through a `$ref`:
+Kubb writes a response schema and an input schema, also for schemas reached through a `$ref`:
 
 ```typescript [src/gen/zod/slotSchema.ts]
 export const slotSchema = z.object({
@@ -127,11 +129,13 @@ Use a runtime that provides `Temporal`, or add its polyfill through a generated 
 > [!IMPORTANT]
 > With `inferred: true` instead of `'codec'`, a request type is the encoded string, not `Temporal.PlainTime`. Types from `pluginTs` describe the wire format.
 
-For built-in date conversion, set `dateType: 'date'` on the adapter. Response schemas then convert ISO date-times to `Date`, and request schemas convert them back with `toISOString()`. With `mini: true`, both print a plain `z.date()` without the conversion.
+For built-in `Date` conversion, set `dateType: 'date'` on the adapter instead.
+
+See [Dates and times](EDGE:dates-and-times).
 
 ## Import a custom codec
 
-Override a printer handler and register the package import with `this.import`. This example uses your package's `myCodec.uint64()` for `int64` fields:
+Override a printer handler and register its import with `this.import`. This example uses `myCodec.uint64()` from your package for `int64` fields:
 
 ::code-group
 
@@ -166,3 +170,5 @@ export const petSchema = z.object({
 ::
 
 Leave `root` unset on the import to keep the package specifier. With `root` set, Kubb rewrites it as a relative file path.
+
+For the handler context and how overrides compose with macros, see the [printer guide](https://kubb.dev/docs/5.x/how-to/customize#printers).
