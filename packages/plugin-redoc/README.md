@@ -29,12 +29,16 @@
 ## Installation
 
 ```bash
+npx kubb add plugin-redoc
+# or
 bun add @kubb/plugin-redoc
 # or
 pnpm add @kubb/plugin-redoc
 # or
 npm install @kubb/plugin-redoc
 ```
+
+`kubb add` installs the version the [Kubb registry](https://kubb.dev/registry) pins and adds `pluginRedoc()` to your `kubb.config.ts`. Run `npx kubb init` first if you have no config.
 
 ## Documentation
 

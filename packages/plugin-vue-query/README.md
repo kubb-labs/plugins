@@ -29,12 +29,16 @@
 ## Installation
 
 ```bash
+npx kubb add plugin-vue-query
+# or
 bun add @kubb/plugin-vue-query
 # or
 pnpm add @kubb/plugin-vue-query
 # or
 npm install @kubb/plugin-vue-query
 ```
+
+`kubb add` installs the version the [Kubb registry](https://kubb.dev/registry) pins and adds `pluginVueQuery()` to your `kubb.config.ts`. Run `npx kubb init` first if you have no config.
 
 ## Documentation
 

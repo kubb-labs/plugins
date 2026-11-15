@@ -29,12 +29,16 @@
 ## Installation
 
 ```bash
+npx kubb add plugin-cypress
+# or
 bun add @kubb/plugin-cypress
 # or
 pnpm add @kubb/plugin-cypress
 # or
 npm install @kubb/plugin-cypress
 ```
+
+`kubb add` installs the version the [Kubb registry](https://kubb.dev/registry) pins and adds `pluginCypress()` to your `kubb.config.ts`. Run `npx kubb init` first if you have no config.
 
 ## Documentation
 

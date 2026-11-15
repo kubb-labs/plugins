@@ -29,12 +29,16 @@
 ## Installation
 
 ```bash
+npx kubb add plugin-fetch
+# or
 bun add @kubb/plugin-fetch
 # or
 pnpm add @kubb/plugin-fetch
 # or
 npm install @kubb/plugin-fetch
 ```
+
+`kubb add` installs the version the [Kubb registry](https://kubb.dev/registry) pins and adds `pluginFetch()` to your `kubb.config.ts`. Run `npx kubb init` first if you have no config.
 
 ## Documentation
 

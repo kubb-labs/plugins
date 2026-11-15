@@ -29,12 +29,16 @@
 ## Installation
 
 ```bash
+npx kubb add plugin-mcp
+# or
 bun add @kubb/plugin-mcp
 # or
 pnpm add @kubb/plugin-mcp
 # or
 npm install @kubb/plugin-mcp
 ```
+
+`kubb add` installs the version the [Kubb registry](https://kubb.dev/registry) pins and adds `pluginMcp()` to your `kubb.config.ts`. Run `npx kubb init` first if you have no config.
 
 ## Documentation
 
