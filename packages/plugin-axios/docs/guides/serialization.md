@@ -1,6 +1,6 @@
 # Configure serialization
 
-Change how the generated client encodes parameters by their OpenAPI `style` and `explode`, and how it encodes and decodes bodies by media type.
+Configure how the generated Axios client serializes OpenAPI parameters and encodes request and response bodies by media type.
 
 Each generated call carries its parameter styles and content types, so most specs need no setup.
 

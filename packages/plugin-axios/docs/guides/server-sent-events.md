@@ -1,6 +1,6 @@
 # Server-sent events
 
-Stream a `text/event-stream` or JSON Lines response as typed items, then stop, resume, and handle errors.
+Consume typed server-sent events and JSON Lines with the generated Axios client. Stop, resume, and handle streaming errors.
 
 Kubb types the items from the OpenAPI document, and `.kubb/sse.ts` parses events as the WHATWG event stream specification does.
 

@@ -1,6 +1,6 @@
 # Handle errors
 
-Catch a `ResponseError`, return errors as values with `throwOnError: false`, and tell a 4xx or 5xx answer apart from a request that never completed.
+Handle HTTP and network errors in the generated Axios client with `ResponseError`, or return errors as values with `throwOnError: false`.
 
 ## What a call does
 
