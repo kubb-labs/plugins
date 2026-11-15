@@ -1,12 +1,12 @@
 # Run an MCP server
 
-Generate and start an MCP server with typed tools and an HTTP client.
+Generate an MCP server from your OpenAPI spec, start it, and connect Claude Code or Claude Desktop to its tools.
 
 ::steps{level="2"}
 
 ## Generate the server
 
-Register TypeScript types, Zod schemas, and an Axios or Fetch client alongside `pluginMcp`. A single registered client is detected automatically.
+Register TypeScript types, Zod schemas, and one client plugin next to `pluginMcp`, then run `kubb generate`. A single client plugin is detected automatically.
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
@@ -27,16 +27,18 @@ export default defineConfig({
 })
 ```
 
-Run `kubb generate`. The plugin writes tool handlers, `server.ts`, `start.ts`, and `.mcp.json`. Each generated handler calls its HTTP operation, forwards the cancellation signal, and throws for non-2xx responses. Tool results include text content and structured response data. `server.ts` registers tools with Zod input and output schemas, and `start.ts` calls its `startServer()` to serve them over stdio. The tool list shows an `int64` field as an integer and a binary field as a value without a type, because `bigint` and `Blob` have no JSON Schema form. Operations that stream their response, such as `text/event-stream` or JSON Lines, get no tool, because a tool returns one JSON result.
+The plugin writes one handler per operation, plus `server.ts`, `start.ts`, and `.mcp.json` in `src/gen/mcp/`.
 
-## Start the server
+## Install the runtime
 
-Install the generated server's runtime dependencies and a TypeScript runner:
+Install the server's runtime dependencies and a TypeScript runner:
 
 ```shell [Terminal]
 npm install @modelcontextprotocol/server@^2 zod@^4.2 axios@^1.20.0
 npm install -D tsx
 ```
+
+## Start the server
 
 Run the generated entry from the project root:
 
@@ -44,11 +46,11 @@ Run the generated entry from the project root:
 npx tsx src/gen/mcp/start.ts
 ```
 
-The server reads MCP messages from stdin, prints nothing on startup, and logs transport errors to stderr. Press `Ctrl+C` to stop it.
+The server reads MCP messages from stdin, prints nothing on startup, and logs transport errors to stderr. Press `Ctrl+C` to stop it. You do not need to keep it running: an MCP client starts it.
 
-## Connect a client
+## Connect Claude Code
 
-The generated `.mcp.json` runs the same command:
+The generated `.mcp.json` runs the same command. Claude Code reads `.mcp.json` from the project root, so copy the entry under `mcpServers` into that file.
 
 ```json [src/gen/mcp/.mcp.json]
 {
@@ -62,13 +64,75 @@ The generated `.mcp.json` runs the same command:
 }
 ```
 
-The server name comes from `info.title` in your OpenAPI spec. MCP clients start the command from their own working directory, so the `args` path is relative to the Kubb `root`, not to the `.mcp.json` folder. Claude Code reads `.mcp.json` from the project root, so copy the entry under `mcpServers` into that file. For a client that starts in another folder, such as Claude Desktop, use an absolute path to `start.ts`.
+The server name comes from `info.title` in your spec. The `args` path is relative to the Kubb `root`, not to the `.mcp.json` folder, because MCP clients start the command from their own working directory.
+
+::
+
+## What the tools look like
+
+`server.ts` registers one tool per operation:
+
+| Tool field  | Comes from                                                                                                        |
+| ----------- | ----------------------------------------------------------------------------------------------------------------- |
+| Name        | The `operationId`                                                                                                 |
+| Title       | The operation `summary`                                                                                           |
+| Description | The operation `description`, or one built from the method and path, such as `Make a GET request to /pets/{petId}` |
+| Input       | The Zod schemas of the path, query, header, and cookie parameters and the request body                            |
+| Output      | `{ data }` with the success response, as structured content and as JSON text                                      |
+
+Each handler forwards the MCP cancellation signal to the client and throws for a non-2xx response, which the assistant sees as a tool error. In the tool list, an `int64` field shows as an integer and a binary field as a value without a type, because `bigint` and `Blob` have no JSON Schema form. Operations that stream their response, such as `text/event-stream` or JSON Lines, get no tool.
+
+## Claude Desktop
+
+Claude Desktop does not start servers from your project folder, so its entry needs an absolute path to `start.ts`. Generate the server and install the runtime first, as in the steps above.
+
+::steps{level="3"}
+
+### Register the server
+
+Open Claude Desktop's `Settings → Developer → Edit Config`. This opens `claude_desktop_config.json`, on macOS under `~/Library/Application Support/Claude/` and on Windows under `%APPDATA%\Claude\`. It is the same file the [Kubb MCP server](https://kubb.dev/docs/5.x/ai/mcp#client-configuration) uses.
+
+Copy the entry from `src/gen/mcp/.mcp.json` into the file's `mcpServers` object, next to any existing servers. Change the path in `args` to the absolute path of the generated `start.ts`:
+
+:::code-group
+
+```json [macOS]
+{
+  "mcpServers": {
+    "Swagger Petstore": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["tsx", "/absolute/path/to/project/src/gen/mcp/start.ts"]
+    }
+  }
+}
+```
+
+```json [Windows]
+{
+  "mcpServers": {
+    "Swagger Petstore": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["tsx", "C:\\path\\to\\project\\src\\gen\\mcp\\start.ts"]
+    }
+  }
+}
+```
+
+:::
+
+In Windows JSON paths, escape each backslash as `\\`.
+
+### Use the generated tools
+
+Quit Claude Desktop completely and reopen it. Open `Manage connectors`, select your server, and check that the tools match the operations in your spec. Ask Claude to run one of those operations, and review its request before you approve the API call.
 
 ::
 
 ## Use your own entry file
 
-To run setup code first, such as loading environment variables, import `startServer` from the generated `server.ts` in your own entry file and point `args` at that file instead of `start.ts`.
+To run setup code first, such as loading environment variables, import `startServer` from the generated `server.ts` in your own entry file. Point `args` at that file instead of `start.ts`.
 
 ```typescript [mcp.ts]
 import { startServer } from './src/gen/mcp/server'
@@ -78,7 +142,7 @@ startServer()
 
 ## Select a client
 
-When both HTTP plugins are registered, set [`client`](https://kubb.dev/extensions/kubb-labs/plugin-mcp/options#client) explicitly. Give each client a different output directory so their generated files do not overwrite each other.
+When several client plugins are registered, set [`client`](https://kubb.dev/extensions/kubb-labs/plugin-mcp/options#client). Give each client its own output folder so their files do not overwrite each other.
 
 ```typescript [kubb.config.ts]
 import { pluginAxios } from '@kubb/plugin-axios'
@@ -92,4 +156,4 @@ const clients = [
 ]
 ```
 
-Add these entries alongside `pluginTs` and `pluginZod` in `defineConfig.plugins`. The handlers import operations from `clients-axios`.
+Add these entries next to `pluginTs` and `pluginZod` in `plugins`. The handlers then import their operations from `clients-axios`.

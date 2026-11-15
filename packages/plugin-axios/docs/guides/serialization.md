@@ -1,115 +1,126 @@
 # Configure serialization
 
-The generated client encodes parameters by their OpenAPI `style` and `explode`, and encodes and decodes bodies by their media type. Each generated operation carries its parameter styles and content types, so most requests need no extra setup.
+Change how the generated client encodes parameters by their OpenAPI `style` and `explode`, and how it encodes and decodes bodies by media type. Each generated call carries its parameter styles and content types, so most specs need no setup.
 
 ## Parameter styles
 
-A parameter without `style` or `explode` in the spec uses the default for its location.
+A parameter without `style` or `explode` in the spec uses its location's default.
 
-### Query
+::tabs
 
-Query parameters default to the `form` style. Arrays explode into repeated keys unless the spec
-says otherwise, and `spaceDelimited`, `pipeDelimited`, and `deepObject` change how arrays and
-objects collapse.
+:::tabs-item{label="Query"}
 
-| Style            | `explode` | Input               | Result           |
-| ---------------- | --------- | ------------------- | ---------------- |
-| `form` (default) | `true`    | `{ id: [3, 4, 5] }` | `id=3&id=4&id=5` |
-| `form`           | `false`   | `{ id: [3, 4, 5] }` | `id=3,4,5`       |
-| `spaceDelimited` | `false`   | `{ id: [3, 4, 5] }` | `id=3%204%205`   |
-| `pipeDelimited`  | `false`   | `{ id: [3, 4, 5] }` | `id=3\|4\|5`     |
-| `deepObject`     | `n/a`     | `{ a: { b: 1 } }`   | `a%5Bb%5D=1`     |
+For a query parameter named `id`:
 
-With `explode: true`, `spaceDelimited` and `pipeDelimited` fall back to repeated keys like `form`,
-so the delimiter only shows with `explode: false`.
+| Style            | `explode` | Input            | Sent             |
+| ---------------- | --------- | ---------------- | ---------------- |
+| `form` (default) | `true`    | `[3, 4, 5]`      | `id=3&id=4&id=5` |
+| `form`           | `false`   | `[3, 4, 5]`      | `id=3,4,5`       |
+| `form` (default) | `true`    | `{ a: 1, b: 2 }` | `a=1&b=2`        |
+| `spaceDelimited` | `false`   | `[3, 4, 5]`      | `id=3%204%205`   |
+| `pipeDelimited`  | `false`   | `[3, 4, 5]`      | `id=3%7C4%7C5`   |
+| `deepObject`     | n/a       | `{ a: 1 }`       | `id%5Ba%5D=1`    |
 
-### Path
+`spaceDelimited` and `pipeDelimited` default `explode` to `false`. With `explode: true` they repeat the key, like `form`. A space in a value goes out as `%20`. With `allowReserved`, reserved characters stay as they are, except `#`, `&`, and `+`.
 
-Path parameters default to the `simple` style, which emits the bare value. `label` prefixes a
-`.` and `matrix` prefixes a `;name=` segment. The results below are the serialized segment for a
-parameter named `id`.
+:::
 
-| Style              | `explode` | Input            | Result            |
+:::tabs-item{label="Path"}
+
+For a path parameter named `id`, the segment that replaces `{id}`:
+
+| Style              | `explode` | Input            | Sent              |
 | ------------------ | --------- | ---------------- | ----------------- |
 | `simple` (default) | `false`   | `[3, 4, 5]`      | `3,4,5`           |
+| `simple` (default) | `false`   | `{ x: 1, y: 2 }` | `x,1,y,2`         |
 | `label`            | `true`    | `[3, 4, 5]`      | `.3.4.5`          |
 | `matrix`           | `true`    | `[3, 4, 5]`      | `;id=3;id=4;id=5` |
-| `simple`           | `false`   | `{ x: 1, y: 2 }` | `x,1,y,2`         |
 
-### Header and cookie
+:::
 
-Header parameters use the `simple` style and cookie parameters use the `form` style. Both fix the
-style and only let `explode` vary, so the metadata for these locations carries `explode` alone.
-Header values are sent as-is, and cookie values are URL-encoded into a single `Cookie` header.
+:::tabs-item{label="Header"}
 
-| Location | `explode` | Input                             | Result                 |
-| -------- | --------- | --------------------------------- | ---------------------- |
-| header   | `false`   | `[3, 4]`                          | `X-Ids: 3,4`           |
-| header   | `true`    | `{ role: 'admin' }`               | `X-Filter: role=admin` |
-| cookie   | `false`   | `{ session: 'abc', ids: [1, 2] }` | `session=abc; ids=1,2` |
-| cookie   | `true`    | `{ ids: [1, 2] }`                 | `ids=1; ids=2`         |
+Headers always use the `simple` style. Only `explode` varies, and values are sent as they are.
+
+| `explode`         | Input                           | Sent                   |
+| ----------------- | ------------------------------- | ---------------------- |
+| `false` (default) | `'X-Ids': [3, 4]`               | `X-Ids: 3,4`           |
+| `false` (default) | `'X-Filter': { role: 'admin' }` | `X-Filter: role,admin` |
+| `true`            | `'X-Filter': { role: 'admin' }` | `X-Filter: role=admin` |
+
+:::
+
+:::tabs-item{label="Cookie"}
+
+Cookies use the `form` style, or the OpenAPI 3.2 `cookie` style. The input is the call's `cookies` object, joined into one `Cookie` header.
+
+| Style            | `explode` | Input                             | Sent                   |
+| ---------------- | --------- | --------------------------------- | ---------------------- |
+| `form` (default) | `false`   | `{ session: 'abc', ids: [1, 2] }` | `session=abc; ids=1,2` |
+| `form`           | `true`    | `{ ids: [1, 2] }`                 | `ids=1; ids=2`         |
+| `cookie`         | `true`    | `{ ids: [1, 2] }`                 | `ids=1; ids=2`         |
+
+`form` percent-encodes values. `cookie` sends them as they are, and a value it cannot send, such as one with `;`, throws a `TypeError`.
+
+:::
+
+::
 
 ## Override parameter serialization
 
-To replace these defaults, override `serializer.query` or `serializer.path` on the client. Omitted functions keep their defaults:
+Kubb writes the serializers a spec needs into `.kubb/serializers/` and registers them in `.kubb/config.ts`:
+
+| Key in `serializer` | File                                                           | Written for                    |
+| ------------------- | -------------------------------------------------------------- | ------------------------------ |
+| `query`             | `query.ts`, or `queryStyles.ts` with a styled query parameter  | every spec                     |
+| `path`              | `path.ts`, plus `pathStyles.ts` with a `label` or `matrix` one | every spec                     |
+| `header`            | `headers.ts`                                                   | a spec with a header parameter |
+| `cookie`            | `cookies.ts`                                                   | a spec with a cookie parameter |
+
+Set a key on the client to replace that serializer for every call, or on one call. The other keys keep theirs:
 
 ```typescript
-import { client } from './gen/.kubb/client'
 import qs from 'qs'
+import { client } from './gen/.kubb/client'
 
 client.setConfig({
-  serializer: {
-    query: (params) => qs.stringify(params, { arrayFormat: 'brackets' }),
-  },
+  serializer: { query: (params) => qs.stringify(params, { arrayFormat: 'brackets' }) },
 })
 ```
 
-A serializer set this way runs for every call. Pass `serializer` on a single call to override only that request.
-
-Kubb writes each serializer a spec needs into `.kubb/serializers/` and lists it in `.kubb/config.ts`, which `.kubb/client.ts` passes to `setConfig`. The core has no serializer of its own.
-
-| Key in `serializer` | File                                                                                 | Written for                    |
-| ------------------- | ------------------------------------------------------------------------------------ | ------------------------------ |
-| `query`             | `query.ts`, or `queryStyles.ts` for a spec with a styled query parameter             | every spec                     |
-| `path`              | `path.ts`, plus `pathStyles.ts` for a spec with a `label` or `matrix` path parameter | every spec                     |
-| `header`            | `headers.ts`                                                                         | a spec with a header parameter |
-| `cookie`            | `cookies.ts`                                                                         | a spec with a cookie parameter |
-
-A call that needs a serializer the spec did not register throws a `TypeError` that names the key, such as `serializer.cookie`. Set it on the client to send such a call. Without `serializer.header`, an array or object header value is sent as JSON.
+A call that needs a serializer the spec did not register throws a `TypeError` that names it, such as `serializer.cookie`. Without `serializer.header`, an array or object header value goes out as JSON.
 
 ## Built-in media types
 
 | Keys                                                                                     | Encodes                                           | Decodes                                    |
 | ---------------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------ |
 | `application/json`, `application/*+json`, `text/json`                                    | JSON                                              | JSON                                       |
-| `text/*`                                                                                 | a string                                          | text                                       |
+| `text/*`                                                                                 | a string as is                                    | text                                       |
 | `multipart/form-data`, `application/x-www-form-urlencoded`                               | `FormData` or `URLSearchParams` from an object    | `FormData`                                 |
 | `application/octet-stream`, `application/pdf`, `image/*`, `audio/*`, `video/*`           | a `Blob` as is                                    | `Blob`                                     |
 | `text/event-stream`, `application/jsonl`, `application/x-ndjson`, `application/json-seq` |                                                   | text, or item by item with `client.stream` |
 | `*/*`                                                                                    | JSON for objects, strings and binary bodies as is | JSON, or text when the body is not JSON    |
 
-`.kubb/client.ts` registers a form media type only when the document has a body of that type, and the stream media types only when it streams. `multipartFormData` is in `.kubb/mediaTypes/formData.ts` and `urlencoded` in `.kubb/mediaTypes/urlencoded.ts`. The stream media types are `streamMediaTypes` in `.kubb/sse.ts`.
+`.kubb/client.ts` registers the form types only when the spec has a body of that type, from `.kubb/mediaTypes/formData.ts` and `.kubb/mediaTypes/urlencoded.ts`. It registers the stream types, `streamMediaTypes` in `.kubb/sse.ts`, only when the spec streams.
 
-A key can be a pattern. The runtime lower-cases the type, drops its parameters, and tries the exact type, then a suffix such as `application/*+json`, then a wildcard such as `text/*`, then `*/*`. Write your own keys in lower case.
+The runtime lower-cases a `Content-Type`, drops its parameters, and tries the exact type, then a suffix such as `application/*+json`, then a wildcard such as `text/*`, then `*/*`. Write your own keys in lower case.
 
 ## Encode request bodies
 
-When an operation declares one request content type, Kubb sets it on the generated function, so you pass only the body. For an operation that accepts more than one, set `contentType` on the call. A body without a content type is sent as `application/json`, unless it is already encoded.
+An operation with one request content type has it built in. For one with several, set `contentType` on the call. A body without a content type goes out as `application/json`, unless it is already encoded.
 
-Bodies that are already encoded (`FormData`, `URLSearchParams`, `Blob`, `ArrayBuffer`, typed arrays, streams, and strings) pass through every built-in media type as they are. A string under a JSON media type is JSON-encoded.
-
-> [!NOTE]
-> When the body is `FormData`, the runtime removes any `Content-Type` header so the transport sets it with the multipart boundary.
-
-An XML, YAML, or CSV media type has no built-in handler, so an object sent under one throws a `TypeError`. Pass the encoded body as a string, or register a media type. The generated body type is the schema, such as `Pet`, so a string body needs a cast: `body: xml as unknown as AddPetBodyXml`.
+- An encoded body passes every built-in media type as is: `FormData`, `URLSearchParams`, `Blob`, `ArrayBuffer`, typed arrays, streams, and strings. Under a JSON media type, a string is JSON-encoded.
+- For a `FormData` body, the runtime removes `Content-Type`, so the transport sets it with the multipart boundary.
+- A `bigint` goes out as a JSON number. One past `Number.MAX_SAFE_INTEGER` throws a `TypeError` instead of losing precision.
+- XML, YAML, and CSV have no built-in encoder, so an object under one throws a `TypeError`. Pass the encoded string, cast to the body type (`body: xml as unknown as AddPetBodyXml`), or add a media type.
 
 ## Add a media type
 
-Register a handler under its media type with `mediaTypes`. `encode` gets the body and a context with the full `contentType`, and returns a body axios can send. `decode` gets the `Response`, so a binary format can read bytes:
+Register a handler under its media type in `mediaTypes`. `encode` gets the body and a context with the full `contentType`, and returns a body axios can send. `decode` gets the `Response`, so a binary format can read bytes:
 
 ```typescript
-import { client } from './gen/.kubb/client'
 import { XMLBuilder, XMLParser } from 'fast-xml-parser'
+import { client } from './gen/.kubb/client'
 
 client.setConfig({
   mediaTypes: {
@@ -121,33 +132,28 @@ client.setConfig({
 })
 ```
 
-Handlers merge per key over the built-ins, over earlier `setConfig` calls, and, when passed on a single call, over the client ones. An entry with only `decode` still encodes through the next match, such as `*/*`.
-
-A streaming format adds `stream`, which reads the 2xx body item by item. The runtime validates each item:
+Handlers merge per key over the built-ins and over earlier `setConfig` calls, and a handler passed on one call merges over the client's. An entry with only `decode` still encodes through the next match, such as `*/*`. A streaming format adds `stream`, which reads a 2xx body item by item, and the runtime validates each item:
 
 ```typescript
 client.setConfig({
-  mediaTypes: {
-    'multipart/mixed': { stream: (body, { contentType }) => readParts(body, boundaryOf(contentType)) },
-  },
+  mediaTypes: { 'multipart/mixed': { stream: (body, { contentType }) => readParts(body, boundaryOf(contentType)) } },
 })
 ```
 
 ## Decode responses
 
-The runtime decodes each body by the response `Content-Type`, after axios reads it as bytes. Native axios response interceptors on `getAxiosInstance()` see those bytes, so use `client.interceptors.response` to see the decoded body. The media type is on the result as `contentType`, so a `switch (result.contentType)` narrows `data` for an operation that returns more than one.
+Axios reads every body as bytes, then the runtime decodes it by the response `Content-Type`. Native axios response interceptors see those bytes, so use `client.interceptors.response` to see the decoded body. The result's `contentType` holds the media type, so a `switch (result.contentType)` narrows `data` for an operation that returns several.
 
-- A 2xx response without a `Content-Type` is decoded as the media type the call asked for in `contentType.response`, then as `*/*`.
-- A 204, 205, or 304 response, a `HEAD` request, and an empty body give `data: undefined`.
-- Invalid JSON under a JSON media type throws a `ParseError`. Catch it, or register a lenient `application/json` handler.
+| Response                                             | `data`                                                                |
+| ---------------------------------------------------- | --------------------------------------------------------------------- |
+| 2xx without a `Content-Type`                         | Decoded as the call's `contentType.response`, then `*/*`.             |
+| 204, 205, or 304, a `HEAD` request, or an empty body | `undefined`                                                           |
+| Invalid JSON under a JSON media type                 | Throws a `ParseError`.                                                |
+| 2xx with `parseAs` set on the call                   | Read as `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`. |
 
-To skip the lookup for one call, set `parseAs` to `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`. It applies to a 2xx body only. Kubb sets `parseAs: 'blob'` on an operation with only binary success content:
+Kubb sets `parseAs: 'blob'` on an operation whose success content is only binary. Catch the `ParseError`, or register a lenient `application/json` handler.
 
-```typescript
-const { data } = await getReport({ path: { id: '123' }, parseAs: 'text' })
-```
-
-The generated types follow what the built-in media types return. A response read as text, such as `application/xml`, `application/yaml`, or `text/csv`, is typed `string`, even when the document gives it an object schema. A vendor type such as `application/vnd.github.object` keeps its schema type, because the client parses its JSON body. A media type you register changes the value but not that type, so narrow or cast `data` to what it returns:
+The generated types follow what the built-in media types return. XML, YAML, and CSV responses are typed `string`, even with an object schema. A vendor type such as `application/vnd.github.object` keeps its schema type. A media type you register changes the value but not the type, so cast `data`:
 
 ```typescript
 const result = await getPetById({ path: { petId: 1 }, contentType: { response: 'application/xml' } })
@@ -156,27 +162,7 @@ if (result.contentType === 'application/xml') {
 }
 ```
 
-The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
-
-[Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events) covers stream media types and `client.stream`.
-
 > [!NOTE]
-> With the adapter's default [`integerType: 'bigint'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype), a `format: int64` field is typed `bigint`, but `JSON.parse` returns a `number`. Set `integerType: 'number'` on `adapterOas`, or turn on [`validator: 'zod'`](#validate-responses), which converts the field to `bigint`. Either way, `JSON.parse` loses precision above `Number.MAX_SAFE_INTEGER`, so declare an exact 64-bit ID as a string in the document.
+> With the adapter's default [`integerType: 'bigint'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype), an `int64` field is typed `bigint`, but `JSON.parse` returns a `number`. Set `integerType: 'number'`, or turn on [`validator: 'zod'`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator), which converts the field. `JSON.parse` loses precision above `Number.MAX_SAFE_INTEGER` either way, so declare an exact 64-bit ID as a string.
 
-## Validate responses
-
-Enable `validator` on the client plugin and register `pluginZod` in the same configuration. Validation is disabled by default.
-
-```typescript
-import { pluginAxios } from '@kubb/plugin-axios'
-
-pluginAxios({ validator: 'zod' })
-```
-
-`'zod'` validates the success response body and the error body. Use the object form to opt in per direction, where `request` validates the request body before the call goes out:
-
-```typescript
-pluginAxios({ validator: { request: 'zod', response: 'zod' } })
-```
-
-With a validator set, Kubb passes the matching schema to each generated call, and the runtime parses the decoded body through it. A body that does not match throws a `ParseError` with the schema's `issues`.
+[Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events) covers the stream media types and `client.stream`.

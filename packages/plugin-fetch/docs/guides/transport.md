@@ -1,36 +1,29 @@
 # Use a custom transport
 
-Set a transport at runtime to replace the network send. The client still builds URLs, serializes parameters, resolves authentication, and handles results.
-
-The transport is a function. Use interceptors for request headers or response logging.
+Replace the network send with another HTTP library or your own function. The client still builds the URL, serializes parameters, resolves auth, runs interceptors, and decodes the result.
 
 ## Write a transport function
 
-`@kubb/plugin-fetch` types the transport as a function that receives a fully resolved request and returns a web `Response`:
+A transport gets the resolved request and returns a web `Response` with its body unread:
 
 ```typescript
 type Transport = (request: ResolvedRequest) => Promise<Response | TransportResult>
 
 type ResolvedRequest = {
-  url: string
+  url: string // built, with the query
   method: string
-  headers: Record<string, string>
-  body?: RequestBody
+  headers: Record<string, string> // auth headers included
+  body?: RequestBody // already encoded
   signal?: AbortSignal
   credentials?: RequestCredentials
-  options?: NativeOptions
-  // Set when the call streams the response. Do not buffer the body.
-  stream?: boolean
+  options?: NativeOptions // RequestInit plus Next.js's `next`
+  stream?: boolean // the call streams the response, so do not buffer the body
 }
 
-type TransportResult = {
-  webResponse: Response
-  request: Request
-  response: Response
-}
+type TransportResult = { webResponse: Response; request: Request; response: Response }
 ```
 
-The `ResolvedRequest` has the URL built, the query and body encoded, and auth headers set. Return the `Response` with its body unread. Return a `TransportResult` to set the native `request` and `response` on results and errors.
+Return a `TransportResult` to set the native `request` and `response` that results and errors carry. With a plain `Response`, `request` is a `Request` built from the resolved request without its body, or the resolved request itself for a relative URL.
 
 ## Send with another library
 
@@ -41,42 +34,18 @@ import ky from 'ky'
 import { client, toRequestInit } from './gen/.kubb/client'
 
 client.setConfig({
-  // The client splits success from error itself, so ky must not throw or retry on an error status. ky's `timeout`
-  // (10 seconds by default) only waits for the response headers and never ends a started body or stream. Turn it
-  // off and bound the whole call with `signal: AbortSignal.timeout(ms)`.
   transport: (request) => ky(request.url, { ...toRequestInit(request), throwHttpErrors: false, retry: 0, timeout: false }),
 })
 ```
 
-The library must hand back the body unread. `result.request` is then a `Request` built from the resolved request, without its body, since the library keeps its own. With a relative URL, it is the resolved request itself.
+`client.interceptors` handlers keep running, whatever the transport.
 
-## Mock the network in tests
-
-Return a fixed result from an isolated client in tests:
-
-```typescript
-import { createClient } from './gen/.kubb/client'
-import { getPetById } from './gen/clients/getPetById'
-
-const testClient = createClient({
-  transport: async () => Response.json({ id: 1, name: 'Fluffy' }),
-})
-
-const { data } = await getPetById({ path: { petId: 1 }, client: testClient })
-//      ^ { id: 1, name: 'Fluffy' }
-```
-
-The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
-
-Pass the isolated client per operation or to a query plugin.
-
-## Where to set it
-
-Use `client.setConfig({ transport })` for shared configuration, `createClient({ transport })` for an isolated instance, or pass `transport` on an operation to override it for one call.
+> [!NOTE]
+> The client splits success from error itself, so ky must not throw or retry on an error status. ky's `timeout` only waits for the response headers and never ends a started body or stream, so turn it off and bound the whole call with `signal: AbortSignal.timeout(ms)`. The library must hand back the body unread.
 
 ## Wrap the default transport
 
-The generated client exports `defaultTransport`, the `fetch`-based send it uses when no transport is set. Wrap it to add tracing, timing, or headers and keep the built-in request and response handling:
+`defaultTransport` is the `fetch`-based send the client uses when no transport is set. Wrap it to add tracing, timing, or headers and keep the built-in request and response handling:
 
 ```typescript
 import { client, defaultTransport } from './gen/.kubb/client'
@@ -85,3 +54,27 @@ client.setConfig({
   transport: (request) => withSpan(request, () => defaultTransport(request)),
 })
 ```
+
+## Mock the network in tests
+
+Return a fixed `Response` from a separate client, and pass it to the call or to a query plugin:
+
+```typescript
+import { createClient } from './gen/.kubb/client'
+import { getPetById } from './gen/clients/getPetById'
+
+const testClient = createClient({ transport: async () => Response.json({ id: 1, name: 'Fluffy' }) })
+
+const { data } = await getPetById({ path: { petId: 1 }, client: testClient })
+//      ^ { id: 1, name: 'Fluffy' }
+```
+
+## Where to set it
+
+| Scope             | How                               |
+| ----------------- | --------------------------------- |
+| Every call        | `client.setConfig({ transport })` |
+| A separate client | `createClient({ transport })`     |
+| One call          | `transport` on the call           |
+
+A client from `createClient()` copies the shared `transport` when you create it, and a later `client.setConfig({ transport })` does not reach it. Without a `transport` on either, it sends with the global `fetch`.

@@ -1,10 +1,18 @@
 # Mock API responses
 
-Configure generated MSW handlers and register them in tests or a browser worker.
+Generate typed MSW handlers and register them in tests or a browser worker.
 
-## Generate typed handlers
+::steps{level="2"}
 
-Add `pluginTs` and `pluginMsw` to your configuration. The default `parser: 'data'` creates handlers whose response data you supply.
+## Generate the handlers
+
+Add `pluginTs` and `pluginMsw` to `kubb.config.ts`, then run `kubb generate`. Pick where the response body comes from:
+
+:::tabs
+
+::::tabs-item{label="Your test data"}
+
+The default `parser: 'data'` creates handlers that return the data you pass.
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
@@ -21,25 +29,11 @@ export default defineConfig({
 })
 ```
 
-> [!TIP]
-> For Node tests, set `baseURL` to the URL your client calls so MSW can match absolute requests. Browser handlers can use relative paths for the current origin.
+::::
 
-## Supply test data
+::::tabs-item{label="Faker mock data"}
 
-Call a generated handler with a response body or a callback that returns a `Response`.
-
-```typescript [test-server.ts]
-import { setupServer } from 'msw/node'
-import { getPetByIdHandler } from './src/gen/handlers/getPetByIdHandler'
-
-export const server = setupServer(
-  getPetByIdHandler({ name: 'Rex', photoUrls: [] }),
-)
-```
-
-## Generate mock data
-
-Add `pluginFaker` and change the MSW [`parser`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#parser) to `'faker'`. A handler sends an `int64` field, which Faker generates as a `bigint`, as a JSON number. A value outside the safe-integer range throws instead of losing precision.
+Add `pluginFaker` and set [`parser`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#parser) to `'faker'`. A handler called without data then returns generated values.
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
@@ -63,13 +57,20 @@ export default defineConfig({
 })
 ```
 
-Calling `getPetByIdHandler()` without data now uses generated Faker values.
+Faker generates an `int64` field as a `bigint`, and the handler sends it as a JSON number. A value outside the safe-integer range throws instead of losing precision.
 
-## Register the handler collection
+::::
 
-With `handlers: true`, `handlers.ts` exports a `handlers` array with every handler in operation order. Register it in Node or a browser.
+:::
 
-::code-group
+> [!TIP]
+> For Node tests, set `baseURL` to the URL your client calls, so MSW can match absolute requests. Browser handlers can use relative paths for the current origin.
+
+## Register the handlers
+
+With `handlers: true`, `handlers.ts` exports a `handlers` array with every handler in operation order.
+
+:::code-group
 
 ```typescript [test-server.ts]
 import { setupServer } from 'msw/node'
@@ -85,13 +86,28 @@ import { handlers } from './src/gen/handlers/handlers'
 export const worker = setupWorker(...handlers)
 ```
 
-::
+:::
 
 Call `server.listen()` in your test setup, or `await worker.start()` in your browser entry.
 
+## Supply test data
+
+Call a handler with a response body, or with a callback that returns a `Response`.
+
+```typescript [test-server.ts]
+import { setupServer } from 'msw/node'
+import { getPetByIdHandler } from './src/gen/handlers/getPetByIdHandler'
+
+export const server = setupServer(
+  getPetByIdHandler({ name: 'Rex', photoUrls: [] }),
+)
+```
+
+::
+
 ## Set the base URL at runtime
 
-The `baseURL` option is fixed when Kubb generates the handlers. When the host is only known at runtime, such as from your API client's config, call `createHandlers` with it:
+The `baseURL` option is fixed when Kubb generates the handlers. When the host is known only at runtime, such as from your API client's config, pass it to `createHandlers`:
 
 ```typescript [test-server.ts]
 import { setupServer } from 'msw/node'
@@ -100,7 +116,7 @@ import { createHandlers } from './src/gen/handlers/handlers'
 export const server = setupServer(...createHandlers({ baseURL: getBaseURL() }))
 ```
 
-Each handler also takes `{ baseURL }` as its second argument, which overrides the configured one for that handler. Pass `undefined` as the first argument to keep the default response. This lets you mock two services that share a path:
+Each handler also takes `{ baseURL }` as its second argument, which overrides the configured one for that handler. Pass `undefined` as the first argument to keep the default response. This way you can mock two services that share a path:
 
 ```typescript [test-server.ts]
 export const server = setupServer(

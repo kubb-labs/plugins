@@ -1,28 +1,30 @@
 # Axios
 
-The Axios plugin turns each operation in your OpenAPI spec into a typed async function that sends the request with axios. Each function takes grouped `path`, `query`, `headers`, and `body` parameters and returns a result keyed by status code.
+Generates one typed async function per OpenAPI operation that sends the request with axios. Each function takes grouped `path`, `query`, `headers`, `cookies`, and `body` options and returns a result keyed by status code.
 
-The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, and `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call these functions. The plugin also copies its runtime files to `.kubb/` in the root output folder. Import the client from `.kubb/client.ts`.
+The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call these functions. The plugin also copies its runtime into `.kubb/` in the root output folder, so the generated code imports only `axios`.
 
 ## Setup
 
 - Add `@kubb/plugin-ts` for the operation types, or `@kubb/plugin-zod` with `inferred: true`.
-- Add `@kubb/plugin-zod` when you set `validator`, and install `zod` v4. Generation fails without the plugin.
-- Install `axios` 1.20 or a later v1 release in the app that uses the generated code.
+- Add `@kubb/plugin-zod` and install `zod` v4 when you set `validator`. Generation fails without the plugin.
+- Install `axios` 1.20 or a later 1.x release in the app that runs the generated code.
 
 ## Options worth knowing
 
-- `baseURL` is prepended to every request. The spec's top-level `servers` URL is not used, so without `baseURL` you set one at runtime with `client.setConfig({ baseURL })`. Operations with their own `servers`, on the path or the operation, call that URL instead.
-- `validator: 'zod'` validates response bodies with the schemas from `@kubb/plugin-zod`. Use `{ request: 'zod', response: 'zod' }` to also validate request bodies.
-- `throwOnErrorDefault: false` returns non-2xx responses as values instead of throwing. A single call can still pass `throwOnError`.
-- `returnType: 'data'` makes a call resolve to the success body instead of the full result. With `throwOnError: false`, the call still returns the full result.
-- `sdk` generates a class-based SDK, grouped by tag or flat, instead of standalone functions. The query plugins and `@kubb/plugin-mcp` need the standalone functions, so leave `sdk` unset when you use them.
+| Option                | Set it to                                                                                           |
+| --------------------- | --------------------------------------------------------------------------------------------------- |
+| `baseURL`             | Give the client a starting host. The spec's top-level `servers` URL is not used.                    |
+| `validator`           | `'zod'` to check response bodies, or `{ request, params, response }` to check each part.            |
+| `throwOnErrorDefault` | `false` to return non-2xx responses as values. A call can still pass `throwOnError`.                |
+| `returnType`          | `'data'` to resolve to the success body instead of the full result.                                 |
+| `sdk`                 | Generate classes instead of functions. Leave it unset for the query plugins and `@kubb/plugin-mcp`. |
 
-See [Options](https://kubb.dev/extensions/kubb-labs/plugin-axios/options) for every option and its default.
+[Options](https://kubb.dev/extensions/kubb-labs/plugin-axios/options) lists every option and its default.
 
 ## Example
 
-The config below generates an axios client that sends every request to the Petstore API.
+::code-group
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
@@ -34,9 +36,25 @@ export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
   adapter: adapterOas({ integerType: 'number' }),
-  plugins: [
-    pluginTs(),
-    pluginAxios({ baseURL: 'https://petstore.swagger.io/v2' }),
-  ],
+  plugins: [pluginTs(), pluginAxios({ baseURL: 'https://petstore.swagger.io/v2' })],
 })
 ```
+
+```typescript [src/app.ts]
+import { getPetById } from './gen/clients/getPetById'
+
+const { data } = await getPetById({ path: { petId: 1 } })
+```
+
+```text [Generated files]
+src/gen/
+├── .kubb/          # the runtime: client.ts, core.ts, config.ts, serializers/, ...
+├── clients/
+│   ├── getPetById.ts
+│   └── index.ts
+└── types/
+```
+
+::
+
+The config sets [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype), so an `int64` id such as `petId` is a `number`. With the default `bigint`, the call takes `1n`.

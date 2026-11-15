@@ -1,28 +1,39 @@
 # Use a custom transport
 
-Set a transport at runtime to replace the network send. The client still builds URLs, serializes parameters, resolves authentication, and handles results.
+Replace the network send with your own axios instance or function. The client still builds the URL, serializes parameters, resolves auth, runs interceptors, and decodes the result.
 
-The transport is a function that takes the resolved request and returns a web `Response` with the native axios config and response, as in `@kubb/plugin-fetch`. The default is `defaultTransport`, which sends through `getAxiosInstance()`. `createAxiosTransport(instance)` turns any axios instance into a transport.
+## Write a transport function
+
+A transport gets the resolved request and returns a web `Response` with its body unread:
 
 ```typescript
-type ClientConfig = {
-  // ...
-  transport?: Transport
+type Transport = (request: ResolvedRequest) => Promise<Response | TransportResult>
+
+type ResolvedRequest = {
+  url: string // built, with the query
+  method: string
+  headers: Record<string, string> // auth headers included
+  body?: RequestBody // already encoded
+  signal?: AbortSignal
+  credentials?: RequestCredentials
+  options?: NativeOptions // AxiosRequestConfig
+  stream?: boolean // the call streams the response, so do not buffer the body
 }
+
+type TransportResult = { webResponse: Response; request: AxiosRequestConfig; response: AxiosResponse }
 ```
 
-## Send through a pre-configured instance
+Return a `TransportResult` to set the native `request` and `response` that results and errors carry. With a plain `Response`, `request` is a `Request` built from the resolved request without its body, or the resolved request itself for a relative URL.
 
-Wrap an instance with a timeout, default headers, and a logging interceptor:
+## Send through your own axios instance
+
+`createAxiosTransport(instance)` turns any axios instance into a transport, with its defaults, adapter, and interceptors:
 
 ```typescript
 import axios from 'axios'
 import { client, createAxiosTransport } from './gen/.kubb/client'
 
-const instance = axios.create({
-  timeout: 10_000,
-  headers: { 'X-Client': 'kubb' },
-})
+const instance = axios.create({ timeout: 10_000, headers: { 'X-Client': 'kubb' } })
 
 instance.interceptors.response.use((response) => {
   console.info(`${response.config.method?.toUpperCase()} ${response.config.url} -> ${response.status}`)
@@ -32,39 +43,45 @@ instance.interceptors.response.use((response) => {
 client.setConfig({ transport: createAxiosTransport(instance) })
 ```
 
-Every generated function now sends through your instance, so its timeout, headers, and axios interceptors apply to each call. Handlers registered through `client.interceptors` keep running, whatever the transport.
+`client.interceptors` handlers keep running, whatever the transport.
 
 > [!NOTE]
-> Kubb sets `url`, `method`, `headers`, `data`, `transformRequest`, `transformResponse`, `responseType`, and `validateStatus` for its own serialization and status handling, so leave those fields alone. Set timeouts, retries, and interceptors on the instance. For one call, pass `options`, such as `{ timeout }` or `{ onUploadProgress }`, instead of building a new instance.
+> Kubb sets `url`, `method`, `headers`, `data`, `transformRequest`, `transformResponse`, `responseType`, and `validateStatus` for its own serialization and status handling, so leave those alone. For one call, pass `options`, such as `{ timeout }` or `{ onUploadProgress }`, instead of a new instance.
 
-## Configure the default instance
+## Wrap the default transport
 
-The generated client exports `getAxiosInstance()`, which returns the instance `defaultTransport` sends through. Configure it directly to add tracing or headers without replacing the transport:
+`defaultTransport` sends through the instance `getAxiosInstance()` returns. Configure that instance to keep the default transport, or wrap the transport to add tracing or timing:
 
 ```typescript
-import { getAxiosInstance } from './gen/.kubb/client'
+import { client, defaultTransport, getAxiosInstance } from './gen/.kubb/client'
 
 getAxiosInstance().defaults.timeout = 10_000
-getAxiosInstance().interceptors.request.use((config) => {
-  config.headers.set('traceparent', currentTraceparent())
-  return config
-})
-```
-
-An instance from `createClient()` copies the `transport` of `client` when you create it, unless you pass its own. A later `client.setConfig({ transport })` does not reach it. Without a `transport` on either, it sends through `getAxiosInstance()`.
-
-## Where to set it
-
-Use `client.setConfig({ transport })` for shared configuration, `createClient({ transport })` for an isolated instance, or pass `transport` on an operation to override it for one call.
-
-## Write a transport function
-
-A custom function can wrap `defaultTransport`, or the transport of any instance:
-
-```typescript
-import { client, defaultTransport } from './gen/.kubb/client'
 
 client.setConfig({
   transport: (request) => withSpan(request, () => defaultTransport(request)),
 })
 ```
+
+## Mock the network in tests
+
+Return a fixed `Response` from a separate client, and pass it to the call or to a query plugin:
+
+```typescript
+import { createClient } from './gen/.kubb/client'
+import { getPetById } from './gen/clients/getPetById'
+
+const testClient = createClient({ transport: async () => Response.json({ id: 1, name: 'Fluffy' }) })
+
+const { data } = await getPetById({ path: { petId: 1 }, client: testClient })
+//      ^ { id: 1, name: 'Fluffy' }
+```
+
+## Where to set it
+
+| Scope             | How                               |
+| ----------------- | --------------------------------- |
+| Every call        | `client.setConfig({ transport })` |
+| A separate client | `createClient({ transport })`     |
+| One call          | `transport` on the call           |
+
+A client from `createClient()` copies the shared `transport` when you create it, and a later `client.setConfig({ transport })` does not reach it. Without a `transport` on either, it sends through `getAxiosInstance()`.

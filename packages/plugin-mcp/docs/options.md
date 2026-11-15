@@ -1,81 +1,56 @@
 # Options
 
-Pass these options to `pluginMcp()`. Shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options).
+Pass these options to `pluginMcp()`. Shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options), and this page gives only their default here.
 
 ## Options overview
 
-| Option                                                                    | Purpose                                                                   | Default                                      |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------- |
-| [`output`](#output)                                                       | Where handlers are written: `path`, `mode`, `barrel`, `banner`, `footer`. | `{ path: 'mcp', barrel: { type: 'named' } }` |
-| [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path: `type`, `name`.                              | None                                         |
-| [`client`](#client)                                                       | Which registered client plugin the handlers call.                         | Auto-detected                                |
-| [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                          | None                                         |
-| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                               | `[]`                                         |
-| [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                      | `[]`                                         |
-| [`resolver`](#resolver)                                                   | Customize generated names and file paths.                                 | `resolverMcp`                                |
-| [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                                        | `[]`                                         |
+| Option                                                                    | Purpose                                                                              | Default                                      |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------- |
+| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where handlers are written: `path`, `mode`, `barrel`, `banner`, `footer`.            | `{ path: 'mcp', barrel: { type: 'named' } }` |
+| [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                                         | None                                         |
+| [`client`](#client)                                                       | Registered client plugin the handlers call.                                          | Detected                                     |
+| [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                                     | None                                         |
+| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                                          | `[]`                                         |
+| [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                                 | `[]`                                         |
+| [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) | Customize generated names and file paths. See [resolver members](#resolver-members). | `resolverMcp`                                |
+| [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                                                   | `[]`                                         |
+
+> [!IMPORTANT]
+> Keep `output.path` a folder name, such as the default `'mcp'`. The plugin writes `server.ts`, `start.ts`, and `.mcp.json` at its root, next to the handlers, and single-file output (`output.mode: 'file'`, or a `path` with an extension) has no room for them. With `group`, handlers move into subfolders and those three files stay at the root.
 
 ## Option details
 
-### output
-
-Where the generated MCP handler files are written. The plugin writes `server.ts`, `start.ts`, and `.mcp.json` at the root of `output.path`, next to the handlers. Keep `output.path` a folder name such as the default `'mcp'`. Single-file output (`output.mode: 'file'`, or a `path` with an extension) has no room for those files. With `group`, handlers move into subfolders and those files stay at the root.
-
-|          |                                              |
-| -------- | -------------------------------------------- |
-| Type     | `Output`                                     |
-| Required | `false`                                      |
-| Default  | `{ path: 'mcp', barrel: { type: 'named' } }` |
-
 ### client
 
-Selects which registered client plugin the handlers call. A single registered client is auto-detected. Set `client` when several are registered.
+Selects the registered client plugin that the handlers call. Configure transport settings such as `baseURL` on that client plugin.
 
 |          |                                  |
 | -------- | -------------------------------- |
 | Type     | `'fetch' \| 'axios' \| 'client'` |
 | Required | `false`                          |
 
-::field-group
+| Value           | Handlers call                                                                |
+| --------------- | ---------------------------------------------------------------------------- |
+| Unset (default) | The only registered client plugin                                            |
+| `'fetch'`       | [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch)   |
+| `'axios'`       | [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios)   |
+| `'client'`      | [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client) |
 
-:::field{name="'fetch'"}
-Calls the operations generated by [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch).
-:::
+The build fails when no client plugin is registered, when several are registered and `client` is unset, or when `client` names a plugin that is not registered.
 
-:::field{name="'axios'"}
-Calls the operations generated by [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios).
-:::
+Each handler passes grouped `{ path, query, headers, body }` options, the MCP cancellation signal, and `throwOnError: true`, so a non-2xx response throws and surfaces as a tool error, whatever the client's `throwOnErrorDefault`.
 
-:::field{name="'client'"}
-Calls the operations generated by [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client).
-:::
+| Client `returnType`                                                         | Tool response body       |
+| --------------------------------------------------------------------------- | ------------------------ |
+| `'full'` (the client default), or the plain result of `@kubb/plugin-client` | `res.data`               |
+| `'data'`                                                                    | The resolved call result |
 
-::
+## Resolver members
 
-Each handler passes grouped `{ path, query, headers, body }` options. Configure transport settings such as `baseURL` on the client plugin.
-
-Generated handlers follow the client plugin's `returnType` option. With `'full'` (the client default) or `@kubb/plugin-client`'s plain result, handlers read the success body from `res.data`. With `'data'`, they use the resolved call result as the tool response body. Handlers always pass `throwOnError: true` so non-2xx responses throw and surface as tool errors, regardless of the client's `throwOnErrorDefault`.
-
-> [!NOTE]
-> The handlers call a client plugin's functions, so register `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client` alongside this one.
-
-### resolver
-
-Overrides generated file and symbol names. Omitted members keep `resolverMcp`. The shared members (`name`, `file`, `imports`) and the `this` context are described under [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver).
-
-|          |                              |
-| -------- | ---------------------------- |
-| Type     | `ResolverPatch<ResolverMcp>` |
-| Required | `false`                      |
+A `resolver` patch overrides generated names. Members you leave out keep `resolverMcp`. Next to the shared `name`, `file`, and `imports` members described under [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverMcp` has these:
 
 ```typescript [Partial override]
 type ResolverMcpPatch = {
-  name?(name: string): string
-  file?: {
-    baseName?(params: { name: string; extname: string }): string
-    path?(params: { baseName: string; output: Output }): string
-  }
-  imports?(options: ResolveImportsOptions): Array<ImportNode>
   handler?: {
     name?(node: OperationNode): string  // → 'showPetByIdHandler'
   }

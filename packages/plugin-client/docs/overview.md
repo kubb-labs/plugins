@@ -2,19 +2,22 @@
 
 The Client plugin turns each operation in your OpenAPI spec into a typed function that calls a client module you write. The generated code has no Fetch, axios, or Kubb runtime dependency.
 
-Each function takes grouped `path`, `query`, `headers`, and `body` parameters and passes the operation's auth requirements to your client in a `security` list. A single call can pass its own `client` to replace the default. For a ready-made client, use `@kubb/plugin-fetch` or `@kubb/plugin-axios` instead. The query plugins and `@kubb/plugin-mcp` work with this plugin too, and their hooks and handlers then call your client module.
+Each function takes grouped `path`, `query`, `headers`, `cookies`, and `body` parameters and passes the operation's auth requirements to your client as `security`. A call can pass its own `client` to replace the default. For a ready-made client, use [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios). The query plugins and `@kubb/plugin-mcp` can call the generated functions too.
 
 ## Setup
 
-- Set the required `importPath` option to your client module. The module must export a generic `client` and the `Options` and `RequestResult` types. When the spec has server-sent event or JSON Lines operations, `client` also needs a `stream` method, and the module exports the `StreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent` types.
+- Set the required `importPath` to your client module. [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client) lists what the module must export.
 - Add `@kubb/plugin-ts` for the operation types, or `@kubb/plugin-zod` with `inferred: true`.
-- Add `@kubb/plugin-zod` when you set `validator`, and install `zod` v4. Generation fails without the plugin.
+- When you set `validator`, add `@kubb/plugin-zod` and install `zod` v4. Generation fails without the plugin.
 
 ## Options worth knowing
 
-- `importPath` is written into every generated import as given, so it must resolve from the generated file. A relative path, a package name, or an alias works.
-- `validator: 'zod'` passes response schemas from `@kubb/plugin-zod` to your client. Use `{ request: 'zod', response: 'zod' }` to also pass request body schemas.
-- `throwOnErrorDefault` is the `throwOnError` value each call passes to your client. The default is `true`.
+| Option                | What it does                                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `importPath`          | Written into every generated import as given, so it must resolve from the generated file.                          |
+| `returnType`          | `'plain'` returns what your `client` returns. `'full'` adds `.unwrap()`, and `'data'` resolves to the body.        |
+| `validator`           | `'zod'` passes response schemas to your client. `{ request: 'zod', response: 'zod' }` also passes request schemas. |
+| `throwOnErrorDefault` | The `throwOnError` value each call passes to your client. The default is `true`.                                   |
 
 See [Options](https://kubb.dev/extensions/kubb-labs/plugin-client/options) for every option and its default.
 

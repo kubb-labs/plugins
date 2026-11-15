@@ -1,28 +1,28 @@
 # Options
 
-Pass these options to `pluginZod()`. Shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options) for details.
+Pass these options to `pluginZod()`. Shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options), and this page gives only their default here.
 
 ## Options overview
 
-| Option                                                                    | Purpose                                                                | Default                                      |
-| ------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------- |
-| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written: `path`, `mode`, `barrel`, `banner`, `footer`. | `{ path: 'zod', barrel: { type: 'named' } }` |
-| [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path: `type`, `name`.                           | None                                         |
-| [`importPath`](#importpath)                                               | Module the generated files import `z` from.                            | `'zod'`, or `'zod/mini'` with `mini`         |
-| [`inferred`](#inferred)                                                   | Emit a `z.infer` (or `z.input`/`z.output`) alias next to each schema.  | `false`                                      |
-| [`coercion`](#coercion)                                                   | Coerce input before validation.                                        | `false`                                      |
-| [`guidType`](#guidtype)                                                   | Validator for `format: uuid` properties.                               | `'uuid'`                                     |
-| [`regexType`](#regextype)                                                 | How an OpenAPI `pattern` is written.                                   | `'literal'`                                  |
-| [`oneOfType`](#oneoftype)                                                 | How a `oneOf` is validated.                                            | `'union'`                                    |
-| [`compile`](#compile)                                                     | Wrap schemas in `z.compile` for fast-path validation.                  | `false`                                      |
-| [`mini`](#mini)                                                           | Generate Zod Mini schemas.                                             | `false`                                      |
-| [`typeGuards`](#typeguards)                                               | Generate `is*` type guards and `assert*` assertions.                   | `false`                                      |
-| [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations and schemas that match.                           | None                                         |
-| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations and schemas that match.                                | `[]`                                         |
-| [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                   | `[]`                                         |
-| [`resolver`](#resolver)                                                   | Customize generated names and file paths.                              | `resolverZod`                                |
-| [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                                     | `[]`                                         |
-| [`printer`](#printer)                                                     | Replace the handler for a schema type.                                 | None                                         |
+| Option                                                                    | Purpose                                                                              | Default                                      |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------- |
+| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written: `path`, `mode`, `barrel`, `banner`, `footer`.               | `{ path: 'zod', barrel: { type: 'named' } }` |
+| [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                                         | None                                         |
+| [`importPath`](#importpath)                                               | Module the generated files import `z` from.                                          | `'zod'`, or `'zod/mini'` with `mini`         |
+| [`inferred`](#inferred)                                                   | Add a `z.infer` (or `z.input` and `z.output`) type next to each schema.              | `false`                                      |
+| [`coercion`](#coercion)                                                   | Coerce input before validation.                                                      | `false`                                      |
+| [`guidType`](#guidtype)                                                   | Validator for `format: uuid`.                                                        | `'uuid'`                                     |
+| [`regexType`](#regextype)                                                 | How an OpenAPI `pattern` is written.                                                 | `'literal'`                                  |
+| [`oneOfType`](#oneoftype)                                                 | How a `oneOf` is validated.                                                          | `'union'`                                    |
+| [`compile`](#compile)                                                     | Wrap schemas in `z.compile` for fast-path validation.                                | `false`                                      |
+| [`mini`](#mini)                                                           | Generate Zod Mini schemas.                                                           | `false`                                      |
+| [`typeGuards`](#typeguards)                                               | Generate `is*` type guards and `assert*` assertions.                                 | `false`                                      |
+| [`printer`](#printer)                                                     | Replace the handler for a schema type.                                               | None                                         |
+| [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations and schemas that match.                                         | None                                         |
+| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations and schemas that match.                                              | `[]`                                         |
+| [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                                 | `[]`                                         |
+| [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) | Customize generated names and file paths. See [resolver members](#resolver-members). | `resolverZod`                                |
+| [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                                                   | `[]`                                         |
 
 ## Option details
 
@@ -30,57 +30,63 @@ Pass these options to `pluginZod()`. Shared options link to [Shared plugin optio
 
 Module the generated files import `z` from. Point it at your own module to re-export Zod.
 
-|          |                             |
-| -------- | --------------------------- |
-| Type     | `string`                    |
-| Required | `false`                     |
-| Default  | `mini ? 'zod/mini' : 'zod'` |
+|          |                                 |
+| -------- | ------------------------------- |
+| Type     | `'zod' \| 'zod/mini' \| string` |
+| Required | `false`                         |
+| Default  | `mini ? 'zod/mini' : 'zod'`     |
 
 `'zod'` and `'zod/mini'` are imported as `import * as z`. A custom module is imported as `import { z }`, so export `z` by name.
 
 ### inferred
 
-Exports a type alias next to each schema, so you do not need `@kubb/plugin-ts`. The type takes the PascalCase schema name plus `SchemaType`, so `petSchema` gets `PetSchemaType`.
+Exports a type next to each schema, so you do not need `@kubb/plugin-ts`. The type takes the PascalCase schema name plus `SchemaType`, so `petSchema` gets `PetSchemaType`.
 
-|          |                      |
-| -------- | -------------------- |
-| Type     | `boolean \| 'codec'` |
-| Required | `false`              |
-| Default  | `false`              |
+|          |                                     |
+| -------- | ----------------------------------- |
+| Type     | `boolean \| 'codec' \| 'direction'` |
+| Required | `false`                             |
+| Default  | `false`                             |
 
 ::field-group
 
 :::field{name="false"}
-Default value. Emits no type aliases.
+Writes no types.
 :::
 
 :::field{name="true"}
-Emits `z.infer<typeof schema>` for every schema.
+Writes `z.infer<typeof schema>` for every schema.
 :::
 
 :::field{name="'codec'"}
-Emits `z.input<typeof schema>` for request schemas (bodies and params) and `z.output<typeof schema>` for response schemas. Use it with codecs, where a request takes the domain value (a `Date`) that the schema encodes and a response returns the decoded value. Clients and query hooks then take their operation types from these aliases instead of `@kubb/plugin-ts`. `'direction'` still works as a deprecated name for `'codec'`.
+Writes `z.input<typeof schema>` for request schemas (bodies and params) and `z.output<typeof schema>` for response schemas. Use it with codecs, where a request takes the domain value (a `Date`) that the schema encodes and a response returns the decoded value. Clients and query hooks then take their operation types from these types instead of `@kubb/plugin-ts`.
+:::
+
+:::field{name="'direction'"}
+Deprecated name for `'codec'`.
 :::
 
 ::
 
-```typescript
+::code-group
+
+```typescript [true]
 export type PetSchemaType = z.infer<typeof petSchema>
 ```
 
-With `'codec'`, request types read the schema's input:
-
-```typescript
+```typescript ['codec' (request)]
 export type PutEventBodySchemaType = z.input<typeof putEventBodySchema>
 ```
 
+::
+
 Pair `'codec'` with `validator: { request: 'zod', params: 'zod' }` in [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#validator) or [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator). Without request validation, the client sends the domain value unencoded.
 
-`inferred` also writes a `ResponsesSchema` for each operation (one schema per status code) and its inferred type. [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) and [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) key their `RequestResult` on it when `@kubb/plugin-ts` is absent.
+`inferred` also writes a `ResponsesSchema` for each operation, with one schema per status code, and its inferred type. [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) and [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) key their `RequestResult` on it when `@kubb/plugin-ts` is absent.
 
 ### coercion
 
-Wraps schemas in `z.coerce` so input is coerced before validation, for form data, query params, and similar string sources. See [Coercion for primitives](https://zod.dev/?id=coercion-for-primitives).
+Wraps schemas in `z.coerce`, so input is converted before validation. Use it for form data, query params, and other string sources. See [Coercion for primitives](https://zod.dev/?id=coercion-for-primitives).
 
 |          |                                                                        |
 | -------- | ---------------------------------------------------------------------- |
@@ -88,32 +94,23 @@ Wraps schemas in `z.coerce` so input is coerced before validation, for form data
 | Required | `false`                                                                |
 | Default  | `false`                                                                |
 
-::field-group
+| Value                            | Effect                                                                                                    |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `false` (default)                | No coercion, except `bigint` fields (`format: int64`), which always use `z.coerce.bigint()`.              |
+| `true`                           | Coerces strings, numbers, and dates with `z.coerce.string()`, `z.coerce.number()`, and `z.coerce.date()`. |
+| `{ dates?, strings?, numbers? }` | Coerces only the primitives you pick.                                                                     |
 
-:::field{name="false"}
-Coerces nothing and validates strictly, except `bigint` fields (`format: int64`), which always use `z.coerce.bigint()`.
-:::
+What each key changes:
 
-:::field{name="true"}
-Coerces strings, numbers, and dates with `z.coerce.string()`, `z.coerce.number()` and `z.coerce.date()`.
-:::
-
-:::field{name="{ dates?, strings?, numbers? }"}
-Chooses which primitives to coerce.
-:::
-
-::
-
-> [!NOTE]
-> `numbers` also coerces an enum whose schema has a numeric `format`, such as `type: integer, format: int32`. Other enums are not coerced. When such an enum is the discriminator of a `oneOf`, the union prints as `z.union` instead of `z.discriminatedUnion`, which cannot read coerced values.
->
-> `strings` replaces the `base64`, `base64url`, `jwt`, `ulid`, `iban`, and `duration` validators with `z.coerce.string()`, so those formats are no longer checked. Fields with `format: email`, `uri`, `uuid`, `ipv4`, or `ipv6` keep their validator and are not coerced. `numbers` prints every integer as `z.coerce.number().int()`, which drops the `int32` and `uint32` range checks.
->
-> `dates` coerces only `Date`-typed fields (from `dateType: 'date'`). ISO-string fields are never coerced, and neither are `format: time` fields, because `new Date()` cannot parse a bare `HH:mm:ss`. For a time-of-day type such as `Temporal.PlainTime`, see [Encode custom types](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization#encode-custom-types).
+| Key       | Coerces                                                    | Side effects                                                                                                                                                                                                                                                                                                |
+| --------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `strings` | String fields                                              | Replaces the `base64`, `base64url`, `jwt`, `ulid`, `iban`, and `duration` validators with `z.coerce.string()`, so those formats are no longer checked. `email`, `uri`, `uuid`, `ipv4`, and `ipv6` keep their validator and are not coerced.                                                                 |
+| `numbers` | Numbers, and enums with a numeric `format` such as `int32` | Prints every integer as `z.coerce.number().int()`, which drops the `int32` and `uint32` range checks. A coerced enum that is the discriminator of a `oneOf` prints the union as `z.union`, because `z.discriminatedUnion` cannot read coerced values. Other enums are not coerced.                          |
+| `dates`   | Only `Date`-typed fields, from `dateType: 'date'`          | ISO-string fields are never coerced, and neither are `format: time` fields, because `new Date()` cannot parse a bare `HH:mm:ss`. For a time-of-day type such as `Temporal.PlainTime`, see [Encode custom types](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization#encode-custom-types). |
 
 ### guidType
 
-Validator used for OpenAPI properties with `format: uuid`.
+Validator for OpenAPI properties with `format: uuid`.
 
 |          |                    |
 | -------- | ------------------ |
@@ -121,21 +118,14 @@ Validator used for OpenAPI properties with `format: uuid`.
 | Required | `false`            |
 | Default  | `'uuid'`           |
 
-::field-group
-
-:::field{name="'uuid'"}
-Generates `z.uuid()`, a standard RFC 4122 UUID.
-:::
-
-:::field{name="'guid'"}
-Generates `z.guid()`, which is looser and accepts Microsoft-style GUIDs.
-:::
-
-::
+| Value              | Output                                                        |
+| ------------------ | ------------------------------------------------------------- |
+| `'uuid'` (default) | `z.uuid()`, a standard RFC 4122 UUID                          |
+| `'guid'`           | `z.guid()`, which is looser and accepts Microsoft-style GUIDs |
 
 ### regexType
 
-Controls how an OpenAPI `pattern` is written inside `.regex(...)`. Use `'constructor'` when a regex literal breaks your build or you need a string pattern.
+How an OpenAPI `pattern` is written inside `.regex(...)`. Use `'constructor'` when a regex literal breaks your build or you need a string pattern.
 
 |          |                              |
 | -------- | ---------------------------- |
@@ -143,21 +133,14 @@ Controls how an OpenAPI `pattern` is written inside `.regex(...)`. Use `'constru
 | Required | `false`                      |
 | Default  | `'literal'`                  |
 
-::field-group
-
-:::field{name="'literal'"}
-Emits a regex literal, such as `.regex(/^[a-z]+$/)`.
-:::
-
-:::field{name="'constructor'"}
-Emits the `RegExp` constructor, such as `.regex(new RegExp("^[a-z]+$"))`.
-:::
-
-::
+| Value                 | Output                           |
+| --------------------- | -------------------------------- |
+| `'literal'` (default) | `.regex(/^[a-z]+$/)`             |
+| `'constructor'`       | `.regex(new RegExp("^[a-z]+$"))` |
 
 ### oneOfType
 
-Controls how a `oneOf` is validated. Use `'xor'` when values may carry extra keys. With `'xor'`, members need `required` keys that tell them apart. When every key is optional, an object matches several members and `z.xor` rejects it.
+How a `oneOf` is validated. Use `'xor'` when values may carry extra keys.
 
 |          |                    |
 | -------- | ------------------ |
@@ -165,23 +148,18 @@ Controls how a `oneOf` is validated. Use `'xor'` when values may carry extra key
 | Required | `false`            |
 | Default  | `'union'`          |
 
-::field-group
+| Value               | Output           | Behavior                                                                                                                                                                                |
+| ------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `'union'` (default) | `z.union([...])` | Inline object members without `additionalProperties` print as `z.strictObject(...)`, so a value with another member's keys fails that member. Extra keys that the spec allows fail too. |
+| `'xor'`             | `z.xor([...])`   | Passes only when exactly one member matches, as `oneOf` requires. Members keep their own `additionalProperties`. Needs Zod 4.2 or later.                                                |
 
-:::field{name="'union'"}
-Emits `z.union([...])`. Inline object members without `additionalProperties` print as `z.strictObject(...)`, so a value with another member's keys fails that member. Extra keys that the spec allows fail too.
-:::
+With `'xor'`, members need `required` keys that tell them apart. When every key is optional, an object matches several members and `z.xor` rejects it.
 
-:::field{name="'xor'"}
-Emits `z.xor([...])`, which passes only when exactly one member matches, as `oneOf` requires. Members keep their own `additionalProperties`. Needs Zod v4.2.0 or higher.
-:::
-
-::
-
-A `oneOf` with a discriminator, where every member is an object, prints `z.discriminatedUnion(...)` with either value, and its members keep extra keys the spec allows. An `anyOf` always prints `z.union(...)`.
+A `oneOf` with a discriminator, where every member is an object, prints `z.discriminatedUnion(...)` with either value, and its members keep the extra keys the spec allows. An `anyOf` always prints `z.union(...)`.
 
 ### compile
 
-Wraps schemas in `z.compile(...)` to generate validation code instead of interpreting the schema on each call. Needs Zod v4.5.0 or higher.
+Wraps schemas in `z.compile(...)`, which generates validation code instead of interpreting the schema on each call. Needs Zod 4.5 or later.
 
 |          |                                   |
 | -------- | --------------------------------- |
@@ -189,30 +167,24 @@ Wraps schemas in `z.compile(...)` to generate validation code instead of interpr
 | Required | `false`                           |
 | Default  | `false`                           |
 
-::field-group
+| Value              | Effect                                                                                                            |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `false` (default)  | Leaves schemas uncompiled.                                                                                        |
+| `true`             | Compiles schemas with `z.compile(...)`. A part that cannot be compiled falls back to the interpreter.             |
+| `{ strict: true }` | Passes `{ strict: true }` to `z.compile(...)`, so Zod throws when a part cannot be compiled into flat JavaScript. |
 
-:::field{name="false"}
-Leaves schemas uncompiled.
-:::
+These schemas stay uncompiled:
 
-:::field{name="true"}
-Compiles schemas using `z.compile(...)`.
-:::
-
-:::field{name="{ strict: true }"}
-Passes `{ strict: true }` to `z.compile(...)`. Zod then throws when a part of the schema cannot be compiled into flat JavaScript, where `true` falls back to the interpreter.
-:::
-
-::
-
-Schemas with circular references (`z.lazy`) and bare `$ref` response aliases stay uncompiled to prevent runtime errors. An alias that adds a description, such as `petSchema.describe('A pet')`, is compiled.
+- Schemas with circular references (`z.lazy`).
+- Bare `$ref` response aliases. An alias that adds a description, such as `petSchema.describe('A pet')`, is compiled.
+- With `strict: true`, a `z.coerce` or `z.xor` schema, a union with such a member, and a schema that reaches a circular one through a `$ref`. This way the module loads without a `ZodCompileUnsupportedError`.
 
 > [!NOTE]
-> `z.compile` cannot compile `z.coerce` or `z.xor`. With `strict: true`, a schema that is one of them stays uncompiled, so the generated module loads without a `ZodCompileUnsupportedError`. The same goes for a union with such a member, and for a schema that reaches a circular one through a `$ref`. Every `format: int64` schema is coerced, and so is every schema that [`coercion`](#coercion) covers. An object or array that holds a coerced field is still compiled, and Zod runs that field on its interpreter. To compile an `int64` schema, set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter.
+> Every `format: int64` schema is coerced, and so is every schema that [`coercion`](#coercion) covers. An object or array that holds a coerced field is still compiled, and Zod runs that field on its interpreter. To compile an `int64` schema, set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter.
 
 ### mini
 
-Generates [Zod Mini](https://zod.dev/packages/mini) schemas. They use functions (`z.optional(z.string())`) instead of method chains (`z.string().optional()`), so bundlers can drop unused validators. `mini` also sets the `importPath` default to `'zod/mini'`.
+Generates [Zod Mini](https://zod.dev/packages/mini) schemas, which use functions instead of method chains, so bundlers can drop unused validators. It also sets the `importPath` default to `'zod/mini'`. This option is in beta.
 
 |          |           |
 | -------- | --------- |
@@ -220,9 +192,21 @@ Generates [Zod Mini](https://zod.dev/packages/mini) schemas. They use functions 
 | Required | `false`   |
 | Default  | `false`   |
 
+::code-group
+
+```typescript [mini: false]
+status: z.string().optional(),
+```
+
+```typescript [mini: true]
+status: z.optional(z.string()),
+```
+
+::
+
 ### typeGuards
 
-Generates TypeScript type guards (`is*`) and assertion functions (`assert*`) with Zod's `validate` API. Needs Zod v4.6.0 or higher.
+Generates TypeScript type guards (`is*`) and assertion functions (`assert*`) with Zod's `validate` API. Needs Zod 4.6 or later.
 
 |          |                                                 |
 | -------- | ----------------------------------------------- |
@@ -230,23 +214,13 @@ Generates TypeScript type guards (`is*`) and assertion functions (`assert*`) wit
 | Required | `false`                                         |
 | Default  | `false`                                         |
 
-::field-group
+| Value              | Generates                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------- |
+| `false` (default)  | Only the Zod schemas                                                                              |
+| `true`             | `is<Schema>` type guards and `assert<Schema>` assertions                                          |
+| `{ is?, assert? }` | Each one on its own. Both default to `true`, so `{ assert: false }` writes only the `is*` guards. |
 
-:::field{name="false"}
-Generates only the Zod schemas.
-:::
-
-:::field{name="true"}
-Generates both `is<Schema>` type guards and `assert<Schema>` assertion functions.
-:::
-
-:::field{name="{ is?: boolean; assert?: boolean }"}
-Turns type guards or assertions off separately. Both default to `true`, so `{ assert: false }` generates only the `is*` guards.
-:::
-
-::
-
-When [`inferred`](#inferred) is `true`, the guards narrow to the generated type alias such as `PetSchemaType`. When [`mini`](#mini) is `true`, they route through `z.validate` and `z.parse`.
+With [`inferred: true`](#inferred), the guards narrow to the generated type, such as `PetSchemaType`. With [`mini: true`](#mini), they call `z.validate` and `z.parse`.
 
 ::code-collapse{name="Guards added to petSchema.ts with typeGuards: true"}
 
@@ -262,20 +236,39 @@ export function assertPet(data: unknown): asserts data is z.infer<typeof petSche
 
 ::
 
-### resolver
+### printer
 
-Overrides generated file and symbol names. Omitted members keep `resolverZod`. The shared members (`name`, `file`, `imports`) and the `this` context are described under [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver).
+Replaces the handler for a schema type such as `'integer'` or `'string'`. Each handler returns the Zod expression as a string, in Zod Mini syntax when `mini` is `true`. Inside a handler, `this.base(node)` returns the built-in output to wrap, and `this.transform(node)` recurses into nested nodes. See the [printer guide](https://kubb.dev/docs/5.x/how-to/customize#printers).
 
-|          |                              |
-| -------- | ---------------------------- |
-| Type     | `ResolverPatch<ResolverZod>` |
-| Required | `false`                      |
+|          |                                                      |
+| -------- | ---------------------------------------------------- |
+| Type     | `{ nodes?: PrinterZodNodes \| PrinterZodMiniNodes }` |
+| Required | `false`                                              |
+
+```typescript [kubb.config.ts]
+import { pluginZod } from '@kubb/plugin-zod'
+
+pluginZod({
+  printer: {
+    nodes: {
+      integer() {
+        return 'z.number()'
+      },
+    },
+  },
+})
+```
+
+A handler can read `this.options.direction`, which is `'decode'` for responses and `'encode'` for request bodies and parameters. When it returns a different expression per direction, Kubb also writes an `${name}InputSchema`, which request bodies use, also through a `$ref`. See [Encode custom types](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization#encode-custom-types).
+
+## Resolver members
+
+A `resolver` patch overrides generated names. Members you leave out keep `resolverZod`. Next to the shared `name`, `file`, and `imports` members described under [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverZod` has these:
 
 ::code-collapse{name="ResolverZod patch members"}
 
 ```typescript [Partial override]
 type ResolverZodPatch = {
-  // plus the shared name, file, and imports members
   schema?: {
     typeName?(name: string): string
     type?(name: string): string
@@ -305,27 +298,48 @@ type ResolverZodPatch = {
 
 ::
 
-### printer
+## Format and type mappings
 
-Replaces the handler for a schema type such as `'integer'` or `'string'`. Each handler returns the Zod expression as a string, in Zod Mini syntax when `mini: true`. Inside a handler, `this.base(node)` returns the built-in output to wrap and `this.transform(node)` recurses into nested nodes. See the [printer guide](https://kubb.dev/docs/5.x/how-to/printers).
+How `@kubb/plugin-zod` maps OpenAPI types and formats to Zod v4:
 
-|          |                                                      |
-| -------- | ---------------------------------------------------- |
-| Type     | `{ nodes?: PrinterZodNodes \| PrinterZodMiniNodes }` |
-| Required | `false`                                              |
+| OpenAPI type and format                                | Zod                                   | Zod Mini                              | Notes                                                                 |
+| :----------------------------------------------------- | :------------------------------------ | :------------------------------------ | :-------------------------------------------------------------------- |
+| `integer`                                              | `z.int()`                             | `z.int()`                             | `z.coerce.number().int()` with `coercion.numbers`                     |
+| `integer`, `format: int32`                             | `z.int32()`                           | `z.int32()`                           | 32-bit signed integer                                                 |
+| `integer`, `format: uint32`                            | `z.uint32()`                          | `z.uint32()`                          | 32-bit unsigned integer                                               |
+| `integer`, `format: int64`                             | `z.coerce.bigint()`                   | `z.coerce.bigint()`                   | Always coerced, because JSON holds a number                           |
+| `string`, `format: base64`                             | `z.base64()`                          | `z.base64()`                          | Base64 string                                                         |
+| `string`, `format: byte` / `binary`                    | `z.instanceof(Blob)`                  | `z.instanceof(Blob)`                  | Binary payload                                                        |
+| `string`, `format: base64url`                          | `z.base64url()`                       | `z.base64url()`                       | URL-safe base64 string                                                |
+| `string`, `contentEncoding: base64` / `base64url`      | `z.base64()` / `z.base64url()`        | `z.base64()` / `z.base64url()`        | Other encodings stay `z.string()`                                     |
+| `string`, JSON `contentMediaType` with `contentSchema` | `z.string().refine(...)`              | `z.string().check(z.refine(...))`     | Must parse as JSON that passes the content schema. It stays a string. |
+| `string`, `format: jwt`                                | `z.jwt()`                             | `z.jwt()`                             | JSON Web Token                                                        |
+| `string`, `format: ulid`                               | `z.ulid()`                            | `z.ulid()`                            | ULID                                                                  |
+| `string`, `format: iban`                               | `z.iban()`                            | `z.iban()`                            | International Bank Account Number                                     |
+| `string`, `format: duration`                           | `z.iso.duration()`                    | `z.iso.duration()`                    | ISO 8601 duration                                                     |
+| `string`, `format: uuid`                               | `z.uuid()` or `z.guid()`              | `z.uuid()` or `z.guid()`              | Set by [`guidType`](#guidtype)                                        |
+| `string`, `format: email`                              | `z.email()`                           | `z.email()`                           | Email                                                                 |
+| `string`, `format: uri` / `url`                        | `z.url()`                             | `z.url()`                             | URL                                                                   |
+| `string`, `format: ipv4` / `ipv6`                      | `z.ipv4()` / `z.ipv6()`               | `z.ipv4()` / `z.ipv6()`               | IP address                                                            |
+| `string`, `format: date`                               | `z.iso.date()`                        | `z.iso.date()`                        | ISO 8601 date                                                         |
+| `string`, `format: date-time`                          | `z.iso.datetime()`                    | `z.string()`                          | ISO 8601 date-time                                                    |
+| `string`, `format: time`                               | `z.iso.time()`                        | `z.iso.time()`                        | ISO 8601 time                                                         |
+| `object`, `additionalProperties: <schema>`             | `z.record(z.string(), schema)`        | `z.record(z.string(), schema)`        | Dictionary with no fixed properties                                   |
+| `object`, `additionalProperties: true`                 | `z.looseObject(shape)`                | `z.looseObject(shape)`                | Allows extra keys                                                     |
+| `object`, `propertyNames: <schema>`                    | `z.record(keySchema, schema)`         | `z.record(keySchema, schema)`         | Validated keys, such as a pattern or format                           |
+| `object`, `propertyNames: <enum>`                      | `z.partialRecord(enumSchema, schema)` | `z.partialRecord(enumSchema, schema)` | Enum keys may be missing                                              |
 
-```typescript
-import { pluginZod } from '@kubb/plugin-zod'
+These keywords print a `z.refine` check in both APIs:
 
-pluginZod({
-  printer: {
-    nodes: {
-      integer() {
-        return 'z.number()'
-      },
-    },
-  },
-})
-```
+| Keyword                                                      | Check                                                                            |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| `if`/`then`/`else`, `dependentRequired`, `dependentSchemas`  | Checks the input before parsing, in `z.pipe(z.unknown().check(...), schema)`.    |
+| `contains` with `minContains` and `maxContains`              | Counts the matching items of an array.                                           |
+| `propertyNames` on an object that also declares `properties` | Checks every key of the input. A dictionary keeps `z.record(keySchema, schema)`. |
 
-A handler can read `this.options.direction`, which is `'decode'` for responses and `'encode'` for request bodies and parameters. If it returns a different expression per direction, Kubb also writes an `${name}InputSchema`. Request bodies use it, including bodies that reach the schema through a `$ref`. See [Encode custom types](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization#encode-custom-types).
+Dictionaries and key schemas:
+
+- An open key schema from `propertyNames`, such as a regex, UUID, or length constraint, prints `z.record(keySchema, valueSchema)`.
+- Closed keys, such as enums, literals, or unions of enums, print `z.partialRecord`, so only present keys are validated. The inferred type is `Partial<Record<Keys, Value>>`.
+- `patternProperties` joins its key patterns into one alternation and prints `z.record(z.string().regex(...), valueSchema)`. Zod Mini uses `z.string().check(z.regex(...))` for the key.
+- An `additionalProperties` schema without fixed properties prints a dictionary. With fixed properties, it prints `.catchall(valueSchema)` to keep the declared shape.

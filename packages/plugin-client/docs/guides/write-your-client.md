@@ -1,48 +1,56 @@
 # Write your client
 
-The generated functions import your module through [`importPath`](https://kubb.dev/extensions/kubb-labs/plugin-client/options#importpath). That module is the only runtime code the generated functions call, and you own it.
+Build the client module that every generated function imports through `importPath`, from the contract it must meet to the config that points at it. You own this module and its transport, auth, and error handling.
 
-## Required exports
+::steps{level="2"}
 
-| Export          | Kind     | Purpose                                                                                      |
-| --------------- | -------- | -------------------------------------------------------------------------------------------- |
-| `client`        | function | Sends the request. Every generated function calls it, unless a call passes its own `client`. |
-| `Options`       | type     | The grouped options object a generated function accepts.                                     |
-| `RequestResult` | type     | What a generated function resolves to.                                                       |
+## Check the contract
 
-A generated function calls `client<TResponses, ThrowOnError>(config)`, so type `client` to return `Promise<RequestResult<TResponses, ThrowOnError>>`.
+The generated files import these names from your module. Export the ones your config and spec need.
 
-If your spec has server-sent event or JSON Lines operations, `client` also needs a `stream` method, and the module exports the `StreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent` types. A generated function calls `client.stream<TResponses, ThrowOnError, TItem>(config)` and returns `Promise<StreamResult<TResponses, ThrowOnError, TItem>>`. `TItem` is `TypedEvent<…>` when the document names each event and the success type for JSON Lines. When the document types only the payload, `TItem` is left out and defaults to `ServerSentEvent<SuccessOf<TResponses>>`. A Server-Sent Events call passes `eventShape: 'event'` or `'data'` to say whether `config.validator.response` checks the whole event or its `data`.
+| Export                                                   | Kind           | Needed when                                                                       |
+| -------------------------------------------------------- | -------------- | --------------------------------------------------------------------------------- |
+| `client`                                                 | function       | Always. A call that passes its own `client` uses that one instead.                |
+| `Options`                                                | type           | Always. The grouped options object a generated function takes.                    |
+| `RequestResult`                                          | type           | `returnType` is `'plain'` (default) or `'full'`.                                  |
+| `client.stream`, `StreamResult`                          | method, type   | The spec has Server-Sent Events or JSON Lines operations.                         |
+| `SuccessOf`, `TypedEvent`                                | type           | A stream names each event (both) or streams JSON Lines (`SuccessOf`).             |
+| `withUnwrap`, `resolveThrowOnError`, `Unwrappable`       | function, type | `returnType: 'full'`. Streams also import `StreamOptions`.                        |
+| `unwrapResult`, `resolveThrowOnError`, `UnwrappedResult` | function, type | `returnType: 'data'`. Streams import `StreamOptions` and `UnwrappedStreamResult`. |
+| `toHeadersStandardSchema`                                | function       | `validator: { params: 'zod' }`.                                                   |
+| `RequestConfig`, `ResponseErrorConfig`                   | type           | A query plugin calls the generated functions.                                     |
 
-The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call the generated functions with `throwOnError: true` and read `data` off the result. The query plugins also import two more types from your module:
+The query plugins and `@kubb/plugin-mcp` call the generated functions with `throwOnError: true` and read `data` off the result, so your `RequestResult` needs a `data` field.
 
-| Export                | Kind | Purpose                                                                 |
-| --------------------- | ---- | ----------------------------------------------------------------------- |
-| `RequestConfig`       | type | The per-call `client` options a hook accepts, minus the request fields. |
-| `ResponseErrorConfig` | type | The error type of a failed hook, given the spec's error type.           |
+A generated function calls your client with two or three type arguments:
 
-With a relative `importPath`, the hooks resolve it from the generated operation file, so one path serves both.
+| Call                                                     | Must return                                              |
+| -------------------------------------------------------- | -------------------------------------------------------- |
+| `client<TResponses, ThrowOnError>(config)`               | `Promise<RequestResult<TResponses, ThrowOnError>>`       |
+| `client.stream<TResponses, ThrowOnError, TItem>(config)` | `Promise<StreamResult<TResponses, ThrowOnError, TItem>>` |
 
-## Build on the shared runtime
+`TItem` is `TypedEvent<…>` when the document names each event, and the success type for JSON Lines. When the document types only the payload, the call leaves `TItem` out, so give it a default such as `ServerSentEvent<SuccessOf<TResponses>>`.
 
-To reuse the runtime of the fetch and axios clients instead of writing your own request pipeline:
+`config` carries these fields. Declare each one your spec produces on your `RequestConfig` type, or the generated files fail to compile.
 
-1. Copy `core.ts`, `mediaTypes.ts`, `serializers.ts`, `standardSchema.ts`, `sse.ts`, and the `mediaTypes/` and `serializers/` files your spec needs from `@kubb/plugin-client/templates` next to your `client.ts`.
-2. In `client.ts`, export the three types the core imports, listed below.
-3. Write a `Transport` function that sends a `ResolvedRequest` and returns a web `Response`. If your library does not return one, wrap its bytes in `new Response(bytes, { status, headers })`.
-4. Export `createLazyClient((config) => createClientCore({ defaultTransport, ...config }))` as `client`. Register the form and stream media types your spec needs with `client.setConfig({ mediaTypes: { 'multipart/form-data': multipartFormData, ...streamMediaTypes } })`, and add `export * from './core.ts'` and `export * from './sse.ts'`. The core has no serializers of its own, so also set `serializer: { query: serializeQuery, path: serializePath }` from `serializers/query.ts` and `serializers/path.ts`, or their styled versions, and `header` and `cookie` for a spec with such parameters.
+| Field                                         | Passed when                                                                                            | Value                                                                                                                                                  |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `method`                                      | Always                                                                                                 | The upper-case HTTP method.                                                                                                                            |
+| `url`                                         | Always                                                                                                 | The path template with `{param}` placeholders, such as `'/pet/{petId}'`.                                                                               |
+| `throwOnError`                                | Always                                                                                                 | The caller's value, else [`throwOnErrorDefault`](https://kubb.dev/extensions/kubb-labs/plugin-client/options#throwonerrordefault).                     |
+| `path`, `query`, `headers`, `cookies`, `body` | The caller passes them                                                                                 | Typed from the spec. `cookies` holds name and value pairs.                                                                                             |
+| `baseURL`                                     | The path or operation declares its own `servers`                                                       | That server's URL. Use it when it is set.                                                                                                              |
+| `security`                                    | The operation has security requirements                                                                | See [Authenticate](#authenticate).                                                                                                                     |
+| `styles`                                      | A parameter sets `style`, `explode`, `allowReserved`, or `contentType`                                 | See [Serialize parameters](#serialize-parameters).                                                                                                     |
+| `contentType`                                 | The operation has a body, streams, or offers `text/event-stream`                                       | `request` is the body's media type, `response` the one to ask for in `Accept`.                                                                         |
+| `parseAs`                                     | Every success content type is binary                                                                   | `'blob'`                                                                                                                                               |
+| `eventShape`                                  | A Server-Sent Events operation                                                                         | `'event'` or `'data'`: what `validator.response` checks on each event.                                                                                 |
+| `rawData`                                     | A Server-Sent Events operation types `data` as a string                                                | `true`, or the names of those events. Keep their `data` as text.                                                                                       |
+| `validator`                                   | The [`validator`](https://kubb.dev/extensions/kubb-labs/plugin-client/options#validator) option is set | The schemas to run. See [Validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses). |
 
-| Export           | Purpose                                                 | On fetch      | On axios             |
-| ---------------- | ------------------------------------------------------- | ------------- | -------------------- |
-| `NativeRequest`  | The request object on a result and a `ResponseError`.   | `Request`     | `AxiosRequestConfig` |
-| `NativeResponse` | The response object on a result and a `ResponseError`.  | `Response`    | `AxiosResponse`      |
-| `NativeOptions`  | The `options` a call passes to your HTTP library as is. | `RequestInit` | `AxiosRequestConfig` |
+Anything else the caller passes, such as `signal`, reaches your client through `...config`. A generated function looks like this:
 
-[`@kubb/plugin-fetch/templates/client.ts`](https://github.com/kubb-labs/plugins/blob/main/packages/plugin-fetch/templates/client.ts) is a complete example.
-
-## What a generated function looks like
-
-```typescript
+```typescript [src/gen/clients/pet/getPetById.ts]
 import type { Options, RequestResult } from '../../../client'
 import type { GetPetByIdOptions, GetPetByIdResponses } from '../../types/GetPetById'
 import { client } from '../../../client'
@@ -62,75 +70,15 @@ export function getPetById<ThrowOnError extends boolean = true>(
 }
 ```
 
-Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. `cookies` holds name and value pairs, which your client joins into a `Cookie` header, as the example below does. A `security` entry is one scheme, or an array of schemes to send together.
+## Write the client
 
-Read the body by the response `Content-Type`. An operation with only binary success content also passes `parseAs: 'blob'`.
+Write the module from scratch, or build it on the runtime that `@kubb/plugin-fetch` and `@kubb/plugin-axios` use.
 
-A call can also pass `contentType`: `request` is the body's media type, and `response` is the media type to ask for in `Accept`. A streamed operation always passes its media type, such as `contentType: { response: 'text/event-stream' }` or `contentType: { response: 'application/jsonl' }`. A call whose response offers `text/event-stream` next to another content type passes `text/event-stream` too, unless the caller picks another one. `RequestConfig` needs the field.
+:::tabs
 
-## Serialize parameters
+::::tabs-item{label="From scratch"}
 
-When the spec sets `style`, `explode`, `allowReserved`, or `contentType` on a parameter, the generated call also passes `styles`, grouped by location and keyed by the parameter name:
-
-```typescript
-styles: {
-  path: { petId: { style: 'matrix', explode: true } },
-  query: { tags: { style: 'pipeDelimited', explode: false } },
-}
-```
-
-A parameter without an entry uses the default for its location. The shared runtime's `serializers.ts` applies these styles. A client you write from scratch declares `styles` on `RequestConfig` and applies the styles itself, or ignores them when the spec only uses the defaults.
-
-### Query
-
-Query parameters default to the `form` style. Arrays explode into repeated keys unless the spec
-says otherwise, and `spaceDelimited`, `pipeDelimited`, and `deepObject` change how arrays and
-objects collapse.
-
-| Style            | `explode` | Input               | Result           |
-| ---------------- | --------- | ------------------- | ---------------- |
-| `form` (default) | `true`    | `{ id: [3, 4, 5] }` | `id=3&id=4&id=5` |
-| `form`           | `false`   | `{ id: [3, 4, 5] }` | `id=3,4,5`       |
-| `spaceDelimited` | `false`   | `{ id: [3, 4, 5] }` | `id=3%204%205`   |
-| `pipeDelimited`  | `false`   | `{ id: [3, 4, 5] }` | `id=3\|4\|5`     |
-| `deepObject`     | `n/a`     | `{ a: { b: 1 } }`   | `a%5Bb%5D=1`     |
-
-With `explode: true`, `spaceDelimited` and `pipeDelimited` fall back to repeated keys like `form`,
-so the delimiter only shows with `explode: false`.
-
-### Path
-
-Path parameters default to the `simple` style, which emits the bare value. `label` prefixes a
-`.` and `matrix` prefixes a `;name=` segment. The results below are the serialized segment for a
-parameter named `id`.
-
-| Style              | `explode` | Input            | Result            |
-| ------------------ | --------- | ---------------- | ----------------- |
-| `simple` (default) | `false`   | `[3, 4, 5]`      | `3,4,5`           |
-| `label`            | `true`    | `[3, 4, 5]`      | `.3.4.5`          |
-| `matrix`           | `true`    | `[3, 4, 5]`      | `;id=3;id=4;id=5` |
-| `simple`           | `false`   | `{ x: 1, y: 2 }` | `x,1,y,2`         |
-
-### Header and cookie
-
-Header parameters use the `simple` style and cookie parameters use the `form` style, so the metadata
-for these locations carries only `explode`, plus `style: 'cookie'` for a cookie parameter with the
-OpenAPI 3.2 `cookie` style. Header values are sent as-is. Cookie values are URL-encoded into a single
-`Cookie` header. The `cookie` style sends them unencoded, as RFC 6265 describes, defaults `explode` to
-`true`, and throws on a value with a character such as `;` or a space, or on an exploded object key that is not a valid
-cookie name, such as `a=b`.
-
-| Location               | `explode` | Input                             | Result                    |
-| ---------------------- | --------- | --------------------------------- | ------------------------- |
-| header                 | `false`   | `[3, 4]`                          | `X-Ids: 3,4`              |
-| header                 | `true`    | `{ role: 'admin' }`               | `X-Filter: role=admin`    |
-| cookie                 | `false`   | `{ session: 'abc', ids: [1, 2] }` | `session=abc; ids=1,2`    |
-| cookie                 | `true`    | `{ ids: [1, 2] }`                 | `ids=1; ids=2`            |
-| cookie, `cookie` style | default   | `{ sid: 'a%20b', ids: [1, 2] }`   | `sid=a%20b; ids=1; ids=2` |
-
-## A minimal client
-
-The client below uses `fetch`. Replace the transport with the HTTP library you use.
+The client below uses `fetch` and reads JSON. Replace `send` with the HTTP library you use.
 
 ```typescript [src/client.ts]
 export type Auth = {
@@ -206,7 +154,110 @@ export const client = <TResponses, ThrowOnError extends boolean = true>(config: 
   send(config) as Promise<RequestResult<TResponses, ThrowOnError>>
 ```
 
-The [example project](https://github.com/kubb-labs/plugins/tree/main/examples/client) has a fuller version with a base URL setter, query handling, and an async auth hook. The types in this sketch are minimal. Add status-aware response types when you need them.
+The [example project](https://github.com/kubb-labs/plugins/tree/main/examples/client) has a fuller version with a base URL setter, query handling, streams, and an async auth hook.
+
+::::
+
+::::tabs-item{label="On the shared runtime"}
+
+Reuse the request pipeline of the fetch and axios clients and write only the transport:
+
+1. Copy `core.ts`, `mediaTypes.ts`, `serializers.ts`, `standardSchema.ts`, `sse.ts`, and the `mediaTypes/` and `serializers/` files your spec needs from `@kubb/plugin-client/templates` next to your `client.ts`.
+2. In `client.ts`, export the `NativeRequest`, `NativeResponse`, and `NativeOptions` types the core imports. On fetch they are `Request`, `Response`, and `RequestInit`.
+3. Write a `Transport` function that sends a `ResolvedRequest` and returns a web `Response`. If your library returns something else, wrap its bytes in `new Response(bytes, { status, headers })`.
+4. Export `createLazyClient((config) => createClientCore({ defaultTransport, ...config }))` as `client`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
+5. Register what the core does not ship: `client.setConfig({ mediaTypes: { 'multipart/form-data': multipartFormData, ...streamMediaTypes }, serializer: { query: serializeQuery, path: serializePath } })`. Add `header` and `cookie` serializers when the spec has such parameters.
+
+[`@kubb/plugin-fetch/templates/client.ts`](https://github.com/kubb-labs/plugins/blob/main/packages/plugin-fetch/templates/client.ts) is a complete example.
+
+::::
+
+:::
 
 > [!TIP]
 > Kubb does not depend on retries, interceptors, or request signing. Add them to `client` when you need them.
+
+## Authenticate
+
+The plugin sends no credentials. Each call passes the operation's security requirements as `security`, and your client decides what to send:
+
+```typescript
+security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }]
+```
+
+| Shape                                        | Meaning                                                                                                  |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| No `security` field                          | The operation is public. Skip auth.                                                                      |
+| One entry per requirement                    | Meeting one requirement is enough.                                                                       |
+| An array inside the list                     | One requirement needs these schemes together, such as an API key and a session cookie. Send all of them. |
+| `type: 'http'` with `scheme`                 | `'bearer'` or `'basic'`. Other HTTP schemes arrive as `'bearer'`.                                        |
+| `type: 'oauth2'` with `flows`, `metadataUrl` | The flow URLs, such as the OpenAPI 3.2 `deviceAuthorization` flow, to get a token.                       |
+| `type: 'openIdConnect'` with `url`           | The discovery URL.                                                                                       |
+
+The client can `await` a token before it sends the request, so the token can come from a secrets store or a refresh call:
+
+:::code-group
+
+```typescript [src/client.ts]
+type GetToken = () => Promise<string | undefined>
+
+let getToken: GetToken | undefined
+
+export function setAuth(resolve: GetToken) {
+  getToken = resolve
+}
+
+// inside send(), before fetch()
+const token = config.security?.length ? await getToken?.() : undefined
+const headers = { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(config.headers as Record<string, string>) }
+```
+
+```typescript [src/index.ts]
+import { setAuth } from './client'
+
+setAuth(async () => readTokenFromSecretsStore())
+```
+
+:::
+
+For request signing, such as AWS SigV4, or a service with other credentials, pass a different `client` on the call. It replaces the default for that call only:
+
+```typescript
+await getPetById({ path: { petId: 1 }, client: createSignedClient() })
+```
+
+## Serialize parameters
+
+When the spec sets `style`, `explode`, `allowReserved`, or `contentType` on a parameter, the call passes `styles`, grouped by location and keyed by parameter name:
+
+```typescript
+styles: {
+  path: { petId: { style: 'matrix', explode: true } },
+  query: { tags: { style: 'pipeDelimited', explode: false } },
+}
+```
+
+A parameter without an entry uses the default for its location: `form` for query and cookie, `simple` for path and header. A cookie with the OpenAPI 3.2 `cookie` style passes `style: 'cookie'`, and its values go out unencoded. The shared runtime's `serializers.ts` applies all of these. A client written from scratch applies them itself, or ignores `styles` when the spec only uses the defaults. The [plugin-fetch serialization guide](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/serialization) shows the output of each style.
+
+## Register it
+
+Point `importPath` at the module, resolved from the generated files:
+
+```typescript [kubb.config.ts]
+import { defineConfig } from 'kubb/config'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginClient } from '@kubb/plugin-client'
+
+export default defineConfig({
+  input: './petStore.yaml',
+  output: { path: './src/gen' },
+  plugins: [
+    pluginTs(),
+    pluginClient({ group: { type: 'tag' }, importPath: '../../../client' }),
+  ],
+})
+```
+
+Run `npx kubb generate`, then `npx tsc --noEmit`. A missing export or `RequestConfig` field shows up as a compile error in the generated files. With a relative `importPath`, the query plugins resolve it from the same generated file, so one path serves both.
+
+::

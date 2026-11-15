@@ -1,17 +1,20 @@
 # Options
 
-Pass these options to `pluginClient()`. Shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options).
+Pass these options to `pluginClient()`. Rows for shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options) and give this plugin's default.
 
 ## Options overview
 
 | Option                                                                    | Purpose                                                                | Default                                          |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------ |
 | [`importPath`](#importpath)                                               | Import specifier of your client module.                                | Required                                         |
+| [`returnType`](#returntype)                                               | Shape of the value a generated function resolves to.                   | `'plain'`                                        |
+| [`throwOnErrorDefault`](#throwonerrordefault)                             | `throwOnError` value each call passes to your client.                  | `true`                                           |
+| [`validator`](#validator)                                                 | Pass Zod schemas to your client.                                       | `false`                                          |
+| [`validator.request`](#validator)                                         | Pass the request body schema.                                          | None                                             |
+| [`validator.params`](#validator)                                          | Pass the path, query, header, and cookie schemas.                      | None                                             |
+| [`validator.response`](#validator)                                        | Pass the response and error schemas.                                   | None                                             |
 | [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written: `path`, `mode`, `barrel`, `banner`, `footer`. | `{ path: 'clients', barrel: { type: 'named' } }` |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path: `type`, `name`.                           | None                                             |
-| [`throwOnErrorDefault`](#throwonerrordefault)                             | Default `throwOnError` value passed to your client.                    | `true`                                           |
-| [`validator`](#validator)                                                 | Pass Zod schemas to your client.                                       | `false`                                          |
-| [`returnType`](#returntype)                                               | Shape of the value a generated operation resolves to.                  | `'plain'`                                        |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                       | None                                             |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                            | `[]`                                             |
 | [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                   | `[]`                                             |
@@ -22,7 +25,7 @@ Pass these options to `pluginClient()`. Shared options link to [Shared plugin op
 
 ### importPath
 
-Import specifier of your client module. The plugin writes it into every generated import exactly as given, so it must resolve from the generated file. Use a relative path, a package name, or an alias.
+Import specifier of your client module. The plugin writes it into every generated import exactly as given, so it must resolve from the generated file. A relative path, a package name, or an alias works.
 
 |          |          |
 | -------- | -------- |
@@ -30,35 +33,15 @@ Import specifier of your client module. The plugin writes it into every generate
 | Required | `true`   |
 
 ```typescript
-pluginClient({ importPath: '../../../client' }) // relative to src/gen/clients/<tag>/
+pluginClient({ importPath: '../../../client' }) // from src/gen/clients/<tag>/ to src/client.ts
 pluginClient({ importPath: '@my-org/api-client' }) // a package
 ```
 
-With `group: { type: 'tag' }` and `output.path: 'clients'`, a generated file sits in `src/gen/clients/<tag>/`, so `../../../client` points at `src/client.ts`. Without `group` it is `../../client`.
-
-The module must export `client`, plus the `Options` and `RequestResult` types. See [write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).
-
-### throwOnErrorDefault
-
-Default for the `throwOnError` field that every generated function passes to your client. A call that sets `throwOnError` itself wins. Your client decides what the flag does: the [example client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client) throws on a non-2xx status when it is `true` and returns the error as a value when it is `false`.
-
-|          |           |
-| -------- | --------- |
-| Type     | `boolean` |
-| Required | `false`   |
-| Default  | `true`    |
-
-The setting applies to the whole plugin, so you cannot set it in `override`.
+Without `group`, a generated file sits one folder higher, so the same module is `../../client`. [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client) lists what the module must export.
 
 ### returnType
 
-Shape of the value a generated operation resolves to.
-
-- `'plain'`: returns what your `client` returns.
-- `'full'`: wraps the call in `withUnwrap`, so the caller can `await` it or call `.unwrap()`. Your module must export `withUnwrap`, `resolveThrowOnError`, and the `Unwrappable` type.
-- `'data'`: passes the call through `unwrapResult` and resolves to the body. Your module must export `unwrapResult`, `resolveThrowOnError`, and the `UnwrappedResult` type.
-
-`@kubb/plugin-client/templates/core.ts` exports all of these, so your module can re-export them from there.
+Shape of the value a generated function resolves to. It applies to the whole plugin, so `override` cannot set it.
 
 |          |                               |
 | -------- | ----------------------------- |
@@ -66,18 +49,44 @@ Shape of the value a generated operation resolves to.
 | Required | `false`                       |
 | Default  | `'plain'`                     |
 
+::field-group
+
+:::field{name="'plain'"}
+Default. Returns what your `client` returns.
+:::
+
+:::field{name="'full'"}
+Wraps the call in `withUnwrap`, so the caller can `await` it or call `.unwrap()`. Your module must export `withUnwrap`, `resolveThrowOnError`, and the `Unwrappable` type.
+:::
+
+:::field{name="'data'"}
+Passes the call through `unwrapResult`, so it resolves to the body when `throwOnError` is `true`, and to the full result when it is `false`. Your module must export `unwrapResult`, `resolveThrowOnError`, and the `UnwrappedResult` type.
+:::
+
+::
+
+`@kubb/plugin-client/templates/core.ts` exports all of these, so your module can re-export them from there.
+
 ```typescript
 pluginClient({ importPath: '../../client', returnType: 'full' })
 // const pet = await getPetById({ path: { petId: 1 } }).unwrap()
 ```
 
-The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
+The example sets [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter. With the default, an `int64` id such as `petId` is a `bigint` and takes `1n`.
 
-The setting applies to the whole plugin, so you cannot set it in `override`.
+### throwOnErrorDefault
+
+The `throwOnError` value every generated function passes to your client. A call that sets `throwOnError` wins. Your client decides what the flag does. It applies to the whole plugin, so `override` cannot set it.
+
+|          |           |
+| -------- | --------- |
+| Type     | `boolean` |
+| Required | `false`   |
+| Default  | `true`    |
 
 ### validator
 
-Passes Zod schemas from `@kubb/plugin-zod` to your client on `config.validator`. The plugin does not run the schemas. Your client reads `config.validator` and runs them. See [validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses).
+Passes Zod schemas from `@kubb/plugin-zod` to your client on `config.validator`. The plugin does not run them: your client does. See [Validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses).
 
 |          |                                                                           |
 | -------- | ------------------------------------------------------------------------- |
@@ -88,7 +97,7 @@ Passes Zod schemas from `@kubb/plugin-zod` to your client on `config.validator`.
 ::field-group
 
 :::field{name="false"}
-Default value. Passes nothing.
+Default. Passes nothing.
 :::
 
 :::field{name="'zod'"}
@@ -96,12 +105,10 @@ Passes the response and error schemas.
 :::
 
 :::field{name="{ request?: 'zod', params?: 'zod', response?: 'zod' }"}
-Opts in per direction. `request` passes the request body schema, `params` the path, query, header, and cookie params schemas, and `response` the response and error schemas.
+Opts in per slot. `request` passes the request body schema, `params` the path, query, header, and cookie schemas, and `response` the response and error schemas. With `params`, generated calls also import `toHeadersStandardSchema` from your `importPath` module.
 :::
 
 ::
 
 > [!IMPORTANT]
-> Add `pluginZod()` to the plugins list when `validator` is set. Generation stops with an error if it is missing.
-
-With `params: 'zod'`, generated calls also import `toHeadersStandardSchema` from your [`importPath`](#importpath) module, so that module must export it. See [validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses).
+> Add `pluginZod()` to `plugins` when `validator` is set. Generation stops with an error without it.

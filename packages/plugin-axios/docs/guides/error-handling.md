@@ -1,8 +1,21 @@
 # Handle errors
 
-Handle failures from the client Kubb generates. Catch a `ResponseError`, switch to a returned error result with `throwOnError`, and tell a network failure apart from a 4xx or 5xx response.
+Catch a `ResponseError`, return errors as values with `throwOnError: false`, and tell a 4xx or 5xx answer apart from a request that never completed.
 
-The generated client throws a `ResponseError` on non-2xx responses by default:
+## What a call does
+
+| What happens                             | `throwOnError: true` (default)        | `throwOnError: false`                 |
+| ---------------------------------------- | ------------------------------------- | ------------------------------------- |
+| 2xx response                             | Resolves with `data`.                 | Resolves with `data`.                 |
+| Non-2xx response                         | Throws a `ResponseError`.             | Resolves with `error` and `status`.   |
+| A body fails its schema (`validator` on) | Throws a `ParseError`.                | Throws a `ParseError`.                |
+| Invalid JSON under a JSON media type     | Throws a `ParseError`.                | Throws a `ParseError`.                |
+| Network failure, DNS failure, or timeout | Rejects with the native `AxiosError`. | Rejects with the native `AxiosError`. |
+| Aborted `signal`                         | Rejects with the signal's reason.     | Rejects with the signal's reason.     |
+
+Every failure that rejects also reaches [`client.interceptors.error`](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/configure-requests#add-interceptors).
+
+## Catch a ResponseError
 
 ```typescript
 import { getPetById } from './gen/clients/getPetById'
@@ -10,39 +23,30 @@ import { ResponseError } from './gen/.kubb/client'
 
 try {
   const { data } = await getPetById({ path: { petId: 1 } })
-  console.info(data)
 } catch (error) {
-  if (ResponseError.is(error)) {
-    console.error(error.status) // 404
-    console.error(error.data) // the parsed error body
-  }
+  if (ResponseError.is(error)) console.error(error.status, error.data) // 404, the parsed error body
 }
 ```
 
-The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
-
-The `message` holds the HTTP method and the URL without its query string, so query credentials stay out of logs. For example: `GET https://api.example.com/pets/1 failed with status 404 Not Found`.
-
-The error exposes these fields:
+Each generated package bundles its own `ResponseError` class, so narrow with `ResponseError.is(error)`, which checks the error name, instead of `instanceof`.
 
 ```typescript
 class ResponseError extends Error {
-  static is(error: unknown): error is ResponseError<unknown, unknown, unknown>
   data: TError // the parsed error body
   status: number
   statusText: string
   contentType: string | undefined
-  headers: Headers
+  headers: Headers // such as error.headers.get('Retry-After')
   request: AxiosRequestConfig
   response: AxiosResponse
 }
 ```
 
-Each generated package bundles its own `ResponseError` class, so narrow with `ResponseError.is(error)` instead of `instanceof`. `is()` checks the error name.
+The `message` names the method and the URL without its query string, so query credentials stay out of logs: `GET https://api.example.com/pets/1 failed with status 404 Not Found`.
 
 ## Narrow a thrown error by status
 
-`isResponseError<Responses>(error)` narrows a caught error to the `ResponseError` of one operation. Checking `status` then narrows `data` to the body declared for that status. A range key such as `4xx` covers its statuses that have no entry of their own, and `default` covers the rest:
+`isResponseError<Responses>(error)` narrows a caught error to one operation's `ResponseError`. A check on `status` then narrows `data` to that status's body:
 
 ```typescript
 import { isResponseError } from './gen/.kubb/client'
@@ -57,106 +61,68 @@ try {
 }
 ```
 
-The type argument is not checked at runtime, so keep the `try` around one operation.
-
-The error also carries the response's `Headers` as `error.headers`, so `error.headers.get('Retry-After')` reads the same on every transport.
+A range key such as `4xx` covers its statuses that have no entry of their own, and `default` covers the rest. The type argument is not checked at runtime, so keep the `try` around one operation.
 
 ## Return the error instead
 
-Pass `throwOnError: false` and the call resolves for every documented status. The result is a
-discriminated union: `data` is set on success and `error` on failure. A failed call with an empty
-body sets `error` to `{ status, statusText }`.
-
-Check `data` before you read it. A check on `status` narrows `data` too, unless the operation
-declares a `default` response, whose status can be any number:
+With `throwOnError: false`, the call resolves for every status. `data` is set on success and `error` on failure. A failed call with an empty body sets `error` to `{ status, statusText }`:
 
 ```typescript
 const result = await getPetById({ path: { petId: 1 }, throwOnError: false })
 
-if (result.data !== undefined) {
-  console.info(result.data)
-} else {
-  console.error(result.status, result.error)
-}
+if (result.error) console.error(result.status, result.error)
+else console.info(result.data)
 ```
+
+A check on `status` narrows `data` and `error` too, unless the operation declares a `default` response, whose status can be any number. `.unwrap()` on such a call turns `error` into a rejection.
 
 ## Set the generated default
 
-Set `throwOnErrorDefault` on the client plugin to choose how generated operations handle non-2xx
-responses by default. Each call can still override that setting with `throwOnError`:
+[`throwOnErrorDefault`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#throwonerrordefault) on the plugin sets what a call does when it leaves `throwOnError` out:
 
 ```typescript
-import { pluginAxios } from '@kubb/plugin-axios'
-
 pluginAxios({ throwOnErrorDefault: false })
 
-// resolves with an error result
-const list = await searchPets({ query: { status: 'available' } })
-
-// opt one call back into throwing
-const pet = await getPetById({ path: { petId: 1 }, throwOnError: true })
+const list = await searchPets({ query: { status: 'available' } }) // resolves with an error result
+const pet = await getPetById({ path: { petId: 1 }, throwOnError: true }) // throws
 ```
 
-`client.setConfig({ throwOnError })` does not change this default, because each generated
-operation passes its own value. Set it on the plugin.
-
-## Network failures still throw
-
-> [!IMPORTANT]
-> `throwOnError` only applies when the server answers. A dropped connection, a DNS failure, or an
-> aborted `AbortSignal` always rejects. A `ResponseError` means the server answered with a non-2xx
-> status, and a `ParseError` means a body failed validation or is not valid JSON. Any other error
-> usually means the request never completed. All of them reach `client.interceptors.error`.
-
-```typescript
-try {
-  const { data } = await getPetById({ path: { petId: 1 }, throwOnError: false })
-  use(data)
-} catch (error) {
-  // not a ResponseError: the request never completed
-  console.error('request failed to send', error)
-}
-```
-
-Pass an `AbortSignal` to cancel a request. The call rejects with the abort reason.
+`client.setConfig({ throwOnError })` does not change the default, because each generated function passes its own value.
 
 ## Validation failures
 
-When you turn on the `validator` option, a body that does not match its Zod schema throws a
-`ParseError` instead of returning. It carries the schema's raw `issues`:
+With [`validator`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator) on, a body that does not match its Zod schema throws a `ParseError` with the schema's `issues`:
 
 ```typescript
 import { ParseError } from './gen/.kubb/standardSchema'
 
 try {
-  const { data } = await getPetById({ path: { petId: 1 } })
-  use(data)
+  await getPetById({ path: { petId: 1 } })
 } catch (error) {
-  if (error instanceof ParseError) {
-    console.error(error.issues) // [{ message, path }]
-  }
+  if (error instanceof ParseError) console.error(error.issues) // [{ message, path }]
 }
 ```
 
-A `ParseError` reports schema validation issues. A `ResponseError` reports a non-2xx status. The error body of a non-2xx response is checked against the schema of its status, then of its range such as `5xx`, then of `default`. An error body that fails its schema throws a `ParseError` in place of the `ResponseError`, also with `throwOnError: false`. A status the document leaves out, such as a `502` from a gateway, keeps its body unchecked.
+The error body of a non-2xx response is checked against the schema of its status, then its range such as `5xx`, then `default`. A status the document leaves out keeps its body unchecked. An error body that fails its schema throws a `ParseError` instead of the `ResponseError`, also with `throwOnError: false`.
 
-Calling `.unwrap()` on a `throwOnError: false` call turns that same `error` into a rejection, so a
-`try`/`catch` works there too.
+Pass `onValidationError` on the call or the client to recover. Return `{ value }` to use that value, or nothing to throw the `ParseError`:
+
+```typescript
+client.setConfig({
+  onValidationError: (error, { direction, source, value }) => {
+    console.warn(direction, source, error.issues)
+    return { value }
+  },
+})
+```
 
 ## Turn validation off at runtime
 
-The `validator` option decides at generation time which schemas each call carries. Set `validate` on the client to skip them at runtime, for example in production or in tests with partial fixtures:
+`validator` decides at generation time which schemas a call carries. `validate` skips them at runtime, for example in production or in tests with partial fixtures:
 
 ```typescript
-import { client } from './gen/.kubb/client'
-
 client.setConfig({ validate: import.meta.env.DEV })
+client.setConfig({ validate: { response: false } }) // skip one direction
 ```
 
-`validate: false` skips every schema. An object skips only the directions set to `false`: `request` (the body), `params` (path, query, header, and cookie params), `response`, and `error`:
-
-```typescript
-client.setConfig({ validate: { response: false } })
-```
-
-A per-call `validate` overrides the client setting, such as `getPetById({ path: { petId: 1 }, validate: true })`. The default is `true`.
+`false` skips every schema. The object form skips the directions set to `false`: `request` (the body), `params`, `response`, and `error`. A per-call `validate` overrides the client. The default is `true`.
