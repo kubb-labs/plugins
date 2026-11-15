@@ -1,6 +1,6 @@
 # Call operations
 
-Each generated function takes one grouped options object and returns your client's promise.
+Call a generated function with one grouped options object. It returns your client's promise, shaped by your `RequestResult` type.
 
 ```typescript
 import { addPet, getPetById } from './gen/clients'
@@ -11,31 +11,34 @@ console.log(created.data, created.response.status)
 const pet = await getPetById({ path: { petId: 1 } })
 ```
 
-The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
+The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter. Without it, `petId` is a `bigint` and takes `1n`.
 
-Path keys keep the names from the spec, so a `{pet-id}` placeholder is passed as `path: { 'pet-id': 1 }`. Set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing) on the adapter (`@kubb/adapter-oas` 5.20.0 or later) to pass `path: { petId: 1 }` instead, the name MSW handlers and query keys already use. The HTTP request stays the same.
+| Key                                           | Holds                                                                                                                             |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `path`, `query`, `headers`, `cookies`, `body` | The request values, typed from the spec.                                                                                          |
+| `throwOnError`                                | Overrides [`throwOnErrorDefault`](https://kubb.dev/extensions/kubb-labs/plugin-client/options#throwonerrordefault) for this call. |
+| `client`                                      | Another client function for this call, such as a signed or per-tenant client.                                                     |
+| Any other key                                 | Passed to your client as is, such as `signal`.                                                                                    |
 
-The keys are `path`, `query`, `headers`, `cookies`, and `body`. Kubb types each from the spec, so a wrong key or value fails at compile time.
+Path keys keep their spec names unless you set [`pathParamsCasing`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing). See [Path parameter names](#path-parameter-names).
 
-## Errors
+## Handle errors
 
-`throwOnError` defaults to `true` (see [`throwOnErrorDefault`](https://kubb.dev/extensions/kubb-labs/plugin-client/options#throwonerrordefault)). What that means is up to your client. With the [minimal client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client#a-minimal-client), a non-2xx status throws, and `throwOnError: false` returns the error as a value:
+Your client decides what `throwOnError` does. With the [client from scratch](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client#write-the-client), a non-2xx status throws, and `throwOnError: false` returns the error as a value:
 
 ```typescript
 const result = await getPetById({ path: { petId: 1 }, throwOnError: false })
 
-if (result.error === undefined) {
-  console.log('pet', result.data)
-}
-if (result.error !== undefined) {
-  console.log('failed', result.response.status)
-}
+if (result.error === undefined) console.log('pet', result.data)
+else console.log('failed', result.response.status)
 ```
 
-## Use a different client for one call
+Next, [validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses).
 
-Pass `client` to send one call through another function:
+## Less common cases
 
-```typescript
-await getPetById({ path: { petId: 2 }, client: tenantClient })
-```
+### Path parameter names
+
+When the spec names a path parameter in kebab or snake case, such as `{pet-id}`, the path key keeps that name: pass `path: { 'pet-id': 1 }`.
+
+Set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing) on the adapter (`@kubb/adapter-oas` 5.20.0 or later) to pass `path: { petId: 1 }` instead. The HTTP request stays the same.

@@ -1,12 +1,14 @@
 # Customize generated types
 
-Prefix TypeScript names, change schema type output, and remove descriptions.
+Prefix TypeScript names, change how a schema type prints, and remove descriptions.
 
-Start with the [TypeScript plugin configuration](https://kubb.dev/extensions/kubb-labs/plugin-ts#example). Apply these changes to `pluginTs()` in that configuration.
+Add each change to `pluginTs()` in the [TypeScript plugin configuration](https://kubb.dev/extensions/kubb-labs/plugin-ts#example).
 
 ## Prefix type names
 
-Use `resolverTs.name` to preserve the plugin's PascalCase rule before adding a prefix.
+Override `resolver.name` and call `resolverTs.name` first, so the plugin's PascalCase rule still applies.
+
+::code-group
 
 ```typescript [kubb.config.ts]
 import { pluginTs, resolverTs } from '@kubb/plugin-ts'
@@ -20,11 +22,23 @@ pluginTs({
 })
 ```
 
-A generated `Pet` becomes `ApiPet`. File names stay unchanged unless you also customize the file resolver.
+```typescript [Before]
+export type Pet = { name: string }
+```
+
+```typescript [After]
+export type ApiPet = { name: string }
+```
+
+::
+
+File names stay the same unless you also override `resolver.file`. See every [resolver member](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#resolver-members).
 
 ## Map schema types
 
-Replace [printer handlers](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#printer) with your own. Each handler returns the TypeScript type as a string.
+Replace a [printer handler](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#printer). Each handler returns the TypeScript type as a string.
+
+::code-group
 
 ```typescript [kubb.config.ts]
 import { pluginTs } from '@kubb/plugin-ts'
@@ -43,13 +57,39 @@ pluginTs({
 })
 ```
 
-The example maps `date` fields to `Date` and `int32` integers to `bigint`. The separate `bigint` handler controls `int64` fields, which already use `bigint` by default. A `date-time` field uses the `datetime` handler.
+```typescript [Before]
+export type Pet = {
+  birthday?: string
+  age?: number
+}
+```
 
-Handlers that return TypeScript compiler nodes are deprecated and are removed in the next major. They still work when your project installs `@kubb/parser-ts`, plus `typescript` 5 or 6 or `@typescript/typescript6` next to TypeScript 7. All are optional peer dependencies. If `@kubb/parser-ts` is missing, the build stops with an error that tells you to install it.
+```typescript [After]
+export type Pet = {
+  birthday?: Date
+  age?: bigint
+}
+```
+
+::
+
+Each schema has its own handler:
+
+| Schema                                  | Handler                               |
+| --------------------------------------- | ------------------------------------- |
+| `format: date`                          | `date`                                |
+| `format: date-time`                     | `datetime`                            |
+| `integer`, `format: int32` or no format | `integer`                             |
+| `integer`, `format: int64`              | `bigint`, already `bigint` by default |
+
+> [!WARNING]
+> A handler that returns a TypeScript compiler node is deprecated and is removed in the next major. Until then, it needs `@kubb/parser-ts`, plus `typescript` 5 or 6, or `@typescript/typescript6` next to TypeScript 7. Without `@kubb/parser-ts`, the build stops with an error that tells you to install it.
 
 ## Remove descriptions
 
 Clear schema descriptions with a [macro](https://kubb.dev/docs/5.x/reference/plugin-options#macros).
+
+::code-group
 
 ```typescript [kubb.config.ts]
 import { pluginTs } from '@kubb/plugin-ts'
@@ -67,4 +107,22 @@ const dropDescriptions = defineMacro({
 pluginTs({ macros: [dropDescriptions] })
 ```
 
-The generated types omit description JSDoc. The OpenAPI document stays unchanged. The same macro works with `pluginZod`, with [one exception](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization#remove-descriptions).
+```typescript [Before]
+export type Pet = {
+  /**
+   * @description The name of the pet
+   * @type string
+   */
+  name: string
+}
+```
+
+```typescript [After]
+export type Pet = {
+  name: string
+}
+```
+
+::
+
+The OpenAPI document stays unchanged. The same macro works with `pluginZod`, with [one exception](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization#remove-descriptions).

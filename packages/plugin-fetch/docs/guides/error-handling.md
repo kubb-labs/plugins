@@ -1,8 +1,25 @@
 # Handle errors
 
-Handle failures from the client Kubb generates. Catch a `ResponseError`, switch to a returned error result with `throwOnError`, and tell a network failure apart from a 4xx or 5xx response.
+Catch a `ResponseError`, return errors as values with `throwOnError: false`, and tell a 4xx or 5xx answer apart from a request that never completed.
 
-The generated client throws a `ResponseError` on non-2xx responses by default:
+## What a call does
+
+Only a non-2xx response depends on `throwOnError`:
+
+| What happens                             | Result                                                                                    |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 2xx response                             | Resolves with `data`.                                                                     |
+| Non-2xx response                         | Throws a `ResponseError`. With `throwOnError: false`, resolves with `error` and `status`. |
+| A body fails its schema (`validator` on) | Throws a `ParseError`.                                                                    |
+| Invalid JSON under a JSON media type     | Throws a `ParseError`.                                                                    |
+| Network or DNS failure                   | Rejects with the `TypeError` from `fetch`.                                                |
+| Aborted `signal`                         | Rejects with the signal's reason.                                                         |
+
+Every failure that rejects with an `Error` also reaches [`client.interceptors.error`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/configure-requests#add-interceptors). An abort whose reason is not an `Error`, such as `abort('canceled')`, skips it.
+
+## Catch a ResponseError
+
+Narrow with `ResponseError.is(error)` instead of `instanceof`, because each generated package bundles its own `ResponseError` class:
 
 ```typescript
 import { getPetById } from './gen/clients/getPetById'
@@ -10,39 +27,31 @@ import { ResponseError } from './gen/.kubb/client'
 
 try {
   const { data } = await getPetById({ path: { petId: 1 } })
-  console.info(data)
 } catch (error) {
-  if (ResponseError.is(error)) {
-    console.error(error.status) // 404
-    console.error(error.data) // the parsed error body
-  }
+  if (ResponseError.is(error)) console.error(error.status, error.data) // 404, the parsed error body
 }
 ```
 
-The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
-
-The `message` holds the HTTP method and the URL without its query string, so query credentials stay out of logs. For example: `GET https://api.example.com/pets/1 failed with status 404 Not Found`.
-
-The error exposes these fields:
-
 ```typescript
 class ResponseError extends Error {
-  static is(error: unknown): error is ResponseError<unknown, unknown, unknown>
   data: TError // the parsed error body
   status: number
   statusText: string
   contentType: string | undefined
-  headers: Headers
+  headers: Headers // such as error.headers.get('Retry-After')
   request: Request
   response: Response
 }
 ```
 
-Each generated package bundles its own `ResponseError` class, so narrow with `ResponseError.is(error)` instead of `instanceof`. `is()` checks the error name.
+The `message` leaves out the query string: `GET https://api.example.com/pets/1 failed with status 404 Not Found`. `request` and `response` keep the full URL, so redact them before you log the whole error.
+
+> [!NOTE]
+> The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype). With the default `bigint`, an `int64` id takes `1n`.
 
 ## Narrow a thrown error by status
 
-`isResponseError<Responses>(error)` narrows a caught error to the `ResponseError` of one operation. Checking `status` then narrows `data` to the body declared for that status. A range key such as `4xx` covers its statuses that have no entry of their own, and `default` covers the rest:
+`isResponseError<Responses>(error)` narrows a caught error to one operation's `ResponseError`. A check on `status` then narrows `data`. For range keys such as `4xx`, see [Status ranges](#status-ranges):
 
 ```typescript
 import { isResponseError } from './gen/.kubb/client'
@@ -57,106 +66,89 @@ try {
 }
 ```
 
-The type argument is not checked at runtime, so keep the `try` around one operation.
-
-The error also carries the response's `Headers` as `error.headers`, so `error.headers.get('Retry-After')` reads the same on every transport.
+> [!WARNING]
+> The type argument is not checked at runtime, so keep the `try` around one operation.
 
 ## Return the error instead
 
-Pass `throwOnError: false` and the call resolves for every documented status. The result is a
-discriminated union: `data` is set on success and `error` on failure. A failed call with an empty
-body sets `error` to `{ status, statusText }`.
-
-Check `data` before you read it. A check on `status` narrows `data` too, unless the operation
-declares a `default` response, whose status can be any number:
+With `throwOnError: false`, the call resolves for every status. `data` is set on success and `error` on failure, and a check on `status` narrows both:
 
 ```typescript
 const result = await getPetById({ path: { petId: 1 }, throwOnError: false })
 
-if (result.data !== undefined) {
-  console.info(result.data)
-} else {
-  console.error(result.status, result.error)
-}
+if (result.error !== undefined) console.error(result.status, result.error)
+else console.info(result.data)
 ```
+
+See [Empty error bodies and default responses](#empty-error-bodies-and-default-responses).
 
 ## Set the generated default
 
-Set `throwOnErrorDefault` on the client plugin to choose how generated operations handle non-2xx
-responses by default. Each call can still override that setting with `throwOnError`:
+[`throwOnErrorDefault`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#throwonerrordefault) on the plugin sets what a call does when it leaves `throwOnError` out. `client.setConfig({ throwOnError })` does not change it:
 
 ```typescript
-import { pluginFetch } from '@kubb/plugin-fetch'
-
 pluginFetch({ throwOnErrorDefault: false })
 
-// resolves with an error result
-const list = await searchPets({ query: { status: 'available' } })
-
-// opt one call back into throwing
-const pet = await getPetById({ path: { petId: 1 }, throwOnError: true })
+const list = await searchPets({ query: { status: 'available' } }) // resolves with an error result
+const pet = await getPetById({ path: { petId: 1 }, throwOnError: true }) // throws
 ```
-
-`client.setConfig({ throwOnError })` does not change this default, because each generated
-operation passes its own value. Set it on the plugin.
-
-## Network failures still throw
-
-> [!IMPORTANT]
-> `throwOnError` only applies when the server answers. A dropped connection, a DNS failure, or an
-> aborted `AbortSignal` always rejects. A `ResponseError` means the server answered with a non-2xx
-> status, and a `ParseError` means a body failed validation or is not valid JSON. Any other error
-> usually means the request never completed. All of them reach `client.interceptors.error`.
-
-```typescript
-try {
-  const { data } = await getPetById({ path: { petId: 1 }, throwOnError: false })
-  use(data)
-} catch (error) {
-  // not a ResponseError: the request never completed
-  console.error('request failed to send', error)
-}
-```
-
-Pass an `AbortSignal` to cancel a request. The call rejects with the abort reason.
 
 ## Validation failures
 
-When you turn on the `validator` option, a body that does not match its Zod schema throws a
-`ParseError` instead of returning. It carries the schema's raw `issues`:
+With [`validator`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#validator) on, a body that does not match its Zod schema throws a `ParseError` with the schema's `issues`:
 
 ```typescript
 import { ParseError } from './gen/.kubb/standardSchema'
 
 try {
-  const { data } = await getPetById({ path: { petId: 1 } })
-  use(data)
+  await getPetById({ path: { petId: 1 } })
 } catch (error) {
-  if (error instanceof ParseError) {
-    console.error(error.issues) // [{ message, path }]
-  }
+  if (error instanceof ParseError) console.error(error.issues) // [{ message, path }]
 }
 ```
 
-A `ParseError` reports schema validation issues. A `ResponseError` reports a non-2xx status. The error body of a non-2xx response is checked against the schema of its status, then of its range such as `5xx`, then of `default`. An error body that fails its schema throws a `ParseError` in place of the `ResponseError`, also with `throwOnError: false`. A status the document leaves out, such as a `502` from a gateway, keeps its body unchecked.
+To recover, pass `onValidationError` on the call or the client. Return `{ value }` to use that value, or nothing to throw the `ParseError`:
 
-Calling `.unwrap()` on a `throwOnError: false` call turns that same `error` into a rejection, so a
-`try`/`catch` works there too.
+```typescript
+client.setConfig({
+  onValidationError: (error, { direction, source, value }) => {
+    console.warn(direction, source, error.issues)
+    return { value }
+  },
+})
+```
+
+For which schema checks an error body, see [Error body validation](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/serialization#error-body-validation).
 
 ## Turn validation off at runtime
 
-The `validator` option decides at generation time which schemas each call carries. Set `validate` on the client to skip them at runtime, for example in production or in tests with partial fixtures:
+`validator` decides at generation time which schemas a call carries. `validate` skips them at runtime, for example in production or in tests with partial fixtures:
 
 ```typescript
-import { client } from './gen/.kubb/client'
-
 client.setConfig({ validate: import.meta.env.DEV })
+client.setConfig({ validate: { response: false } }) // skip one direction
 ```
 
-`validate: false` skips every schema. An object skips only the directions set to `false`: `request` (the body), `params` (path, query, header, and cookie params), `response`, and `error`:
+The default is `true`. The object form skips each direction set to `false`: `request` (the body), `params`, `response`, or `error`. A per-call `validate` overrides the client.
 
-```typescript
-client.setConfig({ validate: { response: false } })
-```
+## Less common cases
 
-A per-call `validate` overrides the client setting, such as `getPetById({ path: { petId: 1 }, validate: true })`. The default is `true`.
+### Status ranges
+
+When an operation declares a range key such as `4xx`, the range covers its statuses that have no entry of their own, and `default` covers the rest.
+
+### Empty error bodies and default responses
+
+When a failed call has an empty body, `error` is `{ status, statusText }`.
+
+When the operation declares a `default` response, a check on `status` does not narrow `data` and `error`, because a `default` status can be any number. To get the success body with the default `returnType: 'full'`, call `.unwrap()`, which turns `error` into a rejection. With `returnType: 'data'`, the call returns a plain promise without `.unwrap()`.
+
+### Where the `throwOnError` default comes from
+
+When you set `client.setConfig({ throwOnError })`, generated calls ignore it, because each generated function passes its own value: the call's `throwOnError`, or else [`throwOnErrorDefault`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#throwonerrordefault). That value is also the default of the function's `ThrowOnError` type parameter.
+
+### Read headers with `returnType: 'data'`
+
+When the plugin sets [`returnType: 'data'`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#returntype), a call resolves to the success body alone. To read a header such as `ETag`, pass `throwOnError: false` and call `result.headers.get('etag')`. For a stream call, see [Event IDs when you resume](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/server-sent-events#event-ids-when-you-resume).
+
+The query plugins and `@kubb/plugin-mcp` read `returnType` too, including a per-operation value from [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override).

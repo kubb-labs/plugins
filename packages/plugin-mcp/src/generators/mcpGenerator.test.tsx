@@ -80,7 +80,8 @@ describe("mcpGenerator — the client plugin's returnType", () => {
   test("uses the call result as the body when the client returns 'data'", async () => {
     const source = await renderHandler('data')
 
-    expect(source).toContain('text: JSON.stringify(res)')
+    // A success with no body (such as a 204) stringifies to `undefined`, so the text falls back to an empty string.
+    expect(source).toContain("text: JSON.stringify(res) ?? ''")
     expect(source).toContain('structuredContent: { data: res }')
     expect(source).not.toContain('res.data')
   })

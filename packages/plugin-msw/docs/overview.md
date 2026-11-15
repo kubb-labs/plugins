@@ -1,26 +1,26 @@
 # MSW
 
-The MSW plugin generates a typed MSW request handler for each operation in your OpenAPI spec.
-
-Each handler returns the data you pass to it. With `parser: 'faker'`, a handler called without data returns mock data from `@kubb/plugin-faker`. Only operations with a success response schema get mock data.
+The MSW plugin generates a typed MSW request handler for each operation in your OpenAPI spec. Each handler returns the data you pass or Faker mock data.
 
 ## Setup
 
 - Add `@kubb/plugin-ts` for the request and response types.
-- Add `@kubb/plugin-faker` when you set `parser: 'faker'`, and install `@faker-js/faker` v10. The default `data` parser does not need it.
+- Add `@kubb/plugin-faker` and install `@faker-js/faker` v10 when you set `parser: 'faker'`.
 - Install `msw` v3 in the app that uses the generated code.
 
 ## Options worth knowing
 
-- `parser` sets where the response body comes from: `data` (default) or `faker`.
-- `handlers` writes a `handlers.ts` file that exports every handler, ready to spread into `setupServer` or `setupWorker`, plus `createHandlers({ baseURL })` to set the base URL at runtime.
-- `baseURL` is prepended to the path each handler matches.
-
-See [Options](https://kubb.dev/extensions/kubb-labs/plugin-msw/options) for every option and its default.
+| Option                                                                          | Default  | What it does                                                                            |
+| ------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| [`parser`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#parser)     | `'data'` | Returns the data you pass, or Faker data for operations with a success response schema. |
+| [`handlers`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#handlers) | `false`  | Writes a `handlers.ts` that exports every handler and `createHandlers({ baseURL })`.    |
+| [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-msw/options#baseurl)   | None     | Prepends a host to the path each handler matches.                                       |
 
 ## Example
 
-The config below generates one handler per operation and a `handlers.ts` file that exports them all.
+This config generates one handler per operation and a `handlers.ts` that exports them all. For `GET /pets/{petId}`, the plugin writes `showPetByIdHandler.ts`:
+
+::code-group
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
@@ -36,3 +36,32 @@ export default defineConfig({
   ],
 })
 ```
+
+```typescript [src/gen/handlers/showPetByIdHandler.ts]
+import type { ShowPetByIdResponse } from '../types/ShowPetById'
+import { http, HttpResponse } from 'msw/http'
+
+export function showPetByIdHandlerResponse200(data?: ShowPetByIdResponse) {
+  return new HttpResponse<string>(JSON.stringify(data), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
+export function showPetByIdHandler(
+  data?: ShowPetByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  options?: { baseURL?: string },
+) {
+  return http.get(`${options?.baseURL ?? ''}/pets/:petId`, function handler(info) {
+    if (typeof data === 'function') return data(info)
+
+    return showPetByIdHandlerResponse200(data)
+  })
+}
+```
+
+::
+
+Next, [register the handlers](https://kubb.dev/extensions/kubb-labs/plugin-msw/guides/mock-api) in tests or the browser.

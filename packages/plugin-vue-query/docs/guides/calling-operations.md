@@ -1,64 +1,48 @@
 # Call operations
 
-`@kubb/plugin-vue-query` can generate a typed TanStack Query composable for each operation. `GET` operations get query composables such as `useGetPetById`, and `POST`, `PUT`, `PATCH`, and `DELETE` operations get mutation composables such as `useUpdatePetWithForm`. Each composable calls the client function from `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`.
+Use the generated TanStack Query composables and factories in Vue: queries, mutations, and infinite lists with reactive parameters.
 
-> [!IMPORTANT]
-> By default the plugin emits only the factory helpers (`queryOptions`, `queryKey`, `mutationKey`). Set [`hooks: true`](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/options#hooks) in the plugin options to also generate the `use*` composables shown below.
+## What each plugin generates
 
-## Queries
+Each composable and its helpers live in a file named after the composable, such as `src/gen/hooks/useGetPetById.ts`.
 
-A query composable takes grouped request parameters as its first argument. Parameters accept a value, ref, or getter. See [reactive parameters](#refetch-when-parameters-change).
+| Operation                                   | Exports                                                                                             |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Query (`GET`, `QUERY`)                      | `getPetByIdQueryKey`, `getPetByIdQueryOptions`, plus `useGetPetById` with `hooks`                   |
+| Mutation (`POST`, `PUT`, `PATCH`, `DELETE`) | `updatePetMutationKey`, plus `useUpdatePet` with `hooks`                                            |
+| Infinite, with `infinite` and `hooks`       | `findPetsByTagsInfiniteQueryKey`, `findPetsByTagsInfiniteQueryOptions`, `useFindPetsByTagsInfinite` |
+| Server-Sent Events or JSON Lines            | Nothing. Call the client function directly.                                                         |
 
-```typescript [usage.ts]
-import { useGetPetById } from './gen/hooks/useGetPetById'
+## Call a composable
 
-const { data, error, isLoading } = useGetPetById({ path: { petId: 1 } })
-```
+The examples set `hooks: true`, and [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter so `petId` is a `number`. Path keys keep their spec names unless you set [`pathParamsCasing`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing).
 
-The examples set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, so an `int64` id such as `petId` is a `number`. With the default it is a `bigint` and the call takes `1n`.
+::tabs
 
-Path keys keep the names from the spec, so a `{pet-id}` placeholder is passed as `path: { 'pet-id': 1 }`. Set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing) on the adapter (`@kubb/adapter-oas` 5.20.0 or later) to pass `path: { petId: 1 }` instead, the name MSW handlers and query keys already use. The HTTP request stays the same.
+:::tabs-item{label="Query"}
 
-The second argument has two optional groups. `query` takes any TanStack Query option, and `query.client` sets the `QueryClient` to use. The top-level `client` takes request config for this call, such as `baseURL`:
+The first argument takes the request groups (`path`, `query`, `headers`), each as a value, a ref, or a getter. The second takes TanStack Query options in `query`, with `query.client` for the `QueryClient`, and request config such as `baseURL` in `client`.
 
 ```typescript
 import { useFindPetsByTags } from './gen/hooks/useFindPetsByTags'
 
-useFindPetsByTags(
+const { data, error, isLoading } = useFindPetsByTags(
   { query: { tags: ['dog'] } },
-  {
-    query: { staleTime: 60_000 },
-    client: { baseURL: 'https://api.example.com/v1' },
-  },
+  { query: { staleTime: 60_000 }, client: { baseURL: 'https://api.example.com/v1' } },
 )
 ```
 
-## Factories
+:::
 
-Every query operation also exports a `queryOptions` factory and a `queryKey` helper for prefetching and invalidation. The key is `[{ url }, query]`, built from the operation path and its query params:
+:::tabs-item{label="Mutation"}
 
-```typescript
-import { useQueryClient } from '@tanstack/vue-query'
-import { findPetsByTagsQueryKey, findPetsByTagsQueryOptions } from './gen/hooks/useFindPetsByTags'
-
-const queryClient = useQueryClient()
-
-await queryClient.prefetchQuery(findPetsByTagsQueryOptions({ query: { tags: ['dog'] } }))
-queryClient.invalidateQueries({ queryKey: findPetsByTagsQueryKey({ query: { tags: ['dog'] } }) })
-```
-
-Mutations export a `mutationKey` helper next to the composable.
-
-## Mutations
-
-A mutation composable takes only an options object. The grouped request config is the mutation variable, so you pass it to `mutate` or `mutateAsync`:
+A mutation composable takes only the options object, with `mutation` and `client`. Pass the request groups to `mutate` or `mutateAsync`.
 
 ```typescript
 import { useQueryClient } from '@tanstack/vue-query'
 import { useUpdatePetWithForm } from './gen/hooks/useUpdatePetWithForm'
 
 const queryClient = useQueryClient()
-
 const { mutate } = useUpdatePetWithForm({
   mutation: { onSuccess: () => queryClient.invalidateQueries() },
 })
@@ -66,70 +50,59 @@ const { mutate } = useUpdatePetWithForm({
 mutate({ path: { petId: 1 }, query: { name: 'Fluffy' } })
 ```
 
-## Errors and transport
+:::
 
-Each generated composable calls the client function with `throwOnError: true`. A failed request sets TanStack Query's `error`, typed from the error responses in the spec. Set the base URL, authentication, interceptors, serialization, and validation on the client plugin. See the [plugin-fetch](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [plugin-axios](https://kubb.dev/extensions/kubb-labs/plugin-axios) guide. With [plugin-client](https://kubb.dev/extensions/kubb-labs/plugin-client), set these in your own client module.
+:::tabs-item{label="Infinite"}
 
-## Customize cache keys
-
-Set `queryKey` on the plugin to change generated keys. String entries are emitted as source code, so use `JSON.stringify` for a string literal.
+Only operations that declare `infinite.queryParam` get an infinite composable. Point `nextParam` at the cursor in the response, and give `initialPageParam` the type of the query parameter. See [Infinite queries](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/guides/infinite-queries).
 
 ```typescript [kubb.config.ts]
-import { pluginVueQuery } from '@kubb/plugin-vue-query'
-
-pluginVueQuery({
-  queryKey: ({ node }) => [JSON.stringify(node.operationId)],
-})
-```
-
-> [!WARNING]
-> This `queryKey` gives every call the same key, such as `['getUserByName']`. If path or query values select different data, add them to the key.
-
-## Load more pages
-
-Configure `infinite` with a query parameter declared by the operation, its initial value, and the response path for the next cursor. Infinite output needs `hooks: true`, and only operations that declare the `queryParam` receive it.
-
-::code-group
-
-```typescript [kubb.config.ts]
-import { pluginVueQuery } from '@kubb/plugin-vue-query'
-
 pluginVueQuery({
   hooks: true,
-  infinite: {
-    queryParam: 'page',
-    initialPageParam: 0,
-    nextParam: 'pagination.next.cursor',
-  },
+  infinite: { queryParam: 'page', initialPageParam: 0, nextParam: 'pagination.next.cursor' },
 })
 ```
 
-```typescript [usage.ts]
+```typescript
 import { useFindPetsByTagsInfinite } from './gen/hooks/useFindPetsByTagsInfinite'
 
-const { data, fetchNextPage, hasNextPage } = useFindPetsByTagsInfinite({
-  query: () => ({ tags: ['dog'] }),
-})
+const { data, fetchNextPage, hasNextPage } = useFindPetsByTagsInfinite({ query: () => ({ tags: ['dog'] }) })
 ```
+
+:::
 
 ::
 
-`nextParam` takes dot notation or an array of keys. Change it to match your API's response, and give `initialPageParam` the same type as the query parameter. Without `getNextPageParam`, `nextParam` or `cursorParam`, the generated options increment the page number until a page returns an empty array.
-
 ## Refetch when parameters change
 
-Enable `hooks: true`, then pass a ref or getter to a generated composable. Parameters accept `MaybeRefOrGetter`. A getter tracks its reactive dependencies.
+Pass a ref or a getter instead of a value. A change updates the query key and fetches again:
 
-```typescript [usage.ts]
+```typescript
 import { ref } from 'vue'
 import { useFindPetsByTags } from './gen/hooks/useFindPetsByTags'
 
 const tags = ref(['dog'])
-const { data, error, isLoading } = useFindPetsByTags({
-  query: () => ({ tags: tags.value }),
-})
+const { data } = useFindPetsByTags({ query: () => ({ tags: tags.value }) })
 
-tags.value = ['cat']
+tags.value = ['cat'] // fetches the cat list
 ```
 
-Changing `tags.value` updates the query key and fetches the corresponding resource.
+## Prefetch and invalidate
+
+The factories work without `hooks`, so you can prefetch or invalidate outside a component:
+
+```typescript
+import { findPetsByTagsQueryKey, findPetsByTagsQueryOptions } from './gen/hooks/useFindPetsByTags'
+import { queryClient } from './queryClient' // the QueryClient you pass to VueQueryPlugin
+
+await queryClient.prefetchQuery(findPetsByTagsQueryOptions({ query: { tags: ['dog'] } }))
+queryClient.invalidateQueries({ queryKey: findPetsByTagsQueryKey({ query: { tags: ['dog'] } }) })
+```
+
+[TanStack Query keys](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/guides/query-keys) shows the default keys. To change them, set [`queryKey`](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/options#querykey) and [`mutationKey`](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/options#mutationkey).
+
+## Handle errors
+
+Each composable calls the client with `throwOnError: true`, so a failed request sets TanStack Query's `error`, typed from the spec's error responses.
+
+Next, set the base URL, auth, and interceptors on your client plugin: [plugin-fetch](https://kubb.dev/extensions/kubb-labs/plugin-fetch), [plugin-axios](https://kubb.dev/extensions/kubb-labs/plugin-axios), or your own module with [plugin-client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).

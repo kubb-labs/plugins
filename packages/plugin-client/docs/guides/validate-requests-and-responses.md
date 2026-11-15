@@ -1,8 +1,12 @@
 # Validate requests and responses
 
-`@kubb/plugin-client` does not validate on its own. With `validator` set, it passes the schemas to your client, which runs them.
+Pass Zod schemas from `@kubb/plugin-zod` to your client and run them there.
 
-::code-group
+::steps{level="2"}
+
+## Pass the schemas
+
+Add `pluginZod()` and set [`validator`](https://kubb.dev/extensions/kubb-labs/plugin-client/options#validator). Without `pluginZod()`, generation stops with an error.
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
@@ -21,9 +25,14 @@ export default defineConfig({
 })
 ```
 
-::
+| `validator`           | Keys on `config.validator`            |
+| --------------------- | ------------------------------------- |
+| `'zod'`               | `response`, `error`                   |
+| `{ response: 'zod' }` | `response`, `error`                   |
+| `{ request: 'zod' }`  | `request`                             |
+| `{ params: 'zod' }`   | `path`, `query`, `headers`, `cookies` |
 
-Each generated call now includes the schemas:
+Each generated call now carries the schemas:
 
 ```typescript
 apiClient<AddPetResponses, ThrowOnError>({
@@ -34,9 +43,11 @@ apiClient<AddPetResponses, ThrowOnError>({
 })
 ```
 
-A `validator` passed on one call is merged per key, so `validator: { request }` adds a request schema and keeps the generated response schema. A per-call `error` replaces the generated error map as a whole.
+A `validator` passed on one call merges per key: `{ request }` adds a request schema and keeps the generated response schema. A per-call `error` replaces the whole error map.
 
-Add a `validator` field to your `RequestConfig`, then run the schemas in `client`. Zod schemas follow [Standard Schema](https://standardschema.dev), so `~standard.validate` works with any compatible library:
+## Run them in your client
+
+Add a `validator` field to your `RequestConfig` and run each schema with `~standard.validate`, the [Standard Schema](https://standardschema.dev) method that Zod implements:
 
 ```typescript [src/client.ts]
 type Result = { value: unknown; issues?: undefined } | { issues: ReadonlyArray<unknown> }
@@ -53,32 +64,29 @@ if (result && 'issues' in result && result.issues) throw new Error('Response val
 const validatedBody = result && 'value' in result ? result.value : body
 ```
 
-Return `validatedBody` as `data`, so a schema that transforms the value takes effect. Without a response schema, `validatedBody` is the original `body`.
+Return `validatedBody` as `data`, so a schema that transforms the value takes effect.
 
-`error` is keyed by status, such as `{ 404: schema, '5xx': schema, default: schema }`. Pick the exact status, then its range, then `default`, and skip validation when none matches.
-
-Set `validator: { request: 'zod' }` or `{ response: 'zod' }` to pass one direction only. Without `pluginZod()` in the plugins list, generation stops with an error.
+`error` is keyed by status, such as `{ 404: schema, '5xx': schema, default: schema }`. Try the exact status, then its range, then `default`. If none matches, skip validation.
 
 ## Validate params
 
-With `validator: { params: 'zod' }`, each call also passes the schemas for its path, query, header, and cookie params:
+With `validator: { params: 'zod' }`, each call also passes its path, query, header, and cookie schemas:
 
 ```typescript
-apiClient<PutEventResponses, ThrowOnError>({
-  method: 'PUT',
-  url: '/events/{day}',
-  ...config,
-  validator: {
-    path: putEventPathSchema,
-    query: putEventQuerySchema,
-    headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape),
-    ...config.validator,
-  },
-})
+validator: {
+  path: putEventPathSchema,
+  query: putEventQuerySchema,
+  headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape),
+  ...config.validator,
+}
 ```
 
-Add `path`, `query`, `headers`, and `cookies` to the `validator` field of your `RequestConfig`. Run them on `config.path`, `config.query`, `config.headers`, and `config.cookies` before you build the URL and headers, and send the values they return.
+1. Add `path`, `query`, `headers`, and `cookies` to the `validator` field of your `RequestConfig`.
+2. Run each on `config.path`, `config.query`, `config.headers`, or `config.cookies` before you build the URL and headers.
+3. Send the values they return. The path and query schemas strip keys the spec does not declare.
+4. Export `toHeadersStandardSchema` from your `importPath` module. Copy it from `@kubb/plugin-client/templates/standardSchema.ts`.
 
-The path and query schemas strip keys the spec does not declare, so only declared params are sent. Headers your client adds itself, such as `Authorization`, are not declared, so the headers schema passes undeclared keys through.
+> [!WARNING]
+> If your `toHeadersStandardSchema` returns the schema unchanged, it strips undeclared headers, such as an `Authorization` header your client adds. The template keeps them and matches declared headers in any casing.
 
-The generated call imports `toHeadersStandardSchema` from your `importPath` module, so that module must export it, or the generated code does not compile. `toHeadersStandardSchema` takes a Standard Schema and the object's declared keys, and returns a Standard Schema that matches the declared headers in any casing and passes undeclared headers through. Copy it from the `.kubb/standardSchema.ts` file that `@kubb/plugin-fetch` generates. Returning the schema unchanged is not enough: the plain object schema strips undeclared headers such as `Authorization`.
+::

@@ -4,7 +4,7 @@
   "name": "plugin-react-query",
   "export": "pluginReactQuery",
   "displayName": "React Query",
-  "description": "Generates typed TanStack Query helpers for React from your OpenAPI spec: queryOptions and mutationOptions factories with their cache keys. Set hooks to also get useQuery and useMutation hooks, plus useInfiniteQuery when infinite is set.",
+  "description": "Generates typed TanStack Query helpers for React from your OpenAPI spec: queryOptions and mutationOptions factories with cache keys, plus optional hooks.",
   "category": "framework",
   "icon": {
     "light": "https://kubb.dev/feature/tanstack.svg"
@@ -19,7 +19,7 @@
   ],
   "optionalDependencies": ["plugin-ts", "plugin-zod"],
   "compatibility": {
-    "kubb": ">=5.18.4",
+    "kubb": ">=5.19.0",
     "node": ">=22.22"
   },
   "role": "consumer",

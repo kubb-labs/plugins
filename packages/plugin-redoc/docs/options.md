@@ -1,18 +1,19 @@
 # Options
 
-`pluginRedoc()` accepts a single option, the path of the HTML file it writes. It takes none of the [shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options).
+`pluginRedoc()` takes one option, the path of the HTML file it writes. It takes none of the [shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options).
 
 ## Options overview
 
-| Option              | Purpose                                 | Default                 |
-| ------------------- | --------------------------------------- | ----------------------- |
-| [`output`](#output) | Where the HTML file is written: `path`. | `{ path: 'docs.html' }` |
+| Option                         | Purpose                         | Default                 |
+| ------------------------------ | ------------------------------- | ----------------------- |
+| [`output`](#output)            | Where the HTML file is written. | `{ path: 'docs.html' }` |
+| ↳ [`output.path`](#outputpath) | File path of the HTML page.     | `'docs.html'`           |
 
 ## Option details
 
 ### output
 
-Where the generated Redoc HTML file is written.
+Where the Redoc HTML file is written. Unlike the shared `output` option, it takes only `path`.
 
 |          |                         |
 | -------- | ----------------------- |
@@ -22,7 +23,7 @@ Where the generated Redoc HTML file is written.
 
 #### output.path
 
-File path of the generated HTML, resolved against the global `output.path`. Unlike most plugins, this points at a single file, not a directory. End the path with `.html`. Without `.html`, Kubb writes the file at that exact path, with no extension.
+File path of the HTML page, resolved against the root `output.path`. It names a file, not a folder.
 
 |          |               |
 | -------- | ------------- |
@@ -30,10 +31,8 @@ File path of the generated HTML, resolved against the global `output.path`. Unli
 | Required | `false`       |
 | Default  | `'docs.html'` |
 
-With `output.path` set to `'docs.html'` and the global `output.path` set to `'./src/gen'`, the plugin writes one file:
-
-```text
-src/
-└── gen/
-    └── docs.html
-```
+| `output.path`      | Root `output.path` | Writes                                      |
+| ------------------ | ------------------ | ------------------------------------------- |
+| `'docs.html'`      | `'./src/gen'`      | `src/gen/docs.html`                         |
+| `'api/index.html'` | `'./src/gen'`      | `src/gen/api/index.html`                    |
+| `'docs'`           | `'./src/gen'`      | `src/gen/docs`, a file without an extension |

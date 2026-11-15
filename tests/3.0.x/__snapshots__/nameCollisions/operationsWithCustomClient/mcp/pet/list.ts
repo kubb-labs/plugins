@@ -16,7 +16,7 @@ export async function petListHandler(ctx: ServerContext): Promise<CallToolResult
     content: [
       {
         type: 'text',
-        text: JSON.stringify(res.data)
+        text: JSON.stringify(res.data) ?? ''
       }
     ],
     structuredContent: { data: res.data }

@@ -16,7 +16,7 @@ export async function petCreateHandler2(ctx: ServerContext): Promise<CallToolRes
     content: [
       {
         type: 'text',
-        text: JSON.stringify(res.data)
+        text: JSON.stringify(res.data) ?? ''
       }
     ],
     structuredContent: { data: res.data }

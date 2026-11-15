@@ -1,8 +1,8 @@
 # TypeScript
 
-The TypeScript plugin generates a type or interface for every schema in your OpenAPI spec, plus the request, response, and parameter types of each operation.
+The TypeScript plugin generates a type for every schema in your OpenAPI spec, plus the request, response, and parameter types of each operation.
 
-Kubb runs this plugin before the plugins that import its types, whatever the order of the `plugins` array.
+The other Kubb plugins import these types, and Kubb runs this plugin before them, whatever the order of `plugins`.
 
 ## Setup
 
@@ -10,19 +10,23 @@ No other plugins or packages are needed.
 
 ## Options worth knowing
 
-- `enum.type` sets how enums are written: `asConst` (default), `enum`, `constEnum`, `literal`, or `inlineLiteral`. `enum.constCasing`, `enum.typeSuffix`, and `enum.keyCasing` tune the names.
-- `syntaxType` writes object schemas as `type` aliases (default) or `interface` declarations.
-- `optionalType` sets how optional properties are written: `questionToken` (default), `undefined`, or `questionTokenAndUndefined`.
-- `arrayType` writes arrays as `T[]` (default) or `Array<T>`.
-- `group` splits the output into folders by tag or path. It does not work with `output.mode: 'file'`.
+| Option                                                                                 | Default           | What it does                                                                             |
+| -------------------------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------- |
+| [`enum.type`](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#enumtype)        | `'asConst'`       | Writes enums as an `as const` object, an `enum`, or a literal union.                     |
+| [`syntaxType`](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#syntaxtype)     | `'type'`          | Writes object schemas as `type` or `interface`.                                          |
+| [`optionalType`](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#optionaltype) | `'questionToken'` | Writes `a?: T`, `a: T \| undefined`, or both.                                            |
+| [`arrayType`](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#arraytype)       | `'array'`         | Writes arrays as `T[]` or `Array<T>`.                                                    |
+| [`operations`](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#operations)     | `'export'`        | `'inline'` skips the per-operation type files.                                           |
+| [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)                    | None              | Splits the output into folders by tag or path. Does not work with `output.mode: 'file'`. |
 
-With the default OpenAPI adapter, `int64` fields are typed as `bigint`, while JSON responses hold numbers. Set `integerType: 'number'` on `adapterOas` for most JSON APIs.
-
-See [Options](https://kubb.dev/extensions/kubb-labs/plugin-ts/options) for every option and its default.
+> [!TIP]
+> The OpenAPI adapter types `int64` fields as `bigint`, but JSON responses hold numbers. For most JSON APIs, set [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on `adapterOas`.
 
 ## Example
 
-The config below generates the types into `src/gen/types`.
+This config writes the types to `src/gen/types`. For a `Pet` schema with a `status` enum, the plugin writes `Pet.ts`:
+
+::code-group
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from 'kubb/config'
@@ -31,8 +35,28 @@ import { pluginTs } from '@kubb/plugin-ts'
 export default defineConfig({
   input: './petStore.yaml',
   output: { path: './src/gen' },
-  plugins: [
-    pluginTs(),
-  ],
+  plugins: [pluginTs()],
 })
 ```
+
+```typescript [src/gen/types/Pet.ts]
+// excerpt, without JSDoc
+export const petStatusEnum = {
+  available: 'available',
+  pending: 'pending',
+  sold: 'sold',
+} as const
+
+export type PetStatusEnumKey = (typeof petStatusEnum)[keyof typeof petStatusEnum]
+
+export type Pet = {
+  id?: bigint
+  name: string
+  photoUrls: string[]
+  status?: PetStatusEnumKey
+}
+```
+
+::
+
+Next, [customize the generated types](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization).

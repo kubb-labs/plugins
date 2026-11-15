@@ -19,7 +19,7 @@ export async function findPetsByStatusHandler({ path }: FindPetsByStatusOptions,
     content: [
       {
         type: 'text',
-        text: JSON.stringify(res.data),
+        text: JSON.stringify(res.data) ?? '',
       },
     ],
     structuredContent: { data: res.data },
