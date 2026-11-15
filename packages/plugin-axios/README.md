@@ -29,12 +29,16 @@
 ## Installation
 
 ```bash
+npx kubb add plugin-axios
+# or
 bun add @kubb/plugin-axios axios
 # or
 pnpm add @kubb/plugin-axios axios
 # or
 npm install @kubb/plugin-axios axios
 ```
+
+`kubb add` installs the version the [Kubb registry](https://kubb.dev/registry) pins and adds `pluginAxios()` to your `kubb.config.ts`. Run `npx kubb init` first if you have no config. It installs only Kubb packages, so also install `axios`.
 
 ## Documentation
 
