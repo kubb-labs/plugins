@@ -62,12 +62,12 @@ const { data, fetchNextPage, hasNextPage } = useFindPetsByTagsInfinite({ query: 
 
 The generated `getNextPageParam` comes from the first of these options you set:
 
-| Option                                                                                                          | Generated `getNextPageParam`                                                                    |
-| --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [`getNextPageParam`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#infinitegetnextpageparam) | Your function's source, copied as written. It cannot use variables from the config file.        |
-| [`nextParam`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#infinitenextparam)               | Reads that path on the last page, such as `lastPage?.['pagination']?.['next']?.['cursor']`.     |
-| [`cursorParam`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#infinitecursorparam)           | Deprecated. Reads that top-level field.                                                         |
-| None                                                                                                            | Counts pages up from `initialPageParam` until a page is an empty array.                        |
+| Option                                                                                                          | Generated `getNextPageParam`                                                                |
+| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| [`getNextPageParam`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#infinitegetnextpageparam) | Your function's source, copied as written. It cannot use variables from the config file.    |
+| [`nextParam`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#infinitenextparam)               | Reads that path on the last page, such as `lastPage?.['pagination']?.['next']?.['cursor']`. |
+| [`cursorParam`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#infinitecursorparam)           | Deprecated. Reads that top-level field.                                                     |
+| None                                                                                                            | Counts pages up from `initialPageParam` until a page is an empty array.                     |
 
 `getPreviousPageParam`, `previousParam`, and `cursorParam` set the previous page in the same order. With [`returnType: 'full'`](https://kubb.dev/extensions/kubb-labs/plugin-react-query/options#returntype), the generated code reads the cursor from `lastPage.data`.
 

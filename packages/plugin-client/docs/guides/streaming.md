@@ -69,10 +69,10 @@ Your module needs these on top of the [contract](https://kubb.dev/extensions/kub
 
 The third type argument, `TItem`, follows the document:
 
-| The document                | `TItem`                                                                                |
-| --------------------------- | -------------------------------------------------------------------------------------- |
-| Names each event            | `TypedEvent<SuccessOf<TResponses>>`                                                    |
-| Streams JSON Lines          | `SuccessOf<TResponses>`                                                                |
+| The document           | `TItem`                                                                             |
+| ---------------------- | ----------------------------------------------------------------------------------- |
+| Names each event       | `TypedEvent<SuccessOf<TResponses>>`                                                 |
+| Streams JSON Lines     | `SuccessOf<TResponses>`                                                             |
 | Types only the payload | Left out. Give `TItem` a default, such as `ServerSentEvent<SuccessOf<TResponses>>`. |
 
 ## Read the stream fields
