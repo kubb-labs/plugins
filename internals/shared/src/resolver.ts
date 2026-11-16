@@ -155,10 +155,7 @@ export function getCircularNames(ctx: SchemaIndexContext): ReadonlySet<string> {
  * Names of the schemas whose type is `enum`, computed once per build.
  */
 export function getEnumNames(ctx: SchemaIndexContext): ReadonlySet<string> {
-  return ctx.memo(
-    'enumNames:set',
-    () => new Set(ctx.schemas.flatMap((schema) => (schema.type === 'enum' && schema.name ? [schema.name] : []))),
-  )
+  return ctx.memo('enumNames:set', () => new Set(ctx.schemas.flatMap((schema) => (schema.type === 'enum' && schema.name ? [schema.name] : []))))
 }
 
 declare global {

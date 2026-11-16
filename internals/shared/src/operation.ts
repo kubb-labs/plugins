@@ -53,11 +53,7 @@ export function resolveOperationFile(options: {
     const schemaPaths = memo(
       `${resolver.pluginName}:schemaFilePaths`,
       () =>
-        new Set(
-          ctx.schemas.flatMap((schema) =>
-            schema.name ? [resolver.file({ name: schema.name, extname: '.ts', ...location }).path.toLowerCase()] : [],
-          ),
-        ),
+        new Set(ctx.schemas.flatMap((schema) => (schema.name ? [resolver.file({ name: schema.name, extname: '.ts', ...location }).path.toLowerCase()] : []))),
     )
     let file = resolver.file({ ...operationFileEntry(node, node.operationId), ...location })
 
