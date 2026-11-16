@@ -393,7 +393,7 @@ describe('toResponseContent', () => {
 })
 
 describe('splitEventStream', () => {
-  const schema = (type: 'object' | 'boolean' | 'string' | 'null') => ast.factory.createSchema({ type })
+  const schema = (type: 'object' | 'boolean' | 'string') => ast.factory.createSchema({ type })
   const withStream = (stream: ast.SchemaNode) =>
     ast.factory.createSchema({ type: 'object', properties: [ast.factory.createProperty({ name: 'stream', schema: stream })] })
   const json = ast.factory.createContent({ contentType: 'application/json', schema: schema('object') })
@@ -421,7 +421,7 @@ describe('splitEventStream', () => {
     { name: 'a boolean', bodies: [withStream(schema('boolean'))], selector: true },
     {
       name: 'a nullable boolean',
-      bodies: [withStream(ast.factory.createSchema({ type: 'union', members: [schema('boolean'), schema('null')] }))],
+      bodies: [withStream(ast.factory.createSchema({ type: 'boolean', nullable: true }))],
       selector: true,
     },
     { name: 'a string', bodies: [withStream(schema('string'))], selector: false },

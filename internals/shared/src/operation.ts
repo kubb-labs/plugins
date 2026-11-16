@@ -259,19 +259,15 @@ type EventStreamSplit = {
   stream: ast.HttpOperationNode
 }
 
-function getUnionMembers(schema: ast.SchemaNode): Array<ast.SchemaNode> {
-  const resolved = ast.ref.getSchema(schema)
-  return resolved.type === 'union' ? (ast.schema.narrow(resolved, 'union')?.members ?? []) : [schema]
-}
-
-function isBooleanSchema(schema: ast.SchemaNode): boolean {
-  return getUnionMembers(schema).some((member) => ast.ref.getSchema(member).type === 'boolean')
-}
-
 // Every request content type and every `oneOf` member is read, since any of them can carry the `stream` property.
 function hasStreamProperty(node: ast.HttpOperationNode): boolean {
-  const bodies = (node.requestBody?.content ?? []).flatMap((entry) => (entry.schema ? getUnionMembers(entry.schema) : []))
-  return bodies.some((body) => ast.schema.findProperties({ node: body, propertyName: 'stream' }).some(({ schema }) => isBooleanSchema(schema)))
+  const bodies = (node.requestBody?.content ?? []).flatMap(({ schema }) => {
+    if (!schema) return []
+    return ast.schema.narrow(ast.ref.getSchema(schema), 'union')?.members ?? [schema]
+  })
+  return bodies.some((body) =>
+    ast.schema.findProperties({ node: body, propertyName: 'stream' }).some(({ schema }) => ast.ref.getSchema(schema).type === 'boolean'),
+  )
 }
 
 /**

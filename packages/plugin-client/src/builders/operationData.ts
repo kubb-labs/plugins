@@ -113,9 +113,9 @@ export function resolveOperationCalls({
   // schema when another success status has a body too, because no single generated schema covers both.
   const zodResolver = data.validatorHooks.response ? ctx.driver.getResolver(pluginZodName) : null
   const onlySuccess = ast.http.responses.filterSuccess(node).filter((response) => response.content?.some((entry) => entry.schema)).length === 1
-  const variantHooks = (suffix: string | null, isStream: boolean): ValidatorHooks => {
+  const variantHooks = (suffix: string | null): ValidatorHooks => {
     const hooks = data.validatorHooks
-    if (!zodResolver || !hooks.response || !suffix || !(isStream || onlySuccess)) return hooks
+    if (!zodResolver || !suffix) return hooks
     const response = getPerContentTypeName(zodResolver.response.status(node, split.statusCode), suffix)
     return { ...hooks, response, importedZodNames: hooks.importedZodNames.map((name) => (name === hooks.response ? response : name)) }
   }
@@ -132,14 +132,14 @@ export function resolveOperationCalls({
         `Omit<${responses}, ${status}> & { ${status}: ${restItem ?? `Exclude<${responses}[${status}], { contentType: 'text/event-stream' }>`} }`,
       ),
       accept: ast.mediaType.getBase(getResponseContentTypeInfo(split.rest).defaultContentType),
-      validatorHooks: variantHooks(split.restSuffix, false),
+      validatorHooks: onlySuccess ? variantHooks(split.restSuffix) : data.validatorHooks,
       stream: split.selector ? false : undefined,
       split: 'json',
     },
     {
       ...data,
       node: split.stream,
-      validatorHooks: variantHooks(split.suffix, true),
+      validatorHooks: variantHooks(split.suffix),
       types: callTypes(`Omit<${responses}, ${status}> & { ${status}: ${streamItem} }`),
       importedTypeNames: [...data.importedTypeNames, streamItem],
       stream: split.selector ? true : undefined,
