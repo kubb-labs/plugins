@@ -39,13 +39,9 @@ export function buildCallConfig({
 }: {
   node: ast.HttpOperationNode
   validatorHooks: ValidatorHooks | null
-  /**
-   * Sets `stream` in the body after `...config`, so the call always asks for its own variant.
-   */
+  /** Sets `stream` in the body after `...config`, so the call always asks for its own variant. */
   stream?: boolean
-  /**
-   * The response media type a split JSON call asks for.
-   */
+  /** The response media type a split JSON call asks for. */
   accept?: string
   security?: Array<SecurityRequirement>
   baseURL?: string

@@ -19,9 +19,7 @@ export function buildStreamOverloads({
   comments: Array<string>
   json: OperationBody
   stream: OperationBody
-  /**
-   * The client the call falls back to: `client` in a function, `this.client` in an SDK method.
-   */
+  /** The client the call falls back to: `client` in a function, `this.client` in an SDK method. */
   clientRef: string
   method?: boolean
 }): string {

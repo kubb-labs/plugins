@@ -75,13 +75,9 @@ export function Operation({ name, node, types, validatorHooks, returnType, throw
 }
 
 type StreamOverloadsProps = {
-  /**
-   * The JSON call of a split JSON-or-stream operation.
-   */
+  /** The JSON call of a split JSON-or-stream operation. */
   json: OperationData
-  /**
-   * The stream call of the same operation.
-   */
+  /** The stream call of the same operation. */
   stream: OperationData
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean

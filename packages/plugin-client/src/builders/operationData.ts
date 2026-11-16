@@ -23,21 +23,13 @@ export type OperationData = {
    * The names of the headers types the result references.
    */
   headerTypeNames: Array<string>
-  /**
-   * Every type name the call references from the type file.
-   */
+  /** Every type name the call references from the type file. */
   importedTypeNames: Array<string>
-  /**
-   * The `stream` body property one call of a split JSON-or-stream operation sets.
-   */
+  /** The `stream` body property one call of a split JSON-or-stream operation sets. */
   stream?: boolean
-  /**
-   * The media type the JSON call of a split operation asks for, so a server that picks by `Accept` skips the stream.
-   */
+  /** The media type the JSON call of a split operation asks for, so a server that picks by `Accept` skips the stream. */
   accept?: string
-  /**
-   * Which overload of a split JSON-or-stream operation this call is.
-   */
+  /** Which overload of a split JSON-or-stream operation this call is. */
   split?: 'json' | 'stream'
   security?: Array<SecurityRequirement>
   authRequired: boolean
