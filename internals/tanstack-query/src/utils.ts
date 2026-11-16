@@ -252,7 +252,13 @@ export function buildResponseTypes(
       TData:
         returnType === 'data'
           ? responseName
-          : buildResultType(node, resolver, typedHeaders, split ? `Omit<${responses}, ${status}> & { ${status}: ${restEntry} }` : responses),
+          : buildResultType(
+              node,
+              resolver,
+              typedHeaders,
+              // One remaining variant is the bare body, as in the JSON overload.
+              split ? `Omit<${responses}, ${status}> & { ${status}: ${split.restSuffix ? `${restEntry}['data']` : restEntry} }` : responses,
+            ),
       TError: `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`,
     }
   })

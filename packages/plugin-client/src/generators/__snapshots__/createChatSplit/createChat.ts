@@ -55,7 +55,7 @@ export function createChat<ThrowOnError extends boolean = true>(
         eventShape: 'event',
         rawData: true,
         ...config,
-        body: { ...config.body, stream: true },
+        body: typeof config.body === 'string' ? config.body : { ...config.body, stream: true },
         throwOnError: resolveThrowOnError(config.throwOnError, true),
       }),
     )
@@ -67,7 +67,7 @@ export function createChat<ThrowOnError extends boolean = true>(
       url: '/chat/completions',
       contentType: { request: 'application/json', response: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
       ...config,
-      body: { ...config.body, stream: false },
+      body: typeof config.body === 'string' ? config.body : { ...config.body, stream: false },
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),
   )

@@ -75,7 +75,7 @@ export function buildCallConfig({
     stream === 'event' || stream === 'data' ? `eventShape: '${stream}'` : null,
     rawData ? `rawData: ${toLiteral(rawData)}` : null,
     '...config',
-    streamBody === undefined ? null : `body: { ...config.body, stream: ${streamBody} }`,
+    streamBody === undefined ? null : `body: typeof config.body === 'string' ? config.body : { ...config.body, stream: ${streamBody} }`,
     ownRuntime ? styles : null,
     validatorLiteral,
     throwOnError,

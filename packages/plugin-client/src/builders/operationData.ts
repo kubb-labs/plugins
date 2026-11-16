@@ -107,6 +107,11 @@ export function resolveOperationCalls({
   const options = types.response.options(node)
   const responses = types.response.responses(node)
   const status = `'${split.statusCode}'`
+  // `client.stream` rejects any other success body, so the stream call's record keeps only the streamed status.
+  const successStatuses = ast.http.responses
+    .filterSuccess(node)
+    .map((response) => `'${response.statusCode}'`)
+    .join(' | ')
   const streamItem = types.contentVariant(node, split.statusCode, split.suffix)
   // One remaining content type is named like the stream variant. Several stay the record's `{ contentType; data }` union.
   const restItem = split.restSuffix ? types.contentVariant(node, split.statusCode, split.restSuffix) : null
@@ -142,7 +147,7 @@ export function resolveOperationCalls({
       ...data,
       node: split.stream,
       validatorHooks: variantHooks(split.suffix),
-      types: callTypes(`Omit<${responses}, ${status}> & { ${status}: ${streamItem} }`),
+      types: callTypes(`Omit<${responses}, ${successStatuses}> & { ${status}: ${streamItem} }`),
       importedTypeNames: [...data.importedTypeNames, streamItem],
       stream: split.selector ? true : undefined,
     },

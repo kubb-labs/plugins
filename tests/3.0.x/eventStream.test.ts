@@ -185,6 +185,7 @@ describe('a response that offers JSON or an event stream', () => {
       const { client } = await load(output, '.kubb/client.ts')
       client.setConfig({ baseURL: 'https://api.test', transport: async () => sse('{"id":"1","delta":"hi"}') })
       const { createChat } = await load(output, 'clients/createChat.ts')
+      expect(await read(output, 'clients/createChat.ts')).toContain("StreamResult<Omit<CreateChatResponses, '200' | '202'> & { '200':")
 
       const events = []
       for await (const event of await createChat({ body: {}, stream: true })) events.push(event)
