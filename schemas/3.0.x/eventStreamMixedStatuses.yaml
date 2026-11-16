@@ -1,0 +1,52 @@
+openapi: 3.0.3
+info:
+  title: JSON or an event stream, next to a second success status
+  version: '1'
+paths:
+  /chat:
+    post:
+      operationId: createChat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stream:
+                  type: boolean
+      responses:
+        '200':
+          description: A completion as JSON, or its chunks as an event stream
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Completion'
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/Chunk'
+        '202':
+          description: Accepted for later
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Queued'
+components:
+  schemas:
+    Completion:
+      type: object
+      properties:
+        id:
+          type: string
+    Chunk:
+      type: object
+      properties:
+        id:
+          type: string
+        delta:
+          type: string
+    Queued:
+      type: object
+      properties:
+        jobId:
+          type: string

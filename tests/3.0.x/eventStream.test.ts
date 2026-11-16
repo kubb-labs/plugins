@@ -186,6 +186,44 @@ describe('a response that offers JSON or an event stream', () => {
     }
   })
 
+  test('keeps event-only fields when another success status has a body', async () => {
+    const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-statuses-'))
+    try {
+      const { diagnostics } = await createKubb(
+        {
+          root: dirname,
+          input: '../../schemas/3.0.x/eventStreamMixedStatuses.yaml',
+          output: { path: output, barrel: false },
+          adapter: adapterOas({ validate: false }),
+          parsers: [parserTs()],
+          reporters: [],
+          storage: fsStorage(),
+          plugins: [
+            pluginTs({ output: { path: './types', barrel: false } }),
+            pluginZod({ output: { path: './zod', barrel: false } }),
+            pluginFetch({ output: { path: './clients', barrel: false }, validator: 'zod' }),
+          ],
+        } as Config,
+        { hooks: new Hookable<KubbHooks>() },
+      ).safeBuild()
+      expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
+
+      const { client } = await import(pathToFileURL(path.join(output, '.kubb/client.ts')).href)
+      client.setConfig({
+        baseURL: 'https://api.test',
+        transport: async () => new Response('data: {"id":"1","delta":"hi"}\n\n', { headers: { 'Content-Type': 'text/event-stream' } }),
+      })
+      const { createChatStream } = await import(pathToFileURL(path.join(output, 'clients/createChat.ts')).href)
+
+      const events = []
+      for await (const event of await createChatStream({ body: {} })) events.push(event)
+      // `Completion` declares only `id`, so validating with the success union would strip `delta`.
+      expect(events).toMatchObject([{ data: { id: '1', delta: 'hi' } }])
+    } finally {
+      await fs.rm(output, { recursive: true, force: true })
+    }
+  })
+
   test('returns JSON from the JSON call and parsed events from the stream call', async () => {
     const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-run-'))
     try {
