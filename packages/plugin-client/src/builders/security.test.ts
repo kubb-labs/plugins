@@ -40,7 +40,7 @@ describe('getOperationSecurity', () => {
     expect(getOperationSecurity({ auth: [[{ scheme: 'mtls' }], [{ scheme: 'missing' }]], schemes })).toBeUndefined()
   })
 
-  test('groups the schemes one requirement needs together, and drops repeated and unmet requirements', () => {
+  test('groups the schemes one requirement needs together, and drops repeated requirements and mutualTLS', () => {
     const security = getOperationSecurity({
       auth: [
         [{ scheme: 'api_key' }, { scheme: 'session' }],
@@ -55,10 +55,12 @@ describe('getOperationSecurity', () => {
         { type: 'apiKey', name: 'api_key', in: 'header' },
         { type: 'apiKey', name: 'sid', in: 'cookie' },
       ],
+      // The transport supplies the mutualTLS certificate, so only `api_key` is left of the second requirement.
+      { type: 'apiKey', name: 'api_key', in: 'header' },
       { type: 'oauth2', scopes: ['read:pets'] },
     ])
     expect(buildSecurityMetadata({ security })).toBe(
-      "[[{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'apiKey', name: 'sid', in: 'cookie' }], { type: 'oauth2', scopes: ['read:pets'] }]",
+      "[[{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'apiKey', name: 'sid', in: 'cookie' }], { type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2', scopes: ['read:pets'] }]",
     )
   })
 
