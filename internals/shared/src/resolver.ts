@@ -142,13 +142,13 @@ export function createCasedFile(caseLast: (part: string) => string): ResolverFil
   }
 }
 
-type SchemaIndexContext = Pick<GeneratorContext, 'memo' | 'driver'>
+type SchemaIndexContext = Pick<GeneratorContext, 'memo' | 'schemas'>
 
 /**
  * Names of the schemas in a circular reference chain, computed once per build.
  */
 export function getCircularNames(ctx: SchemaIndexContext): ReadonlySet<string> {
-  return ctx.memo('circularNames:set', () => ast.graph.getCircularNames(ctx.driver.inputNode?.schemas ?? []))
+  return ctx.memo('circularNames:set', () => ast.graph.getCircularNames(ctx.schemas))
 }
 
 /**
@@ -157,7 +157,7 @@ export function getCircularNames(ctx: SchemaIndexContext): ReadonlySet<string> {
 export function getEnumNames(ctx: SchemaIndexContext): ReadonlySet<string> {
   return ctx.memo(
     'enumNames:set',
-    () => new Set((ctx.driver.inputNode?.schemas ?? []).flatMap((schema) => (schema.type === 'enum' && schema.name ? [schema.name] : []))),
+    () => new Set(ctx.schemas.flatMap((schema) => (schema.type === 'enum' && schema.name ? [schema.name] : []))),
   )
 }
 

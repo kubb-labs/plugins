@@ -618,7 +618,7 @@ describe('resolveOperationFile', () => {
     }) as Memo
   }
 
-  const ctxOf = (memo: Memo, schemas: Array<ast.SchemaNode> = []) => ({ memo, driver: { inputNode: { schemas } } })
+  const ctxOf = (memo: Memo, schemas: Array<ast.SchemaNode> = []) => ({ memo, schemas })
 
   function createFileResolver(pluginName: string) {
     return { pluginName, file: vi.fn(() => ast.factory.createFile({ path: '/root/getPetById.ts', baseName: 'getPetById.ts' as const })) }
