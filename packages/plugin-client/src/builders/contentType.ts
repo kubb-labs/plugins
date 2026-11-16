@@ -5,8 +5,7 @@ import { ast, text } from '@kubb/kit'
  * Builds the `contentType` entry baked into the call config. It holds the request default when the operation has a body
  * and `response` set to the streamed media type when it streams items, or `text/event-stream` when it offers events next to
  * another type that has no schema, and is `null` with neither. A response that offers typed events next to another typed
- * content type is split into two calls first, see `resolveOperationCalls`, and its JSON call passes the media type it asks
- * for as `accept`.
+ * content type is split first, see `resolveOperationCalls`. Its JSON call passes its media type as `accept`.
  *
  * `merge` is `true` when the generated function must destructure `contentType` from `options` and merge it over the
  * baked defaults, because the caller can also pick a response content type or a stream must keep its `Accept`.

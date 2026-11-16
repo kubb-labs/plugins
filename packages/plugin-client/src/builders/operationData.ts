@@ -92,11 +92,9 @@ export const omitStreamFieldType =
   "type OmitStreamField<T> = T extends unknown ? { [K in keyof T]: K extends 'body' ? (T[K] extends infer B ? (B extends object ? Omit<B, 'stream'> : B) : never) : T[K] } : never"
 
 /**
- * Resolves the calls one operation generates. A JSON-or-stream operation, whose primary success response offers
- * `text/event-stream` next to another typed content type, gets two under one name: the JSON call and the stream call, which
- * the generators print as the two overloads of one function (`buildStreamOverloads`). Each narrows the responses record
- * to its own variant and asks for its own media type, and sets the `stream` body property when the body has one, so that
- * property is left out of its options type.
+ * Resolves the calls one operation generates. A JSON-or-stream operation gets a JSON call and a stream call under one
+ * name, which the generators print as two overloads (`buildStreamOverloads`). Each call narrows the responses record to
+ * its own variant, asks for its own media type, and sets the `stream` body property when the body has one.
  */
 export function resolveOperationCalls({
   node,
@@ -120,7 +118,7 @@ export function resolveOperationCalls({
   const optionsType = split.selector ? `OmitStreamField<${options}>` : options
   // Each call validates its own variant, since a union of both can parse an event as the JSON body and drop its fields.
   // Only the split status streams, so the stream call always takes its variant. The JSON call keeps the whole success
-  // schema when another success status has a body too, since no one generated schema covers both.
+  // schema when another success status has a body too, because no single generated schema covers both.
   const zodResolver = data.validatorHooks.response ? ctx.driver.getResolver(pluginZodName) : null
   const onlySuccess = ast.http.responses.filterSuccess(node).filter((response) => response.content?.some((entry) => entry.schema)).length === 1
   const variantHooks = (suffix: string | null, isStream: boolean): ValidatorHooks => {
