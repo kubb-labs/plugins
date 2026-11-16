@@ -36,7 +36,6 @@ type Props = {
    * call config's `security` field for the runtime `auth` resolver to consume.
    */
   security?: Array<SecurityRequirement>
-  /** Prints `auth` as a required option. */
   authRequired?: boolean
   /** The operation's own server URL from a path-level or operation-level `servers` entry, emitted as the call's default `baseURL`. */
   baseURL?: string

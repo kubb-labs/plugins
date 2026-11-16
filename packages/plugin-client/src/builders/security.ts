@@ -100,14 +100,7 @@ export function getOperationSecurity({
   return security.length ? security : undefined
 }
 
-/**
- * Whether every way to call the operation needs a token. An empty requirement, from `security: [{}]`, allows an
- * anonymous call. A requirement the runtime cannot send, such as `mutualTLS`, counts as one that needs no token here.
- *
- * @example
- * `isAuthRequired({ auth: [[{ scheme: 'bearerAuth' }]], schemes }) // true`
- * `isAuthRequired({ auth: [[{ scheme: 'bearerAuth' }], []], schemes }) // false`
- */
+/** True when every requirement needs a token the runtime can send. `security: [{}]` and `mutualTLS` need none. */
 export function isAuthRequired({ auth, schemes }: { auth: Array<ast.AuthRequirement> | undefined; schemes: Array<ast.AuthScheme> | undefined }): boolean {
   const requirements = ast.auth.getRequirements({ auth, schemes })
   return (

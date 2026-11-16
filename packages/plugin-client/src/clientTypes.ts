@@ -82,19 +82,7 @@ export type ClientOptions = OutputOptions & {
    * @default false
    */
   validator?: ValidatorOptions
-  /**
-   * Makes `auth` a required option on a generated function whose operation needs a security scheme. An operation
-   * without `security`, or one that allows `{}`, keeps `auth` optional. Leave it off when `client.setConfig({ auth })`
-   * supplies the token, and with the query-hook plugins, which pass a partial config to the function. The SDK
-   * classes take `auth` in their constructor and ignore it.
-   *
-   * @default false
-   * @example
-   * ```ts
-   * pluginFetch({ requireAuth: true })
-   * // await addPet({ body, auth: () => token })
-   * ```
-   */
+  /** Makes `auth` required on a function whose operation needs a token, unless `security` allows `{}`. @default false */
   requireAuth?: boolean
   /**
    * Shape of the value a generated operation function resolves to. Applies to the standalone

@@ -24,9 +24,6 @@ export type OperationData = {
    */
   headerTypeNames: Array<string>
   security?: Array<SecurityRequirement>
-  /**
-   * `requireAuth` is on and every requirement of the operation needs a token.
-   */
   authRequired: boolean
   baseURL?: string
 }

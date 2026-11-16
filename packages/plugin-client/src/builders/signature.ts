@@ -52,14 +52,11 @@ export function buildGroupedOptionsSignature({
    * client, whose own `client.stream` returns a `StreamResult` and types its config itself.
    */
   eventStream?: boolean
-  /**
-   * Makes `auth` required, so the call has no `{}` default.
-   */
   authRequired?: boolean
 }): GroupedOptionsSignature {
   const optionsName = types.response.options(node)
   const baseType = `${eventStream && returnType !== 'plain' ? 'StreamOptions' : 'Options'}<${optionsName}, ThrowOnError>`
-  // `NonNullable` keeps the module's own `auth` type, so a custom `importPath` client needs no extra export.
+  // `NonNullable` reuses the module's own `auth` type, so a custom `importPath` client needs no extra export.
   const optionsType = authRequired ? `${baseType} & { auth: NonNullable<${baseType}['auth']> }` : baseType
   const isOptional = !authRequired && getRequestGroupOptionality(node).isOptional
 
