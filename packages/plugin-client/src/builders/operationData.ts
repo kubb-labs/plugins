@@ -34,7 +34,7 @@ export type OperationData = {
  */
 export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOperationNode; ctx: GeneratorContext; types: OperationTypeSource }): OperationData {
   const { driver, resolver, root } = ctx
-  const { output, validator, importPath, requireAuth } = ctx.options
+  const { output, validator, importPath } = ctx.options
   const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : null
   const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
@@ -58,7 +58,7 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
     headerTypeNames: getResponseHeadersTypeNames({ node, types }),
     // The fetch and axios clients write `securitySchemes` into `.kubb/client.ts`. A custom client module has none.
     security: getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth, hoist: importPath === undefined }),
-    authRequired: requireAuth && isAuthRequired({ auth: node.auth, schemes: ctx.meta.auth }),
+    authRequired: ctx.options.auth === 'required' && isAuthRequired({ auth: node.auth, schemes: ctx.meta.auth }),
     baseURL: ast.http.getBaseURL(
       ast.server.get({ servers: node.servers, index: (ctx.adapter.options as { server?: { index?: number } } | undefined)?.server?.index }),
     ),

@@ -19,6 +19,8 @@ export type ValidatorOptions = false | 'zod' | { request?: 'zod'; params?: 'zod'
  */
 export type Mode = 'tag' | 'flat'
 
+export type AuthOption = 'optional' | 'required'
+
 /**
  * The resolver shared by the client plugins. Inherits the built-in camelCase `name` and `file`;
  * classes and tag groups use PascalCase (with a `Client` suffix for groups).
@@ -82,8 +84,13 @@ export type ClientOptions = OutputOptions & {
    * @default false
    */
   validator?: ValidatorOptions
-  /** Makes `auth` required on a function whose operation needs a token, unless `security` allows `{}`. @default false */
-  requireAuth?: boolean
+  /**
+   * Whether a generated function takes `auth` as an optional or a required option. With `'required'`, `auth` is required
+   * on a function whose operation needs a token, unless `security` allows `{}`.
+   *
+   * @default 'optional'
+   */
+  auth?: AuthOption
   /**
    * Shape of the value a generated operation function resolves to. Applies to the standalone
    * functions and the class-based SDK. The query-hook plugins (`@kubb/plugin-react-query`,
@@ -172,7 +179,7 @@ export type ClientResolvedOptions = {
   importPath?: string
   throwOnErrorDefault: boolean
   validator: NonNullable<ClientOptions['validator']>
-  requireAuth: boolean
+  auth: AuthOption
   returnType: ReturnTypeOption
   sdk:
     | {
