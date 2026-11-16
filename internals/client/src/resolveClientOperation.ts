@@ -77,21 +77,22 @@ function resolveImportPath(options: { importPath: string; operationFile: string 
  */
 export function resolveClientOperation(options: {
   clientPlugin: { pluginName: string } | null
-  driver: {
+  ctx: {
     getPlugin: (name: string) => { options?: ClientPluginOptions } | undefined
     getResolver: (name: string) => Resolver
+    memo: Memo
   }
   node: ast.OperationNode
   root: string
   output: Output
-  memo: Memo
 }): ClientOperation | null {
-  const { clientPlugin, driver, node, root, output, memo } = options
+  const { clientPlugin, ctx, node, root, output } = options
+  const { memo } = ctx
   if (!clientPlugin) return null
 
   return memo(`${clientPlugin.pluginName}:clientOperation:${node.operationId}`, () => {
-    const resolver = driver.getResolver(clientPlugin.pluginName)
-    const pluginOptions = driver.getPlugin(clientPlugin.pluginName)?.options ?? {}
+    const resolver = ctx.getResolver(clientPlugin.pluginName)
+    const pluginOptions = ctx.getPlugin(clientPlugin.pluginName)?.options ?? {}
     const { exclude, include, override } = pluginOptions
     const hasOperationOptions = Boolean(exclude?.length || include?.length || override?.length)
     // Kubb's resolver always has `default`; the fallback keeps partial or custom resolvers working.

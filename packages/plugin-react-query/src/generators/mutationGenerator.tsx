@@ -22,13 +22,13 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { driver, resolver, root } = ctx
+    const { resolver, root } = ctx
     const { output, mutation, client, group, customOptions, hooks } = ctx.options
 
     const importPath = mutation ? mutation.importPath : '@tanstack/react-query'
 
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, ctx, node, root, output })
     if (!contractOp) return null
 
     const mutationHookName = resolver.mutation.name(node)

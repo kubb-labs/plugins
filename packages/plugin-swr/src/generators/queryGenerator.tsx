@@ -15,7 +15,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { driver, resolver, root } = ctx
+    const { resolver, root } = ctx
     const { output, query, mutation, client, group } = ctx.options
 
     const { isQuery } = classifyOperation(node, { query, mutation })
@@ -25,7 +25,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     const importPath = query ? query.importPath : 'swr'
 
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, ctx, node, root, output })
     if (!contractOp) return null
 
     const queryName = resolver.query.name(node)

@@ -46,7 +46,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return
     }
 
-    const tsResolver = ctx.driver.getResolver(pluginTsName)
+    const tsResolver = ctx.getResolver(pluginTsName)
 
     const schemaName = node.name
     const isEnumSchema = !!ast.schema.narrow(node, ast.schema.types.enum)
@@ -120,7 +120,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const { output, group, dateParser, regexGenerator, seed, locale, printer, typeMode } = ctx.options
     const pluginTs = ctx.requirePlugin(pluginTsName)
 
-    const tsResolver = ctx.driver.getResolver(pluginTsName)
+    const tsResolver = ctx.getResolver(pluginTsName)
 
     const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
     const paramGroups = (

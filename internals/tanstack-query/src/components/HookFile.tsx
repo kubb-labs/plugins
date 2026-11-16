@@ -6,7 +6,7 @@ import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { ClientOperation, ReturnTypeOption } from '@internals/client'
 
-type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'memo' | 'meta' | 'driver' | 'requirePlugin' | 'resolver'>
+type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'memo' | 'meta' | 'driver' | 'getPlugin' | 'getResolver' | 'requirePlugin' | 'resolver'>
 
 type ResolveHookFileOptions = {
   name: string
@@ -56,7 +56,7 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
       plugin: resolver.pluginName,
     })
   }
-  const types = resolveOperationTypes(ctx.driver, resolver.pluginName)
+  const types = resolveOperationTypes(ctx, resolver.pluginName)
   const tsResolver = types.resolver
   const headerTypeNames = returnType === 'data' || !contractOp.typedHeaders ? [] : getResponseHeadersTypeNames({ node, types: tsResolver })
 

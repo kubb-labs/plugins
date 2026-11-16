@@ -23,10 +23,10 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
     operation(node, ctx) {
       if (!ast.http.isOperation(node)) return null
 
-      const { config, driver, resolver, root } = ctx
+      const { config, resolver, root } = ctx
       const { output, returnType, throwOnErrorDefault, group, importPath } = ctx.options
 
-      const resolvedTypes = resolveOperationTypes(driver, ctx.plugin.name)
+      const resolvedTypes = resolveOperationTypes(ctx, ctx.plugin.name)
       // A custom client module keeps the two-argument `RequestResult` it documents, so its results get no typed headers.
       const types = importPath === undefined ? resolvedTypes : { ...resolvedTypes, response: { ...resolvedTypes.response, headers: undefined } }
 

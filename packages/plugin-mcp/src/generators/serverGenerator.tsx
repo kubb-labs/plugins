@@ -18,12 +18,12 @@ export const serverGenerator = defineGenerator<PluginMcp>({
   name: 'operations',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { config, resolver, plugin, driver, root } = ctx
+    const { config, resolver, plugin, root } = ctx
     const { output, group } = ctx.options
 
     const pluginZod = ctx.requirePlugin(pluginZodName)
 
-    const zodResolver = driver.getResolver(pluginZodName)
+    const zodResolver = ctx.getResolver(pluginZodName)
 
     const fileAt = <TName extends `${string}.${string}`>(baseName: TName) => ({
       baseName,
