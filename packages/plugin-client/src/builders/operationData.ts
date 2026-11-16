@@ -10,9 +10,9 @@ import { isValidatorEnabled } from './validatorOptions.ts'
 export type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]
 
 /**
- * The calls one operation generates: one, or the JSON call and the stream call of a JSON-or-stream operation.
+ * The calls one operation generates: one, or for a JSON-or-stream operation the unchanged call, the JSON call and the stream call.
  */
-export type OperationCalls = [OperationData] | [json: OperationData, stream: OperationData]
+export type OperationCalls = [OperationData] | [base: OperationData, json: OperationData, stream: OperationData]
 
 export type OperationData = {
   node: ast.HttpOperationNode
@@ -132,6 +132,7 @@ export function resolveOperationCalls({
   })
 
   return [
+    data,
     {
       ...data,
       node: split.rest,

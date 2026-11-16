@@ -21,12 +21,16 @@ export function createChat<ThrowOnError extends boolean = true>(
   >
 >
 export function createChat<ThrowOnError extends boolean = true>(
-  options: Options<OmitStreamField<CreateChatOptions>, ThrowOnError> & { stream?: false },
+  options: Options<OmitStreamField<CreateChatOptions>, ThrowOnError> & { stream: false },
 ): Promise<RequestResult<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>>
+export function createChat<ThrowOnError extends boolean = true>(
+  options: Options<CreateChatOptions, ThrowOnError> & { stream?: undefined },
+): Promise<RequestResult<CreateChatResponses, ThrowOnError>>
 export function createChat<ThrowOnError extends boolean = true>(
   options:
     | (Options<OmitStreamField<CreateChatOptions>, ThrowOnError> & { stream: true })
-    | (Options<OmitStreamField<CreateChatOptions>, ThrowOnError> & { stream?: false }),
+    | (Options<OmitStreamField<CreateChatOptions>, ThrowOnError> & { stream: false })
+    | (Options<CreateChatOptions, ThrowOnError> & { stream?: undefined }),
 ):
   | Promise<
       StreamResult<
@@ -35,10 +39,11 @@ export function createChat<ThrowOnError extends boolean = true>(
         TypedEvent<SuccessOf<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200EventStream }>>
       >
     >
-  | Promise<RequestResult<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>> {
+  | Promise<RequestResult<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>>
+  | Promise<RequestResult<CreateChatResponses, ThrowOnError>> {
   const { client: apiClient = client, stream, contentType, ...config } = options
 
-  if (stream) {
+  if (stream === true) {
     return apiClient.stream<
       Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200EventStream },
       ThrowOnError,
@@ -58,13 +63,22 @@ export function createChat<ThrowOnError extends boolean = true>(
       throwOnError: config.throwOnError ?? true,
     })
   }
+  if (stream === false) {
+    return apiClient<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>({
+      method: 'POST',
+      url: '/chat/completions',
+      contentType: { request: 'application/json', response: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
+      ...config,
+      body: typeof config.body === 'string' ? config.body : { ...config.body, stream: false },
+      throwOnError: config.throwOnError ?? true,
+    })
+  }
 
-  return apiClient<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>({
+  return apiClient<CreateChatResponses, ThrowOnError>({
     method: 'POST',
     url: '/chat/completions',
-    contentType: { request: 'application/json', response: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
+    contentType: { request: 'application/json', response: 'text/event-stream', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
     ...config,
-    body: typeof config.body === 'string' ? config.body : { ...config.body, stream: false },
     throwOnError: config.throwOnError ?? true,
   })
 }

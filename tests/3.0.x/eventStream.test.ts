@@ -144,12 +144,13 @@ describe('a response that offers JSON or an event stream', () => {
     await generate('eventStreamMixed.yaml', [clientPlugin({ output: { path: './clients', barrel: false } })], async (output) => {
       const client = await read(output, 'clients/listChanges.ts')
       expect(client).toContain('& { stream: true }): Unwrappable<StreamResult<')
-      expect(client).toContain('& { stream?: false }): Unwrappable<RequestResult<')
+      expect(client).toContain('& { stream: false }): Unwrappable<RequestResult<')
+      expect(client).toContain('& { stream?: undefined }): Unwrappable<RequestResult<ListChangesResponses, ThrowOnError>>')
       expect(await read(output, '.kubb/client.ts')).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
     })
   })
 
-  test('returns JSON without `stream` and parsed events with `stream: true`', async () => {
+  test('keeps the default call and adds JSON and parsed-event overloads', async () => {
     await generate('eventStreamMixed.yaml', [pluginFetch({ output: { path: './clients', barrel: false } })], async (output) => {
       const accepts: Array<string | undefined> = []
       const { client } = await load(output, '.kubb/client.ts')
@@ -162,11 +163,13 @@ describe('a response that offers JSON or an event stream', () => {
       })
       const { listChanges } = await load(output, 'clients/listChanges.ts')
 
-      expect(await listChanges()).toMatchObject({ data: { $schema: 'change' } })
+      // The default call is unchanged: it asks for the stream and returns its body unread.
+      expect((await listChanges()).data).toBeInstanceOf(ReadableStream)
+      expect(await listChanges({ stream: false })).toMatchObject({ data: { $schema: 'change' } })
       const events = []
       for await (const event of await listChanges({ stream: true })) events.push(event)
       expect(events).toMatchObject([{ data: { $schema: 'change' } }])
-      expect(accepts).toStrictEqual(['application/json', 'text/event-stream'])
+      expect(accepts).toStrictEqual(['text/event-stream', 'application/json', 'text/event-stream'])
     })
   })
 
@@ -176,6 +179,7 @@ describe('a response that offers JSON or an event stream', () => {
       expect([...client.matchAll(/validator: \{ response: (\w+)/g)].map((match) => match[1])).toStrictEqual([
         'listChangesStatus200SchemaEventStream',
         'listChangesStatus200SchemaJson',
+        'listChangesResponseSchema',
       ])
     })
   })

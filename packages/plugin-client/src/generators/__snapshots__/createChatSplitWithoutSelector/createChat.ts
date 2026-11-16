@@ -17,10 +17,16 @@ export function createChat<ThrowOnError extends boolean = true>(
   >
 >
 export function createChat<ThrowOnError extends boolean = true>(
-  options?: Options<CreateChatOptions, ThrowOnError> & { stream?: false },
+  options: Options<CreateChatOptions, ThrowOnError> & { stream: false },
 ): Unwrappable<RequestResult<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>>
 export function createChat<ThrowOnError extends boolean = true>(
-  options: (StreamOptions<CreateChatOptions, ThrowOnError> & { stream: true }) | (Options<CreateChatOptions, ThrowOnError> & { stream?: false }) = {},
+  options?: Options<CreateChatOptions, ThrowOnError> & { stream?: undefined },
+): Unwrappable<RequestResult<CreateChatResponses, ThrowOnError>>
+export function createChat<ThrowOnError extends boolean = true>(
+  options:
+    | (StreamOptions<CreateChatOptions, ThrowOnError> & { stream: true })
+    | (Options<CreateChatOptions, ThrowOnError> & { stream: false })
+    | (Options<CreateChatOptions, ThrowOnError> & { stream?: undefined }) = {},
 ):
   | Unwrappable<
       StreamResult<
@@ -29,10 +35,11 @@ export function createChat<ThrowOnError extends boolean = true>(
         TypedEvent<SuccessOf<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200EventStream }>>
       >
     >
-  | Unwrappable<RequestResult<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>> {
+  | Unwrappable<RequestResult<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>>
+  | Unwrappable<RequestResult<CreateChatResponses, ThrowOnError>> {
   const { client: apiClient = client, stream, ...config } = options
 
-  if (stream) {
+  if (stream === true) {
     return withUnwrap(
       apiClient.stream<
         Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200EventStream },
@@ -49,12 +56,23 @@ export function createChat<ThrowOnError extends boolean = true>(
       }),
     )
   }
+  if (stream === false) {
+    return withUnwrap(
+      apiClient<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>({
+        method: 'POST',
+        url: '/chat/completions',
+        contentType: { response: 'application/json' },
+        ...config,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
+    )
+  }
 
   return withUnwrap(
-    apiClient<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>({
+    apiClient<CreateChatResponses, ThrowOnError>({
       method: 'POST',
       url: '/chat/completions',
-      contentType: { response: 'application/json' },
+      contentType: { response: 'text/event-stream' },
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),

@@ -9,7 +9,6 @@ import {
   resolveSuccessNames,
   buildClientOptionType,
   requestGroupOrder,
-  splitEventStream,
 } from '@internals/shared'
 import { ast } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
@@ -201,9 +200,9 @@ export function buildCallResultBody(call: string, options: { clientReturnType?: 
   return `return ${call}.unwrap()`
 }
 
-function buildResultType(node: ast.OperationNode, resolver: ResolverTs, typedHeaders: boolean, responses: string): string {
+function buildResultType(node: ast.OperationNode, resolver: ResolverTs, typedHeaders: boolean): string {
   const headers = typedHeaders ? buildResponseHeadersType({ node, types: resolver }) : null
-  return buildResultTypeRef('RequestResult', responses, headers, ['true'])
+  return buildResultTypeRef('RequestResult', resolver.response.responses(node), headers, ['true'])
 }
 
 type ResponseTypes = {
@@ -236,29 +235,14 @@ export function buildResponseTypes(
   const { returnType = 'data', typedHeaders = true } = options
   // The same operation gets typed headers from one client and not from another, so both results are kept.
   return resolver.memo(`responseTypes:${returnType}:${typedHeaders}:${node.method}\0${node.path}`, () => {
-    // A JSON-or-stream operation is split, and the hooks wrap its JSON call, so they type that call's variant only.
-    const responses = resolver.response.responses(node)
-    const split = ast.http.isOperation(node) ? splitEventStream(node) : null
-    const status = split && `'${split.statusCode}'`
-    const restEntry = split && `Exclude<${responses}[${status}], { contentType: 'text/event-stream' }>`
-    const splitName = split && resolver.response.status(node, split.statusCode)
-    const successNames = resolveSuccessNames(node, resolver).map((name) => (name === splitName ? `${restEntry}['data']` : name))
+    const successNames = resolveSuccessNames(node, resolver)
     const bodyName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
     // The client resolves a stream variant of a mixed response to its raw body.
-    const responseName = hasStreamVariant(split?.rest ?? node) ? `${bodyName} | ReadableStream<Uint8Array>` : bodyName
+    const responseName = hasStreamVariant(node) ? `${bodyName} | ReadableStream<Uint8Array>` : bodyName
     const errorNames = resolveErrorNames(node, resolver)
 
     return {
-      TData:
-        returnType === 'data'
-          ? responseName
-          : buildResultType(
-              node,
-              resolver,
-              typedHeaders,
-              // One remaining variant is the bare body, as in the JSON overload.
-              split ? `Omit<${responses}, ${status}> & { ${status}: ${split.restSuffix ? `${restEntry}['data']` : restEntry} }` : responses,
-            ),
+      TData: returnType === 'data' ? responseName : buildResultType(node, resolver, typedHeaders),
       TError: `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`,
     }
   })

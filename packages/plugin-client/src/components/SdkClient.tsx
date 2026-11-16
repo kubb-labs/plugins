@@ -59,8 +59,8 @@ type OperationData = {
 
 type Props = {
   name: string
-  /** One entry per operation: its call, or its JSON call and stream call. */
-  operations: Array<[OperationData] | [OperationData, OperationData]>
+  /** One entry per operation: its call, or its unchanged, JSON and stream calls. */
+  operations: Array<[OperationData] | [OperationData, OperationData, OperationData]>
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
 }
@@ -86,12 +86,13 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
       accept: op.accept,
     })
   // A JSON-or-stream operation is printed as one overloaded method.
-  const methods = operations.map(([op, stream]) =>
-    stream
+  const methods = operations.map(([op, json, stream]) =>
+    json && stream
       ? buildStreamOverloads({
           name: op.name,
           comments: buildOperationComments(op.node, { splitLines: true }),
-          json: bodyOf(op),
+          base: bodyOf(op),
+          json: bodyOf(json),
           stream: bodyOf(stream),
           clientRef: 'this.client',
           method: true,

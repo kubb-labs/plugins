@@ -75,7 +75,9 @@ export function Operation({ name, node, types, validatorHooks, returnType, throw
 }
 
 type StreamOverloadsProps = {
-  /** The JSON call of a split JSON-or-stream operation. */
+  /** The unchanged call of a split JSON-or-stream operation. */
+  base: OperationData
+  /** The JSON call of the same operation. */
   json: OperationData
   /** The stream call of the same operation. */
   stream: OperationData
@@ -84,10 +86,10 @@ type StreamOverloadsProps = {
 }
 
 /**
- * Renders a JSON-or-stream operation as one function with a `stream: true` overload for the typed events and a JSON
- * overload, see `buildStreamOverloads`.
+ * Renders a JSON-or-stream operation as one function with `stream: true`, `stream: false` and default overloads, see
+ * `buildStreamOverloads`.
  */
-export function StreamOverloads({ json, stream, returnType, throwOnErrorDefault }: StreamOverloadsProps): KubbReactNode {
+export function StreamOverloads({ base, json, stream, returnType, throwOnErrorDefault }: StreamOverloadsProps): KubbReactNode {
   const bodyOf = (call: OperationData) =>
     buildOperationBody({
       node: call.node,
@@ -103,10 +105,11 @@ export function StreamOverloads({ json, stream, returnType, throwOnErrorDefault 
     })
 
   return (
-    <File.Source name={json.name} isExportable isIndexable>
+    <File.Source name={base.name} isExportable isIndexable>
       {buildStreamOverloads({
-        name: json.name,
-        comments: buildOperationComments(json.node, { splitLines: true }),
+        name: base.name,
+        comments: buildOperationComments(base.node, { splitLines: true }),
+        base: bodyOf(base),
         json: bodyOf(json),
         stream: bodyOf(stream),
         clientRef: 'client',

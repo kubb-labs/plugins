@@ -4,4 +4,4 @@
 '@kubb/plugin-axios': minor
 ---
 
-An operation whose success response offers JSON or a typed `text/event-stream` gets a `stream: true` overload. `createChat({ body })` returns the JSON result, and `createChat({ body, stream: true })` returns typed events. Before, it returned the raw `ReadableStream`.
+An operation whose success response offers JSON or a typed `text/event-stream` gets two overloads. `createChat({ body, stream: true })` returns typed events, and `createChat({ body, stream: false })` returns the JSON result. `createChat({ body })` is unchanged.
