@@ -1,5 +1,17 @@
 # @kubb/plugin-axios
 
+## 6.1.0
+
+### Minor Changes
+
+- [#1479](https://github.com/kubb-labs/plugins/pull/1479) [`f868cb2`](https://github.com/kubb-labs/plugins/commit/f868cb26b8ce9d1e92d9ddf9c79d6f4c53bda790) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add the `auth` option. With `auth: { mode: 'required' }`, a generated function whose operation needs a security scheme takes `auth` as a required option, so a call without a token fails to compile. Operations without `security`, or that allow `{}`, keep `auth` optional.
+
+### Patch Changes
+
+- [#1477](https://github.com/kubb-labs/plugins/pull/1477) [`a6ba0c1`](https://github.com/kubb-labs/plugins/commit/a6ba0c11463ff79fc583d8087b4fbb4ac8718d92) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Distinguish Axios and Fetch guide descriptions in search results.
+- Updated dependencies [[`f868cb2`](https://github.com/kubb-labs/plugins/commit/f868cb26b8ce9d1e92d9ddf9c79d6f4c53bda790)]:
+  - @kubb/plugin-client@6.1.0
+
 ## 6.0.4
 
 ### Patch Changes
