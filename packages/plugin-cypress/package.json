@@ -74,14 +74,14 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.20.1",
+    "@kubb/kit": "^5.20.2",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/renderer-jsx": "^5.20.1"
+    "@kubb/renderer-jsx": "^5.20.2"
   },
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "cypress": "^16.2.1"
+    "cypress": "^16.3.0"
   },
   "peerDependencies": {
     "cypress": "^15.0.0 || ^16.0.0"
