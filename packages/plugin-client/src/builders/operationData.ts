@@ -9,6 +9,11 @@ import { isValidatorEnabled } from './validatorOptions.ts'
 
 export type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]
 
+/**
+ * The calls one operation generates: one, or the JSON call and the stream call of a JSON-or-stream operation.
+ */
+export type OperationCalls = [OperationData] | [json: OperationData, stream: OperationData]
+
 export type OperationData = {
   node: ast.HttpOperationNode
   name: string
@@ -29,8 +34,6 @@ export type OperationData = {
   stream?: boolean
   /** The media type the JSON call of a split operation asks for, so a server that picks by `Accept` skips the stream. */
   accept?: string
-  /** Which overload of a split JSON-or-stream operation this call is. */
-  split?: 'json' | 'stream'
   security?: Array<SecurityRequirement>
   authRequired: boolean
   baseURL?: string
@@ -96,7 +99,7 @@ export function resolveOperationCalls({
   node: ast.HttpOperationNode
   ctx: GeneratorContext
   types: OperationTypeSource
-}): [OperationData] | [json: OperationData, stream: OperationData] {
+}): OperationCalls {
   const data = resolveOperationData({ node, ctx, types })
   const split = splitEventStream(node)
   if (!split) return [data]
@@ -134,7 +137,6 @@ export function resolveOperationCalls({
       accept: ast.mediaType.getBase(getResponseContentTypeInfo(split.rest).defaultContentType),
       validatorHooks: onlySuccess ? variantHooks(split.restSuffix) : data.validatorHooks,
       stream: split.selector ? false : undefined,
-      split: 'json',
     },
     {
       ...data,
@@ -143,7 +145,6 @@ export function resolveOperationCalls({
       types: callTypes(`Omit<${responses}, ${status}> & { ${status}: ${streamItem} }`),
       importedTypeNames: [...data.importedTypeNames, streamItem],
       stream: split.selector ? true : undefined,
-      split: 'stream',
     },
   ]
 }

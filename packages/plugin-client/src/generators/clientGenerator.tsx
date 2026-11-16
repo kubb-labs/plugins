@@ -79,7 +79,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
           {data.validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
 
           {calls.some((call) => call.stream !== undefined) && <File.Source name="OmitStreamField">{omitStreamFieldType}</File.Source>}
-          {data.split === 'json' && stream?.split === 'stream' ? (
+          {stream ? (
             <StreamOverloads json={data} stream={stream} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
           ) : (
             <Operation

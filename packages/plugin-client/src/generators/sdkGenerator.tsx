@@ -5,7 +5,7 @@ import { ensureValidVarName } from '@internals/utils'
 import { ast, defineGenerator, Diagnostics, memo } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
-import { type GeneratorContext, omitStreamFieldType, type OperationData, resolveOperationCalls } from '../builders/operationData.ts'
+import { type GeneratorContext, omitStreamFieldType, type OperationCalls, type OperationData, resolveOperationCalls } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
@@ -17,7 +17,7 @@ type Controller = {
   name: string
   tag: string | undefined
   file: ast.FileNode
-  operations: Array<OperationData>
+  operations: Array<OperationCalls>
 }
 
 /**
@@ -39,9 +39,9 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
     const previous = acc.find((item) => item.file.path === file.path)
 
     if (previous) {
-      previous.operations.push(...operationData)
+      previous.operations.push(operationData)
     } else {
-      acc.push({ name, tag, file, operations: operationData })
+      acc.push({ name, tag, file, operations: [operationData] })
     }
 
     return acc
@@ -111,7 +111,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
       const banner = (file: ast.FileNode) => resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
       const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
 
-      const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
+      const renderClassFile = (className: string, file: ast.FileNode, calls: Array<OperationCalls>) => {
+        const ops = calls.flat()
         const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
           file: op.typeFile,
           names: op.importedTypeNames,
@@ -167,7 +168,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
 
             {ops.some((op) => op.stream !== undefined) && <File.Source name="OmitStreamField">{omitStreamFieldType}</File.Source>}
 
-            <SdkClient name={className} operations={ops} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
+            <SdkClient name={className} operations={calls} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
           </File>
         )
       }

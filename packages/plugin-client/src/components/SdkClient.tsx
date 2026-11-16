@@ -55,12 +55,12 @@ type OperationData = {
   baseURL?: string
   stream?: boolean
   accept?: string
-  split?: 'json' | 'stream'
 }
 
 type Props = {
   name: string
-  operations: Array<OperationData>
+  /** One entry per operation: its call, or its JSON call and stream call. */
+  operations: Array<[OperationData] | [OperationData, OperationData]>
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
 }
@@ -85,35 +85,28 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
       stream: op.stream,
       accept: op.accept,
     })
-  // A split JSON-or-stream operation is its JSON call followed by its stream call, printed as one overloaded method.
-  const methods = operations.flatMap((op, index) => {
-    if (op.split === 'stream') return []
-    const next = operations[index + 1]
-    if (op.split === 'json' && next?.split === 'stream') {
-      return [
-        buildStreamOverloads({
+  // A JSON-or-stream operation is printed as one overloaded method.
+  const methods = operations.map(([op, stream]) =>
+    stream
+      ? buildStreamOverloads({
           name: op.name,
           comments: buildOperationComments(op.node, { splitLines: true }),
           json: bodyOf(op),
-          stream: bodyOf(next),
+          stream: bodyOf(stream),
           clientRef: 'this.client',
           method: true,
+        })
+      : buildSdkMethod({
+          node: op.node,
+          name: op.name,
+          types: op.types,
+          validatorHooks: op.validatorHooks,
+          security: op.security,
+          baseURL: op.baseURL,
+          returnType,
+          throwOnErrorDefault,
         }),
-      ]
-    }
-    return [
-      buildSdkMethod({
-        node: op.node,
-        name: op.name,
-        types: op.types,
-        validatorHooks: op.validatorHooks,
-        security: op.security,
-        baseURL: op.baseURL,
-        returnType,
-        throwOnErrorDefault,
-      }),
-    ]
-  })
+  )
 
   const constructor = [
     '  readonly client: ClientInstance',
