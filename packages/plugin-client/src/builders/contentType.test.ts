@@ -27,4 +27,23 @@ describe('buildContentType', () => {
       merge: true,
     })
   })
+
+  test('asks for text/event-stream when only the event stream next to another type has a schema', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'changes',
+      method: 'GET',
+      path: '/changes',
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({ contentType: 'application/json' }),
+            ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object' }) }),
+          ],
+        }),
+      ],
+    })
+
+    expect(buildContentType({ node })).toStrictEqual({ literal: "contentType: { response: 'text/event-stream' }", merge: false })
+  })
 })

@@ -20,6 +20,7 @@ import {
   resolveResponseTypes,
   resolveStatusCodeNames,
   resolveSuccessNames,
+  splitEventStream,
   toResponseContent,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
@@ -388,6 +389,58 @@ describe('toResponseContent', () => {
     const unknown = ast.factory.createSchema({ type: 'unknown' })
     expect(typeOf('application/x-www-form-urlencoded', unknown).schema).toBe(unknown)
     expect(typeOf('text/plain', unknown).schema).toStrictEqual(ast.factory.createSchema({ type: 'string' }))
+  })
+})
+
+describe('splitEventStream', () => {
+  const schema = (type: 'object' | 'boolean' | 'string') => ast.factory.createSchema({ type })
+  const withStream = (stream: ast.SchemaNode) =>
+    ast.factory.createSchema({ type: 'object', properties: [ast.factory.createProperty({ name: 'stream', schema: stream })] })
+  const json = ast.factory.createContent({ contentType: 'application/json', schema: schema('object') })
+  const events = ast.factory.createContent({ contentType: 'text/event-stream', schema: schema('object'), stream: {} })
+  const chat = ({ bodies = [withStream(schema('boolean'))], content = [json, events] }: { bodies?: Array<ast.SchemaNode>; content?: Array<ast.ContentNode> }) =>
+    ast.factory.createOperation({
+      operationId: 'createChat',
+      method: 'POST',
+      path: '/chat',
+      requestBody: {
+        content: bodies.map((body, index) => ast.factory.createContent({ contentType: index ? 'multipart/form-data' : 'application/json', schema: body })),
+      },
+      responses: [ast.factory.createResponse({ statusCode: '200', content })],
+    }) as ast.HttpOperationNode
+
+  test('splits JSON next to typed events into a JSON variant and a stream variant', () => {
+    const split = splitEventStream(chat({}))
+
+    expect(split).toMatchObject({ statusCode: '200', suffix: 'EventStream', restSuffix: 'Json', selector: true })
+    expect(split?.rest.responses[0]?.content).toStrictEqual([json])
+    expect(split?.stream.responses[0]?.content).toStrictEqual([events])
+  })
+
+  test.each([
+    { name: 'a boolean', bodies: [withStream(schema('boolean'))], selector: true },
+    {
+      name: 'a nullable boolean',
+      bodies: [withStream(ast.factory.createSchema({ type: 'boolean', nullable: true }))],
+      selector: true,
+    },
+    { name: 'a string', bodies: [withStream(schema('string'))], selector: false },
+    {
+      name: 'a `oneOf` member',
+      bodies: [ast.factory.createSchema({ type: 'union', members: [schema('object'), withStream(schema('boolean'))] })],
+      selector: true,
+    },
+    { name: 'a second request content type', bodies: [schema('object'), withStream(schema('boolean'))], selector: true },
+  ])('reads the `stream` selector on $name', ({ bodies, selector }) => {
+    expect(splitEventStream(chat({ bodies }))?.selector).toBe(selector)
+  })
+
+  test.each([
+    { name: 'stream-only', content: [events] },
+    { name: 'JSON-only', content: [json] },
+    { name: 'schemaless-stream', content: [json, ast.factory.createContent({ contentType: 'text/event-stream' })] },
+  ])('returns null for a $name response', ({ content }) => {
+    expect(splitEventStream(chat({ content }))).toBeNull()
   })
 })
 

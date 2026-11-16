@@ -231,13 +231,71 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
 }
 
 /**
- * Whether the primary success response offers `text/event-stream`, alone or next to other content types. The client asks
- * for the stream by default and ships the `sse.ts` runtime, so a mixed response can be read as events too.
+ * Whether the primary success response offers `text/event-stream`, alone or next to other content types, so the client
+ * ships the `sse.ts` runtime. A mixed response gets a `stream: true` overload, see `splitEventStream`.
  */
 export function hasEventStreamContent(node: ast.OperationNode): boolean {
   const entries = ast.http.responses.findPrimary(node)?.content ?? []
   // Next to another type, a stream without a schema gets no typed variant, so it keeps the plain call.
   return entries.some((entry) => getStreamFraming(entry) === 'events' && (entries.length === 1 || Boolean(entry.schema)))
+}
+
+/**
+ * The two calls an operation splits into when its primary success response offers `text/event-stream` with a schema next
+ * to another typed content type, such as the JSON-or-stream endpoints of LLM provider APIs:
+ * - `rest` keeps every other content type and returns a one-shot result
+ * - `stream` keeps only `text/event-stream` and returns typed events
+ *
+ * `suffix` is the stream variant's per-content-type suffix, such as `EventStream` in `CreateChatStatus200EventStream`, and
+ * `restSuffix` the other variant's, such as `Json`, when only one other content type is left.
+ * `selector` is whether the request body has a boolean `stream` property that picks the variant.
+ */
+type EventStreamSplit = {
+  statusCode: ast.StatusCode
+  suffix: string
+  restSuffix: string | null
+  selector: boolean
+  rest: ast.HttpOperationNode
+  stream: ast.HttpOperationNode
+}
+
+// Every request content type and every `oneOf` member is read, since any of them can carry the `stream` property.
+function hasStreamProperty(node: ast.HttpOperationNode): boolean {
+  const bodies = (node.requestBody?.content ?? []).flatMap(({ schema }) => {
+    if (!schema) return []
+    return ast.schema.narrow(ast.ref.getSchema(schema), 'union')?.members ?? [schema]
+  })
+  return bodies.some((body) =>
+    ast.schema.findProperties({ node: body, propertyName: 'stream' }).some(({ schema }) => ast.ref.getSchema(schema).type === 'boolean'),
+  )
+}
+
+/**
+ * Splits a JSON-or-stream operation into a one-shot call and a stream call, or returns `null` for any other operation.
+ */
+export function splitEventStream(node: ast.HttpOperationNode): EventStreamSplit | null {
+  const primary = ast.http.responses.findPrimary(node)
+  const entries = (primary?.content ?? []).filter((entry) => entry.schema)
+  const streamEntry = entries.find((entry) => getStreamFraming(entry) === 'events')
+  if (!primary || !streamEntry || entries.length < 2) return null
+
+  const withContent = (content: Array<ast.ContentNode>): ast.HttpOperationNode => ({
+    ...node,
+    responses: node.responses.map((response) => (response === primary ? { ...response, content } : response)),
+  })
+  const variants = resolveContentTypeVariants(entries, '')
+  const restVariants = variants.filter((item) => item.contentType !== streamEntry.contentType)
+  // shortcut: only a boolean `stream` property is detected, the name LLM provider APIs use. Add an option when one names it otherwise.
+  const selector = hasStreamProperty(node)
+
+  return {
+    statusCode: primary.statusCode,
+    suffix: variants.find((item) => item.contentType === streamEntry.contentType)!.suffix,
+    restSuffix: restVariants.length === 1 ? restVariants[0]!.suffix : null,
+    selector,
+    rest: withContent((primary.content ?? []).filter((entry) => entry !== streamEntry)),
+    stream: withContent([streamEntry]),
+  }
 }
 
 /**

@@ -240,6 +240,34 @@ const streamChatNode = ast.factory.createOperation({
   ],
 })
 
+// An LLM-style endpoint: the 200 offers JSON or typed events, and a boolean `stream` body property picks one.
+const createChatNode = ast.factory.createOperation({
+  operationId: 'createChat',
+  method: 'POST',
+  path: '/chat/completions',
+  requestBody: {
+    required: true,
+    content: [
+      ast.factory.createContent({
+        contentType: 'application/json',
+        schema: ast.factory.createSchema({
+          type: 'object',
+          properties: [ast.factory.createProperty({ name: 'stream', schema: ast.factory.createSchema({ type: 'boolean' }) })],
+        }),
+      }),
+    ],
+  },
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      content: [
+        ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }),
+        ast.factory.createContent({ contentType: 'text/event-stream', schema: streamChatSchema, stream: { schema: streamChatSchema, shape: 'event' } }),
+      ],
+    }),
+  ],
+})
+
 const securityMeta: ast.InputMeta = {
   auth: [
     { name: 'bearerAuth', credential: { type: 'http', scheme: 'bearer' } },
@@ -261,6 +289,10 @@ describe('clientGenerator operation', () => {
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
     // A `stream.shape` of `event` types each event by name.
     { name: 'streamChatTypedEvents', node: streamChatNode, options: {} },
+    // JSON next to typed events gets a `stream: true` overload.
+    { name: 'createChatSplit', node: createChatNode, options: {} },
+    // Without a `stream` body property, the body type stays as is.
+    { name: 'createChatSplitWithoutSelector', node: { ...createChatNode, requestBody: undefined }, options: {} },
     // An operation's own oauth2 requirement with its scopes.
     {
       name: 'addPetWithSecurity',
@@ -383,6 +415,25 @@ describe('clientGenerator with a custom client module', () => {
     })
 
     await matchFiles(driver.fileManager.files, 'getPetByIdFullCustomClientPath')
+  })
+  test('createChatSplitPlainCustomClientPath', async () => {
+    const options: PluginClient['resolvedOptions'] = { ...defaultOptions, returnType: 'plain', importPath: '@acme/api-client' }
+    const plugin = createMockedPlugin<PluginClient>({ name: 'plugin-client', options, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'createChatSplitPlainCustomClientPath',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperation(customClientGenerator, createChatNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverClient,
+    })
+
+    await matchFiles(driver.fileManager.files, 'createChatSplitPlainCustomClientPath')
   })
 })
 

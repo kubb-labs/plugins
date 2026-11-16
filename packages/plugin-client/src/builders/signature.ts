@@ -24,6 +24,10 @@ export type GroupedOptionsSignature = {
    * The function generics. One per-call `ThrowOnError` flag, defaulting to the plugin setting.
    */
   generics: Array<string>
+  /** The type of the `options` parameter, for the overload signatures of a split operation. */
+  optionsType: string
+  /** Whether `options` may be left out. */
+  isOptional: boolean
 }
 
 /**
@@ -71,5 +75,7 @@ export function buildGroupedOptionsSignature({
     paramsSignature,
     returnType: buildResultType({ node, types, returnType }),
     generics: [`ThrowOnError extends boolean = ${throwOnErrorDefault}`],
+    optionsType,
+    isOptional,
   }
 }

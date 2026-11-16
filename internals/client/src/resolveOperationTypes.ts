@@ -1,3 +1,4 @@
+import { getPerContentTypeName } from '@internals/shared'
 import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import type { PluginZod, ResolverZod } from '@kubb/plugin-zod'
@@ -82,6 +83,11 @@ export type OperationTypeSource = OperationTypeNames & {
    * The supplying plugin's own `group`, when it configured one.
    */
   group: Group | undefined
+  /**
+   * Resolves the name of one content type's body type for a status that documents several, such as
+   * `CreateChatStatus200EventStream` for the `EventStream` suffix.
+   */
+  contentVariant(node: ast.OperationNode, statusCode: ast.StatusCode, suffix: string): string
 }
 
 /**
@@ -135,7 +141,13 @@ export function resolveOperationTypes(driver: GeneratorDriver, pluginName: strin
 
     if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
       const resolver = driver.getResolver(pluginTsName)
-      return { response: resolver.response, resolver, output: pluginTs.options?.output, group: pluginTs.options?.group ?? undefined }
+      return {
+        response: resolver.response,
+        resolver,
+        output: pluginTs.options?.output,
+        group: pluginTs.options?.group ?? undefined,
+        contentVariant: (node, statusCode, suffix) => getPerContentTypeName(resolver.response.status(node, statusCode), suffix),
+      }
     }
 
     if (!pluginZod?.options?.inferred) {
@@ -149,8 +161,16 @@ export function resolveOperationTypes(driver: GeneratorDriver, pluginName: strin
       })
     }
 
-    const resolver = toZodTypeResolver(driver.getResolver(pluginZodName))
-    return { response: resolver.response, resolver, output: pluginZod.options.output, group: pluginZod.options.group ?? undefined }
+    const zodResolver = driver.getResolver(pluginZodName)
+    const resolver = toZodTypeResolver(zodResolver)
+    return {
+      response: resolver.response,
+      resolver,
+      output: pluginZod.options.output,
+      group: pluginZod.options.group ?? undefined,
+      // plugin-zod names the variant schema first and infers its type from that name.
+      contentVariant: (node, statusCode, suffix) => zodResolver.schema.type(getPerContentTypeName(zodResolver.response.status(node, statusCode), suffix)),
+    }
   })
 }
 

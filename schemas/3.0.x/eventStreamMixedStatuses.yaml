@@ -1,0 +1,24 @@
+openapi: 3.0.3
+info: { title: JSON or an event stream next to a second success status, version: '1' }
+paths:
+  /chat:
+    post:
+      operationId: createChat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, properties: { stream: { type: boolean } } }
+      responses:
+        '200':
+          description: A completion, or its chunks as events
+          content:
+            application/json:
+              schema: { type: object, properties: { id: { type: string } } }
+            text/event-stream:
+              schema: { type: object, properties: { id: { type: string }, delta: { type: string } } }
+        '202':
+          description: Accepted for later
+          content:
+            application/json:
+              schema: { type: object, properties: { jobId: { type: string } } }

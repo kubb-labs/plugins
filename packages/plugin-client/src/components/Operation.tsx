@@ -4,6 +4,8 @@ import { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
+import type { OperationData } from '../builders/operationData.ts'
+import { buildStreamOverloads } from '../builders/overloads.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
 import type { ReturnTypeOption } from '../types.ts'
@@ -68,6 +70,50 @@ export function Operation({ name, node, types, validatorHooks, returnType, throw
         <br />
         {body.statement}
       </Function>
+    </File.Source>
+  )
+}
+
+type StreamOverloadsProps = {
+  /** The unchanged call of a split JSON-or-stream operation. */
+  base: OperationData
+  /** The JSON call of the same operation. */
+  json: OperationData
+  /** The stream call of the same operation. */
+  stream: OperationData
+  returnType: ReturnTypeOption
+  throwOnErrorDefault: boolean
+}
+
+/**
+ * Renders a JSON-or-stream operation as one function with `stream: true`, `stream: false` and default overloads, see
+ * `buildStreamOverloads`.
+ */
+export function StreamOverloads({ base, json, stream, returnType, throwOnErrorDefault }: StreamOverloadsProps): KubbReactNode {
+  const bodyOf = (call: OperationData) =>
+    buildOperationBody({
+      node: call.node,
+      types: call.types,
+      validatorHooks: call.validatorHooks,
+      security: call.security,
+      authRequired: call.authRequired,
+      baseURL: call.baseURL,
+      returnType,
+      throwOnErrorDefault,
+      stream: call.stream,
+      accept: call.accept,
+    })
+
+  return (
+    <File.Source name={base.name} isExportable isIndexable>
+      {buildStreamOverloads({
+        name: base.name,
+        comments: buildOperationComments(base.node, { splitLines: true }),
+        base: bodyOf(base),
+        json: bodyOf(json),
+        stream: bodyOf(stream),
+        clientRef: 'client',
+      })}
     </File.Source>
   )
 }

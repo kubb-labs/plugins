@@ -18,6 +18,7 @@ export {
   hasEventStreamContent,
   hasStreamVariant,
   isEventStream,
+  splitEventStream,
   requestGroupOrder,
   operationFileEntry,
   resolveContentTypeVariants,
