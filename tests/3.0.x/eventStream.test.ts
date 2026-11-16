@@ -177,8 +177,7 @@ describe('a response that offers JSON or an event stream', () => {
       const events = []
       for await (const event of await listChangesStream()) events.push(event)
       expect(events).toMatchObject([{ data: { $schema: 'change' } }])
-      expect(accepts.at(-1)).toBe('text/event-stream')
-      expect(accepts[0]).not.toBe('text/event-stream')
+      expect(accepts).toStrictEqual(['application/json', 'text/event-stream'])
     } finally {
       await fs.rm(output, { recursive: true, force: true })
     }

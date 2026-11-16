@@ -259,10 +259,19 @@ type EventStreamSplit = {
   stream: ast.HttpOperationNode
 }
 
-function isBooleanSchema(schema: ast.SchemaNode): boolean {
+function getUnionMembers(schema: ast.SchemaNode): Array<ast.SchemaNode> {
   const resolved = ast.ref.getSchema(schema)
-  if (resolved.type === 'boolean') return true
-  return resolved.type === 'union' && (ast.schema.narrow(resolved, 'union')?.members ?? []).some((member) => ast.ref.getSchema(member).type === 'boolean')
+  return resolved.type === 'union' ? (ast.schema.narrow(resolved, 'union')?.members ?? []) : [schema]
+}
+
+function isBooleanSchema(schema: ast.SchemaNode): boolean {
+  return getUnionMembers(schema).some((member) => ast.ref.getSchema(member).type === 'boolean')
+}
+
+// Every request content type and every `oneOf` member is read, since any of them can carry the `stream` property.
+function hasStreamProperty(node: ast.HttpOperationNode): boolean {
+  const bodies = (node.requestBody?.content ?? []).flatMap((entry) => (entry.schema ? getUnionMembers(entry.schema) : []))
+  return bodies.some((body) => ast.schema.findProperties({ node: body, propertyName: 'stream' }).some(({ schema }) => isBooleanSchema(schema)))
 }
 
 /**
@@ -280,9 +289,8 @@ export function splitEventStream(node: ast.HttpOperationNode): EventStreamSplit 
   })
   const variants = resolveContentTypeVariants(entries, '')
   const restVariants = variants.filter((item) => item.contentType !== streamEntry.contentType)
-  const body = ast.http.requestBody.getSchema(node)
   // shortcut: only a boolean `stream` property is detected, the name LLM provider APIs use. Add an option when one names it otherwise.
-  const selector = Boolean(body && ast.schema.findProperties({ node: body, propertyName: 'stream' }).some(({ schema }) => isBooleanSchema(schema)))
+  const selector = hasStreamProperty(node)
 
   return {
     statusCode: primary.statusCode,

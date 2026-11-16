@@ -16,6 +16,7 @@ export function createChat<ThrowOnError extends boolean = true>(
     apiClient<Omit<CreateChatResponses, '200'> & { '200': CreateChatStatus200Json }, ThrowOnError>({
       method: 'POST',
       url: '/chat/completions',
+      contentType: { response: 'application/json' },
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),

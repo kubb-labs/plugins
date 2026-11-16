@@ -40,6 +40,7 @@ type Props = {
   /** The operation's own server URL from a path-level or operation-level `servers` entry, emitted as the call's default `baseURL`. */
   baseURL?: string
   stream?: boolean
+  accept?: string
 }
 
 /**
@@ -59,10 +60,11 @@ export function Operation({
   authRequired,
   baseURL,
   stream,
+  accept,
 }: Props): KubbReactNode {
   if (!ast.http.isOperation(node)) return null
 
-  const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault, stream })
+  const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault, stream, accept })
 
   return (
     <File.Source name={name} isExportable isIndexable>

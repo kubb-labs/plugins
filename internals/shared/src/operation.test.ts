@@ -435,6 +435,38 @@ describe('splitEventStream', () => {
     expect(splitEventStream(chatNode({ stream: ast.factory.createSchema({ type: 'string' }), content: [json, events] }))?.selector).toBe(false)
   })
 
+  test('detects `stream` on a `oneOf` member and on a second request content type', () => {
+    const member = (name: string) =>
+      ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({ name, schema: ast.factory.createSchema({ type: 'string' }) }),
+          ast.factory.createProperty({ name: 'stream', schema: ast.factory.createSchema({ type: 'boolean' }) }),
+        ],
+      })
+    const node = chatNode({ content: [json, events] })
+    const withBody = (content: Array<ast.ContentNode>) => ({ ...node, requestBody: { required: true, content } })
+
+    expect(
+      splitEventStream(
+        withBody([
+          ast.factory.createContent({
+            contentType: 'application/json',
+            schema: ast.factory.createSchema({ type: 'union', members: [member('prompt'), member('image')] }),
+          }),
+        ]),
+      )?.selector,
+    ).toBe(true)
+    expect(
+      splitEventStream(
+        withBody([
+          ast.factory.createContent({ contentType: 'application/json', schema: object() }),
+          ast.factory.createContent({ contentType: 'multipart/form-data', schema: member('file') }),
+        ]),
+      )?.selector,
+    ).toBe(true)
+  })
+
   test('returns null for a stream-only, JSON-only, or schemaless-stream response', () => {
     expect(splitEventStream(chatNode({ content: [events] }))).toBeNull()
     expect(splitEventStream(chatNode({ content: [json] }))).toBeNull()

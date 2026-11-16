@@ -35,6 +35,7 @@ export function buildCallConfig({
   throwOnErrorDefault,
   returnType,
   stream: streamBody,
+  accept,
 }: {
   node: ast.HttpOperationNode
   validatorHooks: ValidatorHooks | null
@@ -42,6 +43,10 @@ export function buildCallConfig({
    * Sets `stream` in the body after `...config`, so the call always asks for its own variant.
    */
   stream?: boolean
+  /**
+   * The response media type a split JSON call asks for.
+   */
+  accept?: string
   security?: Array<SecurityRequirement>
   baseURL?: string
   throwOnErrorDefault: boolean
@@ -55,7 +60,7 @@ export function buildCallConfig({
   const stylesLiteral = buildStyles({ node, merge: ownRuntime })
   const styles = stylesLiteral ? `styles: ${stylesLiteral}` : null
   const validatorLiteral = buildValidatorLiteral(validatorHooks, ['request', 'path', 'query', 'headers', 'cookies', 'response', 'error'])
-  const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
+  const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node, accept })
   // The runtime's call types `throwOnError` as the operation's `ThrowOnError`, which the shared helper keeps. A `'plain'`
   // client takes a boolean.
   const throwOnError = ownRuntime

@@ -4,7 +4,7 @@ import { getEventStream, operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
-import { resolveOperationCalls } from '../builders/operationData.ts'
+import { omitStreamFieldType, resolveOperationCalls } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { Operation } from '../components/Operation.tsx'
 import { ClientRuntime } from '../components/ClientRuntime.tsx'
@@ -79,6 +79,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
           )}
           {validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
 
+          {calls.some((call) => call.stream !== undefined) && <File.Source name="OmitStreamField">{omitStreamFieldType}</File.Source>}
           {calls.map((call) => (
             <Operation
               key={call.name}
@@ -92,6 +93,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
               authRequired={call.authRequired}
               baseURL={call.baseURL}
               stream={call.stream}
+              accept={call.accept}
             />
           ))}
         </File>

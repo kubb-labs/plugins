@@ -5,7 +5,7 @@ import { ensureValidVarName } from '@internals/utils'
 import { ast, defineGenerator, Diagnostics, memo } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
-import { type GeneratorContext, type OperationData, resolveOperationCalls } from '../builders/operationData.ts'
+import { type GeneratorContext, omitStreamFieldType, type OperationData, resolveOperationCalls } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
@@ -164,6 +164,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
               ))}
 
             {ops.some((op) => op.validatorHooks.headers) && <File.Import name={['toHeadersStandardSchema']} root={file.path} path={standardSchemaPath} />}
+
+            {ops.some((op) => op.stream !== undefined) && <File.Source name="OmitStreamField">{omitStreamFieldType}</File.Source>}
 
             <SdkClient name={className} operations={ops} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
           </File>

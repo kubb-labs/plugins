@@ -22,6 +22,7 @@ export function buildOperationBody({
   returnType,
   throwOnErrorDefault,
   stream,
+  accept,
 }: {
   node: ast.HttpOperationNode
   types: OperationTypeNames
@@ -32,6 +33,7 @@ export function buildOperationBody({
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
   stream?: boolean
+  accept?: string
 }): { generics: Array<string>; paramsSignature: string; returnType: string; statement: string; mergeContentType: boolean } {
   const { callConfig, mergeContentType, eventStream } = buildCallConfig({
     node,
@@ -41,6 +43,7 @@ export function buildOperationBody({
     throwOnErrorDefault,
     returnType,
     stream,
+    accept,
   })
   const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault, eventStream, authRequired })
   const streamReturn = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, throwOnErrorDefault }) : null

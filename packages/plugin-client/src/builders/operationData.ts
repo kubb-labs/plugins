@@ -1,5 +1,5 @@
 import { getResponseHeadersTypeNames, type OperationTypeNames, type OperationTypeSource } from '@internals/client'
-import { operationKey, resolveOperationFile, splitEventStream } from '@internals/shared'
+import { getResponseContentTypeInfo, operationKey, resolveOperationFile, splitEventStream } from '@internals/shared'
 import { ast, type Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import type { ContractClientFactory } from '../types.ts'
@@ -31,6 +31,10 @@ export type OperationData = {
    * The `stream` body property one call of a split JSON-or-stream operation sets.
    */
   stream?: boolean
+  /**
+   * The media type the JSON call of a split operation asks for, so a server that picks by `Accept` skips the stream.
+   */
+  accept?: string
   security?: Array<SecurityRequirement>
   authRequired: boolean
   baseURL?: string
@@ -77,10 +81,25 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
 }
 
 /**
+ * Leaves `stream` out of an options type's body. It distributes over a union of options, such as one per request content
+ * type, and over a union body, so each member keeps its own fields. Emitted once in each file that has a split call.
+ */
+export const omitStreamFieldType =
+  "type OmitStreamField<T> = T extends unknown ? { [K in keyof T]: K extends 'body' ? (T[K] extends infer B ? (B extends object ? Omit<B, 'stream'> : B) : never) : T[K] } : never"
+
+function getOperationNames(ctx: GeneratorContext): Set<string> {
+  return ctx.memo(`${ctx.plugin.name}:operationNames`, () => {
+    const operations = (ctx.driver.inputNode?.operations ?? []).filter(ast.http.isOperation)
+    return new Set(operations.map((operation) => ctx.resolver.resolveName({ key: operationKey(operation), name: ctx.resolver.name(operation.operationId) })))
+  })
+}
+
+/**
  * Resolves the calls one operation generates. A JSON-or-stream operation, whose primary success response offers
  * `text/event-stream` next to another typed content type, gets two: `<name>` without the stream and `<name>Stream` with
- * typed events. Each narrows the responses record to its own variant, and sets the `stream` body property when the body
- * has one, so that property is left out of its options type.
+ * typed events. Each narrows the responses record to its own variant and asks for its own media type, and sets the
+ * `stream` body property when the body has one, so that property is left out of its options type. When another operation
+ * already has the `<name>Stream` name, the operation keeps one call and a warning is reported.
  */
 export function resolveOperationCalls({
   node,
@@ -95,17 +114,21 @@ export function resolveOperationCalls({
   const split = splitEventStream(node)
   if (!split) return [data]
 
+  const streamName = `${data.name}Stream`
+  if (getOperationNames(ctx).has(streamName)) {
+    ctx.warn(`Operation "${node.operationId}" offers JSON or an event stream, but "${streamName}" is already an operation name, so it keeps one call.`, {
+      help: `Rename one of the two operations so the stream call can be named "${streamName}".`,
+    })
+    return [data]
+  }
+
   const options = types.response.options(node)
   const responses = types.response.responses(node)
   const status = `'${split.statusCode}'`
   const streamItem = types.contentVariant(node, split.statusCode, split.suffix)
   // One remaining content type is named like the stream variant. Several stay the record's `{ contentType; data }` union.
-  const restItem = split.restSuffix
-    ? types.contentVariant(node, split.statusCode, split.restSuffix)
-    : `Exclude<${responses}[${status}], { contentType: 'text/event-stream' }>`
-  const optionsType = split.selector
-    ? `Omit<${options}, 'body'> & { body${node.requestBody?.required ? '' : '?'}: Omit<NonNullable<${options}['body']>, 'stream'> }`
-    : options
+  const restItem = split.restSuffix ? types.contentVariant(node, split.statusCode, split.restSuffix) : null
+  const optionsType = split.selector ? `OmitStreamField<${options}>` : options
   const callTypes = (responsesType: string): OperationTypeNames => ({
     response: { options: () => optionsType, responses: () => responsesType, headers: types.response.headers?.bind(types.response) },
   })
@@ -114,17 +137,31 @@ export function resolveOperationCalls({
     {
       ...data,
       node: split.rest,
-      importedTypeNames: split.restSuffix ? [...data.importedTypeNames, restItem] : data.importedTypeNames,
-      types: callTypes(`Omit<${responses}, ${status}> & { ${status}: ${restItem} }`),
+      importedTypeNames: restItem ? [...data.importedTypeNames, restItem] : data.importedTypeNames,
+      types: callTypes(
+        `Omit<${responses}, ${status}> & { ${status}: ${restItem ?? `Exclude<${responses}[${status}], { contentType: 'text/event-stream' }>`} }`,
+      ),
+      accept: ast.mediaType.getBase(getResponseContentTypeInfo(split.rest).defaultContentType),
       stream: split.selector ? false : undefined,
     },
     {
       ...data,
       node: split.stream,
-      name: `${data.name}Stream`,
+      name: streamName,
       types: callTypes(`Omit<${responses}, ${status}> & { ${status}: ${streamItem} }`),
       importedTypeNames: [...data.importedTypeNames, streamItem],
       stream: split.selector ? true : undefined,
     },
   ]
+}
+
+declare global {
+  namespace Kubb {
+    interface MemoRegistry {
+      /**
+       * The resolved function names of every operation in the document, per client plugin.
+       */
+      operationNames: Set<string>
+    }
+  }
 }

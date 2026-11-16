@@ -22,6 +22,7 @@ export function buildSdkMethod({
   returnType,
   throwOnErrorDefault,
   stream,
+  accept,
 }: {
   node: ast.OperationNode
   name: string
@@ -32,10 +33,11 @@ export function buildSdkMethod({
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
   stream?: boolean
+  accept?: string
 }): string {
   if (!ast.http.isOperation(node)) return ''
 
-  const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault, stream })
+  const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault, stream, accept })
   const generics = body.generics.length ? `<${body.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { splitLines: true }))
 
@@ -55,6 +57,7 @@ type OperationData = {
   security?: Array<SecurityRequirement>
   baseURL?: string
   stream?: boolean
+  accept?: string
 }
 
 type Props = {
@@ -72,7 +75,7 @@ type Props = {
  * can add interceptors, and a per-call `client` option still overrides it for a one-off call.
  */
 export function SdkClient({ name, operations, returnType, throwOnErrorDefault }: Props): KubbReactNode {
-  const methods = operations.map(({ node, name: methodName, types, validatorHooks, security, baseURL, stream }) =>
+  const methods = operations.map(({ node, name: methodName, types, validatorHooks, security, baseURL, stream, accept }) =>
     buildSdkMethod({
       node,
       name: methodName,
@@ -83,6 +86,7 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
       returnType,
       throwOnErrorDefault,
       stream,
+      accept,
     }),
   )
 
