@@ -35,6 +35,10 @@ export type OperationData = {
    * The media type the JSON call of a split operation asks for, so a server that picks by `Accept` skips the stream.
    */
   accept?: string
+  /**
+   * Which overload of a split JSON-or-stream operation this call is.
+   */
+  split?: 'json' | 'stream'
   security?: Array<SecurityRequirement>
   authRequired: boolean
   baseURL?: string
@@ -87,19 +91,12 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
 export const omitStreamFieldType =
   "type OmitStreamField<T> = T extends unknown ? { [K in keyof T]: K extends 'body' ? (T[K] extends infer B ? (B extends object ? Omit<B, 'stream'> : B) : never) : T[K] } : never"
 
-function getOperationNames(ctx: GeneratorContext): Set<string> {
-  return ctx.memo(`${ctx.plugin.name}:operationNames`, () => {
-    const operations = (ctx.driver.inputNode?.operations ?? []).filter(ast.http.isOperation)
-    return new Set(operations.map((operation) => ctx.resolver.resolveName({ key: operationKey(operation), name: ctx.resolver.name(operation.operationId) })))
-  })
-}
-
 /**
  * Resolves the calls one operation generates. A JSON-or-stream operation, whose primary success response offers
- * `text/event-stream` next to another typed content type, gets two: `<name>` without the stream and `<name>Stream` with
- * typed events. Each narrows the responses record to its own variant and asks for its own media type, and sets the
- * `stream` body property when the body has one, so that property is left out of its options type. When another operation
- * already has the `<name>Stream` name, the operation keeps one call and a warning is reported.
+ * `text/event-stream` next to another typed content type, gets two under one name: the JSON call and the stream call, which
+ * the generators print as the two overloads of one function (`buildStreamOverloads`). Each narrows the responses record
+ * to its own variant and asks for its own media type, and sets the `stream` body property when the body has one, so that
+ * property is left out of its options type.
  */
 export function resolveOperationCalls({
   node,
@@ -113,14 +110,6 @@ export function resolveOperationCalls({
   const data = resolveOperationData({ node, ctx, types })
   const split = splitEventStream(node)
   if (!split) return [data]
-
-  const streamName = `${data.name}Stream`
-  if (getOperationNames(ctx).has(streamName)) {
-    ctx.warn(`Operation "${node.operationId}" offers JSON or an event stream, but "${streamName}" is already an operation name, so it keeps one call.`, {
-      help: `Rename one of the two operations so the stream call can be named "${streamName}".`,
-    })
-    return [data]
-  }
 
   const options = types.response.options(node)
   const responses = types.response.responses(node)
@@ -155,26 +144,16 @@ export function resolveOperationCalls({
       accept: ast.mediaType.getBase(getResponseContentTypeInfo(split.rest).defaultContentType),
       validatorHooks: variantHooks(split.restSuffix, false),
       stream: split.selector ? false : undefined,
+      split: 'json',
     },
     {
       ...data,
       node: split.stream,
-      name: streamName,
       validatorHooks: variantHooks(split.suffix, true),
       types: callTypes(`Omit<${responses}, ${status}> & { ${status}: ${streamItem} }`),
       importedTypeNames: [...data.importedTypeNames, streamItem],
       stream: split.selector ? true : undefined,
+      split: 'stream',
     },
   ]
-}
-
-declare global {
-  namespace Kubb {
-    interface MemoRegistry {
-      /**
-       * The resolved function names of every operation in the document, per client plugin.
-       */
-      operationNames: Set<string>
-    }
-  }
 }

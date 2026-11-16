@@ -129,7 +129,7 @@ describe('a response that offers JSON or an event stream', () => {
   test.each([
     { name: 'axios', clientPlugin: pluginAxios },
     { name: 'fetch', clientPlugin: pluginFetch },
-  ])('splits the $name call into a JSON call and a stream call, and ships the runtime to parse events', async ({ clientPlugin }) => {
+  ])('gives the $name call a stream overload, and ships the runtime to parse events', async ({ clientPlugin }) => {
     const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-'))
     try {
       await generate({ output, clientPlugin })
@@ -139,10 +139,10 @@ describe('a response that offers JSON or an event stream', () => {
 
       const client = await fs.readFile(path.join(output, 'clients', 'listChanges.ts'), 'utf8')
       expect(client).toContain(
-        "export function listChanges<ThrowOnError extends boolean = true>(options: Options<ListChangesOptions, ThrowOnError> = {}): Unwrappable<RequestResult<Omit<ListChangesResponses, '200'> & { '200': ListChangesStatus200Json }, ThrowOnError>>",
+        "export function listChanges<ThrowOnError extends boolean = true>(options: StreamOptions<ListChangesOptions, ThrowOnError> & { stream: true }): Unwrappable<StreamResult<Omit<ListChangesResponses, '200'> & { '200': ListChangesStatus200EventStream }, ThrowOnError>>",
       )
       expect(client).toContain(
-        "export function listChangesStream<ThrowOnError extends boolean = true>(options: StreamOptions<ListChangesOptions, ThrowOnError> = {}): Unwrappable<StreamResult<Omit<ListChangesResponses, '200'> & { '200': ListChangesStatus200EventStream }, ThrowOnError>>",
+        "export function listChanges<ThrowOnError extends boolean = true>(options?: Options<ListChangesOptions, ThrowOnError> & { stream?: false }): Unwrappable<RequestResult<Omit<ListChangesResponses, '200'> & { '200': ListChangesStatus200Json }, ThrowOnError>>",
       )
       expect(client.match(/contentType: \{ response: 'text\/event-stream' \}/g)).toHaveLength(1)
 
@@ -177,7 +177,7 @@ describe('a response that offers JSON or an event stream', () => {
 
       const client = await fs.readFile(path.join(output, 'clients', 'listChanges.ts'), 'utf8')
       const responseValidators = [...client.matchAll(/validator: \{ response: (\w+)/g)].map((match) => match[1])
-      expect(responseValidators).toStrictEqual(['listChangesStatus200SchemaJson', 'listChangesStatus200SchemaEventStream'])
+      expect(responseValidators).toStrictEqual(['listChangesStatus200SchemaEventStream', 'listChangesStatus200SchemaJson'])
 
       const zod = await fs.readFile(path.join(output, 'zod', 'listChangesSchema.ts'), 'utf8')
       for (const name of responseValidators) expect(zod).toContain(`export const ${name}`)
@@ -213,10 +213,10 @@ describe('a response that offers JSON or an event stream', () => {
         baseURL: 'https://api.test',
         transport: async () => new Response('data: {"id":"1","delta":"hi"}\n\n', { headers: { 'Content-Type': 'text/event-stream' } }),
       })
-      const { createChatStream } = await import(pathToFileURL(path.join(output, 'clients/createChat.ts')).href)
+      const { createChat } = await import(pathToFileURL(path.join(output, 'clients/createChat.ts')).href)
 
       const events = []
-      for await (const event of await createChatStream({ body: {} })) events.push(event)
+      for await (const event of await createChat({ body: {}, stream: true })) events.push(event)
       // `Completion` declares only `id`, so validating with the success union would strip `delta`.
       expect(events).toMatchObject([{ data: { id: '1', delta: 'hi' } }])
     } finally {
@@ -241,12 +241,12 @@ describe('a response that offers JSON or an event stream', () => {
             : Response.json({ $schema: 'change' })
         },
       })
-      const { listChanges, listChangesStream } = await import(pathToFileURL(path.join(output, 'clients/listChanges.ts')).href)
+      const { listChanges } = await import(pathToFileURL(path.join(output, 'clients/listChanges.ts')).href)
 
       expect(await listChanges()).toMatchObject({ contentType: 'application/json', data: { $schema: 'change' } })
 
       const events = []
-      for await (const event of await listChangesStream()) events.push(event)
+      for await (const event of await listChanges({ stream: true })) events.push(event)
       expect(events).toMatchObject([{ data: { $schema: 'change' } }])
       expect(accepts).toStrictEqual(['application/json', 'text/event-stream'])
     } finally {

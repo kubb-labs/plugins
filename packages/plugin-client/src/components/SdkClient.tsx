@@ -5,6 +5,7 @@ import { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
+import { buildStreamOverloads } from '../builders/overloads.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
 import type { ReturnTypeOption } from '../types.ts'
@@ -58,6 +59,7 @@ type OperationData = {
   baseURL?: string
   stream?: boolean
   accept?: string
+  split?: 'json' | 'stream'
 }
 
 type Props = {
@@ -75,20 +77,49 @@ type Props = {
  * can add interceptors, and a per-call `client` option still overrides it for a one-off call.
  */
 export function SdkClient({ name, operations, returnType, throwOnErrorDefault }: Props): KubbReactNode {
-  const methods = operations.map(({ node, name: methodName, types, validatorHooks, security, baseURL, stream, accept }) =>
-    buildSdkMethod({
-      node,
-      name: methodName,
-      types,
-      validatorHooks,
-      security,
-      baseURL,
+  const bodyOf = (op: OperationData) =>
+    buildOperationBody({
+      node: op.node as ast.HttpOperationNode,
+      types: op.types,
+      validatorHooks: op.validatorHooks,
+      security: op.security,
+      baseURL: op.baseURL,
       returnType,
       throwOnErrorDefault,
-      stream,
-      accept,
-    }),
-  )
+      stream: op.stream,
+      accept: op.accept,
+    })
+  // A split JSON-or-stream operation is its JSON call followed by its stream call, printed as one overloaded method.
+  const methods = operations.flatMap((op, index) => {
+    if (op.split === 'stream') return []
+    const next = operations[index + 1]
+    if (op.split === 'json' && next?.split === 'stream') {
+      return [
+        buildStreamOverloads({
+          name: op.name,
+          comments: buildOperationComments(op.node, { splitLines: true }),
+          json: bodyOf(op),
+          stream: bodyOf(next),
+          clientRef: 'this.client',
+          method: true,
+        }),
+      ]
+    }
+    return [
+      buildSdkMethod({
+        node: op.node,
+        name: op.name,
+        types: op.types,
+        validatorHooks: op.validatorHooks,
+        security: op.security,
+        baseURL: op.baseURL,
+        returnType,
+        throwOnErrorDefault,
+        stream: op.stream,
+        accept: op.accept,
+      }),
+    ]
+  })
 
   const constructor = [
     '  readonly client: ClientInstance',

@@ -6,7 +6,7 @@ import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { omitStreamFieldType, resolveOperationCalls } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
-import { Operation } from '../components/Operation.tsx'
+import { Operation, StreamOverloads } from '../components/Operation.tsx'
 import { ClientRuntime } from '../components/ClientRuntime.tsx'
 import type { ContractClientFactory } from '../types.ts'
 
@@ -79,22 +79,21 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
           {data.validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
 
           {calls.some((call) => call.stream !== undefined) && <File.Source name="OmitStreamField">{omitStreamFieldType}</File.Source>}
-          {calls.map((call) => (
+          {calls.length === 2 ? (
+            <StreamOverloads calls={[calls[0]!, calls[1]!]} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
+          ) : (
             <Operation
-              key={call.name}
-              name={call.name}
-              node={call.node}
-              types={call.types}
-              validatorHooks={call.validatorHooks}
+              name={data.name}
+              node={data.node}
+              types={data.types}
+              validatorHooks={data.validatorHooks}
               returnType={returnType}
               throwOnErrorDefault={throwOnErrorDefault}
-              security={call.security}
-              authRequired={call.authRequired}
-              baseURL={call.baseURL}
-              stream={call.stream}
-              accept={call.accept}
+              security={data.security}
+              authRequired={data.authRequired}
+              baseURL={data.baseURL}
             />
-          ))}
+          )}
         </File>
       )
     },

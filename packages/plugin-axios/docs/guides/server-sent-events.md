@@ -14,7 +14,7 @@ Kubb generates a stream call when the success response declares only a stream co
 | `text/event-stream`, with any other item schema                                            | `ServerSentEvent<Item>`, with `Item` in `data` |
 | `application/jsonl`, `application/x-ndjson`, `application/json-seq`, or a `+json-seq` type | `Item`, one per line                           |
 
-With `text/event-stream` next to another content type, Kubb generates a normal call and a stream call. See [JSON or an event stream](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events#json-or-an-event-stream).
+With `text/event-stream` next to another content type, the call gets a `stream: true` overload that returns the events. See [JSON or an event stream](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events#json-or-an-event-stream).
 
 The item schema is `itemSchema` in OpenAPI 3.2. In OpenAPI 3.0 and 3.1, `schema` describes one event or one line:
 
@@ -202,20 +202,20 @@ An error thrown from the loop skips `client.interceptors.error`. `.unwrap()` res
 
 ## JSON or an event stream
 
-LLM provider APIs, such as OpenAI's `POST /chat/completions`, offer `application/json` and `text/event-stream` on one success response, and a `stream` field in the body picks one. When the event stream has a schema, Kubb generates two calls:
+LLM provider APIs, such as OpenAI's `POST /chat/completions`, offer `application/json` and `text/event-stream` on one success response, and a `stream` field in the body picks one. When the event stream has a schema, Kubb generates one function with two overloads:
 
-- `createChat` leaves the event stream out and returns the JSON result.
-- `createChatStream` asks for `text/event-stream` and returns typed events, like a stream-only operation.
+- `createChat({ body })` asks for `application/json` and returns the JSON result.
+- `createChat({ body, stream: true })` asks for `text/event-stream` and returns typed events, like a stream-only operation.
 
-When the body has a boolean `stream` property, each call sets it, `false` or `true`, and leaves it out of its options type:
+When the body has a boolean `stream` property, the call sets it from the `stream` option and leaves it out of the body type:
 
 ```typescript
 const completion = await createChat({ body: { model, messages } }).unwrap()
 
-for await (const event of await createChatStream({ body: { model, messages } })) render(event)
+for await (const event of await createChat({ body: { model, messages }, stream: true })) render(event)
 ```
 
-The query hooks wrap the JSON call. The stream call gets no hook, like a stream-only operation.
+Pass `stream` as the literal `true`, or leave it out. A `boolean` variable matches neither overload, so narrow it first. `ReturnType<typeof createChat>` is the JSON result. The query hooks wrap the JSON call.
 
 ## Stream with the client
 

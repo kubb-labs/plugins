@@ -2,7 +2,7 @@ import type { Config, PluginType } from '@kubb/kit'
 import { ast, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import {
   createMockedAdapter,
   createMockedPlugin,
@@ -294,7 +294,7 @@ describe('clientGenerator operation', () => {
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
     // A `stream.shape` of `event` types each event by name.
     { name: 'streamChatTypedEvents', node: streamChatNode, options: {} },
-    // JSON next to typed events splits into `createChat` and `createChatStream`, each setting `stream` in the body.
+    // JSON next to typed events becomes one `createChat` with a `stream: true` overload, each call setting `stream` in the body.
     { name: 'createChatSplit', node: createChatNode, options: {} },
     // Without a `stream` body property, the split keeps the options type and the body as they are.
     { name: 'createChatSplitWithoutSelector', node: { ...createChatNode, requestBody: undefined }, options: {} },
@@ -379,35 +379,6 @@ describe('clientGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
-  })
-})
-
-describe('clientGenerator with a stream name that is taken', () => {
-  test('keeps one call and warns when another operation is named <name>Stream', async () => {
-    const options: PluginFetch['resolvedOptions'] = { ...defaultOptions }
-    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options, resolver: resolverClient })
-    const driver = createMockedPluginDriver({
-      name: 'createChatSplitNameTaken',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-    const taken = ast.factory.createOperation({ operationId: 'createChatStream', method: 'GET', path: '/chat/stream', responses: [] })
-    Object.assign(driver, { inputNode: { schemas: [], operations: [createChatNode, taken] } })
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-
-    await renderGeneratorOperation(clientGenerator, createChatNode, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverClient,
-    })
-
-    const source = rawSources(driver.fileManager.files).join('\n')
-    expect(source).toContain('export function createChat<')
-    expect(source).not.toContain('createChatStream')
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('"createChatStream" is already an operation name'))
-    warn.mockRestore()
   })
 })
 

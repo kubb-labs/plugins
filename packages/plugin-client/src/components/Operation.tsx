@@ -4,6 +4,8 @@ import { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
+import type { OperationData } from '../builders/operationData.ts'
+import { buildStreamOverloads } from '../builders/overloads.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
 import type { ReturnTypeOption } from '../types.ts'
@@ -82,6 +84,48 @@ export function Operation({
         <br />
         {body.statement}
       </Function>
+    </File.Source>
+  )
+}
+
+type StreamOverloadsProps = {
+  /**
+   * The JSON call and the stream call of a split JSON-or-stream operation, in that order.
+   */
+  calls: [OperationData, OperationData]
+  returnType: ReturnTypeOption
+  throwOnErrorDefault: boolean
+}
+
+/**
+ * Renders a JSON-or-stream operation as one function with a `stream: true` overload for the typed events and a JSON
+ * overload, see `buildStreamOverloads`.
+ */
+export function StreamOverloads({ calls, returnType, throwOnErrorDefault }: StreamOverloadsProps): KubbReactNode {
+  const [json, stream] = calls.map((call) =>
+    buildOperationBody({
+      node: call.node,
+      types: call.types,
+      validatorHooks: call.validatorHooks,
+      security: call.security,
+      authRequired: call.authRequired,
+      baseURL: call.baseURL,
+      returnType,
+      throwOnErrorDefault,
+      stream: call.stream,
+      accept: call.accept,
+    }),
+  )
+
+  return (
+    <File.Source name={calls[0].name} isExportable isIndexable>
+      {buildStreamOverloads({
+        name: calls[0].name,
+        comments: buildOperationComments(calls[0].node, { splitLines: true }),
+        json: json!,
+        stream: stream!,
+        clientRef: 'client',
+      })}
     </File.Source>
   )
 }

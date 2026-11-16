@@ -7,6 +7,16 @@ import type { SecurityRequirement } from './security.ts'
 import { buildGroupedOptionsSignature } from './signature.ts'
 import type { ValidatorHooks } from './validator.ts'
 
+export type OperationBody = {
+  generics: Array<string>
+  paramsSignature: string
+  optionsType: string
+  isOptional: boolean
+  returnType: string
+  statement: string
+  mergeContentType: boolean
+}
+
 /**
  * The pieces of a generated operation: its generics, `options` parameter, return type, return statement, and whether the
  * body destructures `contentType` from `options`. Shared by the standalone functions and the SDK methods, so a
@@ -34,7 +44,7 @@ export function buildOperationBody({
   throwOnErrorDefault: boolean
   stream?: boolean
   accept?: string
-}): { generics: Array<string>; paramsSignature: string; returnType: string; statement: string; mergeContentType: boolean } {
+}): OperationBody {
   const { callConfig, mergeContentType, eventStream } = buildCallConfig({
     node,
     validatorHooks,
@@ -51,6 +61,8 @@ export function buildOperationBody({
   return {
     generics: signature.generics,
     paramsSignature: signature.paramsSignature,
+    optionsType: signature.optionsType,
+    isOptional: signature.isOptional,
     returnType: streamReturn?.returnType ?? signature.returnType,
     statement: streamReturn?.statement ?? buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault }),
     mergeContentType,
