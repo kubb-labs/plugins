@@ -41,8 +41,6 @@ type Props = {
   authRequired?: boolean
   /** The operation's own server URL from a path-level or operation-level `servers` entry, emitted as the call's default `baseURL`. */
   baseURL?: string
-  stream?: boolean
-  accept?: string
 }
 
 /**
@@ -51,22 +49,10 @@ type Props = {
  * type, signature, and call config are built with the AST factory, and only the jsx-renderer emits
  * the source.
  */
-export function Operation({
-  name,
-  node,
-  types,
-  validatorHooks,
-  returnType,
-  throwOnErrorDefault,
-  security,
-  authRequired,
-  baseURL,
-  stream,
-  accept,
-}: Props): KubbReactNode {
+export function Operation({ name, node, types, validatorHooks, returnType, throwOnErrorDefault, security, authRequired, baseURL }: Props): KubbReactNode {
   if (!ast.http.isOperation(node)) return null
 
-  const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault, stream, accept })
+  const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault })
 
   return (
     <File.Source name={name} isExportable isIndexable>
@@ -90,9 +76,13 @@ export function Operation({
 
 type StreamOverloadsProps = {
   /**
-   * The JSON call and the stream call of a split JSON-or-stream operation, in that order.
+   * The JSON call of a split JSON-or-stream operation.
    */
-  calls: [OperationData, OperationData]
+  json: OperationData
+  /**
+   * The stream call of the same operation.
+   */
+  stream: OperationData
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
 }
@@ -101,8 +91,8 @@ type StreamOverloadsProps = {
  * Renders a JSON-or-stream operation as one function with a `stream: true` overload for the typed events and a JSON
  * overload, see `buildStreamOverloads`.
  */
-export function StreamOverloads({ calls, returnType, throwOnErrorDefault }: StreamOverloadsProps): KubbReactNode {
-  const [json, stream] = calls.map((call) =>
+export function StreamOverloads({ json, stream, returnType, throwOnErrorDefault }: StreamOverloadsProps): KubbReactNode {
+  const bodyOf = (call: OperationData) =>
     buildOperationBody({
       node: call.node,
       types: call.types,
@@ -114,16 +104,15 @@ export function StreamOverloads({ calls, returnType, throwOnErrorDefault }: Stre
       throwOnErrorDefault,
       stream: call.stream,
       accept: call.accept,
-    }),
-  )
+    })
 
   return (
-    <File.Source name={calls[0].name} isExportable isIndexable>
+    <File.Source name={json.name} isExportable isIndexable>
       {buildStreamOverloads({
-        name: calls[0].name,
-        comments: buildOperationComments(calls[0].node, { splitLines: true }),
-        json: json!,
-        stream: stream!,
+        name: json.name,
+        comments: buildOperationComments(json.node, { splitLines: true }),
+        json: bodyOf(json),
+        stream: bodyOf(stream),
         clientRef: 'client',
       })}
     </File.Source>

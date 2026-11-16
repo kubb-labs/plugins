@@ -22,8 +22,6 @@ export function buildSdkMethod({
   baseURL,
   returnType,
   throwOnErrorDefault,
-  stream,
-  accept,
 }: {
   node: ast.OperationNode
   name: string
@@ -33,12 +31,10 @@ export function buildSdkMethod({
   baseURL?: string
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
-  stream?: boolean
-  accept?: string
 }): string {
   if (!ast.http.isOperation(node)) return ''
 
-  const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault, stream, accept })
+  const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault })
   const generics = body.generics.length ? `<${body.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { splitLines: true }))
 
@@ -115,8 +111,6 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
         baseURL: op.baseURL,
         returnType,
         throwOnErrorDefault,
-        stream: op.stream,
-        accept: op.accept,
       }),
     ]
   })

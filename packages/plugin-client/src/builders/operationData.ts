@@ -106,7 +106,7 @@ export function resolveOperationCalls({
   node: ast.HttpOperationNode
   ctx: GeneratorContext
   types: OperationTypeSource
-}): Array<OperationData> {
+}): [OperationData] | [json: OperationData, stream: OperationData] {
   const data = resolveOperationData({ node, ctx, types })
   const split = splitEventStream(node)
   if (!split) return [data]

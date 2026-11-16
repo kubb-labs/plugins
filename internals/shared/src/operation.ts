@@ -232,7 +232,7 @@ export function hasTextEventData(node: ast.OperationNode): boolean | Array<strin
 
 /**
  * Whether the primary success response offers `text/event-stream`, alone or next to other content types, so the client
- * ships the `sse.ts` runtime. A mixed response gets a separate stream call, see `splitEventStream`.
+ * ships the `sse.ts` runtime. A mixed response gets a `stream: true` overload, see `splitEventStream`.
  */
 export function hasEventStreamContent(node: ast.OperationNode): boolean {
   const entries = ast.http.responses.findPrimary(node)?.content ?? []

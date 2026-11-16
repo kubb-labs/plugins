@@ -31,7 +31,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       const types = importPath === undefined ? resolvedTypes : { ...resolvedTypes, response: { ...resolvedTypes.response, headers: undefined } }
 
       const calls = resolveOperationCalls({ node, ctx, types })
-      const data = calls[0]!
+      const [data, stream] = calls
       const { headerTypeNames } = data
       const zodNames = Array.from(new Set(calls.flatMap((call) => call.validatorHooks.importedZodNames)))
       const file = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
@@ -79,8 +79,8 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
           {data.validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
 
           {calls.some((call) => call.stream !== undefined) && <File.Source name="OmitStreamField">{omitStreamFieldType}</File.Source>}
-          {calls.length === 2 ? (
-            <StreamOverloads calls={[calls[0]!, calls[1]!]} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
+          {data.split === 'json' && stream?.split === 'stream' ? (
+            <StreamOverloads json={data} stream={stream} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
           ) : (
             <Operation
               name={data.name}
