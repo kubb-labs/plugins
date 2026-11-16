@@ -10,7 +10,8 @@ Pass these options to `pluginClient()`. Shared options link to [Shared plugin op
 | [`returnType`](#returntype)                                               | What a generated function resolves to.                                              | `'plain'`                                        |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | `throwOnError` value each call passes to your client.                               | `true`                                           |
 | [`validator`](#validator)                                                 | Zod schemas to pass to your client.                                                 | `false`                                          |
-| [`auth`](#auth)                                                           | Make `auth` required on operations that need a token.                               | `'optional'`                                     |
+| [`auth`](#auth)                                                           | How generated functions handle the `auth` option.                                   | None                                             |
+| [`auth.mode`](#auth)                                                      | Make `auth` required on operations that need a token.                               | `'optional'`                                     |
 | [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                                            | `{ path: 'clients', barrel: { type: 'named' } }` |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                                        | None                                             |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                                    | None                                             |
@@ -112,18 +113,17 @@ Opts in per slot: `request` for the body, `params` for the path, query, header, 
 
 ### auth
 
-With `'required'`, makes `auth` a required option on a generated function whose operation needs a security scheme, so a missing token fails at compile time. An operation without `security`, or one that allows `{}` (anonymous access), keeps `auth` optional.
+With `mode: 'required'`, makes `auth` a required option on a generated function whose operation needs a security scheme, so a missing token fails at compile time. An operation without `security`, or one that allows `{}` (anonymous access), keeps `auth` optional.
 
-The required type is read from the `auth` key of your module's `Options`, so that type must have one. Keep `'optional'` with the query-hook plugins, which pass a partial config to the function.
+The required type is read from the `auth` key of your module's `Options`, so that type must have one. Keep `mode: 'optional'` with the query-hook plugins, which pass a partial config to the function.
 
-|          |                            |
-| -------- | -------------------------- |
-| Type     | `'optional' \| 'required'` |
-| Required | `false`                    |
-| Default  | `'optional'`               |
+|          |                                       |
+| -------- | ------------------------------------- |
+| Type     | `{ mode?: 'optional' \| 'required' }` |
+| Required | `false`                               |
 
 ```ts
-// with pluginClient({ importPath: '../client', auth: 'required' })
+// with pluginClient({ importPath: '../client', auth: { mode: 'required' } })
 await addPet({ body, auth: () => getToken() })
 await addPet({ body }) // Type error: `auth` is missing
 ```

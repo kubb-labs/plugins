@@ -11,7 +11,8 @@ Pass these options to `pluginAxios()`. Shared options link to [Shared plugin opt
 | [`baseURL`](#baseurl)                                                     | Base URL the client starts with.                            | None                                             |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | Throw on a non-2xx response unless a call says otherwise.   | `true`                                           |
 | [`validator`](#validator)                                                 | Validate requests and responses with Zod.                   | `false`                                          |
-| [`auth`](#auth)                                                           | Make `auth` required on operations that need a token.       | `'optional'`                                     |
+| [`auth`](#auth)                                                           | How generated functions handle the `auth` option.           | None                                             |
+| [`auth.mode`](#auth)                                                      | Make `auth` required on operations that need a token.       | `'optional'`                                     |
 | [`returnType`](#returntype)                                               | What a call resolves to.                                    | `'full'`                                         |
 | [`sdk`](#sdk)                                                             | Generate classes instead of standalone functions.           | None                                             |
 | [`sdk.mode`](#sdk)                                                        | One class per tag, or one class with every operation.       | `'tag'`                                          |
@@ -101,18 +102,17 @@ See [Turn validation off at runtime](https://kubb.dev/extensions/kubb-labs/plugi
 
 ### auth
 
-With `'required'`, makes `auth` a required option on a generated function whose operation needs a security scheme, so a missing token fails at compile time. An operation without `security`, or one that allows `{}` (anonymous access), keeps `auth` optional.
+With `mode: 'required'`, makes `auth` a required option on a generated function whose operation needs a security scheme, so a missing token fails at compile time. An operation without `security`, or one that allows `{}` (anonymous access), keeps `auth` optional.
 
-Keep `'optional'` when `client.setConfig({ auth })` supplies the token, and with the query-hook plugins, which pass a partial config to the function. SDK classes take `auth` in their constructor and ignore this option.
+Keep `mode: 'optional'` when `client.setConfig({ auth })` supplies the token, and with the query-hook plugins, which pass a partial config to the function. SDK classes take `auth` in their constructor and ignore this option.
 
-|          |                            |
-| -------- | -------------------------- |
-| Type     | `'optional' \| 'required'` |
-| Required | `false`                    |
-| Default  | `'optional'`               |
+|          |                                       |
+| -------- | ------------------------------------- |
+| Type     | `{ mode?: 'optional' \| 'required' }` |
+| Required | `false`                               |
 
 ```ts
-// with pluginAxios({ auth: 'required' })
+// with pluginAxios({ auth: { mode: 'required' } })
 await addPet({ body, auth: () => getToken() })
 await addPet({ body }) // Type error: `auth` is missing
 ```
