@@ -19,7 +19,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { driver, resolver, config, root } = ctx
+    const { resolver, config, root } = ctx
     const { output, parser, baseURL, group } = ctx.options
 
     const fileName = resolver.name(node.operationId)
@@ -29,7 +29,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     }
 
     const fakerPlugin = parser === 'faker' ? ctx.requirePlugin(pluginFakerName) : null
-    const fakerResolver = fakerPlugin ? driver.getResolver(pluginFakerName) : null
+    const fakerResolver = fakerPlugin ? ctx.getResolver(pluginFakerName) : null
     const faker =
       fakerPlugin && fakerResolver
         ? {
@@ -46,7 +46,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         : null
 
     const pluginTs = ctx.requirePlugin(pluginTsName)
-    const tsResolver = driver.getResolver(pluginTsName)
+    const tsResolver = ctx.getResolver(pluginTsName)
 
     const type = {
       file: resolveOperationFile({

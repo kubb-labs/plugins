@@ -101,7 +101,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
         })
       }
 
-      const types = resolveOperationTypes(ctx.driver, ctx.plugin.name)
+      const types = resolveOperationTypes(ctx, ctx.plugin.name)
 
       const validatorEnabled = isValidatorEnabled(validator)
       const controllers = buildControllers(nodes, ctx, types)

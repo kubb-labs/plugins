@@ -53,7 +53,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
     },
     operation(node, ctx) {
       if (!ast.http.isOperation(node)) return null
-      const { driver, resolver, root } = ctx
+      const { resolver, root } = ctx
       const { output, query, infinite: infiniteConfig, client, group, customOptions, hooks } = ctx.options
 
       const infiniteOptions = infinite && infiniteConfig && typeof infiniteConfig === 'object' ? infiniteConfig : null
@@ -65,7 +65,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
         if (pageParamsWarning) ctx.warn(pageParamsWarning)
       }
 
-      const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
+      const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, ctx, node, root, output })
       if (!contractOp) return null
 
       const importPath = query ? query.importPath : '@tanstack/react-query'
@@ -74,7 +74,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
       const queryOptionsName = variantResolver.optionsName(node)
       const queryKeyName = variantResolver.keyName(node)
       const queryKeyTypeName = variantResolver.keyTypeName(node)
-      const tsResolver = resolveOperationTypes(driver, resolver.pluginName).resolver
+      const tsResolver = resolveOperationTypes(ctx, resolver.pluginName).resolver
 
       const hook = resolveHookFile(node, ctx, {
         name: queryName,

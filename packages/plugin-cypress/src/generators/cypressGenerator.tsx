@@ -15,12 +15,12 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { config, resolver, driver, root } = ctx
+    const { config, resolver, root } = ctx
     const { output, baseURL, group } = ctx.options
 
     const pluginTs = ctx.requirePlugin(pluginTsName)
 
-    const tsResolver = driver.getResolver(pluginTsName)
+    const tsResolver = ctx.getResolver(pluginTsName)
 
     const importedTypeNames = [tsResolver.response.options(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })]
     const name = resolver.name(node.operationId)

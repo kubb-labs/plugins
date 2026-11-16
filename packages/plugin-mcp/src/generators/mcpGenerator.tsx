@@ -18,14 +18,14 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     if (!ast.http.isOperation(node)) return null
     // A stream has no single JSON body to return as tool output, like the query plugins skip it.
     if (isEventStream(node) || hasStreamVariant(node)) return null
-    const { resolver, driver, root, config } = ctx
+    const { resolver, root, config } = ctx
     const { output, client, group } = ctx.options
 
-    const types = resolveOperationTypes(driver, resolver.pluginName)
+    const types = resolveOperationTypes(ctx, resolver.pluginName)
     const tsResolver = types.resolver
 
     // The registered contract client plugin owns the `<op>` the handler imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, ctx, node, root, output })
     if (!contractOp) {
       return null
     }

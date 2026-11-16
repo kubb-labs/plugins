@@ -24,7 +24,7 @@ describe('resolveClientOperation', () => {
     const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
     const driver = createDriver()
 
-    const result = resolveClientOperation({ clientPlugin: null, driver, node, root: '/root', output: { path: '.' }, memo: createTestMemo() })
+    const result = resolveClientOperation({ clientPlugin: null, ctx: { ...driver, memo: createTestMemo() }, node, root: '/root', output: { path: '.' } })
 
     expect(result).toBeNull()
     expect(driver.getResolver).not.toHaveBeenCalled()
@@ -35,8 +35,14 @@ describe('resolveClientOperation', () => {
     const driver = createDriver()
     const memo = createTestMemo()
 
-    const first = resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, driver, node, root: '/root', output: { path: '.' }, memo })
-    const second = resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, driver, node, root: '/root', output: { path: '.' }, memo })
+    const first = resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, ctx: { ...driver, memo }, node, root: '/root', output: { path: '.' } })
+    const second = resolveClientOperation({
+      clientPlugin: { pluginName: 'plugin-fetch' },
+      ctx: { ...driver, memo },
+      node,
+      root: '/root',
+      output: { path: '.' },
+    })
 
     expect(second).toStrictEqual(first)
     expect(driver.getResolver).toHaveBeenCalledOnce()
@@ -47,8 +53,8 @@ describe('resolveClientOperation', () => {
     const driver = createDriver()
     const memo = createTestMemo()
 
-    resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, driver, node, root: '/root', output: { path: '.' }, memo })
-    resolveClientOperation({ clientPlugin: { pluginName: 'plugin-axios' }, driver, node, root: '/root', output: { path: '.' }, memo })
+    resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, ctx: { ...driver, memo }, node, root: '/root', output: { path: '.' } })
+    resolveClientOperation({ clientPlugin: { pluginName: 'plugin-axios' }, ctx: { ...driver, memo }, node, root: '/root', output: { path: '.' } })
 
     expect(driver.getResolver).toHaveBeenCalledTimes(2)
     expect(driver.getResolver).toHaveBeenNthCalledWith(1, 'plugin-fetch')
@@ -66,11 +72,10 @@ describe('resolveClientOperation', () => {
 
       return resolveClientOperation({
         clientPlugin: { pluginName: 'plugin-axios' },
-        driver,
+        ctx: { ...driver, memo: createTestMemo() },
         node,
         root: '/root',
         output: { path: '.', mode: 'directory' },
-        memo: createTestMemo(),
       })
     }
 
@@ -131,11 +136,10 @@ describe('resolveClientOperation', () => {
 
       const res = resolveClientOperation({
         clientPlugin: { pluginName: 'plugin-axios' },
-        driver,
+        ctx: { ...driver, memo: createTestMemo() },
         node: getPetById,
         root: '/root',
         output: { path: '.', mode: 'directory' },
-        memo: createTestMemo(),
       })
 
       expect(res?.returnType).toBe('full')

@@ -5,7 +5,7 @@ import type { PluginZod, ResolverZod } from '@kubb/plugin-zod'
 // A type-only import: the query plugins bundle this file but do not depend on @kubb/plugin-zod.
 const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
 
-type GeneratorDriver = GeneratorContext['driver']
+type OperationTypesContext = Pick<GeneratorContext, 'memo' | 'getPlugin' | 'getResolver'>
 
 /**
  * The per-operation type names a generated client references: the grouped input, the per-status
@@ -124,17 +124,17 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
  *
  * @example
  * ```ts
- * const types = resolveOperationTypes(ctx.driver, ctx.plugin.name)
+ * const types = resolveOperationTypes(ctx, ctx.plugin.name)
  * types.response.options(node) // 'GetPetByIdOptions', or 'GetPetByIdOptionsSchemaType' from zod
  * ```
  */
-export function resolveOperationTypes(driver: GeneratorDriver, pluginName: string): OperationTypeSource {
-  return driver.memo(`operationTypes:${pluginName}`, () => {
-    const pluginTs = driver.getPlugin(pluginTsName)
-    const pluginZod = driver.getPlugin(pluginZodName)
+export function resolveOperationTypes(ctx: OperationTypesContext, pluginName: string): OperationTypeSource {
+  return ctx.memo(`operationTypes:${pluginName}`, () => {
+    const pluginTs = ctx.getPlugin(pluginTsName)
+    const pluginZod = ctx.getPlugin(pluginZodName)
 
     if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
-      const resolver = driver.getResolver(pluginTsName)
+      const resolver = ctx.getResolver(pluginTsName)
       return { response: resolver.response, resolver, output: pluginTs.options?.output, group: pluginTs.options?.group ?? undefined }
     }
 
@@ -149,7 +149,7 @@ export function resolveOperationTypes(driver: GeneratorDriver, pluginName: strin
       })
     }
 
-    const resolver = toZodTypeResolver(driver.getResolver(pluginZodName))
+    const resolver = toZodTypeResolver(ctx.getResolver(pluginZodName))
     return { response: resolver.response, resolver, output: pluginZod.options.output, group: pluginZod.options.group ?? undefined }
   })
 }

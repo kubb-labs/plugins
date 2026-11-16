@@ -33,10 +33,10 @@ export type OperationData = {
  * schemas come from, and its validator hooks, security, base URL and response headers types.
  */
 export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOperationNode; ctx: GeneratorContext; types: OperationTypeSource }): OperationData {
-  const { driver, resolver, root } = ctx
+  const { resolver, root } = ctx
   const { output, validator, importPath } = ctx.options
-  const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : null
-  const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
+  const pluginZod = isValidatorEnabled(validator) ? ctx.getPlugin(pluginZodName) : null
+  const zodResolver = pluginZod ? ctx.getResolver(pluginZodName) : null
 
   return {
     node,
