@@ -10,6 +10,7 @@ Pass these options to `pluginClient()`. Shared options link to [Shared plugin op
 | [`returnType`](#returntype)                                               | What a generated function resolves to.                                              | `'plain'`                                        |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | `throwOnError` value each call passes to your client.                               | `true`                                           |
 | [`validator`](#validator)                                                 | Zod schemas to pass to your client.                                                 | `false`                                          |
+| [`requireAuth`](#requireauth)                                             | Make `auth` required on operations that need a token.                               | `false`                                          |
 | [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                                            | `{ path: 'clients', barrel: { type: 'named' } }` |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                                        | None                                             |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                                    | None                                             |
@@ -108,3 +109,15 @@ Opts in per slot: `request` for the body, `params` for the path, query, header, 
 
 > [!IMPORTANT]
 > Add `pluginZod()` to `plugins` when `validator` is set, or generation stops with an error.
+
+### requireAuth
+
+Makes `auth` a required option on a generated function whose operation needs a security scheme, so a missing token fails at compile time. An operation without `security`, or one that allows `{}` (anonymous access), keeps `auth` optional.
+
+The required type is read from the `auth` key of your module's `Options`, so that type must have one. Leave the option off with the query-hook plugins, which pass a partial config to the function.
+
+```ts
+// with pluginClient({ importPath: '../client', requireAuth: true })
+await addPet({ body, auth: () => getToken() })
+await addPet({ body }) // Type error: `auth` is missing
+```

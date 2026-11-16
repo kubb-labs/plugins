@@ -101,6 +101,22 @@ export function getOperationSecurity({
 }
 
 /**
+ * Whether every way to call the operation needs a token. An empty requirement, from `security: [{}]`, allows an
+ * anonymous call. A requirement the runtime cannot send, such as `mutualTLS`, counts as one that needs no token here.
+ *
+ * @example
+ * `isAuthRequired({ auth: [[{ scheme: 'bearerAuth' }]], schemes }) // true`
+ * `isAuthRequired({ auth: [[{ scheme: 'bearerAuth' }], []], schemes }) // false`
+ */
+export function isAuthRequired({ auth, schemes }: { auth: Array<ast.AuthRequirement> | undefined; schemes: Array<ast.AuthScheme> | undefined }): boolean {
+  const requirements = ast.auth.getRequirements({ auth, schemes })
+  return (
+    requirements.length > 0 &&
+    requirements.every((requirement) => requirement.length > 0 && requirement.every(({ credential }) => resolveCredential(credential) !== null))
+  )
+}
+
+/**
  * Serializes the per-operation security into the literal emitted on each generated call's `security`
  * field. The runtime `resolveAuth` helper walks it, calling the configured `auth` resolver per scheme.
  *

@@ -45,6 +45,7 @@ const defaultOptions: PluginFetch['resolvedOptions'] = {
   baseURL: undefined,
   throwOnErrorDefault: true,
   validator: false,
+  requireAuth: false,
   returnType: 'full',
   sdk: undefined,
   resolver: resolverClient,
@@ -274,6 +275,20 @@ describe('clientGenerator operation', () => {
       name: 'getPetByIdWithMultipleSchemes',
       node: { ...getPetByIdNode, auth: [[{ scheme: 'petstore_auth', scopes: ['read:pets'] }], [{ scheme: 'api_key' }]] },
       options: {},
+      meta: securityMeta,
+    },
+    // `requireAuth` makes `auth` required on an operation that needs a token.
+    {
+      name: 'findPetsByTagsWithRequiredAuth',
+      node: { ...findPetsByTagsNode, auth: [[{ scheme: 'bearerAuth' }]] },
+      options: { requireAuth: true },
+      meta: securityMeta,
+    },
+    // An anonymous `{}` requirement keeps `auth` optional under `requireAuth`.
+    {
+      name: 'findPetsByTagsWithOptionalAuth',
+      node: { ...findPetsByTagsNode, auth: [[{ scheme: 'bearerAuth' }], []] },
+      options: { requireAuth: true },
       meta: securityMeta,
     },
     // Declared response headers type `headers` on the result, also on the full result `returnType: 'data'` resolves to without throwing.

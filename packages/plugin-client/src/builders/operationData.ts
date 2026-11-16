@@ -3,7 +3,7 @@ import { operationKey, resolveOperationFile } from '@internals/shared'
 import { ast, type Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import type { ContractClientFactory } from '../types.ts'
-import { getOperationSecurity, type SecurityRequirement } from './security.ts'
+import { getOperationSecurity, isAuthRequired, type SecurityRequirement } from './security.ts'
 import { buildValidatorHooks, type ValidatorHooks } from './validator.ts'
 import { isValidatorEnabled } from './validatorOptions.ts'
 
@@ -24,6 +24,10 @@ export type OperationData = {
    */
   headerTypeNames: Array<string>
   security?: Array<SecurityRequirement>
+  /**
+   * `requireAuth` is on and every requirement of the operation needs a token.
+   */
+  authRequired: boolean
   baseURL?: string
 }
 
@@ -33,7 +37,7 @@ export type OperationData = {
  */
 export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOperationNode; ctx: GeneratorContext; types: OperationTypeSource }): OperationData {
   const { driver, resolver, root } = ctx
-  const { output, validator, importPath } = ctx.options
+  const { output, validator, importPath, requireAuth } = ctx.options
   const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : null
   const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
@@ -57,6 +61,7 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
     headerTypeNames: getResponseHeadersTypeNames({ node, types }),
     // The fetch and axios clients write `securitySchemes` into `.kubb/client.ts`. A custom client module has none.
     security: getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth, hoist: importPath === undefined }),
+    authRequired: requireAuth && isAuthRequired({ auth: node.auth, schemes: ctx.meta.auth }),
     baseURL: ast.http.getBaseURL(
       ast.server.get({ servers: node.servers, index: (ctx.adapter.options as { server?: { index?: number } } | undefined)?.server?.index }),
     ),

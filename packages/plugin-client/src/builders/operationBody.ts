@@ -17,6 +17,7 @@ export function buildOperationBody({
   types,
   validatorHooks,
   security,
+  authRequired = false,
   baseURL,
   returnType,
   throwOnErrorDefault,
@@ -25,12 +26,13 @@ export function buildOperationBody({
   types: OperationTypeNames
   validatorHooks: ValidatorHooks | null
   security?: Array<SecurityRequirement>
+  authRequired?: boolean
   baseURL?: string
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
 }): { generics: Array<string>; paramsSignature: string; returnType: string; statement: string; mergeContentType: boolean } {
   const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, baseURL, throwOnErrorDefault, returnType })
-  const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault, eventStream })
+  const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault, eventStream, authRequired })
   const stream = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, throwOnErrorDefault }) : null
 
   return {

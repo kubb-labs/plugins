@@ -1,6 +1,6 @@
 import type { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { buildSecurityMetadata, buildSecuritySchemes, getOperationSecurity, resolveCredential } from './security.ts'
+import { buildSecurityMetadata, buildSecuritySchemes, getOperationSecurity, isAuthRequired, resolveCredential } from './security.ts'
 
 describe('buildSecurityMetadata', () => {
   test('returns null when there is no security', () => {
@@ -103,5 +103,26 @@ describe('buildSecuritySchemes', () => {
     expect(buildSecuritySchemes(schemes)).toContain("export const securitySchemes = { 'x-key': { type: 'apiKey', name: 'X-Key', in: 'header' } } as const")
     expect(buildSecuritySchemes([{ name: 'mtls', credential: { type: 'mutualTLS' } }])).toBeNull()
     expect(buildSecuritySchemes(undefined)).toBeNull()
+  })
+})
+
+describe('isAuthRequired', () => {
+  const schemes: Array<ast.AuthScheme> = [
+    { name: 'bearerAuth', credential: { type: 'http', scheme: 'bearer' } },
+    { name: 'mtls', credential: { type: 'mutualTLS' } },
+  ]
+
+  test('is true when every requirement needs a token', () => {
+    expect(isAuthRequired({ auth: [[{ scheme: 'bearerAuth' }]], schemes })).toBe(true)
+  })
+
+  test('is false without security, or when `{}` allows an anonymous call', () => {
+    expect(isAuthRequired({ auth: undefined, schemes })).toBe(false)
+    expect(isAuthRequired({ auth: [], schemes })).toBe(false)
+    expect(isAuthRequired({ auth: [[{ scheme: 'bearerAuth' }], []], schemes })).toBe(false)
+  })
+
+  test('is false when a requirement needs no token, such as mutualTLS', () => {
+    expect(isAuthRequired({ auth: [[{ scheme: 'bearerAuth' }], [{ scheme: 'mtls' }]], schemes })).toBe(false)
   })
 })

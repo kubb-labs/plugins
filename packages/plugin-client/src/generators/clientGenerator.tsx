@@ -85,6 +85,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
             returnType={returnType}
             throwOnErrorDefault={throwOnErrorDefault}
             security={data.security}
+            authRequired={data.authRequired}
             baseURL={data.baseURL}
           />
         </File>
