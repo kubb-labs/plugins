@@ -240,12 +240,11 @@ const streamChatNode = ast.factory.createOperation({
   ],
 })
 
-// An LLM-style endpoint: the 200 offers JSON or typed events, and the boolean `stream` body property picks one.
+// An LLM-style endpoint: the 200 offers JSON or typed events, and a boolean `stream` body property picks one.
 const createChatNode = ast.factory.createOperation({
   operationId: 'createChat',
   method: 'POST',
   path: '/chat/completions',
-  tags: ['chat'],
   requestBody: {
     required: true,
     content: [
@@ -253,10 +252,7 @@ const createChatNode = ast.factory.createOperation({
         contentType: 'application/json',
         schema: ast.factory.createSchema({
           type: 'object',
-          properties: [
-            ast.factory.createProperty({ name: 'model', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
-            ast.factory.createProperty({ name: 'stream', schema: ast.factory.createSchema({ type: 'boolean' }) }),
-          ],
+          properties: [ast.factory.createProperty({ name: 'stream', schema: ast.factory.createSchema({ type: 'boolean' }) })],
         }),
       }),
     ],
@@ -264,7 +260,6 @@ const createChatNode = ast.factory.createOperation({
   responses: [
     ast.factory.createResponse({
       statusCode: '200',
-      description: 'a completion or its events',
       content: [
         ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }),
         ast.factory.createContent({ contentType: 'text/event-stream', schema: streamChatSchema, stream: { schema: streamChatSchema, shape: 'event' } }),
@@ -294,9 +289,9 @@ describe('clientGenerator operation', () => {
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
     // A `stream.shape` of `event` types each event by name.
     { name: 'streamChatTypedEvents', node: streamChatNode, options: {} },
-    // JSON next to typed events becomes one `createChat` with a `stream: true` overload, each call setting `stream` in the body.
+    // JSON next to typed events gets a `stream: true` overload.
     { name: 'createChatSplit', node: createChatNode, options: {} },
-    // Without a `stream` body property, the split keeps the options type and the body as they are.
+    // Without a `stream` body property, the body type stays as is.
     { name: 'createChatSplitWithoutSelector', node: { ...createChatNode, requestBody: undefined }, options: {} },
     // An operation's own oauth2 requirement with its scopes.
     {

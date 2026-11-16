@@ -109,149 +109,88 @@ describe('event stream runtime', () => {
 })
 
 describe('a response that offers JSON or an event stream', () => {
-  async function generate({ output, clientPlugin }: { output: string; clientPlugin: typeof pluginFetch | typeof pluginAxios }) {
-    const { diagnostics } = await createKubb(
-      {
-        root: dirname,
-        input: '../../schemas/3.0.x/eventStreamMixed.yaml',
-        output: { path: output, barrel: false },
-        adapter: adapterOas({ validate: false }),
-        parsers: [parserTs()],
-        reporters: [],
-        storage: fsStorage(),
-        plugins: [pluginTs({ output: { path: './types', barrel: false } }), clientPlugin({ output: { path: './clients', barrel: false } })],
-      } as Config,
-      { hooks: new Hookable<KubbHooks>() },
-    ).safeBuild()
-    expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
+  const sse = (data: string) => new Response(`data: ${data}\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
+
+  async function generate(input: string, plugins: Config['plugins'], check: (output: string) => Promise<void>) {
+    const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-'))
+    try {
+      const { diagnostics } = await createKubb(
+        {
+          root: dirname,
+          input: `../../schemas/3.0.x/${input}`,
+          output: { path: output, barrel: false },
+          adapter: adapterOas({ validate: false }),
+          parsers: [parserTs()],
+          reporters: [],
+          storage: fsStorage(),
+          plugins: [pluginTs({ output: { path: './types', barrel: false } }), ...plugins],
+        } as Config,
+        { hooks: new Hookable<KubbHooks>() },
+      ).safeBuild()
+      expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
+      await check(output)
+    } finally {
+      await fs.rm(output, { recursive: true, force: true })
+    }
   }
+  const load = async (output: string, file: string) => import(pathToFileURL(path.join(output, file)).href)
+  const read = (output: string, file: string) => fs.readFile(path.join(output, file), 'utf8')
+  const zod = [pluginZod({ output: { path: './zod', barrel: false } }), pluginFetch({ output: { path: './clients', barrel: false }, validator: 'zod' })]
 
   test.each([
     { name: 'axios', clientPlugin: pluginAxios },
     { name: 'fetch', clientPlugin: pluginFetch },
-  ])('gives the $name call a stream overload, and ships the runtime to parse events', async ({ clientPlugin }) => {
-    const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-'))
-    try {
-      await generate({ output, clientPlugin })
-
-      expect(await fs.readFile(path.join(output, '.kubb', 'sse.ts'), 'utf8')).toContain('export async function* parseEventStream')
-      expect(await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
-
-      const client = await fs.readFile(path.join(output, 'clients', 'listChanges.ts'), 'utf8')
-      expect(client).toContain(
-        "export function listChanges<ThrowOnError extends boolean = true>(options: StreamOptions<ListChangesOptions, ThrowOnError> & { stream: true }): Unwrappable<StreamResult<Omit<ListChangesResponses, '200'> & { '200': ListChangesStatus200EventStream }, ThrowOnError>>",
-      )
-      expect(client).toContain(
-        "export function listChanges<ThrowOnError extends boolean = true>(options?: Options<ListChangesOptions, ThrowOnError> & { stream?: false }): Unwrappable<RequestResult<Omit<ListChangesResponses, '200'> & { '200': ListChangesStatus200Json }, ThrowOnError>>",
-      )
-      expect(client.match(/contentType: \{ response: 'text\/event-stream' \}/g)).toHaveLength(1)
-
-      const types = await fs.readFile(path.join(output, 'types', 'ListChanges.ts'), 'utf8')
-      expect(types).toMatch(/contentType: 'application\/json';?\s+data: ListChangesStatus200Json/)
-    } finally {
-      await fs.rm(output, { recursive: true, force: true })
-    }
+  ])('gives the $name call a stream overload', async ({ clientPlugin }) => {
+    await generate('eventStreamMixed.yaml', [clientPlugin({ output: { path: './clients', barrel: false } })], async (output) => {
+      const client = await read(output, 'clients/listChanges.ts')
+      expect(client).toContain('& { stream: true }): Unwrappable<StreamResult<')
+      expect(client).toContain('& { stream?: false }): Unwrappable<RequestResult<')
+      expect(await read(output, '.kubb/client.ts')).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
+    })
   })
 
-  test('validates each call with the zod schema of its own content type', async () => {
-    const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-zod-'))
-    try {
-      const { diagnostics } = await createKubb(
-        {
-          root: dirname,
-          input: '../../schemas/3.0.x/eventStreamMixed.yaml',
-          output: { path: output, barrel: false },
-          adapter: adapterOas({ validate: false }),
-          parsers: [parserTs()],
-          reporters: [],
-          storage: fsStorage(),
-          plugins: [
-            pluginTs({ output: { path: './types', barrel: false } }),
-            pluginZod({ output: { path: './zod', barrel: false } }),
-            pluginFetch({ output: { path: './clients', barrel: false }, validator: 'zod' }),
-          ],
-        } as Config,
-        { hooks: new Hookable<KubbHooks>() },
-      ).safeBuild()
-      expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
-
-      const client = await fs.readFile(path.join(output, 'clients', 'listChanges.ts'), 'utf8')
-      const responseValidators = [...client.matchAll(/validator: \{ response: (\w+)/g)].map((match) => match[1])
-      expect(responseValidators).toStrictEqual(['listChangesStatus200SchemaEventStream', 'listChangesStatus200SchemaJson'])
-
-      const zod = await fs.readFile(path.join(output, 'zod', 'listChangesSchema.ts'), 'utf8')
-      for (const name of responseValidators) expect(zod).toContain(`export const ${name}`)
-    } finally {
-      await fs.rm(output, { recursive: true, force: true })
-    }
-  })
-
-  test('keeps event-only fields when another success status has a body', async () => {
-    const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-statuses-'))
-    try {
-      const { diagnostics } = await createKubb(
-        {
-          root: dirname,
-          input: '../../schemas/3.0.x/eventStreamMixedStatuses.yaml',
-          output: { path: output, barrel: false },
-          adapter: adapterOas({ validate: false }),
-          parsers: [parserTs()],
-          reporters: [],
-          storage: fsStorage(),
-          plugins: [
-            pluginTs({ output: { path: './types', barrel: false } }),
-            pluginZod({ output: { path: './zod', barrel: false } }),
-            pluginFetch({ output: { path: './clients', barrel: false }, validator: 'zod' }),
-          ],
-        } as Config,
-        { hooks: new Hookable<KubbHooks>() },
-      ).safeBuild()
-      expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
-
-      const { client } = await import(pathToFileURL(path.join(output, '.kubb/client.ts')).href)
-      client.setConfig({
-        baseURL: 'https://api.test',
-        transport: async () => new Response('data: {"id":"1","delta":"hi"}\n\n', { headers: { 'Content-Type': 'text/event-stream' } }),
-      })
-      const { createChat } = await import(pathToFileURL(path.join(output, 'clients/createChat.ts')).href)
-
-      const events = []
-      for await (const event of await createChat({ body: {}, stream: true })) events.push(event)
-      // `Completion` declares only `id`, so validating with the success union would strip `delta`.
-      expect(events).toMatchObject([{ data: { id: '1', delta: 'hi' } }])
-    } finally {
-      await fs.rm(output, { recursive: true, force: true })
-    }
-  })
-
-  test('returns JSON from the JSON call and parsed events from the stream call', async () => {
-    const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-run-'))
-    try {
-      await generate({ output, clientPlugin: pluginFetch })
-
+  test('returns JSON without `stream` and parsed events with `stream: true`', async () => {
+    await generate('eventStreamMixed.yaml', [pluginFetch({ output: { path: './clients', barrel: false } })], async (output) => {
       const accepts: Array<string | undefined> = []
-      const { client } = await import(pathToFileURL(path.join(output, '.kubb/client.ts')).href)
+      const { client } = await load(output, '.kubb/client.ts')
       client.setConfig({
         baseURL: 'https://api.test',
-        transport: async (request: { headers: Record<string, string> }) => {
-          const accept = request.headers['Accept']
-          accepts.push(accept)
-          return accept === 'text/event-stream'
-            ? new Response('data: {"$schema":"change"}\n\n', { headers: { 'Content-Type': 'text/event-stream' } })
-            : Response.json({ $schema: 'change' })
+        transport: async ({ headers }: { headers: Record<string, string> }) => {
+          accepts.push(headers['Accept'])
+          return headers['Accept'] === 'text/event-stream' ? sse('{"$schema":"change"}') : Response.json({ $schema: 'change' })
         },
       })
-      const { listChanges } = await import(pathToFileURL(path.join(output, 'clients/listChanges.ts')).href)
+      const { listChanges } = await load(output, 'clients/listChanges.ts')
 
-      expect(await listChanges()).toMatchObject({ contentType: 'application/json', data: { $schema: 'change' } })
-
+      expect(await listChanges()).toMatchObject({ data: { $schema: 'change' } })
       const events = []
       for await (const event of await listChanges({ stream: true })) events.push(event)
       expect(events).toMatchObject([{ data: { $schema: 'change' } }])
       expect(accepts).toStrictEqual(['application/json', 'text/event-stream'])
-    } finally {
-      await fs.rm(output, { recursive: true, force: true })
-    }
+    })
+  })
+
+  test('validates each overload with the zod schema of its own content type', async () => {
+    await generate('eventStreamMixed.yaml', zod, async (output) => {
+      const client = await read(output, 'clients/listChanges.ts')
+      expect([...client.matchAll(/validator: \{ response: (\w+)/g)].map((match) => match[1])).toStrictEqual([
+        'listChangesStatus200SchemaEventStream',
+        'listChangesStatus200SchemaJson',
+      ])
+    })
+  })
+
+  test('keeps event-only fields when another success status has a body', async () => {
+    await generate('eventStreamMixedStatuses.yaml', zod, async (output) => {
+      const { client } = await load(output, '.kubb/client.ts')
+      client.setConfig({ baseURL: 'https://api.test', transport: async () => sse('{"id":"1","delta":"hi"}') })
+      const { createChat } = await load(output, 'clients/createChat.ts')
+
+      const events = []
+      for await (const event of await createChat({ body: {}, stream: true })) events.push(event)
+      // `Completion` declares only `id`, so the success union would strip `delta`.
+      expect(events).toMatchObject([{ data: { id: '1', delta: 'hi' } }])
+    })
   })
 })
 

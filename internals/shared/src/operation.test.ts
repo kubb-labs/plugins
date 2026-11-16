@@ -393,84 +393,54 @@ describe('toResponseContent', () => {
 })
 
 describe('splitEventStream', () => {
-  const object = () => ast.factory.createSchema({ type: 'object', properties: [] })
-  function chatNode({ stream, content }: { stream?: ast.SchemaNode; content: Array<ast.ContentNode> }) {
-    return ast.factory.createOperation({
+  const schema = (type: 'object' | 'boolean' | 'string' | 'null') => ast.factory.createSchema({ type })
+  const withStream = (stream: ast.SchemaNode) =>
+    ast.factory.createSchema({ type: 'object', properties: [ast.factory.createProperty({ name: 'stream', schema: stream })] })
+  const json = ast.factory.createContent({ contentType: 'application/json', schema: schema('object') })
+  const events = ast.factory.createContent({ contentType: 'text/event-stream', schema: schema('object'), stream: {} })
+  const chat = ({ bodies = [withStream(schema('boolean'))], content = [json, events] }: { bodies?: Array<ast.SchemaNode>; content?: Array<ast.ContentNode> }) =>
+    ast.factory.createOperation({
       operationId: 'createChat',
       method: 'POST',
       path: '/chat',
       requestBody: {
-        required: true,
-        content: [
-          ast.factory.createContent({
-            contentType: 'application/json',
-            schema: ast.factory.createSchema({
-              type: 'object',
-              properties: stream ? [ast.factory.createProperty({ name: 'stream', schema: stream })] : [],
-            }),
-          }),
-        ],
+        content: bodies.map((body, index) => ast.factory.createContent({ contentType: index ? 'multipart/form-data' : 'application/json', schema: body })),
       },
       responses: [ast.factory.createResponse({ statusCode: '200', content })],
     }) as ast.HttpOperationNode
-  }
-  const json = ast.factory.createContent({ contentType: 'application/json', schema: object() })
-  const events = ast.factory.createContent({ contentType: 'text/event-stream', schema: object(), stream: {} })
 
-  test('splits JSON next to typed events into a JSON call and a stream call', () => {
-    const split = splitEventStream(chatNode({ stream: ast.factory.createSchema({ type: 'boolean' }), content: [json, events] }))
+  test('splits JSON next to typed events into a JSON variant and a stream variant', () => {
+    const split = splitEventStream(chat({}))
 
     expect(split).toMatchObject({ statusCode: '200', suffix: 'EventStream', restSuffix: 'Json', selector: true })
-    expect(split?.rest.responses[0]?.content?.map((entry) => entry.contentType)).toEqual(['application/json'])
-    expect(split?.stream.responses[0]?.content?.map((entry) => entry.contentType)).toEqual(['text/event-stream'])
+    expect(split?.rest.responses[0]?.content).toStrictEqual([json])
+    expect(split?.stream.responses[0]?.content).toStrictEqual([events])
   })
 
-  test('detects a nullable boolean `stream` and ignores a property of another type', () => {
-    const nullable = ast.factory.createSchema({
-      type: 'union',
-      members: [ast.factory.createSchema({ type: 'boolean' }), ast.factory.createSchema({ type: 'null' })],
-    })
-
-    expect(splitEventStream(chatNode({ stream: nullable, content: [json, events] }))?.selector).toBe(true)
-    expect(splitEventStream(chatNode({ stream: ast.factory.createSchema({ type: 'string' }), content: [json, events] }))?.selector).toBe(false)
+  test.each([
+    { name: 'a boolean', bodies: [withStream(schema('boolean'))], selector: true },
+    {
+      name: 'a nullable boolean',
+      bodies: [withStream(ast.factory.createSchema({ type: 'union', members: [schema('boolean'), schema('null')] }))],
+      selector: true,
+    },
+    { name: 'a string', bodies: [withStream(schema('string'))], selector: false },
+    {
+      name: 'a `oneOf` member',
+      bodies: [ast.factory.createSchema({ type: 'union', members: [schema('object'), withStream(schema('boolean'))] })],
+      selector: true,
+    },
+    { name: 'a second request content type', bodies: [schema('object'), withStream(schema('boolean'))], selector: true },
+  ])('reads the `stream` selector on $name', ({ bodies, selector }) => {
+    expect(splitEventStream(chat({ bodies }))?.selector).toBe(selector)
   })
 
-  test('detects `stream` on a `oneOf` member and on a second request content type', () => {
-    const member = (name: string) =>
-      ast.factory.createSchema({
-        type: 'object',
-        properties: [
-          ast.factory.createProperty({ name, schema: ast.factory.createSchema({ type: 'string' }) }),
-          ast.factory.createProperty({ name: 'stream', schema: ast.factory.createSchema({ type: 'boolean' }) }),
-        ],
-      })
-    const node = chatNode({ content: [json, events] })
-    const withBody = (content: Array<ast.ContentNode>) => ({ ...node, requestBody: { required: true, content } })
-
-    expect(
-      splitEventStream(
-        withBody([
-          ast.factory.createContent({
-            contentType: 'application/json',
-            schema: ast.factory.createSchema({ type: 'union', members: [member('prompt'), member('image')] }),
-          }),
-        ]),
-      )?.selector,
-    ).toBe(true)
-    expect(
-      splitEventStream(
-        withBody([
-          ast.factory.createContent({ contentType: 'application/json', schema: object() }),
-          ast.factory.createContent({ contentType: 'multipart/form-data', schema: member('file') }),
-        ]),
-      )?.selector,
-    ).toBe(true)
-  })
-
-  test('returns null for a stream-only, JSON-only, or schemaless-stream response', () => {
-    expect(splitEventStream(chatNode({ content: [events] }))).toBeNull()
-    expect(splitEventStream(chatNode({ content: [json] }))).toBeNull()
-    expect(splitEventStream(chatNode({ content: [json, ast.factory.createContent({ contentType: 'text/event-stream' })] }))).toBeNull()
+  test.each([
+    { name: 'stream-only', content: [events] },
+    { name: 'JSON-only', content: [json] },
+    { name: 'schemaless-stream', content: [json, ast.factory.createContent({ contentType: 'text/event-stream' })] },
+  ])('returns null for a $name response', ({ content }) => {
+    expect(splitEventStream(chat({ content }))).toBeNull()
   })
 })
 
