@@ -248,13 +248,13 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
  *
  * `suffix` is the stream variant's per-content-type suffix, such as `EventStream` in `CreateChatStatus200EventStream`, and
  * `restSuffix` the other variant's, such as `Json`, when only one other content type is left.
- * `selector` is the boolean request body property that picks the variant, `stream` when the body has one.
+ * `selector` is whether the request body has a boolean `stream` property that picks the variant.
  */
-export type EventStreamSplit = {
+type EventStreamSplit = {
   statusCode: ast.StatusCode
   suffix: string
   restSuffix: string | null
-  selector: string | null
+  selector: boolean
   rest: ast.HttpOperationNode
   stream: ast.HttpOperationNode
 }
@@ -282,7 +282,7 @@ export function splitEventStream(node: ast.HttpOperationNode): EventStreamSplit 
   const restVariants = variants.filter((item) => item.contentType !== streamEntry.contentType)
   const body = ast.http.requestBody.getSchema(node)
   // shortcut: only a boolean `stream` property is detected, the name LLM provider APIs use. Add an option when one names it otherwise.
-  const selector = body && ast.schema.findProperties({ node: body, propertyName: 'stream' }).some(({ schema }) => isBooleanSchema(schema)) ? 'stream' : null
+  const selector = Boolean(body && ast.schema.findProperties({ node: body, propertyName: 'stream' }).some(({ schema }) => isBooleanSchema(schema)))
 
   return {
     statusCode: primary.statusCode,

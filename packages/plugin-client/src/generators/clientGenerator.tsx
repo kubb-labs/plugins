@@ -91,7 +91,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
               security={call.security}
               authRequired={call.authRequired}
               baseURL={call.baseURL}
-              streamSelector={call.streamSelector}
+              stream={call.stream}
             />
           ))}
         </File>

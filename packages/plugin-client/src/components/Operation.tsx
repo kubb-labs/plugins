@@ -6,7 +6,6 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
-import type { StreamSelector } from '../builders/operationData.ts'
 import type { ReturnTypeOption } from '../types.ts'
 
 type Props = {
@@ -40,7 +39,7 @@ type Props = {
   authRequired?: boolean
   /** The operation's own server URL from a path-level or operation-level `servers` entry, emitted as the call's default `baseURL`. */
   baseURL?: string
-  streamSelector?: StreamSelector
+  stream?: boolean
 }
 
 /**
@@ -59,11 +58,11 @@ export function Operation({
   security,
   authRequired,
   baseURL,
-  streamSelector,
+  stream,
 }: Props): KubbReactNode {
   if (!ast.http.isOperation(node)) return null
 
-  const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault, streamSelector })
+  const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault, stream })
 
   return (
     <File.Source name={name} isExportable isIndexable>

@@ -9,8 +9,6 @@ import { isValidatorEnabled } from './validatorOptions.ts'
 
 export type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]
 
-export type StreamSelector = { name: string; value: boolean }
-
 export type OperationData = {
   node: ast.HttpOperationNode
   name: string
@@ -30,9 +28,9 @@ export type OperationData = {
    */
   importedTypeNames: Array<string>
   /**
-   * The request body property one call of a split JSON-or-stream operation sets, such as `{ name: 'stream', value: true }`.
+   * The `stream` body property one call of a split JSON-or-stream operation sets.
    */
-  streamSelector?: StreamSelector
+  stream?: boolean
   security?: Array<SecurityRequirement>
   authRequired: boolean
   baseURL?: string
@@ -106,12 +104,11 @@ export function resolveOperationCalls({
     ? types.contentVariant(node, split.statusCode, split.restSuffix)
     : `Exclude<${responses}[${status}], { contentType: 'text/event-stream' }>`
   const optionsType = split.selector
-    ? `Omit<${options}, 'body'> & { body${node.requestBody?.required ? '' : '?'}: Omit<NonNullable<${options}['body']>, '${split.selector}'> }`
+    ? `Omit<${options}, 'body'> & { body${node.requestBody?.required ? '' : '?'}: Omit<NonNullable<${options}['body']>, 'stream'> }`
     : options
   const callTypes = (responsesType: string): OperationTypeNames => ({
     response: { options: () => optionsType, responses: () => responsesType, headers: types.response.headers?.bind(types.response) },
   })
-  const selector = (value: boolean) => (split.selector ? { name: split.selector, value } : undefined)
 
   return [
     {
@@ -119,7 +116,7 @@ export function resolveOperationCalls({
       node: split.rest,
       importedTypeNames: split.restSuffix ? [...data.importedTypeNames, restItem] : data.importedTypeNames,
       types: callTypes(`Omit<${responses}, ${status}> & { ${status}: ${restItem} }`),
-      streamSelector: selector(false),
+      stream: split.selector ? false : undefined,
     },
     {
       ...data,
@@ -127,7 +124,7 @@ export function resolveOperationCalls({
       name: `${data.name}Stream`,
       types: callTypes(`Omit<${responses}, ${status}> & { ${status}: ${streamItem} }`),
       importedTypeNames: [...data.importedTypeNames, streamItem],
-      streamSelector: selector(true),
+      stream: split.selector ? true : undefined,
     },
   ]
 }

@@ -3,7 +3,6 @@ import { getEventStream, hasTextEventData } from '@internals/shared'
 
 import { ast, text } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
-import type { StreamSelector } from './operationData.ts'
 import { buildContentType } from './contentType.ts'
 import { buildSecurityMetadata, type SecurityRequirement } from './security.ts'
 import { buildStyles } from './styles.ts'
@@ -35,14 +34,14 @@ export function buildCallConfig({
   baseURL,
   throwOnErrorDefault,
   returnType,
-  streamSelector,
+  stream: streamBody,
 }: {
   node: ast.HttpOperationNode
   validatorHooks: ValidatorHooks | null
   /**
-   * Sets this body property after `...config`, so the call always asks for its own variant.
+   * Sets `stream` in the body after `...config`, so the call always asks for its own variant.
    */
-  streamSelector?: StreamSelector
+  stream?: boolean
   security?: Array<SecurityRequirement>
   baseURL?: string
   throwOnErrorDefault: boolean
@@ -75,7 +74,7 @@ export function buildCallConfig({
     stream === 'event' || stream === 'data' ? `eventShape: '${stream}'` : null,
     rawData ? `rawData: ${toLiteral(rawData)}` : null,
     '...config',
-    streamSelector ? `body: { ...config.body, ${streamSelector.name}: ${streamSelector.value} }` : null,
+    streamBody === undefined ? null : `body: { ...config.body, stream: ${streamBody} }`,
     ownRuntime ? styles : null,
     validatorLiteral,
     throwOnError,

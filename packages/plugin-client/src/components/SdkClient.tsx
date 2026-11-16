@@ -7,7 +7,6 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
-import type { StreamSelector } from '../builders/operationData.ts'
 import type { ReturnTypeOption } from '../types.ts'
 
 /**
@@ -22,7 +21,7 @@ export function buildSdkMethod({
   baseURL,
   returnType,
   throwOnErrorDefault,
-  streamSelector,
+  stream,
 }: {
   node: ast.OperationNode
   name: string
@@ -32,11 +31,11 @@ export function buildSdkMethod({
   baseURL?: string
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
-  streamSelector?: StreamSelector
+  stream?: boolean
 }): string {
   if (!ast.http.isOperation(node)) return ''
 
-  const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault, streamSelector })
+  const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault, stream })
   const generics = body.generics.length ? `<${body.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { splitLines: true }))
 
@@ -55,7 +54,7 @@ type OperationData = {
   validatorHooks: ValidatorHooks | null
   security?: Array<SecurityRequirement>
   baseURL?: string
-  streamSelector?: StreamSelector
+  stream?: boolean
 }
 
 type Props = {
@@ -73,7 +72,7 @@ type Props = {
  * can add interceptors, and a per-call `client` option still overrides it for a one-off call.
  */
 export function SdkClient({ name, operations, returnType, throwOnErrorDefault }: Props): KubbReactNode {
-  const methods = operations.map(({ node, name: methodName, types, validatorHooks, security, baseURL, streamSelector }) =>
+  const methods = operations.map(({ node, name: methodName, types, validatorHooks, security, baseURL, stream }) =>
     buildSdkMethod({
       node,
       name: methodName,
@@ -83,7 +82,7 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
       baseURL,
       returnType,
       throwOnErrorDefault,
-      streamSelector,
+      stream,
     }),
   )
 

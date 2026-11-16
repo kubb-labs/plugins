@@ -420,7 +420,7 @@ describe('splitEventStream', () => {
   test('splits JSON next to typed events into a JSON call and a stream call', () => {
     const split = splitEventStream(chatNode({ stream: ast.factory.createSchema({ type: 'boolean' }), content: [json, events] }))
 
-    expect(split).toMatchObject({ statusCode: '200', suffix: 'EventStream', restSuffix: 'Json', selector: 'stream' })
+    expect(split).toMatchObject({ statusCode: '200', suffix: 'EventStream', restSuffix: 'Json', selector: true })
     expect(split?.rest.responses[0]?.content?.map((entry) => entry.contentType)).toEqual(['application/json'])
     expect(split?.stream.responses[0]?.content?.map((entry) => entry.contentType)).toEqual(['text/event-stream'])
   })
@@ -431,8 +431,8 @@ describe('splitEventStream', () => {
       members: [ast.factory.createSchema({ type: 'boolean' }), ast.factory.createSchema({ type: 'null' })],
     })
 
-    expect(splitEventStream(chatNode({ stream: nullable, content: [json, events] }))?.selector).toBe('stream')
-    expect(splitEventStream(chatNode({ stream: ast.factory.createSchema({ type: 'string' }), content: [json, events] }))?.selector).toBeNull()
+    expect(splitEventStream(chatNode({ stream: nullable, content: [json, events] }))?.selector).toBe(true)
+    expect(splitEventStream(chatNode({ stream: ast.factory.createSchema({ type: 'string' }), content: [json, events] }))?.selector).toBe(false)
   })
 
   test('returns null for a stream-only, JSON-only, or schemaless-stream response', () => {

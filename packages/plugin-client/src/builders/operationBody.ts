@@ -6,7 +6,6 @@ import { buildEventStreamReturn, buildReturnStatement } from './returnStatement.
 import type { SecurityRequirement } from './security.ts'
 import { buildGroupedOptionsSignature } from './signature.ts'
 import type { ValidatorHooks } from './validator.ts'
-import type { StreamSelector } from './operationData.ts'
 
 /**
  * The pieces of a generated operation: its generics, `options` parameter, return type, return statement, and whether the
@@ -22,7 +21,7 @@ export function buildOperationBody({
   baseURL,
   returnType,
   throwOnErrorDefault,
-  streamSelector,
+  stream,
 }: {
   node: ast.HttpOperationNode
   types: OperationTypeNames
@@ -32,7 +31,7 @@ export function buildOperationBody({
   baseURL?: string
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
-  streamSelector?: StreamSelector
+  stream?: boolean
 }): { generics: Array<string>; paramsSignature: string; returnType: string; statement: string; mergeContentType: boolean } {
   const { callConfig, mergeContentType, eventStream } = buildCallConfig({
     node,
@@ -41,16 +40,16 @@ export function buildOperationBody({
     baseURL,
     throwOnErrorDefault,
     returnType,
-    streamSelector,
+    stream,
   })
   const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault, eventStream, authRequired })
-  const stream = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, throwOnErrorDefault }) : null
+  const streamReturn = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, throwOnErrorDefault }) : null
 
   return {
     generics: signature.generics,
     paramsSignature: signature.paramsSignature,
-    returnType: stream?.returnType ?? signature.returnType,
-    statement: stream?.statement ?? buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault }),
+    returnType: streamReturn?.returnType ?? signature.returnType,
+    statement: streamReturn?.statement ?? buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault }),
     mergeContentType,
   }
 }
