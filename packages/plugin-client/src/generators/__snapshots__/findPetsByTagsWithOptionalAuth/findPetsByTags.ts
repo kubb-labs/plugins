@@ -8,7 +8,7 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from './.kub
  * `GET /pet/findByTags`
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByTagsOptions, ThrowOnError>,
+  options: Options<FindPetsByTagsOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 

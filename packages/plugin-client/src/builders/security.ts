@@ -100,13 +100,10 @@ export function getOperationSecurity({
   return security.length ? security : undefined
 }
 
-/** True when every requirement needs a token the runtime can send. `security: [{}]` and `mutualTLS` need none. */
+/** True when every requirement has a scheme that needs a token. `security: [{}]` and `mutualTLS` alone need none. */
 export function isAuthRequired({ auth, schemes }: { auth: Array<ast.AuthRequirement> | undefined; schemes: Array<ast.AuthScheme> | undefined }): boolean {
   const requirements = ast.auth.getRequirements({ auth, schemes })
-  return (
-    requirements.length > 0 &&
-    requirements.every((requirement) => requirement.length > 0 && requirement.every(({ credential }) => resolveCredential(credential) !== null))
-  )
+  return requirements.length > 0 && requirements.every((requirement) => requirement.some(({ credential }) => resolveCredential(credential) !== null))
 }
 
 /**

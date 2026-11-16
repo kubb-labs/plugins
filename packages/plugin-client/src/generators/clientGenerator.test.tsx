@@ -280,14 +280,14 @@ describe('clientGenerator operation', () => {
     // `requireAuth` makes `auth` required on an operation that needs a token.
     {
       name: 'findPetsByTagsWithRequiredAuth',
-      node: { ...findPetsByTagsNode, auth: [[{ scheme: 'bearerAuth' }]] },
+      node: { ...findPetsByTagsNode, parameters: [], auth: [[{ scheme: 'bearerAuth' }]] },
       options: { requireAuth: true },
       meta: securityMeta,
     },
     // An anonymous `{}` requirement keeps `auth` optional under `requireAuth`.
     {
       name: 'findPetsByTagsWithOptionalAuth',
-      node: { ...findPetsByTagsNode, auth: [[{ scheme: 'bearerAuth' }], []] },
+      node: { ...findPetsByTagsNode, parameters: [], auth: [[{ scheme: 'bearerAuth' }], []] },
       options: { requireAuth: true },
       meta: securityMeta,
     },

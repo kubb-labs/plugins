@@ -122,6 +122,10 @@ describe('isAuthRequired', () => {
     expect(isAuthRequired({ auth: [[{ scheme: 'bearerAuth' }], []], schemes })).toBe(false)
   })
 
+  test('is true when mutualTLS is combined with a token scheme', () => {
+    expect(isAuthRequired({ auth: [[{ scheme: 'bearerAuth' }, { scheme: 'mtls' }]], schemes })).toBe(true)
+  })
+
   test('is false when a requirement needs no token, such as mutualTLS', () => {
     expect(isAuthRequired({ auth: [[{ scheme: 'bearerAuth' }], [{ scheme: 'mtls' }]], schemes })).toBe(false)
   })

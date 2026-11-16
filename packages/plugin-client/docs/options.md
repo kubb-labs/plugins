@@ -116,6 +116,12 @@ Makes `auth` a required option on a generated function whose operation needs a s
 
 The required type is read from the `auth` key of your module's `Options`, so that type must have one. Leave the option off with the query-hook plugins, which pass a partial config to the function.
 
+|          |           |
+| -------- | --------- |
+| Type     | `boolean` |
+| Required | `false`   |
+| Default  | `false`   |
+
 ```ts
 // with pluginClient({ importPath: '../client', requireAuth: true })
 await addPet({ body, auth: () => getToken() })

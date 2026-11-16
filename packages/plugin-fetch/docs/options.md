@@ -105,6 +105,12 @@ Makes `auth` a required option on a generated function whose operation needs a s
 
 Leave it off when `client.setConfig({ auth })` supplies the token, and with the query-hook plugins, which pass a partial config to the function. SDK classes take `auth` in their constructor and ignore this option.
 
+|          |           |
+| -------- | --------- |
+| Type     | `boolean` |
+| Required | `false`   |
+| Default  | `false`   |
+
 ```ts
 // with pluginFetch({ requireAuth: true })
 await addPet({ body, auth: () => getToken() })
