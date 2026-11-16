@@ -19,6 +19,11 @@ export type ValidatorOptions = false | 'zod' | { request?: 'zod'; params?: 'zod'
  */
 export type Mode = 'tag' | 'flat'
 
+/**
+ * How generated functions take the `auth` option.
+ * - `'optional'`: every function takes `auth` as an optional option.
+ * - `'required'`: a function whose operation needs a token takes `auth` as a required option.
+ */
 export type AuthMode = 'optional' | 'required'
 
 /**
@@ -85,12 +90,21 @@ export type ClientOptions = OutputOptions & {
    */
   validator?: ValidatorOptions
   /**
-   * How generated functions handle the `auth` option.
+   * How generated functions take the `auth` option. SDK classes take `auth` in their constructor and ignore it.
+   *
+   * @example Make `auth` required on operations that need a token
+   * ```ts
+   * pluginFetch({ auth: { mode: 'required' } })
+   * // await addPet({ body, auth: () => getToken() })
+   * // await addPet({ body }) // Type error: `auth` is missing
+   * ```
    */
   auth?: {
     /**
-     * Whether a generated function takes `auth` as an optional or a required option. With `'required'`, `auth` is
-     * required on a function whose operation needs a token, unless `security` allows `{}`.
+     * Whether a generated function takes `auth` as an optional or a required option.
+     * - `'optional'`: every function takes `auth` as an optional option.
+     * - `'required'`: a function whose operation needs a token takes `auth` as a required option. An operation
+     *   without `security`, or one that allows `{}`, keeps it optional.
      *
      * @default 'optional'
      */
