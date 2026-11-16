@@ -7,6 +7,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
+import type { StreamSelector } from '../builders/operationData.ts'
 import type { ReturnTypeOption } from '../types.ts'
 
 /**
@@ -21,6 +22,7 @@ export function buildSdkMethod({
   baseURL,
   returnType,
   throwOnErrorDefault,
+  streamSelector,
 }: {
   node: ast.OperationNode
   name: string
@@ -30,10 +32,11 @@ export function buildSdkMethod({
   baseURL?: string
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
+  streamSelector?: StreamSelector
 }): string {
   if (!ast.http.isOperation(node)) return ''
 
-  const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault })
+  const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault, streamSelector })
   const generics = body.generics.length ? `<${body.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { splitLines: true }))
 
@@ -52,6 +55,7 @@ type OperationData = {
   validatorHooks: ValidatorHooks | null
   security?: Array<SecurityRequirement>
   baseURL?: string
+  streamSelector?: StreamSelector
 }
 
 type Props = {
@@ -69,7 +73,7 @@ type Props = {
  * can add interceptors, and a per-call `client` option still overrides it for a one-off call.
  */
 export function SdkClient({ name, operations, returnType, throwOnErrorDefault }: Props): KubbReactNode {
-  const methods = operations.map(({ node, name: methodName, types, validatorHooks, security, baseURL }) =>
+  const methods = operations.map(({ node, name: methodName, types, validatorHooks, security, baseURL, streamSelector }) =>
     buildSdkMethod({
       node,
       name: methodName,
@@ -79,6 +83,7 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
       baseURL,
       returnType,
       throwOnErrorDefault,
+      streamSelector,
     }),
   )
 

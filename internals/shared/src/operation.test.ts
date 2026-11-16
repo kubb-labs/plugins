@@ -20,6 +20,7 @@ import {
   resolveResponseTypes,
   resolveStatusCodeNames,
   resolveSuccessNames,
+  splitEventStream,
   toResponseContent,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
@@ -388,6 +389,56 @@ describe('toResponseContent', () => {
     const unknown = ast.factory.createSchema({ type: 'unknown' })
     expect(typeOf('application/x-www-form-urlencoded', unknown).schema).toBe(unknown)
     expect(typeOf('text/plain', unknown).schema).toStrictEqual(ast.factory.createSchema({ type: 'string' }))
+  })
+})
+
+describe('splitEventStream', () => {
+  const object = () => ast.factory.createSchema({ type: 'object', properties: [] })
+  function chatNode({ stream, content }: { stream?: ast.SchemaNode; content: Array<ast.ContentNode> }) {
+    return ast.factory.createOperation({
+      operationId: 'createChat',
+      method: 'POST',
+      path: '/chat',
+      requestBody: {
+        required: true,
+        content: [
+          ast.factory.createContent({
+            contentType: 'application/json',
+            schema: ast.factory.createSchema({
+              type: 'object',
+              properties: stream ? [ast.factory.createProperty({ name: 'stream', schema: stream })] : [],
+            }),
+          }),
+        ],
+      },
+      responses: [ast.factory.createResponse({ statusCode: '200', content })],
+    }) as ast.HttpOperationNode
+  }
+  const json = ast.factory.createContent({ contentType: 'application/json', schema: object() })
+  const events = ast.factory.createContent({ contentType: 'text/event-stream', schema: object(), stream: {} })
+
+  test('splits JSON next to typed events into a JSON call and a stream call', () => {
+    const split = splitEventStream(chatNode({ stream: ast.factory.createSchema({ type: 'boolean' }), content: [json, events] }))
+
+    expect(split).toMatchObject({ statusCode: '200', suffix: 'EventStream', restSuffix: 'Json', selector: 'stream' })
+    expect(split?.rest.responses[0]?.content?.map((entry) => entry.contentType)).toEqual(['application/json'])
+    expect(split?.stream.responses[0]?.content?.map((entry) => entry.contentType)).toEqual(['text/event-stream'])
+  })
+
+  test('detects a nullable boolean `stream` and ignores a property of another type', () => {
+    const nullable = ast.factory.createSchema({
+      type: 'union',
+      members: [ast.factory.createSchema({ type: 'boolean' }), ast.factory.createSchema({ type: 'null' })],
+    })
+
+    expect(splitEventStream(chatNode({ stream: nullable, content: [json, events] }))?.selector).toBe('stream')
+    expect(splitEventStream(chatNode({ stream: ast.factory.createSchema({ type: 'string' }), content: [json, events] }))?.selector).toBeNull()
+  })
+
+  test('returns null for a stream-only, JSON-only, or schemaless-stream response', () => {
+    expect(splitEventStream(chatNode({ content: [events] }))).toBeNull()
+    expect(splitEventStream(chatNode({ content: [json] }))).toBeNull()
+    expect(splitEventStream(chatNode({ content: [json, ast.factory.createContent({ contentType: 'text/event-stream' })] }))).toBeNull()
   })
 })
 

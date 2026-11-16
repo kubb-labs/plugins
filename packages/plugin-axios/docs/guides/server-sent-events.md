@@ -14,7 +14,7 @@ Kubb generates a stream call when the success response declares only a stream co
 | `text/event-stream`, with any other item schema                                            | `ServerSentEvent<Item>`, with `Item` in `data` |
 | `application/jsonl`, `application/x-ndjson`, `application/json-seq`, or a `+json-seq` type | `Item`, one per line                           |
 
-With `text/event-stream` next to another content type, Kubb generates a normal call instead. See [JSON or an event stream](#json-or-an-event-stream).
+With `text/event-stream` next to another content type, Kubb generates a normal call and a stream call. See [JSON or an event stream](#json-or-an-event-stream).
 
 The item schema is `itemSchema` in OpenAPI 3.2. In OpenAPI 3.0 and 3.1, `schema` describes one event or one line:
 
@@ -202,19 +202,20 @@ An error thrown from the loop skips `client.interceptors.error`. `.unwrap()` res
 
 ## JSON or an event stream
 
-When the success response declares `text/event-stream` next to another type, such as `application/json`, Kubb generates a normal call that sends `Accept: text/event-stream`. Pass `contentType: { response: 'application/json' }` to ask for JSON. When the server streams, `data` is the raw `ReadableStream<Uint8Array>`, so read it with `parseEventStream`, or `parseJsonLines({ stream })` for JSON Lines:
+LLM provider APIs, such as OpenAI's `POST /chat/completions`, offer `application/json` and `text/event-stream` on one success response, and a `stream` field in the body picks one. When the event stream has a schema, Kubb generates two calls:
+
+- `createChat` leaves the event stream out and returns the JSON result.
+- `createChatStream` asks for `text/event-stream` and returns typed events, like a stream-only operation.
+
+When the body has a boolean `stream` property, each call sets it, `false` or `true`, and leaves it out of its options type:
 
 ```typescript
-import { parseEventStream } from './gen/.kubb/client'
+const completion = await createChat({ body: { model, messages } }).unwrap()
 
-const result = await getRecentChanges({ signal })
-
-if (result.contentType === 'text/event-stream') {
-  for await (const { data } of parseEventStream(result.data)) render(data)
-} else {
-  render(result.data) // the JSON body
-}
+for await (const event of await createChatStream({ body: { model, messages } })) render(event)
 ```
+
+The query hooks wrap the JSON call. The stream call gets no hook, like a stream-only operation.
 
 ## Stream with the client
 

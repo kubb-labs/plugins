@@ -5,7 +5,7 @@ import { ensureValidVarName } from '@internals/utils'
 import { ast, defineGenerator, Diagnostics, memo } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
-import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
+import { type GeneratorContext, type OperationData, resolveOperationCalls } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
@@ -35,13 +35,13 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
     // `group.name` names the folder and file, never the class.
     const fileName = tag && group ? ensureValidVarName(path.basename(resolver.groupDir(group, tag))) : name
     const file = resolver.file({ name: fileName, extname: '.ts', tag, root, output, group: group ?? undefined })
-    const operationData = resolveOperationData({ node: operationNode, ctx, types })
+    const operationData = resolveOperationCalls({ node: operationNode, ctx, types })
     const previous = acc.find((item) => item.file.path === file.path)
 
     if (previous) {
-      previous.operations.push(operationData)
+      previous.operations.push(...operationData)
     } else {
-      acc.push({ name, tag, file, operations: [operationData] })
+      acc.push({ name, tag, file, operations: operationData })
     }
 
     return acc
@@ -114,7 +114,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
           file: op.typeFile,
-          names: [op.types.response.options(op.node), op.types.response.responses(op.node), ...op.headerTypeNames],
+          names: op.importedTypeNames,
         }))
         const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = validatorEnabled
           ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.validatorHooks.importedZodNames }))

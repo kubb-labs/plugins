@@ -6,6 +6,7 @@ import { buildEventStreamReturn, buildReturnStatement } from './returnStatement.
 import type { SecurityRequirement } from './security.ts'
 import { buildGroupedOptionsSignature } from './signature.ts'
 import type { ValidatorHooks } from './validator.ts'
+import type { StreamSelector } from './operationData.ts'
 
 /**
  * The pieces of a generated operation: its generics, `options` parameter, return type, return statement, and whether the
@@ -21,6 +22,7 @@ export function buildOperationBody({
   baseURL,
   returnType,
   throwOnErrorDefault,
+  streamSelector,
 }: {
   node: ast.HttpOperationNode
   types: OperationTypeNames
@@ -30,8 +32,17 @@ export function buildOperationBody({
   baseURL?: string
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
+  streamSelector?: StreamSelector
 }): { generics: Array<string>; paramsSignature: string; returnType: string; statement: string; mergeContentType: boolean } {
-  const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, baseURL, throwOnErrorDefault, returnType })
+  const { callConfig, mergeContentType, eventStream } = buildCallConfig({
+    node,
+    validatorHooks,
+    security,
+    baseURL,
+    throwOnErrorDefault,
+    returnType,
+    streamSelector,
+  })
   const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault, eventStream, authRequired })
   const stream = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, throwOnErrorDefault }) : null
 

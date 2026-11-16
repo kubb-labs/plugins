@@ -6,6 +6,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
+import type { StreamSelector } from '../builders/operationData.ts'
 import type { ReturnTypeOption } from '../types.ts'
 
 type Props = {
@@ -39,6 +40,7 @@ type Props = {
   authRequired?: boolean
   /** The operation's own server URL from a path-level or operation-level `servers` entry, emitted as the call's default `baseURL`. */
   baseURL?: string
+  streamSelector?: StreamSelector
 }
 
 /**
@@ -47,10 +49,21 @@ type Props = {
  * type, signature, and call config are built with the AST factory, and only the jsx-renderer emits
  * the source.
  */
-export function Operation({ name, node, types, validatorHooks, returnType, throwOnErrorDefault, security, authRequired, baseURL }: Props): KubbReactNode {
+export function Operation({
+  name,
+  node,
+  types,
+  validatorHooks,
+  returnType,
+  throwOnErrorDefault,
+  security,
+  authRequired,
+  baseURL,
+  streamSelector,
+}: Props): KubbReactNode {
   if (!ast.http.isOperation(node)) return null
 
-  const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault })
+  const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault, streamSelector })
 
   return (
     <File.Source name={name} isExportable isIndexable>

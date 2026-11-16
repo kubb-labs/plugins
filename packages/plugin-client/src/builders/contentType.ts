@@ -1,10 +1,10 @@
-import { getContentTypeInfo, getResponseContentTypeInfo, hasEventStreamContent, isEventStream } from '@internals/shared'
+import { getContentTypeInfo, getResponseContentTypeInfo, isEventStream } from '@internals/shared'
 import { ast, text } from '@kubb/kit'
 
 /**
  * Builds the `contentType` entry baked into the call config. It holds the request default when the operation has a body
- * and `response` set to the streamed media type when it streams items, or `text/event-stream` when it offers events next to
- * another type, and is `null` with neither.
+ * and `response` set to the streamed media type when it streams items, and is `null` with neither. A response that offers
+ * events next to another type is split into two calls first, see `resolveOperationCalls`.
  *
  * `merge` is `true` when the generated function must destructure `contentType` from `options` and merge it over the
  * baked defaults, because the caller can also pick a response content type or a stream must keep its `Accept`.
@@ -14,10 +14,9 @@ export function buildContentType({ node }: { node: ast.HttpOperationNode }): { l
   const hasRequestBody = Boolean(ast.http.requestBody.getSchema(node))
   // The first declared type is the default; the caller overrides it on `contentType`.
   const requestContentType = hasRequestBody ? defaultContentType : null
-  // A stream asks for its own media type, and a response that offers events next to JSON asks for the events, so a client whose
-  // default `Accept` prefers JSON, such as axios, gets the stream. The caller picks another type with `contentType.response`.
+  // A stream asks for its own media type, so a client whose default `Accept` prefers JSON, such as axios, gets the stream.
   const streamType = isEventStream(node) ? ast.mediaType.getBase(getResponseContentTypeInfo(node).defaultContentType) : null
-  const response = streamType || hasEventStreamContent(node) ? `response: ${text.quote(streamType ?? 'text/event-stream')}` : null
+  const response = streamType ? `response: ${text.quote(streamType)}` : null
 
   if (!requestContentType) return { literal: response && `contentType: { ${response} }`, merge: false }
 
