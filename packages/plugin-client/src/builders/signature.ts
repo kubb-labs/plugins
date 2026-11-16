@@ -41,6 +41,7 @@ export function buildGroupedOptionsSignature({
   returnType,
   throwOnErrorDefault,
   eventStream = false,
+  authRequired = false,
 }: {
   node: ast.OperationNode
   types: OperationTypeNames
@@ -51,10 +52,13 @@ export function buildGroupedOptionsSignature({
    * client, whose own `client.stream` returns a `StreamResult` and types its config itself.
    */
   eventStream?: boolean
+  authRequired?: boolean
 }): GroupedOptionsSignature {
   const optionsName = types.response.options(node)
-  const optionsType = `${eventStream && returnType !== 'plain' ? 'StreamOptions' : 'Options'}<${optionsName}, ThrowOnError>`
-  const { isOptional } = getRequestGroupOptionality(node)
+  const baseType = `${eventStream && returnType !== 'plain' ? 'StreamOptions' : 'Options'}<${optionsName}, ThrowOnError>`
+  // `NonNullable` reuses the module's own `auth` type, so a custom `importPath` client needs no extra export.
+  const optionsType = authRequired ? `${baseType} & { auth: NonNullable<${baseType}['auth']> }` : baseType
+  const isOptional = !authRequired && getRequestGroupOptionality(node).isOptional
 
   const paramsSignature =
     declarationPrinter.print(

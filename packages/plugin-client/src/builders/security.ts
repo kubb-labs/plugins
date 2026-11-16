@@ -69,9 +69,9 @@ export function resolveCredential(credential: ast.AuthCredential): Auth | null {
 
 /**
  * Derives the per-operation security metadata from `OperationNode.auth` and the document's `meta.auth` schemes. Each
- * requirement becomes one entry: its scheme, or an array of its schemes when it needs several together. A requirement
- * with a scheme the runtime cannot place or that is not declared is left out, since it can never be met, and so is a
- * repeated one. With `hoist`, each scheme carries its name as `ref`.
+ * requirement becomes one entry: its scheme, or an array of its schemes when it needs several together. A `mutualTLS`
+ * scheme is left out, since the transport supplies the certificate, and so is a requirement left with no scheme, an
+ * undeclared one, or a repeated one. With `hoist`, each scheme carries its name as `ref`.
  *
  * @example
  * `getOperationSecurity({ auth: [[{ scheme: 'bearerAuth' }]], schemes: meta.auth })`
@@ -89,15 +89,21 @@ export function getOperationSecurity({
   hoist?: boolean
 }): Array<SecurityRequirement> | undefined {
   const security = ast.auth.getRequirements({ auth, schemes }).flatMap((requirement): Array<SecurityRequirement> => {
-    const resolved = requirement.map(({ name, credential, scopes }) => {
+    const resolved = requirement.flatMap(({ name, credential, scopes }): Array<OperationAuth> => {
       const entry = resolveCredential(credential)
-      return entry && { ...entry, ...(scopes.length ? { scopes } : {}), ...(hoist ? { ref: name } : {}) }
+      return entry ? [{ ...entry, ...(scopes.length ? { scopes } : {}), ...(hoist ? { ref: name } : {}) }] : []
     })
-    if (!resolved.length || !resolved.every((entry): entry is OperationAuth => entry !== null)) return []
+    if (!resolved.length) return []
     return [resolved.length === 1 ? resolved[0]! : resolved]
   })
 
   return security.length ? security : undefined
+}
+
+/** True when every requirement has a scheme that needs a token. `security: [{}]` and `mutualTLS` alone need none. */
+export function isAuthRequired({ auth, schemes }: { auth: Array<ast.AuthRequirement> | undefined; schemes: Array<ast.AuthScheme> | undefined }): boolean {
+  const requirements = ast.auth.getRequirements({ auth, schemes })
+  return requirements.length > 0 && requirements.every((requirement) => requirement.some(({ credential }) => resolveCredential(credential) !== null))
 }
 
 /**

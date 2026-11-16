@@ -20,6 +20,13 @@ export type ValidatorOptions = false | 'zod' | { request?: 'zod'; params?: 'zod'
 export type Mode = 'tag' | 'flat'
 
 /**
+ * How generated functions take the `auth` option.
+ * - `'optional'`: every function takes `auth` as an optional option.
+ * - `'required'`: a function whose operation needs a token takes `auth` as a required option.
+ */
+export type AuthMode = 'optional' | 'required'
+
+/**
  * The resolver shared by the client plugins. Inherits the built-in camelCase `name` and `file`;
  * classes and tag groups use PascalCase (with a `Client` suffix for groups).
  */
@@ -82,6 +89,27 @@ export type ClientOptions = OutputOptions & {
    * @default false
    */
   validator?: ValidatorOptions
+  /**
+   * How generated functions take the `auth` option. SDK classes take `auth` in their constructor and ignore it.
+   *
+   * @example Make `auth` required on operations that need a token
+   * ```ts
+   * pluginFetch({ auth: { mode: 'required' } })
+   * // await addPet({ body, auth: () => getToken() })
+   * // await addPet({ body }) // Type error: `auth` is missing
+   * ```
+   */
+  auth?: {
+    /**
+     * Whether a generated function takes `auth` as an optional or a required option.
+     * - `'optional'`: every function takes `auth` as an optional option.
+     * - `'required'`: a function whose operation needs a token takes `auth` as a required option. An operation
+     *   without `security`, or one that allows `{}`, keeps it optional.
+     *
+     * @default 'optional'
+     */
+    mode?: AuthMode
+  }
   /**
    * Shape of the value a generated operation function resolves to. Applies to the standalone
    * functions and the class-based SDK. The query-hook plugins (`@kubb/plugin-react-query`,
@@ -170,6 +198,7 @@ export type ClientResolvedOptions = {
   importPath?: string
   throwOnErrorDefault: boolean
   validator: NonNullable<ClientOptions['validator']>
+  auth: { mode: AuthMode }
   returnType: ReturnTypeOption
   sdk:
     | {

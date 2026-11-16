@@ -3,7 +3,7 @@ import { operationKey, resolveOperationFile } from '@internals/shared'
 import { ast, type Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import type { ContractClientFactory } from '../types.ts'
-import { getOperationSecurity, type SecurityRequirement } from './security.ts'
+import { getOperationSecurity, isAuthRequired, type SecurityRequirement } from './security.ts'
 import { buildValidatorHooks, type ValidatorHooks } from './validator.ts'
 import { isValidatorEnabled } from './validatorOptions.ts'
 
@@ -24,6 +24,7 @@ export type OperationData = {
    */
   headerTypeNames: Array<string>
   security?: Array<SecurityRequirement>
+  authRequired: boolean
   baseURL?: string
 }
 
@@ -57,6 +58,7 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
     headerTypeNames: getResponseHeadersTypeNames({ node, types }),
     // The fetch and axios clients write `securitySchemes` into `.kubb/client.ts`. A custom client module has none.
     security: getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth, hoist: importPath === undefined }),
+    authRequired: ctx.options.auth.mode === 'required' && isAuthRequired({ auth: node.auth, schemes: ctx.meta.auth }),
     baseURL: ast.http.getBaseURL(
       ast.server.get({ servers: node.servers, index: (ctx.adapter.options as { server?: { index?: number } } | undefined)?.server?.index }),
     ),

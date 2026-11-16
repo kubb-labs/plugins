@@ -10,6 +10,8 @@ Pass these options to `pluginClient()`. Shared options link to [Shared plugin op
 | [`returnType`](#returntype)                                               | What a generated function resolves to.                                              | `'plain'`                                        |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | `throwOnError` value each call passes to your client.                               | `true`                                           |
 | [`validator`](#validator)                                                 | Zod schemas to pass to your client.                                                 | `false`                                          |
+| [`auth`](#auth)                                                           | How generated functions take `auth`.                                                | None                                             |
+| [`auth.mode`](#auth)                                                      | Optional `auth`, or required when a token is needed.                                | `'optional'`                                     |
 | [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                                            | `{ path: 'clients', barrel: { type: 'named' } }` |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                                        | None                                             |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                                    | None                                             |
@@ -108,3 +110,32 @@ Opts in per slot: `request` for the body, `params` for the path, query, header, 
 
 > [!IMPORTANT]
 > Add `pluginZod()` to `plugins` when `validator` is set, or generation stops with an error.
+
+### auth
+
+Sets how generated functions take the `auth` option.
+
+|          |                                       |
+| -------- | ------------------------------------- |
+| Type     | `{ mode?: 'optional' \| 'required' }` |
+| Required | `false`                               |
+
+::field-group
+
+:::field{name="mode: 'optional'"}
+Default value. Every generated function takes `auth` as an optional option. Use it with the query-hook plugins, which pass a partial config to the function.
+:::
+
+:::field{name="mode: 'required'"}
+A generated function whose operation needs a security scheme takes `auth` as a required option, so a missing token fails at compile time. An operation without `security`, or one that allows `{}` (anonymous access), keeps `auth` optional.
+:::
+
+::
+
+With `mode: 'required'`, the required type is read from the `auth` key of your module's `Options`, so that type must have one.
+
+```ts
+// with pluginClient({ importPath: '../client', auth: { mode: 'required' } })
+await addPet({ body, auth: () => getToken() })
+await addPet({ body }) // Type error: `auth` is missing
+```
