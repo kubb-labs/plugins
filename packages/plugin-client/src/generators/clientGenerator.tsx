@@ -32,7 +32,8 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
       const calls = resolveOperationCalls({ node, ctx, types })
       const data = calls[0]!
-      const { validatorHooks, headerTypeNames } = data
+      const { headerTypeNames } = data
+      const zodNames = Array.from(new Set(calls.flatMap((call) => call.validatorHooks.importedZodNames)))
       const file = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
       const importedTypeNames = calls.flatMap((call) => call.importedTypeNames)
 
@@ -74,10 +75,8 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
           <File.Import name={Array.from(new Set(importedTypeNames))} root={file.path} path={data.typeFile.path} isTypeOnly />
 
-          {data.zodFile && validatorHooks.importedZodNames.length > 0 && (
-            <File.Import name={validatorHooks.importedZodNames} root={file.path} path={data.zodFile.path} />
-          )}
-          {validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
+          {data.zodFile && zodNames.length > 0 && <File.Import name={zodNames} root={file.path} path={data.zodFile.path} />}
+          {data.validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
 
           {calls.some((call) => call.stream !== undefined) && <File.Source name="OmitStreamField">{omitStreamFieldType}</File.Source>}
           {calls.map((call) => (
@@ -86,7 +85,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
               name={call.name}
               node={call.node}
               types={call.types}
-              validatorHooks={validatorHooks}
+              validatorHooks={call.validatorHooks}
               returnType={returnType}
               throwOnErrorDefault={throwOnErrorDefault}
               security={call.security}

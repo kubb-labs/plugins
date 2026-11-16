@@ -1,5 +1,5 @@
 import { getResponseHeadersTypeNames, type OperationTypeNames, type OperationTypeSource } from '@internals/client'
-import { getResponseContentTypeInfo, operationKey, resolveOperationFile, splitEventStream } from '@internals/shared'
+import { getPerContentTypeName, getResponseContentTypeInfo, operationKey, resolveOperationFile, splitEventStream } from '@internals/shared'
 import { ast, type Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import type { ContractClientFactory } from '../types.ts'
@@ -129,6 +129,16 @@ export function resolveOperationCalls({
   // One remaining content type is named like the stream variant. Several stay the record's `{ contentType; data }` union.
   const restItem = split.restSuffix ? types.contentVariant(node, split.statusCode, split.restSuffix) : null
   const optionsType = split.selector ? `OmitStreamField<${options}>` : options
+  // Each call validates its own variant, since a union of both can parse an event as the JSON body and drop its fields.
+  // The whole success schema stays when another success status has a body too.
+  const zodResolver = data.validatorHooks.response ? ctx.driver.getResolver(pluginZodName) : null
+  const onlySuccess = ast.http.responses.filterSuccess(node).filter((response) => response.content?.some((entry) => entry.schema)).length === 1
+  const variantHooks = (suffix: string | null): ValidatorHooks => {
+    const hooks = data.validatorHooks
+    if (!zodResolver || !hooks.response || !suffix || !onlySuccess) return hooks
+    const response = getPerContentTypeName(zodResolver.response.status(node, split.statusCode), suffix)
+    return { ...hooks, response, importedZodNames: hooks.importedZodNames.map((name) => (name === hooks.response ? response : name)) }
+  }
   const callTypes = (responsesType: string): OperationTypeNames => ({
     response: { options: () => optionsType, responses: () => responsesType, headers: types.response.headers?.bind(types.response) },
   })
@@ -142,12 +152,14 @@ export function resolveOperationCalls({
         `Omit<${responses}, ${status}> & { ${status}: ${restItem ?? `Exclude<${responses}[${status}], { contentType: 'text/event-stream' }>`} }`,
       ),
       accept: ast.mediaType.getBase(getResponseContentTypeInfo(split.rest).defaultContentType),
+      validatorHooks: variantHooks(split.restSuffix),
       stream: split.selector ? false : undefined,
     },
     {
       ...data,
       node: split.stream,
       name: streamName,
+      validatorHooks: variantHooks(split.suffix),
       types: callTypes(`Omit<${responses}, ${status}> & { ${status}: ${streamItem} }`),
       importedTypeNames: [...data.importedTypeNames, streamItem],
       stream: split.selector ? true : undefined,

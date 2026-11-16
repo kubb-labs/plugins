@@ -14,7 +14,7 @@ Kubb generates a stream call when the success response declares only a stream co
 | `text/event-stream`, with any other item schema                                            | `ServerSentEvent<Item>`, with `Item` in `data` |
 | `application/jsonl`, `application/x-ndjson`, `application/json-seq`, or a `+json-seq` type | `Item`, one per line                           |
 
-With `text/event-stream` next to another content type, Kubb generates a normal call and a stream call. See [JSON or an event stream](#json-or-an-event-stream).
+With `text/event-stream` next to another content type, Kubb generates a normal call and a stream call. See [JSON or an event stream](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events#json-or-an-event-stream).
 
 The item schema is `itemSchema` in OpenAPI 3.2. In OpenAPI 3.0 and 3.1, `schema` describes one event or one line:
 

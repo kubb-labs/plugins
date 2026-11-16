@@ -153,6 +153,39 @@ describe('a response that offers JSON or an event stream', () => {
     }
   })
 
+  test('validates each call with the zod schema of its own content type', async () => {
+    const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-zod-'))
+    try {
+      const { diagnostics } = await createKubb(
+        {
+          root: dirname,
+          input: '../../schemas/3.0.x/eventStreamMixed.yaml',
+          output: { path: output, barrel: false },
+          adapter: adapterOas({ validate: false }),
+          parsers: [parserTs()],
+          reporters: [],
+          storage: fsStorage(),
+          plugins: [
+            pluginTs({ output: { path: './types', barrel: false } }),
+            pluginZod({ output: { path: './zod', barrel: false } }),
+            pluginFetch({ output: { path: './clients', barrel: false }, validator: 'zod' }),
+          ],
+        } as Config,
+        { hooks: new Hookable<KubbHooks>() },
+      ).safeBuild()
+      expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
+
+      const client = await fs.readFile(path.join(output, 'clients', 'listChanges.ts'), 'utf8')
+      const responseValidators = [...client.matchAll(/validator: \{ response: (\w+)/g)].map((match) => match[1])
+      expect(responseValidators).toStrictEqual(['listChangesStatus200SchemaJson', 'listChangesStatus200SchemaEventStream'])
+
+      const zod = await fs.readFile(path.join(output, 'zod', 'listChangesSchema.ts'), 'utf8')
+      for (const name of responseValidators) expect(zod).toContain(`export const ${name}`)
+    } finally {
+      await fs.rm(output, { recursive: true, force: true })
+    }
+  })
+
   test('returns JSON from the JSON call and parsed events from the stream call', async () => {
     const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-run-'))
     try {
