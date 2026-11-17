@@ -2,6 +2,7 @@ import http from 'node:http'
 import type { AddressInfo } from 'node:net'
 import ky from 'ky'
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
+import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
 import { client, createClient, createKyTransport, ResponseError } from './client.ts'
 
 type Hit = { method?: string; url?: string; headers: http.IncomingHttpHeaders; body: string }
@@ -17,7 +18,23 @@ const server = http.createServer((req, res) => {
     hits.push({ method: req.method, url: req.url, headers: req.headers, body: Buffer.concat(chunks).toString() })
     const count = hits.filter((hit) => hit.url === req.url).length
     if (req.url === '/slow') return
-    const status = req.url === '/missing' ? 404 : req.url?.startsWith('/down') || (req.url === '/flaky' && count === 1) ? 503 : 200
+    // Sends the headers at once and then one event every 60 ms, after a 503 on the first try of `/events-flaky`.
+    if (req.url?.startsWith('/events') && !(req.url === '/events-flaky' && count === 1)) {
+      res.writeHead(200, { 'content-type': 'text/event-stream' })
+      res.flushHeaders()
+      let sent = 0
+      const timer = setInterval(() => {
+        res.write(`id: ${++sent}\ndata: {"n":${sent}}\n\n`)
+        if (sent === 3) {
+          clearInterval(timer)
+          res.end()
+        }
+      }, 60)
+      res.on('close', () => clearInterval(timer))
+      return
+    }
+    const status =
+      req.url === '/missing' ? 404 : req.url === '/events-flaky' || req.url?.startsWith('/down') || (req.url === '/flaky' && count === 1) ? 503 : 200
     res.writeHead(status, { 'content-type': 'application/json' })
     res.end(JSON.stringify(status === 200 ? { ok: true } : { message: 'nope' }))
   })
@@ -95,5 +112,42 @@ describe('createKyTransport', () => {
     await expect(flaky({ method: 'POST', url: '/down-post' })).rejects.toMatchObject({ status: 503 })
     await expect(flaky({ method: 'GET', url: '/down-once', options: { retry: 0 } })).rejects.toMatchObject({ status: 503 })
     expect(hits.filter((hit) => hit.url?.startsWith('/down-'))).toHaveLength(2)
+  })
+})
+
+describe('client.stream', () => {
+  const streamClient = () => createClient({ baseURL, mediaTypes: streamMediaTypes, options: { timeout: 50, retry: { limit: 1, delay: () => 0 } } })
+
+  test('reads server-sent events past the Ky timeout, which only waits for the headers', async () => {
+    const events = await streamClient().stream<{ '200': { n: number } }>({ method: 'GET', url: '/events' })
+    const seen: Array<unknown> = []
+    for await (const event of events) seen.push(event.data)
+
+    expect(seen).toStrictEqual([{ n: 1 }, { n: 2 }, { n: 3 }])
+    expect(hits.filter((hit) => hit.url === '/events')).toHaveLength(1)
+    expect(hits.at(-1)?.headers.accept).toBe('text/event-stream')
+  })
+
+  test('retries a 503 before the stream starts, and stops the request when the loop breaks', async () => {
+    const events = await streamClient().stream<{ '200': { n: number } }>({ method: 'GET', url: '/events-flaky' })
+    const seen: Array<unknown> = []
+    for await (const event of events) {
+      seen.push(event.data)
+      break
+    }
+
+    expect(seen).toStrictEqual([{ n: 1 }])
+    expect(hits.filter((hit) => hit.url === '/events-flaky')).toHaveLength(2)
+  })
+
+  test('rejects with the signal reason when the abort comes while events are read', async () => {
+    const controller = new AbortController()
+    const reason = new Error('stop')
+    const events = await streamClient().stream({ method: 'GET', url: '/events-abort', signal: controller.signal })
+    const read = (async () => {
+      for await (const _ of events) controller.abort(reason)
+    })()
+
+    await expect(read).rejects.toBe(reason)
   })
 })
