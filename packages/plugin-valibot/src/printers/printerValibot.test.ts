@@ -215,6 +215,7 @@ describe('printerValibot', () => {
     test('drops a default that does not fit the schema', () => {
       expect(print(createSchema({ type: 'array', items: [string()], default: {} }))).toBe('v.array(v.string())')
       expect(print(createSchema({ type: 'string', default: null }))).toBe('v.string()')
+      expect(print(createSchema({ type: 'date', representation: 'date', default: '2020-01-01' }))).toBe('v.date()')
     })
   })
 
@@ -260,6 +261,28 @@ describe('printerValibot', () => {
       expect(code).toBe('v.object({\n  ...petSchema.entries,\n  id: v.string(),\n  age: v.number(),\n})')
       expect(v.is(build(code, scope), { id: 'a', age: 1 })).toBe(true)
       expect(v.is(build(code, scope), { age: 1 })).toBe(false)
+    })
+
+    test.each([
+      ['a loose base stays loose', { additionalProperties: true }, 'v.looseObject({\n  ...petSchema.entries,\n  age: v.number(),\n})'],
+      ['a strict base stays strict', { additionalProperties: false }, 'v.strictObject({\n  ...petSchema.entries,\n  age: v.number(),\n})'],
+      [
+        'a base with a rest schema stays in v.intersect',
+        { additionalProperties: createSchema({ type: 'number' }) },
+        'v.intersect([\n  petSchema,\n  v.object({\n    age: v.number(),\n  }),\n])',
+      ],
+      [
+        'a base with a default is a wrapper, so it stays in v.intersect',
+        { default: { id: 'a' } },
+        'v.intersect([\n  petSchema,\n  v.object({\n    age: v.number(),\n  }),\n])',
+      ],
+    ] as const)('an object allOf: %s', (_name, extra, expected) => {
+      const node = createSchema({
+        type: 'intersection',
+        members: [ref('Pet', { ...petNode, ...extra } as ast.SchemaNode), object({ age: createSchema({ type: 'number' }) })],
+      })
+
+      expect(print(node)).toBe(expected)
     })
 
     test('an object allOf prints a property two members declare once', () => {

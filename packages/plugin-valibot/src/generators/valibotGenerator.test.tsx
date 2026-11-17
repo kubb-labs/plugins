@@ -54,7 +54,7 @@ function setup(name: string, optionOverrides: Partial<PluginValibot['resolvedOpt
   }
 }
 
-describe('valibotGenerator — Schema', () => {
+describe('valibotGenerator schema', () => {
   const schemas: Array<{ name: string; node: ast.SchemaNode; options?: Partial<PluginValibot['resolvedOptions']> }> = [
     { name: 'object', node: createSchema({ ...petSchema, properties: petProperties.slice(0, 3) }) },
     { name: 'inferred', node: createSchema({ type: 'array', name: 'PetNames', items: [createSchema({ type: 'string' })] }), options: { inferred: true } },
@@ -89,10 +89,10 @@ describe('valibotGenerator — Schema', () => {
   })
 })
 
-describe('valibotGenerator — Operation', () => {
+describe('valibotGenerator operation', () => {
   const operations: Array<{ name: string; node: ast.OperationNode; options?: Partial<PluginValibot['resolvedOptions']> }> = [
     {
-      name: 'updatePet — params, request body, and several status codes',
+      name: 'updatePet with params, request body, and several status codes',
       node: createOperation({
         operationId: 'updatePet',
         method: 'PUT',
@@ -130,7 +130,7 @@ describe('valibotGenerator — Operation', () => {
       options: { inferred: true },
     },
     {
-      name: 'uploadFile — several request content types',
+      name: 'uploadFile with several request content types',
       node: createOperation({
         operationId: 'uploadFile',
         method: 'POST',
