@@ -6,7 +6,7 @@ import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { ClientOperation, ReturnTypeOption } from '@internals/client'
 
-type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'memo' | 'meta' | 'driver' | 'getPlugin' | 'getResolver' | 'requirePlugin' | 'resolver'>
+type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'memo' | 'meta' | 'schemas' | 'getPlugin' | 'getResolver' | 'requirePlugin' | 'resolver'>
 
 type ResolveHookFileOptions = {
   name: string

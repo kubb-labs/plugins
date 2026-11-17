@@ -27,7 +27,7 @@ export function operationFileEntry(node: ast.OperationNode, name: string, extnam
  * operation. The plugin itself and every plugin that imports from it call this, so they all get
  * the same path.
  *
- * When that path matches the file of a component schema in `ctx.driver.inputNode`, ignoring case, the file name
+ * When that path matches the file of a component schema in `ctx.schemas`, ignoring case, the file name
  * gets an `Operation` suffix: operation `point` goes to `PointOperation.ts` next to schema `Point.ts`.
  * Otherwise the two merge into one file, or overwrite each other on a case-insensitive file system.
  * Only the file name changes. The declarations keep their names.
@@ -38,7 +38,7 @@ export function operationFileEntry(node: ast.OperationNode, name: string, extnam
  * ```
  */
 export function resolveOperationFile(options: {
-  ctx: { memo: Memo; driver: { inputNode?: { schemas: ReadonlyArray<ast.SchemaNode> } | null } }
+  ctx: { memo: Memo; schemas: ReadonlyArray<ast.SchemaNode> }
   node: ast.OperationNode
   resolver: Pick<Resolver, 'file' | 'pluginName'>
   root: string
@@ -53,11 +53,7 @@ export function resolveOperationFile(options: {
     const schemaPaths = memo(
       `${resolver.pluginName}:schemaFilePaths`,
       () =>
-        new Set(
-          (ctx.driver.inputNode?.schemas ?? []).flatMap((schema) =>
-            schema.name ? [resolver.file({ name: schema.name, extname: '.ts', ...location }).path.toLowerCase()] : [],
-          ),
-        ),
+        new Set(ctx.schemas.flatMap((schema) => (schema.name ? [resolver.file({ name: schema.name, extname: '.ts', ...location }).path.toLowerCase()] : []))),
     )
     let file = resolver.file({ ...operationFileEntry(node, node.operationId), ...location })
 
