@@ -896,6 +896,9 @@ importers:
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
+      '@kubb/plugin-valibot':
+        specifier: workspace:^
+        version: link:../plugin-valibot
       '@kubb/plugin-zod':
         specifier: workspace:^
         version: link:../plugin-zod

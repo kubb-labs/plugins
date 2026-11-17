@@ -1,4 +1,5 @@
 import { ast } from '@kubb/kit'
+import { resolverValibot } from '@kubb/plugin-valibot'
 import { resolverZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 import { buildValidatorHooks } from './validator.ts'
@@ -47,10 +48,10 @@ function toResponse(statusCode: ast.StatusCode) {
 
 describe('buildValidatorHooks', () => {
   test("the 'zod' shorthand also wires the error validator when an error response is documented", () => {
-    const hooks = buildValidatorHooks({ node: addPetWithError, validator: 'zod', zodResolver: resolverZod })
+    const hooks = buildValidatorHooks({ node: addPetWithError, validator: 'zod', schemaResolver: resolverZod })
     expect(hooks.response).toBe('addPetResponseSchema')
     expect(hooks.error).toBe('{ 422: addPetStatus422Schema }')
-    expect(hooks.importedZodNames).toStrictEqual(['addPetResponseSchema', 'addPetStatus422Schema'])
+    expect(hooks.importedSchemaNames).toStrictEqual(['addPetResponseSchema', 'addPetStatus422Schema'])
   })
 
   test('keys the error map by status, quoting range and default keys and skipping bodiless statuses', () => {
@@ -64,9 +65,9 @@ describe('buildValidatorHooks', () => {
         ast.factory.createResponse({ statusCode: '409', description: 'no body' }),
       ],
     }
-    const hooks = buildValidatorHooks({ node, validator: 'zod', zodResolver: resolverZod })
+    const hooks = buildValidatorHooks({ node, validator: 'zod', schemaResolver: resolverZod })
     expect(hooks.error).toBe("{ 422: addPetStatus422Schema, '5xx': addPetStatus5xxSchema, '4xx': addPetStatus4xxSchema, 'default': addPetStatusDefaultSchema }")
-    expect(hooks.importedZodNames).toStrictEqual([
+    expect(hooks.importedSchemaNames).toStrictEqual([
       'addPetResponseSchema',
       'addPetStatus422Schema',
       'addPetStatus5xxSchema',
@@ -78,25 +79,36 @@ describe('buildValidatorHooks', () => {
   test('wires no response validator for an operation without a response body schema, since plugin-zod emits none', () => {
     const bodiless = [ast.factory.createResponse({ statusCode: '204', description: 'no body' })]
     for (const responses of [[], bodiless]) {
-      const hooks = buildValidatorHooks({ node: { ...addPet, responses }, validator: 'zod', zodResolver: resolverZod })
+      const hooks = buildValidatorHooks({ node: { ...addPet, responses }, validator: 'zod', schemaResolver: resolverZod })
       expect(hooks.response).toBeNull()
-      expect(hooks.importedZodNames).toStrictEqual([])
+      expect(hooks.importedSchemaNames).toStrictEqual([])
     }
   })
 
   test('the object form wires the request validator from the body schema', () => {
-    const hooks = buildValidatorHooks({ node: addPet, validator: { request: 'zod' }, zodResolver: resolverZod })
+    const hooks = buildValidatorHooks({ node: addPet, validator: { request: 'zod' }, schemaResolver: resolverZod })
     expect(hooks.request).toBe('addPetBodySchema')
     expect(hooks.response).toBeNull()
     expect(hooks.error).toBeNull()
-    expect(hooks.importedZodNames).toStrictEqual(['addPetBodySchema'])
+    expect(hooks.importedSchemaNames).toStrictEqual(['addPetBodySchema'])
   })
 
   test('request alone leaves the params unvalidated', () => {
-    const hooks = buildValidatorHooks({ node: putEvent, validator: { request: 'zod' }, zodResolver: resolverZod })
+    const hooks = buildValidatorHooks({ node: putEvent, validator: { request: 'zod' }, schemaResolver: resolverZod })
     expect(hooks.request).toBe('putEventBodySchema')
     expect(hooks.path).toBeNull()
     expect(hooks.query).toBeNull()
     expect(hooks.headers).toBeNull()
+  })
+
+  test('valibot reads the header keys from `.entries`, where zod has `.shape`', () => {
+    const validator = (library: 'zod' | 'valibot') => ({ params: library }) as const
+
+    expect(buildValidatorHooks({ node: putEvent, validator: validator('valibot'), schemaResolver: resolverValibot }).headers).toBe(
+      'toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.entries)',
+    )
+    expect(buildValidatorHooks({ node: putEvent, validator: validator('zod'), schemaResolver: resolverZod }).headers).toBe(
+      'toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape)',
+    )
   })
 })

@@ -80,9 +80,7 @@ async function loadClient(
     baseURL: 'https://api.test',
     transport: async (request: ResolvedRequest) => {
       requests.push(request)
-      return Response.json(
-        request.url.includes('/resources/') ? { resource: 'https://docs.test/guide', revision } : { startsAt: '2026-10-01T09:00:00.000Z' },
-      )
+      return Response.json(request.url.includes('/resources/') ? { resource: 'https://docs.test/guide', revision } : { startsAt: '2026-10-01T09:00:00.000Z' })
     },
   })
   const { putEvent } = (await import(pathToFileURL(path.join(output, 'clients/putEvent.ts')).href)) as { putEvent: Operation }

@@ -55,5 +55,4 @@ describe(`plugin-client ${version}`, () => {
     expect(putEvent).not.toContain('.kubb')
     expect(files.some((file) => file.path.split(path.sep).includes('.kubb'))).toBe(false)
   })
-
 })

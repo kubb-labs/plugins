@@ -17,6 +17,13 @@ describe('pluginFetch setup', () => {
     })
   })
 
+  test("validator: 'valibot' requires plugin-valibot, and not plugin-zod", async () => {
+    await expect(setupKubb({ validator: 'valibot' }, ['plugin-ts', 'plugin-zod'])).rejects.toMatchObject({
+      diagnostic: { code: 'KUBB_MISSING_DEPENDENCY', message: 'Plugin "plugin-valibot" is required by "plugin-fetch" but not found.' },
+    })
+    await expect(setupKubb({ validator: 'valibot' }, ['plugin-ts', 'plugin-valibot'])).resolves.toBeUndefined()
+  })
+
   test("returnType: 'plain' is rejected by the Options type", () => {
     // @ts-expect-error 'plain' belongs to plugin-client, the bundled runtime does not typecheck with it
     const options: Options = { returnType: 'plain' }

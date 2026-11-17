@@ -9,7 +9,7 @@ Pass these options to `pluginClient()`. Shared options link to [Shared plugin op
 | [`importPath`](#importpath)                                               | Import specifier of your client module.                                             | Required                                         |
 | [`returnType`](#returntype)                                               | What a generated function resolves to.                                              | `'plain'`                                        |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | `throwOnError` value each call passes to your client.                               | `true`                                           |
-| [`validator`](#validator)                                                 | Zod schemas to pass to your client.                                                 | `false`                                          |
+| [`validator`](#validator)                                                 | Zod or Valibot schemas to pass to your client.                                      | `false`                                          |
 | [`auth`](#auth)                                                           | How generated functions take `auth`.                                                | None                                             |
 | [`auth.mode`](#auth)                                                      | Optional `auth`, or required when a token is needed.                                | `'optional'`                                     |
 | [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                                            | `{ path: 'clients', barrel: { type: 'named' } }` |
@@ -84,13 +84,13 @@ The `throwOnError` value every generated function passes to your client, unless 
 
 ### validator
 
-Passes Zod schemas from `@kubb/plugin-zod` to your client on `config.validator`. Your client runs them. See [Validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses).
+Passes Zod schemas from `@kubb/plugin-zod`, or Valibot schemas from `@kubb/plugin-valibot`, to your client on `config.validator`. Your client runs them. See [Validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses).
 
-|          |                                                                           |
-| -------- | ------------------------------------------------------------------------- |
-| Type     | `false \| 'zod' \| { request?: 'zod'; params?: 'zod'; response?: 'zod' }` |
-| Required | `false`                                                                   |
-| Default  | `false`                                                                   |
+|          |                                                                   |
+| -------- | ----------------------------------------------------------------- |
+| Type     | `false \| 'zod' \| 'valibot' \| { request?; params?; response? }` |
+| Required | `false`                                                           |
+| Default  | `false`                                                           |
 
 ::field-group
 
@@ -99,17 +99,21 @@ Default. Passes nothing.
 :::
 
 :::field{name="'zod'"}
-Passes the response and error schemas.
+Passes the response and error schemas of `@kubb/plugin-zod`.
 :::
 
-:::field{name="{ request?: 'zod', params?: 'zod', response?: 'zod' }"}
-Opts in per slot: `request` for the body, `params` for the path, query, header, and cookie schemas, and `response` for the response and error schemas. `params` also imports `toHeadersStandardSchema` from your module.
+:::field{name="'valibot'"}
+Passes the response and error schemas of `@kubb/plugin-valibot`.
+:::
+
+:::field{name="{ request?, params?, response? }"}
+Opts in per slot, with `'zod'` or `'valibot'` as the value. Use one library for every slot. `request` for the body, `params` for the path, query, header, and cookie schemas, and `response` for the response and error schemas. `params` also imports `toHeadersStandardSchema` from your module.
 :::
 
 ::
 
 > [!IMPORTANT]
-> Add `pluginZod()` to `plugins` when `validator` is set, or generation stops with an error.
+> Add the plugin of the library to `plugins` when `validator` is set: `pluginZod()` for `'zod'`, `pluginValibot()` for `'valibot'`. Without it, generation stops with an error.
 
 ### auth
 

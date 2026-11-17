@@ -2,15 +2,22 @@ import type { ReturnTypeOption } from '@internals/client'
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
 
 /**
- * Validator applied to the request and response using schemas from `@kubb/plugin-zod`.
- * - `false`: no validation.
- * - `'zod'`: validates the success (2xx) response body, and the error body of a non-2xx call, whether it
- *   throws or returns the error.
- * - `{ request?: 'zod'; params?: 'zod'; response?: 'zod' }`: opt in per slot. `request` encodes the
- *   request body before the call; `params` validate the path, query, and header params;
- *   `response` validates the success response body and the error body.
+ * The schema library a validator reads its schemas from: `@kubb/plugin-zod` or `@kubb/plugin-valibot`.
  */
-export type ValidatorOptions = false | 'zod' | { request?: 'zod'; params?: 'zod'; response?: 'zod' }
+export type ValidatorLibrary = 'zod' | 'valibot'
+
+type ValidatorSlots<TLibrary extends ValidatorLibrary> = { request?: TLibrary; params?: TLibrary; response?: TLibrary }
+
+/**
+ * Validator applied to the request and response using schemas from `@kubb/plugin-zod` or `@kubb/plugin-valibot`.
+ * - `false`: no validation.
+ * - `'zod'` or `'valibot'`: validates the success (2xx) response body, and the error body of a non-2xx call,
+ *   whether it throws or returns the error.
+ * - `{ request?, params?, response? }`: opt in per slot, with one library for every slot. `request` checks the
+ *   request body before the call; `params` validate the path, query, and header params; `response` validates
+ *   the success response body and the error body.
+ */
+export type ValidatorOptions = false | ValidatorLibrary | ValidatorSlots<'zod'> | ValidatorSlots<'valibot'>
 
 /**
  * How the class-based SDK groups operations.
@@ -84,7 +91,8 @@ export type ClientOptions = OutputOptions & {
    */
   throwOnErrorDefault?: boolean
   /**
-   * Validate the request body, the request params, and the response with schemas from `@kubb/plugin-zod`.
+   * Validate the request body, the request params, and the response with schemas from `@kubb/plugin-zod` or
+   * `@kubb/plugin-valibot`.
    *
    * @default false
    */

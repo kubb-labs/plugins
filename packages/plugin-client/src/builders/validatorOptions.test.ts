@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { isValidatorEnabled, resolveParamsValidator, resolveRequestValidator } from './validatorOptions.ts'
+import { isValidatorEnabled, resolveParamsValidator, resolveRequestValidator, resolveResponseValidator, resolveValidatorLibrary } from './validatorOptions.ts'
 
 describe('validator resolvers', () => {
   test('isValidatorEnabled tracks every form', () => {
@@ -11,7 +11,22 @@ describe('validator resolvers', () => {
   })
 
   test('request and params opt in independently', () => {
-    expect(resolveParamsValidator({ request: 'zod' })).toBeNull()
-    expect(resolveRequestValidator({ params: 'zod' })).toBeNull()
+    expect(resolveParamsValidator({ request: 'zod' })).toBe(false)
+    expect(resolveRequestValidator({ params: 'zod' })).toBe(false)
+    expect(resolveRequestValidator({ request: 'valibot' })).toBe(true)
+  })
+
+  test('the string shorthand turns on the response only', () => {
+    expect(resolveResponseValidator('valibot')).toBe(true)
+    expect(resolveRequestValidator('valibot')).toBe(false)
+    expect(resolveParamsValidator('valibot')).toBe(false)
+  })
+
+  test('resolveValidatorLibrary reads the library from every form', () => {
+    expect(resolveValidatorLibrary(false)).toBeNull()
+    expect(resolveValidatorLibrary({})).toBeNull()
+    expect(resolveValidatorLibrary('valibot')).toBe('valibot')
+    expect(resolveValidatorLibrary({ params: 'valibot' })).toBe('valibot')
+    expect(resolveValidatorLibrary({ response: 'zod' })).toBe('zod')
   })
 })

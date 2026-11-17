@@ -105,7 +105,7 @@ describe('buildCallConfig', () => {
     cookies: null,
     response: 'responseSchema',
     error: null,
-    importedZodNames: [],
+    importedSchemaNames: [],
   }
   const evaluate = (config: object) => {
     const { callConfig } = buildCallConfig({ node: listPets, validatorHooks, throwOnErrorDefault: true, returnType: 'full' })
