@@ -210,7 +210,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
 
 describe(`plugin-faker options ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-${name}-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-${name}-`))
     const output = path.join(tmpDir, name)
     const { files, diagnostics } = await createKubb(
       {
