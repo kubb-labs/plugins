@@ -1,9 +1,9 @@
 import { ast, text } from '@kubb/kit'
 
 /**
- * Whether the node is a plain inline object whose shape can be lifted into an `.extend({ … })`
- * argument. Input checks, a catchall, `patternProperties`, or a nullable/optional wrapper cannot, so those stay
- * on `.and(…)`.
+ * Whether the node is a plain inline object whose properties can merge into another object schema.
+ * Input checks, `additionalProperties`, `patternProperties`, `propertyNames`, and a nullable or
+ * optional wrapper rule it out.
  */
 export function isPlainInlineObject(node: ast.SchemaNode): boolean {
   if (node.type !== 'object') return false
@@ -17,11 +17,11 @@ export function isPlainInlineObject(node: ast.SchemaNode): boolean {
 }
 
 /**
- * Whether a node renders as a bare Zod object — one that accepts `.extend(…)` and can be a
- * `z.discriminatedUnion` option. Covers object nodes, `$ref`s that resolve to (or are still
- * unresolved) objects, single-member unions of an object, and object-composable `allOf`.
+ * Whether a node prints as a plain object schema, which other schemas can extend or discriminate on.
+ * Covers object nodes, a `$ref` that resolves to an object or is still unresolved, a union with one
+ * object member, and an object-composable `allOf`.
  *
- * Input checks, such as property counts and `conditionals`, render as a pipe. A ref into `cyclicSchemas` renders as `z.lazy(…)`.
+ * A nullable or optional node, a node with input checks, and a ref into `cyclicSchemas` do not count.
  */
 export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.nullable || node.optional || node.nullish) return false
@@ -54,9 +54,8 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
 }
 
 /**
- * Whether an `allOf` is a pure object composition — an object base plus inline object members whose
- * shapes merge with `.extend(…)`. These stay a Zod object instead of a `ZodIntersection`, which
- * `z.discriminatedUnion` rejects.
+ * Whether an `allOf` is an object base plus inline object members, so it can print as one object
+ * schema and not as an intersection.
  */
 export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.type !== 'intersection') return false
@@ -64,6 +63,9 @@ export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchem
   return !!first && isObjectSchemaNode(first, cyclicSchemas) && rest.every(isPlainInlineObject)
 }
 
+/**
+ * Marks a property required in a later `allOf` member when an earlier member already requires it.
+ */
 export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Array<ast.SchemaNode> {
   const hasRequiredProperty = ({
     node,
@@ -121,13 +123,13 @@ export function formatDefault(value: unknown): string {
 }
 
 /**
- * Format a default for `.default(...)` so the literal matches the generated schema's type.
+ * Formats a default so the literal matches the type of the generated schema, or returns `null` when
+ * the default should be dropped.
  *
- * An OpenAPI `default` does not always agree with the schema it sits on: a `bigint` field
- * (`format: int64`) carries a `number` default, and a spec may put `default: {}` on an `array`.
- * Emitting those verbatim produces a Zod schema that does not typecheck, so coerce the bigint case
- * to a `BigInt(...)` literal and emit an array literal for arrays (dropping a non-array default).
- * Returns `null` when no `.default(...)` should be emitted. Keys off the schema node's type.
+ * An OpenAPI `default` does not always agree with its schema: a `bigint` field (`format: int64`)
+ * carries a `number` default, and a spec may put `default: {}` on an `array`. Printed as they are,
+ * those do not typecheck, so a bigint default becomes a `BigInt(...)` literal and a non-array default
+ * on an array is dropped.
  */
 export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown): string | null {
   // A `null` default is invalid on a non-nullable schema and redundant on a nullish one, and emitting
@@ -159,7 +161,7 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
 }
 
 /**
- * Numeric constraint limits for Zod schemas (min, max, and exclusive bounds).
+ * Numeric limits of a schema: min, max, exclusive bounds, and `multipleOf`.
  */
 export type NumericConstraints = Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive' | 'multipleOf'>
 
@@ -188,8 +190,8 @@ export function bigintConstraints({ min, max, exclusive, multipleOf }: NumericCo
 }
 
 /**
- * Whether `propertyNames` needs its own check: `z.record` checks the keys of a map, but `z.object` and a record keyed by
- * `patternProperties` do not.
+ * Whether `propertyNames` needs its own check. A record schema checks its keys, but an object with
+ * `properties` and a record keyed by `patternProperties` do not.
  */
 export function hasKeyCheck(node: ast.SchemaNode): node is ast.ObjectSchemaNode & { propertyNames: ast.SchemaNode } {
   if (node.type !== 'object' || !node.propertyNames) return false
@@ -199,14 +201,14 @@ export function hasKeyCheck(node: ast.SchemaNode): node is ast.ObjectSchemaNode 
 }
 
 /**
- * Whether the node prints inside `z.pipe(z.unknown().check(…), …)`, see {@link inputChecks}.
+ * Whether the node has checks that run on the raw input: `conditionals`, property counts, or a key check.
  */
 export function hasInputChecks(node: ast.SchemaNode): boolean {
   return Boolean(node.conditionals?.length) || (node.type === 'object' && (node.min !== undefined || node.max !== undefined)) || hasKeyCheck(node)
 }
 
 /**
- * Marks an inline `oneOf` object strict, so `object()` builds `z.strictObject(...)` and no eager `.shape` read hits a deferred getter.
+ * Marks an inline `oneOf` object strict, so a value with the keys of another member does not match it.
  */
 export function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
   return node.type === 'object' && node.additionalProperties === undefined ? { ...node, additionalProperties: false } : node

@@ -47,7 +47,6 @@ export {
   integerFormatPattern,
   isObjectComposableIntersection,
   isObjectSchemaNode,
-  isPlainInlineObject,
   preserveRequiredProperties,
   strictOneOfNode,
 } from './schema.ts'
