@@ -1,5 +1,5 @@
 /**
- * Declaration-build plugin for the client templates of `@kubb/plugin-fetch` and `@kubb/plugin-axios`. The `./core.ts`
+ * Declaration-build plugin for the client templates of `@kubb/plugin-fetch`, `@kubb/plugin-axios`, and `@kubb/plugin-ky`. The `./core.ts`
  * stub next to each template re-exports `@kubb/plugin-client` with `export *`, which the declaration bundler turns into an
  * undeclared namespace, so the shared templates resolve to the package directly.
  */

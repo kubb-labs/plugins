@@ -1,0 +1,34 @@
+{
+  "name": "ky-pet-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Ky PetStore example",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kubb-labs/plugins.git",
+    "directory": "examples/ky"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
+    "typecheck": "tsc && tsc -p tsconfig.strict.json"
+  },
+  "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/plugin-ky": "workspace:*",
+    "@kubb/plugin-ts": "workspace:*",
+    "kubb": "catalog:",
+    "ky": "^2.2.0"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.22",
+    "pnpm": ">=11.0.0"
+  },
+  "packageManager": "pnpm@12.3.4"
+}

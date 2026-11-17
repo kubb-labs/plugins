@@ -1,0 +1,236 @@
+{
+  "$schema": "https://kubb.dev/schemas/kubb-extension.json",
+  "kind": "plugin",
+  "name": "plugin-ky",
+  "export": "pluginKy",
+  "displayName": "Ky",
+  "description": "Generates a type-safe Ky client from your OpenAPI spec, one async function per operation, so each call stays in sync with the API.",
+  "category": "client",
+  "icon": {
+    "light": "https://kubb.dev/feature/javascript.svg"
+  },
+  "tags": ["api-client", "ky", "http-client", "codegen", "openapi", "validator"],
+  "docs": "https://kubb.dev/extensions/kubb-labs/plugin-ky",
+  "maintainers": [
+    {
+      "name": "Stijn Van Hulle",
+      "github": "stijnvanhulle"
+    }
+  ],
+  "optionalDependencies": ["plugin-ts", "plugin-zod"],
+  "compatibility": {
+    "kubb": ">=5.19.0",
+    "node": ">=22.22"
+  },
+  "role": "client",
+  "options": [
+    {
+      "key": "outputPath",
+      "path": ["output", "path"],
+      "label": "Output Path",
+      "description": "Output folder for generated files",
+      "type": "text",
+      "default": "clients"
+    },
+    {
+      "key": "barrel",
+      "path": ["output", "barrel"],
+      "label": "Barrel",
+      "description": "How index.ts barrel files are generated",
+      "type": "select",
+      "default": {
+        "type": "named"
+      },
+      "choices": [
+        {
+          "label": "named",
+          "value": {
+            "type": "named"
+          }
+        },
+        {
+          "label": "named (nested)",
+          "value": {
+            "type": "named",
+            "nested": true
+          }
+        },
+        {
+          "label": "all",
+          "value": {
+            "type": "all"
+          }
+        },
+        {
+          "label": "all (nested)",
+          "value": {
+            "type": "all",
+            "nested": true
+          }
+        },
+        {
+          "label": "false (disabled)",
+          "value": false
+        }
+      ]
+    },
+    {
+      "key": "outputMode",
+      "path": ["output", "mode"],
+      "label": "Output Mode",
+      "description": "How the plugin consolidates its code into files. File mode writes everything into a single file, so the output path must include a file extension and cannot be grouped.",
+      "type": "select",
+      "default": "directory",
+      "choices": [
+        {
+          "label": "directory (one file per schema)",
+          "value": "directory"
+        },
+        {
+          "label": "file (single file)",
+          "value": "file"
+        }
+      ]
+    },
+    {
+      "key": "validator",
+      "path": ["validator"],
+      "label": "Validator",
+      "description": "Validate request and response bodies with schemas from @kubb/plugin-zod",
+      "type": "select",
+      "default": false,
+      "choices": [
+        {
+          "label": "false (disabled)",
+          "value": false
+        },
+        {
+          "label": "zod",
+          "value": "zod"
+        }
+      ]
+    },
+    {
+      "key": "group",
+      "path": ["group"],
+      "label": "Group",
+      "description": "Group generated operations by OpenAPI tag or path",
+      "type": "select",
+      "default": null,
+      "choices": [
+        {
+          "label": "none",
+          "value": null
+        },
+        {
+          "label": "by tag",
+          "value": {
+            "type": "tag"
+          }
+        },
+        {
+          "label": "by path",
+          "value": {
+            "type": "path"
+          }
+        }
+      ]
+    },
+    {
+      "key": "excludeTags",
+      "path": ["exclude"],
+      "label": "Exclude Tags",
+      "description": "Comma-separated OpenAPI tags to exclude from generation",
+      "type": "list",
+      "item": {
+        "type": "tag",
+        "pattern": "$item"
+      }
+    },
+    {
+      "key": "includeTags",
+      "path": ["include"],
+      "label": "Include Tags",
+      "description": "Comma-separated OpenAPI tags to include. Only operations with these tags are generated",
+      "type": "list",
+      "item": {
+        "type": "tag",
+        "pattern": "$item"
+      }
+    },
+    {
+      "key": "baseURL",
+      "path": ["baseURL"],
+      "label": "Base URL",
+      "description": "Custom API base URL",
+      "type": "text"
+    },
+    {
+      "key": "sdkMode",
+      "path": ["sdk", "mode"],
+      "label": "SDK Mode",
+      "description": "Group generated operations into an SDK client by tag or flat",
+      "type": "select",
+      "default": null,
+      "choices": [
+        {
+          "label": "off (standalone functions)",
+          "value": null
+        },
+        {
+          "label": "tag",
+          "value": "tag"
+        },
+        {
+          "label": "flat",
+          "value": "flat"
+        }
+      ]
+    },
+    {
+      "key": "sdkName",
+      "path": ["sdk", "name"],
+      "label": "SDK Name",
+      "description": "Root client name for the generated SDK",
+      "type": "text"
+    },
+    {
+      "key": "returnType",
+      "path": ["returnType"],
+      "label": "Return Type",
+      "description": "What a generated function resolves to. full is the whole result with status and error, and data is only the success body when it throws",
+      "type": "select",
+      "default": "full",
+      "choices": [
+        {
+          "value": "full"
+        },
+        {
+          "value": "data"
+        }
+      ]
+    },
+    {
+      "key": "throwOnErrorDefault",
+      "path": ["throwOnErrorDefault"],
+      "label": "Throw on Error",
+      "description": "Throw when a request fails. A per-call throwOnError overrides it",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "key": "banner",
+      "path": ["output", "banner"],
+      "label": "Banner",
+      "description": "Text added at the top of every generated file",
+      "type": "text"
+    },
+    {
+      "key": "footer",
+      "path": ["output", "footer"],
+      "label": "Footer",
+      "description": "Text added at the end of every generated file",
+      "type": "text"
+    }
+  ]
+}
