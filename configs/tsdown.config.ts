@@ -1,30 +1,18 @@
 import { defineConfig, type UserConfig } from 'tsdown'
 
 type Options = {
-  /**
-   * Packages to leave out of the bundle, next to `@kubb/*`.
-   */
   neverBundle?: Array<string | RegExp>
   /**
-   * Raw templates under `templates/`, named without `.ts`, that get their own declarations, so consumers can import
-   * their types without `allowImportingTsExtensions`.
+   * Raw templates under `templates/`, named without `.ts`, that get declarations of their own.
    */
   templates?: Array<string>
-  /**
-   * Plugins for the template declaration build.
-   */
   templatePlugins?: UserConfig['plugins']
 }
 
 const dts = { dtsOnly: true, tsconfig: '../../tsconfig.dts.json' }
 
 /**
- * The tsdown build every plugin package shares: ESM and CJS JavaScript with their declarations from `src/index.ts`.
- *
- * @example
- * ```ts
- * export default definePluginConfig({ neverBundle: ['@types/react'] })
- * ```
+ * The tsdown build every plugin package shares. `neverBundle` adds to `@kubb/*`.
  */
 export function definePluginConfig({ neverBundle = [], templates = [], templatePlugins }: Options = {}) {
   const entry = { index: 'src/index.ts' }
