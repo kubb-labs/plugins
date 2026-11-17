@@ -15,25 +15,8 @@ import { ast, createPrinter, text } from '@kubb/kit'
 import type { PluginValibot, ResolverValibot } from '../types.ts'
 
 /**
- * Partial map of node-type overrides for the Valibot printer.
- *
- * Each key is a `SchemaType` string, such as `'date'` or `'string'`. The function replaces the
- * built-in handler for that node type. Use `this.transform` to print a nested schema node,
- * `this.base` to reuse the output of the handler being replaced, and `this.options` to read the
- * printer options.
- *
- * @example Override the `date` handler
- * ```ts
- * pluginValibot({
- *   printer: {
- *     nodes: {
- *       date() {
- *         return 'v.pipe(v.string(), v.isoDate(), v.transform((value) => new Date(value)))'
- *       },
- *     },
- *   },
- * })
- * ```
+ * Partial map of node-type overrides for the Valibot printer, keyed by `SchemaType`. Each function
+ * replaces the built-in handler and can call `this.transform`, `this.base`, and `this.options`.
  */
 export type PrinterValibotNodes = ast.PrinterPartial<string, PrinterValibotOptions>
 
