@@ -51,6 +51,7 @@ type DemoResponses = { '200': Pet; '404': { message: string }; '5xx': { retryAft
 // Checking `status` narrows `data`: the `5xx` range covers every status from 500 to 599.
 export function describeError(error: unknown): string {
   if (!isResponseError<DemoResponses>(error)) return 'network'
-  if (error.status === 404) return error.data.message
+  // An empty 404 body leaves `data` undefined, whatever the document declares.
+  if (error.status === 404) return error.data?.message ?? 'not found'
   return `retry in ${error.data.retryAfter}s`
 }
