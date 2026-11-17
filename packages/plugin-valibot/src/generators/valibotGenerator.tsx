@@ -1,0 +1,253 @@
+import { getCircularNames, getOasAdapter, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
+import { ast, defineGenerator } from '@kubb/kit'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { Valibot } from '../components/Valibot.tsx'
+import { printerValibot } from '../printers/printerValibot.ts'
+import type { PrinterValibotOptions } from '../printers/printerValibot.ts'
+import type { PluginValibot, ResolverValibot } from '../types.ts'
+
+type BuildResponseUnionParams = {
+  responses: Array<ast.ResponseNode>
+  name: string
+  fallbackUnknown: boolean
+}
+
+/**
+ * The printer, built once per plugin per build. A `keysToOmit` list and a `printer.nodes` override
+ * differ per node and have no string key, so they get a fresh printer.
+ */
+function getPrinter(resolver: ResolverValibot, options: PrinterValibotOptions) {
+  if (options.nodes || options.keysToOmit?.length) return printerValibot(options)
+
+  return resolver.memo(`valibotPrinter:${options.regexType}:${options.dateType}`, () => printerValibot(options))
+}
+
+/**
+ * Built-in generator for `@kubb/plugin-valibot`. Emits one Valibot schema per schema in the spec,
+ * plus the parameter, request, and response schemas of each operation.
+ */
+export const valibotGenerator = defineGenerator<PluginValibot>({
+  name: 'valibot',
+  renderer: jsxRenderer,
+  schema(node, ctx) {
+    const { adapter, config, resolver, root } = ctx
+    const { output, regexType, inferred, importPath, group, printer } = ctx.options
+
+    if (!node.name) {
+      return
+    }
+
+    const cyclicSchemas = getCircularNames(ctx)
+    const dateType = getOasAdapter(adapter).options.dateType
+    const imports = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
+    const meta = {
+      name: resolver.name(node.name),
+      file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
+    } as const
+
+    return (
+      <File
+        baseName={meta.file.baseName}
+        path={meta.file.path}
+        meta={meta.file.meta}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+      >
+        <File.Import name="v" path={importPath} isNameSpace />
+        {imports.map((imp) => (
+          <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+        ))}
+
+        <Valibot
+          name={meta.name}
+          node={node}
+          printer={getPrinter(resolver, { regexType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes })}
+          inferTypeName={inferred ? resolver.schema.typeName(node.name) : null}
+          cyclic={cyclicSchemas.has(node.name)}
+        />
+      </File>
+    )
+  },
+  operation(node, ctx) {
+    if (!ast.http.isOperation(node)) return null
+    const { adapter, config, resolver, root } = ctx
+    const { output, regexType, inferred, importPath, group, printer } = ctx.options
+    const dateType = getOasAdapter(adapter).options.dateType
+
+    const meta = {
+      file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
+    } as const
+
+    const cyclicSchemas = getCircularNames(ctx)
+    const printerOptions: PrinterValibotOptions = { regexType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+
+    function renderSchemaEntry({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
+      if (!schema) return null
+
+      const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, checks: true })
+
+      return (
+        <>
+          {imports.map((imp) => (
+            <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+          ))}
+          {/* A circular component schema carries the `v.GenericSchema` annotation at its own definition.
+              Annotating the operation schema too would erase its inferred type to `unknown`. */}
+          <Valibot
+            name={name}
+            node={schema}
+            printer={getPrinter(resolver, { ...printerOptions, keysToOmit })}
+            inferTypeName={inferred ? resolver.schema.type(name) : null}
+          />
+        </>
+      )
+    }
+
+    // Multiple content types for a single name: emit one schema per content type plus a union alias.
+    function buildContentTypeVariants(
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
+      baseName: string,
+    ) {
+      const variants = resolveContentTypeVariants(entries, baseName)
+      const unionSchema = ast.factory.createSchema({
+        type: 'union',
+        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
+      })
+      return (
+        <>
+          {variants.map((variant) =>
+            renderSchemaEntry({
+              schema: variant.schema,
+              name: variant.name,
+              keysToOmit: variant.keysToOmit,
+            }),
+          )}
+          {renderSchemaEntry({ schema: unionSchema, name: baseName })}
+        </>
+      )
+    }
+
+    // Builds a response/error union schema: one schema per member response, aliased under `name`.
+    function buildResponseUnion({ responses, name, fallbackUnknown }: BuildResponseUnionParams) {
+      // Collect import names from the response schemas to detect naming collisions. When a response
+      // is a $ref to a component schema whose resolved name matches `name`, skip generation to avoid
+      // redeclaration errors.
+      const importedNames = new Set(ast.http.responses.getImportedNames(responses).map((refName) => resolver.name(refName)))
+
+      if (importedNames.has(name)) {
+        return null
+      }
+
+      const members = responses.map((res) => ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) }))
+
+      // No documented schema: fall back to an unknown schema so the name still resolves for
+      // consumers that parse those bodies.
+      if (fallbackUnknown && members.length === 0) {
+        return renderSchemaEntry({ schema: ast.factory.createSchema({ type: 'unknown' }), name })
+      }
+
+      const unionNode = members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
+
+      return renderSchemaEntry({
+        schema: unionNode,
+        name,
+      })
+    }
+
+    const paramSchemas = node.parameters.map((param) => renderSchemaEntry({ schema: param.schema, name: resolver.param.name(node, param) }))
+
+    const responseSchemas = node.responses.map((res) => {
+      const content = (res.content ?? []).map((entry, _, content) => toResponseContent(entry, content))
+      const variants = content.filter((entry) => entry.schema)
+      if (variants.length > 1) {
+        return buildContentTypeVariants(content, resolver.response.status(node, res.statusCode))
+      }
+      const primary = variants[0] ?? content[0]
+      return renderSchemaEntry({
+        schema: primary?.schema ?? null,
+        name: resolver.response.status(node, res.statusCode),
+        keysToOmit: primary?.keysToOmit,
+      })
+    })
+
+    const toParamsSchema = (params: Array<ast.ParameterNode>) =>
+      ast.factory.createSchema({
+        type: 'object',
+        // `primitive: 'object'` makes the printer emit `v.object(…)` rather than a record.
+        primitive: 'object',
+        properties: params.map((param) => ast.factory.createProperty({ name: param.name, required: param.required, schema: param.schema })),
+      })
+
+    const responseHeaderSchemas = node.responses.map((res) =>
+      res.headers?.length ? renderSchemaEntry({ schema: toParamsSchema(res.headers), name: resolver.response.headers(node, res.statusCode) }) : null,
+    )
+
+    const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
+    // The response schema covers success (2xx) bodies only.
+    const successResponsesWithSchema = responsesWithSchema.filter((res) => ast.http.status.isSuccess(res))
+    const responseUnionSchema =
+      responsesWithSchema.length > 0
+        ? buildResponseUnion({ responses: successResponsesWithSchema, name: resolver.response.response(node), fallbackUnknown: true })
+        : null
+
+    // The error schema covers every non-2xx response, including the OpenAPI `default`.
+    const errorResponsesWithSchema = responsesWithSchema.filter((res) => !ast.http.status.isSuccess(res))
+    const errorUnionSchema =
+      errorResponsesWithSchema.length > 0
+        ? buildResponseUnion({ responses: errorResponsesWithSchema, name: resolver.response.error(node), fallbackUnknown: false })
+        : null
+
+    const requestBodyContent = node.requestBody?.content ?? []
+    const requestSchema = (() => {
+      if (requestBodyContent.length === 0) return null
+      if (requestBodyContent.length === 1) {
+        const entry = requestBodyContent[0]!
+        if (!entry.schema) return null
+        return renderSchemaEntry({
+          schema: entry.schema,
+          name: resolver.response.body(node),
+          keysToOmit: entry.keysToOmit,
+        })
+      }
+      return buildContentTypeVariants(requestBodyContent, resolver.response.body(node))
+    })()
+
+    // Grouped path, query, headers, and cookies schemas, one object per group.
+    const { path, query, header, cookie } = ast.http.groupParameters(node)
+
+    const paramGroupSchemas = (
+      [
+        { kind: 'path', params: path },
+        { kind: 'query', params: query },
+        { kind: 'headers', params: header },
+        { kind: 'cookies', params: cookie },
+      ] as const
+    )
+      .filter(({ params }) => params.length > 0)
+      .map(({ kind, params }) =>
+        renderSchemaEntry({
+          schema: toParamsSchema(params),
+          name: resolver.param[kind](node, params[0]!),
+        }),
+      )
+
+    return (
+      <File
+        baseName={meta.file.baseName}
+        path={meta.file.path}
+        meta={meta.file.meta}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+      >
+        <File.Import name="v" path={importPath} isNameSpace />
+        {paramSchemas}
+        {responseSchemas}
+        {responseHeaderSchemas}
+        {responseUnionSchema}
+        {errorUnionSchema}
+        {requestSchema}
+        {paramGroupSchemas}
+      </File>
+    )
+  },
+})

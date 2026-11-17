@@ -48,6 +48,7 @@ plugins/
 │   ├── plugin-vue-query/    # TanStack Query hooks for Vue
 │   ├── plugin-swr/          # SWR hooks
 │   ├── plugin-zod/          # Zod schemas
+│   ├── plugin-valibot/      # Valibot schemas
 │   ├── plugin-faker/        # Faker mock data
 │   ├── plugin-msw/          # MSW handlers
 │   ├── plugin-cypress/      # Cypress tests

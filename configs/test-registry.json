@@ -55,6 +55,8 @@
   "packages/plugin-vue-query/src/generators/infiniteQueryGenerator.test.tsx": "Rendered cursor and pageParamCode infinite variants plus hooks false; the snapshot pins one infinite config.",
   "packages/plugin-vue-query/src/generators/queryGenerator.test.tsx": "Rendered query hook with the configured query importPath, plus the variant passed to a custom queryKey.",
   "packages/plugin-vue-query/src/index.test.ts": "Pins the default key transformer re-exports; swapping one fails only this test.",
+  "packages/plugin-valibot/src/generators/valibotGenerator.test.tsx": "Pins the generated files: the v.GenericSchema annotation on a circular schema, v.omit on a request body, content-type variants, inferred aliases and a custom importPath.",
+  "packages/plugin-valibot/src/printers/printerValibot.test.ts": "Branchy printer whose output runs against the real valibot package: records, v.variant, strict oneOf members, the allOf merge, omit behind wrappers, cycles.",
   "packages/plugin-zod/src/generators/zodGenerator.test.tsx": "Regressions #332 and #3172, typeGuards, compile, inferred codec, custom imports beyond the e2e configs.",
   "packages/plugin-zod/src/printers/conditionals.test.ts": "Runtime-checks if/then, dependentRequired, dependentSchemas, contains and propertyNames in both Zod printers; the printed refines are only meaningful when evaluated.",
   "packages/plugin-zod/src/printers/const.test.ts": "OpenAPI 3.1 structural const across ts, faker and zod printers; schemas/3.0.x/constCases.yaml is in no e2e suite.",
@@ -79,6 +81,7 @@
   "tests/3.0.x/pluginSwr.test.ts": "Golden path: query and mutation toggles, filters; only plugin-swr option coverage.",
   "tests/3.0.x/pluginTs.test.ts": "Only coverage of exclude and include on plugin-ts, plus the noTagsDotOperationId version-dot regression.",
   "tests/3.0.x/pluginVueQuery.test.ts": "Golden path: mutation off, filters, group; only plugin-vue-query option coverage.",
+  "tests/3.0.x/pluginValibot.test.ts": "Golden path through the real build: plugin setup, inferred aliases, include filter and group by tag; the package tests render the generator with mocks only.",
   "tests/3.0.x/pluginZod.test.ts": "Golden path: coercion, filters, group, directional printer node; only plugin-zod option coverage.",
   "tests/3.0.x/reservedOperationNames.test.ts": "Regression: reserved-word operationIds compile through clients and hooks; unique spec.",
   "tests/performance/main.bench.ts": "Only benchmark; CI reports generation time in the job log so a slowdown is visible."
