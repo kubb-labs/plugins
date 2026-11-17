@@ -119,6 +119,22 @@ describe('createKyTransport', () => {
     expect(hits.filter((hit) => hit.url?.startsWith('/down-'))).toHaveLength(2)
   })
 
+  test('runs the instance hooks before the hooks in options, and the hooks of a call replace the client hooks', async () => {
+    const seen: Array<string> = []
+    const hook = (name: string) => () => void seen.push(name)
+    const own = createClient({
+      baseURL,
+      transport: createKyTransport(ky.create({ hooks: { beforeRequest: [hook('instance')] } })),
+      options: { hooks: { beforeRequest: [hook('client')] } },
+    })
+    own.interceptors.request.use((request) => (seen.push('interceptor'), request))
+
+    await own({ method: 'GET', url: '/order' })
+    await own({ method: 'GET', url: '/order', options: { hooks: { beforeRequest: [hook('call')] } } })
+
+    expect(seen).toStrictEqual(['interceptor', 'instance', 'client', 'interceptor', 'instance', 'call'])
+  })
+
   test('decides a status retry as Ky does: Retry-After, a permanent 413, and shouldRetry', async () => {
     const delay = vi.fn(() => 0)
     const retrying = createClient({ baseURL, options: { retry: { limit: 2, delay } } })

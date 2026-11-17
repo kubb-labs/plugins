@@ -123,6 +123,22 @@ client.interceptors.request.eject(id)
 > [!NOTE]
 > With `throwOnError: false`, a non-2xx response resolves, so no error handler runs for it.
 
+### Native Ky hooks
+
+For the native `Request` and `Response`, pass [Ky hooks](https://github.com/sindresorhus/ky#hooks) in `options`. An `afterResponse` hook sees the response before Kubb decodes it:
+
+```typescript
+import { client } from './gen/.kubb/client'
+
+client.setConfig({
+  options: {
+    hooks: { beforeRequest: [({ request }) => request.headers.set('traceparent', currentTraceparent())] },
+  },
+})
+```
+
+For the order hooks and core handlers run in, see [Hook order](#hook-order).
+
 Next, [use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/transport).
 
 ## Less common cases
@@ -170,3 +186,12 @@ security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets'] }]
 When the spec has a `mutualTLS` scheme, `securitySchemes` leaves it out, because its credential is a client certificate on the connection, not on the request. In Node.js, send through an undici `Agent` that holds the certificate, with a [custom transport](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/transport).
 
 In the browser, the browser picks the client certificate itself.
+
+### Hook order
+
+When you register [native Ky hooks](#native-ky-hooks) next to `client.interceptors`:
+
+- `beforeRequest` hooks run after the `client.interceptors.request` handlers.
+- `afterResponse` hooks see the raw response, before Kubb decodes it and before the `client.interceptors.response` handlers.
+- `hooks` in the `options` of a call replace the `hooks` in the client's `options`. They do not merge.
+- An instance you pass to `createKyTransport` keeps its own hooks, which run before the ones in `options`.

@@ -106,12 +106,12 @@ const retryStatus: AfterResponseHook = async ({ request, response, options, retr
  */
 export function createKyTransport(instance: KyInstance): Transport {
   return (request) => {
-    const init = toRequestInit(request) as KyOptions
+    const hooks = request.options?.hooks
     // The core splits success from error and reads the body, so Ky must resolve every status with the body unread.
     return instance(request.url, {
-      ...init,
+      ...toRequestInit(request),
       throwHttpErrors: false,
-      hooks: { ...init.hooks, afterResponse: [...(init.hooks?.afterResponse ?? []), retryStatus] },
+      hooks: { ...hooks, afterResponse: [...(hooks?.afterResponse ?? []), retryStatus] },
     })
   }
 }

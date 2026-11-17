@@ -1,0 +1,157 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { getRelativePath } from '@internals/utils'
+import { adapterOas } from '@kubb/adapter-oas'
+import { Hookable, createKubb } from '@kubb/core'
+import { type Config, Diagnostics, fsStorage, type KubbHooks } from 'kubb/kit'
+import { pluginKy } from '@kubb/plugin-ky'
+import { pluginBarrel } from '@kubb/plugin-barrel'
+import { parserTs } from '@kubb/parser-ts'
+import { pluginTs } from '@kubb/plugin-ts'
+import { describe, expect, test } from 'vitest'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const version = '3.0.x'
+
+type BuildConfig = Omit<Config, 'plugins' | 'storage' | 'reporters'> & { plugins: unknown }
+
+const configs: Array<{ name: string; config: BuildConfig }> = [
+  // ─── sdk single (one flat class, every operation a direct method) ────────
+  {
+    name: 'sdkSingle',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/petStore.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs()],
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginKy({ output: { path: './clients', barrel: false, mode: 'directory' }, sdk: { mode: 'flat', name: 'PetStore' } }),
+      ],
+    },
+  },
+]
+
+describe(`plugin-ky options ${version}`, () => {
+  test.each(configs)('config testing with config as $name', async ({ name, config }) => {
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-ky-${name}-`))
+    const output = path.join(tmpDir, name)
+    const { files, diagnostics } = await createKubb(
+      {
+        ...config,
+        storage: fsStorage(),
+        output: {
+          ...config.output,
+          path: output,
+        },
+      } as Config,
+      {
+        hooks: new Hookable<KubbHooks>(),
+      },
+    ).safeBuild()
+
+    expect(Diagnostics.hasError(diagnostics)).toBe(false)
+
+    // Snapshot only this plugin's output. The plugins it builds on have their own suites.
+    const ownFiles = files.filter((file) => /^\.\/(clients|\.kubb)\//.test(getRelativePath(output, file.path)))
+    expect(ownFiles.length).toBeGreaterThan(0)
+
+    for (const file of ownFiles) {
+      const fileContent = await fs.readFile(file.path, 'utf-8')
+      await expect(fileContent).toMatchFileSnapshot(path.join(__dirname, '__snapshots__', 'pluginKy', name, getRelativePath(output, file.path)))
+    }
+
+    await fs.rm(tmpDir, { recursive: true, force: true })
+  })
+
+  test.each([
+    {
+      name: 'literal',
+      baseURL: 'https://petstore3.swagger.io/api/v3',
+      expected: 'defaultConfig: ClientConfig = { baseURL: "https://petstore3.swagger.io/api/v3", ',
+    },
+    {
+      name: 'template',
+      baseURL: '${import.meta.env.VITE_API_SERVER}',
+      expected: 'defaultConfig: ClientConfig = { baseURL: `${import.meta.env.VITE_API_SERVER}`, ',
+    },
+  ])('emits $name baseURL in the client config', async ({ name, baseURL, expected }) => {
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-ky-base-url-${name}-`))
+    const output = path.join(tmpDir, 'gen')
+    const { files, diagnostics } = await createKubb(
+      {
+        root: __dirname,
+        input: '../../schemas/3.0.x/petStore.yaml',
+        output: { path: output, barrel: false },
+        adapter: adapterOas({ validate: false, enums: 'root' }),
+        parsers: [parserTs()],
+        reporters: [],
+        storage: fsStorage(),
+        plugins: [
+          pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+          pluginKy({
+            output: { path: './clients', barrel: false, mode: 'directory' },
+            baseURL,
+          }),
+        ],
+      } as Config,
+      { hooks: new Hookable<KubbHooks>() },
+    ).safeBuild()
+
+    expect(files.length).toBeGreaterThan(0)
+    expect(Diagnostics.hasError(diagnostics)).toBe(false)
+
+    const clientRuntime = files.find((file) => file.path === path.join(output, '.kubb/config.ts'))
+    expect(clientRuntime).toBeDefined()
+
+    const source = await fs.readFile(clientRuntime!.path, 'utf-8')
+    expect(source).toContain(expected)
+    if (name === 'template') expect(source).not.toContain('baseURL: "${import.meta.env.VITE_API_SERVER}"')
+
+    await fs.rm(tmpDir, { recursive: true, force: true })
+  })
+
+  // The petstore tag `pet` and schema `Pet` share a name. With the barrel middleware active, the
+  // root `index.ts` re-exports both, so the generated sdk class must be `PetClient` to avoid a
+  // TS2300 duplicate-identifier error. Asserted on the barrel string so it stays robust across
+  // environments.
+  test('sdk classes keep a distinct name from schema models in the barrel', async () => {
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-ky-barrel-`))
+    const output = path.join(tmpDir, 'gen')
+    const { files, diagnostics } = await createKubb(
+      {
+        root: __dirname,
+        input: '../../schemas/3.0.x/petStore.yaml',
+        output: { path: output, barrel: { type: 'named' } },
+        adapter: adapterOas({ validate: false, enums: 'root' }),
+        parsers: [parserTs()],
+        reporters: [],
+        storage: fsStorage(),
+        plugins: [
+          pluginBarrel(),
+          pluginTs({ output: { path: './types', barrel: { type: 'named' }, mode: 'directory' } }),
+          pluginKy({ output: { path: './clients', barrel: { type: 'named' }, mode: 'directory' }, sdk: {} }),
+        ],
+      } as Config,
+      { hooks: new Hookable<KubbHooks>() },
+    ).safeBuild()
+
+    expect(Diagnostics.hasError(diagnostics)).toBe(false)
+
+    const rootBarrel = files.find((file) => file.path === path.join(output, 'index.ts'))
+    expect(rootBarrel).toBeDefined()
+    const source = await fs.readFile(rootBarrel!.path, 'utf-8')
+
+    expect(source).toContain('PetClient')
+    expect(source).toContain("export * from './.kubb/client'")
+    expect(source).toContain("export type { Pet } from './types/Pet'")
+    expect(source).not.toMatch(/export \{ Pet \}/)
+
+    await fs.rm(tmpDir, { recursive: true, force: true })
+  })
+})

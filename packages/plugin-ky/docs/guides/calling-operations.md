@@ -120,7 +120,7 @@ When you set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-
 
 ### How status retries work
 
-Kubb reads the error body itself, so Ky returns an error status instead of throwing it. The client retries a status with its own `afterResponse` hook, which decides as Ky does:
+The client retries an error status as Ky does:
 
 - It retries only a method in `retry.methods` and a status in `retry.statusCodes`, up to `retry.limit`.
 - `retry.shouldRetry` overrides the status check with `true` and stops the retry with `false`. Its `error` is an `HTTPError` with no `data`, because the body is unread.
