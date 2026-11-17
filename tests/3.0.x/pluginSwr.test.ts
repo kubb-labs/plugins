@@ -8,6 +8,7 @@ import { Hookable, createKubb } from '@kubb/core'
 import { type Config, Diagnostics, fsStorage, type KubbHooks } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginAxios } from '@kubb/plugin-axios'
+import { pluginKy } from '@kubb/plugin-ky'
 import { pluginSwr } from '@kubb/plugin-swr'
 import { pluginTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
@@ -95,6 +96,28 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginSwr({
           output: { path: './hooks', barrel: false, mode: 'directory' },
+          include: [{ type: 'tag', pattern: 'pet' }],
+        }),
+      ],
+    },
+  },
+
+  // ─── client: 'ky' picks the Ky client when two client plugins are registered ─
+  {
+    name: 'clientKy',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/petStore.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs()],
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
+        pluginKy({ output: { path: './clients-ky', barrel: false, mode: 'directory' } }),
+        pluginSwr({
+          output: { path: './hooks', barrel: false, mode: 'directory' },
+          client: 'ky',
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],

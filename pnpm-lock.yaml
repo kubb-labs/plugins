@@ -1234,6 +1234,9 @@ importers:
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
+      '@kubb/plugin-ky':
+        specifier: workspace:*
+        version: link:../../packages/plugin-ky
       '@kubb/plugin-mcp':
         specifier: workspace:*
         version: link:../../packages/plugin-mcp
