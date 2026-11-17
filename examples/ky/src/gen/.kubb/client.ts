@@ -3,6 +3,7 @@ import ky from 'ky'
 import type { AfterResponseHook, KyInstance, Options as KyOptions } from 'ky'
 import { defaultConfig } from './config'
 import { createClientCore, createLazyClient, toRequestInit } from './core'
+import { HTTPError } from 'ky'
 export * from './core'
 
 /**
@@ -76,12 +77,28 @@ export const isResponseError = core.isResponseError as <TResponses = unknown, TR
   error: unknown,
 ) => error is ResponseErrorOf<TResponses, TRequest, TResponse, THeaders>
 
-// Ky only retries a status it throws on, and a thrown `HTTPError` has read the body. This hook retries by Ky's own
-// `retry` options and hands the last response back unread.
-// shortcut: retries after Ky's `retry.delay` and ignores a `Retry-After` header, pass `ky.retry({ delay })` from an own hook when a server needs it.
-const retryStatus: AfterResponseHook = ({ request, response, options, retryCount }) => {
-  const { limit, methods, statusCodes } = options.retry
-  return retryCount < limit && statusCodes.includes(response.status) && methods.includes(request.method.toLowerCase()) ? ky.retry() : undefined
+// The delay a `Retry-After` header asks for, in milliseconds: a number of seconds, or an HTTP date.
+function retryAfter(response: Response): number | undefined {
+  const value = response.headers.get('Retry-After')
+  if (!value) return undefined
+  const delay = /^\d+$/.test(value) ? Number(value) * 1000 : Date.parse(value) - Date.now()
+  return Number.isNaN(delay) ? undefined : Math.max(0, delay)
+}
+
+// Ky only retries a status it throws on, and a thrown `HTTPError` has read the body. This hook makes the same
+// decision from Ky's `retry` options and hands the last response back unread.
+const retryStatus: AfterResponseHook = async ({ request, response, options, retryCount }) => {
+  const { limit, methods, statusCodes, afterStatusCodes, maxRetryAfter, shouldRetry } = options.retry
+  if (response.ok || retryCount >= limit || !methods.includes(request.method.toLowerCase())) return undefined
+
+  // `shouldRetry` overrides the status check with `true` and vetoes the retry with `false`, as in Ky.
+  const verdict = await shouldRetry?.({ error: new HTTPError(response, request, options), retryCount: retryCount + 1 })
+  if (verdict === false || (verdict !== true && !statusCodes.includes(response.status))) return undefined
+
+  const delay = afterStatusCodes.includes(response.status) ? retryAfter(response) : undefined
+  if (delay !== undefined) return ky.retry({ delay: Math.min(maxRetryAfter, delay) })
+  // A 413 without a `Retry-After` is permanent.
+  return verdict !== true && response.status === 413 ? undefined : ky.retry()
 }
 
 /**

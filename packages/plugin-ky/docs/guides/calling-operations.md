@@ -97,7 +97,7 @@ Ky's defaults apply unless you change them:
 | `timeout` | 10 seconds to get the response headers. Set `false` to wait without a limit.                                                         |
 | `retry`   | 2 retries after a network error or a status such as `429` or `503`, for every method except `POST` and `PATCH`. Set `0` to turn off. |
 
-After the last retry, the call gets the last response, and [handles it as an error](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/error-handling). See [Retry timing](#retry-timing) for `Retry-After`.
+After the last retry, the call gets the last response, and [handles it as an error](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/error-handling). See [How status retries work](#how-status-retries-work).
 
 ## Build a URL without sending
 
@@ -118,27 +118,16 @@ Next, [handle errors](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/err
 
 When you set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing), the HTTP request stays the same, because path parameter names never reach the wire. The exception is the `matrix` style, which sends the name (`;group-id=42`), so an operation with a matrix path parameter keeps its spec names.
 
-### Retry timing
+### How status retries work
 
-Kubb reads the error body itself, so it retries a status with its own `afterResponse` hook, by Ky's `retry.limit`, `retry.methods`, and `retry.statusCodes`. The wait between tries comes from `retry.delay`, and a `Retry-After` header is not read. To follow one, add your own hook:
+Kubb reads the error body itself, so Ky returns an error status instead of throwing it. The client retries a status with its own `afterResponse` hook, which decides as Ky does:
 
-```typescript
-import ky from 'ky'
-import { client } from './gen/.kubb/client'
+- It retries only a method in `retry.methods` and a status in `retry.statusCodes`, up to `retry.limit`.
+- `retry.shouldRetry` overrides the status check with `true` and stops the retry with `false`. Its `error` is an `HTTPError` with no `data`, because the body is unread.
+- A `Retry-After` header on a status in `retry.afterStatusCodes` sets the wait, in seconds or as an HTTP date, up to `retry.maxRetryAfter`. Without one, `retry.delay` does.
+- A `413` without a `Retry-After` header is not retried.
 
-client.setConfig({
-  options: {
-    hooks: {
-      afterResponse: [
-        ({ response, retryCount, options }) => {
-          const seconds = Number(response.headers.get('Retry-After'))
-          return seconds > 0 && retryCount < options.retry.limit ? ky.retry({ delay: seconds * 1000 }) : undefined
-        },
-      ],
-    },
-  },
-})
-```
+The `RateLimit-Reset` headers that Ky also reads are not used.
 
 ### TRACE operations
 
