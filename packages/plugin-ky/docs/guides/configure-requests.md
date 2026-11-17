@@ -75,11 +75,11 @@ For a credential that no security scheme describes, such as a request signature,
 
 `client.interceptors` has three stacks. Each handler gets the value the one before it returned:
 
-| Stack      | Runs                                                                 | Gets              | Returns                                        |
-| ---------- | -------------------------------------------------------------------- | ----------------- | ---------------------------------------------- |
-| `request`  | After the URL, body, and auth are built, before the send.            | `ResolvedRequest` | The request.                                   |
-| `response` | After the body is decoded, before the status check and validator.    | `DecodedResponse` | The result.                                    |
-| `error`    | On any failure: `ResponseError`, network error, abort, `ParseError`. | The error         | Another error to throw, or nothing to keep it. |
+| Stack      | Runs                                                                    | Gets              | Returns                                        |
+| ---------- | ----------------------------------------------------------------------- | ----------------- | ---------------------------------------------- |
+| `request`  | After the URL, body, and auth are built, before the send.               | `ResolvedRequest` | The request.                                   |
+| `response` | After the body is decoded, before the status check and validator.       | `DecodedResponse` | The result.                                    |
+| `error`    | When a call fails: `ResponseError`, network error, abort, `ParseError`. | The error         | Another error to throw, or nothing to keep it. |
 
 ::code-group
 
@@ -121,7 +121,7 @@ client.interceptors.request.eject(id)
 ```
 
 > [!NOTE]
-> With `throwOnError: false`, a non-2xx response resolves, so no error handler runs for it.
+> With `throwOnError: false`, a non-2xx response resolves, so no error handler runs for it. An error thrown while a stream is read, in the `for await` loop, does not reach the error handlers either.
 
 ### Native Ky hooks
 
