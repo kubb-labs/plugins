@@ -33,7 +33,6 @@ The item schema is `itemSchema` in OpenAPI 3.2. In OpenAPI 3.0 and 3.1, `schema`
               type: object
               required: [event]
               properties:
-                data: { type: string }
                 event: { type: string }
                 id: { type: string }
                 retry: { type: integer, minimum: 0 }
@@ -59,7 +58,7 @@ The item schema is `itemSchema` in OpenAPI 3.2. In OpenAPI 3.0 and 3.1, `schema`
         description: One PetEvent per event
         content:
           text/event-stream:
-            schema: { type: string } # for OpenAPI 3.0 and 3.1 tools
+            schema: { type: string } # the whole stream, for tools that do not read itemSchema
             itemSchema: { $ref: '#/components/schemas/PetEvent' }
 ```
 
@@ -77,7 +76,7 @@ The item schema is `itemSchema` in OpenAPI 3.2. In OpenAPI 3.0 and 3.1, `schema`
 
 ::
 
-For typed events in OpenAPI 3.0 and 3.1, put the same `oneOf` on `schema`, with a `discriminator` on `event`.
+In OpenAPI 3.0 and 3.1, put the item schema on `schema` instead: the `PetEvent` reference for a payload, or the same `oneOf` with a `discriminator` on `event` for typed events.
 
 ## The generated function
 
@@ -158,20 +157,29 @@ To resume, send a new call with a `Last-Event-ID` header. `lastEventId` is the `
 
 ```typescript
 import { ResponseError } from './gen/.kubb/client'
+import { ParseError } from './gen/.kubb/standardSchema'
 
-let lastEventId = ''
+async function* resumeChat(attempts = 3) {
+  let lastEventId = ''
 
-for (let attempt = 0; attempt < 3; attempt++) {
-  const result = await streamChat({ body, headers: lastEventId ? { 'Last-Event-ID': lastEventId } : {} })
-  try {
-    for await (const event of result) render(event)
-    break
-  } catch (error) {
-    if (ResponseError.is(error)) throw error
-    lastEventId = result.lastEventId || lastEventId
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const result = await streamChat({ body, headers: lastEventId ? { 'Last-Event-ID': lastEventId } : {} })
+      for await (const event of result) {
+        lastEventId = result.lastEventId
+        yield event
+      }
+      return
+    } catch (error) {
+      if (attempt === attempts || ResponseError.is(error) || error instanceof ParseError) throw error
+    }
   }
 }
+
+for await (const event of resumeChat()) render(event)
 ```
+
+The loop retries a failed connect and a dropped connection. It rethrows the last failure, so a cut stream never looks complete. It also rethrows a `ResponseError` and a `ParseError` at once, because a retry cannot fix them and would skip the failing event. Rethrow your abort reason the same way when you pass `signal`. An error from `render` is thrown outside the generator, so it is never retried.
 
 For cleared IDs and resuming with `returnType: 'data'`, see [Event IDs when you resume](#event-ids-when-you-resume).
 
@@ -221,8 +229,14 @@ if (result.contentType === 'text/event-stream') {
 import { client, type SuccessOf } from './gen/.kubb/client'
 import type { StreamLogsResponses } from './gen/types/StreamLogs'
 
-const result = await client.stream<StreamLogsResponses, true, SuccessOf<StreamLogsResponses>>({ method: 'GET', url: '/logs' })
+const result = await client.stream<StreamLogsResponses, true, SuccessOf<StreamLogsResponses>>({
+  method: 'GET',
+  url: '/logs',
+  contentType: { response: 'application/jsonl' },
+})
 ```
+
+Without `contentType.response` or an `Accept` header, `client.stream` sends `Accept: text/event-stream`.
 
 The item type defaults to `ServerSentEvent` around the success body. To stream another format, register a `stream` handler, as [Add a media type](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/serialization#add-a-media-type) shows.
 
@@ -271,7 +285,7 @@ When you [resume a stream](#stop-abort-and-resume):
 
 - The runtime does not reconnect, because many streams end on purpose and the retry policy belongs to your app.
 - `lastEventId` is empty until the server sends an `id`, and an empty `id:` clears it.
-- The `||` fallback in the resume loop cannot tell a cleared ID from no ID, so after a clear the loop resends the previous ID.
+- The resume loop copies `lastEventId` after each event, so after a clear it sends no `Last-Event-ID`. A connection that drops before its first event keeps the ID from the connection before.
 - With `returnType: 'data'`, the items alone carry no `lastEventId`, so pass `throwOnError: false` to get the full result.
 
 ### Interceptors on a stream call
