@@ -116,7 +116,6 @@ type ResolverValibotPatch = {
     status?(node: OperationNode, statusCode: StatusCode): string
     headers?(node: OperationNode, statusCode: StatusCode): string
     body?(node: OperationNode): string
-    responses?(node: OperationNode): string
     response?(node: OperationNode): string
     error?(node: OperationNode): string
   }

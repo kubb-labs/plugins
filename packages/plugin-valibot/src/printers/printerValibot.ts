@@ -2,7 +2,6 @@ import {
   bigintConstraints,
   defaultLiteral,
   formatDefault,
-  hasInputChecks,
   integerFormatPattern,
   isObjectComposableIntersection,
   isObjectSchemaNode,
@@ -58,7 +57,7 @@ export type PrinterValibotFactory = ast.PrinterFactoryOptions<'valibot', Printer
 
 type LengthConstraints = { min?: number; max?: number; pattern?: string }
 
-type PrinterContext = { transform: (node: ast.SchemaNode) => string | null; options: PrinterValibotOptions }
+type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
 
 type ModifierOptions = {
   value: string
@@ -71,18 +70,13 @@ type ModifierOptions = {
 
 const UNKNOWN = 'v.unknown()'
 
-/**
- * Actions for string `format`s that Valibot checks with a dedicated action.
- */
+// Actions for string `format`s that Valibot checks with a dedicated action.
 const stringFormatActions = new Map<string | undefined, string>([
   ['byte', 'v.base64()'],
   ['base64', 'v.base64()'],
   ['ulid', 'v.ulid()'],
 ])
 
-/**
- * Wraps `base` and its actions in `v.pipe(...)`, or returns `base` when there is no action.
- */
 function pipe(base: string, actions: Array<string | false | undefined>): string {
   const list = actions.filter(Boolean)
 
@@ -107,12 +101,9 @@ function numberActions({ min, max, exclusive, multipleOf }: NumericConstraints, 
   ].filter((action): action is string => Boolean(action))
 }
 
-/**
- * The actions an `allOf` member adds to a bare string, number, or array. An empty list means the
- * member prints as its own schema.
- */
+// The actions an `allOf` member adds to a bare string, number, or array. An empty list means the
+// member prints as its own schema.
 function memberActions(member: ast.SchemaNode, regexType: PrinterValibotOptions['regexType']): Array<string> {
-  if (hasInputChecks(member)) return []
   if (member.primitive === 'string') return lengthActions(ast.schema.narrow(member, 'string') ?? {}, regexType)
   if (member.primitive === 'number' || member.primitive === 'integer') {
     return numberActions(ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer') ?? {})
@@ -136,9 +127,7 @@ function buildLiteral(value: unknown): string {
   return `v.literal(${formatDefault(value)})`
 }
 
-/**
- * `v.picklist` takes strings and numbers only, so any other set prints as a union of literals.
- */
+// `v.picklist` takes strings and numbers only, so any other set prints as a union of literals.
 function buildEnum(values: Array<unknown>): string {
   if (values.length === 1) return buildLiteral(values[0])
   if (values.every((value) => typeof value === 'string' || typeof value === 'number')) {
@@ -148,27 +137,30 @@ function buildEnum(values: Array<unknown>): string {
   return `v.union([${values.map((value) => buildLiteral(value)).join(', ')}])`
 }
 
-/**
- * Wraps a value in `v.nullable(...)` and `v.optional(...)`. A default goes in as the second argument
- * of `v.optional`, so `null` stays `null` and only a missing value takes the default.
- */
+// A spec default is a string, which does not fit a schema that prints `v.date()`.
+function expectsDate(node: ast.SchemaNode): boolean {
+  const resolved = ast.ref.mergeSchema(node)
+
+  return (resolved.type === 'date' || resolved.type === 'time') && resolved.representation !== 'string'
+}
+
+// Wraps a value in `v.nullable(...)` and `v.optional(...)`. A default goes in as the second argument
+// of `v.optional`, so `null` stays `null` and only a missing value takes the default.
 function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue }: ModifierOptions): string {
   const inner = nullable || nullish ? `v.nullable(${value})` : value
-  const literal = defaultValue !== undefined ? defaultLiteral(schema, defaultValue) : null
+  const literal = defaultValue !== undefined && !expectsDate(schema) ? defaultLiteral(schema, defaultValue) : null
   if (literal !== null) return `v.optional(${inner}, ${literal})`
 
   return optional || nullish ? `v.optional(${inner})` : inner
 }
 
-/**
- * The `.wrapped` chain that reaches the object behind the `v.optional` and `v.nullable` wrappers
- * {@link applyModifiers} put on the const a `$ref` resolves to.
- */
+// The `.wrapped` chain that reaches the object behind the `v.optional` and `v.nullable` wrappers
+// `applyModifiers` puts on the const a `$ref` resolves to.
 function unwrapChain(node: ast.SchemaNode): string {
   const ref = ast.schema.narrow(node, 'ref')
   if (!ref) return ''
   const target = ref.schema ?? ref
-  const hasDefault = target.default !== undefined && defaultLiteral(target, target.default) !== null
+  const hasDefault = target.default !== undefined && !expectsDate(target) && defaultLiteral(target, target.default) !== null
   const depth = Number(Boolean(target.nullable || target.nullish)) + Number(Boolean(target.optional || target.nullish || hasDefault))
 
   return '.wrapped'.repeat(depth)
@@ -190,11 +182,9 @@ function objectEntries(ctx: PrinterContext, properties: Array<ast.PropertyNode>)
   })
 }
 
-/**
- * Makes a `$ref` member of a `oneOf` strict, so a value with the keys of another member does not
- * match it. Only a const that holds a plain object schema has the `.entries` this reads.
- */
-function strictMember(member: string, node: ast.SchemaNode, cyclicSchemas: ReadonlySet<string> | undefined): string {
+// Makes a `$ref` member of a `oneOf` strict, so a value with the keys of another member does not
+// match it. Only a const that holds a plain object schema has the `.entries` this reads.
+function strictMember({ member, node, cyclicSchemas }: { member: string; node: ast.SchemaNode; cyclicSchemas?: ReadonlySet<string> }): string {
   if (node.type !== ast.schema.types.ref) return member
   const refName = ast.ref.getName(node)
   if (refName && cyclicSchemas?.has(refName)) return member
@@ -223,6 +213,8 @@ function strictMember(member: string, node: ast.SchemaNode, cyclicSchemas: Reado
 export const printerValibot = createPrinter<PrinterValibotFactory>((options) => {
   // Read once: `isObjectSchemaNode` and `strictMember` need the full set for every node.
   const { cyclicSchemas } = options
+  // A const whose schema carries a `default` is a `v.optional(...)` wrapper, which has no `.entries`.
+  const isObjectNode = (node: ast.SchemaNode) => isObjectSchemaNode(node, cyclicSchemas) && ast.ref.mergeSchema(node).default === undefined
   const unionsWithSiblings = new WeakSet<ast.SchemaNode>()
   // An OpenAPI 3.0 `nullable: true` set on an array item or union member, which only a property or a root applies.
   const printNullable = (schema: ast.SchemaNode, output: string | null) => (output && schema.nullable ? `v.nullable(${output})` : output)
@@ -329,14 +321,14 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       const nodeMembers = node.members ?? []
       const { discriminatorPropertyName } = node
       // `v.variant` takes object schemas only. Intersections, wrapped objects, and `v.lazy` refs fall back to `v.union`.
-      const isDiscriminated = !!discriminatorPropertyName && nodeMembers.every((member) => isObjectSchemaNode(member, cyclicSchemas))
+      const isDiscriminated = !!discriminatorPropertyName && nodeMembers.every(isObjectNode)
       // `v.union` returns the first member that matches, and an object member drops the keys it does not
       // know. A strict member rejects those keys instead, so a `oneOf` value reaches the member it belongs to.
       const isStrict = node.strategy === 'one' && !isDiscriminated && !unionsWithSiblings.has(node)
       const members = nodeMembers
         .map((member) => {
           const output = this.transform(isStrict ? strictOneOfNode(member) : member)
-          return printNullable(member, output && isStrict ? strictMember(output, member, cyclicSchemas) : output)
+          return printNullable(member, output && isStrict ? strictMember({ member: output, node: member, cyclicSchemas }) : output)
         })
         .filter((member): member is string => Boolean(member))
 
@@ -365,7 +357,12 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       if (!firstBase) return ''
 
       // An object `allOf` is a merge: one `v.object` with the entries of every member stays usable in `v.variant` and `v.omit`.
-      if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemas)) {
+      const base = ast.ref.mergeSchema(first)
+      const baseObject = ast.schema.narrow(base, ast.schema.types.object)
+      // A rest schema or a key pattern cannot move into the merged object, so that base stays in `v.intersect`.
+      const hasRest =
+        Boolean(baseObject?.patternProperties) || (baseObject?.additionalProperties !== undefined && typeof baseObject.additionalProperties !== 'boolean')
+      if (rest.length > 0 && !hasRest && isObjectNode(first) && isObjectComposableIntersection(node, cyclicSchemas)) {
         // A discriminated `oneOf` base already pins its discriminator to a literal, which a sibling `type: string` would widen.
         const discriminator = ast.schema.narrow(first, ast.schema.types.union)?.discriminatorPropertyName
         // Keyed by name: a property two members declare is one key of the object literal, and the last member wins.
@@ -377,7 +374,10 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
             .map((property) => [property.name, property] as const),
         )
 
-        return `v.object(${buildObject([`...${firstBase}.entries`, ...objectEntries(this, [...properties.values()])])})`
+        const additional = baseObject?.additionalProperties
+        const ctor = additional === true ? 'v.looseObject' : additional === false ? 'v.strictObject' : 'v.object'
+
+        return `${ctor}(${buildObject([`...${firstBase}.entries`, ...objectEntries(this, [...properties.values()])])})`
       }
 
       const schemas = [firstBase]

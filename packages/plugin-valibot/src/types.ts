@@ -36,7 +36,6 @@ export type ResolverValibot = Resolver & {
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
     headers(node: ast.OperationNode, statusCode: ast.StatusCode): string
     body(node: ast.OperationNode): string
-    responses(node: ast.OperationNode): string
     response(node: ast.OperationNode): string
     error(node: ast.OperationNode): string
   }
@@ -63,8 +62,6 @@ export type Options = OutputOptions & {
   importPath?: string
   /**
    * Export a `v.InferOutput` type alias next to every schema.
-   *
-   * @default false
    */
   inferred?: boolean
   /**
