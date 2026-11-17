@@ -1,14 +1,10 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
+import { defaultLiteral, formatDefault, isObjectComposableIntersection, isObjectSchemaNode, isPlainInlineObject } from '@internals/shared'
 import {
   applyMiniModifiers,
   applyModifiers,
-  defaultLiteral,
-  formatDefault,
   isClosedKeySchema,
-  isObjectComposableIntersection,
-  isObjectSchemaNode,
-  isPlainInlineObject,
   lengthChecksMini,
   lengthConstraints,
   numberChecksMini,

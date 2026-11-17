@@ -2,25 +2,27 @@ import { buildList } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
+  hasInputChecks,
+  hasKeyCheck,
+  integerFormatPattern,
+  isObjectComposableIntersection,
+  isObjectSchemaNode,
+  preserveRequiredProperties,
+  strictOneOfNode,
+} from '@internals/shared'
+import {
   buildEnum,
   buildLiteral,
   type buildObjectShape,
   contentEncodingCalls,
   getMemberConstraint,
-  hasInputChecks,
-  hasKeyCheck,
   inputChecks,
-  integerFormatPattern,
   jsonContentCheck,
   isClosedKeySchema,
-  isObjectComposableIntersection,
-  isObjectSchemaNode,
   type lengthConstraints,
   type numberConstraints,
   type patternKeySchema,
-  preserveRequiredProperties,
   shouldCoerce,
-  strictOneOfNode,
   stringFormatCalls,
 } from '../utils.ts'
 

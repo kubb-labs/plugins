@@ -38,3 +38,17 @@ export {
   operationKey,
   resolveOperationName,
 } from './resolver.ts'
+export {
+  bigintConstraints,
+  defaultLiteral,
+  formatDefault,
+  hasInputChecks,
+  hasKeyCheck,
+  integerFormatPattern,
+  isObjectComposableIntersection,
+  isObjectSchemaNode,
+  isPlainInlineObject,
+  preserveRequiredProperties,
+  strictOneOfNode,
+} from './schema.ts'
+export type { NumericConstraints } from './schema.ts'

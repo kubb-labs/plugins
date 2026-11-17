@@ -1,18 +1,8 @@
 import { lazyGetter, objectKey } from '@internals/utils'
 import { ast, createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import {
-  applyModifiers,
-  bigintConstraints,
-  buildObjectShape,
-  defaultLiteral,
-  hasInputChecks,
-  lengthConstraints,
-  numberConstraints,
-  patternKeySchema,
-  printWithOmit,
-  shouldCoerce,
-} from '../utils.ts'
+import { bigintConstraints, defaultLiteral, hasInputChecks } from '@internals/shared'
+import { applyModifiers, buildObjectShape, lengthConstraints, numberConstraints, patternKeySchema, printWithOmit, shouldCoerce } from '../utils.ts'
 import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
 /**
