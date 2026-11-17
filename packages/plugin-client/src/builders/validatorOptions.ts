@@ -17,11 +17,6 @@ export function isValidatorEnabled(validator: ValidatorOptions | undefined): boo
 
 /**
  * Returns the library the validator uses, or `null` when no direction is on.
- *
- * @example
- * ```ts
- * resolveValidatorLibrary({ params: 'valibot' }) // 'valibot'
- * ```
  */
 export function resolveValidatorLibrary(validator: ValidatorOptions | undefined): ValidatorLibrary | null {
   if (!validator) return null

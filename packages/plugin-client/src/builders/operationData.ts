@@ -36,7 +36,6 @@ export type OperationData = {
 export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOperationNode; ctx: GeneratorContext; types: OperationTypeSource }): OperationData {
   const { resolver, root } = ctx
   const { output, validator, importPath } = ctx.options
-  // One branch per library: `getPlugin` and `getResolver` are typed by the literal plugin name.
   const library = resolveValidatorLibrary(validator)
   const schemaPlugin = library === 'valibot' ? ctx.getPlugin(pluginValibotName) : library === 'zod' ? ctx.getPlugin(pluginZodName) : null
   const schemaResolver = !schemaPlugin ? null : library === 'valibot' ? ctx.getResolver(pluginValibotName) : ctx.getResolver(pluginZodName)
