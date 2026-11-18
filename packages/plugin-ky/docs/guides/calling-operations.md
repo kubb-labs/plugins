@@ -90,12 +90,7 @@ await getPetById({ path: { petId: 1 }, options: { timeout: 5000, retry: { limit:
 
 `client.setConfig({ options })` sets shared defaults, and per-call options win. Kubb sets the method, headers, body, and signal over them, and sets `throwHttpErrors: false` to keep control of status handling. `options` does not take `json`, `prefix`, or `searchParams`, because Kubb builds the body and the URL: pass `body`, `baseURL`, and `query` on the call.
 
-The client changes one Ky default, `retry`, so a call is sent once, as with the fetch and axios clients. Ky's timeout stays:
-
-| Option    | Default                                                                                              |
-| --------- | ---------------------------------------------------------------------------------------------------- |
-| `timeout` | Ky's default: 10 seconds to get the response headers. Set `false` to wait without a limit.           |
-| `retry`   | `0`, so a call is sent once. Ky's own default is 2. See [Retry a call](#retry-a-call) to turn it on. |
+The client sets `retry: 0`, so a call is sent once, where Ky's own default is 2. See [Retry a call](#retry-a-call) to turn it on. Ky's `timeout` default stays: 10 seconds to get the response headers, or `false` to wait without a limit.
 
 ## Build a URL without sending
 
@@ -118,7 +113,7 @@ When you set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-
 
 ### Retry a call
 
-The client does not retry. Set Ky's `retry` option to retry a network error, for every call or for one. Ky retries only the methods in `retry.methods`, which leaves out `POST` and `PATCH`:
+Set Ky's `retry` option to retry a network error, for every call or for one. Ky retries only the methods in `retry.methods`, which leaves out `POST` and `PATCH`:
 
 ```typescript
 import { client } from './gen/.kubb/client'

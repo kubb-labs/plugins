@@ -13,10 +13,10 @@ export type NativeRequest = Request
 export type NativeResponse = Response
 
 /**
- * Extra Ky options for a call or client, such as `retry`, `timeout`, or `hooks`.
+ * Extra Ky options for a call or client, such as `retry`, `timeout`, or `hooks`. The left-out options would replace
+ * the body or URL the core built, or its status handling. The intersection keeps the options assignable to
+ * `RequestInit` under `exactOptionalPropertyTypes`.
  */
-// The intersection keeps the options assignable to `RequestInit` under `exactOptionalPropertyTypes`. The left-out
-// options would replace the body or URL the core built, or its status handling.
 export type NativeOptions = Omit<KyOptions, 'json' | 'prefix' | 'searchParams' | 'throwHttpErrors'> & RequestInit
 
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
@@ -86,7 +86,7 @@ export function createKyTransport(instance: KyInstance): Transport {
   return (request) => instance(request.url, { ...toRequestInit(request), throwHttpErrors: false })
 }
 
-// Ky retries by default. The client does not, as the fetch and axios clients do not, unless `options.retry` asks for it.
+// Ky retries by default. The client sends each call once unless `options.retry` asks for more.
 export const defaultTransport: Transport = createKyTransport(ky.create({ retry: 0 }))
 
 /**

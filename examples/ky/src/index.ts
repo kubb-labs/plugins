@@ -3,8 +3,7 @@ import { addPet, getPetById } from './gen/clients/index.ts'
 import type { GetPetByIdResponses, Pet } from './gen/models/index.ts'
 
 // Configure the bundled runtime. There is no runtime dependency on @kubb/plugin-ky, only on ky.
-// `options` takes Ky options: every call here waits 5 seconds for the response headers, and Ky retries a
-// network error twice on the methods it retries, which leave out POST and PATCH.
+// `options` takes Ky options, such as `timeout` and `retry`.
 client.setConfig({ baseURL: 'https://petstore3.swagger.io/api/v3', options: { timeout: 5000, retry: 2 } })
 
 export async function demo() {

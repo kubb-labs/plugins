@@ -41,7 +41,7 @@ client.setConfig({ transport: createKyTransport(instance) })
 ```
 
 > [!NOTE]
-> Leave `prefix`, `baseUrl`, `json`, and `searchParams` off the instance, and set the base URL with [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#set-the-base-url). The transport sets `throwHttpErrors: false`, because the client splits success from error itself. Your instance keeps Ky's own `retry` default of 2, so pass `retry: 0` to `ky.create` to send each call once, as the default client does.
+> Leave `prefix`, `baseUrl`, `json`, and `searchParams` off the instance, and set the base URL with [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#set-the-base-url). The transport sets `throwHttpErrors: false`. Your instance keeps Ky's own `retry` default of 2, so pass `retry: 0` to `ky.create` to send each call once, as the default client does.
 
 ## Wrap the default transport
 
