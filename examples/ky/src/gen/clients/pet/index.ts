@@ -1,0 +1,8 @@
+export { addPet } from './addPet'
+export { deletePet } from './deletePet'
+export { findPetsByStatus } from './findPetsByStatus'
+export { findPetsByTags } from './findPetsByTags'
+export { getPetById } from './getPetById'
+export { updatePet } from './updatePet'
+export { updatePetWithForm } from './updatePetWithForm'
+export { uploadFile } from './uploadFile'

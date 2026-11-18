@@ -5,7 +5,7 @@ The Client plugin turns each OpenAPI operation into a typed function that calls 
 - Each function takes grouped `path`, `query`, `headers`, `cookies`, and `body` parameters, and passes your client the operation's auth requirements as `security`.
 - A call can pass its own `client` to replace the default.
 - The query plugins and `@kubb/plugin-mcp` can call the generated functions.
-- For a ready-made client, use [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) instead.
+- For a ready-made client, use [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch), [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios), or [`@kubb/plugin-ky`](https://kubb.dev/extensions/kubb-labs/plugin-ky) instead.
 
 ## Setup
 

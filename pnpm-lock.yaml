@@ -488,6 +488,28 @@ importers:
         specifier: 'catalog:'
         version: 7.0.2
 
+  examples/ky:
+    dependencies:
+      '@kubb/adapter-oas':
+        specifier: 'catalog:'
+        version: 5.21.1(openapi-types@12.1.3)
+      '@kubb/plugin-ky':
+        specifier: workspace:*
+        version: link:../../packages/plugin-ky
+      '@kubb/plugin-ts':
+        specifier: workspace:*
+        version: link:../../packages/plugin-ts
+      kubb:
+        specifier: 'catalog:'
+        version: 5.21.1(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+      ky:
+        specifier: ^2.2.0
+        version: 2.2.0
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+
   examples/mcp:
     dependencies:
       '@kubb/adapter-oas':
@@ -955,6 +977,22 @@ importers:
         specifier: 'catalog:'
         version: 7.0.2
 
+  packages/plugin-ky:
+    dependencies:
+      '@kubb/kit':
+        specifier: ^5.21.1
+        version: 5.21.1
+      '@kubb/plugin-client':
+        specifier: workspace:^
+        version: link:../plugin-client
+    devDependencies:
+      ky:
+        specifier: ^2.2.0
+        version: 2.2.0
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+
   packages/plugin-mcp:
     dependencies:
       '@kubb/kit':
@@ -1196,6 +1234,9 @@ importers:
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
+      '@kubb/plugin-ky':
+        specifier: workspace:*
+        version: link:../../packages/plugin-ky
       '@kubb/plugin-mcp':
         specifier: workspace:*
         version: link:../../packages/plugin-mcp
@@ -3277,6 +3318,10 @@ packages:
     resolution: {integrity: sha512-MFYs/vZPTOPeoX1lgsGRLd2TeqtnjMlH41pezTxziAG3FkaDesuIgJlibPbBeGp3N6HjLq0UijqMEMi53XXigA==}
     engines: {node: '>=22.22'}
     hasBin: true
+
+  ky@2.2.0:
+    resolution: {integrity: sha512-4+B63kyZt+Y8snQiUGydK1vgY9xYQJZEh9K/nIAIEts+gYJzy1EiAw3BbK8xpWRuWUpN70SNCMjqRGTm75xxIA==}
+    engines: {node: '>=22'}
 
   launch-editor@2.14.2:
     resolution: {integrity: sha512-NHJEb30MGBCkmZXLZwz25t37QR4aY03ZzPYUJXOJaOa92uWwExI9SBQUuIznBYc1xkD7cJNGX7oc3Nl3sq2kQQ==}
@@ -5916,6 +5961,8 @@ snapshots:
       - unloader
       - vite
       - webpack
+
+  ky@2.2.0: {}
 
   launch-editor@2.14.2:
     dependencies:

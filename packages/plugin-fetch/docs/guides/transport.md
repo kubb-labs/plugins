@@ -29,7 +29,7 @@ Return a `TransportResult` to set the native `request` and `response` that resul
 
 ## Send with another library
 
-A library that returns a `Response`, such as [ky](https://github.com/sindresorhus/ky), needs only the send. `toRequestInit(request)` gives the `RequestInit` that `fetch` and ky take:
+For Ky with its retries and hooks, use [`@kubb/plugin-ky`](https://kubb.dev/extensions/kubb-labs/plugin-ky) instead of this plugin. A library that returns a `Response`, such as [ky](https://github.com/sindresorhus/ky), needs only the send. `toRequestInit(request)` gives the `RequestInit` that `fetch` and ky take:
 
 ```typescript
 import ky from 'ky'

@@ -14,15 +14,15 @@ Next to the handlers, the plugin writes three files at the root of its `output.p
 
 ## Setup
 
-- Add `@kubb/plugin-zod`, one client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`), and `@kubb/plugin-ts`. `@kubb/plugin-ts` is optional with `pluginZod({ inferred: 'codec' })`. Leave `sdk` unset on the client plugin.
-- Install `@modelcontextprotocol/server` v2 and `zod` 4.2 or a later v4 release in the app that runs the server. Add `axios` too when you use `@kubb/plugin-axios`.
+- Add `@kubb/plugin-zod`, one client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`, `@kubb/plugin-ky`, or `@kubb/plugin-client`), and `@kubb/plugin-ts`. `@kubb/plugin-ts` is optional with `pluginZod({ inferred: 'codec' })`. Leave `sdk` unset on the client plugin.
+- Install `@modelcontextprotocol/server` v2 and `zod` 4.2 or a later v4 release in the app that runs the server. Add `axios` or `ky` too when you use `@kubb/plugin-axios` or `@kubb/plugin-ky`.
 - Install a TypeScript runner such as `tsx`. The generated `.mcp.json` runs `npx tsx`, which downloads `tsx` from npm when it is missing.
 
 ## Options worth knowing
 
 | Option                                                                      | Default  | What it does                                                                                               |
 | --------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
-| [`client`](https://kubb.dev/extensions/kubb-labs/plugin-mcp/options#client) | Detected | Picks `'fetch'`, `'axios'`, or `'client'` when several client plugins are registered.                      |
+| [`client`](https://kubb.dev/extensions/kubb-labs/plugin-mcp/options#client) | Detected | Picks `'fetch'`, `'axios'`, `'ky'`, or `'client'` when several client plugins are registered.              |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)     | `[]`     | Skips operations, such as one with a binary request body. An MCP client sends JSON and cannot send a file. |
 | [`output.path`](https://kubb.dev/docs/5.x/reference/plugin-options#output)  | `'mcp'`  | Must name a folder for `server.ts`, `start.ts`, and `.mcp.json`.                                           |
 

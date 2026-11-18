@@ -25,6 +25,7 @@
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-fetch": "workspace:*",
+    "@kubb/plugin-ky": "workspace:*",
     "@kubb/plugin-mcp": "workspace:*",
     "@kubb/plugin-msw": "workspace:*",
     "@kubb/plugin-react-query": "workspace:*",

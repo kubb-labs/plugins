@@ -43,10 +43,10 @@ Pass these options to `pluginReactQuery()`. Shared options link to [Shared plugi
 
 The client plugin the hooks call. Kubb detects a lone client plugin, so set `client` only when several are registered. Generation fails when none is.
 
-|          |                                  |
-| -------- | -------------------------------- |
-| Type     | `'fetch' \| 'axios' \| 'client'` |
-| Required | `false`                          |
+|          |                                          |
+| -------- | ---------------------------------------- |
+| Type     | `'fetch' \| 'axios' \| 'ky' \| 'client'` |
+| Required | `false`                                  |
 
 ::field-group
 
@@ -56,6 +56,10 @@ Calls [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch)
 
 :::field{name="'axios'"}
 Calls [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios).
+:::
+
+:::field{name="'ky'"}
+Calls [`@kubb/plugin-ky`](https://kubb.dev/extensions/kubb-labs/plugin-ky).
 :::
 
 :::field{name="'client'"}
