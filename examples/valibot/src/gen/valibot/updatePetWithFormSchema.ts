@@ -5,6 +5,9 @@
 
 import * as v from 'valibot'
 
+/**
+ * ID of pet that needs to be updated
+ */
 export const updatePetWithFormPathPetIdSchema = v.pipe(
   v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
   v.description('ID of pet that needs to be updated'),
@@ -12,10 +15,16 @@ export const updatePetWithFormPathPetIdSchema = v.pipe(
 
 export type UpdatePetWithFormPathPetIdSchemaType = v.InferInput<typeof updatePetWithFormPathPetIdSchema>
 
+/**
+ * Name of pet that needs to be updated
+ */
 export const updatePetWithFormQueryNameSchema = v.optional(v.pipe(v.string(), v.description('Name of pet that needs to be updated')))
 
 export type UpdatePetWithFormQueryNameSchemaType = v.InferInput<typeof updatePetWithFormQueryNameSchema>
 
+/**
+ * Status of pet that needs to be updated
+ */
 export const updatePetWithFormQueryStatusSchema = v.optional(v.pipe(v.string(), v.description('Status of pet that needs to be updated')))
 
 export type UpdatePetWithFormQueryStatusSchemaType = v.InferInput<typeof updatePetWithFormQueryStatusSchema>
@@ -33,17 +42,14 @@ export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
 export type UpdatePetWithFormErrorSchemaType = v.InferOutput<typeof updatePetWithFormErrorSchema>
 
 export const updatePetWithFormPathSchema = v.object({
-  petId: v.pipe(
-    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
-    v.description('ID of pet that needs to be updated'),
-  ),
+  petId: updatePetWithFormPathPetIdSchema,
 })
 
 export type UpdatePetWithFormPathSchemaType = v.InferInput<typeof updatePetWithFormPathSchema>
 
 export const updatePetWithFormQuerySchema = v.object({
-  name: v.optional(v.pipe(v.string(), v.description('Name of pet that needs to be updated'))),
-  status: v.optional(v.pipe(v.string(), v.description('Status of pet that needs to be updated'))),
+  name: updatePetWithFormQueryNameSchema,
+  status: updatePetWithFormQueryStatusSchema,
 })
 
 export type UpdatePetWithFormQuerySchemaType = v.InferInput<typeof updatePetWithFormQuerySchema>

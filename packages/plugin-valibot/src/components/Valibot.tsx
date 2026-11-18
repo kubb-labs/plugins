@@ -30,15 +30,34 @@ type Props = {
    * `v.lazy(() => …)`, which is implicitly `any` under `strict`, so the const gets a `v.GenericSchema` annotation.
    */
   cyclic?: boolean
+  /**
+   * Text for the JSDoc comment above the schema const, so an editor shows it on hover.
+   */
+  description?: string
+  deprecated?: boolean
 }
 
-export function Valibot({ name, node, printer, inferTypeName, inferKind = 'InferOutput', typeGuards, isName, assertName, cyclic }: Props): KubbReactNode {
+export function Valibot({
+  name,
+  node,
+  printer,
+  inferTypeName,
+  inferKind = 'InferOutput',
+  typeGuards,
+  isName,
+  assertName,
+  cyclic,
+  description,
+  deprecated,
+}: Props): KubbReactNode {
   const output = printer.print(node)
   const printerImports = printer.drainImports()
 
   if (!output) {
     return
   }
+
+  const comments = [description, deprecated && '@deprecated'].filter((comment): comment is string => Boolean(comment))
 
   // `v.is` and `v.assert` narrow to the value the schema accepts, before any conversion.
   const guardType = `v.InferInput<typeof ${name}>`
@@ -58,7 +77,7 @@ export function Valibot({ name, node, printer, inferTypeName, inferKind = 'Infer
         />
       ))}
       <File.Source name={name} isExportable isIndexable>
-        <Const export name={name} type={cyclic ? 'v.GenericSchema' : undefined}>
+        <Const export name={name} type={cyclic ? 'v.GenericSchema' : undefined} JSDoc={comments.length ? { comments } : undefined}>
           {output}
         </Const>
       </File.Source>

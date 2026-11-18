@@ -6,6 +6,9 @@
 import * as v from 'valibot'
 import { petSchema } from './petSchema'
 
+/**
+ * Status values that need to be considered for filter
+ */
 export const findPetsByStatusQueryStatusSchema = v.optional(
   v.pipe(v.picklist(['available', 'pending', 'sold']), v.description('Status values that need to be considered for filter')),
   'available',
@@ -38,7 +41,7 @@ export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
 export type FindPetsByStatusErrorSchemaType = v.InferOutput<typeof findPetsByStatusErrorSchema>
 
 export const findPetsByStatusQuerySchema = v.object({
-  status: v.optional(v.pipe(v.picklist(['available', 'pending', 'sold']), v.description('Status values that need to be considered for filter')), 'available'),
+  status: findPetsByStatusQueryStatusSchema,
 })
 
 export type FindPetsByStatusQuerySchemaType = v.InferInput<typeof findPetsByStatusQuerySchema>

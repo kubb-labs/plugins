@@ -41,7 +41,7 @@ limit: v.optional(v.pipe(v.unknown(), v.toNumber(), v.integer())),
 
 `numbers` prints number and integer fields as `v.pipe(v.unknown(), v.toNumber())`.
 
-- Integers keep `v.integer()`, and `format: int32` and `uint32` keep the `v.minValue()` and `v.maxValue()` of the format's range.
+- Integers keep `v.integer()`, and `format: int8`, `int16`, `int32`, and their `uint` forms keep the `v.minValue()` and `v.maxValue()` of the format's range.
 - `format: int64` fields typed as `bigint`, the adapter default, keep `v.toBigint()` with or without this option.
 
 ## Coerce dates

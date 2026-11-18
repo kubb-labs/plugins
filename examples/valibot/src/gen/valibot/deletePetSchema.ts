@@ -9,6 +9,9 @@ export const deletePetHeaderApiKeySchema = v.optional(v.string())
 
 export type DeletePetHeaderApiKeySchemaType = v.InferInput<typeof deletePetHeaderApiKeySchema>
 
+/**
+ * Pet id to delete
+ */
 export const deletePetPathPetIdSchema = v.pipe(
   v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
   v.description('Pet id to delete'),
@@ -29,16 +32,13 @@ export const deletePetErrorSchema = deletePetStatus400Schema
 export type DeletePetErrorSchemaType = v.InferOutput<typeof deletePetErrorSchema>
 
 export const deletePetPathSchema = v.object({
-  petId: v.pipe(
-    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
-    v.description('Pet id to delete'),
-  ),
+  petId: deletePetPathPetIdSchema,
 })
 
 export type DeletePetPathSchemaType = v.InferInput<typeof deletePetPathSchema>
 
 export const deletePetHeadersSchema = v.object({
-  api_key: v.optional(v.string()),
+  api_key: deletePetHeaderApiKeySchema,
 })
 
 export type DeletePetHeadersSchemaType = v.InferInput<typeof deletePetHeadersSchema>
