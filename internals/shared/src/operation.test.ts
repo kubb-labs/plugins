@@ -2,7 +2,10 @@ import { ast, casing, createResolver } from '@kubb/kit'
 import type { Group, Memo, Output, PluginType, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import {
+  buildContentTypeEntries,
   buildOperationComments,
+  buildParamRefsSchema,
+  buildResponseUnionSchema,
   buildOptionsSchema,
   buildRequestConfigType,
   getContentTypeInfo,
@@ -719,5 +722,46 @@ describe('getStreamFraming', () => {
     ['plain JSON', { contentType: 'application/json' }, undefined],
   ] as const)('%s', (_, entry, expected) => {
     expect(getStreamFraming(entry)).toBe(expected)
+  })
+})
+
+describe('schema builders for an operation', () => {
+  const { createOperation, createParameter, createResponse, createSchema } = ast.factory
+  const string = createSchema({ type: 'string' })
+  const names = {
+    name: (name: string) => `${name}Schema`,
+    response: { status: (_node: ast.OperationNode, statusCode: ast.StatusCode) => `Status${statusCode}` },
+  }
+  const response = (statusCode: ast.StatusCode) => createResponse({ statusCode, content: [{ contentType: 'application/json', schema: string }] })
+  const node = createOperation({ operationId: 'getPet', method: 'GET', path: '/pets', parameters: [], responses: [] })
+
+  test('buildParamRefsSchema points every key at the const of its parameter', () => {
+    const params = [createParameter({ name: 'limit', in: 'query', required: false, schema: string })]
+    const schema = buildParamRefsSchema({ node, params, resolver: { param: { name: (_node, param) => `${param.name}Param` } } })
+
+    expect(ast.schema.narrow(schema, 'object')?.properties).toMatchObject([{ name: 'limit', required: true, schema: { type: 'ref', name: 'limitParam' } }])
+  })
+
+  test('buildContentTypeEntries ends with the union of its content types', () => {
+    const entries = buildContentTypeEntries(
+      [
+        { contentType: 'application/json', schema: string },
+        { contentType: 'application/xml', schema: string },
+      ],
+      'body',
+    )
+
+    expect(entries.map((entry) => entry.name)).toStrictEqual(['bodyJson', 'bodyXml', 'body'])
+    expect(entries.at(-1)?.schema).toMatchObject({ type: 'union', members: [{ name: 'bodyJson' }, { name: 'bodyXml' }] })
+  })
+
+  test('buildResponseUnionSchema returns one ref, a union, an unknown fallback, or nothing', () => {
+    const build = (responses: Array<ast.ResponseNode>, fallbackUnknown: boolean) =>
+      buildResponseUnionSchema({ node, responses, name: 'getPetResponse', resolver: names, fallbackUnknown })
+
+    expect(build([response('200')], true)).toMatchObject({ type: 'ref', name: 'Status200' })
+    expect(build([response('200'), response('201')], true)).toMatchObject({ type: 'union', members: [{ name: 'Status200' }, { name: 'Status201' }] })
+    expect(build([], true)).toMatchObject({ type: 'unknown' })
+    expect(build([], false)).toBeNull()
   })
 })

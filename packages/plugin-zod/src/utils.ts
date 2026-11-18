@@ -1,17 +1,9 @@
-import { defaultLiteral, formatDefault, hasInputChecks, type NumericBounds } from '@internals/shared'
+import { type NumericBounds, defaultLiteral, formatDefault, hasInputChecks, numericLiteral } from '@internals/shared'
 import { buildObject, toRegExpString } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
 
-/**
- * Returns `true` when the given coercion option enables coercion for the specified type.
- */
-export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] | undefined, type: 'dates' | 'strings' | 'numbers'): boolean {
-  if (coercion === undefined || coercion === false) return false
-  if (coercion === true) return true
-
-  return !!coercion[type]
-}
+export { shouldCoerce } from '@internals/shared'
 
 /**
  * Whether the schema node represents a closed or finite set of keys (e.g. enum, literal,
@@ -117,17 +109,12 @@ export type ModifierOptions = {
   examples?: Array<unknown>
 }
 
-// A bigint bound prints as `BigInt('…')`, which is exact and compiles below ES2020, where a `1n` literal does not.
-function bigintLiteral(value: number | string, isBigint: boolean): number | string {
-  return isBigint ? `BigInt('${value}')` : value
-}
-
 /**
  * Build `.min()` / `.max()` / `.gt()` / `.lt()` constraint chains for numbers
  * using the standard chainable Zod v4 API.
  */
 export function numberConstraints({ min, max, exclusive, multipleOf }: NumericBounds, isBigint = false): string {
-  const literal = (value: number | string) => bigintLiteral(value, isBigint)
+  const literal = (value: number | string) => numericLiteral(value, isBigint)
 
   return [
     min !== undefined ? `.min(${literal(min)})` : '',
@@ -154,7 +141,7 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
  * Build `.check(z.minimum(), z.maximum())` for `zod/mini` numeric constraints.
  */
 export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericBounds, isBigint = false): string {
-  const literal = (value: number | string) => bigintLiteral(value, isBigint)
+  const literal = (value: number | string) => numericLiteral(value, isBigint)
   const checks = [
     min !== undefined && `z.minimum(${literal(min)})`,
     max !== undefined && `z.maximum(${literal(max)})`,

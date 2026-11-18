@@ -8,7 +8,9 @@ import {
   isObjectComposableIntersection,
   isObjectSchemaNode,
   type NumericBounds,
+  numericLiteral,
   preserveRequiredProperties,
+  shouldCoerce,
   strictOneOfNode,
   withFormatRange,
 } from '@internals/shared'
@@ -101,10 +103,6 @@ const UNKNOWN = 'v.unknown()'
 // A check on the raw input skips every value that is not a plain object.
 const NOT_OBJECT = 'typeof value !== "object" || value === null || Array.isArray(value)'
 
-function shouldCoerce(coercion: PrinterValibotOptions['coercion'], type: 'dates' | 'strings' | 'numbers'): boolean {
-  return coercion === true || (typeof coercion === 'object' && Boolean(coercion[type]))
-}
-
 // Actions for string `format`s that Valibot checks with a dedicated action.
 const stringFormatActions = new Map<string | undefined, string>([
   ['byte', 'v.base64()'],
@@ -126,9 +124,8 @@ function lengthActions({ min, max, pattern }: LengthConstraints, regexType: Prin
   ].filter((action): action is string => Boolean(action))
 }
 
-// A bigint bound prints as `BigInt('…')`, which is exact and compiles below ES2020, where a `1n` literal does not.
 function numberActions({ min, max, exclusive, multipleOf }: NumericBounds, isBigint = false): Array<string> {
-  const literal = (value: number | string) => (isBigint ? `BigInt('${value}')` : value)
+  const literal = (value: number | string) => numericLiteral(value, isBigint)
 
   return [
     min !== undefined && `v.minValue(${literal(min)})`,

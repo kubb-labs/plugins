@@ -1,3 +1,4 @@
+import { jsDocEscape } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 
 /**
@@ -254,4 +255,32 @@ export function hasInputChecks(node: ast.SchemaNode): boolean {
  */
 export function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
   return node.type === 'object' && node.additionalProperties === undefined ? { ...node, additionalProperties: false } : node
+}
+
+/**
+ * Whether the `coercion` option turns on conversion for a type.
+ */
+export function shouldCoerce(
+  coercion: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean } | undefined,
+  type: 'dates' | 'strings' | 'numbers',
+): boolean {
+  return coercion === true || (typeof coercion === 'object' && Boolean(coercion[type]))
+}
+
+/**
+ * A numeric bound as source code. A bigint bound prints as `BigInt('…')`, which is exact and
+ * compiles below ES2020, where a `1n` literal does not.
+ */
+export function numericLiteral(value: number | string, isBigint: boolean): number | string {
+  return isBigint ? `BigInt('${value}')` : value
+}
+
+/**
+ * The JSDoc lines above a schema const: its description, and `@deprecated` when the spec says so.
+ * A `$ref` const gets none, because the const it points to has them.
+ */
+export function schemaComments(node: ast.SchemaNode): Array<string> {
+  if (node.type === ast.schema.types.ref) return []
+
+  return [node.description && jsDocEscape(node.description), node.deprecated && '@deprecated'].filter((comment): comment is string => Boolean(comment))
 }

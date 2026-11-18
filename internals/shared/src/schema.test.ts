@@ -1,6 +1,16 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { defaultLiteral, formatDefault, isObjectComposableIntersection, isObjectSchemaNode, isPlainInlineObject, withFormatRange } from './schema.ts'
+import {
+  defaultLiteral,
+  formatDefault,
+  isObjectComposableIntersection,
+  isObjectSchemaNode,
+  isPlainInlineObject,
+  numericLiteral,
+  schemaComments,
+  shouldCoerce,
+  withFormatRange,
+} from './schema.ts'
 
 describe('formatDefault', () => {
   test('object value keeps its contents', () => {
@@ -260,5 +270,31 @@ describe('withFormatRange', () => {
   test('leaves a schema alone when the format has no range for that type', () => {
     expect(withFormatRange({ format: 'int64', min: 1 }, 'integer')).toStrictEqual({ format: 'int64', min: 1 })
     expect(withFormatRange({ min: 1 }, 'bigint')).toStrictEqual({ min: 1 })
+  })
+})
+
+describe('schemaComments', () => {
+  test('escapes a line that starts with @, so the description cannot add a JSDoc tag', () => {
+    const node = ast.factory.createSchema({ type: 'string', description: 'A pet\n@internal use v2', deprecated: true })
+
+    expect(schemaComments(node)).toStrictEqual(['A pet\n\\@internal use v2', '@deprecated'])
+  })
+
+  test('a $ref const takes no comment', () => {
+    expect(schemaComments(ast.factory.createSchema({ type: 'ref', name: 'Pet', description: 'A pet' }))).toStrictEqual([])
+  })
+})
+
+describe('shouldCoerce and numericLiteral', () => {
+  test('coercion is on for true or for the named type', () => {
+    expect(shouldCoerce(true, 'dates')).toBe(true)
+    expect(shouldCoerce({ numbers: true }, 'numbers')).toBe(true)
+    expect(shouldCoerce({ numbers: true }, 'strings')).toBe(false)
+    expect(shouldCoerce(undefined, 'strings')).toBe(false)
+  })
+
+  test('a bigint bound prints as a BigInt string', () => {
+    expect(numericLiteral('9223372036854775807', true)).toBe("BigInt('9223372036854775807')")
+    expect(numericLiteral(5, false)).toBe(5)
   })
 })
