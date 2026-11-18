@@ -6,6 +6,7 @@
 
 import type { CreatePetsResponse, CreatePetsBody } from './CreatePets'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
@@ -14,11 +15,13 @@ export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
   })
 }
 
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
 export function createPetsHandler(
-  data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, CreatePetsBody>,
+  data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, MswBody<CreatePetsBody>>,
   options?: { baseURL?: string },
 ) {
-  return http.post<Record<string, string>, CreatePetsBody>(`${options?.baseURL ?? ''}/pets`, function handler(info) {
+  return http.post<Record<string, string>, MswBody<CreatePetsBody>>(`${options?.baseURL ?? ''}/pets`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new HttpResponse<string>(JSON.stringify(data), {

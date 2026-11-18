@@ -5,6 +5,7 @@
 
 import type { UploadFileResponse, UploadFileBody } from '../../types/UploadFile'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function uploadFileHandlerResponse200(data?: UploadFileResponse) {
@@ -16,8 +17,10 @@ export function uploadFileHandlerResponse200(data?: UploadFileResponse) {
   })
 }
 
-export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileBody>, options?: { baseURL?: string }) {
-  return http.post<Record<string, string>, UploadFileBody>(`${options?.baseURL ?? ''}/pet/:petId/uploadImage`, function handler(info) {
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
+export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, MswBody<UploadFileBody>>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, MswBody<UploadFileBody>>(`${options?.baseURL ?? ''}/pet/:petId/uploadImage`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return uploadFileHandlerResponse200(data)

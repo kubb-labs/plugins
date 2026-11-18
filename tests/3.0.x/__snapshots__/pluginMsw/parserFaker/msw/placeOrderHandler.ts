@@ -5,6 +5,7 @@
 
 import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderBody } from '../types/PlaceOrder'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { createPlaceOrderResponse } from '../faker/createPlaceOrder'
 import { http, HttpResponse } from 'msw/http'
 
@@ -27,8 +28,10 @@ export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
   })
 }
 
-export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, PlaceOrderBody>, options?: { baseURL?: string }) {
-  return http.post<Record<string, string>, PlaceOrderBody>(`${options?.baseURL ?? ''}/store/order`, function handler(info) {
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
+export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, MswBody<PlaceOrderBody>>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, MswBody<PlaceOrderBody>>(`${options?.baseURL ?? ''}/store/order`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return placeOrderHandlerResponse200(data ?? createPlaceOrderResponse())

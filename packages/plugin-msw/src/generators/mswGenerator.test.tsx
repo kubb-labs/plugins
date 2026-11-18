@@ -237,27 +237,16 @@ async function importGenerated(source: string, stubs: Record<string, string> = {
 }
 
 describe('mswGenerator request body types', () => {
+  // The body type comes from plugin-ts, so each case stubs `CreatePetsBody` and checks the exact type of `request.json()`.
   test.each([
-    ['unknown', 'unknown', 'typed'],
-    ['unknown', 'ref', 'typed'],
-    ['{ name: string }', 'object', '{ ...body }'],
-  ] as const)('typechecks a handler when the request body is %s', async (bodyType, schemaType, usage) => {
-    const schemas = {
-      unknown: ast.factory.createSchema({ type: 'unknown' }),
-      ref: ast.factory.createSchema({
-        type: 'ref',
-        name: 'Anything',
-        ref: '#/components/schemas/Anything',
-        schema: ast.factory.createSchema({ type: 'unknown' }),
-      }),
-      object: ast.factory.createSchema({ type: 'object', properties: [] }),
-    }
-    const schema = schemas[schemaType]
-    const node = {
-      ...createPetsNode,
-      requestBody: ast.factory.createRequestBody({ required: true, content: [ast.factory.createContent({ contentType: 'application/json', schema })] }),
-    }
-    const files = await renderOperation({ name: 'createPet', node, options: {} })
+    ['{ name: string }', '{ name: string }', '{ ...body }'],
+    ['unknown', 'DefaultBodyType', 'body'],
+    ['bigint', 'DefaultBodyType', 'body'],
+    ['void', 'DefaultBodyType', 'body'],
+    ['unknown | string', 'DefaultBodyType', 'body'],
+    ['string | number', 'string | number', 'body'],
+  ] as const)('typechecks a handler when the request body is %s', async (bodyType, expectedType, usage) => {
+    const files = await renderOperation({ name: 'createPet', node: createPetsNode, options: {} })
     const [source] = rawSources(files)
     const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.msw-'))
     onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
@@ -269,11 +258,13 @@ export type CreatePetsResponse = unknown`,
     )
     await fs.writeFile(
       path.join(dir, 'check.ts'),
-      `import { createPetsHandler } from './handler'
+      `import type { DefaultBodyType } from 'msw'
 import { HttpResponse } from 'msw/http'
+import { createPetsHandler } from './handler'
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false
 createPetsHandler(async ({ request }) => {
   const body = await request.json()
-  const typed: ${bodyType} = body
+  const exact: Equal<typeof body, ${expectedType}> = true
   return new HttpResponse(JSON.stringify(${usage}))
 })`,
     )
