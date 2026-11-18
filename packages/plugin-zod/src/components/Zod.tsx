@@ -46,6 +46,11 @@ type Props = {
    * target, so strict compilation looks it up here.
    */
   siblings?: ReadonlyMap<string, ast.SchemaNode>
+  /**
+   * Text for the JSDoc comment above the schema const, so an editor shows it on hover.
+   */
+  description?: string
+  deprecated?: boolean
 }
 
 /**
@@ -93,7 +98,10 @@ export function Zod({
   cyclic,
   compile,
   siblings,
+  description,
+  deprecated,
 }: Props): KubbReactNode {
+  const comments = [description, deprecated && '@deprecated'].filter((comment): comment is string => Boolean(comment))
   const output = printer.print(node)
   const printerImports = printer.drainImports()
 
@@ -133,7 +141,12 @@ export function Zod({
         />
       ))}
       <File.Source name={name} isExportable isIndexable>
-        <Const export name={name} type={needsAnnotation ? (mini ? 'z.ZodMiniType' : 'z.ZodType') : undefined}>
+        <Const
+          export
+          name={name}
+          type={needsAnnotation ? (mini ? 'z.ZodMiniType' : 'z.ZodType') : undefined}
+          JSDoc={comments.length ? { comments } : undefined}
+        >
           {value}
         </Const>
       </File.Source>

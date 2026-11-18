@@ -15,6 +15,6 @@ export const getPetsStatus200Schema = z.object({})
 export const getPetsResponseSchema = getPetsStatus200Schema
 
 export const getPetsHeadersSchema = z.object({
-  'X-Request-Id': z.string(),
-  'X-Correlation-Id': z.string().optional(),
+  'X-Request-Id': getPetsHeaderXRequestIdSchema,
+  'X-Correlation-Id': getPetsHeaderXCorrelationIdSchema,
 })

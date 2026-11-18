@@ -71,6 +71,8 @@ To change `int64` fields for every plugin, set the adapter's [`integerType`](htt
 
 ## Remove descriptions
 
+A schema's `description` prints twice: as a `.describe()` call, and as the JSDoc comment above the schema const, so an editor shows it on hover.
+
 Pass the [description-removal macro](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#remove-descriptions) to `pluginZod({ macros: [dropDescriptions] })`. Schemas then omit their own `.describe()` calls.
 
 > [!NOTE]

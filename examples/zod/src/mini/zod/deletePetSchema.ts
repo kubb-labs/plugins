@@ -7,6 +7,9 @@ import * as z from 'zod/mini'
 
 export const deletePetHeaderApiKeySchema = z.optional(z.string())
 
+/**
+ * Pet id to delete
+ */
 export const deletePetPathPetIdSchema = z.pipe(z.coerce.bigint(), z.int64())
 
 export const deletePetStatus400Schema = z.unknown()
@@ -16,9 +19,9 @@ export const deletePetResponseSchema = z.unknown()
 export const deletePetErrorSchema = deletePetStatus400Schema
 
 export const deletePetPathSchema = z.object({
-  petId: z.pipe(z.coerce.bigint(), z.int64()),
+  petId: deletePetPathPetIdSchema,
 })
 
 export const deletePetHeadersSchema = z.object({
-  api_key: z.optional(z.string()),
+  api_key: deletePetHeaderApiKeySchema,
 })

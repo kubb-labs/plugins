@@ -6,6 +6,9 @@
 import * as z from 'zod/mini'
 import { orderSchema } from './orderSchema'
 
+/**
+ * ID of order that needs to be fetched
+ */
 export const getOrderByIdPathOrderIdSchema = z.pipe(z.coerce.bigint(), z.int64())
 
 export const getOrderByIdStatus200SchemaJson = orderSchema
@@ -23,5 +26,5 @@ export const getOrderByIdResponseSchema = getOrderByIdStatus200Schema
 export const getOrderByIdErrorSchema = z.union([getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
 
 export const getOrderByIdPathSchema = z.object({
-  orderId: z.pipe(z.coerce.bigint(), z.int64()),
+  orderId: getOrderByIdPathOrderIdSchema,
 })

@@ -16,8 +16,11 @@ export const placeOrderPatchResponseSchema = placeOrderPatchStatus200Schema
 
 export const placeOrderPatchErrorSchema = placeOrderPatchStatus405Schema
 
+/**
+ * Order payload
+ */
 export const placeOrderPatchBodySchema = z.object({}).describe('Order payload')
 
 export const placeOrderPatchPathSchema = z.object({
-  orderId: z.int(),
+  orderId: placeOrderPatchPathOrderIdSchema,
 })

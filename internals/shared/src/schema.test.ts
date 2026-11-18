@@ -69,8 +69,8 @@ describe('defaultLiteral', () => {
       ref: '#/components/schemas/Id',
       schema: ast.factory.createSchema({ type: 'bigint' }),
     })
-    expect(defaultLiteral(node, 0)).toBe('BigInt(0)')
-    expect(defaultLiteral(node, 42)).toBe('BigInt(42)')
+    expect(defaultLiteral(node, 0)).toBe("BigInt('0')")
+    expect(defaultLiteral(node, 42)).toBe("BigInt('42')")
     expect(defaultLiteral(node, 'invalid')).toBeNull()
   })
 

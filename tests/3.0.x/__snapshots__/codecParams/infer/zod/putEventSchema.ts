@@ -41,19 +41,19 @@ export const putEventBodySchema = eventSchema
 export type PutEventBodySchemaType = z.infer<typeof putEventBodySchema>
 
 export const putEventPathSchema = z.object({
-  day: z.iso.date(),
+  day: putEventPathDaySchema,
 })
 
 export type PutEventPathSchemaType = z.infer<typeof putEventPathSchema>
 
 export const putEventQuerySchema = z.object({
-  after: z.iso.datetime().optional(),
+  after: putEventQueryAfterSchema,
 })
 
 export type PutEventQuerySchemaType = z.infer<typeof putEventQuerySchema>
 
 export const putEventHeadersSchema = z.object({
-  'X-Since': z.iso.datetime().optional(),
+  'X-Since': putEventHeaderXSinceSchema,
 })
 
 export type PutEventHeadersSchemaType = z.infer<typeof putEventHeadersSchema>

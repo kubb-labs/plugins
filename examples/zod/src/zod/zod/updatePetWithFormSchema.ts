@@ -5,14 +5,23 @@
 
 import { z } from '../../zod.ts'
 
+/**
+ * ID of pet that needs to be updated
+ */
 export const updatePetWithFormPathPetIdSchema = z.coerce.bigint().pipe(z.int64()).describe('ID of pet that needs to be updated')
 
 export type UpdatePetWithFormPathPetIdSchemaType = z.infer<typeof updatePetWithFormPathPetIdSchema>
 
+/**
+ * Name of pet that needs to be updated
+ */
 export const updatePetWithFormQueryNameSchema = z.string().optional().describe('Name of pet that needs to be updated')
 
 export type UpdatePetWithFormQueryNameSchemaType = z.infer<typeof updatePetWithFormQueryNameSchema>
 
+/**
+ * Status of pet that needs to be updated
+ */
 export const updatePetWithFormQueryStatusSchema = z.string().optional().describe('Status of pet that needs to be updated')
 
 export type UpdatePetWithFormQueryStatusSchemaType = z.infer<typeof updatePetWithFormQueryStatusSchema>
@@ -30,14 +39,14 @@ export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
 export type UpdatePetWithFormErrorSchemaType = z.infer<typeof updatePetWithFormErrorSchema>
 
 export const updatePetWithFormPathSchema = z.object({
-  petId: z.coerce.bigint().pipe(z.int64()).describe('ID of pet that needs to be updated'),
+  petId: updatePetWithFormPathPetIdSchema,
 })
 
 export type UpdatePetWithFormPathSchemaType = z.infer<typeof updatePetWithFormPathSchema>
 
 export const updatePetWithFormQuerySchema = z.object({
-  name: z.string().optional().describe('Name of pet that needs to be updated'),
-  status: z.string().optional().describe('Status of pet that needs to be updated'),
+  name: updatePetWithFormQueryNameSchema,
+  status: updatePetWithFormQueryStatusSchema,
 })
 
 export type UpdatePetWithFormQuerySchemaType = z.infer<typeof updatePetWithFormQuerySchema>

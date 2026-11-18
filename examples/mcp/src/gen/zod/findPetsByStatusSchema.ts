@@ -25,5 +25,5 @@ export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
 export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
 
 export const findPetsByStatusPathSchema = z.object({
-  step_id: z.string(),
+  step_id: findPetsByStatusPathStepIdSchema,
 })

@@ -5,6 +5,9 @@
 
 import * as z from 'zod/mini'
 
+/**
+ * ID of the order that needs to be deleted
+ */
 export const deleteOrderPathOrderIdSchema = z.pipe(z.coerce.bigint(), z.int64())
 
 export const deleteOrderStatus400Schema = z.unknown()
@@ -16,5 +19,5 @@ export const deleteOrderResponseSchema = z.unknown()
 export const deleteOrderErrorSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
 
 export const deleteOrderPathSchema = z.object({
-  orderId: z.pipe(z.coerce.bigint(), z.int64()),
+  orderId: deleteOrderPathOrderIdSchema,
 })

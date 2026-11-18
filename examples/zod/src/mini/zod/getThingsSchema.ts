@@ -5,12 +5,21 @@
 
 import * as z from 'zod/mini'
 
+/**
+ * Maximum number of things to return
+ */
 export const getThingsQueryLimitSchema = z._default(z.optional(z.int().check(z.minimum(1), z.maximum(100))), 100)
 
+/**
+ * Number of things to skip
+ */
 export const getThingsQuerySkipSchema = z._default(z.optional(z.int().check(z.minimum(0))), 0)
 
 export const getThingsStatus201Schema = z.unknown()
 
+/**
+ * Pet not found
+ */
 export const getThingsStatusDefaultSchema = z.unknown()
 
 export const getThingsResponseSchema = getThingsStatus201Schema
@@ -18,6 +27,6 @@ export const getThingsResponseSchema = getThingsStatus201Schema
 export const getThingsErrorSchema = getThingsStatusDefaultSchema
 
 export const getThingsQuerySchema = z.object({
-  limit: z._default(z.optional(z.int().check(z.minimum(1), z.maximum(100))), 100),
-  skip: z._default(z.optional(z.int().check(z.minimum(0))), 0),
+  limit: getThingsQueryLimitSchema,
+  skip: getThingsQuerySkipSchema,
 })

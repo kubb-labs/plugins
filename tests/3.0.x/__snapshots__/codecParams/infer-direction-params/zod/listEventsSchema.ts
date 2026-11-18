@@ -19,7 +19,7 @@ export const listEventsResponseSchema = listEventsStatus200Schema
 export type ListEventsResponseSchemaType = z.output<typeof listEventsResponseSchema>
 
 export const listEventsQuerySchema = z.object({
-  ids: z.array(z.int()).optional(),
+  ids: listEventsQueryIdsSchema,
 })
 
 export type ListEventsQuerySchemaType = z.input<typeof listEventsQuerySchema>

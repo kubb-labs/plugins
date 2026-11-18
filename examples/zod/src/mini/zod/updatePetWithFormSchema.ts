@@ -5,10 +5,19 @@
 
 import * as z from 'zod/mini'
 
+/**
+ * ID of pet that needs to be updated
+ */
 export const updatePetWithFormPathPetIdSchema = z.pipe(z.coerce.bigint(), z.int64())
 
+/**
+ * Name of pet that needs to be updated
+ */
 export const updatePetWithFormQueryNameSchema = z.optional(z.string())
 
+/**
+ * Status of pet that needs to be updated
+ */
 export const updatePetWithFormQueryStatusSchema = z.optional(z.string())
 
 export const updatePetWithFormStatus405Schema = z.unknown()
@@ -18,10 +27,10 @@ export const updatePetWithFormResponseSchema = z.unknown()
 export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
 
 export const updatePetWithFormPathSchema = z.object({
-  petId: z.pipe(z.coerce.bigint(), z.int64()),
+  petId: updatePetWithFormPathPetIdSchema,
 })
 
 export const updatePetWithFormQuerySchema = z.object({
-  name: z.optional(z.string()),
-  status: z.optional(z.string()),
+  name: updatePetWithFormQueryNameSchema,
+  status: updatePetWithFormQueryStatusSchema,
 })

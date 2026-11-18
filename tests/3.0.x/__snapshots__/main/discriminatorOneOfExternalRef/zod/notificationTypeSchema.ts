@@ -5,4 +5,7 @@
 
 import * as z from 'zod'
 
+/**
+ * Notification type: PING — test, ORDER_CREATED — new order, ORDER_CANCELLED — order cancelled
+ */
 export const notificationTypeSchema = z.enum(['PING', 'ORDER_CREATED', 'ORDER_CANCELLED']).describe('Notification type: PING — test, ORDER_CREATED — new order, ORDER_CANCELLED — order cancelled')

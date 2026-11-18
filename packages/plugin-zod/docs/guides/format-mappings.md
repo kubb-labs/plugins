@@ -6,13 +6,14 @@ Look up the Zod v4 call Kubb writes for each OpenAPI type and format, such as `z
 
 ## Integers
 
-| OpenAPI type and format               | Zod                                 | Zod Mini                               | Notes                                                                                                              |
-| :------------------------------------ | :---------------------------------- | :------------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
-| `integer`                             | `z.int()`                           | `z.int()`                              | Coerced with [`coercion.numbers`](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/coercion#coerce-numbers) |
-| `integer`, `format: int32`            | `z.int32()`                         | `z.int32()`                            | 32-bit signed integer                                                                                              |
-| `integer`, `format: uint32`           | `z.uint32()`                        | `z.uint32()`                           | 32-bit unsigned integer                                                                                            |
-| `integer`, `format: int64` / `uint64` | `z.coerce.bigint().pipe(z.int64())` | `z.pipe(z.coerce.bigint(), z.int64())` | Converts first, because JSON holds a number, then `z.int64()` or `z.uint64()` checks the range.                    |
-| `string`, `format: int32` / `int64`   | `z.string().regex(/^-?\d+$/)`       | `z.string().check(z.regex(/^-?\d+$/))` | An integer sent as a JSON string. `uint64` uses `/^\d+$/`. A `pattern` in the spec wins.                           |
+| OpenAPI type and format                                  | Zod                                 | Zod Mini                                    | Notes                                                                                                              |
+| :------------------------------------------------------- | :---------------------------------- | :------------------------------------------ | :----------------------------------------------------------------------------------------------------------------- |
+| `integer`                                                | `z.int()`                           | `z.int()`                                   | Coerced with [`coercion.numbers`](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/coercion#coerce-numbers) |
+| `integer`, `format: int32`                               | `z.int32()`                         | `z.int32()`                                 | 32-bit signed integer                                                                                              |
+| `integer`, `format: uint32`                              | `z.uint32()`                        | `z.uint32()`                                | 32-bit unsigned integer                                                                                            |
+| `integer`, `format: int8` / `int16` / `uint8` / `uint16` | `z.int().min(…).max(…)`             | `z.int().check(z.minimum(…), z.maximum(…))` | Zod has no schema for these, so the range prints as bounds                                                         |
+| `integer`, `format: int64` / `uint64`                    | `z.coerce.bigint().pipe(z.int64())` | `z.pipe(z.coerce.bigint(), z.int64())`      | Converts first, because JSON holds a number, then `z.int64()` or `z.uint64()` checks the range.                    |
+| `string`, `format: int32` / `int64`                      | `z.string().regex(/^-?\d+$/)`       | `z.string().check(z.regex(/^-?\d+$/))`      | An integer sent as a JSON string. `uint64` uses `/^\d+$/`. A `pattern` in the spec wins.                           |
 
 With [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, `format: int64` prints `z.int()`.
 

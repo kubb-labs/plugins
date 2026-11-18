@@ -41,19 +41,19 @@ export const putEventBodySchema = eventInputSchema
 export type PutEventBodySchemaType = z.input<typeof putEventBodySchema>
 
 export const putEventPathSchema = z.object({
-  day: z.date().transform((value) => value.toISOString().slice(0, 10)),
+  day: putEventPathDaySchema,
 })
 
 export type PutEventPathSchemaType = z.input<typeof putEventPathSchema>
 
 export const putEventQuerySchema = z.object({
-  after: z.date().transform((value) => value.toISOString()).optional(),
+  after: putEventQueryAfterSchema,
 })
 
 export type PutEventQuerySchemaType = z.input<typeof putEventQuerySchema>
 
 export const putEventHeadersSchema = z.object({
-  'X-Since': z.date().transform((value) => value.toISOString()).optional(),
+  'X-Since': putEventHeaderXSinceSchema,
 })
 
 export type PutEventHeadersSchemaType = z.input<typeof putEventHeadersSchema>
