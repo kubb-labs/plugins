@@ -88,7 +88,12 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         ? `${mock.name}Response${primaryResponse.statusCode}`
         : undefined
 
-    const requestName = ast.http.requestBody.getSchema(node) ? tsResolver.response.body(node) : null
+    const requestSchema = ast.http.requestBody.getSchema(node)
+    // MSW needs a `DefaultBodyType` body, and an empty schema prints as `unknown`. A conditional type here would block spreading the body.
+    // shortcut: a `$ref` to an empty schema is not resolved, so it still prints `unknown`; resolve the ref when that comes up.
+    const isUnknownBody = requestSchema?.type === 'unknown'
+    const requestName = requestSchema && !isUnknownBody ? tsResolver.response.body(node) : null
+    const requestTypeName = isUnknownBody ? 'DefaultBodyType' : requestName
 
     return (
       <File
@@ -100,7 +105,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       >
         <File.Import name={['http', 'HttpResponse']} path="msw/http" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
-        {requestName && <File.Import name={['DefaultBodyType']} isTypeOnly path="msw" />}
+        {isUnknownBody && <File.Import name={['DefaultBodyType']} isTypeOnly path="msw" />}
         <File.Import
           name={Array.from(new Set([...(hasResponseNameCollision ? [] : [type.responseName]), ...responseTypeNames, ...(requestName ? [requestName] : [])]))}
           path={type.file.path}
@@ -116,7 +121,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         <Mock
           name={mock.name}
           typeName={mockResponseName}
-          requestTypeName={requestName}
+          requestTypeName={requestTypeName}
           fakerName={faker && hasSuccessSchema ? faker.name : undefined}
           responseName={responseHelperName}
           node={node}

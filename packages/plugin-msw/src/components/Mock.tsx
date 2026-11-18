@@ -28,7 +28,7 @@ export function Mock({ baseURL = '', name, fakerName, responseName, typeName, re
   const responseHasSchema = hasResponseSchema(successResponse)
   const dataType = responseHasSchema ? typeName : 'string | number | boolean | null | object'
   const paramType = fakerName ? typeName : dataType
-  const requestBodyType = requestTypeName ? `${requestTypeName} extends DefaultBodyType ? ${requestTypeName} : DefaultBodyType` : null
+  const requestBodyType = requestTypeName ?? null
 
   const callbackType = requestBodyType
     ? `HttpResponseResolver<Record<string, string>, ${requestBodyType}>`

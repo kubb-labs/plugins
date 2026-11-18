@@ -237,8 +237,16 @@ async function importGenerated(source: string, stubs: Record<string, string> = {
 }
 
 describe('mswGenerator request body types', () => {
-  test.each(['unknown', '{ name: string }'])('typechecks a handler when the request body is %s', async (bodyType) => {
-    const files = await renderOperation({ name: 'createPet', node: createPetsNode, options: {} })
+  test.each([
+    ['unknown', 'unknown', 'typed'],
+    ['{ name: string }', 'object', '{ ...body }'],
+  ] as const)('typechecks a handler when the request body is %s', async (bodyType, schemaType, usage) => {
+    const schema = schemaType === 'unknown' ? ast.factory.createSchema({ type: 'unknown' }) : ast.factory.createSchema({ type: 'object', properties: [] })
+    const node = {
+      ...createPetsNode,
+      requestBody: ast.factory.createRequestBody({ required: true, content: [ast.factory.createContent({ contentType: 'application/json', schema })] }),
+    }
+    const files = await renderOperation({ name: 'createPet', node, options: {} })
     const [source] = rawSources(files)
     const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.msw-'))
     onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
@@ -253,8 +261,9 @@ export type CreatePetsResponse = unknown`,
       `import { createPetsHandler } from './handler'
 import { HttpResponse } from 'msw/http'
 createPetsHandler(async ({ request }) => {
-  const body: ${bodyType} = await request.json()
-  return new HttpResponse(JSON.stringify(body))
+  const body = await request.json()
+  const typed: ${bodyType} = body
+  return new HttpResponse(JSON.stringify(${usage}))
 })`,
     )
     const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
