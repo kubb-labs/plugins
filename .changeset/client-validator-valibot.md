@@ -11,3 +11,5 @@ export default defineConfig({
   plugins: [pluginTs(), pluginValibot(), pluginFetch({ validator: { request: 'valibot', params: 'valibot', response: 'valibot' } })],
 })
 ```
+
+`@kubb/plugin-zod` and `@kubb/plugin-valibot` are now optional peer dependencies of `@kubb/plugin-client`, so it no longer installs them for you. Install the one your `validator` names.

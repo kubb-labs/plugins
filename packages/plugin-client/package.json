@@ -69,17 +69,28 @@
   "dependencies": {
     "@kubb/kit": "^5.21.1",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/plugin-valibot": "workspace:^",
-    "@kubb/plugin-zod": "workspace:^",
     "@kubb/renderer-jsx": "^5.21.1"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
+    "@kubb/plugin-valibot": "workspace:^",
+    "@kubb/plugin-zod": "workspace:^",
     "typescript": "catalog:"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "@kubb/plugin-valibot": "workspace:^",
+    "@kubb/plugin-zod": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@kubb/plugin-valibot": {
+      "optional": true
+    },
+    "@kubb/plugin-zod": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": ">=22.22"
   }

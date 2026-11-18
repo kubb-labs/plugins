@@ -1,7 +1,11 @@
 import { ast, text } from '@kubb/kit'
-import type { ResolverValibot } from '@kubb/plugin-valibot'
-import type { ResolverZod } from '@kubb/plugin-zod'
+import type { PluginValibot, ResolverValibot } from '@kubb/plugin-valibot'
+import type { PluginZod, ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorLibrary, ValidatorOptions } from '../types.ts'
+
+// Literals, not imports: both schema plugins are optional peers, so `dist` must not load them at runtime.
+export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
+export const pluginValibotName = 'plugin-valibot' satisfies PluginValibot['name']
 
 /**
  * The resolver of the plugin that generates the schemas a validator reads.

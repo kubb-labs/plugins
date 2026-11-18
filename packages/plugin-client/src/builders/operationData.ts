@@ -1,12 +1,10 @@
 import { getResponseHeadersTypeNames, type OperationTypeNames, type OperationTypeSource } from '@internals/client'
 import { operationKey, resolveOperationFile } from '@internals/shared'
 import { ast, type Generator } from '@kubb/kit'
-import { pluginValibotName } from '@kubb/plugin-valibot'
-import { pluginZodName } from '@kubb/plugin-zod'
 import type { ContractClientFactory } from '../types.ts'
 import { getOperationSecurity, isAuthRequired, type SecurityRequirement } from './security.ts'
 import { buildValidatorHooks, type ValidatorHooks } from './validator.ts'
-import { resolveValidatorLibrary } from './validatorOptions.ts'
+import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './validatorOptions.ts'
 
 export type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]
 
