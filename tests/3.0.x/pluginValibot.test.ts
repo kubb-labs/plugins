@@ -87,6 +87,10 @@ describe(`plugin-valibot options ${version}`, () => {
     expect(files.length).toBeGreaterThan(0)
     expect(Diagnostics.hasError(diagnostics)).toBe(false)
 
+    // A file the build stops writing has no content to compare, so the list of files is pinned too.
+    const paths = files.map((file) => getRelativePath(output, file.path)).sort()
+    await expect(`${paths.join('\n')}\n`).toMatchFileSnapshot(path.join(__dirname, '__snapshots__', 'pluginValibot', name, 'files.txt'))
+
     for (const file of files) {
       const fileContent = await fs.readFile(file.path, 'utf-8')
       await expect(fileContent).toMatchFileSnapshot(path.join(__dirname, '__snapshots__', 'pluginValibot', name, getRelativePath(output, file.path)))
