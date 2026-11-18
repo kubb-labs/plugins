@@ -29,6 +29,18 @@ export const resolverValibot = createResolver<PluginValibot>({
     type(name) {
       return this.memo(`type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
     },
+    inputName(name) {
+      return this.name(`${name} input`)
+    },
+    inputTypeName(name) {
+      return this.schema.typeName(`${name} input`)
+    },
+    isName(name) {
+      return ensureValidVarName(casing.camel(name, { prefix: 'is' }))
+    },
+    assertName(name) {
+      return ensureValidVarName(casing.camel(name, { prefix: 'assert' }))
+    },
   },
   param: createOperationParamResolver(),
   response: {

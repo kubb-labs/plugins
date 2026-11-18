@@ -19,7 +19,12 @@ const object = (properties: Record<string, ast.SchemaNode>, extra: Partial<ast.O
   })
 const ref = (name: string, schema?: ast.SchemaNode) => createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}`, schema })
 
-const resolver = { name: (name: string) => `${name[0]!.toLowerCase()}${name.slice(1)}Schema` } as ResolverValibot
+const camel = (name: string) => `${name[0]!.toLowerCase()}${name.slice(1)}`
+const resolver = {
+  name: (name: string) => `${camel(name)}Schema`,
+  schema: { inputName: (name: string) => `${camel(name)}InputSchema` },
+  memo: (_key: string, compute: () => unknown) => compute(),
+} as unknown as ResolverValibot
 
 /**
  * Runs printed code against the real library, with `scope` as the consts a `$ref` resolves to.
@@ -76,7 +81,6 @@ describe('printerValibot', () => {
       [1.5, 'x', -1],
     ],
     ['date as a string', createSchema({ type: 'date', representation: 'string' }), 'v.pipe(v.string(), v.isoDate())', ['2026-01-31'], ['2026-13-01']],
-    ['date as a Date', createSchema({ type: 'date', representation: 'date' }), 'v.date()', [new Date()], ['2026-01-31']],
     [
       'datetime',
       createSchema({ type: 'datetime' }),
@@ -215,7 +219,10 @@ describe('printerValibot', () => {
     test('drops a default that does not fit the schema', () => {
       expect(print(createSchema({ type: 'array', items: [string()], default: {} }))).toBe('v.array(v.string())')
       expect(print(createSchema({ type: 'string', default: null }))).toBe('v.string()')
-      expect(print(createSchema({ type: 'date', representation: 'date', default: '2020-01-01' }))).toBe('v.date()')
+      // An encode schema takes a `Date`, which a string default does not fit. The decode schema takes the wire string.
+      const date = createSchema({ type: 'date', representation: 'date', format: 'date', default: '2020-01-01' })
+      expect(printerValibot({ direction: 'encode' }).print(date)).toBe('v.pipe(v.date(), v.transform((value) => value.toISOString().slice(0, 10)))')
+      expect(print(date)).toBe("v.optional(v.pipe(v.string(), v.isoDate(), v.transform((value) => new Date(value))), '2020-01-01')")
     })
   })
 
@@ -245,22 +252,10 @@ describe('printerValibot', () => {
       expect(v.is(build(code, { petSchema: build(print(nullablePet)) }), null)).toBe(true)
     })
 
-    test('keeps every key of a circular ref, which v.omit cannot type', () => {
+    test('keeps a circular ref as it is, because v.omit cannot type it', () => {
       const cyclic = printerValibot({ resolver, keysToOmit: ['id'], cyclicSchemas: new Set(['Pet']) })
 
       expect(cyclic.print(ref('Pet', petNode))).toBe('v.lazy(() => petSchema)')
-    })
-
-    test('an object allOf merges into one object that keeps required properties', () => {
-      const node = createSchema({
-        type: 'intersection',
-        members: [ref('Pet', petNode), object({ 'id?': string(), age: createSchema({ type: 'number' }) })],
-      })
-      const code = print(node)
-
-      expect(code).toBe('v.object({\n  ...petSchema.entries,\n  id: v.string(),\n  age: v.number(),\n})')
-      expect(v.is(build(code, scope), { id: 'a', age: 1 })).toBe(true)
-      expect(v.is(build(code, scope), { age: 1 })).toBe(false)
     })
 
     test.each([
@@ -351,5 +346,153 @@ describe('printerValibot', () => {
     })
 
     expect(custom.print(string())).toBe('v.pipe(v.string(), v.trim())')
+  })
+  describe('coercion', () => {
+    const coerced = printerValibot({ coercion: true })
+
+    test.each([
+      ['string', createSchema({ type: 'string', min: 1 }), 'v.pipe(v.unknown(), v.toString(), v.minLength(1))', [1, 'a'], ['']],
+      ['number', createSchema({ type: 'number', max: 5 }), 'v.pipe(v.unknown(), v.toNumber(), v.maxValue(5))', ['5', 2], ['x', 6]],
+      ['integer', createSchema({ type: 'integer' }), 'v.pipe(v.unknown(), v.toNumber(), v.integer())', ['5'], ['5.5']],
+      ['date', createSchema({ type: 'date', representation: 'date' }), 'v.pipe(v.unknown(), v.toDate())', ['2026-01-31', 0], ['x']],
+    ] as const)('%s', (_name, node, expected, valid, invalid) => {
+      const code = coerced.print(node)!
+      expect(code).toBe(expected)
+      for (const value of valid) expect(v.is(build(code), value)).toBe(true)
+      for (const value of invalid) expect(v.is(build(code), value)).toBe(false)
+    })
+
+    test('the object form turns it on per type', () => {
+      const numbers = printerValibot({ coercion: { numbers: true } })
+
+      expect(numbers.print(createSchema({ type: 'number' }))).toBe('v.pipe(v.unknown(), v.toNumber())')
+      expect(numbers.print(string())).toBe('v.string()')
+    })
+  })
+
+  describe('direction', () => {
+    const date = createSchema({ type: 'date', representation: 'date', format: 'date' })
+    const datetime = createSchema({ type: 'date', representation: 'date' })
+    const time = createSchema({ type: 'time', representation: 'date' })
+    const encode = printerValibot({ resolver, direction: 'encode' })
+
+    test('a response decodes a wire string into a Date', () => {
+      expect(v.parse(build(print(date)), '2026-01-31')).toEqual(new Date('2026-01-31'))
+      expect(v.parse(build(print(datetime)), '2026-01-31T10:00:00Z')).toEqual(new Date('2026-01-31T10:00:00Z'))
+      expect(v.parse(build(print(time)), '10:30:00')).toEqual(new Date('1970-01-01T10:30:00Z'))
+      expect(v.is(build(print(time)), 'x')).toBe(false)
+      expect(v.is(build(print(date)), new Date())).toBe(false)
+    })
+
+    test('a request encodes a Date back into the wire string', () => {
+      const value = new Date('2026-01-31T10:30:00Z')
+
+      expect(v.parse(build(encode.print(date)!), value)).toBe('2026-01-31')
+      expect(v.parse(build(encode.print(datetime)!), value)).toBe('2026-01-31T10:30:00.000Z')
+      expect(v.parse(build(encode.print(time)!), value)).toBe('10:30:00')
+      expect(v.is(build(encode.print(date)!), new Date('x'))).toBe(false)
+    })
+
+    test('a request reads a component with a date from its input variant', () => {
+      const event = object({ at: date }, { name: 'Event' })
+
+      expect(encode.print(ref('Event', event))).toBe('eventInputSchema')
+      expect(print(ref('Event', event))).toBe('eventSchema')
+      expect(encode.print(ref('Pet', object({ id: string() })))).toBe('petSchema')
+    })
+
+    test('a string date field prints the same in both directions', () => {
+      const node = createSchema({ type: 'date', representation: 'string' })
+
+      expect(encode.print(node)).toBe(print(node))
+    })
+  })
+
+  describe('input checks', () => {
+    const number = createSchema({ type: 'number' })
+
+    test('minProperties and maxProperties count the keys of the raw input', () => {
+      const code = print(object({ 'id?': string() }, { min: 1, max: 2 }))
+      const schema = build(code)
+
+      expect(code).toContain('v.pipe(v.unknown(), v.check(')
+      expect(v.is(schema, {})).toBe(false)
+      // `extra` is not declared, so the object schema drops it, but it still counts.
+      expect(v.is(schema, { extra: 1 })).toBe(true)
+      expect(v.is(schema, { a: 1, b: 2, c: 3 })).toBe(false)
+    })
+
+    test('propertyNames checks every key of an object that declares properties', () => {
+      const keys = createSchema({ type: 'string', pattern: '^[a-z]+$' })
+      const schema = build(print(object({ id: string() }, { propertyNames: keys })))
+
+      expect(v.is(schema, { id: 'a', extra: 1 })).toBe(true)
+      expect(v.is(schema, { id: 'a', Extra: 1 })).toBe(false)
+    })
+
+    test('a strict object with patternProperties takes declared keys and keys that match a pattern', () => {
+      const schema = build(print(object({ id: string() }, { additionalProperties: false, patternProperties: { '^x-': number } })))
+
+      expect(v.is(schema, { id: 'a', 'x-rate': 1 })).toBe(true)
+      expect(v.is(schema, { id: 'a', other: 1 })).toBe(false)
+      expect(v.is(schema, { id: 'a', 'x-rate': 'fast' })).toBe(false)
+    })
+
+    test('if/then/else and dependentRequired check the raw input', () => {
+      const conditional = object(
+        { 'kind?': string(), 'size?': number },
+        {
+          conditionals: [
+            {
+              if: object({ kind: createSchema({ type: 'enum', primitive: 'string', enumValues: ['box'] }) }),
+              then: object({ size: createSchema({ type: 'unknown' }) }),
+            },
+          ],
+        },
+      )
+      const schema = build(print(conditional))
+
+      expect(v.is(schema, { kind: 'box', size: 1 })).toBe(true)
+      expect(v.is(schema, { kind: 'box' })).toBe(false)
+      expect(v.is(schema, { kind: 'bag' })).toBe(true)
+    })
+
+    test('contains counts the matching items', () => {
+      const node = createSchema({ type: 'array', items: [createSchema({ type: 'unknown' })], contains: { schema: number, min: 1, max: 2 } })
+      const schema = build(print(node))
+
+      expect(v.is(schema, ['a', 1])).toBe(true)
+      expect(v.is(schema, ['a'])).toBe(false)
+      expect(v.is(schema, [1, 2, 3])).toBe(false)
+    })
+
+    test('a string with a contentSchema must hold JSON that matches it', () => {
+      const node = createSchema({ type: 'string', content: { mediaType: 'application/json', schema: object({ id: number }) } })
+      const schema = build(print(node))
+
+      expect(v.is(schema, '{"id":1}')).toBe(true)
+      expect(v.is(schema, '{"id":"a"}')).toBe(false)
+      expect(v.is(schema, 'not json')).toBe(false)
+    })
+
+    test('a schema with input checks is not a plain object for v.variant, a oneOf, or an allOf merge', () => {
+      const counted = object({ id: string() }, { min: 1 })
+      const union = createSchema({ type: 'union', strategy: 'one', members: [ref('Pet', counted), string()] })
+      const merge = createSchema({ type: 'intersection', members: [ref('Pet', counted), object({ age: number })] })
+
+      expect(print(union)).toBe('v.union([petSchema, v.string()])')
+      expect(print(merge)).toContain('v.intersect([')
+    })
+
+    test('omits keys from the object behind the checks', () => {
+      const counted = object({ id: string(), name: string() }, { min: 1 })
+      const omit = printerValibot({ resolver, keysToOmit: ['id'] })
+      const refCode = omit.print(ref('Pet', counted))!
+      const inlineCode = omit.print(counted)!
+
+      expect(refCode).toBe("v.omit(petSchema.pipe[2], ['id'])")
+      expect(v.parse(build(refCode, { petSchema: build(print(counted)) }), { id: 'a', name: 'b' })).toEqual({ name: 'b' })
+      expect(v.parse(build(inlineCode), { id: 'a', name: 'b' })).toEqual({ name: 'b' })
+    })
   })
 })

@@ -24,6 +24,37 @@ export type ResolverValibot = Resolver & {
      * ```
      */
     type(name: string): string
+    /**
+     * The name of the request variant of a component schema, which encodes where the schema decodes.
+     *
+     * @example
+     * ```ts
+     * resolver.schema.inputName('pet') // 'petInputSchema'
+     * ```
+     */
+    inputName(name: string): string
+    /**
+     * The inferred type name of the request variant.
+     */
+    inputTypeName(name: string): string
+    /**
+     * The name of the type guard of a component schema.
+     *
+     * @example
+     * ```ts
+     * resolver.schema.isName('pet') // 'isPet'
+     * ```
+     */
+    isName(name: string): string
+    /**
+     * The name of the assertion function of a component schema.
+     *
+     * @example
+     * ```ts
+     * resolver.schema.assertName('pet') // 'assertPet'
+     * ```
+     */
+    assertName(name: string): string
   }
   param: {
     name(node: ast.OperationNode, param: ast.ParameterNode): string
@@ -61,9 +92,23 @@ export type Options = OutputOptions & {
    */
   importPath?: string
   /**
-   * Export a `v.InferOutput` type alias next to every schema.
+   * Export a type alias next to every schema: `v.InferInput` for a request schema, which is the
+   * value the caller passes, and `v.InferOutput` for every other schema.
    */
   inferred?: boolean
+  /**
+   * Convert input before validation with `v.toString()`, `v.toNumber()`, and `v.toDate()`.
+   * Pass an object to turn it on per type.
+   *
+   * @default false
+   */
+  coercion?: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }
+  /**
+   * Generate an `is*` type guard and an `assert*` function for every component schema.
+   *
+   * @default false
+   */
+  typeGuards?: boolean | { is?: boolean; assert?: boolean }
   /**
    * Output form for an OpenAPI `pattern` inside `v.regex(...)`: a regex literal (`'literal'`) or
    * the `RegExp` constructor (`'constructor'`).
@@ -109,6 +154,8 @@ type ResolvedOptions = {
   importPath: NonNullable<Options['importPath']>
   inferred: NonNullable<Options['inferred']>
   regexType: NonNullable<Options['regexType']>
+  coercion: NonNullable<Options['coercion']>
+  typeGuards: NonNullable<Options['typeGuards']>
   printer: Options['printer']
 }
 
@@ -121,6 +168,7 @@ declare global {
     }
     interface MemoRegistry {
       valibotPrinter: ReturnType<typeof printerValibot>
+      valibotDirectionalNodes: WeakMap<ast.SchemaNode, ast.SchemaNode | null>
     }
   }
 }

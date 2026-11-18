@@ -7,15 +7,15 @@ import * as v from 'valibot'
 
 export const updatePetWithFormPathPetIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())
 
-export type UpdatePetWithFormPathPetIdSchemaType = v.InferOutput<typeof updatePetWithFormPathPetIdSchema>
+export type UpdatePetWithFormPathPetIdSchemaType = v.InferInput<typeof updatePetWithFormPathPetIdSchema>
 
 export const updatePetWithFormQueryNameSchema = v.optional(v.string())
 
-export type UpdatePetWithFormQueryNameSchemaType = v.InferOutput<typeof updatePetWithFormQueryNameSchema>
+export type UpdatePetWithFormQueryNameSchemaType = v.InferInput<typeof updatePetWithFormQueryNameSchema>
 
 export const updatePetWithFormQueryStatusSchema = v.optional(v.string())
 
-export type UpdatePetWithFormQueryStatusSchemaType = v.InferOutput<typeof updatePetWithFormQueryStatusSchema>
+export type UpdatePetWithFormQueryStatusSchemaType = v.InferInput<typeof updatePetWithFormQueryStatusSchema>
 
 export const updatePetWithFormStatus405Schema = v.unknown()
 
@@ -33,11 +33,11 @@ export const updatePetWithFormPathSchema = v.object({
   petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint()),
 })
 
-export type UpdatePetWithFormPathSchemaType = v.InferOutput<typeof updatePetWithFormPathSchema>
+export type UpdatePetWithFormPathSchemaType = v.InferInput<typeof updatePetWithFormPathSchema>
 
 export const updatePetWithFormQuerySchema = v.object({
   name: v.optional(v.string()),
   status: v.optional(v.string()),
 })
 
-export type UpdatePetWithFormQuerySchemaType = v.InferOutput<typeof updatePetWithFormQuerySchema>
+export type UpdatePetWithFormQuerySchemaType = v.InferInput<typeof updatePetWithFormQuerySchema>

@@ -11,11 +11,12 @@ The Valibot plugin generates a Valibot v1 schema for every schema in your OpenAP
 
 ## Options worth knowing
 
-| Option                                                                                | Default     | What it does                                                                         |
-| ------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------ |
-| [`inferred`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#inferred)   | `false`     | Adds a `v.InferOutput` type next to each schema, so you can skip `@kubb/plugin-ts`.  |
-| [`regexType`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#regextype) | `'literal'` | Writes an OpenAPI `pattern` as a regex literal or a `RegExp` call.                   |
-| [`printer`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#printer)     | None        | Replaces the Valibot call for a schema type, such as a date that parses to a `Date`. |
+| Option                                                                                  | Default | What it does                                                        |
+| --------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------- |
+| [`inferred`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#inferred)     | `false` | Adds a type next to each schema, so you can skip `@kubb/plugin-ts`. |
+| [`coercion`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#coercion)     | `false` | Converts input before validation, such as query strings.            |
+| [`typeGuards`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#typeguards) | `false` | Adds `is*` type guards and `assert*` assertions.                    |
+| [`printer`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#printer)       | None    | Replaces the Valibot call for a schema type.                        |
 
 ## Example
 

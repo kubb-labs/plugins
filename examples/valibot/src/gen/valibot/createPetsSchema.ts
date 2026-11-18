@@ -7,15 +7,15 @@ import * as v from 'valibot'
 
 export const createPetsPathUuidSchema = v.string()
 
-export type CreatePetsPathUuidSchemaType = v.InferOutput<typeof createPetsPathUuidSchema>
+export type CreatePetsPathUuidSchemaType = v.InferInput<typeof createPetsPathUuidSchema>
 
 export const createPetsQueryOffsetSchema = v.optional(v.pipe(v.number(), v.integer()))
 
-export type CreatePetsQueryOffsetSchemaType = v.InferOutput<typeof createPetsQueryOffsetSchema>
+export type CreatePetsQueryOffsetSchemaType = v.InferInput<typeof createPetsQueryOffsetSchema>
 
 export const createPetsHeaderXEXAMPLESchema = v.picklist(['ONE', 'TWO', 'THREE'])
 
-export type CreatePetsHeaderXEXAMPLESchemaType = v.InferOutput<typeof createPetsHeaderXEXAMPLESchema>
+export type CreatePetsHeaderXEXAMPLESchemaType = v.InferInput<typeof createPetsHeaderXEXAMPLESchema>
 
 export const createPetsStatus201Schema = v.unknown()
 
@@ -38,22 +38,22 @@ export const createPetsBodySchema = v.object({
   tag: v.string(),
 })
 
-export type CreatePetsBodySchemaType = v.InferOutput<typeof createPetsBodySchema>
+export type CreatePetsBodySchemaType = v.InferInput<typeof createPetsBodySchema>
 
 export const createPetsPathSchema = v.object({
   uuid: v.string(),
 })
 
-export type CreatePetsPathSchemaType = v.InferOutput<typeof createPetsPathSchema>
+export type CreatePetsPathSchemaType = v.InferInput<typeof createPetsPathSchema>
 
 export const createPetsQuerySchema = v.object({
   offset: v.optional(v.pipe(v.number(), v.integer())),
 })
 
-export type CreatePetsQuerySchemaType = v.InferOutput<typeof createPetsQuerySchema>
+export type CreatePetsQuerySchemaType = v.InferInput<typeof createPetsQuerySchema>
 
 export const createPetsHeadersSchema = v.object({
   'X-EXAMPLE': v.picklist(['ONE', 'TWO', 'THREE']),
 })
 
-export type CreatePetsHeadersSchemaType = v.InferOutput<typeof createPetsHeadersSchema>
+export type CreatePetsHeadersSchemaType = v.InferInput<typeof createPetsHeadersSchema>

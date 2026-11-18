@@ -8,7 +8,7 @@ import { petSchema } from './petSchema'
 
 export const findPetsByStatusQueryStatusSchema = v.optional(v.picklist(['available', 'pending', 'sold']), 'available')
 
-export type FindPetsByStatusQueryStatusSchemaType = v.InferOutput<typeof findPetsByStatusQueryStatusSchema>
+export type FindPetsByStatusQueryStatusSchemaType = v.InferInput<typeof findPetsByStatusQueryStatusSchema>
 
 export const findPetsByStatusStatus200SchemaJson = v.array(v.lazy(() => petSchema))
 
@@ -38,4 +38,4 @@ export const findPetsByStatusQuerySchema = v.object({
   status: v.optional(v.picklist(['available', 'pending', 'sold']), 'available'),
 })
 
-export type FindPetsByStatusQuerySchemaType = v.InferOutput<typeof findPetsByStatusQuerySchema>
+export type FindPetsByStatusQuerySchemaType = v.InferInput<typeof findPetsByStatusQuerySchema>

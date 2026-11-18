@@ -8,7 +8,7 @@ import { petSchema } from './petSchema'
 
 export const getPetByIdPathPetIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())
 
-export type GetPetByIdPathPetIdSchemaType = v.InferOutput<typeof getPetByIdPathPetIdSchema>
+export type GetPetByIdPathPetIdSchemaType = v.InferInput<typeof getPetByIdPathPetIdSchema>
 
 export const getPetByIdStatus200SchemaJson = v.lazy(() => petSchema)
 
@@ -42,4 +42,4 @@ export const getPetByIdPathSchema = v.object({
   petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint()),
 })
 
-export type GetPetByIdPathSchemaType = v.InferOutput<typeof getPetByIdPathSchema>
+export type GetPetByIdPathSchemaType = v.InferInput<typeof getPetByIdPathSchema>

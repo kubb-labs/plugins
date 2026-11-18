@@ -7,7 +7,7 @@ import * as v from 'valibot'
 
 export const deleteOrderPathOrderIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())
 
-export type DeleteOrderPathOrderIdSchemaType = v.InferOutput<typeof deleteOrderPathOrderIdSchema>
+export type DeleteOrderPathOrderIdSchemaType = v.InferInput<typeof deleteOrderPathOrderIdSchema>
 
 export const deleteOrderStatus400Schema = v.unknown()
 
@@ -29,4 +29,4 @@ export const deleteOrderPathSchema = v.object({
   orderId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint()),
 })
 
-export type DeleteOrderPathSchemaType = v.InferOutput<typeof deleteOrderPathSchema>
+export type DeleteOrderPathSchemaType = v.InferInput<typeof deleteOrderPathSchema>

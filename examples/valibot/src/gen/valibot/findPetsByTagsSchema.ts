@@ -13,19 +13,19 @@ export const findPetsByTagsQueryTagsSchema = v.optional(
   ),
 )
 
-export type FindPetsByTagsQueryTagsSchemaType = v.InferOutput<typeof findPetsByTagsQueryTagsSchema>
+export type FindPetsByTagsQueryTagsSchemaType = v.InferInput<typeof findPetsByTagsQueryTagsSchema>
 
 export const findPetsByTagsQueryPageSchema = v.optional(v.string())
 
-export type FindPetsByTagsQueryPageSchemaType = v.InferOutput<typeof findPetsByTagsQueryPageSchema>
+export type FindPetsByTagsQueryPageSchemaType = v.InferInput<typeof findPetsByTagsQueryPageSchema>
 
 export const findPetsByTagsQueryPageSizeSchema = v.optional(v.string())
 
-export type FindPetsByTagsQueryPageSizeSchemaType = v.InferOutput<typeof findPetsByTagsQueryPageSizeSchema>
+export type FindPetsByTagsQueryPageSizeSchemaType = v.InferInput<typeof findPetsByTagsQueryPageSizeSchema>
 
 export const findPetsByTagsHeaderXEXAMPLESchema = v.picklist(['ONE', 'TWO', 'THREE'])
 
-export type FindPetsByTagsHeaderXEXAMPLESchemaType = v.InferOutput<typeof findPetsByTagsHeaderXEXAMPLESchema>
+export type FindPetsByTagsHeaderXEXAMPLESchemaType = v.InferInput<typeof findPetsByTagsHeaderXEXAMPLESchema>
 
 export const findPetsByTagsStatus200SchemaJson = v.array(v.lazy(() => petSchema))
 
@@ -62,10 +62,10 @@ export const findPetsByTagsQuerySchema = v.object({
   pageSize: v.optional(v.string()),
 })
 
-export type FindPetsByTagsQuerySchemaType = v.InferOutput<typeof findPetsByTagsQuerySchema>
+export type FindPetsByTagsQuerySchemaType = v.InferInput<typeof findPetsByTagsQuerySchema>
 
 export const findPetsByTagsHeadersSchema = v.object({
   'X-EXAMPLE': v.picklist(['ONE', 'TWO', 'THREE']),
 })
 
-export type FindPetsByTagsHeadersSchemaType = v.InferOutput<typeof findPetsByTagsHeadersSchema>
+export type FindPetsByTagsHeadersSchemaType = v.InferInput<typeof findPetsByTagsHeadersSchema>

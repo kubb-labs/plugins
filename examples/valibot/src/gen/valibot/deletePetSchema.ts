@@ -7,11 +7,11 @@ import * as v from 'valibot'
 
 export const deletePetHeaderApiKeySchema = v.optional(v.string())
 
-export type DeletePetHeaderApiKeySchemaType = v.InferOutput<typeof deletePetHeaderApiKeySchema>
+export type DeletePetHeaderApiKeySchemaType = v.InferInput<typeof deletePetHeaderApiKeySchema>
 
 export const deletePetPathPetIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())
 
-export type DeletePetPathPetIdSchemaType = v.InferOutput<typeof deletePetPathPetIdSchema>
+export type DeletePetPathPetIdSchemaType = v.InferInput<typeof deletePetPathPetIdSchema>
 
 export const deletePetStatus400Schema = v.unknown()
 
@@ -29,10 +29,10 @@ export const deletePetPathSchema = v.object({
   petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint()),
 })
 
-export type DeletePetPathSchemaType = v.InferOutput<typeof deletePetPathSchema>
+export type DeletePetPathSchemaType = v.InferInput<typeof deletePetPathSchema>
 
 export const deletePetHeadersSchema = v.object({
   api_key: v.optional(v.string()),
 })
 
-export type DeletePetHeadersSchemaType = v.InferOutput<typeof deletePetHeadersSchema>
+export type DeletePetHeadersSchemaType = v.InferInput<typeof deletePetHeadersSchema>

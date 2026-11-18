@@ -7,11 +7,11 @@ import * as v from 'valibot'
 
 export const getThingsQueryLimitSchema = v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100)
 
-export type GetThingsQueryLimitSchemaType = v.InferOutput<typeof getThingsQueryLimitSchema>
+export type GetThingsQueryLimitSchemaType = v.InferInput<typeof getThingsQueryLimitSchema>
 
 export const getThingsQuerySkipSchema = v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0)
 
-export type GetThingsQuerySkipSchemaType = v.InferOutput<typeof getThingsQuerySkipSchema>
+export type GetThingsQuerySkipSchemaType = v.InferInput<typeof getThingsQuerySkipSchema>
 
 export const getThingsStatus201Schema = v.unknown()
 
@@ -34,4 +34,4 @@ export const getThingsQuerySchema = v.object({
   skip: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0),
 })
 
-export type GetThingsQuerySchemaType = v.InferOutput<typeof getThingsQuerySchema>
+export type GetThingsQuerySchemaType = v.InferInput<typeof getThingsQuerySchema>
