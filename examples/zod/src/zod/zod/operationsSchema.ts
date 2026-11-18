@@ -38,7 +38,7 @@ import {
   getPetByIdResponseSchema,
   getPetByIdPathSchema,
 } from './getPetByIdSchema'
-import { getThingsStatus201Schema, getThingsResponseSchema, getThingsQuerySchema } from './getThingsSchema'
+import { getThingsStatus201Schema, getThingsResponseSchema, getThingsPathSchema, getThingsQuerySchema } from './getThingsSchema'
 import {
   placeOrderPatchBodySchema,
   placeOrderPatchStatus200Schema,
@@ -84,7 +84,7 @@ export const operations = {
   getThings: {
     request: null,
     parameters: {
-      path: null,
+      path: getThingsPathSchema,
       query: getThingsQuerySchema,
       header: null,
     },

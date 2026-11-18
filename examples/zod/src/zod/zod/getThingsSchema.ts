@@ -6,6 +6,13 @@
 import { z } from '../../zod.ts'
 
 /**
+ * UUID
+ */
+export const getThingsPathUuidSchema = z.string().describe('UUID')
+
+export type GetThingsPathUuidSchemaType = z.infer<typeof getThingsPathUuidSchema>
+
+/**
  * Maximum number of things to return
  */
 export const getThingsQueryLimitSchema = z.int().min(1).max(100).optional().default(100).describe('Maximum number of things to return')
@@ -23,10 +30,10 @@ export const getThingsStatus201Schema = z.unknown()
 
 export type GetThingsStatus201SchemaType = z.infer<typeof getThingsStatus201Schema>
 
-/**
- * Pet not found
- */
-export const getThingsStatusDefaultSchema = z.unknown().describe('Pet not found')
+export const getThingsStatusDefaultSchema = z.object({
+  code: z.int32().optional(),
+  message: z.string().optional(),
+})
 
 export type GetThingsStatusDefaultSchemaType = z.infer<typeof getThingsStatusDefaultSchema>
 
@@ -38,6 +45,12 @@ export const getThingsErrorSchema = getThingsStatusDefaultSchema
 
 export type GetThingsErrorSchemaType = z.infer<typeof getThingsErrorSchema>
 
+export const getThingsPathSchema = z.object({
+  uuid: getThingsPathUuidSchema,
+})
+
+export type GetThingsPathSchemaType = z.infer<typeof getThingsPathSchema>
+
 export const getThingsQuerySchema = z.object({
   limit: getThingsQueryLimitSchema,
   skip: getThingsQuerySkipSchema,
@@ -47,7 +60,7 @@ export type GetThingsQuerySchemaType = z.infer<typeof getThingsQuerySchema>
 
 export const getThingsOptionsSchema = z.object({
   body: z.never().optional(),
-  path: z.never().optional(),
+  path: getThingsPathSchema,
   query: getThingsQuerySchema.optional(),
   headers: z.never().optional(),
 })

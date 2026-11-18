@@ -22,10 +22,10 @@ export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE'])
 
 export const createPetsStatus201Schema = z.unknown()
 
-/**
- * Pet not found
- */
-export const createPetsStatusDefaultSchema = z.unknown()
+export const createPetsStatusDefaultSchema = z.object({
+  code: z.optional(z.int32()),
+  message: z.optional(z.string()),
+})
 
 export const createPetsResponseSchema = createPetsStatus201Schema
 

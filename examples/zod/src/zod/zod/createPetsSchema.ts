@@ -30,10 +30,10 @@ export const createPetsStatus201Schema = z.unknown()
 
 export type CreatePetsStatus201SchemaType = z.infer<typeof createPetsStatus201Schema>
 
-/**
- * Pet not found
- */
-export const createPetsStatusDefaultSchema = z.unknown().describe('Pet not found')
+export const createPetsStatusDefaultSchema = z.object({
+  code: z.int32().optional(),
+  message: z.string().optional(),
+})
 
 export type CreatePetsStatusDefaultSchemaType = z.infer<typeof createPetsStatusDefaultSchema>
 
