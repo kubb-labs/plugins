@@ -129,7 +129,7 @@ export const printerZodMini = createPrinter<PrinterZodMiniFactory>((options) => 
     nodes: withInputChecks({
       ...buildZodNodes(miniDialect, options.cyclicSchemas),
       bigint(node) {
-        return `z.coerce.bigint()${numberChecksMini(withFormatRange({ ...bigintConstraints(node), format: node.format }, 'bigint'), 'n')}`
+        return `z.coerce.bigint()${numberChecksMini(withFormatRange({ ...bigintConstraints(node), format: node.format }, 'bigint'), true)}`
       },
       date(node) {
         if (node.representation === 'string') {

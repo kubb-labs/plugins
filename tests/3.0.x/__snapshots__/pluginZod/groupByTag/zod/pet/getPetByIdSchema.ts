@@ -6,7 +6,7 @@
 import * as z from 'zod'
 import { petSchema } from '../petSchema'
 
-export const getPetByIdPathPetIdSchema = z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet to return')
+export const getPetByIdPathPetIdSchema = z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('ID of pet to return')
 
 export const getPetByIdStatus200SchemaJson = petSchema
 
@@ -23,5 +23,5 @@ export const getPetByIdResponseSchema = getPetByIdStatus200Schema
 export const getPetByIdErrorSchema = z.union([getPetByIdStatus400Schema, getPetByIdStatus404Schema])
 
 export const getPetByIdPathSchema = z.object({
-  petId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet to return'),
+  petId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('ID of pet to return'),
 })

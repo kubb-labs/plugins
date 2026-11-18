@@ -131,14 +131,14 @@ describe('printerZodMini', () => {
 
     test('int64 keeps to the range of the format', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'int64' }))).toBe(
-        'z.coerce.bigint().check(z.minimum(-9223372036854775808n), z.maximum(9223372036854775807n))',
+        "z.coerce.bigint().check(z.minimum(BigInt('-9223372036854775808')), z.maximum(BigInt('9223372036854775807')))",
       )
     })
 
     test('bigint bounds print as bigint literals', () => {
       const output = printer.print(ast.factory.createSchema({ type: 'bigint', min: 0.5, exclusive: { max: 10 }, multipleOf: 2 }))
 
-      expect(output).toBe('z.coerce.bigint().check(z.minimum(1n), z.maximum(9n), z.multipleOf(2n))')
+      expect(output).toBe("z.coerce.bigint().check(z.minimum(BigInt('1')), z.maximum(BigInt('9')), z.multipleOf(BigInt('2')))")
       const schema = new Function('z', `return ${output}`)(z) as z.ZodMiniType
       expect(schema.safeParse(4).success).toBe(true)
       expect(schema.safeParse(3).success).toBe(false)

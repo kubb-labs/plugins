@@ -6,7 +6,7 @@
 import * as z from 'zod/mini'
 import { orderSchema } from './orderSchema'
 
-export const getOrderByIdPathOrderIdSchema = z.coerce.bigint().check(z.minimum(-9223372036854775808n), z.maximum(9223372036854775807n))
+export const getOrderByIdPathOrderIdSchema = z.coerce.bigint().check(z.minimum(BigInt('-9223372036854775808')), z.maximum(BigInt('9223372036854775807')))
 
 export const getOrderByIdStatus200SchemaJson = orderSchema
 
@@ -23,5 +23,5 @@ export const getOrderByIdResponseSchema = getOrderByIdStatus200Schema
 export const getOrderByIdErrorSchema = z.union([getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
 
 export const getOrderByIdPathSchema = z.object({
-  orderId: z.coerce.bigint().check(z.minimum(-9223372036854775808n), z.maximum(9223372036854775807n)),
+  orderId: z.coerce.bigint().check(z.minimum(BigInt('-9223372036854775808')), z.maximum(BigInt('9223372036854775807'))),
 })

@@ -6,8 +6,8 @@
 import * as z from 'zod/mini'
 
 export const orderSchema = z.object({
-  id: z.optional(z.coerce.bigint().check(z.minimum(-9223372036854775808n), z.maximum(9223372036854775807n))),
-  petId: z.optional(z.coerce.bigint().check(z.minimum(-9223372036854775808n), z.maximum(9223372036854775807n))),
+  id: z.optional(z.coerce.bigint().check(z.minimum(BigInt('-9223372036854775808')), z.maximum(BigInt('9223372036854775807')))),
+  petId: z.optional(z.coerce.bigint().check(z.minimum(BigInt('-9223372036854775808')), z.maximum(BigInt('9223372036854775807')))),
   quantity: z.optional(z.int32()),
   shipDate: z.optional(z.string()),
   status: z.optional(z.enum(['placed', 'approved', 'delivered'])),

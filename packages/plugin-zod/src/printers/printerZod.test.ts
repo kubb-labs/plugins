@@ -261,24 +261,28 @@ describe('printerZod', () => {
 
     test('int64 and uint64 keep to the range of the format', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'int64' }))).toBe(
-        'z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n)',
+        "z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807'))",
       )
-      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'uint64', min: 5 }))).toBe('z.coerce.bigint().min(5n).max(18446744073709551615n)')
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'uint64', min: 5 }))).toBe(
+        "z.coerce.bigint().min(BigInt('5')).max(BigInt('18446744073709551615'))",
+      )
     })
 
     test('bigint keeps its bounds as bigint literals', () => {
       const output = printer.print(ast.factory.createSchema({ type: 'bigint', max: 10, exclusive: { min: 0 } }))
 
-      expect(output).toBe('z.coerce.bigint().min(1n).max(10n)')
+      expect(output).toBe("z.coerce.bigint().min(BigInt('1')).max(BigInt('10'))")
       const schema = new Function('z', `return ${output}`)(z) as z.ZodType
       expect(schema.safeParse(5).success).toBe(true)
       expect(schema.safeParse(0).success).toBe(false)
       // A fractional bound rounds inward, so it never loosens the check.
       expect(printer.print(ast.factory.createSchema({ type: 'bigint', min: 0.5, max: 10.5, exclusive: { min: 1.5 } }))).toBe(
-        'z.coerce.bigint().min(2n).max(10n)',
+        "z.coerce.bigint().min(BigInt('2')).max(BigInt('10'))",
       )
       // A bound past the safe integer range would print as `1e+21n` or a rounded literal.
-      expect(printer.print(ast.factory.createSchema({ type: 'bigint', min: 0, max: 2 ** 63, exclusive: { max: 1e21 } }))).toBe('z.coerce.bigint().min(0n)')
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', min: 0, max: 2 ** 63, exclusive: { max: 1e21 } }))).toBe(
+        "z.coerce.bigint().min(BigInt('0'))",
+      )
     })
   })
 

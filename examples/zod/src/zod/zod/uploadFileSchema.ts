@@ -6,7 +6,11 @@
 import { z } from '../../zod.ts'
 import { apiResponseSchema } from './apiResponseSchema'
 
-export const uploadFilePathPetIdSchema = z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet to update')
+export const uploadFilePathPetIdSchema = z.coerce
+  .bigint()
+  .min(BigInt('-9223372036854775808'))
+  .max(BigInt('9223372036854775807'))
+  .describe('ID of pet to update')
 
 export type UploadFilePathPetIdSchemaType = z.infer<typeof uploadFilePathPetIdSchema>
 
@@ -27,7 +31,7 @@ export const uploadFileBodySchema = z.instanceof(Blob).optional()
 export type UploadFileBodySchemaType = z.infer<typeof uploadFileBodySchema>
 
 export const uploadFilePathSchema = z.object({
-  petId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet to update'),
+  petId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('ID of pet to update'),
 })
 
 export type UploadFilePathSchemaType = z.infer<typeof uploadFilePathSchema>

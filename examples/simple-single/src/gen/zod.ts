@@ -27,14 +27,14 @@ export const findPetsByStatusStatusSchema = z
 export const orderSchema = z.object({
   id: z.coerce
     .bigint()
-    .min(-9223372036854775808n)
-    .max(9223372036854775807n)
+    .min(BigInt('-9223372036854775808'))
+    .max(BigInt('9223372036854775807'))
     .optional()
     .meta({ examples: [10] }),
   petId: z.coerce
     .bigint()
-    .min(-9223372036854775808n)
-    .max(9223372036854775807n)
+    .min(BigInt('-9223372036854775808'))
+    .max(BigInt('9223372036854775807'))
     .optional()
     .meta({ examples: [198772] }),
   quantity: z
@@ -56,8 +56,8 @@ export const orderSchema = z.object({
 export const categorySchema = z.object({
   id: z.coerce
     .bigint()
-    .min(-9223372036854775808n)
-    .max(9223372036854775807n)
+    .min(BigInt('-9223372036854775808'))
+    .max(BigInt('9223372036854775807'))
     .optional()
     .meta({ examples: [1] }),
   name: z
@@ -67,7 +67,7 @@ export const categorySchema = z.object({
 })
 
 export const tagSchema = z.object({
-  id: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).optional(),
+  id: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).optional(),
   name: z.string().optional(),
 })
 
@@ -78,8 +78,8 @@ export const personSchema = z.object({
 export const petSchema = z.object({
   id: z.coerce
     .bigint()
-    .min(-9223372036854775808n)
-    .max(9223372036854775807n)
+    .min(BigInt('-9223372036854775808'))
+    .max(BigInt('9223372036854775807'))
     .optional()
     .meta({ examples: [10] }),
   name: z.string().meta({ examples: ['doggie'] }),
@@ -92,8 +92,8 @@ export const petSchema = z.object({
 export const addPetRequestSchema = z.object({
   id: z.coerce
     .bigint()
-    .min(-9223372036854775808n)
-    .max(9223372036854775807n)
+    .min(BigInt('-9223372036854775808'))
+    .max(BigInt('9223372036854775807'))
     .optional()
     .meta({ examples: [10] }),
   name: z.string().meta({ examples: ['doggie'] }),
@@ -206,7 +206,11 @@ export const findPetsByTagsQuerySchema = z.object({
   pageSize: z.string().optional().describe('to request with required page size'),
 })
 
-export const getPetByIdPathPetIdSchema = z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet to return')
+export const getPetByIdPathPetIdSchema = z.coerce
+  .bigint()
+  .min(BigInt('-9223372036854775808'))
+  .max(BigInt('9223372036854775807'))
+  .describe('ID of pet to return')
 
 export const getPetByIdStatus200SchemaJson = petSchema
 
@@ -223,13 +227,13 @@ export const getPetByIdResponseSchema = getPetByIdStatus200Schema
 export const getPetByIdErrorSchema = z.union([getPetByIdStatus400Schema, getPetByIdStatus404Schema])
 
 export const getPetByIdPathSchema = z.object({
-  petId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet to return'),
+  petId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('ID of pet to return'),
 })
 
 export const updatePetWithFormPathPetIdSchema = z.coerce
   .bigint()
-  .min(-9223372036854775808n)
-  .max(9223372036854775807n)
+  .min(BigInt('-9223372036854775808'))
+  .max(BigInt('9223372036854775807'))
   .describe('ID of pet that needs to be updated')
 
 export const updatePetWithFormQueryNameSchema = z.string().optional().describe('Name of pet that needs to be updated')
@@ -243,7 +247,7 @@ export const updatePetWithFormResponseSchema = z.unknown()
 export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
 
 export const updatePetWithFormPathSchema = z.object({
-  petId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet that needs to be updated'),
+  petId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('ID of pet that needs to be updated'),
 })
 
 export const updatePetWithFormQuerySchema = z.object({
@@ -253,7 +257,7 @@ export const updatePetWithFormQuerySchema = z.object({
 
 export const deletePetHeaderApiKeySchema = z.string().optional()
 
-export const deletePetPathPetIdSchema = z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('Pet id to delete')
+export const deletePetPathPetIdSchema = z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('Pet id to delete')
 
 export const deletePetStatus400Schema = z.unknown()
 
@@ -262,14 +266,18 @@ export const deletePetResponseSchema = z.unknown()
 export const deletePetErrorSchema = deletePetStatus400Schema
 
 export const deletePetPathSchema = z.object({
-  petId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('Pet id to delete'),
+  petId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('Pet id to delete'),
 })
 
 export const deletePetHeadersSchema = z.object({
   api_key: z.string().optional(),
 })
 
-export const uploadFilePathPetIdSchema = z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet to update')
+export const uploadFilePathPetIdSchema = z.coerce
+  .bigint()
+  .min(BigInt('-9223372036854775808'))
+  .max(BigInt('9223372036854775807'))
+  .describe('ID of pet to update')
 
 export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
@@ -280,7 +288,7 @@ export const uploadFileResponseSchema = uploadFileStatus200Schema
 export const uploadFileBodySchema = z.instanceof(Blob).optional()
 
 export const uploadFilePathSchema = z.object({
-  petId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet to update'),
+  petId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('ID of pet to update'),
 })
 
 export const uploadFileQuerySchema = z.object({
@@ -325,8 +333,8 @@ export const placeOrderPatchBodySchema = z.union([placeOrderPatchBodySchemaJson,
 
 export const getOrderByIdPathOrderIdSchema = z.coerce
   .bigint()
-  .min(-9223372036854775808n)
-  .max(9223372036854775807n)
+  .min(BigInt('-9223372036854775808'))
+  .max(BigInt('9223372036854775807'))
   .describe('ID of order that needs to be fetched')
 
 export const getOrderByIdStatus200SchemaJson = orderSchema
@@ -344,13 +352,13 @@ export const getOrderByIdResponseSchema = getOrderByIdStatus200Schema
 export const getOrderByIdErrorSchema = z.union([getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
 
 export const getOrderByIdPathSchema = z.object({
-  orderId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of order that needs to be fetched'),
+  orderId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('ID of order that needs to be fetched'),
 })
 
 export const deleteOrderPathOrderIdSchema = z.coerce
   .bigint()
-  .min(-9223372036854775808n)
-  .max(9223372036854775807n)
+  .min(BigInt('-9223372036854775808'))
+  .max(BigInt('9223372036854775807'))
   .describe('ID of the order that needs to be deleted')
 
 export const deleteOrderStatus400Schema = z.unknown()
@@ -362,5 +370,5 @@ export const deleteOrderResponseSchema = z.unknown()
 export const deleteOrderErrorSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
 
 export const deleteOrderPathSchema = z.object({
-  orderId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of the order that needs to be deleted'),
+  orderId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('ID of the order that needs to be deleted'),
 })

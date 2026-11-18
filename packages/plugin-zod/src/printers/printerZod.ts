@@ -305,7 +305,7 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
 const scalarNodes: PrinterZodNodes = {
   ...buildScalarNodes(standardDialect),
   bigint(node) {
-    return `z.coerce.bigint()${numberConstraints(withFormatRange({ ...bigintConstraints(node), format: node.format }, 'bigint'), 'n')}`
+    return `z.coerce.bigint()${numberConstraints(withFormatRange({ ...bigintConstraints(node), format: node.format }, 'bigint'), true)}`
   },
   date(node) {
     if (node.representation !== 'date') return 'z.iso.date()'
