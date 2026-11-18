@@ -7,15 +7,13 @@ import * as v from 'valibot'
 import { apiResponseSchema } from './apiResponseSchema'
 
 export const uploadFilePathPetIdSchema = v.pipe(
-  v.union([v.bigint(), v.number(), v.string()]),
-  v.toBigint(),
-  v.minValue(-9223372036854775808n),
-  v.maxValue(9223372036854775807n),
+  v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  v.description('ID of pet to update'),
 )
 
 export type UploadFilePathPetIdSchemaType = v.InferInput<typeof uploadFilePathPetIdSchema>
 
-export const uploadFileQueryAdditionalMetadataSchema = v.optional(v.string())
+export const uploadFileQueryAdditionalMetadataSchema = v.optional(v.pipe(v.string(), v.description('Additional Metadata')))
 
 export type UploadFileQueryAdditionalMetadataSchemaType = v.InferInput<typeof uploadFileQueryAdditionalMetadataSchema>
 
@@ -32,13 +30,31 @@ export const uploadFileBodySchema = v.optional(v.blob())
 export type UploadFileBodySchemaType = v.InferInput<typeof uploadFileBodySchema>
 
 export const uploadFilePathSchema = v.object({
-  petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  petId: v.pipe(
+    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+    v.description('ID of pet to update'),
+  ),
 })
 
 export type UploadFilePathSchemaType = v.InferInput<typeof uploadFilePathSchema>
 
 export const uploadFileQuerySchema = v.object({
-  additionalMetadata: v.optional(v.string()),
+  additionalMetadata: v.optional(v.pipe(v.string(), v.description('Additional Metadata'))),
 })
 
 export type UploadFileQuerySchemaType = v.InferInput<typeof uploadFileQuerySchema>
+
+export const uploadFileOptionsSchema = v.object({
+  body: v.optional(uploadFileBodySchema),
+  path: uploadFilePathSchema,
+  query: v.optional(uploadFileQuerySchema),
+  headers: v.optional(v.never()),
+})
+
+export type UploadFileOptionsSchemaType = v.InferInput<typeof uploadFileOptionsSchema>
+
+export const uploadFileResponsesSchema = v.object({
+  '200': uploadFileStatus200Schema,
+})
+
+export type UploadFileResponsesSchemaType = v.InferOutput<typeof uploadFileResponsesSchema>

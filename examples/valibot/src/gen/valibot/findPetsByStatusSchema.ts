@@ -6,7 +6,10 @@
 import * as v from 'valibot'
 import { petSchema } from './petSchema'
 
-export const findPetsByStatusQueryStatusSchema = v.optional(v.picklist(['available', 'pending', 'sold']), 'available')
+export const findPetsByStatusQueryStatusSchema = v.optional(
+  v.pipe(v.picklist(['available', 'pending', 'sold']), v.description('Status values that need to be considered for filter')),
+  'available',
+)
 
 export type FindPetsByStatusQueryStatusSchemaType = v.InferInput<typeof findPetsByStatusQueryStatusSchema>
 
@@ -35,7 +38,32 @@ export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
 export type FindPetsByStatusErrorSchemaType = v.InferOutput<typeof findPetsByStatusErrorSchema>
 
 export const findPetsByStatusQuerySchema = v.object({
-  status: v.optional(v.picklist(['available', 'pending', 'sold']), 'available'),
+  status: v.optional(v.pipe(v.picklist(['available', 'pending', 'sold']), v.description('Status values that need to be considered for filter')), 'available'),
 })
 
 export type FindPetsByStatusQuerySchemaType = v.InferInput<typeof findPetsByStatusQuerySchema>
+
+export const findPetsByStatusOptionsSchema = v.object({
+  body: v.optional(v.never()),
+  path: v.optional(v.never()),
+  query: v.optional(findPetsByStatusQuerySchema),
+  headers: v.optional(v.never()),
+})
+
+export type FindPetsByStatusOptionsSchemaType = v.InferInput<typeof findPetsByStatusOptionsSchema>
+
+export const findPetsByStatusResponsesSchema = v.object({
+  '200': v.union([
+    v.object({
+      contentType: v.literal('application/json'),
+      data: findPetsByStatusStatus200SchemaJson,
+    }),
+    v.object({
+      contentType: v.literal('application/xml'),
+      data: findPetsByStatusStatus200SchemaXml,
+    }),
+  ]),
+  '400': findPetsByStatusStatus400Schema,
+})
+
+export type FindPetsByStatusResponsesSchemaType = v.InferOutput<typeof findPetsByStatusResponsesSchema>

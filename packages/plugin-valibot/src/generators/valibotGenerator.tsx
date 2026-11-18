@@ -1,4 +1,12 @@
-import { getCircularNames, getOasAdapter, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
+import {
+  buildOptionsSchema,
+  buildResponses,
+  getCircularNames,
+  getOasAdapter,
+  resolveContentTypeVariants,
+  resolveOperationFile,
+  toResponseContent,
+} from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
@@ -22,7 +30,10 @@ function getPrinter(resolver: ResolverValibot, options: PrinterValibotOptions, d
   const build = () => printerValibot({ ...options, direction })
   if (options.nodes || options.keysToOmit?.length) return build()
 
-  return resolver.memo(`valibotPrinter:${[direction, JSON.stringify(options.coercion), options.regexType, options.dateType].join(':')}`, build)
+  return resolver.memo(
+    `valibotPrinter:${[direction, JSON.stringify(options.coercion), options.regexType, options.oneOfType, options.dateType].join(':')}`,
+    build,
+  )
 }
 
 // A request schema is typed by the value the caller passes, every other schema by the value it returns.
@@ -37,7 +48,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, regexType, coercion, inferred, typeGuards, importPath, group, printer } = ctx.options
+    const { output, regexType, oneOfType, coercion, inferred, typeGuards, importPath, group, printer } = ctx.options
 
     if (!node.name) {
       return
@@ -45,7 +56,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
 
     const cyclicSchemas = getCircularNames(ctx)
     const dateType = getOasAdapter(adapter).options.dateType
-    const printerOptions: PrinterValibotOptions = { regexType, coercion, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterValibotOptions = { regexType, oneOfType, coercion, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
     // Rendered twice: the schema decodes, and its `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions })
     const inputImports = hasDirectionalNode
@@ -109,7 +120,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { adapter, config, resolver, root } = ctx
-    const { output, regexType, coercion, inferred, importPath, group, printer } = ctx.options
+    const { output, regexType, oneOfType, coercion, inferred, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     const meta = {
@@ -117,7 +128,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     } as const
 
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterValibotOptions = { regexType, coercion, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterValibotOptions = { regexType, oneOfType, coercion, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
     function renderSchemaEntry({
       schema,
@@ -311,6 +322,13 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
         }),
       )
 
+    // The combined options object and the per-status record back `resolver.response.options(node)` and
+    // `resolver.response.responses(node)`, for callers that take their types from this plugin.
+    const optionsSchema = inferred
+      ? renderSchemaEntry({ schema: buildOptionsSchema(node, resolver), name: resolver.name(`${node.operationId} Options`), direction: 'encode' })
+      : null
+    const responsesSchema = inferred ? renderSchemaEntry({ schema: buildResponses(node, resolver), name: resolver.response.responses(node) }) : null
+
     return (
       <File
         baseName={meta.file.baseName}
@@ -327,6 +345,8 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
         {errorUnionSchema}
         {requestSchema}
         {paramGroupSchemas}
+        {optionsSchema}
+        {responsesSchema}
       </File>
     )
   },

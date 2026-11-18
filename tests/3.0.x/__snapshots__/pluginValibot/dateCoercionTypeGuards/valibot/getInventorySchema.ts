@@ -12,3 +12,18 @@ export type GetInventoryStatus200SchemaType = v.InferOutput<typeof getInventoryS
 export const getInventoryResponseSchema = getInventoryStatus200Schema
 
 export type GetInventoryResponseSchemaType = v.InferOutput<typeof getInventoryResponseSchema>
+
+export const getInventoryOptionsSchema = v.object({
+  body: v.optional(v.never()),
+  path: v.optional(v.never()),
+  query: v.optional(v.never()),
+  headers: v.optional(v.never()),
+})
+
+export type GetInventoryOptionsSchemaType = v.InferInput<typeof getInventoryOptionsSchema>
+
+export const getInventoryResponsesSchema = v.object({
+  '200': getInventoryStatus200Schema,
+})
+
+export type GetInventoryResponsesSchemaType = v.InferOutput<typeof getInventoryResponsesSchema>

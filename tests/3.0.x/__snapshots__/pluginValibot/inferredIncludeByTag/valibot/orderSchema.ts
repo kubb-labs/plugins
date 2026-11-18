@@ -6,11 +6,11 @@
 import * as v from 'valibot'
 
 export const orderSchema = v.object({
-  id: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))),
-  petId: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))),
-  quantity: v.optional(v.pipe(v.number(), v.integer(), v.minValue(-2147483648), v.maxValue(2147483647))),
+  id: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)), v.metadata({ examples: [10] }))),
+  petId: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)), v.metadata({ examples: [198772] }))),
+  quantity: v.optional(v.pipe(v.pipe(v.number(), v.integer(), v.minValue(-2147483648), v.maxValue(2147483647)), v.metadata({ examples: [7] }))),
   shipDate: v.optional(v.pipe(v.string(), v.isoTimestamp())),
-  status: v.optional(v.picklist(['placed', 'approved', 'delivered'])),
+  status: v.optional(v.pipe(v.picklist(['placed', 'approved', 'delivered']), v.description('Order Status'), v.metadata({ examples: ['approved'] }))),
   complete: v.optional(v.boolean()),
 })
 

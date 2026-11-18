@@ -3,9 +3,6 @@ import { ensureValidVarName } from '@internals/utils'
 import { casing, createResolver } from '@kubb/kit'
 import type { PluginValibot } from '../types.ts'
 
-// `responses` names the per-status record schema, which this plugin does not generate.
-const { responses: _responses, ...operationResponse } = createOperationResponseResolver()
-
 /**
  * Default resolver for `@kubb/plugin-valibot`. Schema and file names are camelCase with a `Schema`
  * suffix, and inferred types are PascalCase.
@@ -44,10 +41,14 @@ export const resolverValibot = createResolver<PluginValibot>({
   },
   param: createOperationParamResolver(),
   response: {
-    ...operationResponse,
+    ...createOperationResponseResolver(),
     error(node) {
       const name = this.name(`${node.operationId} Error`)
       return this.resolveName({ key: operationKey(node, 'response', 'error'), name })
+    },
+    options(node) {
+      const name = this.schema.type(this.name(`${node.operationId} Options`))
+      return this.resolveName({ key: operationKey(node, 'response', 'options'), name })
     },
   },
 })

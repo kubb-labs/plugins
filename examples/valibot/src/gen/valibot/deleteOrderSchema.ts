@@ -6,10 +6,8 @@
 import * as v from 'valibot'
 
 export const deleteOrderPathOrderIdSchema = v.pipe(
-  v.union([v.bigint(), v.number(), v.string()]),
-  v.toBigint(),
-  v.minValue(-9223372036854775808n),
-  v.maxValue(9223372036854775807n),
+  v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  v.description('ID of the order that needs to be deleted'),
 )
 
 export type DeleteOrderPathOrderIdSchemaType = v.InferInput<typeof deleteOrderPathOrderIdSchema>
@@ -31,7 +29,26 @@ export const deleteOrderErrorSchema = v.union([deleteOrderStatus400Schema, delet
 export type DeleteOrderErrorSchemaType = v.InferOutput<typeof deleteOrderErrorSchema>
 
 export const deleteOrderPathSchema = v.object({
-  orderId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  orderId: v.pipe(
+    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+    v.description('ID of the order that needs to be deleted'),
+  ),
 })
 
 export type DeleteOrderPathSchemaType = v.InferInput<typeof deleteOrderPathSchema>
+
+export const deleteOrderOptionsSchema = v.object({
+  body: v.optional(v.never()),
+  path: deleteOrderPathSchema,
+  query: v.optional(v.never()),
+  headers: v.optional(v.never()),
+})
+
+export type DeleteOrderOptionsSchemaType = v.InferInput<typeof deleteOrderOptionsSchema>
+
+export const deleteOrderResponsesSchema = v.object({
+  '400': deleteOrderStatus400Schema,
+  '404': deleteOrderStatus404Schema,
+})
+
+export type DeleteOrderResponsesSchemaType = v.InferOutput<typeof deleteOrderResponsesSchema>

@@ -37,3 +37,19 @@ export type PlaceOrderBodySchemaFormUrlEncodedType = v.InferInput<typeof placeOr
 export const placeOrderBodySchema = v.union([placeOrderBodySchemaJson, placeOrderBodySchemaXml, placeOrderBodySchemaFormUrlEncoded])
 
 export type PlaceOrderBodySchemaType = v.InferInput<typeof placeOrderBodySchema>
+
+export const placeOrderOptionsSchema = v.object({
+  body: v.optional(placeOrderBodySchema),
+  path: v.optional(v.never()),
+  query: v.optional(v.never()),
+  headers: v.optional(v.never()),
+})
+
+export type PlaceOrderOptionsSchemaType = v.InferInput<typeof placeOrderOptionsSchema>
+
+export const placeOrderResponsesSchema = v.object({
+  '200': placeOrderStatus200Schema,
+  '405': placeOrderStatus405Schema,
+})
+
+export type PlaceOrderResponsesSchemaType = v.InferOutput<typeof placeOrderResponsesSchema>

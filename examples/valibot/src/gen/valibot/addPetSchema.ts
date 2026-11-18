@@ -49,3 +49,28 @@ export type AddPetBodySchemaFormUrlEncodedType = v.InferInput<typeof addPetBodyS
 export const addPetBodySchema = v.union([addPetBodySchemaJson, addPetBodySchemaXml, addPetBodySchemaFormUrlEncoded])
 
 export type AddPetBodySchemaType = v.InferInput<typeof addPetBodySchema>
+
+export const addPetOptionsSchema = v.object({
+  body: addPetBodySchema,
+  path: v.optional(v.never()),
+  query: v.optional(v.never()),
+  headers: v.optional(v.never()),
+})
+
+export type AddPetOptionsSchemaType = v.InferInput<typeof addPetOptionsSchema>
+
+export const addPetResponsesSchema = v.object({
+  '200': v.union([
+    v.object({
+      contentType: v.literal('application/json'),
+      data: addPetStatus200SchemaJson,
+    }),
+    v.object({
+      contentType: v.literal('application/xml'),
+      data: addPetStatus200SchemaXml,
+    }),
+  ]),
+  '405': addPetStatus405Schema,
+})
+
+export type AddPetResponsesSchemaType = v.InferOutput<typeof addPetResponsesSchema>
