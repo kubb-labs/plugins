@@ -1,10 +1,16 @@
 import * as z from 'zod'
 import { apiResponseSchema } from '../apiResponseSchema'
 
+/**
+ * ID of pet to update
+ */
 export const uploadFilePathPetIdSchema = z.int().describe('ID of pet to update')
 
 export type UploadFilePathPetIdSchemaType = z.infer<typeof uploadFilePathPetIdSchema>
 
+/**
+ * Additional Metadata
+ */
 export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
 export type UploadFileQueryAdditionalMetadataSchemaType = z.infer<typeof uploadFileQueryAdditionalMetadataSchema>
@@ -22,13 +28,13 @@ export const uploadFileBodySchema = z.instanceof(Blob)
 export type UploadFileBodySchemaType = z.infer<typeof uploadFileBodySchema>
 
 export const uploadFilePathSchema = z.object({
-  petId: z.int().describe('ID of pet to update'),
+  petId: uploadFilePathPetIdSchema,
 })
 
 export type UploadFilePathSchemaType = z.infer<typeof uploadFilePathSchema>
 
 export const uploadFileQuerySchema = z.object({
-  additionalMetadata: z.string().optional().describe('Additional Metadata'),
+  additionalMetadata: uploadFileQueryAdditionalMetadataSchema,
 })
 
 export type UploadFileQuerySchemaType = z.infer<typeof uploadFileQuerySchema>

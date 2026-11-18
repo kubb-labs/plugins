@@ -38,14 +38,14 @@ export const listPaymentsErrorSchema = listPaymentsStatus4xxSchema
 export type ListPaymentsErrorSchemaType = z.infer<typeof listPaymentsErrorSchema>
 
 export const listPaymentsQuerySchema = z.object({
-  status: z.string().optional(),
-  filter: z.string().optional(),
+  status: listPaymentsQueryStatusSchema,
+  filter: listPaymentsQueryFilterSchema,
 })
 
 export type ListPaymentsQuerySchemaType = z.infer<typeof listPaymentsQuerySchema>
 
 export const listPaymentsCookiesSchema = z.object({
-  session: z.string().optional(),
+  session: listPaymentsCookieSessionSchema,
 })
 
 export type ListPaymentsCookiesSchemaType = z.infer<typeof listPaymentsCookiesSchema>
