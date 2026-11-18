@@ -6,6 +6,9 @@
 import * as v from 'valibot'
 import { apiResponseSchema } from './apiResponseSchema'
 
+/**
+ * ID of pet to update
+ */
 export const uploadFilePathPetIdSchema = v.pipe(
   v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
   v.description('ID of pet to update'),
@@ -13,6 +16,9 @@ export const uploadFilePathPetIdSchema = v.pipe(
 
 export type UploadFilePathPetIdSchemaType = v.InferInput<typeof uploadFilePathPetIdSchema>
 
+/**
+ * Additional Metadata
+ */
 export const uploadFileQueryAdditionalMetadataSchema = v.optional(v.pipe(v.string(), v.description('Additional Metadata')))
 
 export type UploadFileQueryAdditionalMetadataSchemaType = v.InferInput<typeof uploadFileQueryAdditionalMetadataSchema>
@@ -30,16 +36,13 @@ export const uploadFileBodySchema = v.optional(v.blob())
 export type UploadFileBodySchemaType = v.InferInput<typeof uploadFileBodySchema>
 
 export const uploadFilePathSchema = v.object({
-  petId: v.pipe(
-    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
-    v.description('ID of pet to update'),
-  ),
+  petId: uploadFilePathPetIdSchema,
 })
 
 export type UploadFilePathSchemaType = v.InferInput<typeof uploadFilePathSchema>
 
 export const uploadFileQuerySchema = v.object({
-  additionalMetadata: v.optional(v.pipe(v.string(), v.description('Additional Metadata'))),
+  additionalMetadata: uploadFileQueryAdditionalMetadataSchema,
 })
 
 export type UploadFileQuerySchemaType = v.InferInput<typeof uploadFileQuerySchema>

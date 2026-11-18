@@ -5,6 +5,9 @@
 
 import * as v from 'valibot'
 
+/**
+ * ID of the order that needs to be deleted
+ */
 export const deleteOrderPathOrderIdSchema = v.pipe(
   v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
   v.description('ID of the order that needs to be deleted'),
@@ -29,10 +32,7 @@ export const deleteOrderErrorSchema = v.union([deleteOrderStatus400Schema, delet
 export type DeleteOrderErrorSchemaType = v.InferOutput<typeof deleteOrderErrorSchema>
 
 export const deleteOrderPathSchema = v.object({
-  orderId: v.pipe(
-    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
-    v.description('ID of the order that needs to be deleted'),
-  ),
+  orderId: deleteOrderPathOrderIdSchema,
 })
 
 export type DeleteOrderPathSchemaType = v.InferInput<typeof deleteOrderPathSchema>

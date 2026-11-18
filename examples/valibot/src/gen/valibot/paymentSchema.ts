@@ -6,6 +6,9 @@
 import * as v from 'valibot'
 import { paymentErrorSchema } from './paymentErrorSchema'
 
+/**
+ * A payment for a store order
+ */
 export const paymentSchema = v.pipe(
   v.pipe(
     v.unknown(),

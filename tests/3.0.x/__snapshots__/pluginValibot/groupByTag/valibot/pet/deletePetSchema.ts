@@ -7,6 +7,9 @@ import * as v from 'valibot'
 
 export const deletePetHeaderApiKeySchema = v.optional(v.string())
 
+/**
+ * Pet id to delete
+ */
 export const deletePetPathPetIdSchema = v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))), v.description('Pet id to delete'))
 
 export const deletePetStatus400Schema = v.unknown()
@@ -16,9 +19,9 @@ export const deletePetResponseSchema = v.unknown()
 export const deletePetErrorSchema = deletePetStatus400Schema
 
 export const deletePetPathSchema = v.object({
-  petId: v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))), v.description('Pet id to delete')),
+  petId: deletePetPathPetIdSchema,
 })
 
 export const deletePetHeadersSchema = v.object({
-  api_key: v.optional(v.string()),
+  api_key: deletePetHeaderApiKeySchema,
 })

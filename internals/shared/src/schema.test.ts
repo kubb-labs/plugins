@@ -249,6 +249,8 @@ describe('withFormatRange', () => {
   test('adds the range of the format as digit strings', () => {
     expect(withFormatRange({ format: 'int64' }, 'bigint')).toStrictEqual({ format: 'int64', min: '-9223372036854775808', max: '9223372036854775807' })
     expect(withFormatRange({ format: 'uint32' }, 'integer')).toStrictEqual({ format: 'uint32', min: '0', max: '4294967295' })
+    expect(withFormatRange({ format: 'int8' }, 'integer')).toStrictEqual({ format: 'int8', min: '-128', max: '127' })
+    expect(withFormatRange({ format: 'uint16' }, 'integer')).toStrictEqual({ format: 'uint16', min: '0', max: '65535' })
   })
 
   test('keeps a bound from the spec that is tighter, and replaces a looser one', () => {

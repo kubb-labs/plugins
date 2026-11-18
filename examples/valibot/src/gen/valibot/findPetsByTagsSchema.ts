@@ -6,6 +6,9 @@
 import * as v from 'valibot'
 import { petSchema } from './petSchema'
 
+/**
+ * Tags to filter by
+ */
 export const findPetsByTagsQueryTagsSchema = v.optional(
   v.pipe(
     v.pipe(
@@ -18,14 +21,23 @@ export const findPetsByTagsQueryTagsSchema = v.optional(
 
 export type FindPetsByTagsQueryTagsSchemaType = v.InferInput<typeof findPetsByTagsQueryTagsSchema>
 
+/**
+ * to request with required page number or pagination
+ */
 export const findPetsByTagsQueryPageSchema = v.optional(v.pipe(v.string(), v.description('to request with required page number or pagination')))
 
 export type FindPetsByTagsQueryPageSchemaType = v.InferInput<typeof findPetsByTagsQueryPageSchema>
 
+/**
+ * to request with required page size
+ */
 export const findPetsByTagsQueryPageSizeSchema = v.optional(v.pipe(v.string(), v.description('to request with required page size')))
 
 export type FindPetsByTagsQueryPageSizeSchemaType = v.InferInput<typeof findPetsByTagsQueryPageSizeSchema>
 
+/**
+ * Header parameters
+ */
 export const findPetsByTagsHeaderXEXAMPLESchema = v.pipe(v.picklist(['ONE', 'TWO', 'THREE']), v.description('Header parameters'))
 
 export type FindPetsByTagsHeaderXEXAMPLESchemaType = v.InferInput<typeof findPetsByTagsHeaderXEXAMPLESchema>
@@ -55,23 +67,15 @@ export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
 export type FindPetsByTagsErrorSchemaType = v.InferOutput<typeof findPetsByTagsErrorSchema>
 
 export const findPetsByTagsQuerySchema = v.object({
-  tags: v.optional(
-    v.pipe(
-      v.pipe(
-        v.array(v.string()),
-        v.check((items) => new Set(items).size === items.length, 'Array entries must be unique'),
-      ),
-      v.description('Tags to filter by'),
-    ),
-  ),
-  page: v.optional(v.pipe(v.string(), v.description('to request with required page number or pagination'))),
-  pageSize: v.optional(v.pipe(v.string(), v.description('to request with required page size'))),
+  tags: findPetsByTagsQueryTagsSchema,
+  page: findPetsByTagsQueryPageSchema,
+  pageSize: findPetsByTagsQueryPageSizeSchema,
 })
 
 export type FindPetsByTagsQuerySchemaType = v.InferInput<typeof findPetsByTagsQuerySchema>
 
 export const findPetsByTagsHeadersSchema = v.object({
-  'X-EXAMPLE': v.pipe(v.picklist(['ONE', 'TWO', 'THREE']), v.description('Header parameters')),
+  'X-EXAMPLE': findPetsByTagsHeaderXEXAMPLESchema,
 })
 
 export type FindPetsByTagsHeadersSchemaType = v.InferInput<typeof findPetsByTagsHeadersSchema>

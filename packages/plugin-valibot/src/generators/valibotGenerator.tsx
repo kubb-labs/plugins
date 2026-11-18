@@ -20,6 +20,11 @@ type BuildResponseUnionParams = {
   fallbackUnknown: boolean
 }
 
+// The comment above a schema const. A `$ref` const takes none, because the const it points to has it.
+function jsDoc(node: ast.SchemaNode): { description?: string; deprecated?: boolean } {
+  return node.type === ast.schema.types.ref ? {} : { description: node.description, deprecated: node.deprecated }
+}
+
 type Direction = NonNullable<PrinterValibotOptions['direction']>
 
 /**
@@ -100,6 +105,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
           isName={resolver.schema.isName(node.name)}
           assertName={resolver.schema.assertName(node.name)}
           cyclic={cyclicSchemas.has(node.name)}
+          {...jsDoc(node)}
         />
         {hasDirectionalNode && (
           <Valibot
@@ -112,6 +118,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
             isName={resolver.schema.isName(inputName)}
             assertName={resolver.schema.assertName(inputName)}
             cyclic={cyclicSchemas.has(node.name)}
+            {...jsDoc(node)}
           />
         )}
       </File>
@@ -183,6 +190,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
             printer={getPrinter(resolver, { ...printerOptions, keysToOmit }, direction)}
             inferTypeName={inferred ? resolver.schema.type(name) : null}
             inferKind={inferKinds[direction]}
+            {...jsDoc(schema)}
           />
         </>
       )
@@ -267,6 +275,20 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
         properties: params.map((param) => ast.factory.createProperty({ name: param.name, required: param.required, schema: param.schema })),
       })
 
+    // Each parameter already has its own const, optional wrapper included, so the group points at it.
+    const toParamRefsSchema = (params: Array<ast.ParameterNode>) =>
+      ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: params.map((param) =>
+          ast.factory.createProperty({
+            name: param.name,
+            required: true,
+            schema: ast.factory.createSchema({ type: 'ref', name: resolver.param.name(node, param) }),
+          }),
+        ),
+      })
+
     const responseHeaderSchemas = node.responses.map((res) =>
       res.headers?.length ? renderSchemaEntry({ schema: toParamsSchema(res.headers), name: resolver.response.headers(node, res.statusCode) }) : null,
     )
@@ -316,7 +338,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       .filter(({ params }) => params.length > 0)
       .map(({ kind, params }) =>
         renderSchemaEntry({
-          schema: toParamsSchema(params),
+          schema: toParamRefsSchema(params),
           name: resolver.param[kind](node, params[0]!),
           direction: 'encode',
         }),

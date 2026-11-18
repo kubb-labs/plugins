@@ -101,6 +101,20 @@ describe('printerValibot', () => {
       ['18446744073709551615'],
       [-1, '18446744073709551616'],
     ],
+    [
+      'int8 keeps to its range',
+      createSchema({ type: 'integer', format: 'int8' }),
+      'v.pipe(v.number(), v.integer(), v.minValue(-128), v.maxValue(127))',
+      [-128, 127],
+      [-129, 128],
+    ],
+    [
+      'uint16 keeps to its range',
+      createSchema({ type: 'integer', format: 'uint16' }),
+      'v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(65535))',
+      [0, 65535],
+      [-1, 65536],
+    ],
     ['date as a string', createSchema({ type: 'date', representation: 'string' }), 'v.pipe(v.string(), v.isoDate())', ['2026-01-31'], ['2026-13-01']],
     [
       'datetime',
@@ -367,15 +381,16 @@ describe('printerValibot', () => {
   })
 
   test('a description and examples ride along as metadata inside the optional wrapper', () => {
-    const node = object({ 'name?': createSchema({ type: 'string', description: 'A "name"', examples: ['Rex', null] }) }, { description: 'A pet' })
+    const node = object({ 'name?': createSchema({ type: 'string', description: 'A "name"', examples: ['Rex', null] }) }, { title: 'Pet', description: 'A pet' })
     const code = print(node)!
 
     expect(code).toMatchInlineSnapshot(`
       "v.pipe(v.object({
         name: v.optional(v.pipe(v.string(), v.description('A "name"'), v.metadata({ examples: ['Rex', null] }))),
-      }), v.description('A pet'))"
+      }), v.title('Pet'), v.description('A pet'))"
     `)
     expect(v.getDescription(build(code))).toBe('A pet')
+    expect(v.getTitle(build(code))).toBe('Pet')
     expect(v.parse(build(code), {})).toEqual({})
   })
 

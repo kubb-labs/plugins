@@ -6,6 +6,9 @@
 import * as v from 'valibot'
 import { orderSchema } from './orderSchema'
 
+/**
+ * ID of order that needs to be fetched
+ */
 export const getOrderByIdPathOrderIdSchema = v.pipe(
   v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
   v.description('ID of order that needs to be fetched'),
@@ -42,10 +45,7 @@ export const getOrderByIdErrorSchema = v.union([getOrderByIdStatus400Schema, get
 export type GetOrderByIdErrorSchemaType = v.InferOutput<typeof getOrderByIdErrorSchema>
 
 export const getOrderByIdPathSchema = v.object({
-  orderId: v.pipe(
-    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
-    v.description('ID of order that needs to be fetched'),
-  ),
+  orderId: getOrderByIdPathOrderIdSchema,
 })
 
 export type GetOrderByIdPathSchemaType = v.InferInput<typeof getOrderByIdPathSchema>
