@@ -76,7 +76,7 @@ describe('printerValibot', () => {
     [
       'bigint converts a JSON number or string',
       createSchema({ type: 'bigint', min: 0 }),
-      'v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(0n))',
+      "v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('0')))",
       [1, '2', 3n],
       [1.5, 'x', -1],
     ],
@@ -90,14 +90,14 @@ describe('printerValibot', () => {
     [
       'int64 keeps to its range',
       createSchema({ type: 'bigint', format: 'int64' }),
-      'v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))',
+      "v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807')))",
       ['9223372036854775807', -5],
       ['9223372036854775808'],
     ],
     [
       'uint64 keeps to its range',
       createSchema({ type: 'bigint', format: 'uint64' }),
-      'v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(0n), v.maxValue(18446744073709551615n))',
+      "v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('0')), v.maxValue(BigInt('18446744073709551615')))",
       ['18446744073709551615'],
       [-1, '18446744073709551616'],
     ],

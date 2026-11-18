@@ -6,8 +6,8 @@
 import * as v from 'valibot'
 
 export const orderSchema = v.object({
-  id: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)), v.metadata({ examples: [10] }))),
-  petId: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)), v.metadata({ examples: [198772] }))),
+  id: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))), v.metadata({ examples: [10] }))),
+  petId: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))), v.metadata({ examples: [198772] }))),
   quantity: v.optional(v.pipe(v.pipe(v.unknown(), v.toNumber(), v.integer(), v.minValue(-2147483648), v.maxValue(2147483647)), v.metadata({ examples: [7] }))),
   shipDate: v.optional(v.pipe(v.unknown(), v.toDate())),
   status: v.optional(v.pipe(v.picklist(['placed', 'approved', 'delivered']), v.description('Order Status'), v.metadata({ examples: ['approved'] }))),
@@ -30,8 +30,8 @@ export function assertOrder(data: unknown): asserts data is v.InferInput<typeof 
 }
 
 export const orderInputSchema = v.object({
-  id: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)), v.metadata({ examples: [10] }))),
-  petId: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)), v.metadata({ examples: [198772] }))),
+  id: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))), v.metadata({ examples: [10] }))),
+  petId: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))), v.metadata({ examples: [198772] }))),
   quantity: v.optional(v.pipe(v.pipe(v.unknown(), v.toNumber(), v.integer(), v.minValue(-2147483648), v.maxValue(2147483647)), v.metadata({ examples: [7] }))),
   shipDate: v.optional(v.pipe(v.date(), v.transform((value) => value.toISOString()))),
   status: v.optional(v.pipe(v.picklist(['placed', 'approved', 'delivered']), v.description('Order Status'), v.metadata({ examples: ['approved'] }))),

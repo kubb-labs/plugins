@@ -6,15 +6,15 @@ Look up the Valibot call Kubb writes for each OpenAPI type and format, such as `
 
 ## Numbers
 
-| OpenAPI type and format                | Valibot                                                                                               | Notes                                                                                     |
-| :------------------------------------- | :---------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
-| `number`                               | `v.number()`                                                                                          |                                                                                           |
-| `integer`                              | `v.pipe(v.number(), v.integer())`                                                                     | `format: int32` and `uint32` add `v.minValue()` and `v.maxValue()` for the format's range |
-| `integer`, `format: int64` / `uint64`  | `v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(…n), v.maxValue(…n))` | Converts, because JSON holds a number or a string, then checks the format's range         |
-| `string`, `format: int32` / `int64`    | `v.pipe(v.string(), v.regex(/^-?\d+$/))`                                                              | An integer sent as a JSON string. A `pattern` in the spec wins.                           |
-| `minimum`, `maximum`                   | `v.minValue(n)`, `v.maxValue(n)`                                                                      |                                                                                           |
-| `exclusiveMinimum`, `exclusiveMaximum` | `v.gtValue(n)`, `v.ltValue(n)`                                                                        |                                                                                           |
-| `multipleOf`                           | `v.multipleOf(n)`                                                                                     |                                                                                           |
+| OpenAPI type and format                | Valibot                                                                                                                 | Notes                                                                                     |
+| :------------------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
+| `number`                               | `v.number()`                                                                                                            |                                                                                           |
+| `integer`                              | `v.pipe(v.number(), v.integer())`                                                                                       | `format: int32` and `uint32` add `v.minValue()` and `v.maxValue()` for the format's range |
+| `integer`, `format: int64` / `uint64`  | `v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('…')), v.maxValue(BigInt('…')))` | Converts, because JSON holds a number or a string, then checks the format's range         |
+| `string`, `format: int32` / `int64`    | `v.pipe(v.string(), v.regex(/^-?\d+$/))`                                                                                | An integer sent as a JSON string. A `pattern` in the spec wins.                           |
+| `minimum`, `maximum`                   | `v.minValue(n)`, `v.maxValue(n)`                                                                                        |                                                                                           |
+| `exclusiveMinimum`, `exclusiveMaximum` | `v.gtValue(n)`, `v.ltValue(n)`                                                                                          |                                                                                           |
+| `multipleOf`                           | `v.multipleOf(n)`                                                                                                       |                                                                                           |
 
 With [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) on the adapter, `format: int64` prints `v.pipe(v.number(), v.integer())`.
 

@@ -8,7 +8,12 @@ import * as v from 'valibot'
 export const categorySchema: v.GenericSchema = v.object({
   id: v.optional(
     v.pipe(
-      v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+      v.pipe(
+        v.union([v.bigint(), v.number(), v.string()]),
+        v.toBigint(),
+        v.minValue(BigInt('-9223372036854775808')),
+        v.maxValue(BigInt('9223372036854775807')),
+      ),
       v.metadata({ examples: [1] }),
     ),
   ),

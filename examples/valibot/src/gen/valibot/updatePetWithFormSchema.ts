@@ -6,7 +6,7 @@
 import * as v from 'valibot'
 
 export const updatePetWithFormPathPetIdSchema = v.pipe(
-  v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
   v.description('ID of pet that needs to be updated'),
 )
 
@@ -34,7 +34,7 @@ export type UpdatePetWithFormErrorSchemaType = v.InferOutput<typeof updatePetWit
 
 export const updatePetWithFormPathSchema = v.object({
   petId: v.pipe(
-    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
     v.description('ID of pet that needs to be updated'),
   ),
 })
