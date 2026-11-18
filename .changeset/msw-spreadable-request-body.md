@@ -2,4 +2,4 @@
 '@kubb/plugin-msw': patch
 ---
 
-Type a handler's request body as the plain body type, so `{ ...(await request.json()) }` compiles again. A request body with an empty schema still falls back to `DefaultBodyType`.
+Type a handler's request body through a local `MswBody<T>` alias, so `{ ...(await request.json()) }` compiles again. A body type that MSW does not accept, such as `unknown`, `bigint` or `void`, still falls back to `DefaultBodyType`.
