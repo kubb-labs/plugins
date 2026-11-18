@@ -53,7 +53,7 @@ With `dateType: 'date'`, a date, date-time, or time is a `Date` in your code and
 | :---------------------------- | :------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
 | `string`, `format: date`      | `v.pipe(v.string(), v.isoDate(), v.transform((value) => new Date(value)))` | `v.pipe(v.date(), v.transform((value) => value.toISOString().slice(0, 10)))` |
 | `string`, `format: date-time` | `v.pipe(v.string(), v.isoTimestamp(), v.transform(...))`                   | `v.pipe(v.date(), v.transform((value) => value.toISOString()))`              |
-| `string`, `format: time`      | Parses onto `1970-01-01` UTC                                               | Writes `HH:mm:ss`, with milliseconds when the value has them                 |
+| `string`, `format: time`      | Parses onto `1970-01-01`, as UTC when the value has no offset              | Writes `HH:mm:ssZ`, with milliseconds when the value has them                |
 
 A component schema with such a field is generated twice: `petSchema` for responses and `petInputSchema` for requests. With [`coercion`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#coercion) for dates, the response schema prints `v.pipe(v.unknown(), v.toDate())`.
 

@@ -380,6 +380,8 @@ describe('printerValibot', () => {
       expect(v.parse(build(print(date)), '2026-01-31')).toEqual(new Date('2026-01-31'))
       expect(v.parse(build(print(datetime)), '2026-01-31T10:00:00Z')).toEqual(new Date('2026-01-31T10:00:00Z'))
       expect(v.parse(build(print(time)), '10:30:00')).toEqual(new Date('1970-01-01T10:30:00Z'))
+      expect(v.parse(build(print(time)), '10:30:00Z')).toEqual(new Date('1970-01-01T10:30:00Z'))
+      expect(v.parse(build(print(time)), '10:30:00.5+02:00')).toEqual(new Date('1970-01-01T08:30:00.500Z'))
       expect(v.is(build(print(time)), 'x')).toBe(false)
       expect(v.is(build(print(date)), new Date())).toBe(false)
     })
@@ -389,8 +391,8 @@ describe('printerValibot', () => {
 
       expect(v.parse(build(encode.print(date)!), value)).toBe('2026-01-31')
       expect(v.parse(build(encode.print(datetime)!), value)).toBe('2026-01-31T10:30:00.000Z')
-      expect(v.parse(build(encode.print(time)!), value)).toBe('10:30:00')
-      expect(v.parse(build(encode.print(time)!), new Date('2026-01-31T10:30:00.789Z'))).toBe('10:30:00.789')
+      expect(v.parse(build(encode.print(time)!), value)).toBe('10:30:00Z')
+      expect(v.parse(build(encode.print(time)!), new Date('2026-01-31T10:30:00.789Z'))).toBe('10:30:00.789Z')
       expect(v.is(build(encode.print(date)!), new Date('x'))).toBe(false)
     })
 

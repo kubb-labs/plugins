@@ -331,7 +331,7 @@ function withInputChecks(nodes: PrinterValibotNodes, isSkipped: (node: ast.Schem
 /**
  * The handlers that print differently per direction. `date` and `time` decode a wire string into a
  * `Date` on responses and encode it back on requests. Only `representation: 'date'` fields convert.
- * `time` has no date part, so it decodes onto `1970-01-01` UTC and encodes back to `HH:mm:ss`, with milliseconds when it has them.
+ * `time` has no date part, so it decodes onto `1970-01-01` and encodes back to `HH:mm:ssZ`, with milliseconds when it has them.
  */
 const directionalNodes: PrinterValibotNodes = {
   date(node) {
@@ -350,11 +350,11 @@ const directionalNodes: PrinterValibotNodes = {
   time(node) {
     // Valibot's time actions reject fractional seconds, which an OpenAPI `time` allows, so a time string stays unchecked.
     if (node.representation === 'string') return 'v.string()'
-    // Keeps the milliseconds, so a decoded `12:34:56.789` encodes back to the same value.
-    if (this.options.direction === 'encode') return 'v.pipe(v.date(), v.transform((value) => value.toISOString().slice(11, 23).replace(".000", "")))'
+    // An OpenAPI `time` is an RFC 3339 full-time: it ends in `Z` or an offset, and can carry milliseconds.
+    if (this.options.direction === 'encode') return 'v.pipe(v.date(), v.transform((value) => value.toISOString().slice(11).replace(".000Z", "Z")))'
 
-    // The trailing `v.date()` rejects the Invalid Date a malformed time turns into.
-    return 'v.pipe(v.string(), v.transform((value) => new Date(`1970-01-01T${value}Z`)), v.date())'
+    // A time without an offset is read as UTC. The trailing `v.date()` rejects the Invalid Date a malformed time turns into.
+    return 'v.pipe(v.string(), v.transform((value) => new Date(`1970-01-01T${value}${/(?:z|[+-]\\d{2}:\\d{2})$/i.test(value) ? "" : "Z"}`)), v.date())'
   },
 }
 
