@@ -1,5 +1,8 @@
 import * as z from 'zod'
 
+/**
+ * pet status in the store
+ */
 export const addPetRequestStatusEnumSchema = z.enum(['available', 'pending', 'sold']).describe('pet status in the store')
 
 export type AddPetRequestStatusEnumSchemaType = z.infer<typeof addPetRequestStatusEnumSchema>

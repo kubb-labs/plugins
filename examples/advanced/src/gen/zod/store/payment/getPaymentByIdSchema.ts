@@ -14,7 +14,7 @@ export const getPaymentByIdResponseSchema = getPaymentByIdStatus200Schema
 export type GetPaymentByIdResponseSchemaType = z.infer<typeof getPaymentByIdResponseSchema>
 
 export const getPaymentByIdPathSchema = z.object({
-  paymentId: z.int(),
+  paymentId: getPaymentByIdPathPaymentIdSchema,
 })
 
 export type GetPaymentByIdPathSchemaType = z.infer<typeof getPaymentByIdPathSchema>

@@ -1,6 +1,9 @@
 import * as z from 'zod'
 import { orderEventSchema } from '../orderEventSchema'
 
+/**
+ * ID of the order to stream events for
+ */
 export const streamOrderEventsPathOrderIdSchema = z.int().describe('ID of the order to stream events for')
 
 export type StreamOrderEventsPathOrderIdSchemaType = z.infer<typeof streamOrderEventsPathOrderIdSchema>
@@ -14,7 +17,7 @@ export const streamOrderEventsResponseSchema = streamOrderEventsStatus200Schema
 export type StreamOrderEventsResponseSchemaType = z.infer<typeof streamOrderEventsResponseSchema>
 
 export const streamOrderEventsPathSchema = z.object({
-  orderId: z.int().describe('ID of the order to stream events for'),
+  orderId: streamOrderEventsPathOrderIdSchema,
 })
 
 export type StreamOrderEventsPathSchemaType = z.infer<typeof streamOrderEventsPathSchema>

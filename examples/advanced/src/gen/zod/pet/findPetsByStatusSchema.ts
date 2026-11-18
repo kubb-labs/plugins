@@ -34,7 +34,7 @@ export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
 export type FindPetsByStatusErrorSchemaType = z.infer<typeof findPetsByStatusErrorSchema>
 
 export const findPetsByStatusPathSchema = z.object({
-  step_id: z.string(),
+  step_id: findPetsByStatusPathStepIdSchema,
 })
 
 export type FindPetsByStatusPathSchemaType = z.infer<typeof findPetsByStatusPathSchema>
