@@ -22,7 +22,7 @@ export const getThingsStatus201Schema = v.unknown()
 export type GetThingsStatus201SchemaType = v.InferOutput<typeof getThingsStatus201Schema>
 
 export const getThingsStatusDefaultSchema = v.object({
-  code: v.optional(v.pipe(v.number(), v.integer())),
+  code: v.optional(v.pipe(v.number(), v.integer(), v.minValue(-2147483648), v.maxValue(2147483647))),
   message: v.optional(v.string()),
 })
 

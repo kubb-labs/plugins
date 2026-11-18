@@ -6,9 +6,9 @@
 import * as v from 'valibot'
 
 export const orderSchema = v.object({
-  id: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())),
-  petId: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())),
-  quantity: v.optional(v.pipe(v.unknown(), v.toNumber(), v.integer())),
+  id: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))),
+  petId: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))),
+  quantity: v.optional(v.pipe(v.unknown(), v.toNumber(), v.integer(), v.minValue(-2147483648), v.maxValue(2147483647))),
   shipDate: v.optional(v.pipe(v.unknown(), v.toDate())),
   status: v.optional(v.picklist(['placed', 'approved', 'delivered'])),
   complete: v.optional(v.boolean()),
@@ -30,9 +30,9 @@ export function assertOrder(data: unknown): asserts data is v.InferInput<typeof 
 }
 
 export const orderInputSchema = v.object({
-  id: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())),
-  petId: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())),
-  quantity: v.optional(v.pipe(v.unknown(), v.toNumber(), v.integer())),
+  id: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))),
+  petId: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))),
+  quantity: v.optional(v.pipe(v.unknown(), v.toNumber(), v.integer(), v.minValue(-2147483648), v.maxValue(2147483647))),
   shipDate: v.optional(v.pipe(v.date(), v.transform((value) => value.toISOString()))),
   status: v.optional(v.picklist(['placed', 'approved', 'delivered'])),
   complete: v.optional(v.boolean()),

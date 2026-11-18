@@ -6,7 +6,12 @@
 import * as v from 'valibot'
 import { apiResponseSchema } from './apiResponseSchema'
 
-export const uploadFilePathPetIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())
+export const uploadFilePathPetIdSchema = v.pipe(
+  v.union([v.bigint(), v.number(), v.string()]),
+  v.toBigint(),
+  v.minValue(-9223372036854775808n),
+  v.maxValue(9223372036854775807n),
+)
 
 export type UploadFilePathPetIdSchemaType = v.InferInput<typeof uploadFilePathPetIdSchema>
 
@@ -27,7 +32,7 @@ export const uploadFileBodySchema = v.optional(v.blob())
 export type UploadFileBodySchemaType = v.InferInput<typeof uploadFileBodySchema>
 
 export const uploadFilePathSchema = v.object({
-  petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint()),
+  petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
 })
 
 export type UploadFilePathSchemaType = v.InferInput<typeof uploadFilePathSchema>

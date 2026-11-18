@@ -190,6 +190,40 @@ export function bigintConstraints({ min, max, exclusive, multipleOf }: NumericCo
 }
 
 /**
+ * Numeric limits whose `min` and `max` may be digit strings, for 64-bit bounds a `number` cannot hold.
+ */
+export type NumericBounds = Omit<NumericConstraints, 'min' | 'max'> & { min?: number | string; max?: number | string }
+
+const integerFormatRanges: Record<'integer' | 'bigint', Record<string, [min: bigint, max: bigint]>> = {
+  integer: { int32: [-(2n ** 31n), 2n ** 31n - 1n], uint32: [0n, 2n ** 32n - 1n] },
+  bigint: { int64: [-(2n ** 63n), 2n ** 63n - 1n], uint64: [0n, 2n ** 64n - 1n] },
+}
+
+/**
+ * Adds the range of an integer `format` to a schema's limits. A bound from the spec stays when it
+ * is at least as tight as the format's.
+ *
+ * @example
+ * ```ts
+ * withFormatRange({ format: 'int32', min: 0 }, 'integer') // { format: 'int32', min: 0, max: '2147483647' }
+ * ```
+ */
+export function withFormatRange<T extends NumericConstraints & { format?: string }>(
+  node: T,
+  type: 'integer' | 'bigint',
+): Omit<T, 'min' | 'max'> & NumericBounds {
+  const range = node.format ? integerFormatRanges[type][node.format] : undefined
+  if (!range) return node
+  const [min, max] = range
+
+  return {
+    ...node,
+    min: node.min === undefined || node.min < Number(min) ? String(min) : node.min,
+    max: node.max === undefined || node.max > Number(max) ? String(max) : node.max,
+  }
+}
+
+/**
  * Whether `propertyNames` needs its own check. A record schema checks its keys, but an object with
  * `properties` and a record keyed by `patternProperties` do not.
  */

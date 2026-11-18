@@ -1,6 +1,6 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { defaultLiteral, formatDefault, isObjectComposableIntersection, isObjectSchemaNode, isPlainInlineObject } from './schema.ts'
+import { defaultLiteral, formatDefault, isObjectComposableIntersection, isObjectSchemaNode, isPlainInlineObject, withFormatRange } from './schema.ts'
 
 describe('formatDefault', () => {
   test('object value keeps its contents', () => {
@@ -242,5 +242,21 @@ describe('isPlainInlineObject', () => {
     expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', nullable: true }))).toBe(false)
     expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', optional: true }))).toBe(false)
     expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', nullish: true }))).toBe(false)
+  })
+})
+
+describe('withFormatRange', () => {
+  test('adds the range of the format as digit strings', () => {
+    expect(withFormatRange({ format: 'int64' }, 'bigint')).toStrictEqual({ format: 'int64', min: '-9223372036854775808', max: '9223372036854775807' })
+    expect(withFormatRange({ format: 'uint32' }, 'integer')).toStrictEqual({ format: 'uint32', min: '0', max: '4294967295' })
+  })
+
+  test('keeps a bound from the spec that is tighter, and replaces a looser one', () => {
+    expect(withFormatRange({ format: 'int32', min: 0, max: 5e9 }, 'integer')).toStrictEqual({ format: 'int32', min: 0, max: '2147483647' })
+  })
+
+  test('leaves a schema alone when the format has no range for that type', () => {
+    expect(withFormatRange({ format: 'int64', min: 1 }, 'integer')).toStrictEqual({ format: 'int64', min: 1 })
+    expect(withFormatRange({ min: 1 }, 'bigint')).toStrictEqual({ min: 1 })
   })
 })

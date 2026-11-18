@@ -5,7 +5,7 @@
 
 import * as v from 'valibot'
 
-export const getInventoryStatus200Schema = v.record(v.string(), v.pipe(v.unknown(), v.toNumber(), v.integer()))
+export const getInventoryStatus200Schema = v.record(v.string(), v.pipe(v.unknown(), v.toNumber(), v.integer(), v.minValue(-2147483648), v.maxValue(2147483647)))
 
 export type GetInventoryStatus200SchemaType = v.InferOutput<typeof getInventoryStatus200Schema>
 

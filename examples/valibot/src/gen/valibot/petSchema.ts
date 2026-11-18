@@ -8,7 +8,7 @@ import { categorySchema } from './categorySchema'
 import { tagSchema } from './tagSchema'
 
 export const petSchema: v.GenericSchema = v.object({
-  id: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())),
+  id: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))),
   parent: v.optional(v.array(v.lazy(() => petSchema))),
   internalId: v.optional(v.pipe(v.string(), v.regex(/^[0-9]{1,19}$/))),
   name: v.string(),

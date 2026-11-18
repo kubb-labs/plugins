@@ -6,7 +6,7 @@
 import * as v from 'valibot'
 import { apiResponseSchema } from '../apiResponseSchema'
 
-export const uploadFilePathPetIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())
+export const uploadFilePathPetIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))
 
 export const uploadFileQueryAdditionalMetadataSchema = v.optional(v.string())
 
@@ -17,7 +17,7 @@ export const uploadFileResponseSchema = uploadFileStatus200Schema
 export const uploadFileBodySchema = v.optional(v.blob())
 
 export const uploadFilePathSchema = v.object({
-  petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint()),
+  petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
 })
 
 export const uploadFileQuerySchema = v.object({
