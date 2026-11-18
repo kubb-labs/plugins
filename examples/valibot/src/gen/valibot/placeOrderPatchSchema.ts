@@ -24,16 +24,16 @@ export type PlaceOrderPatchErrorSchemaType = v.InferOutput<typeof placeOrderPatc
 
 export const placeOrderPatchBodySchemaJson = v.optional(orderSchema)
 
-export type PlaceOrderPatchBodySchemaJsonType = v.InferOutput<typeof placeOrderPatchBodySchemaJson>
+export type PlaceOrderPatchBodySchemaJsonType = v.InferInput<typeof placeOrderPatchBodySchemaJson>
 
 export const placeOrderPatchBodySchemaXml = v.optional(orderSchema)
 
-export type PlaceOrderPatchBodySchemaXmlType = v.InferOutput<typeof placeOrderPatchBodySchemaXml>
+export type PlaceOrderPatchBodySchemaXmlType = v.InferInput<typeof placeOrderPatchBodySchemaXml>
 
 export const placeOrderPatchBodySchemaFormUrlEncoded = v.optional(orderSchema)
 
-export type PlaceOrderPatchBodySchemaFormUrlEncodedType = v.InferOutput<typeof placeOrderPatchBodySchemaFormUrlEncoded>
+export type PlaceOrderPatchBodySchemaFormUrlEncodedType = v.InferInput<typeof placeOrderPatchBodySchemaFormUrlEncoded>
 
 export const placeOrderPatchBodySchema = v.union([placeOrderPatchBodySchemaJson, placeOrderPatchBodySchemaXml, placeOrderPatchBodySchemaFormUrlEncoded])
 
-export type PlaceOrderPatchBodySchemaType = v.InferOutput<typeof placeOrderPatchBodySchema>
+export type PlaceOrderPatchBodySchemaType = v.InferInput<typeof placeOrderPatchBodySchema>

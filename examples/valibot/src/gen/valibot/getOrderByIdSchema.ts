@@ -8,7 +8,7 @@ import { orderSchema } from './orderSchema'
 
 export const getOrderByIdPathOrderIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())
 
-export type GetOrderByIdPathOrderIdSchemaType = v.InferOutput<typeof getOrderByIdPathOrderIdSchema>
+export type GetOrderByIdPathOrderIdSchemaType = v.InferInput<typeof getOrderByIdPathOrderIdSchema>
 
 export const getOrderByIdStatus200SchemaJson = orderSchema
 
@@ -42,4 +42,4 @@ export const getOrderByIdPathSchema = v.object({
   orderId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint()),
 })
 
-export type GetOrderByIdPathSchemaType = v.InferOutput<typeof getOrderByIdPathSchema>
+export type GetOrderByIdPathSchemaType = v.InferInput<typeof getOrderByIdPathSchema>

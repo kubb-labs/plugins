@@ -8,11 +8,11 @@ import { apiResponseSchema } from './apiResponseSchema'
 
 export const uploadFilePathPetIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())
 
-export type UploadFilePathPetIdSchemaType = v.InferOutput<typeof uploadFilePathPetIdSchema>
+export type UploadFilePathPetIdSchemaType = v.InferInput<typeof uploadFilePathPetIdSchema>
 
 export const uploadFileQueryAdditionalMetadataSchema = v.optional(v.string())
 
-export type UploadFileQueryAdditionalMetadataSchemaType = v.InferOutput<typeof uploadFileQueryAdditionalMetadataSchema>
+export type UploadFileQueryAdditionalMetadataSchemaType = v.InferInput<typeof uploadFileQueryAdditionalMetadataSchema>
 
 export const uploadFileStatus200Schema = apiResponseSchema
 
@@ -24,16 +24,16 @@ export type UploadFileResponseSchemaType = v.InferOutput<typeof uploadFileRespon
 
 export const uploadFileBodySchema = v.optional(v.blob())
 
-export type UploadFileBodySchemaType = v.InferOutput<typeof uploadFileBodySchema>
+export type UploadFileBodySchemaType = v.InferInput<typeof uploadFileBodySchema>
 
 export const uploadFilePathSchema = v.object({
   petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint()),
 })
 
-export type UploadFilePathSchemaType = v.InferOutput<typeof uploadFilePathSchema>
+export type UploadFilePathSchemaType = v.InferInput<typeof uploadFilePathSchema>
 
 export const uploadFileQuerySchema = v.object({
   additionalMetadata: v.optional(v.string()),
 })
 
-export type UploadFileQuerySchemaType = v.InferOutput<typeof uploadFileQuerySchema>
+export type UploadFileQuerySchemaType = v.InferInput<typeof uploadFileQuerySchema>

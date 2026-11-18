@@ -2,6 +2,8 @@ import {
   bigintConstraints,
   defaultLiteral,
   formatDefault,
+  hasInputChecks,
+  hasKeyCheck,
   integerFormatPattern,
   isObjectComposableIntersection,
   isObjectSchemaNode,
@@ -26,6 +28,21 @@ export type PrinterValibotOptions = {
    * @default 'literal'
    */
   regexType?: PluginValibot['resolvedOptions']['regexType']
+  /**
+   * Convert input before validation: `v.toString()`, `v.toNumber()`, and `v.toDate()`.
+   *
+   * @default false
+   */
+  coercion?: PluginValibot['resolvedOptions']['coercion']
+  /**
+   * Which way a node converts between its wire type and its runtime type:
+   * - `'decode'` (default): wire into runtime, used by response schemas.
+   * - `'encode'`: runtime back to wire, used by request bodies and parameters.
+   *
+   * A handler that returns different output per direction makes the generator emit an
+   * `${name}InputSchema` variant for that component.
+   */
+  direction?: 'encode' | 'decode'
   /**
    * The adapter's `dateType`. `'stringLocal'` drops the timestamp check, because Valibot has no
    * check for a date-time without an offset.
@@ -57,7 +74,7 @@ export type PrinterValibotFactory = ast.PrinterFactoryOptions<'valibot', Printer
 
 type LengthConstraints = { min?: number; max?: number; pattern?: string }
 
-type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
+type PrinterContext = { transform: (node: ast.SchemaNode) => string | null; options: PrinterValibotOptions }
 
 type ModifierOptions = {
   value: string
@@ -66,9 +83,17 @@ type ModifierOptions = {
   optional?: boolean
   nullish?: boolean
   defaultValue?: unknown
+  direction?: PrinterValibotOptions['direction']
 }
 
 const UNKNOWN = 'v.unknown()'
+
+// A check on the raw input skips every value that is not a plain object.
+const NOT_OBJECT = 'typeof value !== "object" || value === null || Array.isArray(value)'
+
+function shouldCoerce(coercion: PrinterValibotOptions['coercion'], type: 'dates' | 'strings' | 'numbers'): boolean {
+  return coercion === true || (typeof coercion === 'object' && Boolean(coercion[type]))
+}
 
 // Actions for string `format`s that Valibot checks with a dedicated action.
 const stringFormatActions = new Map<string | undefined, string>([
@@ -77,7 +102,7 @@ const stringFormatActions = new Map<string | undefined, string>([
   ['ulid', 'v.ulid()'],
 ])
 
-function pipe(base: string, actions: Array<string | false | undefined>): string {
+function pipe(base: string, actions: Array<string | false | null | undefined>): string {
   const list = actions.filter(Boolean)
 
   return list.length ? `v.pipe(${[base, ...list].join(', ')})` : base
@@ -104,6 +129,8 @@ function numberActions({ min, max, exclusive, multipleOf }: NumericConstraints, 
 // The actions an `allOf` member adds to a bare string, number, or array. An empty list means the
 // member prints as its own schema.
 function memberActions(member: ast.SchemaNode, regexType: PrinterValibotOptions['regexType']): Array<string> {
+  // Checks on the raw input cannot ride along as actions, so that member prints as its own schema.
+  if (hasChecks(member)) return []
   if (member.primitive === 'string') return lengthActions(ast.schema.narrow(member, 'string') ?? {}, regexType)
   if (member.primitive === 'number' || member.primitive === 'integer') {
     return numberActions(ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer') ?? {})
@@ -137,18 +164,41 @@ function buildEnum(values: Array<unknown>): string {
   return `v.union([${values.map((value) => buildLiteral(value)).join(', ')}])`
 }
 
-// A spec default is a string, which does not fit a schema that prints `v.date()`.
-function expectsDate(node: ast.SchemaNode): boolean {
+// A spec default is a string, which does not fit an encode schema that takes a `Date`.
+function expectsDate(node: ast.SchemaNode, direction: PrinterValibotOptions['direction']): boolean {
   const resolved = ast.ref.mergeSchema(node)
 
-  return (resolved.type === 'date' || resolved.type === 'time') && resolved.representation !== 'string'
+  return direction === 'encode' && (resolved.type === 'date' || resolved.type === 'time') && resolved.representation !== 'string'
+}
+
+// An object with `properties`, `patternProperties`, and `additionalProperties: false` takes a key that
+// is declared or matches a pattern. Its rest schema checks the values, so the keys need their own check.
+function hasPatternKeyCheck(node: ast.SchemaNode): node is ast.ObjectSchemaNode & { patternProperties: Record<string, ast.SchemaNode> } {
+  return node.type === 'object' && node.additionalProperties === false && node.properties.length > 0 && Boolean(node.patternProperties)
+}
+
+function hasChecks(node: ast.SchemaNode): boolean {
+  return hasInputChecks(node) || hasPatternKeyCheck(node)
+}
+
+// How many `v.check` actions `withInputChecks` puts before the schema of a node.
+function countChecks(node: ast.SchemaNode): number {
+  const object = ast.schema.narrow(node, 'object')
+
+  return (
+    Number(object?.min !== undefined) +
+    Number(object?.max !== undefined) +
+    Number(hasKeyCheck(node)) +
+    Number(hasPatternKeyCheck(node)) +
+    (node.conditionals?.length ?? 0)
+  )
 }
 
 // Wraps a value in `v.nullable(...)` and `v.optional(...)`. A default goes in as the second argument
 // of `v.optional`, so `null` stays `null` and only a missing value takes the default.
-function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue }: ModifierOptions): string {
+function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, direction }: ModifierOptions): string {
   const inner = nullable || nullish ? `v.nullable(${value})` : value
-  const literal = defaultValue !== undefined && !expectsDate(schema) ? defaultLiteral(schema, defaultValue) : null
+  const literal = defaultValue !== undefined && !expectsDate(schema, direction) ? defaultLiteral(schema, defaultValue) : null
   if (literal !== null) return `v.optional(${inner}, ${literal})`
 
   return optional || nullish ? `v.optional(${inner})` : inner
@@ -156,11 +206,11 @@ function applyModifiers({ value, schema, nullable, optional, nullish, defaultVal
 
 // The `.wrapped` chain that reaches the object behind the `v.optional` and `v.nullable` wrappers
 // `applyModifiers` puts on the const a `$ref` resolves to.
-function unwrapChain(node: ast.SchemaNode): string {
+function unwrapChain(node: ast.SchemaNode, direction: PrinterValibotOptions['direction']): string {
   const ref = ast.schema.narrow(node, 'ref')
   if (!ref) return ''
   const target = ref.schema ?? ref
-  const hasDefault = target.default !== undefined && !expectsDate(target) && defaultLiteral(target, target.default) !== null
+  const hasDefault = target.default !== undefined && !expectsDate(target, direction) && defaultLiteral(target, target.default) !== null
   const depth = Number(Boolean(target.nullable || target.nullish)) + Number(Boolean(target.optional || target.nullish || hasDefault))
 
   return '.wrapped'.repeat(depth)
@@ -176,6 +226,7 @@ function objectEntries(ctx: PrinterContext, properties: Array<ast.PropertyNode>)
       optional: schema.optional || required === false,
       nullish: schema.nullish,
       defaultValue: meta.default,
+      direction: ctx.options.direction,
     })
 
     return `${objectKey(name)}: ${value}`
@@ -195,9 +246,156 @@ function strictMember({ member, node, cyclicSchemas }: { member: string; node: a
     schema.type === ast.schema.types.object &&
     (schema.additionalProperties === undefined || schema.additionalProperties === false) &&
     !schema.patternProperties &&
-    !schema.propertyNames
+    !schema.propertyNames &&
+    !hasChecks(schema)
 
   return isPlainObject && !isWrapped ? `v.strictObject(${member}.entries)` : member
+}
+
+// Counts the items of an array that match the `contains` schema.
+function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | false {
+  if (min === 0 && max === undefined) return false
+  const bounds = [`count >= ${min}`, max !== undefined && `count <= ${max}`].filter(Boolean).join(' && ')
+  const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
+
+  return `v.check((items) => { const count = items.filter((item) => v.is(${ctx.transform(schema) ?? UNKNOWN}, item)).length; return ${bounds} }, ${JSON.stringify(message)})`
+}
+
+// A required `unknown` property means "the key is present", which an object schema accepts as missing, so those keys are checked with `in`.
+function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
+  if (!schema) return 'true'
+  const object = ast.schema.narrow(schema, ast.schema.types.object)
+  const keyOnlyNames =
+    object?.properties.filter((property) => property.required && property.schema.type === ast.schema.types.unknown).map((property) => property.name) ?? []
+  const restSchema = object ? { ...object, properties: object.properties.filter((property) => !keyOnlyNames.includes(property.name)) } : schema
+  // An object with no properties left still means "is an object", so only a key check stands alone.
+  const isOnlyKeys =
+    keyOnlyNames.length > 0 &&
+    restSchema.type === 'object' &&
+    restSchema.properties.length === 0 &&
+    restSchema.additionalProperties === undefined &&
+    !restSchema.patternProperties &&
+    !restSchema.propertyNames &&
+    !hasChecks(restSchema)
+
+  return [
+    keyOnlyNames.length > 0 && `typeof value === "object" && value !== null && ${JSON.stringify(keyOnlyNames)}.every((key) => key in value)`,
+    !isOnlyKeys && `v.is(${ctx.transform(restSchema) ?? UNKNOWN}, value)`,
+  ]
+    .filter(Boolean)
+    .join(' && ')
+}
+
+// The `v.check` actions that run on the raw input, before an object schema drops unknown keys or fills in defaults.
+function inputChecks(ctx: PrinterContext, node: ast.SchemaNode): Array<string> {
+  const { min, max } = node.type === 'object' ? node : {}
+  const keySchema = hasKeyCheck(node) ? ctx.transform(node.propertyNames) : null
+  const patternKeys = hasPatternKeyCheck(node)
+    ? `${JSON.stringify(node.properties.map((property) => property.name))}.includes(key) || ${Object.keys(node.patternProperties)
+        .map((pattern) => `${toRegExpString(pattern, ctx.options.regexType === 'constructor' ? 'RegExp' : null)}.test(key)`)
+        .join(' || ')}`
+    : null
+
+  return [
+    min !== undefined && `v.check((value) => ${NOT_OBJECT} || Object.keys(value).length >= ${min}, "Object must have at least ${min} properties")`,
+    max !== undefined && `v.check((value) => ${NOT_OBJECT} || Object.keys(value).length <= ${max}, "Object must have at most ${max} properties")`,
+    keySchema &&
+      `v.check((value) => ${NOT_OBJECT} || Object.keys(value).every((key) => v.is(${keySchema}, key)), "Object keys must match the property names schema")`,
+    patternKeys && `v.check((value) => ${NOT_OBJECT} || Object.keys(value).every((key) => ${patternKeys}), "Object keys must be declared or match a pattern")`,
+    ...(node.conditionals ?? []).map(
+      (entry) =>
+        `v.check((value) => (${conditionExpression(ctx, entry.if)} ? ${conditionExpression(ctx, entry.then)} : ${conditionExpression(ctx, entry.else)}), "Value does not meet a conditional schema")`,
+    ),
+  ].filter((check): check is string => Boolean(check))
+}
+
+type Handler<K extends ast.SchemaType> = (this: ThisParameterType<NonNullable<PrinterValibotNodes['any']>>, node: ast.SchemaNodeByType[K]) => string | null
+
+// Wraps each handler so its output first checks the raw input: `v.pipe(v.unknown(), ...checks, schema)`.
+function withInputChecks(nodes: PrinterValibotNodes, isSkipped: () => boolean): PrinterValibotNodes {
+  const wrapHandler = <K extends ast.SchemaType>(type: K): Array<[K, Handler<K>]> => {
+    const handler: Handler<K> | undefined = nodes[type]
+    if (!handler) return []
+    const checkedHandler: Handler<K> = function (node) {
+      const output = handler.call(this, node)
+      if (!output || isSkipped() || !hasChecks(node)) return output
+
+      return pipe(UNKNOWN, [...inputChecks(this, node), output])
+    }
+    return [[type, checkedHandler]]
+  }
+
+  return Object.fromEntries(Object.values(ast.schema.types).flatMap(wrapHandler))
+}
+
+/**
+ * The handlers that print differently per direction. `date` and `time` decode a wire string into a
+ * `Date` on responses and encode it back on requests. Only `representation: 'date'` fields convert.
+ * `time` has no date part, so it decodes onto `1970-01-01` UTC and encodes back to `HH:mm:ss`.
+ */
+const directionalNodes: PrinterValibotNodes = {
+  date(node) {
+    if (node.representation !== 'date') return 'v.pipe(v.string(), v.isoDate())'
+    if (this.options.direction === 'encode') {
+      return node.format === 'date'
+        ? 'v.pipe(v.date(), v.transform((value) => value.toISOString().slice(0, 10)))'
+        : 'v.pipe(v.date(), v.transform((value) => value.toISOString()))'
+    }
+    if (shouldCoerce(this.options.coercion, 'dates')) return 'v.pipe(v.unknown(), v.toDate())'
+
+    return node.format === 'date'
+      ? 'v.pipe(v.string(), v.isoDate(), v.transform((value) => new Date(value)))'
+      : 'v.pipe(v.string(), v.isoTimestamp(), v.transform((value) => new Date(value)))'
+  },
+  time(node) {
+    // Valibot's time actions reject fractional seconds, which an OpenAPI `time` allows, so a time string stays unchecked.
+    if (node.representation === 'string') return 'v.string()'
+    if (this.options.direction === 'encode') return 'v.pipe(v.date(), v.transform((value) => value.toISOString().slice(11, 19)))'
+
+    // The trailing `v.date()` rejects the Invalid Date a malformed time turns into.
+    return 'v.pipe(v.string(), v.transform((value) => new Date(`1970-01-01T${value}Z`)), v.date())'
+  },
+}
+
+type DirectionProbeContext = { options: PrinterValibotOptions; transform: () => null; base: () => null; import: () => void }
+
+// Runs the handler of a node once per direction and reports whether the two outputs differ.
+function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; printerOptions: PrinterValibotOptions }): boolean {
+  const handler = printerOptions.nodes?.[node.type] ?? directionalNodes[node.type]
+  if (!handler) return false
+
+  const call = (direction: 'encode' | 'decode') => {
+    const context: DirectionProbeContext = { options: { ...printerOptions, direction }, transform: () => null, base: () => null, import: () => {} }
+    return (handler as (this: DirectionProbeContext, node: ast.SchemaNode) => string | null).call(context, node)
+  }
+
+  return call('decode') !== call('encode')
+}
+
+/**
+ * Whether the schema contains a node that prints differently per direction, so it decodes on
+ * responses and encodes on requests. Follows a `$ref` through its resolved schema.
+ */
+export function containsDirectionalNode({ node, printerOptions }: { node: ast.SchemaNode | undefined; printerOptions: PrinterValibotOptions }): boolean {
+  if (!node) return false
+  const { resolver, nodes, coercion, dateType } = printerOptions
+  // A `printer.nodes` override has no string key, so it searches without a cache.
+  const cache =
+    resolver && !nodes
+      ? resolver.memo(`valibotDirectionalNodes:${shouldCoerce(coercion, 'dates')}:${dateType}`, () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>())
+      : undefined
+
+  return ast.schema.find(node, { predicate: (schema) => variesByDirection({ node: schema, printerOptions }), followRefs: true, cache }) !== undefined
+}
+
+/**
+ * Names of the `$ref` schemas a request schema reads from their `${name}InputSchema` variant.
+ */
+export function collectDirectionalRefNames({ node, printerOptions }: { node: ast.SchemaNode; printerOptions: PrinterValibotOptions }): Array<string> {
+  return ast.node.collect<string>(node, {
+    schema: (n) =>
+      n.type === ast.schema.types.ref && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.ref.getName(n) ?? undefined) : undefined,
+  })
 }
 
 /**
@@ -214,11 +412,36 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
   // Read once: `isObjectSchemaNode` and `strictMember` need the full set for every node.
   const { cyclicSchemas } = options
   // A const whose schema carries a `default` is a `v.optional(...)` wrapper, which has no `.entries`.
-  const isObjectNode = (node: ast.SchemaNode) => isObjectSchemaNode(node, cyclicSchemas) && ast.ref.mergeSchema(node).default === undefined
+  const isObjectNode = (node: ast.SchemaNode) => {
+    const resolved = ast.ref.mergeSchema(node)
+    return isObjectSchemaNode(node, cyclicSchemas) && resolved.default === undefined && !hasPatternKeyCheck(resolved)
+  }
+  // Set while `print` reads the object behind a schema with input checks, which `v.omit` needs bare.
+  let skipsInputChecks = false
   const unionsWithSiblings = new WeakSet<ast.SchemaNode>()
   // An OpenAPI 3.0 `nullable: true` set on an array item or union member, which only a property or a root applies.
   const printNullable = (schema: ast.SchemaNode, output: string | null) => (output && schema.nullable ? `v.nullable(${output})` : output)
   const formatString = (action: string, node: LengthConstraints) => pipe('v.string()', [action, ...lengthActions(node, options.regexType)])
+
+  // Prints the schema without `keysToOmit`. `v.omit` takes a bare object schema, so each wrapper is peeled off first.
+  function omitKeys(this: PrinterContext, { node, transformed, keysToOmit }: { node: ast.SchemaNode; transformed: string; keysToOmit: Array<string> }): string {
+    const target = ast.schema.narrow(node, 'ref')?.schema ?? node
+    const keys = `[${keysToOmit.map((key) => text.quote(key)).join(', ')}]`
+
+    // A circular const is typed `v.GenericSchema`, which `v.omit` does not take. The generator prints that object inline.
+    if (transformed.startsWith('v.lazy(')) return transformed
+    if (!hasChecks(target)) return `v.omit(${transformed}${unwrapChain(node, this.options.direction)}, ${keys})`
+    // The object is the last item of the `v.pipe` that `withInputChecks` printed. The omitted schema leaves the input checks out.
+    if (node.type === ast.schema.types.ref)
+      return `v.omit(${transformed}${unwrapChain(node, this.options.direction)}.pipe[${countChecks(target) + 1}], ${keys})`
+
+    skipsInputChecks = true
+    try {
+      return `v.omit(${this.transform(node)}, ${keys})`
+    } finally {
+      skipsInputChecks = false
+    }
+  }
 
   const nodes: PrinterValibotNodes = {
     any: () => 'v.any()',
@@ -231,36 +454,48 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
     ipv4: () => 'v.pipe(v.string(), v.ipv4())',
     ipv6: () => 'v.pipe(v.string(), v.ipv6())',
     string(node) {
+      const coerce = shouldCoerce(this.options.coercion, 'strings')
       const format = stringFormatActions.get(node.format) ?? (node.content?.encoding?.toLowerCase() === 'base64' ? 'v.base64()' : undefined)
       const pattern = node.pattern ?? integerFormatPattern(node.format)
+      const actions = [coerce && 'v.toString()', format, ...lengthActions({ ...node, pattern }, this.options.regexType)]
 
-      return pipe('v.string()', [format, ...lengthActions({ ...node, pattern }, this.options.regexType)])
+      const contentNode = ast.schema.getEmbeddedJson(node)
+      if (!contentNode) return pipe(coerce ? UNKNOWN : 'v.string()', actions)
+      // The string holds wire JSON whichever way the string itself travels, so its schema always decodes.
+      const { direction } = this.options
+      this.options.direction = 'decode'
+      const content = this.transform(contentNode)
+      this.options.direction = direction
+
+      return pipe(coerce ? UNKNOWN : 'v.string()', [
+        ...actions,
+        content &&
+          `v.check((value) => { try { return v.is(${content}, JSON.parse(value)) } catch { return false } }, "String must hold JSON that matches its content schema")`,
+      ])
     },
     uuid: (node) => formatString('v.uuid()', node),
     email: (node) => formatString('v.email()', node),
     url: (node) => formatString('v.url()', node),
     number(node) {
-      return pipe('v.number()', numberActions(node))
+      const coerce = shouldCoerce(this.options.coercion, 'numbers')
+
+      return pipe(coerce ? UNKNOWN : 'v.number()', [coerce && 'v.toNumber()', ...numberActions(node)])
     },
     integer(node) {
-      return pipe('v.number()', ['v.integer()', ...numberActions(node)])
+      const coerce = shouldCoerce(this.options.coercion, 'numbers')
+
+      return pipe(coerce ? UNKNOWN : 'v.number()', [coerce && 'v.toNumber()', 'v.integer()', ...numberActions(node)])
     },
     bigint(node) {
       // JSON carries a 64-bit integer as a number or a string, so both convert.
       return pipe('v.union([v.bigint(), v.number(), v.string()])', ['v.toBigint()', ...numberActions(bigintConstraints(node), 'n')])
     },
-    date(node) {
-      return node.representation === 'date' ? 'v.date()' : 'v.pipe(v.string(), v.isoDate())'
-    },
+    ...directionalNodes,
     datetime(node) {
       // `v.isoTimestamp()` needs a `Z` or an offset, so a local date-time stays an unchecked string.
       const isLocal = node.local || this.options.dateType === 'stringLocal'
 
       return isLocal ? 'v.string()' : 'v.pipe(v.string(), v.isoTimestamp())'
-    },
-    time(node) {
-      // Valibot's time actions reject fractional seconds and offsets, which an OpenAPI `time` allows.
-      return node.representation === 'string' ? 'v.string()' : 'v.date()'
     },
     enum(node) {
       return buildEnum(ast.schema.getLiterals(node).filter((value) => value !== null))
@@ -269,7 +504,10 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       if (!node.name) return null
       const refName = ast.ref.getName(node)
       if (!refName) return null
-      const resolvedName = node.ref ? (this.options.resolver?.name(refName) ?? refName) : node.name
+      // A request schema reads a component with a direction-dependent field from its `${name}InputSchema` variant.
+      const useInputVariant = node.ref != null && this.options.direction === 'encode' && containsDirectionalNode({ node, printerOptions: this.options })
+      const resolver = this.options.resolver
+      const resolvedName = node.ref ? ((useInputVariant ? resolver?.schema.inputName(refName) : resolver?.name(refName)) ?? refName) : node.name
 
       return node.ref && cyclicSchemas?.has(refName) ? `v.lazy(() => ${resolvedName})` : resolvedName
     },
@@ -308,6 +546,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       return pipe(`v.array(${inner})`, [
         ...lengthActions({ min: node.min, max: node.max }, this.options.regexType),
         node.unique && 'v.check((items) => new Set(items).size === items.length, "Array entries must be unique")',
+        node.contains && containsCheck(this, node.contains),
       ])
     },
     tuple(node) {
@@ -315,7 +554,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       // OpenAPI 3.1 `items` next to `prefixItems` types the elements after the positional ones.
       const rest = node.rest ? this.transform(node.rest) : null
 
-      return rest ? `v.tupleWithRest(${items}, ${rest})` : `v.tuple(${items})`
+      return pipe(rest ? `v.tupleWithRest(${items}, ${rest})` : `v.tuple(${items})`, [node.contains && containsCheck(this, node.contains)])
     },
     union(node) {
       const nodeMembers = node.members ?? []
@@ -396,20 +635,26 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
   return {
     name: 'valibot',
     options,
-    nodes,
+    nodes: withInputChecks(nodes, () => skipsInputChecks),
     overrides: options.nodes,
     print(node) {
       const transformed = this.transform(node)
       if (!transformed) return null
 
-      const { keysToOmit } = this.options
+      const { keysToOmit, direction } = this.options
       const meta = ast.ref.mergeSchema(node)
-      // A `v.lazy` ref is typed as `v.GenericSchema`, which `v.omit` does not take, so a circular schema keeps every key.
-      const canOmit =
-        keysToOmit?.length && meta.primitive === 'object' && !(meta.type === 'union' && meta.discriminatorPropertyName) && !transformed.startsWith('v.lazy(')
-      const value = canOmit ? `v.omit(${transformed}${unwrapChain(node)}, [${keysToOmit.map((key) => text.quote(key)).join(', ')}])` : transformed
+      const canOmit = keysToOmit?.length && meta.primitive === 'object' && !(meta.type === 'union' && meta.discriminatorPropertyName)
+      const value = canOmit ? omitKeys.call(this, { node, transformed, keysToOmit }) : transformed
 
-      return applyModifiers({ value, schema: node, nullable: meta.nullable, optional: meta.optional, nullish: meta.nullish, defaultValue: meta.default })
+      return applyModifiers({
+        value,
+        schema: node,
+        nullable: meta.nullable,
+        optional: meta.optional,
+        nullish: meta.nullish,
+        defaultValue: meta.default,
+        direction,
+      })
     },
   }
 })

@@ -2,7 +2,7 @@ import { getCircularNames, getOasAdapter, resolveContentTypeVariants, resolveOpe
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
-import { printerValibot } from '../printers/printerValibot.ts'
+import { collectDirectionalRefNames, containsDirectionalNode, printerValibot } from '../printers/printerValibot.ts'
 import type { PrinterValibotOptions } from '../printers/printerValibot.ts'
 import type { PluginValibot, ResolverValibot } from '../types.ts'
 
@@ -12,15 +12,21 @@ type BuildResponseUnionParams = {
   fallbackUnknown: boolean
 }
 
-/**
- * The printer, built once per plugin per build. A `keysToOmit` list and a `printer.nodes` override
- * differ per node and have no string key, so they get a fresh printer.
- */
-function getPrinter(resolver: ResolverValibot, options: PrinterValibotOptions) {
-  if (options.nodes || options.keysToOmit?.length) return printerValibot(options)
+type Direction = NonNullable<PrinterValibotOptions['direction']>
 
-  return resolver.memo(`valibotPrinter:${options.regexType}:${options.dateType}`, () => printerValibot(options))
+/**
+ * The printer for one direction, built once per plugin per build. A `keysToOmit` list and a
+ * `printer.nodes` override differ per node and have no string key, so they get a fresh printer.
+ */
+function getPrinter(resolver: ResolverValibot, options: PrinterValibotOptions, direction: Direction) {
+  const build = () => printerValibot({ ...options, direction })
+  if (options.nodes || options.keysToOmit?.length) return build()
+
+  return resolver.memo(`valibotPrinter:${[direction, JSON.stringify(options.coercion), options.regexType, options.dateType].join(':')}`, build)
 }
+
+// A request schema is typed by the value the caller passes, every other schema by the value it returns.
+const inferKinds = { encode: 'InferInput', decode: 'InferOutput' } as const
 
 /**
  * Built-in generator for `@kubb/plugin-valibot`. Emits one Valibot schema per schema in the spec,
@@ -31,7 +37,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, regexType, inferred, importPath, group, printer } = ctx.options
+    const { output, regexType, coercion, inferred, typeGuards, importPath, group, printer } = ctx.options
 
     if (!node.name) {
       return
@@ -39,7 +45,23 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
 
     const cyclicSchemas = getCircularNames(ctx)
     const dateType = getOasAdapter(adapter).options.dateType
-    const imports = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
+    const printerOptions: PrinterValibotOptions = { regexType, coercion, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    // Rendered twice: the schema decodes, and its `${name}InputSchema` variant encodes.
+    const hasDirectionalNode = containsDirectionalNode({ node, printerOptions })
+    const inputImports = hasDirectionalNode
+      ? collectDirectionalRefNames({ node, printerOptions }).map((schemaName) => ({
+          name: [resolver.schema.inputName(schemaName)],
+          path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
+        }))
+      : []
+    const imports = [
+      ...new Map(
+        [...resolver.imports({ node, root, output, group: group ?? undefined, checks: true }), ...inputImports].map(
+          (imp) => [`${Array.isArray(imp.name) ? imp.name.join(',') : imp.name}|${imp.path}`, imp] as const,
+        ),
+      ).values(),
+    ]
+    const inputName = resolver.schema.inputName(node.name)
     const meta = {
       name: resolver.name(node.name),
       file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
@@ -61,17 +83,33 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
         <Valibot
           name={meta.name}
           node={node}
-          printer={getPrinter(resolver, { regexType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes })}
+          printer={getPrinter(resolver, printerOptions, 'decode')}
           inferTypeName={inferred ? resolver.schema.typeName(node.name) : null}
+          typeGuards={typeGuards}
+          isName={resolver.schema.isName(node.name)}
+          assertName={resolver.schema.assertName(node.name)}
           cyclic={cyclicSchemas.has(node.name)}
         />
+        {hasDirectionalNode && (
+          <Valibot
+            name={inputName}
+            node={node}
+            printer={getPrinter(resolver, printerOptions, 'encode')}
+            inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
+            inferKind="InferInput"
+            typeGuards={typeGuards}
+            isName={resolver.schema.isName(inputName)}
+            assertName={resolver.schema.assertName(inputName)}
+            cyclic={cyclicSchemas.has(node.name)}
+          />
+        )}
       </File>
     )
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { adapter, config, resolver, root } = ctx
-    const { output, regexType, inferred, importPath, group, printer } = ctx.options
+    const { output, regexType, coercion, inferred, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     const meta = {
@@ -79,12 +117,37 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     } as const
 
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterValibotOptions = { regexType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterValibotOptions = { regexType, coercion, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
-    function renderSchemaEntry({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
+    function renderSchemaEntry({
+      schema,
+      name,
+      keysToOmit,
+      direction = 'decode',
+    }: {
+      schema: ast.SchemaNode | null
+      name: string
+      keysToOmit?: Array<string> | null
+      direction?: Direction
+    }) {
       if (!schema) return null
+      // A circular const is typed `v.GenericSchema`, which `v.omit` does not take, so its object prints here without the keys.
+      const refName = schema.type === 'ref' ? ast.ref.getName(schema) : null
+      const target = schema.type === 'ref' && schema.schema ? ast.schema.narrow(schema.schema, 'object') : undefined
+      if (keysToOmit?.length && target && refName && cyclicSchemas.has(refName)) {
+        const inline = { ...target, properties: target.properties.filter((property) => !keysToOmit.includes(property.name)) }
+        return renderSchemaEntry({ schema: inline, name, direction })
+      }
 
-      const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, checks: true })
+      const inputRefNames = direction === 'encode' ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
+      const imports = resolver.imports({
+        node: schema,
+        root,
+        output,
+        group: group ?? undefined,
+        checks: true,
+        name: (schemaName) => (inputRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
+      })
 
       return (
         <>
@@ -96,8 +159,9 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
           <Valibot
             name={name}
             node={schema}
-            printer={getPrinter(resolver, { ...printerOptions, keysToOmit })}
+            printer={getPrinter(resolver, { ...printerOptions, keysToOmit }, direction)}
             inferTypeName={inferred ? resolver.schema.type(name) : null}
+            inferKind={inferKinds[direction]}
           />
         </>
       )
@@ -107,6 +171,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     function buildContentTypeVariants(
       entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
       baseName: string,
+      direction?: Direction,
     ) {
       const variants = resolveContentTypeVariants(entries, baseName)
       const unionSchema = ast.factory.createSchema({
@@ -120,9 +185,10 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
               schema: variant.schema,
               name: variant.name,
               keysToOmit: variant.keysToOmit,
+              direction,
             }),
           )}
-          {renderSchemaEntry({ schema: unionSchema, name: baseName })}
+          {renderSchemaEntry({ schema: unionSchema, name: baseName, direction })}
         </>
       )
     }
@@ -154,7 +220,9 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       })
     }
 
-    const paramSchemas = node.parameters.map((param) => renderSchemaEntry({ schema: param.schema, name: resolver.param.name(node, param) }))
+    const paramSchemas = node.parameters.map((param) =>
+      renderSchemaEntry({ schema: param.schema, name: resolver.param.name(node, param), direction: 'encode' }),
+    )
 
     const responseSchemas = node.responses.map((res) => {
       const content = (res.content ?? []).map((entry, _, content) => toResponseContent(entry, content))
@@ -207,9 +275,10 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
           schema: entry.schema,
           name: resolver.response.body(node),
           keysToOmit: entry.keysToOmit,
+          direction: 'encode',
         })
       }
-      return buildContentTypeVariants(requestBodyContent, resolver.response.body(node))
+      return buildContentTypeVariants(requestBodyContent, resolver.response.body(node), 'encode')
     })()
 
     // Grouped path, query, headers, and cookies schemas, one object per group.
@@ -228,6 +297,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
         renderSchemaEntry({
           schema: toParamsSchema(params),
           name: resolver.param[kind](node, params[0]!),
+          direction: 'encode',
         }),
       )
 

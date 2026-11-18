@@ -6,6 +6,9 @@
   "displayName": "Valibot",
   "description": "Generates Valibot v1 schemas from your OpenAPI spec so you validate API responses, form input, and query params at runtime.",
   "category": "validation",
+  "icon": {
+    "light": "https://kubb.dev/feature/valibot.svg"
+  },
   "tags": ["valibot", "validation", "schema", "runtime-validation", "codegen", "openapi"],
   "docs": "https://kubb.dev/extensions/kubb-labs/plugin-valibot",
   "maintainers": [
@@ -165,7 +168,23 @@
       "key": "inferred",
       "path": ["inferred"],
       "label": "Inferred",
-      "description": "Export a v.InferOutput type alias next to every generated schema",
+      "description": "Export a type alias next to every generated schema",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "key": "coercion",
+      "path": ["coercion"],
+      "label": "Coercion",
+      "description": "Convert input with v.toString, v.toNumber, and v.toDate before validation",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "key": "typeGuards",
+      "path": ["typeGuards"],
+      "label": "Type Guards",
+      "description": "Generate is* type guards and assert* functions for each schema",
       "type": "boolean",
       "default": false
     },

@@ -1,6 +1,6 @@
 # Valibot schemas for OpenAPI formats
 
-Look up the Valibot call Kubb writes for each OpenAPI type and format, such as `v.uuid()` for `format: uuid`, and the keywords the plugin does not check.
+Look up the Valibot call Kubb writes for each OpenAPI type and format, such as `v.uuid()` for `format: uuid`, and the keywords that add a `v.check`.
 
 `@kubb/plugin-valibot` reads the `type` and `format` of each schema and prints the matching Valibot call. Constraints such as `minLength` and `maximum` go into the same `v.pipe(...)`.
 
@@ -37,16 +37,25 @@ Any other string format prints `v.string()`.
 
 ## Dates and times
 
-| OpenAPI type and format       | Valibot                                | Notes                                                 |
-| :---------------------------- | :------------------------------------- | :---------------------------------------------------- |
-| `string`, `format: date`      | `v.pipe(v.string(), v.isoDate())`      | ISO 8601 date                                         |
-| `string`, `format: date-time` | `v.pipe(v.string(), v.isoTimestamp())` | Needs a `Z` or an offset                              |
-| `string`, `format: time`      | `v.string()`                           | Not checked. Valibot's time actions reject an offset. |
+| OpenAPI type and format       | Valibot                                | Notes                                                          |
+| :---------------------------- | :------------------------------------- | :------------------------------------------------------------- |
+| `string`, `format: date`      | `v.pipe(v.string(), v.isoDate())`      | ISO 8601 date                                                  |
+| `string`, `format: date-time` | `v.pipe(v.string(), v.isoTimestamp())` | Needs a `Z` or an offset                                       |
+| `string`, `format: time`      | `v.string()`                           | Not checked. Valibot's time actions reject fractional seconds. |
 
-These rows apply to the adapter's default `dateType: 'string'`.
+These rows apply to the adapter's default `dateType: 'string'`. With `dateType: 'stringLocal'`, a date-time prints `v.string()`, because Valibot has no check for a date-time without an offset.
 
-- With `dateType: 'date'`, a date, date-time, or time prints `v.date()`. The schema then expects a `Date` and does not convert the JSON string. To convert, replace the handler with [`printer`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#printer).
-- With `dateType: 'stringLocal'`, a date-time prints `v.string()`, because Valibot has no check for a date-time without an offset.
+### Date fields
+
+With `dateType: 'date'`, a date, date-time, or time is a `Date` in your code and a string on the wire. A response schema converts the string to a `Date`, and a request schema converts it back:
+
+| OpenAPI type and format       | Response schema                                                            | Request schema                                                               |
+| :---------------------------- | :------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
+| `string`, `format: date`      | `v.pipe(v.string(), v.isoDate(), v.transform((value) => new Date(value)))` | `v.pipe(v.date(), v.transform((value) => value.toISOString().slice(0, 10)))` |
+| `string`, `format: date-time` | `v.pipe(v.string(), v.isoTimestamp(), v.transform(...))`                   | `v.pipe(v.date(), v.transform((value) => value.toISOString()))`              |
+| `string`, `format: time`      | Parses onto `1970-01-01` UTC                                               | Writes `HH:mm:ss`                                                            |
+
+A component schema with such a field is generated twice: `petSchema` for responses and `petInputSchema` for requests. With [`coercion`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#coercion) for dates, the response schema prints `v.pipe(v.unknown(), v.toDate())`.
 
 ## Objects, arrays, and unions
 
@@ -66,19 +75,22 @@ These rows apply to the adapter's default `dateType: 'string'`.
 | `allOf` of objects                         | `v.object({ ...base.entries, ... })` | Other members print `v.intersect([...])`, or extra actions in the pipe when a member only adds constraints |
 | `$ref`                                     | The schema's const                   | `v.lazy(() => schema)` for a circular reference                                                            |
 
-## Keywords the plugin does not check
+## JSON Schema keywords
 
-Valibot has no direct call for these, so the generated schema accepts any value for them:
+These keywords print a `v.check`:
 
-- `if`/`then`/`else`, `dependentRequired`, and `dependentSchemas`
-- `minProperties` and `maxProperties`
-- `propertyNames` on an object that also declares `properties`
-- `contains`, `minContains`, and `maxContains`
-- `contentSchema` on a string that holds JSON
-- The key patterns of `patternProperties` on an object that also declares `properties`. The values are checked.
-- `propertyNames` next to `patternProperties`
-- `readOnly` on a request body that is a circular schema. The body schema keeps those keys.
+| Keyword                                                                    | Check                                                                            |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `if`/`then`/`else`, `dependentRequired`, `dependentSchemas`                | Checks the input before parsing, in `v.pipe(v.unknown(), v.check(...), schema)`. |
+| `minProperties`, `maxProperties`                                           | Counts the keys of the input before parsing, in the same `v.pipe(...)`.          |
+| `propertyNames` on an object that also declares `properties`               | Checks every key of the input. A dictionary keeps `v.record(keySchema, schema)`. |
+| `patternProperties` next to `properties` and `additionalProperties: false` | Rejects a key that is not declared and matches no pattern.                       |
+| `contains` with `minContains` and `maxContains`                            | Counts the matching items of an array.                                           |
+| `contentSchema` on a string that holds JSON                                | Parses the string and checks the result.                                         |
+| `uniqueItems`                                                              | Rejects an array with duplicate entries.                                         |
 
-The plugin also does not write `description` or `examples` into the schemas.
+A schema with a check on the input is a `v.pipe`, so it is no member of a `v.variant` and does not merge into an `allOf` object. A request body that drops `readOnly` keys from such a schema leaves the input checks out.
 
-To add a check for one type, replace its handler with [`printer`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#printer).
+The plugin does not write `description` or `examples` into the schemas.
+
+To change the call for one type, replace its handler with [`printer`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#printer).

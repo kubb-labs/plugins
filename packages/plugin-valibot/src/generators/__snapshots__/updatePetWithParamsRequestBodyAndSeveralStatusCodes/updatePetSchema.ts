@@ -9,15 +9,15 @@ import { petSchema } from './petSchema'
 
 export const updatePetPathPetIdSchema = v.pipe(v.string(), v.uuid())
 
-export type UpdatePetPathPetIdSchemaType = v.InferOutput<typeof updatePetPathPetIdSchema>
+export type UpdatePetPathPetIdSchemaType = v.InferInput<typeof updatePetPathPetIdSchema>
 
 export const updatePetQueryDryRunSchema = v.optional(v.boolean(), false)
 
-export type UpdatePetQueryDryRunSchemaType = v.InferOutput<typeof updatePetQueryDryRunSchema>
+export type UpdatePetQueryDryRunSchemaType = v.InferInput<typeof updatePetQueryDryRunSchema>
 
 export const updatePetHeaderXRequestIdSchema = v.optional(v.string())
 
-export type UpdatePetHeaderXRequestIdSchemaType = v.InferOutput<typeof updatePetHeaderXRequestIdSchema>
+export type UpdatePetHeaderXRequestIdSchemaType = v.InferInput<typeof updatePetHeaderXRequestIdSchema>
 
 export const updatePetStatus200Schema = petSchema
 
@@ -39,22 +39,22 @@ export type UpdatePetErrorSchemaType = v.InferOutput<typeof updatePetErrorSchema
 
 export const updatePetBodySchema = v.omit(petSchema, ['id'])
 
-export type UpdatePetBodySchemaType = v.InferOutput<typeof updatePetBodySchema>
+export type UpdatePetBodySchemaType = v.InferInput<typeof updatePetBodySchema>
 
 export const updatePetPathSchema = v.object({
   petId: v.pipe(v.string(), v.uuid()),
 })
 
-export type UpdatePetPathSchemaType = v.InferOutput<typeof updatePetPathSchema>
+export type UpdatePetPathSchemaType = v.InferInput<typeof updatePetPathSchema>
 
 export const updatePetQuerySchema = v.object({
   dryRun: v.optional(v.boolean(), false),
 })
 
-export type UpdatePetQuerySchemaType = v.InferOutput<typeof updatePetQuerySchema>
+export type UpdatePetQuerySchemaType = v.InferInput<typeof updatePetQuerySchema>
 
 export const updatePetHeadersSchema = v.object({
   'X-Request-Id': v.optional(v.string()),
 })
 
-export type UpdatePetHeadersSchemaType = v.InferOutput<typeof updatePetHeadersSchema>
+export type UpdatePetHeadersSchemaType = v.InferInput<typeof updatePetHeadersSchema>

@@ -36,16 +36,16 @@ export type AddPetErrorSchemaType = v.InferOutput<typeof addPetErrorSchema>
 
 export const addPetBodySchemaJson = addPetRequestSchema
 
-export type AddPetBodySchemaJsonType = v.InferOutput<typeof addPetBodySchemaJson>
+export type AddPetBodySchemaJsonType = v.InferInput<typeof addPetBodySchemaJson>
 
 export const addPetBodySchemaXml = v.lazy(() => petSchema)
 
-export type AddPetBodySchemaXmlType = v.InferOutput<typeof addPetBodySchemaXml>
+export type AddPetBodySchemaXmlType = v.InferInput<typeof addPetBodySchemaXml>
 
 export const addPetBodySchemaFormUrlEncoded = v.lazy(() => petSchema)
 
-export type AddPetBodySchemaFormUrlEncodedType = v.InferOutput<typeof addPetBodySchemaFormUrlEncoded>
+export type AddPetBodySchemaFormUrlEncodedType = v.InferInput<typeof addPetBodySchemaFormUrlEncoded>
 
 export const addPetBodySchema = v.union([addPetBodySchemaJson, addPetBodySchemaXml, addPetBodySchemaFormUrlEncoded])
 
-export type AddPetBodySchemaType = v.InferOutput<typeof addPetBodySchema>
+export type AddPetBodySchemaType = v.InferInput<typeof addPetBodySchema>

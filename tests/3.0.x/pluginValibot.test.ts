@@ -35,6 +35,23 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
   {
+    name: 'dateCoercionTypeGuards',
+    config: {
+      ...base,
+      adapter: adapterOas({ validate: false, dateType: 'date' }),
+      output: { path: './gen', barrel: false },
+      plugins: [
+        pluginValibot({
+          output: { path: './valibot', barrel: false, mode: 'directory' },
+          coercion: true,
+          typeGuards: true,
+          inferred: true,
+          include: [{ type: 'tag', pattern: 'store' }],
+        }),
+      ],
+    },
+  },
+  {
     name: 'groupByTag',
     config: {
       ...base,

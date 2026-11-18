@@ -45,6 +45,8 @@ export const pluginValibot = defineExtension<PluginValibot>({
       importPath = 'valibot',
       inferred = false,
       regexType = 'literal',
+      coercion = false,
+      typeGuards = false,
       printer,
       resolver: userResolver,
       macros: userMacros,
@@ -65,6 +67,8 @@ export const pluginValibot = defineExtension<PluginValibot>({
       importPath,
       inferred,
       regexType,
+      coercion,
+      typeGuards,
       printer,
     }
   },

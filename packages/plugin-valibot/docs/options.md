@@ -10,6 +10,8 @@ Pass these options to `pluginValibot()`. Shared options link to [Shared plugin o
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                                         | None                                             |
 | [`importPath`](#importpath)                                               | Module the generated files import `v` from.                                          | `'valibot'`                                      |
 | [`inferred`](#inferred)                                                   | Export a type next to each schema.                                                   | `false`                                          |
+| [`coercion`](#coercion)                                                   | Convert input before validation.                                                     | `false`                                          |
+| [`typeGuards`](#typeguards)                                               | Generate `is*` type guards and `assert*` assertions.                                 | `false`                                          |
 | [`regexType`](#regextype)                                                 | How an OpenAPI `pattern` is written.                                                 | `'literal'`                                      |
 | [`printer`](#printer)                                                     | Replace the handler for a schema type.                                               | None                                             |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations and schemas that match.                                         | None                                             |
@@ -46,7 +48,57 @@ Exports a type next to each schema, so you do not need `@kubb/plugin-ts`.
 export type PetSchemaType = v.InferOutput<typeof petSchema>
 ```
 
+A request schema, such as a request body or a query schema, gets `v.InferInput`, which is the value the caller passes. Every other schema gets `v.InferOutput`. The two differ for a schema that converts, such as a `Date` field or a default.
+
 A schema that is part of a circular reference is annotated as `v.GenericSchema`, so its inferred type is `unknown`. Add `@kubb/plugin-ts` when you need the types of those schemas.
+
+### coercion
+
+Converts input before validation, so a query string such as `'5'` passes an integer schema.
+
+|          |                                                                        |
+| -------- | ---------------------------------------------------------------------- |
+| Type     | `boolean \| { dates?: boolean; strings?: boolean; numbers?: boolean }` |
+| Required | `false`                                                                |
+| Default  | `false`                                                                |
+
+::field-group
+
+:::field{name="strings"}
+Writes `v.pipe(v.unknown(), v.toString())` for a `string`.
+:::
+
+:::field{name="numbers"}
+Writes `v.pipe(v.unknown(), v.toNumber())` for a `number` and an `integer`.
+:::
+
+:::field{name="dates"}
+Writes `v.pipe(v.unknown(), v.toDate())` for a response field that is a `Date`. This needs `dateType: 'date'` on the adapter.
+:::
+
+::
+
+`true` turns on all three. A `format: int64` field always converts, because JSON holds a number or a string.
+
+### typeGuards
+
+Generates an `is*` type guard and an `assert*` function for every component schema.
+
+|          |                                                 |
+| -------- | ----------------------------------------------- |
+| Type     | `boolean \| { is?: boolean; assert?: boolean }` |
+| Required | `false`                                         |
+| Default  | `false`                                         |
+
+```typescript [petSchema.ts]
+export const isPet = (data: unknown): data is v.InferInput<typeof petSchema> => v.is(petSchema, data)
+
+export function assertPet(data: unknown): asserts data is v.InferInput<typeof petSchema> {
+  v.assert(petSchema, data)
+}
+```
+
+Both narrow to `v.InferInput`, the value the schema accepts before it converts anything.
 
 ### regexType
 
@@ -104,6 +156,10 @@ type ResolverValibotPatch = {
   schema?: {
     typeName?(name: string): string
     type?(name: string): string
+    inputName?(name: string): string
+    inputTypeName?(name: string): string
+    isName?(name: string): string
+    assertName?(name: string): string
   }
   param?: {
     name?(node: OperationNode, param: ParameterNode): string

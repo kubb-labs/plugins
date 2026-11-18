@@ -19,6 +19,8 @@ const defaultOptions: PluginValibot['resolvedOptions'] = {
   inferred: false,
   importPath: 'valibot',
   regexType: 'literal',
+  coercion: false,
+  typeGuards: false,
   output: { path: '.', mode: 'directory' },
   exclude: [],
   include: undefined,
@@ -37,6 +39,13 @@ const petProperties = [
 ]
 
 const petSchema = createSchema({ type: 'object', primitive: 'object', name: 'Pet', properties: petProperties })
+
+const staySchema = createSchema({
+  type: 'object',
+  primitive: 'object',
+  name: 'Stay',
+  properties: [createProperty({ name: 'until', required: true, schema: createSchema({ type: 'date', representation: 'date', format: 'date' }) })],
+})
 
 function setup(name: string, optionOverrides: Partial<PluginValibot['resolvedOptions']> = {}) {
   const options = { ...defaultOptions, ...optionOverrides }
@@ -77,6 +86,31 @@ describe('valibotGenerator schema', () => {
     await renderGeneratorSchema(valibotGenerator, node, { ...context, driver })
 
     await matchFiles(driver.fileManager.files, name)
+  })
+
+  test('typeGuards adds an is* guard and an assert* function', async () => {
+    const { driver, context } = setup('typeGuards', { typeGuards: true })
+
+    await renderGeneratorSchema(valibotGenerator, createSchema({ type: 'integer', name: 'PetId' }), { ...context, driver })
+
+    await matchFiles(driver.fileManager.files, 'typeGuards')
+  })
+
+  test('a schema with a Date field also gets an input variant that encodes', async () => {
+    const { driver, context } = setup('inputVariant', { inferred: true })
+    const node = createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'Visit',
+      properties: [
+        createProperty({ name: 'at', required: true, schema: createSchema({ type: 'date', representation: 'date' }) }),
+        createProperty({ name: 'pet', schema: createSchema({ type: 'ref', name: 'Stay', ref: '#/components/schemas/Stay', schema: staySchema }) }),
+      ],
+    })
+
+    await renderGeneratorSchema(valibotGenerator, node, { ...context, driver })
+
+    await matchFiles(driver.fileManager.files, 'inputVariant')
   })
 
   test('a circular schema is annotated, so its v.lazy self-reference compiles', async () => {
@@ -146,6 +180,41 @@ describe('valibotGenerator operation', () => {
       }),
     },
   ]
+
+  test('a request body that is a circular schema prints inline without its readOnly keys', async () => {
+    const { driver, context } = setup('circularBody')
+    driver.inputNode = ast.factory.createInput({ schemas: [petSchema] })
+    const node = createOperation({
+      operationId: 'addPet',
+      method: 'POST',
+      path: '/pets',
+      tags: ['pets'],
+      requestBody: { content: [createContent({ contentType: 'application/json', schema: petRef(petSchema), keysToOmit: ['id'] })] },
+      responses: [createResponse({ statusCode: '204', description: 'Created' })],
+    })
+
+    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
+
+    await matchFiles(driver.fileManager.files, 'circularBody')
+  })
+
+  test('a request encodes a Date and a response decodes it', async () => {
+    const { driver, context } = setup('codec', { inferred: true })
+    const stayRef = () => createSchema({ type: 'ref', name: 'Stay', ref: '#/components/schemas/Stay', schema: staySchema })
+    const node = createOperation({
+      operationId: 'bookStay',
+      method: 'POST',
+      path: '/stays',
+      tags: ['stays'],
+      parameters: [createParameter({ name: 'from', in: 'query', schema: createSchema({ type: 'date', representation: 'date', format: 'date' }) })],
+      requestBody: { content: [createContent({ contentType: 'application/json', schema: stayRef() })] },
+      responses: [createResponse({ statusCode: '200', schema: stayRef(), description: 'Booked' })],
+    })
+
+    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
+
+    await matchFiles(driver.fileManager.files, 'codec')
+  })
 
   test.each(operations)('$name', async ({ name, node, options }) => {
     const { driver, context } = setup(name, options)
