@@ -239,9 +239,20 @@ async function importGenerated(source: string, stubs: Record<string, string> = {
 describe('mswGenerator request body types', () => {
   test.each([
     ['unknown', 'unknown', 'typed'],
+    ['unknown', 'ref', 'typed'],
     ['{ name: string }', 'object', '{ ...body }'],
   ] as const)('typechecks a handler when the request body is %s', async (bodyType, schemaType, usage) => {
-    const schema = schemaType === 'unknown' ? ast.factory.createSchema({ type: 'unknown' }) : ast.factory.createSchema({ type: 'object', properties: [] })
+    const schemas = {
+      unknown: ast.factory.createSchema({ type: 'unknown' }),
+      ref: ast.factory.createSchema({
+        type: 'ref',
+        name: 'Anything',
+        ref: '#/components/schemas/Anything',
+        schema: ast.factory.createSchema({ type: 'unknown' }),
+      }),
+      object: ast.factory.createSchema({ type: 'object', properties: [] }),
+    }
+    const schema = schemas[schemaType]
     const node = {
       ...createPetsNode,
       requestBody: ast.factory.createRequestBody({ required: true, content: [ast.factory.createContent({ contentType: 'application/json', schema })] }),

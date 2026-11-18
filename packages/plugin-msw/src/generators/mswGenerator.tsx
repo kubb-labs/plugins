@@ -90,8 +90,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const requestSchema = ast.http.requestBody.getSchema(node)
     // MSW needs a `DefaultBodyType` body, and an empty schema prints as `unknown`. A conditional type here would block spreading the body.
-    // shortcut: a `$ref` to an empty schema is not resolved, so it still prints `unknown`; resolve the ref when that comes up.
-    const isUnknownBody = requestSchema?.type === 'unknown'
+    const isUnknownBody = !!requestSchema && ast.ref.getSchema(requestSchema).type === 'unknown'
     const requestName = requestSchema && !isUnknownBody ? tsResolver.response.body(node) : null
     const requestTypeName = isUnknownBody ? 'DefaultBodyType' : requestName
 
