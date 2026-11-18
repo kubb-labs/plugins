@@ -39,7 +39,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
 
 describe(`plugin-axios options ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-axios-${name}-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-axios-${name}-`))
     const output = path.join(tmpDir, name)
     const { files, diagnostics } = await createKubb(
       {
@@ -81,7 +81,7 @@ describe(`plugin-axios options ${version}`, () => {
       expected: 'defaultConfig: ClientConfig = { baseURL: `${import.meta.env.VITE_API_SERVER}`, ',
     },
   ])('emits $name baseURL in the client config', async ({ name, baseURL, expected }) => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-axios-base-url-${name}-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-axios-base-url-${name}-`))
     const output = path.join(tmpDir, 'gen')
     const { files, diagnostics } = await createKubb(
       {
@@ -121,7 +121,7 @@ describe(`plugin-axios options ${version}`, () => {
   // TS2300 duplicate-identifier error. Asserted on the barrel string so it stays robust across
   // environments.
   test('sdk classes keep a distinct name from schema models in the barrel', async () => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-axios-barrel-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-axios-barrel-`))
     const output = path.join(tmpDir, 'gen')
     const { files, diagnostics } = await createKubb(
       {

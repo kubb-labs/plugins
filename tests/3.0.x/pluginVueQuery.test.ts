@@ -137,7 +137,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
 
 describe(`plugin-vue-query options ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-vue-query-${name}-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-vue-query-${name}-`))
     const output = path.join(tmpDir, name)
     const { files, diagnostics } = await createKubb(
       {
