@@ -5,20 +5,35 @@
 
 import * as z from 'zod'
 
+/**
+ * Order Status
+ */
 export const orderStatusEnumSchema = z
   .enum(['placed', 'approved', 'delivered'])
   .describe('Order Status')
   .meta({ examples: ['approved'] })
 
+/**
+ * HTTP Status's and item of this
+ */
 export const orderHttpStatusEnumSchema = z
   .union([z.literal(200), z.literal(400), z.literal(500)])
   .describe("HTTP Status's and item of this")
   .meta({ examples: [200] })
 
+/**
+ * pet status in the store
+ */
 export const petStatusEnumSchema = z.enum(['available', 'pending', 'sold']).describe('pet status in the store')
 
+/**
+ * pet status in the store
+ */
 export const addPetRequestStatusEnumSchema = z.enum(['available', 'pending', 'sold']).describe('pet status in the store')
 
+/**
+ * Status values that need to be considered for filter
+ */
 export const findPetsByStatusStatusSchema = z
   .enum(['available', 'pending', 'sold'])
   .default('available')
@@ -27,10 +42,12 @@ export const findPetsByStatusStatusSchema = z
 export const orderSchema = z.object({
   id: z.coerce
     .bigint()
+    .pipe(z.int64())
     .optional()
     .meta({ examples: [10] }),
   petId: z.coerce
     .bigint()
+    .pipe(z.int64())
     .optional()
     .meta({ examples: [198772] }),
   quantity: z
@@ -52,6 +69,7 @@ export const orderSchema = z.object({
 export const categorySchema = z.object({
   id: z.coerce
     .bigint()
+    .pipe(z.int64())
     .optional()
     .meta({ examples: [1] }),
   name: z
@@ -61,7 +79,7 @@ export const categorySchema = z.object({
 })
 
 export const tagSchema = z.object({
-  id: z.coerce.bigint().optional(),
+  id: z.coerce.bigint().pipe(z.int64()).optional(),
   name: z.string().optional(),
 })
 
@@ -72,6 +90,7 @@ export const personSchema = z.object({
 export const petSchema = z.object({
   id: z.coerce
     .bigint()
+    .pipe(z.int64())
     .optional()
     .meta({ examples: [10] }),
   name: z.string().meta({ examples: ['doggie'] }),
@@ -84,6 +103,7 @@ export const petSchema = z.object({
 export const addPetRequestSchema = z.object({
   id: z.coerce
     .bigint()
+    .pipe(z.int64())
     .optional()
     .meta({ examples: [10] }),
   name: z.string().meta({ examples: ['doggie'] }),
@@ -169,13 +189,22 @@ export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
 export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
 
 export const findPetsByStatusQuerySchema = z.object({
-  status: findPetsByStatusStatusSchema.optional().default('available').describe('Status values that need to be considered for filter'),
+  status: findPetsByStatusQueryStatusSchema,
 })
 
+/**
+ * Tags to filter by
+ */
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
+/**
+ * to request with required page number or pagination
+ */
 export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to request with required page number or pagination')
 
+/**
+ * to request with required page size
+ */
 export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
 export const findPetsByTagsStatus200SchemaJson = z.array(petSchema)
@@ -191,12 +220,15 @@ export const findPetsByTagsResponseSchema = findPetsByTagsStatus200Schema
 export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
 
 export const findPetsByTagsQuerySchema = z.object({
-  tags: z.array(z.string()).optional().describe('Tags to filter by'),
-  page: z.string().optional().describe('to request with required page number or pagination'),
-  pageSize: z.string().optional().describe('to request with required page size'),
+  tags: findPetsByTagsQueryTagsSchema,
+  page: findPetsByTagsQueryPageSchema,
+  pageSize: findPetsByTagsQueryPageSizeSchema,
 })
 
-export const getPetByIdPathPetIdSchema = z.coerce.bigint().describe('ID of pet to return')
+/**
+ * ID of pet to return
+ */
+export const getPetByIdPathPetIdSchema = z.coerce.bigint().pipe(z.int64()).describe('ID of pet to return')
 
 export const getPetByIdStatus200SchemaJson = petSchema
 
@@ -213,13 +245,22 @@ export const getPetByIdResponseSchema = getPetByIdStatus200Schema
 export const getPetByIdErrorSchema = z.union([getPetByIdStatus400Schema, getPetByIdStatus404Schema])
 
 export const getPetByIdPathSchema = z.object({
-  petId: z.coerce.bigint().describe('ID of pet to return'),
+  petId: getPetByIdPathPetIdSchema,
 })
 
-export const updatePetWithFormPathPetIdSchema = z.coerce.bigint().describe('ID of pet that needs to be updated')
+/**
+ * ID of pet that needs to be updated
+ */
+export const updatePetWithFormPathPetIdSchema = z.coerce.bigint().pipe(z.int64()).describe('ID of pet that needs to be updated')
 
+/**
+ * Name of pet that needs to be updated
+ */
 export const updatePetWithFormQueryNameSchema = z.string().optional().describe('Name of pet that needs to be updated')
 
+/**
+ * Status of pet that needs to be updated
+ */
 export const updatePetWithFormQueryStatusSchema = z.string().optional().describe('Status of pet that needs to be updated')
 
 export const updatePetWithFormStatus405Schema = z.unknown()
@@ -229,17 +270,20 @@ export const updatePetWithFormResponseSchema = z.unknown()
 export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
 
 export const updatePetWithFormPathSchema = z.object({
-  petId: z.coerce.bigint().describe('ID of pet that needs to be updated'),
+  petId: updatePetWithFormPathPetIdSchema,
 })
 
 export const updatePetWithFormQuerySchema = z.object({
-  name: z.string().optional().describe('Name of pet that needs to be updated'),
-  status: z.string().optional().describe('Status of pet that needs to be updated'),
+  name: updatePetWithFormQueryNameSchema,
+  status: updatePetWithFormQueryStatusSchema,
 })
 
 export const deletePetHeaderApiKeySchema = z.string().optional()
 
-export const deletePetPathPetIdSchema = z.coerce.bigint().describe('Pet id to delete')
+/**
+ * Pet id to delete
+ */
+export const deletePetPathPetIdSchema = z.coerce.bigint().pipe(z.int64()).describe('Pet id to delete')
 
 export const deletePetStatus400Schema = z.unknown()
 
@@ -248,15 +292,21 @@ export const deletePetResponseSchema = z.unknown()
 export const deletePetErrorSchema = deletePetStatus400Schema
 
 export const deletePetPathSchema = z.object({
-  petId: z.coerce.bigint().describe('Pet id to delete'),
+  petId: deletePetPathPetIdSchema,
 })
 
 export const deletePetHeadersSchema = z.object({
-  api_key: z.string().optional(),
+  api_key: deletePetHeaderApiKeySchema,
 })
 
-export const uploadFilePathPetIdSchema = z.coerce.bigint().describe('ID of pet to update')
+/**
+ * ID of pet to update
+ */
+export const uploadFilePathPetIdSchema = z.coerce.bigint().pipe(z.int64()).describe('ID of pet to update')
 
+/**
+ * Additional Metadata
+ */
 export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
 export const uploadFileStatus200Schema = apiResponseSchema
@@ -266,11 +316,11 @@ export const uploadFileResponseSchema = uploadFileStatus200Schema
 export const uploadFileBodySchema = z.instanceof(Blob).optional()
 
 export const uploadFilePathSchema = z.object({
-  petId: z.coerce.bigint().describe('ID of pet to update'),
+  petId: uploadFilePathPetIdSchema,
 })
 
 export const uploadFileQuerySchema = z.object({
-  additionalMetadata: z.string().optional().describe('Additional Metadata'),
+  additionalMetadata: uploadFileQueryAdditionalMetadataSchema,
 })
 
 export const getInventoryStatus200Schema = z.record(z.string(), z.int32())
@@ -309,7 +359,10 @@ export const placeOrderPatchBodySchemaFormUrlEncoded = orderSchema.optional()
 
 export const placeOrderPatchBodySchema = z.union([placeOrderPatchBodySchemaJson, placeOrderPatchBodySchemaXml, placeOrderPatchBodySchemaFormUrlEncoded])
 
-export const getOrderByIdPathOrderIdSchema = z.coerce.bigint().describe('ID of order that needs to be fetched')
+/**
+ * ID of order that needs to be fetched
+ */
+export const getOrderByIdPathOrderIdSchema = z.coerce.bigint().pipe(z.int64()).describe('ID of order that needs to be fetched')
 
 export const getOrderByIdStatus200SchemaJson = orderSchema
 
@@ -326,10 +379,13 @@ export const getOrderByIdResponseSchema = getOrderByIdStatus200Schema
 export const getOrderByIdErrorSchema = z.union([getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
 
 export const getOrderByIdPathSchema = z.object({
-  orderId: z.coerce.bigint().describe('ID of order that needs to be fetched'),
+  orderId: getOrderByIdPathOrderIdSchema,
 })
 
-export const deleteOrderPathOrderIdSchema = z.coerce.bigint().describe('ID of the order that needs to be deleted')
+/**
+ * ID of the order that needs to be deleted
+ */
+export const deleteOrderPathOrderIdSchema = z.coerce.bigint().pipe(z.int64()).describe('ID of the order that needs to be deleted')
 
 export const deleteOrderStatus400Schema = z.unknown()
 
@@ -340,5 +396,5 @@ export const deleteOrderResponseSchema = z.unknown()
 export const deleteOrderErrorSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
 
 export const deleteOrderPathSchema = z.object({
-  orderId: z.coerce.bigint().describe('ID of the order that needs to be deleted'),
+  orderId: deleteOrderPathOrderIdSchema,
 })

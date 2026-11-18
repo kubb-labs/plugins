@@ -1,10 +1,15 @@
 import {
+  buildContentTypeEntries,
   buildOptionsSchema,
+  buildParamRefsSchema,
+  buildParamsSchema,
+  buildResponseUnionSchema,
   buildResponses,
   getCircularNames,
   getOasAdapter,
-  resolveContentTypeVariants,
   resolveOperationFile,
+  schemaComments,
+  shouldCoerce,
   toResponseContent,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -15,7 +20,6 @@ import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
-import { shouldCoerce } from '../utils.ts'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
@@ -24,12 +28,6 @@ import { shouldCoerce } from '../utils.ts'
 function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction: 'encode' | 'decode'): 'infer' | 'input' | 'output' {
   if (inferred !== 'codec') return 'infer'
   return direction === 'encode' ? 'input' : 'output'
-}
-
-type BuildResponseUnionParams = {
-  responses: Array<ast.ResponseNode>
-  name: string
-  fallbackUnknown: boolean
 }
 
 /**
@@ -118,6 +116,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           mini={mini}
           cyclic={cyclicSchemas.has(node.name)}
           compile={compile}
+          comments={schemaComments(node)}
         />
         {hasDirectionalNode && (
           <Zod
@@ -132,6 +131,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             mini={mini}
             cyclic={cyclicSchemas.has(node.name)}
             compile={compile}
+            comments={schemaComments(node)}
           />
         )}
       </File>
@@ -197,64 +197,21 @@ export const zodGenerator = defineGenerator<PluginZod>({
             cyclic={false}
             compile={compile}
             siblings={siblings}
+            comments={schemaComments(schema)}
           />
         </>
       )
     }
 
-    // Multiple content types for a single name: emit one schema per content type plus a union alias.
-    function buildContentTypeVariants(
-      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
+    // Several content types for one name: one schema per content type, then the union of them.
+    const renderContentTypeVariants = (
+      entries: Parameters<typeof buildContentTypeEntries>[0],
       baseName: string,
       decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
       direction?: 'encode' | 'decode',
-    ) {
-      const variants = resolveContentTypeVariants(entries, baseName)
-      const unionSchema = ast.factory.createSchema({
-        type: 'union',
-        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
-      })
-      return (
-        <>
-          {variants.map((variant) =>
-            renderSchemaEntry({
-              schema: decorate ? decorate(variant.schema) : variant.schema,
-              name: variant.name,
-              keysToOmit: variant.keysToOmit,
-              direction,
-            }),
-          )}
-          {renderSchemaEntry({ schema: unionSchema, name: baseName, direction })}
-        </>
-      )
-    }
-
-    // Builds a response/error union schema: one schema per member response, aliased under `name`.
-    function buildResponseUnion({ responses, name, fallbackUnknown }: BuildResponseUnionParams) {
-      // Collect import names from the response schemas to detect naming collisions. When a response
-      // is a $ref to a component schema whose resolved name matches `name`, skip generation to avoid
-      // redeclaration errors.
-      const importedNames = new Set(ast.http.responses.getImportedNames(responses).map((refName) => resolver.name(refName)))
-
-      if (importedNames.has(name)) {
-        return null
-      }
-
-      const members = responses.map((res) => ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) }))
-
-      // No documented schema: fall back to an unknown schema so the name still resolves for
-      // consumers that parse those bodies.
-      if (fallbackUnknown && members.length === 0) {
-        return renderSchemaEntry({ schema: ast.factory.createSchema({ type: 'unknown' }), name })
-      }
-
-      const unionNode = members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
-
-      return renderSchemaEntry({
-        schema: unionNode,
-        name,
-      })
-    }
+    ) => <>{buildContentTypeEntries(entries, baseName, decorate).map((entry) => renderSchemaEntry({ ...entry, direction }))}</>
+    const renderResponseUnion = (responses: Array<ast.ResponseNode>, name: string, fallbackUnknown: boolean) =>
+      renderSchemaEntry({ schema: buildResponseUnionSchema({ node, responses, name, resolver, fallbackUnknown }), name })
 
     const paramSchemas = node.parameters.map((param) =>
       renderSchemaEntry({ schema: param.schema, name: resolver.param.name(node, param), direction: 'encode' }),
@@ -264,7 +221,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       const content = (res.content ?? []).map((entry, _, content) => toResponseContent(entry, content))
       const variants = content.filter((entry) => entry.schema)
       if (variants.length > 1) {
-        return buildContentTypeVariants(content, resolver.response.status(node, res.statusCode))
+        return renderContentTypeVariants(content, resolver.response.status(node, res.statusCode))
       }
       const primary = variants[0] ?? content[0]
       return renderSchemaEntry({
@@ -274,33 +231,19 @@ export const zodGenerator = defineGenerator<PluginZod>({
       })
     })
 
-    const toParamsSchema = (params: Array<ast.ParameterNode>) =>
-      ast.factory.createSchema({
-        type: 'object',
-        // `primitive: 'object'` makes the printer emit `z.object(…)` rather than a record.
-        primitive: 'object',
-        properties: params.map((param) => ast.factory.createProperty({ name: param.name, required: param.required, schema: param.schema })),
-      })
-
     const responseHeaderSchemas = node.responses.map((res) =>
-      res.headers?.length ? renderSchemaEntry({ schema: toParamsSchema(res.headers), name: resolver.response.headers(node, res.statusCode) }) : null,
+      res.headers?.length ? renderSchemaEntry({ schema: buildParamsSchema(res.headers), name: resolver.response.headers(node, res.statusCode) }) : null,
     )
 
     const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
     // Validate success (2xx) bodies only. Error bodies are surfaced unparsed, typed by plugin-ts (#369).
     const successResponsesWithSchema = responsesWithSchema.filter((res) => ast.http.status.isSuccess(res))
-    const responseUnionSchema =
-      responsesWithSchema.length > 0
-        ? buildResponseUnion({ responses: successResponsesWithSchema, name: resolver.response.response(node), fallbackUnknown: true })
-        : null
+    const responseUnionSchema = responsesWithSchema.length > 0 ? renderResponseUnion(successResponsesWithSchema, resolver.response.response(node), true) : null
 
     // Validate error bodies on the non-throw path. Mirrors the success union but selects every
     // non-2xx response (including the OpenAPI `default`) so it lines up with plugin-ts `ErrorOf` (#369).
     const errorResponsesWithSchema = responsesWithSchema.filter((res) => !ast.http.status.isSuccess(res))
-    const errorUnionSchema =
-      errorResponsesWithSchema.length > 0
-        ? buildResponseUnion({ responses: errorResponsesWithSchema, name: resolver.response.error(node), fallbackUnknown: false })
-        : null
+    const errorUnionSchema = errorResponsesWithSchema.length > 0 ? renderResponseUnion(errorResponsesWithSchema, resolver.response.error(node), false) : null
 
     const requestBodyContent = node.requestBody?.content ?? []
     const requestSchema = (() => {
@@ -315,7 +258,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           direction: 'encode',
         })
       }
-      return buildContentTypeVariants(
+      return renderContentTypeVariants(
         requestBodyContent,
         resolver.response.body(node),
         (schema) => ({
@@ -341,7 +284,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       .filter(({ params }) => params.length > 0)
       .map(({ kind, params }) =>
         renderSchemaEntry({
-          schema: toParamsSchema(params),
+          schema: buildParamRefsSchema({ node, params, resolver }),
           name: resolver.param[kind](node, params[0]!),
           direction: 'encode',
         }),

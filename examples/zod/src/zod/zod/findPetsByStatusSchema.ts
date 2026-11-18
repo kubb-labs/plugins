@@ -6,6 +6,9 @@
 import { z } from '../../zod.ts'
 import { petSchema } from './petSchema'
 
+/**
+ * Status values that need to be considered for filter
+ */
 export const findPetsByStatusQueryStatusSchema = z
   .enum(['available', 'pending', 'sold'])
   .optional()
@@ -39,7 +42,7 @@ export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
 export type FindPetsByStatusErrorSchemaType = z.infer<typeof findPetsByStatusErrorSchema>
 
 export const findPetsByStatusQuerySchema = z.object({
-  status: z.enum(['available', 'pending', 'sold']).optional().default('available').describe('Status values that need to be considered for filter'),
+  status: findPetsByStatusQueryStatusSchema,
 })
 
 export type FindPetsByStatusQuerySchemaType = z.infer<typeof findPetsByStatusQuerySchema>

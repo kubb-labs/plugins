@@ -2,25 +2,29 @@ import { buildList } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
+  bigintConstraints,
+  hasInputChecks,
+  hasKeyCheck,
+  integerFormatPattern,
+  isObjectComposableIntersection,
+  isObjectSchemaNode,
+  preserveRequiredProperties,
+  shouldCoerce,
+  strictOneOfNode,
+  withFormatRange,
+} from '@internals/shared'
+import {
   buildEnum,
   buildLiteral,
   type buildObjectShape,
   contentEncodingCalls,
   getMemberConstraint,
-  hasInputChecks,
-  hasKeyCheck,
   inputChecks,
-  integerFormatPattern,
   jsonContentCheck,
   isClosedKeySchema,
-  isObjectComposableIntersection,
-  isObjectSchemaNode,
   type lengthConstraints,
   type numberConstraints,
   type patternKeySchema,
-  preserveRequiredProperties,
-  shouldCoerce,
-  strictOneOfNode,
   stringFormatCalls,
 } from '../utils.ts'
 
@@ -63,6 +67,7 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
   refine: (value: string, check: string) => string
   extend: (base: string, shape: string) => string
   intersection: (left: string, right: string) => string
+  pipe: (left: string, right: string) => string
   /**
    * Post-processes a member of a strict `oneOf`. `zod/mini` has no chainable `.strict()`, so it leaves this unset.
    */
@@ -193,11 +198,12 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
       return `${base}${dialect.numbers(node)}`
     },
     integer(node) {
-      if (shouldCoerce(this.options.coercion, 'numbers')) return `${dialect.coercedInt}${dialect.numbers(node)}`
+      if (shouldCoerce(this.options.coercion, 'numbers')) return `${dialect.coercedInt}${dialect.numbers(withFormatRange(node, 'integer'))}`
       if (node.format === 'int32') return `z.int32()${dialect.numbers(node)}`
       if (node.format === 'uint32') return `z.uint32()${dialect.numbers(node)}`
 
-      return `z.int()${dialect.numbers(node)}`
+      // Zod has no schema for the 8-bit and 16-bit formats, so their range prints as bounds.
+      return `z.int()${dialect.numbers(withFormatRange(node, 'integer'))}`
     },
     uuid(node) {
       const base = this.options.guidType === 'guid' ? 'z.guid()' : 'z.uuid()'
@@ -396,6 +402,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 
       const firstBase = transform(first)
       if (!firstBase) return ''
+      const isBigintBase = ast.ref.mergeSchema(first).type === ast.schema.types.bigint
 
       // An object `allOf` is a merge, not a runtime intersection: extending keeps it a Zod object
       // (usable in z.discriminatedUnion) instead of a non-discriminable intersection.
@@ -417,6 +424,9 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 
       return rest.reduce((acc, member) => {
         const constraint = getMemberConstraint({ member, regexType: this.options.regexType, lengths: dialect.lengths, numbers: dialect.numbers })
+        const numeric = ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer')
+        // A bigint base can be a pipe, which has no `.min()`, and its bounds are bigints. The member's bounds run as a bigint schema after it.
+        if (constraint && numeric && isBigintBase) return dialect.pipe(acc, `z.bigint()${dialect.numbers(bigintConstraints(numeric), true)}`)
         if (constraint) return acc + constraint
         const transformed = transform(member)
         return transformed ? dialect.intersection(acc, transformed) : acc

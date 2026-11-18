@@ -53,9 +53,10 @@ Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](h
 
 ### Zod
 
-| Package                                     | Version                                                                                                        | Description                                                                       |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| [`@kubb/plugin-zod`](./packages/plugin-zod) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-zod.svg)](https://npmx.dev/package/@kubb/plugin-zod) | [Zod](https://github.com/colinhacks/zod) schema generation for runtime validation |
+| Package                                             | Version                                                                                                                | Description                                                                                |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [`@kubb/plugin-valibot`](./packages/plugin-valibot) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-valibot.svg)](https://npmx.dev/package/@kubb/plugin-valibot) | [Valibot](https://github.com/open-circle/valibot) schema generation for runtime validation |
+| [`@kubb/plugin-zod`](./packages/plugin-zod)         | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-zod.svg)](https://npmx.dev/package/@kubb/plugin-zod)         | [Zod](https://github.com/colinhacks/zod) schema generation for runtime validation          |
 
 ### Data fetching
 
@@ -95,6 +96,7 @@ Plugins built and maintained by the community. Want to add yours? See [CONTRIBUT
 | [`fetch`](./examples/fetch)             | Generate API clients with Fetch     |
 | [`ky`](./examples/ky)                   | Generate API clients with Ky        |
 | [`zod`](./examples/zod)                 | Generate Zod validation schemas     |
+| [`valibot`](./examples/valibot)         | Generate Valibot validation schemas |
 | [`react-query`](./examples/react-query) | Generate React Query hooks          |
 | [`vue-query`](./examples/vue-query)     | Generate Vue Query composables      |
 | [`faker`](./examples/faker)             | Generate Faker.js mock data         |

@@ -13,5 +13,5 @@ export const findPetsByStatusStatus200Schema = z.object({})
 export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
 
 export const findPetsByStatusQuerySchema = z.object({
-  status: z.enum(['available', 'pending', 'sold']).optional(),
+  status: findPetsByStatusQueryStatusSchema,
 })

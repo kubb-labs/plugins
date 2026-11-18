@@ -1,0 +1,224 @@
+{
+  "$schema": "https://kubb.dev/schemas/kubb-extension.json",
+  "kind": "plugin",
+  "name": "plugin-valibot",
+  "export": "pluginValibot",
+  "displayName": "Valibot",
+  "description": "Generates Valibot v1 schemas from your OpenAPI spec so you validate API responses, form input, and query params at runtime.",
+  "category": "validation",
+  "icon": {
+    "light": "https://kubb.dev/feature/valibot.svg"
+  },
+  "tags": ["valibot", "validation", "schema", "runtime-validation", "codegen", "openapi"],
+  "docs": "https://kubb.dev/extensions/kubb-labs/plugin-valibot",
+  "maintainers": [
+    {
+      "name": "Stijn Van Hulle",
+      "github": "stijnvanhulle"
+    }
+  ],
+  "compatibility": {
+    "kubb": ">=5.19.0",
+    "node": ">=22.22"
+  },
+  "options": [
+    {
+      "key": "outputPath",
+      "path": ["output", "path"],
+      "label": "Output Path",
+      "description": "Output folder for generated files",
+      "type": "text",
+      "default": "valibot"
+    },
+    {
+      "key": "barrel",
+      "path": ["output", "barrel"],
+      "label": "Barrel",
+      "description": "How index.ts barrel files are generated",
+      "type": "select",
+      "default": {
+        "type": "named"
+      },
+      "choices": [
+        {
+          "label": "named",
+          "value": {
+            "type": "named"
+          }
+        },
+        {
+          "label": "named (nested)",
+          "value": {
+            "type": "named",
+            "nested": true
+          }
+        },
+        {
+          "label": "all",
+          "value": {
+            "type": "all"
+          }
+        },
+        {
+          "label": "all (nested)",
+          "value": {
+            "type": "all",
+            "nested": true
+          }
+        },
+        {
+          "label": "false (disabled)",
+          "value": false
+        }
+      ]
+    },
+    {
+      "key": "outputMode",
+      "path": ["output", "mode"],
+      "label": "Output Mode",
+      "description": "How the plugin consolidates its code into files. File mode writes everything into a single file, so the output path must include a file extension and cannot be grouped.",
+      "type": "select",
+      "default": "directory",
+      "choices": [
+        {
+          "label": "directory (one file per schema)",
+          "value": "directory"
+        },
+        {
+          "label": "file (single file)",
+          "value": "file"
+        }
+      ]
+    },
+    {
+      "key": "group",
+      "path": ["group"],
+      "label": "Group",
+      "description": "Group generated operations by OpenAPI tag or path",
+      "type": "select",
+      "default": null,
+      "choices": [
+        {
+          "label": "none",
+          "value": null
+        },
+        {
+          "label": "by tag",
+          "value": {
+            "type": "tag"
+          }
+        },
+        {
+          "label": "by path",
+          "value": {
+            "type": "path"
+          }
+        }
+      ]
+    },
+    {
+      "key": "excludeTags",
+      "path": ["exclude"],
+      "label": "Exclude Tags",
+      "description": "Comma-separated OpenAPI tags to exclude from generation",
+      "type": "list",
+      "item": {
+        "type": "tag",
+        "pattern": "$item"
+      }
+    },
+    {
+      "key": "includeTags",
+      "path": ["include"],
+      "label": "Include Tags",
+      "description": "Comma-separated OpenAPI tags to include. Only operations with these tags are generated",
+      "type": "list",
+      "item": {
+        "type": "tag",
+        "pattern": "$item"
+      }
+    },
+    {
+      "key": "importPath",
+      "path": ["importPath"],
+      "label": "Import Path",
+      "description": "Module specifier used in the import statement",
+      "type": "text",
+      "default": "valibot"
+    },
+    {
+      "key": "regexType",
+      "path": ["regexType"],
+      "label": "Regex Type",
+      "description": "Output form for an OpenAPI pattern inside v.regex(...)",
+      "type": "select",
+      "default": "literal",
+      "choices": [
+        {
+          "label": "literal",
+          "value": "literal"
+        },
+        {
+          "label": "constructor",
+          "value": "constructor"
+        }
+      ]
+    },
+    {
+      "key": "oneOfType",
+      "path": ["oneOfType"],
+      "label": "oneOf Type",
+      "description": "How a oneOf is validated: v.union with strict object members, or a check that exactly one member matches",
+      "type": "select",
+      "default": "union",
+      "choices": [
+        {
+          "label": "union",
+          "value": "union"
+        },
+        {
+          "label": "xor",
+          "value": "xor"
+        }
+      ]
+    },
+    {
+      "key": "inferred",
+      "path": ["inferred"],
+      "label": "Inferred",
+      "description": "Export a type alias next to every generated schema",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "key": "coercion",
+      "path": ["coercion"],
+      "label": "Coercion",
+      "description": "Convert input with v.toString, v.toNumber, and v.toDate before validation",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "key": "typeGuards",
+      "path": ["typeGuards"],
+      "label": "Type Guards",
+      "description": "Generate is* type guards and assert* functions for each schema",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "key": "banner",
+      "path": ["output", "banner"],
+      "label": "Banner",
+      "description": "Text added at the top of every generated file",
+      "type": "text"
+    },
+    {
+      "key": "footer",
+      "path": ["output", "footer"],
+      "label": "Footer",
+      "description": "Text added at the end of every generated file",
+      "type": "text"
+    }
+  ]
+}

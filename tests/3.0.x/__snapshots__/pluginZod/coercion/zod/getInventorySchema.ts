@@ -5,6 +5,6 @@
 
 import * as z from 'zod'
 
-export const getInventoryStatus200Schema = z.record(z.string(), z.coerce.number().int())
+export const getInventoryStatus200Schema = z.record(z.string(), z.coerce.number().int().min(-2147483648).max(2147483647))
 
 export const getInventoryResponseSchema = getInventoryStatus200Schema

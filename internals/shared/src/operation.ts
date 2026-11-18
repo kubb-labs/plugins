@@ -755,3 +755,93 @@ export function resolveResponseTypes(node: ast.OperationNode, resolver: Response
 
   return types
 }
+
+/**
+ * One object schema for a list of parameters or response headers, with each schema inline.
+ */
+export function buildParamsSchema(params: Array<ast.ParameterNode>): ast.SchemaNode {
+  return ast.factory.createSchema({
+    type: 'object',
+    // `primitive: 'object'` makes a printer emit an object schema and not a record.
+    primitive: 'object',
+    properties: params.map((param) => ast.factory.createProperty({ name: param.name, required: param.required, schema: param.schema })),
+  })
+}
+
+/**
+ * One object schema for the parameters of an operation, where each key points at the const of
+ * that parameter. The const already has its optional wrapper, so every key is required here.
+ */
+export function buildParamRefsSchema({
+  node,
+  params,
+  resolver,
+}: {
+  node: ast.OperationNode
+  params: Array<ast.ParameterNode>
+  resolver: { param: { name(node: ast.OperationNode, param: ast.ParameterNode): string } }
+}): ast.SchemaNode {
+  return ast.factory.createSchema({
+    type: 'object',
+    primitive: 'object',
+    properties: params.map((param) =>
+      ast.factory.createProperty({
+        name: param.name,
+        required: true,
+        schema: ast.factory.createSchema({ type: 'ref', name: resolver.param.name(node, param) }),
+      }),
+    ),
+  })
+}
+
+type SchemaEntry = { schema: ast.SchemaNode; name: string; keysToOmit?: Array<string> | null }
+
+/**
+ * The schemas a name with several content types needs: one per content type, then the union of
+ * them under `baseName`.
+ */
+export function buildContentTypeEntries(
+  entries: Array<ContentVariantInput>,
+  baseName: string,
+  decorate: (schema: ast.SchemaNode) => ast.SchemaNode = (schema) => schema,
+): Array<SchemaEntry> {
+  const variants = resolveContentTypeVariants(entries, baseName)
+  const union = ast.factory.createSchema({
+    type: 'union',
+    members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
+  })
+
+  return [
+    ...variants.map((variant) => ({ schema: decorate(variant.schema), name: variant.name, keysToOmit: variant.keysToOmit })),
+    { schema: union, name: baseName },
+  ]
+}
+
+/**
+ * The schema behind a response or error name: a union of the per-status schemas. Returns `null`
+ * when a response is a `$ref` to a component whose name is already `name`, which would declare it twice.
+ */
+export function buildResponseUnionSchema({
+  node,
+  responses,
+  name,
+  resolver,
+  fallbackUnknown,
+}: {
+  node: ast.OperationNode
+  responses: Array<ast.ResponseNode>
+  name: string
+  resolver: { name(name: string): string; response: { status(node: ast.OperationNode, statusCode: ast.StatusCode): string } }
+  /**
+   * Print an unknown schema when no response has one, so the name still resolves.
+   */
+  fallbackUnknown: boolean
+}): ast.SchemaNode | null {
+  const importedNames = new Set(ast.http.responses.getImportedNames(responses).map((refName) => resolver.name(refName)))
+  if (importedNames.has(name)) return null
+
+  const members = responses.map((res) => ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) }))
+  if (members.length === 0) return fallbackUnknown ? ast.factory.createSchema({ type: 'unknown' }) : null
+
+  return members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
+}

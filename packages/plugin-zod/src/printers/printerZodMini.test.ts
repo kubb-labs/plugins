@@ -129,10 +129,31 @@ describe('printerZodMini', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'bigint' }))).toBe('z.coerce.bigint()')
     })
 
+    test('int64 converts, then checks the range through z.int64', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'int64' }))).toBe('z.pipe(z.coerce.bigint(), z.int64())')
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'uint64', max: 5 }))).toBe(
+        "z.pipe(z.coerce.bigint(), z.uint64().check(z.maximum(BigInt('5'))))",
+      )
+    })
+
+    test('an allOf member adds its bounds after an int64 pipe', () => {
+      const node = ast.factory.createSchema({
+        type: 'intersection',
+        members: [ast.factory.createSchema({ type: 'bigint', format: 'int64' }), ast.factory.createSchema({ type: 'integer', min: 0 })],
+      })
+      const code = printer.print(node)!
+      const schema = new Function('z', `return ${code}`)(z)
+
+      expect(code).toBe("z.pipe(z.pipe(z.coerce.bigint(), z.int64()), z.bigint().check(z.minimum(BigInt('0'))))")
+      expect(schema.safeParse(5).success).toBe(true)
+      expect(schema.safeParse(-1).success).toBe(false)
+      expect(schema.safeParse('9223372036854775808').success).toBe(false)
+    })
+
     test('bigint bounds print as bigint literals', () => {
       const output = printer.print(ast.factory.createSchema({ type: 'bigint', min: 0.5, exclusive: { max: 10 }, multipleOf: 2 }))
 
-      expect(output).toBe('z.coerce.bigint().check(z.minimum(1n), z.maximum(9n), z.multipleOf(2n))')
+      expect(output).toBe("z.coerce.bigint().check(z.minimum(BigInt('1')), z.maximum(BigInt('9')), z.multipleOf(BigInt('2')))")
       const schema = new Function('z', `return ${output}`)(z) as z.ZodMiniType
       expect(schema.safeParse(4).success).toBe(true)
       expect(schema.safeParse(3).success).toBe(false)
@@ -1339,7 +1360,9 @@ describe('printerZodMini', () => {
 
     test('integer coercion replaces the int32 helper and keeps number checks', () => {
       const p = printerZodMini({ coercion: { numbers: true } })
-      expect(p.print(ast.factory.createSchema({ type: 'integer', format: 'int32', min: 1 }))).toBe('z.coerce.number().check(z.int()).check(z.minimum(1))')
+      expect(p.print(ast.factory.createSchema({ type: 'integer', format: 'int32', min: 1 }))).toBe(
+        'z.coerce.number().check(z.int()).check(z.minimum(1), z.maximum(2147483647))',
+      )
     })
 
     test('ISO string dates and times are never coerced', () => {

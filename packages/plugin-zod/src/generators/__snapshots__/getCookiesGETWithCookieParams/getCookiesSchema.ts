@@ -15,6 +15,6 @@ export const getCookiesStatus200Schema = z.object({})
 export const getCookiesResponseSchema = getCookiesStatus200Schema
 
 export const getCookiesCookiesSchema = z.object({
-  session: z.string(),
-  theme: z.string().optional(),
+  session: getCookiesCookieSessionSchema,
+  theme: getCookiesCookieThemeSchema,
 })

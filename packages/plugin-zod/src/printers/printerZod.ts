@@ -1,18 +1,8 @@
 import { lazyGetter, objectKey } from '@internals/utils'
 import { ast, createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import {
-  applyModifiers,
-  bigintConstraints,
-  buildObjectShape,
-  defaultLiteral,
-  hasInputChecks,
-  lengthConstraints,
-  numberConstraints,
-  patternKeySchema,
-  printWithOmit,
-  shouldCoerce,
-} from '../utils.ts'
+import { bigintConstraints, defaultLiteral, hasInputChecks, shouldCoerce } from '@internals/shared'
+import { applyModifiers, buildObjectShape, lengthConstraints, numberConstraints, patternKeySchema, printWithOmit } from '../utils.ts'
 import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
 /**
@@ -308,6 +298,7 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
   unique: (array) => `${array}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })`,
   extend: (base, shape) => `${base}.extend(${shape})`,
   intersection: (left, right) => `${left}.and(${right})`,
+  pipe: (left, right) => `${left}.pipe(${right})`,
   strictMember: strictOneOfMember,
   useInputVariant: (node, options) => options.direction === 'encode' && containsDirectionalNode({ node, printerOptions: options }),
 }
@@ -315,7 +306,9 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
 const scalarNodes: PrinterZodNodes = {
   ...buildScalarNodes(standardDialect),
   bigint(node) {
-    return `z.coerce.bigint()${numberConstraints(bigintConstraints(node), 'n')}`
+    const constraints = numberConstraints(bigintConstraints(node), true)
+    // `z.int64()` carries the range of the format but takes a bigint only, so the JSON value converts first.
+    return node.format === 'int64' || node.format === 'uint64' ? `z.coerce.bigint().pipe(z.${node.format}()${constraints})` : `z.coerce.bigint()${constraints}`
   },
   date(node) {
     if (node.representation !== 'date') return 'z.iso.date()'

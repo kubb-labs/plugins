@@ -2,6 +2,9 @@ import * as z from 'zod'
 import { paymentErrorSchema } from './paymentErrorSchema'
 import { paymentMethodEnumSchema } from './paymentMethodEnumSchema'
 
+/**
+ * A payment for a store order
+ */
 export const paymentSchema = z
   .pipe(
     z.unknown().check(

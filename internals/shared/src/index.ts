@@ -1,11 +1,15 @@
 export {
   buildClientOptionType,
+  buildContentTypeEntries,
   buildOperationComments,
   buildOptionsSchema,
+  buildParamRefsSchema,
+  buildParamsSchema,
   buildRequestConfigType,
   buildRequestParamsSignature,
   castToClientOptions,
   buildResponses,
+  buildResponseUnionSchema,
   getContentTypeInfo,
   getEventStream,
   hasTextEventData,
@@ -38,3 +42,20 @@ export {
   operationKey,
   resolveOperationName,
 } from './resolver.ts'
+export {
+  bigintConstraints,
+  defaultLiteral,
+  formatDefault,
+  hasInputChecks,
+  hasKeyCheck,
+  integerFormatPattern,
+  isObjectComposableIntersection,
+  isObjectSchemaNode,
+  numericLiteral,
+  preserveRequiredProperties,
+  schemaComments,
+  shouldCoerce,
+  strictOneOfNode,
+  withFormatRange,
+} from './schema.ts'
+export type { NumericBounds, NumericConstraints } from './schema.ts'

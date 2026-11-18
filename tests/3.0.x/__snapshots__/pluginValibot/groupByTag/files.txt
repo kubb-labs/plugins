@@ -1,0 +1,10 @@
+./valibot/addPetRequestSchema.ts
+./valibot/apiResponseSchema.ts
+./valibot/categorySchema.ts
+./valibot/pet/addPetSchema.ts
+./valibot/pet/deletePetSchema.ts
+./valibot/pet/findPetsByStatusSchema.ts
+./valibot/pet/getPetByIdSchema.ts
+./valibot/pet/uploadFileSchema.ts
+./valibot/petSchema.ts
+./valibot/tagSchema.ts

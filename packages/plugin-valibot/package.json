@@ -1,0 +1,96 @@
+{
+  "name": "@kubb/plugin-valibot",
+  "version": "0.0.0",
+  "description": "Generate Valibot validation schemas with Kubb for runtime data parsing and type safety.",
+  "keywords": [
+    "code-generation",
+    "codegen",
+    "kubb",
+    "meta-framework",
+    "parse",
+    "runtime-validation",
+    "schema",
+    "typescript",
+    "valibot",
+    "validation"
+  ],
+  "homepage": "https://kubb.dev/extensions/kubb-labs/plugin-valibot",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubb-labs/plugins.git",
+    "directory": "packages/plugin-valibot"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/stijnvanhulle"
+    },
+    {
+      "type": "opencollective",
+      "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
+    }
+  ],
+  "files": [
+    "dist",
+    "kubb-extension.json",
+    "docs",
+    "!/**/**.test.**",
+    "!/**/__tests__/**",
+    "!/**/__snapshots__/**"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json",
+    "./kubb-extension.json": "./kubb-extension.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
+    "start": "tsdown --watch",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@kubb/kit": "^5.21.1",
+    "@kubb/renderer-jsx": "^5.21.1"
+  },
+  "devDependencies": {
+    "@internals/shared": "workspace:*",
+    "@internals/utils": "workspace:*",
+    "valibot": "^1.5.0"
+  },
+  "peerDependencies": {
+    "valibot": "^1.2.0"
+  },
+  "peerDependenciesMeta": {
+    "valibot": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22.22"
+  }
+}

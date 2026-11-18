@@ -5,14 +5,23 @@
 
 import { z } from '../../zod.ts'
 
+/**
+ * UUID
+ */
 export const createPetsPathUuidSchema = z.string().describe('UUID')
 
 export type CreatePetsPathUuidSchemaType = z.infer<typeof createPetsPathUuidSchema>
 
+/**
+ * Offset
+ */
 export const createPetsQueryOffsetSchema = z.int().optional().describe('Offset')
 
 export type CreatePetsQueryOffsetSchemaType = z.infer<typeof createPetsQueryOffsetSchema>
 
+/**
+ * Header parameters
+ */
 export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
 
 export type CreatePetsHeaderXEXAMPLESchemaType = z.infer<typeof createPetsHeaderXEXAMPLESchema>
@@ -44,19 +53,19 @@ export const createPetsBodySchema = z.object({
 export type CreatePetsBodySchemaType = z.infer<typeof createPetsBodySchema>
 
 export const createPetsPathSchema = z.object({
-  uuid: z.string().describe('UUID'),
+  uuid: createPetsPathUuidSchema,
 })
 
 export type CreatePetsPathSchemaType = z.infer<typeof createPetsPathSchema>
 
 export const createPetsQuerySchema = z.object({
-  offset: z.int().optional().describe('Offset'),
+  offset: createPetsQueryOffsetSchema,
 })
 
 export type CreatePetsQuerySchemaType = z.infer<typeof createPetsQuerySchema>
 
 export const createPetsHeadersSchema = z.object({
-  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters'),
+  'X-EXAMPLE': createPetsHeaderXEXAMPLESchema,
 })
 
 export type CreatePetsHeadersSchemaType = z.infer<typeof createPetsHeadersSchema>

@@ -46,6 +46,10 @@ type Props = {
    * target, so strict compilation looks it up here.
    */
   siblings?: ReadonlyMap<string, ast.SchemaNode>
+  /**
+   * JSDoc lines above the schema const, so an editor shows them on hover.
+   */
+  comments?: Array<string>
 }
 
 /**
@@ -93,6 +97,7 @@ export function Zod({
   cyclic,
   compile,
   siblings,
+  comments = [],
 }: Props): KubbReactNode {
   const output = printer.print(node)
   const printerImports = printer.drainImports()
@@ -133,7 +138,12 @@ export function Zod({
         />
       ))}
       <File.Source name={name} isExportable isIndexable>
-        <Const export name={name} type={needsAnnotation ? (mini ? 'z.ZodMiniType' : 'z.ZodType') : undefined}>
+        <Const
+          export
+          name={name}
+          type={needsAnnotation ? (mini ? 'z.ZodMiniType' : 'z.ZodType') : undefined}
+          JSDoc={comments.length ? { comments } : undefined}
+        >
           {value}
         </Const>
       </File.Source>

@@ -5,10 +5,19 @@
 
 import * as z from 'zod/mini'
 
+/**
+ * UUID
+ */
 export const createPetsPathUuidSchema = z.string()
 
+/**
+ * Offset
+ */
 export const createPetsQueryOffsetSchema = z.optional(z.int())
 
+/**
+ * Header parameters
+ */
 export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE'])
 
 export const createPetsStatus201Schema = z.unknown()
@@ -28,13 +37,13 @@ export const createPetsBodySchema = z.object({
 })
 
 export const createPetsPathSchema = z.object({
-  uuid: z.string(),
+  uuid: createPetsPathUuidSchema,
 })
 
 export const createPetsQuerySchema = z.object({
-  offset: z.optional(z.int()),
+  offset: createPetsQueryOffsetSchema,
 })
 
 export const createPetsHeadersSchema = z.object({
-  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']),
+  'X-EXAMPLE': createPetsHeaderXEXAMPLESchema,
 })

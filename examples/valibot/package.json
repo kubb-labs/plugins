@@ -1,0 +1,31 @@
+{
+  "name": "valibot-pet-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Valibot PetStore example",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kubb-labs/plugins.git",
+    "directory": "examples/valibot"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb --config kubb.config.ts",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/plugin-valibot": "workspace:*",
+    "kubb": "catalog:",
+    "typescript": "catalog:",
+    "valibot": "^1.5.0"
+  },
+  "engines": {
+    "node": ">=22.22",
+    "pnpm": ">=11.0.0"
+  },
+  "packageManager": "pnpm@12.3.4"
+}

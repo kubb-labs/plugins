@@ -2,16 +2,8 @@ import { lazyGetter, objectKey } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import { createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import {
-  applyMiniModifiers,
-  bigintConstraints,
-  buildObjectShape,
-  lengthChecksMini,
-  numberChecksMini,
-  patternKeySchemaMini,
-  printWithOmit,
-  shouldCoerce,
-} from '../utils.ts'
+import { bigintConstraints, shouldCoerce } from '@internals/shared'
+import { applyMiniModifiers, buildObjectShape, lengthChecksMini, numberChecksMini, patternKeySchemaMini, printWithOmit } from '../utils.ts'
 import { buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
 /**
@@ -128,6 +120,7 @@ const miniDialect: ZodDialect<PrinterZodMiniOptions> = {
   unique: (array) => `${array}.check(z.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" }))`,
   extend: (base, shape) => `z.extend(${base}, ${shape})`,
   intersection: (left, right) => `z.intersection(${left}, ${right})`,
+  pipe: (left, right) => `z.pipe(${left}, ${right})`,
 }
 
 export const printerZodMini = createPrinter<PrinterZodMiniFactory>((options) => {
@@ -137,7 +130,9 @@ export const printerZodMini = createPrinter<PrinterZodMiniFactory>((options) => 
     nodes: withInputChecks({
       ...buildZodNodes(miniDialect, options.cyclicSchemas),
       bigint(node) {
-        return `z.coerce.bigint()${numberChecksMini(bigintConstraints(node), 'n')}`
+        const checks = numberChecksMini(bigintConstraints(node), true)
+        // `z.int64()` carries the range of the format but takes a bigint only, so the JSON value converts first.
+        return node.format === 'int64' || node.format === 'uint64' ? `z.pipe(z.coerce.bigint(), z.${node.format}()${checks})` : `z.coerce.bigint()${checks}`
       },
       date(node) {
         if (node.representation === 'string') {

@@ -8,10 +8,12 @@ import { z } from '../../zod.ts'
 export const orderSchema = z.object({
   id: z.coerce
     .bigint()
+    .pipe(z.int64())
     .optional()
     .meta({ examples: [10] }),
   petId: z.coerce
     .bigint()
+    .pipe(z.int64())
     .optional()
     .meta({ examples: [198772] }),
   quantity: z
