@@ -20,7 +20,7 @@ export type Payment = {
   method?: PaymentMethodEnumKey
   creditCard?: string
   billingAddress?: string
-  labels?: Array<string>
+  labels?: string[]
   /**
    * @description The error of the last failed attempt, as a JSON document
    * @type string | undefined

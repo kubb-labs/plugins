@@ -22,7 +22,7 @@ export type Pet = {
    * @type integer | undefined
    */
   id?: bigint
-  parent?: Array<Pet>
+  parent?: Pet[]
   /**
    * @pattern ^[0-9]{1,19}$
    * @example 10
@@ -35,8 +35,8 @@ export type Pet = {
    */
   name: string
   category?: Category
-  photoUrls: Array<string>
-  tags?: Array<Tag>
+  photoUrls: string[]
+  tags?: Tag[]
   /**
    * @description pet status in the store
    * @type string | undefined
