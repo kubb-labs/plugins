@@ -8,7 +8,7 @@ import { categorySchema } from './categorySchema'
 import { tagSchema } from './tagSchema'
 
 export const addPetRequestSchema = v.object({
-  id: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)), v.metadata({ examples: [10] }))),
+  id: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))), v.metadata({ examples: [10] }))),
   name: v.pipe(v.string(), v.metadata({ examples: ['doggie'] })),
   category: v.optional(categorySchema),
   photoUrls: v.array(v.string()),
