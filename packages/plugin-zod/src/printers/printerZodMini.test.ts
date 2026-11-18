@@ -136,6 +136,20 @@ describe('printerZodMini', () => {
       )
     })
 
+    test('an allOf member adds its bounds after an int64 pipe', () => {
+      const node = ast.factory.createSchema({
+        type: 'intersection',
+        members: [ast.factory.createSchema({ type: 'bigint', format: 'int64' }), ast.factory.createSchema({ type: 'integer', min: 0 })],
+      })
+      const code = printer.print(node)!
+      const schema = new Function('z', `return ${code}`)(z)
+
+      expect(code).toBe("z.pipe(z.pipe(z.coerce.bigint(), z.int64()), z.bigint().check(z.minimum(BigInt('0'))))")
+      expect(schema.safeParse(5).success).toBe(true)
+      expect(schema.safeParse(-1).success).toBe(false)
+      expect(schema.safeParse('9223372036854775808').success).toBe(false)
+    })
+
     test('bigint bounds print as bigint literals', () => {
       const output = printer.print(ast.factory.createSchema({ type: 'bigint', min: 0.5, exclusive: { max: 10 }, multipleOf: 2 }))
 

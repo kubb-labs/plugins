@@ -1,3 +1,4 @@
+import { jsDocEscape } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 
 /**
@@ -140,8 +141,8 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   if (resolved?.type === 'blob') return null
   if (resolved && ast.schema.narrow(resolved, 'bigint')) {
     // A string keeps a value above the safe integer range exact, where a number literal is already rounded.
-    if (typeof value === 'bigint') return `BigInt('${value}')`
-    if (typeof value === 'number' && Number.isInteger(value)) return `BigInt('${value}')`
+    // `BigInt(value)` spells a large number out in digits, where `String(1e21)` is `'1e+21'`, which `BigInt` cannot parse.
+    if (typeof value === 'bigint' || (typeof value === 'number' && Number.isInteger(value))) return `BigInt('${BigInt(value)}')`
     return null
   }
   if (resolved && ast.schema.narrow(resolved, 'array')) {
@@ -254,4 +255,32 @@ export function hasInputChecks(node: ast.SchemaNode): boolean {
  */
 export function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
   return node.type === 'object' && node.additionalProperties === undefined ? { ...node, additionalProperties: false } : node
+}
+
+/**
+ * Whether the `coercion` option turns on conversion for a type.
+ */
+export function shouldCoerce(
+  coercion: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean } | undefined,
+  type: 'dates' | 'strings' | 'numbers',
+): boolean {
+  return coercion === true || (typeof coercion === 'object' && Boolean(coercion[type]))
+}
+
+/**
+ * A numeric bound as source code. A bigint bound prints as `BigInt('…')`, which is exact and
+ * compiles below ES2020, where a `1n` literal does not.
+ */
+export function numericLiteral(value: number | string, isBigint: boolean): number | string {
+  return isBigint ? `BigInt('${value}')` : value
+}
+
+/**
+ * The JSDoc lines above a schema const: its description, and `@deprecated` when the spec says so.
+ * A `$ref` const gets none, because the const it points to has them.
+ */
+export function schemaComments(node: ast.SchemaNode): Array<string> {
+  if (node.type === ast.schema.types.ref) return []
+
+  return [node.description && jsDocEscape(node.description), node.deprecated && '@deprecated'].filter((comment): comment is string => Boolean(comment))
 }

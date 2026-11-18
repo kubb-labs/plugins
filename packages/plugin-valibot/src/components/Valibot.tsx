@@ -31,10 +31,9 @@ type Props = {
    */
   cyclic?: boolean
   /**
-   * Text for the JSDoc comment above the schema const, so an editor shows it on hover.
+   * JSDoc lines above the schema const, so an editor shows them on hover.
    */
-  description?: string
-  deprecated?: boolean
+  comments?: Array<string>
 }
 
 export function Valibot({
@@ -47,8 +46,7 @@ export function Valibot({
   isName,
   assertName,
   cyclic,
-  description,
-  deprecated,
+  comments = [],
 }: Props): KubbReactNode {
   const output = printer.print(node)
   const printerImports = printer.drainImports()
@@ -56,8 +54,6 @@ export function Valibot({
   if (!output) {
     return
   }
-
-  const comments = [description, deprecated && '@deprecated'].filter((comment): comment is string => Boolean(comment))
 
   // `v.is` and `v.assert` narrow to the value the schema accepts, before any conversion.
   const guardType = `v.InferInput<typeof ${name}>`

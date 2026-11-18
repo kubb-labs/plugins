@@ -2,6 +2,7 @@ import { buildList } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
+  bigintConstraints,
   hasInputChecks,
   hasKeyCheck,
   integerFormatPattern,
@@ -66,6 +67,7 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
   refine: (value: string, check: string) => string
   extend: (base: string, shape: string) => string
   intersection: (left: string, right: string) => string
+  pipe: (left: string, right: string) => string
   /**
    * Post-processes a member of a strict `oneOf`. `zod/mini` has no chainable `.strict()`, so it leaves this unset.
    */
@@ -400,6 +402,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 
       const firstBase = transform(first)
       if (!firstBase) return ''
+      const isBigintBase = ast.ref.mergeSchema(first).type === ast.schema.types.bigint
 
       // An object `allOf` is a merge, not a runtime intersection: extending keeps it a Zod object
       // (usable in z.discriminatedUnion) instead of a non-discriminable intersection.
@@ -421,6 +424,9 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 
       return rest.reduce((acc, member) => {
         const constraint = getMemberConstraint({ member, regexType: this.options.regexType, lengths: dialect.lengths, numbers: dialect.numbers })
+        const numeric = ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer')
+        // A bigint base can be a pipe, which has no `.min()`, and its bounds are bigints. The member's bounds run as a bigint schema after it.
+        if (constraint && numeric && isBigintBase) return dialect.pipe(acc, `z.bigint()${dialect.numbers(bigintConstraints(numeric), true)}`)
         if (constraint) return acc + constraint
         const transformed = transform(member)
         return transformed ? dialect.intersection(acc, transformed) : acc
