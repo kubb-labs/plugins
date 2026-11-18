@@ -135,10 +135,16 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       const refName = schema.type === 'ref' ? ast.ref.getName(schema) : null
       const target = schema.type === 'ref' ? schema.schema : undefined
       if (keysToOmit?.length && target && refName && cyclicSchemas.has(refName)) {
-        const withoutKeys = (node: ast.SchemaNode): ast.SchemaNode =>
-          node.type === 'object' ? { ...node, properties: node.properties.filter((property) => !keysToOmit.includes(property.name)) } : node
-        // An `allOf` drops the keys from its inline object members. A key that a `$ref` member declares stays.
-        const inline = target.type === 'intersection' ? { ...target, members: (target.members ?? []).map(withoutKeys) } : withoutKeys(target)
+        const declaresKey = (node: ast.SchemaNode) => keysToOmit.some((propertyName) => ast.schema.findProperties({ node, propertyName }).length > 0)
+        // Drops the keys from an object, from every `allOf` member, and from a `$ref` member that declares one, which prints inline.
+        const withoutKeys = (node: ast.SchemaNode, seen = new Set<ast.SchemaNode>()): ast.SchemaNode => {
+          if (node.type === 'object') return { ...node, properties: node.properties.filter((property) => !keysToOmit.includes(property.name)) }
+          if (node.type === 'intersection') return { ...node, members: (node.members ?? []).map((member) => withoutKeys(member, seen)) }
+          if (node.type !== 'ref' || !node.schema || seen.has(node.schema) || !declaresKey(node.schema)) return node
+
+          return withoutKeys(node.schema, seen.add(node.schema))
+        }
+        const inline = withoutKeys(target)
         if (inline.type === 'object' || inline.type === 'intersection') return renderSchemaEntry({ schema: inline, name, direction })
       }
 

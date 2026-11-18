@@ -89,7 +89,7 @@ These keywords print a `v.check`:
 | `contentSchema` on a string that holds JSON                                | Parses the string and checks the result.                                         |
 | `uniqueItems`                                                              | Rejects an array with duplicate entries.                                         |
 
-A request body that is a circular schema prints inline without its `readOnly` keys. In a circular `allOf`, a `readOnly` key that a `$ref` member declares stays.
+A request body that is a circular schema prints inline without its `readOnly` keys. In a circular `allOf`, a `$ref` member that declares such a key prints inline too.
 
 A schema with a check on the input is a `v.pipe`, so it is no member of a `v.variant` and does not merge into an `allOf` object. A request body that drops `readOnly` keys from such a schema leaves the input checks out.
 

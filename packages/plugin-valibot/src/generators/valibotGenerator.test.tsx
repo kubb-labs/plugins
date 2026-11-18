@@ -198,12 +198,30 @@ describe('valibotGenerator operation', () => {
     await matchFiles(driver.fileManager.files, 'circularBody')
   })
 
-  test('a request body that is a circular allOf drops the readOnly keys of its inline members', async () => {
+  test('a request body that is a circular allOf drops the readOnly keys of every member', async () => {
     const { driver, context } = setup('circularAllOfBody')
     const target = createSchema({
       type: 'intersection',
       name: 'Pet',
-      members: [createSchema({ type: 'ref', name: 'Animal', ref: '#/components/schemas/Animal' }), createSchema({ ...petSchema, name: undefined })],
+      members: [
+        createSchema({ type: 'ref', name: 'Animal', ref: '#/components/schemas/Animal' }),
+        // This member declares `id`, so it prints inline without it.
+        createSchema({
+          type: 'ref',
+          name: 'Entity',
+          ref: '#/components/schemas/Entity',
+          schema: createSchema({
+            type: 'object',
+            primitive: 'object',
+            name: 'Entity',
+            properties: [
+              createProperty({ name: 'id', required: true, schema: createSchema({ type: 'integer' }) }),
+              createProperty({ name: 'createdBy', required: true, schema: createSchema({ type: 'string' }) }),
+            ],
+          }),
+        }),
+        createSchema({ ...petSchema, name: undefined }),
+      ],
     })
     driver.inputNode = ast.factory.createInput({ schemas: [target] })
     const node = createOperation({

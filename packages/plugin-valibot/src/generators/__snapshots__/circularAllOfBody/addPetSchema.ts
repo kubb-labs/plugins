@@ -10,6 +10,7 @@ import { petSchema } from './petSchema'
 
 export const addPetBodySchema = v.object({
   ...animalSchema.entries,
+  createdBy: v.string(),
   name: v.pipe(v.string(), v.minLength(1)),
   status: v.optional(v.picklist(['available', 'sold'])),
   friends: v.optional(v.array(v.lazy(() => petSchema))),
