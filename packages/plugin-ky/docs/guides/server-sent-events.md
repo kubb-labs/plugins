@@ -259,7 +259,7 @@ When you type a variable that holds a stream result, the type depends on the res
 | `returnType: 'data'`                                    | `Promise<UnwrappedStreamResult<…>>`: the items, or the full result with `throwOnError: false` |
 | `returnType: 'data'`, and the response declares headers | `Promise<UnwrappedStreamResultWithHeaders<…>>`                                                |
 
-In v5, a stream response that declared headers returned a plain `StreamResult`. [The generated function](#the-generated-function) shows the default signature.
+[The generated function](#the-generated-function) shows the default signature.
 
 ### Stream options Kubb sets
 

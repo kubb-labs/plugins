@@ -9,6 +9,8 @@ import type { NativeOptions } from './client.ts'
 type Hit = { method?: string; url?: string; headers: http.IncomingHttpHeaders; body: string }
 
 const hits: Array<Hit> = []
+// How many events each stream URL had written when its connection closed.
+const closedAfter = new Map<string, number>()
 let baseURL = ''
 
 // `/flaky` answers 503 once and then 200, `/down` always answers 503, `/missing` answers 404, `/slow` never answers, and the rest echoes 200.
@@ -31,7 +33,10 @@ const server = http.createServer((req, res) => {
           res.end()
         }
       }, 60)
-      res.on('close', () => clearInterval(timer))
+      res.on('close', () => {
+        clearInterval(timer)
+        closedAfter.set(req.url!, sent)
+      })
       return
     }
     const status = req.url === '/missing' ? 404 : req.url?.startsWith('/down') || (req.url === '/flaky' && count === 1) ? 503 : 200
@@ -167,6 +172,8 @@ describe('client.stream', () => {
     }
 
     expect(seen).toStrictEqual([{ n: 1 }])
+    await vi.waitFor(() => expect(closedAfter.has('/events-break')).toBe(true))
+    expect(closedAfter.get('/events-break')).toBeLessThan(3)
   })
 
   test('rejects with the signal reason when the abort comes while events are read', async () => {

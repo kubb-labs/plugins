@@ -41,7 +41,7 @@ client.setConfig({ transport: createKyTransport(instance) })
 ```
 
 > [!NOTE]
-> Leave `prefix` and `baseUrl` off the instance, and set the base URL with [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#set-the-base-url). The transport sets `throwHttpErrors: false`, because the client splits success from error itself. Your instance keeps Ky's own `retry` default of 2, so pass `retry: 0` to `ky.create` to send each call once, as the default client does.
+> Leave `prefix`, `baseUrl`, `json`, and `searchParams` off the instance, and set the base URL with [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#set-the-base-url). The transport sets `throwHttpErrors: false`, because the client splits success from error itself. Your instance keeps Ky's own `retry` default of 2, so pass `retry: 0` to `ky.create` to send each call once, as the default client does.
 
 ## Wrap the default transport
 
@@ -82,6 +82,8 @@ A client from `createClient()` copies the shared `transport` at creation, so a l
 ## Less common cases
 
 ### Results from a plain `Response`
+
+The default transport and `createKyTransport` return a plain `Response`, so `request` on a result or an error lacks the headers that instance defaults or Ky hooks add.
 
 When a transport returns a plain `Response`, results and errors carry it as `response`. Their `request` is a `Request` built from the resolved request without its body, or the resolved request itself when `Request` cannot parse the URL, such as a relative URL in Node.js. Return a `TransportResult` to set both, as [Write a transport function](#write-a-transport-function) shows.
 

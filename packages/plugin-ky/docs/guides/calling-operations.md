@@ -34,7 +34,7 @@ type RequestResult = {
   error: TError // the parsed error body, undefined on a success result
   contentType: string | undefined // the response media type, without parameters
   headers: Headers // the response headers
-  request: Request // the native request
+  request: Request // rebuilt from the resolved request
   response: Response // the native response
 }
 ```
@@ -88,9 +88,9 @@ Pass `options` for [Ky options](https://github.com/sindresorhus/ky#options) such
 await getPetById({ path: { petId: 1 }, options: { timeout: 5000, retry: { limit: 3 } } })
 ```
 
-`client.setConfig({ options })` sets shared defaults, and per-call options win. Kubb sets the method, headers, body, and signal over them, and sets `throwHttpErrors: false` to keep control of status handling.
+`client.setConfig({ options })` sets shared defaults, and per-call options win. Kubb sets the method, headers, body, and signal over them, and sets `throwHttpErrors: false` to keep control of status handling. `options` does not take `json`, `prefix`, or `searchParams`, because Kubb builds the body and the URL: pass `body`, `baseURL`, and `query` on the call.
 
-The client changes one Ky default, so it behaves as the fetch and axios clients do:
+The client changes one Ky default, `retry`, so a call is sent once, as with the fetch and axios clients. Ky's timeout stays:
 
 | Option    | Default                                                                                              |
 | --------- | ---------------------------------------------------------------------------------------------------- |
@@ -118,7 +118,7 @@ When you set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-
 
 ### Retry a call
 
-The client does not retry. Set Ky's `retry` option to retry a network error, for every call or for one:
+The client does not retry. Set Ky's `retry` option to retry a network error, for every call or for one. Ky retries only the methods in `retry.methods`, which leaves out `POST` and `PATCH`:
 
 ```typescript
 import { client } from './gen/.kubb/client'
