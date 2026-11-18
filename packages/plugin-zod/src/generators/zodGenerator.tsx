@@ -9,6 +9,7 @@ import {
   getOasAdapter,
   resolveOperationFile,
   schemaComments,
+  shouldCoerce,
   toResponseContent,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -19,7 +20,6 @@ import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
-import { shouldCoerce } from '../utils.ts'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
