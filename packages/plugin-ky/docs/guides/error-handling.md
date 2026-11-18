@@ -12,7 +12,7 @@ Only a non-2xx response depends on `throwOnError`:
 | Non-2xx response                         | Throws a `ResponseError`. With `throwOnError: false`, resolves with `error` and `status`. |
 | A body fails its schema (`validator` on) | Throws a `ParseError`.                                                                    |
 | Invalid JSON under a JSON media type     | Throws a `ParseError`.                                                                    |
-| Network or DNS failure                   | Rejects with the `NetworkError` from Ky, after its retries.                               |
+| Network or DNS failure                   | Rejects with the `NetworkError` from Ky.                                                  |
 | No response headers within `timeout`     | Rejects with the `TimeoutError` from Ky.                                                  |
 | Aborted `signal`                         | Rejects with the signal's reason.                                                         |
 

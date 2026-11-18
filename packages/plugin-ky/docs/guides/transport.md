@@ -29,7 +29,7 @@ Return a `TransportResult` to set the native `request` and `response` that resul
 
 ## Use your own Ky instance
 
-`createKyTransport` sends through a Ky instance and keeps its defaults, retries, and hooks:
+`createKyTransport` sends through a Ky instance and keeps its defaults and hooks:
 
 ```typescript
 import ky from 'ky'
@@ -41,7 +41,7 @@ client.setConfig({ transport: createKyTransport(instance) })
 ```
 
 > [!NOTE]
-> Leave `prefix` and `baseUrl` off the instance, and set the base URL with [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#set-the-base-url). The transport sets `throwHttpErrors: false`, because the client splits success from error itself, and still retries a status by the instance's `retry` options.
+> Leave `prefix` and `baseUrl` off the instance, and set the base URL with [`baseURL`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#set-the-base-url). The transport sets `throwHttpErrors: false`, because the client splits success from error itself. Your instance keeps Ky's own `retry` default of 2, so pass `retry: 0` to `ky.create` to send each call once, as the default client does.
 
 ## Wrap the default transport
 

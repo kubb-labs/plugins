@@ -4,13 +4,14 @@ import ky from 'ky'
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
 import { client, createClient, createKyTransport, ResponseError } from './client.ts'
+import type { NativeOptions } from './client.ts'
 
 type Hit = { method?: string; url?: string; headers: http.IncomingHttpHeaders; body: string }
 
 const hits: Array<Hit> = []
 let baseURL = ''
 
-// `/limited` answers 429 with `Retry-After: 0` once and then 200, `/large` always answers 413, `/flaky` answers 503 once and then 200, `/down` always answers 503, `/missing` answers 404, `/slow` never answers, and the rest echoes 200.
+// `/flaky` answers 503 once and then 200, `/down` always answers 503, `/missing` answers 404, `/slow` never answers, and the rest echoes 200.
 const server = http.createServer((req, res) => {
   const chunks: Array<Buffer> = []
   req.on('data', (chunk) => chunks.push(chunk))
@@ -18,8 +19,8 @@ const server = http.createServer((req, res) => {
     hits.push({ method: req.method, url: req.url, headers: req.headers, body: Buffer.concat(chunks).toString() })
     const count = hits.filter((hit) => hit.url === req.url).length
     if (req.url === '/slow') return
-    // Sends the headers at once and then one event every 60 ms, after a 503 on the first try of `/events-flaky`.
-    if (req.url?.startsWith('/events') && !(req.url === '/events-flaky' && count === 1)) {
+    // Sends the headers at once and then one event every 60 ms.
+    if (req.url?.startsWith('/events')) {
       res.writeHead(200, { 'content-type': 'text/event-stream' })
       res.flushHeaders()
       let sent = 0
@@ -33,13 +34,7 @@ const server = http.createServer((req, res) => {
       res.on('close', () => clearInterval(timer))
       return
     }
-    if (req.url === '/limited' && count === 1) return res.writeHead(429, { 'retry-after': '0' }).end()
-    if (req.url === '/large') return res.writeHead(413).end()
-    const status = req.url?.startsWith('/missing')
-      ? 404
-      : req.url === '/events-flaky' || req.url?.startsWith('/down') || (req.url === '/flaky' && count === 1)
-        ? 503
-        : 200
+    const status = req.url === '/missing' ? 404 : req.url?.startsWith('/down') || (req.url === '/flaky' && count === 1) ? 503 : 200
     res.writeHead(status, { 'content-type': 'application/json' })
     res.end(JSON.stringify(status === 200 ? { ok: true } : { message: 'nope' }))
   })
@@ -88,6 +83,35 @@ describe('defaultTransport', () => {
     await expect(client({ method: 'GET', url: '/slow', options: { timeout: 50, retry: 0 } })).rejects.toMatchObject({ name: 'TimeoutError' })
   })
 
+  test('does not retry an error status or a network error, as the fetch and axios clients do not', async () => {
+    await expect(client({ method: 'GET', url: '/down' })).rejects.toMatchObject({ status: 503, data: { message: 'nope' } })
+    expect(hits.filter((hit) => hit.url === '/down')).toHaveLength(1)
+
+    const retries = vi.fn()
+    const options = { hooks: { beforeRetry: [retries] } }
+    await expect(client({ method: 'GET', url: '/x', baseURL: 'http://127.0.0.1:1', options })).rejects.toMatchObject({ name: 'NetworkError' })
+    expect(retries).not.toHaveBeenCalled()
+  })
+
+  test('retries when options ask for it: a network error by retry, an error status by an afterResponse hook', async () => {
+    const retries = vi.fn()
+    const retry = { limit: 2, delay: () => 0 }
+    await expect(
+      client({ method: 'GET', url: '/x', baseURL: 'http://127.0.0.1:1', options: { retry, hooks: { beforeRetry: [retries] } } }),
+    ).rejects.toMatchObject({ name: 'NetworkError' })
+    expect(retries).toHaveBeenCalledTimes(2)
+
+    // The hook from the calling-operations guide: stop at the limit, so the last response reaches the core.
+    const hooks: NativeOptions['hooks'] = {
+      afterResponse: [({ response, retryCount, options }) => (response.status === 503 && retryCount < options.retry.limit ? ky.retry() : undefined)],
+    }
+    expect((await client({ method: 'GET', url: '/flaky', options: { retry, hooks } })).status).toBe(200)
+    expect(hits.filter((hit) => hit.url === '/flaky')).toHaveLength(2)
+
+    await expect(client({ method: 'GET', url: '/down-hooked', options: { retry, hooks } })).rejects.toMatchObject({ status: 503, data: { message: 'nope' } })
+    expect(hits.filter((hit) => hit.url === '/down-hooked')).toHaveLength(3)
+  })
+
   test('rejects an aborted call with the signal reason', async () => {
     const reason = new Error('stop')
 
@@ -96,27 +120,12 @@ describe('defaultTransport', () => {
 })
 
 describe('createKyTransport', () => {
-  test('keeps the defaults and hooks of the Ky instance, and retries a status by its retry options', async () => {
-    const instance = ky.create({
-      headers: { 'X-Instance': 'yes' },
-      retry: { limit: 2, delay: () => 0 },
-    })
-    const flaky = createClient({ baseURL, transport: createKyTransport(instance) })
+  test('keeps the defaults of the Ky instance', async () => {
+    const own = createClient({ baseURL, transport: createKyTransport(ky.create({ headers: { 'X-Instance': 'yes' } })) })
 
-    const result = await flaky({ method: 'GET', url: '/flaky' })
+    await own({ method: 'GET', url: '/instance' })
 
-    expect(result.status).toBe(200)
-    expect(hits.filter((hit) => hit.url === '/flaky')).toHaveLength(2)
     expect(hits.at(-1)?.headers['x-instance']).toBe('yes')
-
-    // Past the retry limit, the last response reaches the core, which throws its ResponseError.
-    await expect(flaky({ method: 'GET', url: '/down' })).rejects.toMatchObject({ status: 503, data: { message: 'nope' } })
-    expect(hits.filter((hit) => hit.url === '/down')).toHaveLength(3)
-
-    // Ky leaves a POST out of its retry methods, and `retry: 0` turns retries off.
-    await expect(flaky({ method: 'POST', url: '/down-post' })).rejects.toMatchObject({ status: 503 })
-    await expect(flaky({ method: 'GET', url: '/down-once', options: { retry: 0 } })).rejects.toMatchObject({ status: 503 })
-    expect(hits.filter((hit) => hit.url?.startsWith('/down-'))).toHaveLength(2)
   })
 
   test('runs the instance hooks before the hooks in options, and the hooks of a call replace the client hooks', async () => {
@@ -134,31 +143,10 @@ describe('createKyTransport', () => {
 
     expect(seen).toStrictEqual(['interceptor', 'instance', 'client', 'interceptor', 'instance', 'call'])
   })
-
-  test('decides a status retry as Ky does: Retry-After, a permanent 413, and shouldRetry', async () => {
-    const delay = vi.fn(() => 0)
-    const retrying = createClient({ baseURL, options: { retry: { limit: 2, delay } } })
-
-    // A `Retry-After` header sets the wait, so `retry.delay` is not asked.
-    expect((await retrying({ method: 'GET', url: '/limited' })).status).toBe(200)
-    expect(delay).not.toHaveBeenCalled()
-
-    await expect(retrying({ method: 'PUT', url: '/large' })).rejects.toMatchObject({ status: 413 })
-    expect(hits.filter((hit) => hit.url === '/large')).toHaveLength(1)
-
-    const veto = { retry: { limit: 2, delay, shouldRetry: () => false } }
-    await expect(retrying({ method: 'GET', url: '/down-veto', options: veto })).rejects.toMatchObject({ status: 503 })
-    expect(hits.filter((hit) => hit.url === '/down-veto')).toHaveLength(1)
-
-    // `shouldRetry: true` retries a status outside `statusCodes`.
-    const force = { retry: { limit: 1, delay, shouldRetry: () => true } }
-    await expect(retrying({ method: 'GET', url: '/missing-forced', options: force })).rejects.toMatchObject({ status: 404 })
-    expect(hits.filter((hit) => hit.url === '/missing-forced')).toHaveLength(2)
-  })
 })
 
 describe('client.stream', () => {
-  const streamClient = () => createClient({ baseURL, mediaTypes: streamMediaTypes, options: { timeout: 50, retry: { limit: 1, delay: () => 0 } } })
+  const streamClient = () => createClient({ baseURL, mediaTypes: streamMediaTypes, options: { timeout: 50 } })
 
   test('reads server-sent events past the Ky timeout, which only waits for the headers', async () => {
     const events = await streamClient().stream<{ '200': { n: number } }>({ method: 'GET', url: '/events' })
@@ -170,8 +158,8 @@ describe('client.stream', () => {
     expect(hits.at(-1)?.headers.accept).toBe('text/event-stream')
   })
 
-  test('retries a 503 before the stream starts, and stops the request when the loop breaks', async () => {
-    const events = await streamClient().stream<{ '200': { n: number } }>({ method: 'GET', url: '/events-flaky' })
+  test('stops the request when the loop breaks', async () => {
+    const events = await streamClient().stream<{ '200': { n: number } }>({ method: 'GET', url: '/events-break' })
     const seen: Array<unknown> = []
     for await (const event of events) {
       seen.push(event.data)
@@ -179,7 +167,6 @@ describe('client.stream', () => {
     }
 
     expect(seen).toStrictEqual([{ n: 1 }])
-    expect(hits.filter((hit) => hit.url === '/events-flaky')).toHaveLength(2)
   })
 
   test('rejects with the signal reason when the abort comes while events are read', async () => {
