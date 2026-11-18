@@ -5,6 +5,7 @@
   "export": "pluginValibot",
   "displayName": "Valibot",
   "description": "Generates Valibot v1 schemas from your OpenAPI spec so you validate API responses, form input, and query params at runtime.",
+  "beta": true,
   "category": "validation",
   "icon": {
     "light": "https://kubb.dev/feature/valibot.svg"

@@ -5,6 +5,7 @@
   "export": "pluginKy",
   "displayName": "Ky",
   "description": "Generates a type-safe Ky client from your OpenAPI spec, one async function per operation, so each call stays in sync with the API.",
+  "beta": true,
   "category": "client",
   "icon": {
     "light": "https://kubb.dev/feature/ky.svg"
