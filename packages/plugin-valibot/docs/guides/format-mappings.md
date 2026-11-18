@@ -53,7 +53,7 @@ With `dateType: 'date'`, a date, date-time, or time is a `Date` in your code and
 | :---------------------------- | :------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
 | `string`, `format: date`      | `v.pipe(v.string(), v.isoDate(), v.transform((value) => new Date(value)))` | `v.pipe(v.date(), v.transform((value) => value.toISOString().slice(0, 10)))` |
 | `string`, `format: date-time` | `v.pipe(v.string(), v.isoTimestamp(), v.transform(...))`                   | `v.pipe(v.date(), v.transform((value) => value.toISOString()))`              |
-| `string`, `format: time`      | Parses onto `1970-01-01` UTC                                               | Writes `HH:mm:ss`                                                            |
+| `string`, `format: time`      | Parses onto `1970-01-01` UTC                                               | Writes `HH:mm:ss`, with milliseconds when the value has them                 |
 
 A component schema with such a field is generated twice: `petSchema` for responses and `petInputSchema` for requests. With [`coercion`](https://kubb.dev/extensions/kubb-labs/plugin-valibot/options#coercion) for dates, the response schema prints `v.pipe(v.unknown(), v.toDate())`.
 
@@ -88,6 +88,8 @@ These keywords print a `v.check`:
 | `contains` with `minContains` and `maxContains`                            | Counts the matching items of an array.                                           |
 | `contentSchema` on a string that holds JSON                                | Parses the string and checks the result.                                         |
 | `uniqueItems`                                                              | Rejects an array with duplicate entries.                                         |
+
+A request body that is a circular schema prints inline without its `readOnly` keys. In a circular `allOf`, a `readOnly` key that a `$ref` member declares stays.
 
 A schema with a check on the input is a `v.pipe`, so it is no member of a `v.variant` and does not merge into an `allOf` object. A request body that drops `readOnly` keys from such a schema leaves the input checks out.
 

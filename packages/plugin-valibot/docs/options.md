@@ -11,7 +11,12 @@ Pass these options to `pluginValibot()`. Shared options link to [Shared plugin o
 | [`importPath`](#importpath)                                               | Module the generated files import `v` from.                                          | `'valibot'`                                      |
 | [`inferred`](#inferred)                                                   | Export a type next to each schema.                                                   | `false`                                          |
 | [`coercion`](#coercion)                                                   | Convert input before validation.                                                     | `false`                                          |
+| [`coercion.strings`](#coercion)                                           | Convert a `string` with `v.toString()`.                                              | `false`                                          |
+| [`coercion.numbers`](#coercion)                                           | Convert a `number` and an `integer` with `v.toNumber()`.                             | `false`                                          |
+| [`coercion.dates`](#coercion)                                             | Convert a `Date` field of a response with `v.toDate()`.                              | `false`                                          |
 | [`typeGuards`](#typeguards)                                               | Generate `is*` type guards and `assert*` assertions.                                 | `false`                                          |
+| [`typeGuards.is`](#typeguards)                                            | Generate the `is*` type guard.                                                       | `true`                                           |
+| [`typeGuards.assert`](#typeguards)                                        | Generate the `assert*` function.                                                     | `true`                                           |
 | [`regexType`](#regextype)                                                 | How an OpenAPI `pattern` is written.                                                 | `'literal'`                                      |
 | [`printer`](#printer)                                                     | Replace the handler for a schema type.                                               | None                                             |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations and schemas that match.                                         | None                                             |
@@ -78,7 +83,7 @@ Writes `v.pipe(v.unknown(), v.toDate())` for a response field that is a `Date`. 
 
 ::
 
-`true` turns on all three. A `format: int64` field always converts, because JSON holds a number or a string.
+`true` turns on all three. An `integer` with `format: int64` converts with or without this option, because JSON holds a number or a string.
 
 ### typeGuards
 

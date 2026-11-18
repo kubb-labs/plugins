@@ -312,13 +312,13 @@ function inputChecks(ctx: PrinterContext, node: ast.SchemaNode): Array<string> {
 type Handler<K extends ast.SchemaType> = (this: ThisParameterType<NonNullable<PrinterValibotNodes['any']>>, node: ast.SchemaNodeByType[K]) => string | null
 
 // Wraps each handler so its output first checks the raw input: `v.pipe(v.unknown(), ...checks, schema)`.
-function withInputChecks(nodes: PrinterValibotNodes, isSkipped: () => boolean): PrinterValibotNodes {
+function withInputChecks(nodes: PrinterValibotNodes, isSkipped: (node: ast.SchemaNode) => boolean): PrinterValibotNodes {
   const wrapHandler = <K extends ast.SchemaType>(type: K): Array<[K, Handler<K>]> => {
     const handler: Handler<K> | undefined = nodes[type]
     if (!handler) return []
     const checkedHandler: Handler<K> = function (node) {
       const output = handler.call(this, node)
-      if (!output || isSkipped() || !hasChecks(node)) return output
+      if (!output || isSkipped(node) || !hasChecks(node)) return output
 
       return pipe(UNKNOWN, [...inputChecks(this, node), output])
     }
@@ -331,7 +331,7 @@ function withInputChecks(nodes: PrinterValibotNodes, isSkipped: () => boolean): 
 /**
  * The handlers that print differently per direction. `date` and `time` decode a wire string into a
  * `Date` on responses and encode it back on requests. Only `representation: 'date'` fields convert.
- * `time` has no date part, so it decodes onto `1970-01-01` UTC and encodes back to `HH:mm:ss`.
+ * `time` has no date part, so it decodes onto `1970-01-01` UTC and encodes back to `HH:mm:ss`, with milliseconds when it has them.
  */
 const directionalNodes: PrinterValibotNodes = {
   date(node) {
@@ -350,7 +350,8 @@ const directionalNodes: PrinterValibotNodes = {
   time(node) {
     // Valibot's time actions reject fractional seconds, which an OpenAPI `time` allows, so a time string stays unchecked.
     if (node.representation === 'string') return 'v.string()'
-    if (this.options.direction === 'encode') return 'v.pipe(v.date(), v.transform((value) => value.toISOString().slice(11, 19)))'
+    // Keeps the milliseconds, so a decoded `12:34:56.789` encodes back to the same value.
+    if (this.options.direction === 'encode') return 'v.pipe(v.date(), v.transform((value) => value.toISOString().slice(11, 23).replace(".000", "")))'
 
     // The trailing `v.date()` rejects the Invalid Date a malformed time turns into.
     return 'v.pipe(v.string(), v.transform((value) => new Date(`1970-01-01T${value}Z`)), v.date())'
@@ -416,8 +417,8 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
     const resolved = ast.ref.mergeSchema(node)
     return isObjectSchemaNode(node, cyclicSchemas) && resolved.default === undefined && !hasPatternKeyCheck(resolved)
   }
-  // Set while `print` reads the object behind a schema with input checks, which `v.omit` needs bare.
-  let skipsInputChecks = false
+  // The node `print` reads without its input checks, because `v.omit` needs the bare object. Nested nodes keep theirs.
+  let uncheckedNode: ast.SchemaNode | null = null
   const unionsWithSiblings = new WeakSet<ast.SchemaNode>()
   // An OpenAPI 3.0 `nullable: true` set on an array item or union member, which only a property or a root applies.
   const printNullable = (schema: ast.SchemaNode, output: string | null) => (output && schema.nullable ? `v.nullable(${output})` : output)
@@ -435,11 +436,11 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
     if (node.type === ast.schema.types.ref)
       return `v.omit(${transformed}${unwrapChain(node, this.options.direction)}.pipe[${countChecks(target) + 1}], ${keys})`
 
-    skipsInputChecks = true
+    uncheckedNode = node
     try {
       return `v.omit(${this.transform(node)}, ${keys})`
     } finally {
-      skipsInputChecks = false
+      uncheckedNode = null
     }
   }
 
@@ -635,7 +636,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
   return {
     name: 'valibot',
     options,
-    nodes: withInputChecks(nodes, () => skipsInputChecks),
+    nodes: withInputChecks(nodes, (node) => node === uncheckedNode),
     overrides: options.nodes,
     print(node) {
       const transformed = this.transform(node)

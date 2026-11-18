@@ -133,10 +133,13 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       if (!schema) return null
       // A circular const is typed `v.GenericSchema`, which `v.omit` does not take, so its object prints here without the keys.
       const refName = schema.type === 'ref' ? ast.ref.getName(schema) : null
-      const target = schema.type === 'ref' && schema.schema ? ast.schema.narrow(schema.schema, 'object') : undefined
+      const target = schema.type === 'ref' ? schema.schema : undefined
       if (keysToOmit?.length && target && refName && cyclicSchemas.has(refName)) {
-        const inline = { ...target, properties: target.properties.filter((property) => !keysToOmit.includes(property.name)) }
-        return renderSchemaEntry({ schema: inline, name, direction })
+        const withoutKeys = (node: ast.SchemaNode): ast.SchemaNode =>
+          node.type === 'object' ? { ...node, properties: node.properties.filter((property) => !keysToOmit.includes(property.name)) } : node
+        // An `allOf` drops the keys from its inline object members. A key that a `$ref` member declares stays.
+        const inline = target.type === 'intersection' ? { ...target, members: (target.members ?? []).map(withoutKeys) } : withoutKeys(target)
+        if (inline.type === 'object' || inline.type === 'intersection') return renderSchemaEntry({ schema: inline, name, direction })
       }
 
       const inputRefNames = direction === 'encode' ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null

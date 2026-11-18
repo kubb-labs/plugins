@@ -390,6 +390,7 @@ describe('printerValibot', () => {
       expect(v.parse(build(encode.print(date)!), value)).toBe('2026-01-31')
       expect(v.parse(build(encode.print(datetime)!), value)).toBe('2026-01-31T10:30:00.000Z')
       expect(v.parse(build(encode.print(time)!), value)).toBe('10:30:00')
+      expect(v.parse(build(encode.print(time)!), new Date('2026-01-31T10:30:00.789Z'))).toBe('10:30:00.789')
       expect(v.is(build(encode.print(date)!), new Date('x'))).toBe(false)
     })
 
@@ -493,6 +494,11 @@ describe('printerValibot', () => {
       expect(refCode).toBe("v.omit(petSchema.pipe[2], ['id'])")
       expect(v.parse(build(refCode, { petSchema: build(print(counted)) }), { id: 'a', name: 'b' })).toEqual({ name: 'b' })
       expect(v.parse(build(inlineCode), { id: 'a', name: 'b' })).toEqual({ name: 'b' })
+
+      // Only the omitted object loses its checks. A nested object keeps them.
+      const nested = omit.print(object({ id: string(), child: object({ 'name?': string() }, { min: 1 }) }, { min: 1 }))!
+      expect(v.is(build(nested), { id: 'a', child: {} })).toBe(false)
+      expect(v.is(build(nested), { id: 'a', child: { name: 'b' } })).toBe(true)
     })
   })
 })

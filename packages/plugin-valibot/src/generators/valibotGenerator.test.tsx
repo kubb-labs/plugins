@@ -198,6 +198,28 @@ describe('valibotGenerator operation', () => {
     await matchFiles(driver.fileManager.files, 'circularBody')
   })
 
+  test('a request body that is a circular allOf drops the readOnly keys of its inline members', async () => {
+    const { driver, context } = setup('circularAllOfBody')
+    const target = createSchema({
+      type: 'intersection',
+      name: 'Pet',
+      members: [createSchema({ type: 'ref', name: 'Animal', ref: '#/components/schemas/Animal' }), createSchema({ ...petSchema, name: undefined })],
+    })
+    driver.inputNode = ast.factory.createInput({ schemas: [target] })
+    const node = createOperation({
+      operationId: 'addPet',
+      method: 'POST',
+      path: '/pets',
+      tags: ['pets'],
+      requestBody: { content: [createContent({ contentType: 'application/json', schema: petRef(target), keysToOmit: ['id'] })] },
+      responses: [createResponse({ statusCode: '204', description: 'Created' })],
+    })
+
+    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
+
+    await matchFiles(driver.fileManager.files, 'circularAllOfBody')
+  })
+
   test('a request encodes a Date and a response decodes it', async () => {
     const { driver, context } = setup('codec', { inferred: true })
     const stayRef = () => createSchema({ type: 'ref', name: 'Stay', ref: '#/components/schemas/Stay', schema: staySchema })
