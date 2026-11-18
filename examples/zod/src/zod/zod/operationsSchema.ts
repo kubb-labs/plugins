@@ -1,4 +1,4 @@
-import { z } from '../../zod.ts'
+import type { z } from '../../zod.ts'
 import { addPetBodySchema, addPetStatus200Schema, addPetStatus405Schema, addPetResponseSchema } from './addPetSchema'
 import {
   createPetsBodySchema,

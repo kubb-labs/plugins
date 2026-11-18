@@ -10,7 +10,7 @@ export type FindPetsByTagsQuery = {
    * @description Tags to filter by
    * @type array | undefined
    */
-  tags?: string[]
+  tags?: Array<string>
   /**
    * @description to request with required page number or pagination
    * @type string | undefined
@@ -39,7 +39,7 @@ export type FindPetsByTagsHeaders = {
   'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
 }
 
-export type FindPetsByTagsStatus200Json = Pet[]
+export type FindPetsByTagsStatus200Json = Array<Pet>
 
 export type FindPetsByTagsStatus200Xml = string
 

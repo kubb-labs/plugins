@@ -28,8 +28,8 @@ export type AddPetRequest = {
    */
   name: string
   category?: Category
-  photoUrls: string[]
-  tags?: Tag[]
+  photoUrls: Array<string>
+  tags?: Array<Tag>
   /**
    * @description pet status in the store
    * @type string | undefined

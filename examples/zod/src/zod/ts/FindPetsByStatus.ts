@@ -22,7 +22,7 @@ export type FindPetsByStatusQuery = {
   status?: FindPetsByStatusStatusKey
 }
 
-export type FindPetsByStatusStatus200Json = Pet[]
+export type FindPetsByStatusStatus200Json = Array<Pet>
 
 export type FindPetsByStatusStatus200Xml = string
 
