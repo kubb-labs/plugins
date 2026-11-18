@@ -1,5 +1,11 @@
 # @kubb/plugin-ts
 
+## 5.5.6
+
+### Patch Changes
+
+- [#1506](https://github.com/kubb-labs/plugins/pull/1506) [`38204b3`](https://github.com/kubb-labs/plugins/commit/38204b3a786cc285b73fc09007794836f0cfcf04) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use Kubb 5.21.2.
+
 ## 5.5.5
 
 ### Patch Changes

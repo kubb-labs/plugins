@@ -1,5 +1,27 @@
 # @kubb/plugin-react-query
 
+## 5.11.0
+
+### Minor Changes
+
+- [#1491](https://github.com/kubb-labs/plugins/pull/1491) [`a1b4efe`](https://github.com/kubb-labs/plugins/commit/a1b4efe774ac02112c77bb1b84195c5f923b8f5b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `@kubb/plugin-ky`, which generates a type-safe HTTP client that sends with [Ky](https://github.com/sindresorhus/ky). Pass Ky options such as `retry`, `timeout`, and `hooks` in `options`, on a call or with `client.setConfig`. A call is sent once unless you set `retry`, as with the fetch and axios clients. The query and MCP plugins accept `client: 'ky'`.
+  
+  ```ts
+  import { pluginKy } from '@kubb/plugin-ky'
+  
+  export default defineConfig({
+    plugins: [pluginTs(), pluginKy({ baseURL: 'https://petstore.swagger.io/v2' })],
+  })
+  ```
+  
+  The `@kubb/plugin-fetch` and `@kubb/plugin-client` docs now point to `@kubb/plugin-ky`.
+
+### Patch Changes
+
+- [#1506](https://github.com/kubb-labs/plugins/pull/1506) [`38204b3`](https://github.com/kubb-labs/plugins/commit/38204b3a786cc285b73fc09007794836f0cfcf04) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use Kubb 5.21.2.
+- Updated dependencies [[`38204b3`](https://github.com/kubb-labs/plugins/commit/38204b3a786cc285b73fc09007794836f0cfcf04)]:
+  - @kubb/plugin-ts@5.5.6
+
 ## 5.10.5
 
 ### Patch Changes
