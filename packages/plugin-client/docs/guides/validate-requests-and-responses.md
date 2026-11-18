@@ -1,6 +1,6 @@
 # Validate requests and responses
 
-Pass Zod schemas from `@kubb/plugin-zod` to your client and run them there.
+Pass Zod schemas from `@kubb/plugin-zod` to your client and run them there. For Valibot, add `pluginValibot()` from `@kubb/plugin-valibot` and write `'valibot'` wherever this guide writes `'zod'`.
 
 ::steps{level="2"}
 

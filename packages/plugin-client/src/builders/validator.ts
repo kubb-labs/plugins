@@ -1,7 +1,13 @@
 import { ast } from '@kubb/kit'
-import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorOptions } from '../types.ts'
-import { buildZodErrorParse, resolveParamsValidator, resolveRequestValidator, resolveResponseValidator } from './validatorOptions.ts'
+import {
+  buildErrorParse,
+  resolveParamsValidator,
+  resolveRequestValidator,
+  resolveResponseValidator,
+  resolveValidatorLibrary,
+  type ValidatorResolver,
+} from './validatorOptions.ts'
 
 /**
  * The per-call validator references a generated function wires into its request config. Each hook is
@@ -29,9 +35,9 @@ export type ValidatorHooks = {
   /** Per-status schema map for `validator.error`, such as `{ 404: getPetStatus404Schema }`, or `null` when off or absent. */
   error: string | null
   /**
-   * Zod schema names the generated file imports from the zod plugin output.
+   * Schema names the generated file imports from the output of the schema plugin.
    */
-  importedZodNames: Array<string>
+  importedSchemaNames: Array<string>
 }
 
 /**
@@ -42,43 +48,45 @@ export type ValidatorHooks = {
 export function buildValidatorHooks({
   node,
   validator,
-  zodResolver,
+  schemaResolver,
 }: {
   node: ast.OperationNode
   validator: ValidatorOptions | undefined
-  zodResolver: ResolverZod | null | undefined
+  schemaResolver: ValidatorResolver | null | undefined
 }): ValidatorHooks {
   const hasRequestBody = Boolean(ast.http.requestBody.getSchema(node))
-  const parsesResponse = zodResolver && resolveResponseValidator(validator) === 'zod'
+  const parsesResponse = schemaResolver && resolveResponseValidator(validator)
 
   // Success responses validate with the success-only `<operation>ResponseSchema`; error bodies with the schema of their status.
-  // plugin-zod emits that schema only for an operation with a response body schema.
+  // The schema plugins emit that schema only for an operation with a response body schema.
   const hasResponseSchema = node.responses.some((res) => res.content?.some((entry) => entry.schema))
-  const response = parsesResponse && hasResponseSchema ? zodResolver.response.response(node) || null : null
-  const errorParse = parsesResponse ? buildZodErrorParse(node, zodResolver) : null
-  const request = zodResolver && resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.response.body(node) || null : null
+  const response = parsesResponse && hasResponseSchema ? schemaResolver.response.response(node) || null : null
+  const errorParse = parsesResponse ? buildErrorParse(node, schemaResolver) : null
+  const request = schemaResolver && resolveRequestValidator(validator) && hasRequestBody ? schemaResolver.response.body(node) || null : null
 
   const paramGroups = ast.http.groupParameters(node)
   const resolveParamsName = (kind: 'path' | 'query' | 'headers' | 'cookies', params: Array<ast.ParameterNode>): string | null =>
-    zodResolver && resolveParamsValidator(validator) === 'zod' && params.length > 0 ? zodResolver.param[kind](node, params[0]!) : null
+    schemaResolver && resolveParamsValidator(validator) && params.length > 0 ? schemaResolver.param[kind](node, params[0]!) : null
   const path = resolveParamsName('path', paramGroups.path)
   const query = resolveParamsName('query', paramGroups.query)
   const headers = resolveParamsName('headers', paramGroups.header)
   const cookies = resolveParamsName('cookies', paramGroups.cookie)
 
   // Order is output: the generated file imports the response schema, then the error schemas, then the request body and params schemas.
-  const importedZodNames = [response, ...(errorParse?.names ?? []), request, path, query, headers, cookies].filter((name): name is string => Boolean(name))
+  const importedSchemaNames = [response, ...(errorParse?.names ?? []), request, path, query, headers, cookies].filter((name): name is string => Boolean(name))
 
-  const headersValidator = headers ? `toHeadersStandardSchema(${headers}, ${headers}.shape)` : null
+  // The declared keys of an object schema: `.shape` in Zod, `.entries` in Valibot.
+  const keys = resolveValidatorLibrary(validator) === 'valibot' ? 'entries' : 'shape'
+  const headersValidator = headers ? `toHeadersStandardSchema(${headers}, ${headers}.${keys})` : null
 
-  return { request, path, query, headers: headersValidator, cookies, response, error: errorParse?.literal ?? null, importedZodNames }
+  return { request, path, query, headers: headersValidator, cookies, response, error: errorParse?.literal ?? null, importedSchemaNames }
 }
 
 /**
  * Prints the `validator: { … }` entry of a call config from the hooks named in `keys`, or `null` when none is set.
  * The entry spreads `config.validator` last, so a per-call hook overrides the generated one for its key only.
  */
-export function buildValidatorLiteral(hooks: ValidatorHooks | null, keys: ReadonlyArray<keyof Omit<ValidatorHooks, 'importedZodNames'>>): string | null {
+export function buildValidatorLiteral(hooks: ValidatorHooks | null, keys: ReadonlyArray<keyof Omit<ValidatorHooks, 'importedSchemaNames'>>): string | null {
   const entries = keys.flatMap((key) => (hooks?.[key] ? [`${key}: ${hooks[key]}`] : []))
   return entries.length ? `validator: { ${entries.join(', ')}, ...config.validator }` : null
 }

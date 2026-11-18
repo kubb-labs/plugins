@@ -11,6 +11,7 @@ import { pluginBarrel } from '@kubb/plugin-barrel'
 import { pluginFetch } from '@kubb/plugin-fetch'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
+import { pluginValibot } from '@kubb/plugin-valibot'
 import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 
@@ -85,6 +86,25 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
           output: { path: './clients', barrel: false, mode: 'directory' },
           validator: { request: 'zod', params: 'zod', response: 'zod' },
           sdk: {},
+        }),
+      ],
+    },
+  },
+  {
+    name: 'valibotValidator',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/petStore.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs()],
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' }, include: [{ type: 'tag', pattern: 'store' }] }),
+        pluginValibot({ output: { path: './valibot', barrel: false, mode: 'directory' }, include: [{ type: 'tag', pattern: 'store' }] }),
+        pluginFetch({
+          output: { path: './clients', barrel: false, mode: 'directory' },
+          validator: { request: 'valibot', params: 'valibot', response: 'valibot' },
+          include: [{ type: 'tag', pattern: 'store' }],
         }),
       ],
     },

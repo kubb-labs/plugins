@@ -116,8 +116,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
           file: op.typeFile,
           names: [op.types.response.options(op.node), op.types.response.responses(op.node), ...op.headerTypeNames],
         }))
-        const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = validatorEnabled
-          ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.validatorHooks.importedZodNames }))
+        const { namesByPath: schemaNamesByPath, filesByPath: schemaFilesByPath } = validatorEnabled
+          ? collectImportsByFile(ops, (op) => ({ file: op.schemaFile, names: op.validatorHooks.importedSchemaNames }))
           : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, ast.FileNode>() }
         const resultOps = ops.filter((op) => !isEventStream(op.node))
         const typedHeaders = (op: OperationData) => op.headerTypeNames.length > 0
@@ -159,8 +159,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
             ))}
 
             {validatorEnabled &&
-              Array.from(zodNamesByPath.entries()).map(([filePath, set]) => (
-                <File.Import key={filePath} name={Array.from(set)} root={file.path} path={zodFilesByPath.get(filePath)!.path} />
+              Array.from(schemaNamesByPath.entries()).map(([filePath, set]) => (
+                <File.Import key={filePath} name={Array.from(set)} root={file.path} path={schemaFilesByPath.get(filePath)!.path} />
               ))}
 
             {ops.some((op) => op.validatorHooks.headers) && <File.Import name={['toHeadersStandardSchema']} root={file.path} path={standardSchemaPath} />}

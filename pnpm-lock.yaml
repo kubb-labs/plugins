@@ -927,9 +927,6 @@ importers:
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:^
-        version: link:../plugin-zod
       '@kubb/renderer-jsx':
         specifier: ^5.21.1
         version: 5.21.1
@@ -943,6 +940,12 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
+      '@kubb/plugin-valibot':
+        specifier: workspace:^
+        version: link:../plugin-valibot
+      '@kubb/plugin-zod':
+        specifier: workspace:^
+        version: link:../plugin-zod
       typescript:
         specifier: 'catalog:'
         version: 7.0.2

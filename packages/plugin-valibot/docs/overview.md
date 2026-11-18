@@ -4,6 +4,8 @@ The Valibot plugin generates a Valibot v1 schema for every schema in your OpenAP
 
 Every generated schema is a [Standard Schema](https://standardschema.dev), so any library that takes one can validate with it.
 
+`@kubb/plugin-fetch`, `@kubb/plugin-axios`, and `@kubb/plugin-client` validate with these schemas when you set their `validator` option to `'valibot'`.
+
 ## Setup
 
 - No other plugins are needed.

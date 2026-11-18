@@ -72,8 +72,8 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
           <File.Import name={Array.from(new Set(importedTypeNames))} root={file.path} path={data.typeFile.path} isTypeOnly />
 
-          {data.zodFile && validatorHooks.importedZodNames.length > 0 && (
-            <File.Import name={validatorHooks.importedZodNames} root={file.path} path={data.zodFile.path} />
+          {data.schemaFile && validatorHooks.importedSchemaNames.length > 0 && (
+            <File.Import name={validatorHooks.importedSchemaNames} root={file.path} path={data.schemaFile.path} />
           )}
           {validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
 

@@ -2,8 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { addGenerator, injectFile, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
-import { isValidatorEnabled } from './builders/validatorOptions.ts'
+import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './builders/validatorOptions.ts'
 import { createClientGenerator } from './generators/clientGenerator.tsx'
 import { createSdkGenerator } from './generators/sdkGenerator.tsx'
 import { defaultMacros } from './macros.ts'
@@ -85,8 +84,14 @@ export function setupClient({
 }
 
 /**
- * Declares `plugin-ts` as optional and `plugin-zod` as required once `validator` enables a direction.
+ * Declares `plugin-ts` as optional, and the schema plugin of the `validator` library as required once a direction is on.
  */
 export function clientDependencies(options: Pick<ClientOptions, 'validator'>) {
-  return { [pluginTsName]: { optional: true }, [pluginZodName]: { optional: !isValidatorEnabled(options.validator) } }
+  const library = resolveValidatorLibrary(options.validator)
+
+  return {
+    [pluginTsName]: { optional: true },
+    [pluginZodName]: { optional: library !== 'zod' },
+    [pluginValibotName]: { optional: library !== 'valibot' },
+  }
 }
