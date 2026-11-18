@@ -6,6 +6,9 @@
 import * as v from 'valibot'
 import { petSchema } from '../petSchema'
 
+/**
+ * ID of pet to return
+ */
 export const getPetByIdPathPetIdSchema = v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))), v.description('ID of pet to return'))
 
 export const getPetByIdStatus200SchemaJson = petSchema
@@ -23,5 +26,5 @@ export const getPetByIdResponseSchema = getPetByIdStatus200Schema
 export const getPetByIdErrorSchema = v.union([getPetByIdStatus400Schema, getPetByIdStatus404Schema])
 
 export const getPetByIdPathSchema = v.object({
-  petId: v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))), v.description('ID of pet to return')),
+  petId: getPetByIdPathPetIdSchema,
 })

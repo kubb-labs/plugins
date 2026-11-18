@@ -29,12 +29,7 @@ export const bookStayBodySchema = stayInputSchema
 export type BookStayBodySchemaType = v.InferInput<typeof bookStayBodySchema>
 
 export const bookStayQuerySchema = v.object({
-  from: v.optional(
-    v.pipe(
-      v.date(),
-      v.transform((value) => value.toISOString().slice(0, 10)),
-    ),
-  ),
+  from: bookStayQueryFromSchema,
 })
 
 export type BookStayQuerySchemaType = v.InferInput<typeof bookStayQuerySchema>

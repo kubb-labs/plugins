@@ -195,7 +195,14 @@ export function bigintConstraints({ min, max, exclusive, multipleOf }: NumericCo
 export type NumericBounds = Omit<NumericConstraints, 'min' | 'max'> & { min?: number | string; max?: number | string }
 
 const integerFormatRanges: Record<'integer' | 'bigint', Record<string, [min: bigint, max: bigint]>> = {
-  integer: { int32: [-(2n ** 31n), 2n ** 31n - 1n], uint32: [0n, 2n ** 32n - 1n] },
+  integer: {
+    int8: [-(2n ** 7n), 2n ** 7n - 1n],
+    uint8: [0n, 2n ** 8n - 1n],
+    int16: [-(2n ** 15n), 2n ** 15n - 1n],
+    uint16: [0n, 2n ** 16n - 1n],
+    int32: [-(2n ** 31n), 2n ** 31n - 1n],
+    uint32: [0n, 2n ** 32n - 1n],
+  },
   bigint: { int64: [-(2n ** 63n), 2n ** 63n - 1n], uint64: [0n, 2n ** 64n - 1n] },
 }
 

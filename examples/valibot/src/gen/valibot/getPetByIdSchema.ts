@@ -6,6 +6,9 @@
 import * as v from 'valibot'
 import { petSchema } from './petSchema'
 
+/**
+ * ID of pet to return
+ */
 export const getPetByIdPathPetIdSchema = v.pipe(
   v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
   v.description('ID of pet to return'),
@@ -42,10 +45,7 @@ export const getPetByIdErrorSchema = v.union([getPetByIdStatus400Schema, getPetB
 export type GetPetByIdErrorSchemaType = v.InferOutput<typeof getPetByIdErrorSchema>
 
 export const getPetByIdPathSchema = v.object({
-  petId: v.pipe(
-    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(BigInt('-9223372036854775808')), v.maxValue(BigInt('9223372036854775807'))),
-    v.description('ID of pet to return'),
-  ),
+  petId: getPetByIdPathPetIdSchema,
 })
 
 export type GetPetByIdPathSchemaType = v.InferInput<typeof getPetByIdPathSchema>

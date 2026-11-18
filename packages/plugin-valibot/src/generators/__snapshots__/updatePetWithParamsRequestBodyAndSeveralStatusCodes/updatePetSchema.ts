@@ -42,19 +42,19 @@ export const updatePetBodySchema = v.omit(petSchema, ['id'])
 export type UpdatePetBodySchemaType = v.InferInput<typeof updatePetBodySchema>
 
 export const updatePetPathSchema = v.object({
-  petId: v.pipe(v.string(), v.uuid()),
+  petId: updatePetPathPetIdSchema,
 })
 
 export type UpdatePetPathSchemaType = v.InferInput<typeof updatePetPathSchema>
 
 export const updatePetQuerySchema = v.object({
-  dryRun: v.optional(v.boolean(), false),
+  dryRun: updatePetQueryDryRunSchema,
 })
 
 export type UpdatePetQuerySchemaType = v.InferInput<typeof updatePetQuerySchema>
 
 export const updatePetHeadersSchema = v.object({
-  'X-Request-Id': v.optional(v.string()),
+  'X-Request-Id': updatePetHeaderXRequestIdSchema,
 })
 
 export type UpdatePetHeadersSchemaType = v.InferInput<typeof updatePetHeadersSchema>

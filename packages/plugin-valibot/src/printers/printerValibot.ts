@@ -90,6 +90,7 @@ type ModifierOptions = {
   optional?: boolean
   nullish?: boolean
   defaultValue?: unknown
+  title?: string
   description?: string
   examples?: Array<unknown>
   direction?: PrinterValibotOptions['direction']
@@ -208,9 +209,11 @@ function countChecks(node: ast.SchemaNode): number {
 
 // Wraps a value in `v.nullable(...)` and `v.optional(...)`. A default goes in as the second argument
 // of `v.optional`, so `null` stays `null` and only a missing value takes the default.
-function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, description, examples, direction }: ModifierOptions): string {
+function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, title, description, examples, direction }: ModifierOptions): string {
   const metadata = [
+    title && `v.title(${text.quote(title)})`,
     description && `v.description(${text.quote(description)})`,
+    // `v.examples()` is typed against the schema, so an example of the wrong type in the spec would not compile.
     examples?.length && `v.metadata({ examples: [${examples.map((example) => (example === null ? 'null' : formatDefault(example))).join(', ')}] })`,
   ].filter(Boolean)
   // Always its own `v.pipe`, so `.pipe[0]` is the schema without the metadata.
@@ -224,7 +227,7 @@ function applyModifiers({ value, schema, nullable, optional, nullish, defaultVal
 
 // A `$ref` const prints without the metadata of its target, so `print` and `unwrapChain` agree on the shape.
 function hasMetadata(node: ast.SchemaNode): boolean {
-  return node.type !== ast.schema.types.ref && Boolean(node.description || node.examples?.length)
+  return node.type !== ast.schema.types.ref && Boolean(node.title || node.description || node.examples?.length)
 }
 
 // The `.wrapped` chain that reaches the object behind the `v.optional` and `v.nullable` wrappers
@@ -251,6 +254,7 @@ function objectEntries(ctx: PrinterContext, properties: Array<ast.PropertyNode>)
       nullish: schema.nullish,
       defaultValue: meta.default,
       // A property that replaces a `$ref`, such as a discriminator, does not take the description of the target.
+      title: schema.type === ast.schema.types.ref ? undefined : schema.title,
       description: schema.type !== ast.schema.types.ref && meta.type === ast.schema.types.ref ? undefined : meta.description,
       examples: meta.examples,
       direction: ctx.options.direction,
@@ -690,6 +694,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
         optional: meta.optional,
         nullish: meta.nullish,
         defaultValue: meta.default,
+        title: hasMetadata(node) ? meta.title : undefined,
         description: hasMetadata(node) ? meta.description : undefined,
         examples: hasMetadata(node) ? meta.examples : undefined,
         direction,
