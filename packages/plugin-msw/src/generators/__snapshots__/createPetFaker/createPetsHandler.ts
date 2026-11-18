@@ -15,24 +15,17 @@ export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
   })
 }
 
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
 export function createPetsHandler(
-  data?:
-    | string
-    | number
-    | boolean
-    | null
-    | object
-    | HttpResponseResolver<Record<string, string>, CreatePetsBody extends DefaultBodyType ? CreatePetsBody : DefaultBodyType>,
+  data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, MswBody<CreatePetsBody>>,
   options?: { baseURL?: string },
 ) {
-  return http.post<Record<string, string>, CreatePetsBody extends DefaultBodyType ? CreatePetsBody : DefaultBodyType>(
-    `${options?.baseURL ?? ''}/pets`,
-    function handler(info) {
-      if (typeof data === 'function') return data(info)
+  return http.post<Record<string, string>, MswBody<CreatePetsBody>>(`${options?.baseURL ?? ''}/pets`, function handler(info) {
+    if (typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 201,
-      })
-    },
-  )
+    return new HttpResponse<string>(JSON.stringify(data), {
+      status: 201,
+    })
+  })
 }

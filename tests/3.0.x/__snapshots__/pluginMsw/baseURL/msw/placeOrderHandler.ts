@@ -27,8 +27,10 @@ export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
   })
 }
 
-export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, PlaceOrderBody extends DefaultBodyType ? PlaceOrderBody : DefaultBodyType>, options?: { baseURL?: string }) {
-  return http.post<Record<string, string>, PlaceOrderBody extends DefaultBodyType ? PlaceOrderBody : DefaultBodyType>(`${options?.baseURL ?? "http://localhost:3000"}/store/order`, function handler(info) {
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
+export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, MswBody<PlaceOrderBody>>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, MswBody<PlaceOrderBody>>(`${options?.baseURL ?? "http://localhost:3000"}/store/order`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return placeOrderHandlerResponse200(data)

@@ -28,7 +28,7 @@ export function Mock({ baseURL = '', name, fakerName, responseName, typeName, re
   const responseHasSchema = hasResponseSchema(successResponse)
   const dataType = responseHasSchema ? typeName : 'string | number | boolean | null | object'
   const paramType = fakerName ? typeName : dataType
-  const requestBodyType = requestTypeName ? `${requestTypeName} extends DefaultBodyType ? ${requestTypeName} : DefaultBodyType` : null
+  const requestBodyType = requestTypeName ? `MswBody<${requestTypeName}>` : null
 
   const callbackType = requestBodyType
     ? `HttpResponseResolver<Record<string, string>, ${requestBodyType}>`
@@ -48,14 +48,23 @@ export function Mock({ baseURL = '', name, fakerName, responseName, typeName, re
   const responseStatements = responseName && !example ? `return ${responseName}(${responseBody})` : responseReturn(responseBody, statusCode, successResponse)
 
   return (
-    <File.Source name={name} isIndexable isExportable>
-      <Function name={name} export params={params}>
-        {`return ${httpCall}(${urlLiteral}, function handler(info) {
+    <>
+      {requestBodyType && (
+        <File.Source name="MswBody" isTypeOnly>
+          {/* A generic alias keeps an object body spreadable, which the same conditional written inline does not (TS2698).
+          Distribution sends `unknown`, `bigint`, `void` or a union holding `unknown` to `DefaultBodyType`. */}
+          {'type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType'}
+        </File.Source>
+      )}
+      <File.Source name={name} isIndexable isExportable>
+        <Function name={name} export params={params}>
+          {`return ${httpCall}(${urlLiteral}, function handler(info) {
     ${methodGuard}if(typeof data === 'function') return data(info)
 
     ${responseStatements}
   })`}
-      </Function>
-    </File.Source>
+        </Function>
+      </File.Source>
+    </>
   )
 }
