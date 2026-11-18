@@ -1,0 +1,110 @@
+{
+  "name": "@kubb/plugin-ky",
+  "version": "0.0.0",
+  "description": "Generate a slim, type-safe HTTP client with Kubb based on Ky.",
+  "keywords": [
+    "api-client",
+    "code-generation",
+    "codegen",
+    "http-client",
+    "kubb",
+    "ky",
+    "openapi",
+    "swagger",
+    "typescript"
+  ],
+  "homepage": "https://kubb.dev/extensions/kubb-labs/plugin-ky",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubb-labs/plugins.git",
+    "directory": "packages/plugin-ky"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/stijnvanhulle"
+    },
+    {
+      "type": "opencollective",
+      "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
+    }
+  ],
+  "files": [
+    "src",
+    "dist",
+    "templates",
+    "!templates/config.ts",
+    "!templates/core.ts",
+    "!templates/serializers.ts",
+    "!templates/standardSchema.ts",
+    "kubb-extension.json",
+    "docs",
+    "!/**/**.test.**",
+    "!/**/__tests__/**",
+    "!/**/__snapshots__/**"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {}
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json",
+    "./kubb-extension.json": "./kubb-extension.json",
+    "./templates/*.ts": {
+      "types": "./dist/templates/*.d.ts"
+    },
+    "./templates/*.js": {
+      "types": "./dist/templates/*.d.ts"
+    },
+    "./templates/*": "./templates/*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
+    "start": "tsdown --watch",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@kubb/kit": "^5.21.1",
+    "@kubb/plugin-client": "workspace:^"
+  },
+  "devDependencies": {
+    "ky": "^2.2.0",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "ky": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ky": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22.22"
+  }
+}

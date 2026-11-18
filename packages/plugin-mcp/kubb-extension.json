@@ -97,6 +97,10 @@
           "value": "axios"
         },
         {
+          "label": "ky",
+          "value": "ky"
+        },
+        {
           "label": "client",
           "value": "client"
         }

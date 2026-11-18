@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest'
 import { resolveClient, resolveContractClient } from './resolveClient.ts'
 
 describe('resolveClient', () => {
-  test.each(['fetch', 'axios', 'client'] as const)('client: %s selects the matching plugin when it is registered', (client) => {
+  test.each(['fetch', 'axios', 'ky', 'client'] as const)('client: %s selects the matching plugin when it is registered', (client) => {
     expect(resolveClient({ client, pluginNames: ['plugin-ts', `plugin-${client}`] })).toStrictEqual({ kind: 'contract', pluginName: `plugin-${client}` })
   })
 
@@ -18,7 +18,7 @@ describe('resolveClient', () => {
     expect(result).toStrictEqual({
       kind: 'error',
       code: 'KUBB_INVALID_PLUGIN_OPTIONS',
-      message: "Option `client` is 'bogus', but it must be one of 'fetch', 'axios', 'client'.",
+      message: "Option `client` is 'bogus', but it must be one of 'fetch', 'axios', 'ky', 'client'.",
       help: 'Set `client` to one of those values, or drop it to use the registered client plugin.',
     })
   })
@@ -26,7 +26,7 @@ describe('resolveClient', () => {
   test('two contract client plugins without a selector is ambiguous', () => {
     const result = resolveClient({ client: undefined, pluginNames: ['plugin-fetch', 'plugin-axios'] })
     expect(result.kind).toBe('error')
-    if (result.kind === 'error') expect(result.help).toContain("client: 'fetch' | 'axios' | 'client'")
+    if (result.kind === 'error') expect(result.help).toContain("client: 'fetch' | 'axios' | 'ky' | 'client'")
   })
 
   test('no client plugin registered returns a diagnostic asking to add one', () => {

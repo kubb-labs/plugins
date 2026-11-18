@@ -31,7 +31,7 @@
     "node": ">=22.22",
     "pnpm": ">=11.0.0"
   },
-  "packageManager": "pnpm@12.3.4",
+  "packageManager": "pnpm@12.21.0",
   "msw": {
     "workerDirectory": "public"
   }

@@ -25,6 +25,7 @@
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-fetch": "workspace:*",
+    "@kubb/plugin-ky": "workspace:*",
     "@kubb/plugin-mcp": "workspace:*",
     "@kubb/plugin-msw": "workspace:*",
     "@kubb/plugin-react-query": "workspace:*",
@@ -46,5 +47,5 @@
     "node": ">=22.22",
     "pnpm": ">=11.0.0"
   },
-  "packageManager": "pnpm@12.3.4"
+  "packageManager": "pnpm@12.21.0"
 }

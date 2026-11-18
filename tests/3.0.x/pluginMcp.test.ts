@@ -8,6 +8,7 @@ import { Hookable, createKubb } from '@kubb/core'
 import { type Config, Diagnostics, type KubbHooks, fsStorage } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginAxios } from '@kubb/plugin-axios'
+import { pluginKy } from '@kubb/plugin-ky'
 import { pluginMcp } from '@kubb/plugin-mcp'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
@@ -102,6 +103,30 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginMcp({
           output: { path: './mcp', barrel: false, mode: 'directory' },
+          include: [{ type: 'tag', pattern: 'pet' }],
+        }),
+      ],
+    },
+  },
+
+  // ─── client: 'ky' picks the Ky client when two client plugins are registered ─
+  {
+    name: 'clientKy',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/petStore.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs()],
+      storage: fsStorage(),
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginZod({ output: { path: './zod', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
+        pluginKy({ output: { path: './clients-ky', barrel: false, mode: 'directory' } }),
+        pluginMcp({
+          output: { path: './mcp', barrel: false, mode: 'directory' },
+          client: 'ky',
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],

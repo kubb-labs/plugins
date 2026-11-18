@@ -29,10 +29,10 @@ Pass these options to `pluginSwr()`. Shared options link to [Shared plugin optio
 
 The registered client plugin whose functions the hooks call. A lone client plugin is detected, so set `client` only when several are registered. Generation fails when none is registered.
 
-|          |                                  |
-| -------- | -------------------------------- |
-| Type     | `'fetch' \| 'axios' \| 'client'` |
-| Required | `false`                          |
+|          |                                          |
+| -------- | ---------------------------------------- |
+| Type     | `'fetch' \| 'axios' \| 'ky' \| 'client'` |
+| Required | `false`                                  |
 
 ::field-group
 
@@ -42,6 +42,10 @@ Calls [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch)
 
 :::field{name="'axios'"}
 Calls [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) functions.
+:::
+
+:::field{name="'ky'"}
+Calls [`@kubb/plugin-ky`](https://kubb.dev/extensions/kubb-labs/plugin-ky) functions.
 :::
 
 :::field{name="'client'"}
