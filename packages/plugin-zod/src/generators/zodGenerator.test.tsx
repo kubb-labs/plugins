@@ -994,7 +994,7 @@ describe('zodGenerator — inferred aliases', () => {
   test('a custom codec printer node prints the encode transform for request schemas and the decode transform for responses', async () => {
     const source = await renderOperation(getResource, { ...defaultOptions, inferred: 'codec', printer: { nodes: urlCodec } })
     expect(source).toContain(`export const getResourcePathResourceSchema = ${encodeUrl}`)
-    expect(source).toContain(`resource: ${encodeUrl},`)
+    expect(source).toContain('resource: getResourcePathResourceSchema,')
     expect(source).toContain(`resource: ${decodeUrl},`)
   })
 
@@ -1006,7 +1006,7 @@ describe('zodGenerator — inferred aliases', () => {
     const infer = await renderOperation(getResource, { ...defaultOptions, inferred: true, printer: { nodes: urlCodec } })
     expect(infer).toContain('export type GetResourcePathSchemaType = z.infer<typeof getResourcePathSchema>')
     expect(infer).toContain('export type GetResourceStatus200SchemaType = z.infer<typeof getResourceStatus200Schema>')
-    expect(infer).toContain(`resource: ${encodeUrl},`)
+    expect(infer).toContain('resource: getResourcePathResourceSchema,')
   })
 
   test('inferred: true keeps z.infer for a codec component and its encode variant', async () => {

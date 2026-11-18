@@ -33,20 +33,20 @@ export const getResourceResponseSchema = getResourceStatus200Schema
 export type GetResourceResponseSchemaType = z.output<typeof getResourceResponseSchema>
 
 export const getResourcePathSchema = z.object({
-  resource: z.instanceof(URL).transform((url) => url.href),
+  resource: getResourcePathResourceSchema,
 })
 
 export type GetResourcePathSchemaType = z.input<typeof getResourcePathSchema>
 
 export const getResourceQuerySchema = z.object({
-  callback: z.instanceof(URL).transform((url) => url.href).optional(),
-  revision: z.bigint().transform((value) => value.toString()).optional(),
+  callback: getResourceQueryCallbackSchema,
+  revision: getResourceQueryRevisionSchema,
 })
 
 export type GetResourceQuerySchemaType = z.input<typeof getResourceQuerySchema>
 
 export const getResourceHeadersSchema = z.object({
-  'X-Origin': z.instanceof(URL).transform((url) => url.href).optional(),
+  'X-Origin': getResourceHeaderXOriginSchema,
 })
 
 export type GetResourceHeadersSchemaType = z.input<typeof getResourceHeadersSchema>

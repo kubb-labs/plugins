@@ -5,6 +5,9 @@
 
 import * as z from 'zod'
 
+/**
+ * ID of the order that needs to be deleted
+ */
 export const deleteOrderPathOrderIdSchema = z.int().describe('ID of the order that needs to be deleted')
 
 export const deleteOrderStatus400Schema = z.unknown()
@@ -16,5 +19,5 @@ export const deleteOrderResponseSchema = z.unknown()
 export const deleteOrderErrorSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
 
 export const deleteOrderPathSchema = z.object({
-  orderId: z.int().describe('ID of the order that needs to be deleted'),
+  orderId: deleteOrderPathOrderIdSchema,
 })

@@ -6,14 +6,23 @@
 import * as z from 'zod'
 import { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema'
 
+/**
+ * UUID
+ */
 export const createPetsPathUuidSchema = z.string().describe('UUID')
 
+/**
+ * Offset * /
+ */
 export const createPetsQueryOffsetSchema = z.int().optional().describe('Offset */')
 
 export const createPetsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema.describe('Header parameters')
 
 export const createPetsStatus201Schema = z.unknown()
 
+/**
+ * Pet not found
+ */
 export const createPetsStatusDefaultSchema = z.unknown().describe('Pet not found')
 
 export const createPetsResponseSchema = createPetsStatus201Schema
@@ -26,13 +35,13 @@ export const createPetsBodySchema = z.object({
 })
 
 export const createPetsPathSchema = z.object({
-  uuid: z.string().describe('UUID'),
+  uuid: createPetsPathUuidSchema,
 })
 
 export const createPetsQuerySchema = z.object({
-  offset: z.int().optional().describe('Offset */'),
+  offset: createPetsQueryOffsetSchema,
 })
 
 export const createPetsHeadersSchema = z.object({
-  'X-EXAMPLE': createPetsXEXAMPLESchema.describe('Header parameters'),
+  'X-EXAMPLE': createPetsHeaderXEXAMPLESchema,
 })

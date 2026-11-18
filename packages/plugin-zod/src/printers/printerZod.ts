@@ -305,7 +305,9 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
 const scalarNodes: PrinterZodNodes = {
   ...buildScalarNodes(standardDialect),
   bigint(node) {
-    return `z.coerce.bigint()${numberConstraints(bigintConstraints(node), 'n')}`
+    const constraints = numberConstraints(bigintConstraints(node), true)
+    // `z.int64()` carries the range of the format but takes a bigint only, so the JSON value converts first.
+    return node.format === 'int64' || node.format === 'uint64' ? `z.coerce.bigint().pipe(z.${node.format}()${constraints})` : `z.coerce.bigint()${constraints}`
   },
   date(node) {
     if (node.representation !== 'date') return 'z.iso.date()'

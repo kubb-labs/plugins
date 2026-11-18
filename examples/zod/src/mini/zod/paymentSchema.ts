@@ -6,6 +6,9 @@
 import * as z from 'zod/mini'
 import { paymentErrorSchema } from './paymentErrorSchema'
 
+/**
+ * A payment for a store order
+ */
 export const paymentSchema = z.pipe(
   z.unknown().check(
     z.refine((value) => typeof value !== 'object' || value === null || Array.isArray(value) || Object.keys(value).length >= 1, {

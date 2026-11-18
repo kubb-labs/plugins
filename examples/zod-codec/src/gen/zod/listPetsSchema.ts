@@ -23,8 +23,8 @@ export const listPetsResponseSchema = listPetsStatus200Schema
 export type ListPetsResponseSchemaType = z.output<typeof listPetsResponseSchema>
 
 export const listPetsQuerySchema = z.object({
-  bornAfter: z.date().transform((value) => value.toISOString().slice(0, 10)),
-  limit: z.int().optional(),
+  bornAfter: listPetsQueryBornAfterSchema,
+  limit: listPetsQueryLimitSchema,
 })
 
 export type ListPetsQuerySchemaType = z.input<typeof listPetsQuerySchema>

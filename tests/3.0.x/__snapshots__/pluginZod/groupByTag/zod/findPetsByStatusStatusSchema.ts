@@ -5,4 +5,7 @@
 
 import * as z from 'zod'
 
+/**
+ * Status values that need to be considered for filter
+ */
 export const findPetsByStatusStatusSchema = z.enum(['available', 'pending', 'sold']).default('available').describe('Status values that need to be considered for filter')

@@ -21,6 +21,11 @@ import { shouldCoerce } from '../utils.ts'
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
  * input and a response (decode) schema from its output; `true` keeps `z.infer` for both.
  */
+// The comment above a schema const. A `$ref` const takes none, because the const it points to has it.
+function jsDoc(node: ast.SchemaNode): { description?: string; deprecated?: boolean } {
+  return node.type === ast.schema.types.ref ? {} : { description: node.description, deprecated: node.deprecated }
+}
+
 function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction: 'encode' | 'decode'): 'infer' | 'input' | 'output' {
   if (inferred !== 'codec') return 'infer'
   return direction === 'encode' ? 'input' : 'output'
@@ -118,6 +123,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           mini={mini}
           cyclic={cyclicSchemas.has(node.name)}
           compile={compile}
+          {...jsDoc(node)}
         />
         {hasDirectionalNode && (
           <Zod
@@ -132,6 +138,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             mini={mini}
             cyclic={cyclicSchemas.has(node.name)}
             compile={compile}
+            {...jsDoc(node)}
           />
         )}
       </File>
@@ -197,6 +204,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             cyclic={false}
             compile={compile}
             siblings={siblings}
+            {...jsDoc(schema)}
           />
         </>
       )
@@ -282,6 +290,20 @@ export const zodGenerator = defineGenerator<PluginZod>({
         properties: params.map((param) => ast.factory.createProperty({ name: param.name, required: param.required, schema: param.schema })),
       })
 
+    // Each parameter already has its own const, optional wrapper included, so the group points at it.
+    const toParamRefsSchema = (params: Array<ast.ParameterNode>) =>
+      ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: params.map((param) =>
+          ast.factory.createProperty({
+            name: param.name,
+            required: true,
+            schema: ast.factory.createSchema({ type: 'ref', name: resolver.param.name(node, param) }),
+          }),
+        ),
+      })
+
     const responseHeaderSchemas = node.responses.map((res) =>
       res.headers?.length ? renderSchemaEntry({ schema: toParamsSchema(res.headers), name: resolver.response.headers(node, res.statusCode) }) : null,
     )
@@ -341,7 +363,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       .filter(({ params }) => params.length > 0)
       .map(({ kind, params }) =>
         renderSchemaEntry({
-          schema: toParamsSchema(params),
+          schema: toParamRefsSchema(params),
           name: resolver.param[kind](node, params[0]!),
           direction: 'encode',
         }),

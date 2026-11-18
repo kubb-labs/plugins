@@ -58,7 +58,7 @@ pluginZod({
 ```
 
 ```typescript [Before]
-id: z.coerce.bigint(),
+id: z.coerce.bigint().pipe(z.int64()),
 ```
 
 ```typescript [After]
@@ -70,6 +70,8 @@ id: z.int(),
 To change `int64` fields for every plugin, set the adapter's [`integerType`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype) instead.
 
 ## Remove descriptions
+
+A schema's `description` prints twice: as a `.describe()` call, and as the JSDoc comment above the schema const, so an editor shows it on hover.
 
 Pass the [description-removal macro](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#remove-descriptions) to `pluginZod({ macros: [dropDescriptions] })`. Schemas then omit their own `.describe()` calls.
 

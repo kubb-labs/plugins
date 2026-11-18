@@ -6,6 +6,9 @@
 import { z } from '../../zod.ts'
 import { petSchema } from './petSchema'
 
+/**
+ * Tags to filter by
+ */
 export const findPetsByTagsQueryTagsSchema = z
   .array(z.string())
   .refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })
@@ -14,14 +17,23 @@ export const findPetsByTagsQueryTagsSchema = z
 
 export type FindPetsByTagsQueryTagsSchemaType = z.infer<typeof findPetsByTagsQueryTagsSchema>
 
+/**
+ * to request with required page number or pagination
+ */
 export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to request with required page number or pagination')
 
 export type FindPetsByTagsQueryPageSchemaType = z.infer<typeof findPetsByTagsQueryPageSchema>
 
+/**
+ * to request with required page size
+ */
 export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
 export type FindPetsByTagsQueryPageSizeSchemaType = z.infer<typeof findPetsByTagsQueryPageSizeSchema>
 
+/**
+ * Header parameters
+ */
 export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
 
 export type FindPetsByTagsHeaderXEXAMPLESchemaType = z.infer<typeof findPetsByTagsHeaderXEXAMPLESchema>
@@ -51,19 +63,15 @@ export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
 export type FindPetsByTagsErrorSchemaType = z.infer<typeof findPetsByTagsErrorSchema>
 
 export const findPetsByTagsQuerySchema = z.object({
-  tags: z
-    .array(z.string())
-    .refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })
-    .optional()
-    .describe('Tags to filter by'),
-  page: z.string().optional().describe('to request with required page number or pagination'),
-  pageSize: z.string().optional().describe('to request with required page size'),
+  tags: findPetsByTagsQueryTagsSchema,
+  page: findPetsByTagsQueryPageSchema,
+  pageSize: findPetsByTagsQueryPageSizeSchema,
 })
 
 export type FindPetsByTagsQuerySchemaType = z.infer<typeof findPetsByTagsQuerySchema>
 
 export const findPetsByTagsHeadersSchema = z.object({
-  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters'),
+  'X-EXAMPLE': findPetsByTagsHeaderXEXAMPLESchema,
 })
 
 export type FindPetsByTagsHeadersSchemaType = z.infer<typeof findPetsByTagsHeadersSchema>

@@ -13,5 +13,5 @@ export const pointStatus200Schema = pointGeoJsonSchema
 export const pointResponseSchema = pointStatus200Schema
 
 export const pointPathSchema = z.object({
-  id: z.string(),
+  id: pointPathIdSchema,
 })

@@ -6,6 +6,9 @@
 import { z } from '../../zod.ts'
 import { paymentErrorSchema } from './paymentErrorSchema'
 
+/**
+ * A payment for a store order
+ */
 export const paymentSchema = z
   .pipe(
     z.unknown().check(

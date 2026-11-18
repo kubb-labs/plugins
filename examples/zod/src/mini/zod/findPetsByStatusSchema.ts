@@ -6,6 +6,9 @@
 import * as z from 'zod/mini'
 import { petSchema } from './petSchema'
 
+/**
+ * Status values that need to be considered for filter
+ */
 export const findPetsByStatusQueryStatusSchema = z._default(z.optional(z.enum(['available', 'pending', 'sold'])), 'available')
 
 export const findPetsByStatusStatus200SchemaJson = z.array(z.lazy(() => petSchema))
@@ -21,5 +24,5 @@ export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
 export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
 
 export const findPetsByStatusQuerySchema = z.object({
-  status: z._default(z.optional(z.enum(['available', 'pending', 'sold'])), 'available'),
+  status: findPetsByStatusQueryStatusSchema,
 })
