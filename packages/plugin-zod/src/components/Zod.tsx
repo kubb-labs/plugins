@@ -46,9 +46,6 @@ type Props = {
    * target, so strict compilation looks it up here.
    */
   siblings?: ReadonlyMap<string, ast.SchemaNode>
-  /**
-   * Text for the JSDoc comment above the schema const, so an editor shows it on hover.
-   */
   description?: string
   deprecated?: boolean
 }

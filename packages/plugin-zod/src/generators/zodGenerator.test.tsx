@@ -994,7 +994,6 @@ describe('zodGenerator — inferred aliases', () => {
   test('a custom codec printer node prints the encode transform for request schemas and the decode transform for responses', async () => {
     const source = await renderOperation(getResource, { ...defaultOptions, inferred: 'codec', printer: { nodes: urlCodec } })
     expect(source).toContain(`export const getResourcePathResourceSchema = ${encodeUrl}`)
-    // The grouped object points at the parameter's own const, which holds the encode transform.
     expect(source).toContain('resource: getResourcePathResourceSchema,')
     expect(source).toContain(`resource: ${decodeUrl},`)
   })
