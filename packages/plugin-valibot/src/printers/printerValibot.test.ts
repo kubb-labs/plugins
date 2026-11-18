@@ -636,7 +636,7 @@ describe('printerValibot', () => {
         },
       },
     })
-    const embedded = createSchema({ type: 'string', content: { mediaType: 'application/json', schema: createSchema({ type: 'number' }) } } as never)
+    const embedded = createSchema({ type: 'string', content: { mediaType: 'application/json', schema: createSchema({ type: 'number' }) } })
 
     expect(() => throwing.print(embedded)).toThrow('boom')
     expect(throwing.options.direction).toBe('encode')

@@ -9,6 +9,7 @@ import {
   isObjectComposableIntersection,
   isObjectSchemaNode,
   preserveRequiredProperties,
+  shouldCoerce,
   strictOneOfNode,
   withFormatRange,
 } from '@internals/shared'
@@ -24,7 +25,6 @@ import {
   type lengthConstraints,
   type numberConstraints,
   type patternKeySchema,
-  shouldCoerce,
   stringFormatCalls,
 } from '../utils.ts'
 

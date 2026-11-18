@@ -217,10 +217,7 @@ const integerFormatRanges: Record<'integer' | 'bigint', Record<string, [min: big
  * withFormatRange({ format: 'int32', min: 0 }, 'integer') // { format: 'int32', min: 0, max: '2147483647' }
  * ```
  */
-export function withFormatRange<T extends NumericConstraints & { format?: string }>(
-  node: T,
-  type: 'integer' | 'bigint',
-): Omit<T, 'min' | 'max'> & NumericBounds {
+export function withFormatRange(node: NumericConstraints & { format?: string }, type: 'integer' | 'bigint'): NumericBounds {
   const range = node.format ? integerFormatRanges[type][node.format] : undefined
   if (!range) return node
   const [min, max] = range

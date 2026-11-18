@@ -285,16 +285,11 @@ describe('schemaComments', () => {
   })
 })
 
-describe('shouldCoerce and numericLiteral', () => {
+describe('shouldCoerce', () => {
   test('coercion is on for true or for the named type', () => {
     expect(shouldCoerce(true, 'dates')).toBe(true)
     expect(shouldCoerce({ numbers: true }, 'numbers')).toBe(true)
     expect(shouldCoerce({ numbers: true }, 'strings')).toBe(false)
     expect(shouldCoerce(undefined, 'strings')).toBe(false)
-  })
-
-  test('a bigint bound prints as a BigInt string', () => {
-    expect(numericLiteral('9223372036854775807', true)).toBe("BigInt('9223372036854775807')")
-    expect(numericLiteral(5, false)).toBe(5)
   })
 })

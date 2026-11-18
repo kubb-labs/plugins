@@ -76,7 +76,7 @@ To change the TypeScript type as well, set [`integerType: 'number'`](https://kub
 
 ## Remove descriptions
 
-A schema with a `title`, `description`, or `examples` in the spec carries them as `v.title()`, `v.description()`, and `v.metadata({ examples })`. The description is also the JSDoc comment above the schema const, so an editor shows it on hover. Examples stay in `v.metadata()`, because `v.examples()` is typed against the schema and an example of the wrong type in the spec would not compile. Pass the [description-removal macro](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#remove-descriptions) to `pluginValibot({ macros: [dropDescriptions] })` to leave out the `v.description()` calls.
+A schema with a `title`, `description`, or `examples` in the spec carries them as `v.title()`, `v.description()`, and `v.metadata({ examples })`. The description is also the JSDoc comment above the schema const, so an editor shows it on hover. Pass the [description-removal macro](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#remove-descriptions) to `pluginValibot({ macros: [dropDescriptions] })` to leave out the `v.description()` calls.
 
 > [!NOTE]
 > A `$ref` to a described component keeps its `v.description()` call, because a macro does not visit the schema a `$ref` points to.

@@ -3,8 +3,6 @@ import { buildObject, toRegExpString } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
 
-export { shouldCoerce } from '@internals/shared'
-
 /**
  * Whether the schema node represents a closed or finite set of keys (e.g. enum, literal,
  * or union of enums/literals).

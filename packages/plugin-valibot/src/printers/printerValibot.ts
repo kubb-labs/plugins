@@ -296,7 +296,6 @@ function strictMember({ member, node, cyclicSchemas }: { member: string; node: a
   return isPlainObject && !isWrapped ? `v.strictObject(${member}.entries)` : member
 }
 
-// Counts the items of an array that match the `contains` schema.
 function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | false {
   if (min === 0 && max === undefined) return false
   const bounds = [`count >= ${min}`, max !== undefined && `count <= ${max}`].filter(Boolean).join(' && ')
