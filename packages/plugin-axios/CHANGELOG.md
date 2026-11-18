@@ -1,5 +1,27 @@
 # @kubb/plugin-axios
 
+## 6.2.0
+
+### Minor Changes
+
+- [#1498](https://github.com/kubb-labs/plugins/pull/1498) [`4dea353`](https://github.com/kubb-labs/plugins/commit/4dea353d0898f9fcf640199d467a004653cf86c0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Accept `'valibot'` in the `validator` option, next to `'zod'`. The client then validates with the schemas of `@kubb/plugin-valibot`.
+  
+  ```ts
+  export default defineConfig({
+    plugins: [pluginTs(), pluginValibot(), pluginFetch({ validator: { request: 'valibot', params: 'valibot', response: 'valibot' } })],
+  })
+  ```
+  
+  `@kubb/plugin-zod` and `@kubb/plugin-valibot` are now optional peer dependencies of `@kubb/plugin-client`, so it no longer installs them for you. Install the one your `validator` names.
+
+### Patch Changes
+
+- [#1506](https://github.com/kubb-labs/plugins/pull/1506) [`38204b3`](https://github.com/kubb-labs/plugins/commit/38204b3a786cc285b73fc09007794836f0cfcf04) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use Kubb 5.21.2.
+
+- [#1495](https://github.com/kubb-labs/plugins/pull/1495) [`54df1a0`](https://github.com/kubb-labs/plugins/commit/54df1a04112d0a3bed1981b369087b5eca296ab1) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix the streaming guides: the resume example now retries a failed reconnect, rethrows the last failure, and no longer skips an event after a validation or render error. The manual `client.stream` example for JSON Lines sets `contentType.response`, and the typed event schema no longer contradicts itself.
+- Updated dependencies [[`a1b4efe`](https://github.com/kubb-labs/plugins/commit/a1b4efe774ac02112c77bb1b84195c5f923b8f5b), [`4dea353`](https://github.com/kubb-labs/plugins/commit/4dea353d0898f9fcf640199d467a004653cf86c0), [`38204b3`](https://github.com/kubb-labs/plugins/commit/38204b3a786cc285b73fc09007794836f0cfcf04)]:
+  - @kubb/plugin-client@6.2.0
+
 ## 6.1.1
 
 ### Patch Changes
