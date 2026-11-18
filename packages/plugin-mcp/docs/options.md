@@ -24,10 +24,10 @@ Pass these options to `pluginMcp()`. Shared options link to [Shared plugin optio
 
 Selects the registered client plugin that the handlers call. When `client` is unset, the handlers call the only registered client plugin. Set transport options such as `baseURL` on that plugin, or in your own client module with `'client'`.
 
-|          |                                  |
-| -------- | -------------------------------- |
-| Type     | `'fetch' \| 'axios' \| 'client'` |
-| Required | `false`                          |
+|          |                                          |
+| -------- | ---------------------------------------- |
+| Type     | `'fetch' \| 'axios' \| 'ky' \| 'client'` |
+| Required | `false`                                  |
 
 ::field-group
 
@@ -37,6 +37,10 @@ The handlers call [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/p
 
 :::field{name="'axios'"}
 The handlers call [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios).
+:::
+
+:::field{name="'ky'"}
+The handlers call [`@kubb/plugin-ky`](https://kubb.dev/extensions/kubb-labs/plugin-ky).
 :::
 
 :::field{name="'client'"}

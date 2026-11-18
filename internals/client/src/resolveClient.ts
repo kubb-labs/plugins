@@ -3,7 +3,7 @@
  * operation, shared so the selection rules and diagnostics stay in one place.
  *
  * Every client runtime lives in a dedicated client plugin, so a consumer always calls a registered
- * contract client plugin (plugin-fetch, plugin-axios, or plugin-client) and never emits its own
+ * contract client plugin (plugin-fetch, plugin-axios, plugin-ky, or plugin-client) and never emits its own
  * inline client:
  *
  * - `contract` — a registered contract client plugin owns the `<op>` functions and the consumer
@@ -11,28 +11,29 @@
  * - `error` — no client plugin is registered, several are registered without a selector, the
  *   requested one is missing, or `client` is not a known selector.
  *
- * The `client` string selects explicitly (`'fetch'` / `'axios'` / `'client'`); when it is unset a
+ * The `client` string selects explicitly (`'fetch'` / `'axios'` / `'ky'` / `'client'`); when it is unset a
  * lone registered contract client plugin is picked up automatically.
  */
 
 import { Diagnostics } from '@kubb/kit'
 
-// Canonical plugin names. They mirror the `pluginFetchName` / `pluginAxiosName` / `pluginClientName`
+// Canonical plugin names. They mirror the `pluginFetchName` / `pluginAxiosName` / `pluginKyName` / `pluginClientName`
 // consts the plugins export, kept as literals so this internal needs no plugin install deps.
 const pluginFetchName = 'plugin-fetch'
 const pluginAxiosName = 'plugin-axios'
+const pluginKyName = 'plugin-ky'
 const pluginClientName = 'plugin-client'
 
 /**
  * The client selector accepted by a consumer's `client` option. Each calls a registered contract
  * client plugin.
  */
-export type ClientSelector = 'fetch' | 'axios' | 'client'
+export type ClientSelector = 'fetch' | 'axios' | 'ky' | 'client'
 
 /**
  * The resolved client strategy stored in a consumer plugin's options: the generated code always
  * imports and calls a registered contract client plugin's `<op>`. The client runtime lives in
- * plugin-axios / plugin-fetch, so nothing is bundled by the consumer.
+ * plugin-fetch / plugin-axios / plugin-ky, so nothing is bundled by the consumer.
  */
 export type ResolvedContractClient = { kind: 'contract'; pluginName: string }
 
@@ -49,11 +50,12 @@ export type ResolveClientResult =
 const selectorToPlugin: Record<ClientSelector, string> = {
   fetch: pluginFetchName,
   axios: pluginAxiosName,
+  ky: pluginKyName,
   client: pluginClientName,
 }
 
 // Every contract client plugin, in auto-detect priority order.
-const contractPlugins = [pluginFetchName, pluginAxiosName, pluginClientName] as const
+const contractPlugins = [pluginFetchName, pluginAxiosName, pluginKyName, pluginClientName] as const
 
 /**
  * Applies the `client` resolution rules. See the module comment for the strategy shape.
@@ -74,7 +76,7 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
   const { client, pluginNames } = options
   const has = (name: string) => pluginNames.includes(name)
 
-  if (client === 'fetch' || client === 'axios' || client === 'client') {
+  if (client !== undefined && Object.hasOwn(selectorToPlugin, client)) {
     const pluginName = selectorToPlugin[client]
     if (!has(pluginName)) {
       return {
@@ -92,7 +94,7 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
     return {
       kind: 'error',
       code: Diagnostics.code.invalidPluginOptions,
-      message: `Option \`client\` is ${typeof client === 'string' ? `'${client}'` : String(client)}, but it must be one of 'fetch', 'axios', 'client'.`,
+      message: `Option \`client\` is ${typeof client === 'string' ? `'${client}'` : String(client)}, but it must be one of 'fetch', 'axios', 'ky', 'client'.`,
       help: 'Set `client` to one of those values, or drop it to use the registered client plugin.',
     }
   }
@@ -107,7 +109,7 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
       kind: 'error',
       code: Diagnostics.code.invalidPluginOptions,
       message: `Multiple client plugins are registered (${registered.map((name) => `\`@kubb/${name}\``).join(', ')}) and \`client\` is not set.`,
-      help: "Set `client: 'fetch' | 'axios' | 'client'` to choose which client the hooks call, or register a single client plugin.",
+      help: "Set `client: 'fetch' | 'axios' | 'ky' | 'client'` to choose which client the hooks call, or register a single client plugin.",
     }
   }
 
@@ -115,7 +117,7 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
     kind: 'error',
     code: Diagnostics.code.missingDependency,
     message: 'No client plugin is registered.',
-    help: 'Add `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client` to `plugins` so the generated code has an HTTP client to call.',
+    help: 'Add `@kubb/plugin-fetch`, `@kubb/plugin-axios`, `@kubb/plugin-ky`, or `@kubb/plugin-client` to `plugins` so the generated code has an HTTP client to call.',
   }
 }
 

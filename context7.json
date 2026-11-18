@@ -3,14 +3,14 @@
   "url": "https://context7.com/kubb-labs/plugins",
   "public_key": "pk_E3UkJR9X5FvhME9wB1sCS",
   "projectTitle": "Kubb Plugins",
-  "description": "Official and community plugins for Kubb, which turns your API spec into type-safe code: TypeScript types, typed Axios and Fetch clients, TanStack Query and SWR hooks, Zod and Valibot schemas, Faker mocks, MSW handlers, Cypress tests, MCP servers and ReDoc documentation. Each plugin documents itself in packages/<name>/docs/, rendered at https://kubb.dev/extensions/kubb-labs/<name>. The Kubb core docs are indexed on Context7 as /kubb-labs/kubb.",
+  "description": "Official and community plugins for Kubb, which turns your API spec into type-safe code: TypeScript types, typed Axios, Fetch and Ky clients, TanStack Query and SWR hooks, Zod and Valibot schemas, Faker mocks, MSW handlers, Cypress tests, MCP servers and ReDoc documentation. Each plugin documents itself in packages/<name>/docs/, rendered at https://kubb.dev/extensions/kubb-labs/<name>. The Kubb core docs are indexed on Context7 as /kubb-labs/kubb.",
   "folders": ["packages"],
   "excludeFiles": ["AGENTS.md", "CHANGELOG.md"],
   "rules": [
     "Each plugin's overview, options reference and how-to guides are in packages/<name>/docs/ (overview.md, options.md, guides/*.md). The Kubb core docs, such as the configuration reference, are on Context7 as /kubb-labs/kubb.",
     "Import `defineConfig` from `kubb/config`, not from `kubb`.",
     "Kubb v5 has no `pluginOas()`. The OpenAPI adapter is a top-level `adapter` key that defaults to `adapterOas()` from `@kubb/adapter-oas`, which ships with `kubb`. Set it only when you need to pass options.",
-    "Register `pluginAxios` or `pluginFetch` for an HTTP client, then point the query and MCP plugins at it with `client: 'axios' | 'fetch'`. `@kubb/plugin-client` is the bring-your-own-client plugin for a client module you write yourself, not a `client` value.",
+    "Register `pluginAxios`, `pluginFetch` or `pluginKy` for an HTTP client, then point the query and MCP plugins at it with `client: 'axios' | 'fetch' | 'ky'`. `@kubb/plugin-client` is the bring-your-own-client plugin for a client module you write yourself. Select it with `client: 'client'`.",
     "`@kubb/plugin-solid-query` and `@kubb/plugin-svelte-query` were removed in v5 with no equivalent. The query plugins are `pluginReactQuery`, `pluginVueQuery` and `pluginSwr`.",
     "Passing your own `output` to a plugin replaces the plugin's default `output` wholesale. Repeat `barrel` inside it or you lose that plugin's barrel file."
   ]

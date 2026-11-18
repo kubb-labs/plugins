@@ -1,0 +1,209 @@
+# Options
+
+Pass these options to `pluginKy()`. Shared options link to [Shared plugin options](https://kubb.dev/docs/5.x/reference/plugin-options).
+
+## Options overview
+
+| Option                                                                    | Purpose                                                     | Default                                          |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------ |
+| [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                    | `{ path: 'clients', barrel: { type: 'named' } }` |
+| [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                | None                                             |
+| [`baseURL`](#baseurl)                                                     | Base URL the client starts with.                            | None                                             |
+| [`throwOnErrorDefault`](#throwonerrordefault)                             | Throw on a non-2xx response unless a call says otherwise.   | `true`                                           |
+| [`validator`](#validator)                                                 | Validate requests and responses with Zod.                   | `false`                                          |
+| [`auth`](#auth)                                                           | How generated functions take `auth`.                        | None                                             |
+| [`auth.mode`](#auth)                                                      | Optional `auth`, or required when a token is needed.        | `'optional'`                                     |
+| [`returnType`](#returntype)                                               | What a call resolves to.                                    | `'full'`                                         |
+| [`sdk`](#sdk)                                                             | Generate classes instead of standalone functions.           | None                                             |
+| [`sdk.mode`](#sdk)                                                        | One class per tag, or one class with every operation.       | `'tag'`                                          |
+| [`sdk.name`](#sdk)                                                        | Name and file of the root or flat class.                    | None, or `'sdk'` with `mode: 'flat'`             |
+| [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                            | None                                             |
+| [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                 | `[]`                                             |
+| [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Options per pattern, except `throwOnErrorDefault`.          | `[]`                                             |
+| [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) | Generated names and paths, plus the [SDK names](#resolver). | `resolverClient`                                 |
+| [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                          | `[]`, run after the built-in client macros       |
+
+## Option details
+
+### baseURL
+
+The base URL the client starts with. `client.setConfig({ baseURL })` replaces it at runtime.
+
+|          |          |
+| -------- | -------- |
+| Type     | `string` |
+| Required | `false`  |
+
+A `${...}` interpolation becomes a template literal, so it reads the environment at runtime:
+
+```typescript
+pluginKy({ baseURL: '${process.env.API_URL}' })
+```
+
+> [!NOTE]
+> The spec's top-level `servers` URL is never used. See [Set the base URL](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#set-the-base-url).
+
+### throwOnErrorDefault
+
+The `throwOnError` a generated function or SDK method uses when the call leaves it out. Neither `override` nor `client.setConfig({ throwOnError })` changes it. Query hooks always pass `throwOnError: true`.
+
+|          |           |
+| -------- | --------- |
+| Type     | `boolean` |
+| Required | `false`   |
+| Default  | `true`    |
+
+```typescript
+// with pluginKy({ throwOnErrorDefault: false })
+const result = await getPetById({ path: { petId: 1 } })
+if (result.error !== undefined) console.error(result.status, result.error)
+```
+
+### validator
+
+Checks requests and responses against the schemas of `@kubb/plugin-zod`, so add `pluginZod()` too. A value that fails its schema throws a `ParseError`.
+
+|          |                                                                           |
+| -------- | ------------------------------------------------------------------------- |
+| Type     | `false \| 'zod' \| { request?: 'zod'; params?: 'zod'; response?: 'zod' }` |
+| Required | `false`                                                                   |
+| Default  | `false`                                                                   |
+
+::field-group
+
+:::field{name="false"}
+Default value. No validation. The response is cast to the generated type.
+:::
+
+:::field{name="'zod'"}
+Validates the success body, and an error body against the schema of its status.
+:::
+
+:::field{name="{ request?: 'zod', params?: 'zod', response?: 'zod' }"}
+Opts in per part. `request` checks the body and `params` the path, query, header, and cookie params before the send. `response` works as `'zod'`.
+:::
+
+::
+
+```typescript [kubb.config.ts]
+import { defineConfig } from 'kubb/config'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginZod } from '@kubb/plugin-zod'
+import { pluginKy } from '@kubb/plugin-ky'
+
+export default defineConfig({
+  input: './petStore.yaml',
+  output: { path: './src/gen' },
+  plugins: [pluginTs(), pluginZod(), pluginKy({ validator: { request: 'zod', params: 'zod', response: 'zod' } })],
+})
+```
+
+See [Turn validation off at runtime](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/error-handling#turn-validation-off-at-runtime) and [Parameter validation](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/serialization#parameter-validation).
+
+### auth
+
+Sets how generated functions take the `auth` option.
+
+|          |                                       |
+| -------- | ------------------------------------- |
+| Type     | `{ mode?: 'optional' \| 'required' }` |
+| Required | `false`                               |
+
+::field-group
+
+:::field{name="mode: 'optional'"}
+Default value. Every generated function takes `auth` as an optional option. Use it when `client.setConfig({ auth })` supplies the token, and with the query-hook plugins, which pass a partial config to the function.
+:::
+
+:::field{name="mode: 'required'"}
+A generated function whose operation needs a security scheme takes `auth` as a required option, so a missing token fails at compile time. An operation without `security`, or one that allows `{}` (anonymous access), keeps `auth` optional.
+:::
+
+::
+
+SDK classes take `auth` in their constructor and ignore this option.
+
+```ts
+// with pluginKy({ auth: { mode: 'required' } })
+await addPet({ body, auth: () => getToken() })
+await addPet({ body }) // Type error: `auth` is missing
+```
+
+### returnType
+
+What a generated function or SDK method resolves to. The query plugins and `@kubb/plugin-mcp` read it too.
+
+|          |                    |
+| -------- | ------------------ |
+| Type     | `'full' \| 'data'` |
+| Required | `false`            |
+| Default  | `'full'`           |
+
+::field-group
+
+:::field{name="'full'"}
+Default value. The full result: `{ status, data, error, contentType, headers, request, response }`.
+:::
+
+:::field{name="'data'"}
+The success body. With `throwOnError: false`, the full result, so the caller can tell an error from a success.
+:::
+
+::
+
+```typescript
+pluginKy({ returnType: 'data' })
+
+const pet = await getPetById({ path: { petId: 1 } }) // Pet, not { status, data, ... }
+```
+
+See [Read headers with `returnType: 'data'`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/error-handling#read-headers-with-returntype-data).
+
+### sdk
+
+Generates classes instead of standalone functions. Each instance builds its own client from its config, so two environments are two instances.
+
+|          |                                             |
+| -------- | ------------------------------------------- |
+| Type     | `{ mode?: 'tag' \| 'flat'; name?: string }` |
+| Required | `false`                                     |
+
+::field-group
+
+:::field{name="mode: 'tag'"}
+Default value. One class per tag, such as `PetClient`. With `name`, a root class also shares one client with every tag: `new PetStore(config).pet.getPetById(...)`. Throws [`KUBB_INVALID_PLUGIN_OPTIONS`](https://kubb.dev/docs/5.x/reference/diagnostics#kubb-invalid-plugin-options) with single-file output.
+:::
+
+:::field{name="mode: 'flat'"}
+One class named by `name`, with every operation as a method. Without `name`, the class is `Sdk` in `sdk.ts`. Works with single-file output.
+:::
+
+::
+
+Methods take the same options and return the same result as the standalone functions. Interceptors on the root class's `client` reach every tag:
+
+```typescript
+const api = new PetStore({ baseURL: 'https://petstore.swagger.io/v2' })
+api.client.interceptors.request.use((request) => request)
+await api.pet.getPetById({ path: { petId: 1 } })
+
+const pets = new PetClient(api.client) // a tag class also accepts an existing client
+```
+
+> [!WARNING]
+> The query plugins and `@kubb/plugin-mcp` call the standalone functions, so leave `sdk` unset for them.
+
+### resolver
+
+Adds three members to the shared [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver). Members you leave out keep `resolverClient`.
+
+|          |                                 |
+| -------- | ------------------------------- |
+| Type     | `ResolverPatch<ResolverClient>` |
+| Required | `false`                         |
+
+| Member               | Names                                                                 | Example                              |
+| -------------------- | --------------------------------------------------------------------- | ------------------------------------ |
+| `className(name)`    | The root class, the flat class, and the class of untagged operations. | `className('petStore')` → `PetStore` |
+| `groupName(name)`    | A tag class.                                                          | `groupName('pet')` → `PetClient`     |
+| `propertyName(name)` | The field a tag class has on the root class.                          | `propertyName('pet')` → `pet`        |

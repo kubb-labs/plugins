@@ -44,6 +44,7 @@ plugins/
 │   ├── plugin-ts/           # TypeScript types and interfaces
 │   ├── plugin-axios/        # Type-safe HTTP client based on axios
 │   ├── plugin-fetch/        # Type-safe HTTP client based on the Fetch API
+│   ├── plugin-ky/           # Type-safe HTTP client based on Ky
 │   ├── plugin-react-query/  # TanStack Query hooks for React
 │   ├── plugin-vue-query/    # TanStack Query hooks for Vue
 │   ├── plugin-swr/          # SWR hooks
@@ -66,7 +67,7 @@ plugins/
 └── assets/                  # Static assets
 ```
 
-Most plugins under `packages/` follow the same shape: `src/plugin.ts` defines the plugin, `src/generators/` holds the generation logic, `src/components/` holds JSX-renderer components, and `src/*.test.ts` holds the tests. A few are leaner, like the client plugins (`plugin-axios`, `plugin-fetch`) that build on `@kubb/plugin-client`, and `plugin-redoc`, which is a single `redoc.tsx` with no `generators/` or `components/`.
+Most plugins under `packages/` follow the same shape: `src/plugin.ts` defines the plugin, `src/generators/` holds the generation logic, `src/components/` holds JSX-renderer components, and `src/*.test.ts` holds the tests. A few are leaner, like the client plugins (`plugin-axios`, `plugin-fetch`, `plugin-ky`) that build on `@kubb/plugin-client`, and `plugin-redoc`, which is a single `redoc.tsx` with no `generators/` or `components/`.
 
 ## Tech stack
 

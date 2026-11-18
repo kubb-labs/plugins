@@ -43,6 +43,10 @@ component_management:
       name: '@kubb/plugin-fetch'
       paths:
         - packages/plugin-fetch/**
+    - component_id: plugin-ky
+      name: '@kubb/plugin-ky'
+      paths:
+        - packages/plugin-ky/**
     - component_id: plugin-mcp
       name: '@kubb/plugin-mcp'
       paths:

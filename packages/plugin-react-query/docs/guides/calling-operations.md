@@ -104,4 +104,4 @@ queryClient.invalidateQueries({ queryKey: getPetByIdQueryKey({ path: { petId: 1 
 
 Each hook calls the client with `throwOnError: true`, so a failed request sets TanStack Query's `error`, typed from the spec's error responses.
 
-Next, set the base URL, auth, and interceptors on your client plugin: [plugin-fetch](https://kubb.dev/extensions/kubb-labs/plugin-fetch), [plugin-axios](https://kubb.dev/extensions/kubb-labs/plugin-axios), or your own module with [plugin-client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).
+Next, set the base URL, auth, and interceptors on your client plugin: [plugin-fetch](https://kubb.dev/extensions/kubb-labs/plugin-fetch), [plugin-axios](https://kubb.dev/extensions/kubb-labs/plugin-axios), [plugin-ky](https://kubb.dev/extensions/kubb-labs/plugin-ky), or your own module with [plugin-client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).

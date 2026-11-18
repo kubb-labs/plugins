@@ -8,7 +8,7 @@ The Vue Query plugin generates TanStack Query `queryOptions` factories, query an
 ## Setup
 
 - Add `@kubb/plugin-ts`, or `pluginZod({ inferred: 'codec' })` with `zod` v4 in the app.
-- Add one client plugin: `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`. Leave `sdk` unset on it.
+- Add one client plugin: `@kubb/plugin-fetch`, `@kubb/plugin-axios`, `@kubb/plugin-ky`, or `@kubb/plugin-client`. Leave `sdk` unset on it.
 - Install `@tanstack/vue-query` 5.41 or a later v5 release and `vue` 3.3 or later in the app.
 - Set the base URL, auth, and validation on the client plugin. With `@kubb/plugin-client`, your client module owns them.
 
@@ -16,7 +16,7 @@ The Vue Query plugin generates TanStack Query `queryOptions` factories, query an
 
 | Option              | What it does                                                                                     |
 | ------------------- | ------------------------------------------------------------------------------------------------ |
-| `client`            | Picks `'fetch'`, `'axios'`, or `'client'` when several client plugins are registered.            |
+| `client`            | Picks `'fetch'`, `'axios'`, `'ky'`, or `'client'` when several client plugins are registered.    |
 | `hooks`             | Adds the `use*` composables. `infinite` needs it.                                                |
 | `query`, `mutation` | Which HTTP methods become queries and mutations. `false` skips them.                             |
 | `infinite`          | Adds infinite queries to operations with the `infinite.queryParam` parameter, `'id'` by default. |

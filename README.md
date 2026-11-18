@@ -49,6 +49,7 @@ Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](h
 | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
 | [`@kubb/plugin-axios`](./packages/plugin-axios) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-axios.svg)](https://npmx.dev/package/@kubb/plugin-axios) | Type-safe HTTP client based on [Axios](https://github.com/axios/axios) |
 | [`@kubb/plugin-fetch`](./packages/plugin-fetch) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-fetch.svg)](https://npmx.dev/package/@kubb/plugin-fetch) | Type-safe HTTP client based on the Fetch API                           |
+| [`@kubb/plugin-ky`](./packages/plugin-ky) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-ky.svg)](https://npmx.dev/package/@kubb/plugin-ky) | Type-safe HTTP client based on [Ky](https://github.com/sindresorhus/ky) |
 
 ### Zod
 
@@ -93,6 +94,7 @@ Plugins built and maintained by the community. Want to add yours? See [CONTRIBUT
 | [`typescript`](./examples/typescript)   | Generate TypeScript types           |
 | [`client`](./examples/client)           | Generate API clients with Axios     |
 | [`fetch`](./examples/fetch)             | Generate API clients with Fetch     |
+| [`ky`](./examples/ky)                   | Generate API clients with Ky        |
 | [`zod`](./examples/zod)                 | Generate Zod validation schemas     |
 | [`valibot`](./examples/valibot)         | Generate Valibot validation schemas |
 | [`react-query`](./examples/react-query) | Generate React Query hooks          |
