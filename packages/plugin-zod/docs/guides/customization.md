@@ -58,7 +58,7 @@ pluginZod({
 ```
 
 ```typescript [Before]
-id: z.coerce.bigint(),
+id: z.coerce.bigint().pipe(z.int64()),
 ```
 
 ```typescript [After]

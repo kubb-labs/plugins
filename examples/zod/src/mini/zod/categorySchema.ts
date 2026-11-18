@@ -6,7 +6,7 @@
 import * as z from 'zod/mini'
 
 export const categorySchema = z.object({
-  id: z.optional(z.coerce.bigint().check(z.minimum(BigInt('-9223372036854775808')), z.maximum(BigInt('9223372036854775807')))),
+  id: z.optional(z.pipe(z.coerce.bigint(), z.int64())),
   name: z.optional(z.string()),
   get parent() {
     return z.optional(categorySchema)

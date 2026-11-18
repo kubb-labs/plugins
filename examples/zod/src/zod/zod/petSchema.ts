@@ -10,8 +10,7 @@ import { tagSchema } from './tagSchema'
 export const petSchema = z.object({
   id: z.coerce
     .bigint()
-    .min(BigInt('-9223372036854775808'))
-    .max(BigInt('9223372036854775807'))
+    .pipe(z.int64())
     .optional()
     .meta({ examples: [10] }),
   get parent(): z.ZodOptional<z.ZodArray<typeof petSchema>> {

@@ -7,8 +7,8 @@ import * as z from 'zod'
 import { orderStatusEnumSchema } from './orderStatusEnumSchema'
 
 export const orderSchema = z.object({
-  id: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).optional().meta({ examples: [10] }),
-  petId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).optional().meta({ examples: [198772] }),
+  id: z.coerce.bigint().pipe(z.int64()).optional().meta({ examples: [10] }),
+  petId: z.coerce.bigint().pipe(z.int64()).optional().meta({ examples: [198772] }),
   quantity: z.int32().optional().meta({ examples: [7] }),
   shipDate: z.iso.datetime().transform((value) => Temporal.Instant.from(value)).optional(),
   status: orderStatusEnumSchema.optional().describe('Order Status').meta({ examples: ['approved'] }),
@@ -16,8 +16,8 @@ export const orderSchema = z.object({
 })
 
 export const orderInputSchema = z.object({
-  id: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).optional().meta({ examples: [10] }),
-  petId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).optional().meta({ examples: [198772] }),
+  id: z.coerce.bigint().pipe(z.int64()).optional().meta({ examples: [10] }),
+  petId: z.coerce.bigint().pipe(z.int64()).optional().meta({ examples: [198772] }),
   quantity: z.int32().optional().meta({ examples: [7] }),
   shipDate: z.instanceof(Temporal.Instant).transform((value) => value.toString()).optional(),
   status: orderStatusEnumSchema.optional().describe('Order Status').meta({ examples: ['approved'] }),

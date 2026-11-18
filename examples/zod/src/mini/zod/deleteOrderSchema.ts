@@ -5,7 +5,7 @@
 
 import * as z from 'zod/mini'
 
-export const deleteOrderPathOrderIdSchema = z.coerce.bigint().check(z.minimum(BigInt('-9223372036854775808')), z.maximum(BigInt('9223372036854775807')))
+export const deleteOrderPathOrderIdSchema = z.pipe(z.coerce.bigint(), z.int64())
 
 export const deleteOrderStatus400Schema = z.unknown()
 
@@ -16,5 +16,5 @@ export const deleteOrderResponseSchema = z.unknown()
 export const deleteOrderErrorSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
 
 export const deleteOrderPathSchema = z.object({
-  orderId: z.coerce.bigint().check(z.minimum(BigInt('-9223372036854775808')), z.maximum(BigInt('9223372036854775807'))),
+  orderId: z.pipe(z.coerce.bigint(), z.int64()),
 })

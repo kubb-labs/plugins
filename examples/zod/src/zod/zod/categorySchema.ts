@@ -8,8 +8,7 @@ import { z } from '../../zod.ts'
 export const categorySchema = z.object({
   id: z.coerce
     .bigint()
-    .min(BigInt('-9223372036854775808'))
-    .max(BigInt('9223372036854775807'))
+    .pipe(z.int64())
     .optional()
     .meta({ examples: [1] }),
   name: z

@@ -24,11 +24,11 @@ limit: z.coerce.number().int().optional(),
 
 ::
 
-| Value                            | Effect                                                                                                                                                                   |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `false` (default)                | No coercion, except `format: int64` fields, which use `z.coerce.bigint()` because JSON holds a number. With the adapter's `integerType: 'number'`, they print `z.int()`. |
-| `true`                           | Coerces strings, numbers, and dates with `z.coerce.string()`, `z.coerce.number()`, and `z.coerce.date()`.                                                                |
-| `{ dates?, strings?, numbers? }` | Coerces only the primitives you pick.                                                                                                                                    |
+| Value                            | Effect                                                                                                                                                                                   |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `false` (default)                | No coercion, except `format: int64` fields, which use `z.coerce.bigint().pipe(z.int64())` because JSON holds a number. With the adapter's `integerType: 'number'`, they print `z.int()`. |
+| `true`                           | Coerces strings, numbers, and dates with `z.coerce.string()`, `z.coerce.number()`, and `z.coerce.date()`.                                                                                |
+| `{ dates?, strings?, numbers? }` | Coerces only the primitives you pick.                                                                                                                                                    |
 
 ## Coerce strings
 
@@ -42,7 +42,7 @@ limit: z.coerce.number().int().optional(),
 `numbers` coerces number and integer fields, and enums with a numeric `format` such as `int32`.
 
 - Integers typed as `number` print as `z.coerce.number().int()`, or `z.coerce.number().check(z.int())` with Zod Mini. A `format: int32` or `uint32` field adds `.min()` and `.max()` for the format's range.
-- `format: int64` fields typed as `bigint`, the adapter default, keep `z.coerce.bigint()`, with `.min()` and `.max()` for the 64-bit range.
+- `format: int64` fields typed as `bigint`, the adapter default, keep `z.coerce.bigint().pipe(z.int64())`, which converts and then checks the 64-bit range.
 - When a coerced enum is the discriminator of a `oneOf`, the union prints as `z.union`, because `z.discriminatedUnion` cannot read coerced values.
 - Other enums are not coerced.
 

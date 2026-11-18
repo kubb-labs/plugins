@@ -6,11 +6,7 @@
 import { z } from '../../zod.ts'
 import { petSchema } from './petSchema'
 
-export const getPetByIdPathPetIdSchema = z.coerce
-  .bigint()
-  .min(BigInt('-9223372036854775808'))
-  .max(BigInt('9223372036854775807'))
-  .describe('ID of pet to return')
+export const getPetByIdPathPetIdSchema = z.coerce.bigint().pipe(z.int64()).describe('ID of pet to return')
 
 export type GetPetByIdPathPetIdSchemaType = z.infer<typeof getPetByIdPathPetIdSchema>
 
@@ -43,7 +39,7 @@ export const getPetByIdErrorSchema = z.union([getPetByIdStatus400Schema, getPetB
 export type GetPetByIdErrorSchemaType = z.infer<typeof getPetByIdErrorSchema>
 
 export const getPetByIdPathSchema = z.object({
-  petId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('ID of pet to return'),
+  petId: z.coerce.bigint().pipe(z.int64()).describe('ID of pet to return'),
 })
 
 export type GetPetByIdPathSchemaType = z.infer<typeof getPetByIdPathSchema>

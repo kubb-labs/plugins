@@ -7,7 +7,7 @@ import * as z from 'zod'
 
 export const deletePetHeaderApiKeySchema = z.coerce.string().optional()
 
-export const deletePetPathPetIdSchema = z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('Pet id to delete')
+export const deletePetPathPetIdSchema = z.coerce.bigint().pipe(z.int64()).describe('Pet id to delete')
 
 export const deletePetStatus400Schema = z.unknown()
 
@@ -16,7 +16,7 @@ export const deletePetResponseSchema = z.unknown()
 export const deletePetErrorSchema = deletePetStatus400Schema
 
 export const deletePetPathSchema = z.object({
-  petId: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).describe('Pet id to delete'),
+  petId: z.coerce.bigint().pipe(z.int64()).describe('Pet id to delete'),
 })
 
 export const deletePetHeadersSchema = z.object({

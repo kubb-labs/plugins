@@ -92,7 +92,7 @@ Wraps schemas in `z.coerce` to convert input, such as form data and query params
 ::field-group
 
 :::field{name="false"}
-No coercion, except `format: int64` fields, which use `z.coerce.bigint()` with the adapter's default `integerType: 'bigint'`.
+No coercion, except `format: int64` fields, which use `z.coerce.bigint().pipe(z.int64())` with the adapter's default `integerType: 'bigint'`.
 :::
 
 :::field{name="true"}

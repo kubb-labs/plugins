@@ -259,13 +259,9 @@ describe('printerZod', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'bigint' }))).toBe('z.coerce.bigint()')
     })
 
-    test('int64 and uint64 keep to the range of the format', () => {
-      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'int64' }))).toBe(
-        "z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807'))",
-      )
-      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'uint64', min: 5 }))).toBe(
-        "z.coerce.bigint().min(BigInt('5')).max(BigInt('18446744073709551615'))",
-      )
+    test('int64 and uint64 convert, then check the range through z.int64 and z.uint64', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'int64' }))).toBe('z.coerce.bigint().pipe(z.int64())')
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'uint64', min: 5 }))).toBe("z.coerce.bigint().pipe(z.uint64().min(BigInt('5')))")
     })
 
     test('bigint keeps its bounds as bigint literals', () => {

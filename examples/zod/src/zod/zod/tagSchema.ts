@@ -6,7 +6,7 @@
 import { z } from '../../zod.ts'
 
 export const tagSchema = z.object({
-  id: z.coerce.bigint().min(BigInt('-9223372036854775808')).max(BigInt('9223372036854775807')).optional(),
+  id: z.coerce.bigint().pipe(z.int64()).optional(),
   name: z.string().optional(),
 })
 

@@ -8,7 +8,7 @@ import { categorySchema } from './categorySchema'
 import { tagSchema } from './tagSchema'
 
 export const petSchema = z.object({
-  id: z.optional(z.coerce.bigint().check(z.minimum(BigInt('-9223372036854775808')), z.maximum(BigInt('9223372036854775807')))),
+  id: z.optional(z.pipe(z.coerce.bigint(), z.int64())),
   get parent() {
     return z.optional(z.array(petSchema))
   },
