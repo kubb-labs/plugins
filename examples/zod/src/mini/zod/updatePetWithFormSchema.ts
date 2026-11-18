@@ -5,7 +5,7 @@
 
 import * as z from 'zod/mini'
 
-export const updatePetWithFormPathPetIdSchema = z.coerce.bigint()
+export const updatePetWithFormPathPetIdSchema = z.coerce.bigint().check(z.minimum(-9223372036854775808n), z.maximum(9223372036854775807n))
 
 export const updatePetWithFormQueryNameSchema = z.optional(z.string())
 
@@ -18,7 +18,7 @@ export const updatePetWithFormResponseSchema = z.unknown()
 export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
 
 export const updatePetWithFormPathSchema = z.object({
-  petId: z.coerce.bigint(),
+  petId: z.coerce.bigint().check(z.minimum(-9223372036854775808n), z.maximum(9223372036854775807n)),
 })
 
 export const updatePetWithFormQuerySchema = z.object({

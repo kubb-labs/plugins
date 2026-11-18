@@ -129,6 +129,12 @@ describe('printerZodMini', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'bigint' }))).toBe('z.coerce.bigint()')
     })
 
+    test('int64 keeps to the range of the format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'int64' }))).toBe(
+        'z.coerce.bigint().check(z.minimum(-9223372036854775808n), z.maximum(9223372036854775807n))',
+      )
+    })
+
     test('bigint bounds print as bigint literals', () => {
       const output = printer.print(ast.factory.createSchema({ type: 'bigint', min: 0.5, exclusive: { max: 10 }, multipleOf: 2 }))
 
@@ -1339,7 +1345,9 @@ describe('printerZodMini', () => {
 
     test('integer coercion replaces the int32 helper and keeps number checks', () => {
       const p = printerZodMini({ coercion: { numbers: true } })
-      expect(p.print(ast.factory.createSchema({ type: 'integer', format: 'int32', min: 1 }))).toBe('z.coerce.number().check(z.int()).check(z.minimum(1))')
+      expect(p.print(ast.factory.createSchema({ type: 'integer', format: 'int32', min: 1 }))).toBe(
+        'z.coerce.number().check(z.int()).check(z.minimum(1), z.maximum(2147483647))',
+      )
     })
 
     test('ISO string dates and times are never coerced', () => {

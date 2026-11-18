@@ -41,8 +41,8 @@ limit: z.coerce.number().int().optional(),
 
 `numbers` coerces number and integer fields, and enums with a numeric `format` such as `int32`.
 
-- Integers typed as `number` print as `z.coerce.number().int()`, or `z.coerce.number().check(z.int())` with Zod Mini. The coerced call drops the `int32` and `uint32` range checks.
-- `format: int64` fields typed as `bigint`, the adapter default, keep `z.coerce.bigint()`.
+- Integers typed as `number` print as `z.coerce.number().int()`, or `z.coerce.number().check(z.int())` with Zod Mini. A `format: int32` or `uint32` field adds `.min()` and `.max()` for the format's range.
+- `format: int64` fields typed as `bigint`, the adapter default, keep `z.coerce.bigint()`, with `.min()` and `.max()` for the 64-bit range.
 - When a coerced enum is the discriminator of a `oneOf`, the union prints as `z.union`, because `z.discriminatedUnion` cannot read coerced values.
 - Other enums are not coerced.
 

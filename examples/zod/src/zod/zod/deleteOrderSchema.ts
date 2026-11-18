@@ -5,7 +5,11 @@
 
 import { z } from '../../zod.ts'
 
-export const deleteOrderPathOrderIdSchema = z.coerce.bigint().describe('ID of the order that needs to be deleted')
+export const deleteOrderPathOrderIdSchema = z.coerce
+  .bigint()
+  .min(-9223372036854775808n)
+  .max(9223372036854775807n)
+  .describe('ID of the order that needs to be deleted')
 
 export type DeleteOrderPathOrderIdSchemaType = z.infer<typeof deleteOrderPathOrderIdSchema>
 
@@ -26,7 +30,7 @@ export const deleteOrderErrorSchema = z.union([deleteOrderStatus400Schema, delet
 export type DeleteOrderErrorSchemaType = z.infer<typeof deleteOrderErrorSchema>
 
 export const deleteOrderPathSchema = z.object({
-  orderId: z.coerce.bigint().describe('ID of the order that needs to be deleted'),
+  orderId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of the order that needs to be deleted'),
 })
 
 export type DeleteOrderPathSchemaType = z.infer<typeof deleteOrderPathSchema>

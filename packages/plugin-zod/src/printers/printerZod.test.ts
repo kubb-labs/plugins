@@ -168,7 +168,7 @@ describe('printerZod', () => {
 
     test('integer with int32 format respects coercion over native helper', () => {
       const p = printerZod({ coercion: { numbers: true } })
-      expect(p.print(ast.factory.createSchema({ type: 'integer', format: 'int32' }))).toBe('z.coerce.number().int()')
+      expect(p.print(ast.factory.createSchema({ type: 'integer', format: 'int32' }))).toBe('z.coerce.number().int().min(-2147483648).max(2147483647)')
     })
   })
 
@@ -257,6 +257,13 @@ describe('printerZod', () => {
   describe('bigint', () => {
     test('basic bigint coerces, since JSON.parse yields a number', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'bigint' }))).toBe('z.coerce.bigint()')
+    })
+
+    test('int64 and uint64 keep to the range of the format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'int64' }))).toBe(
+        'z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n)',
+      )
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'uint64', min: 5 }))).toBe('z.coerce.bigint().min(5n).max(18446744073709551615n)')
     })
 
     test('bigint keeps its bounds as bigint literals', () => {

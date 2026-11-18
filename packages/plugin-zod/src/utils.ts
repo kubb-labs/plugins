@@ -1,4 +1,4 @@
-import { defaultLiteral, formatDefault, hasInputChecks, type NumericConstraints } from '@internals/shared'
+import { defaultLiteral, formatDefault, hasInputChecks, type NumericBounds } from '@internals/shared'
 import { buildObject, toRegExpString } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
@@ -121,7 +121,7 @@ export type ModifierOptions = {
  * Build `.min()` / `.max()` / `.gt()` / `.lt()` constraint chains for numbers
  * using the standard chainable Zod v4 API.
  */
-export function numberConstraints({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): string {
+export function numberConstraints({ min, max, exclusive, multipleOf }: NumericBounds, suffix: '' | 'n' = ''): string {
   return [
     min !== undefined ? `.min(${min}${suffix})` : '',
     max !== undefined ? `.max(${max}${suffix})` : '',
@@ -146,7 +146,7 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
 /**
  * Build `.check(z.minimum(), z.maximum())` for `zod/mini` numeric constraints.
  */
-export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): string {
+export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericBounds, suffix: '' | 'n' = ''): string {
   const checks = [
     min !== undefined && `z.minimum(${min}${suffix})`,
     max !== undefined && `z.maximum(${max}${suffix})`,
@@ -295,7 +295,7 @@ export function getMemberConstraint({
   member: ast.SchemaNode
   regexType?: LengthConstraints['regexType']
   lengths: (constraints: LengthConstraints) => string
-  numbers: (constraints: NumericConstraints) => string
+  numbers: (constraints: NumericBounds) => string
 }): string | undefined {
   // Checks a suffix cannot carry stay on the member's own schema.
   if (hasInputChecks(member) || ast.schema.narrow(member, 'array')?.contains) return undefined

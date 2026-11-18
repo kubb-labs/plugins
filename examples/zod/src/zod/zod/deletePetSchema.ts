@@ -9,7 +9,7 @@ export const deletePetHeaderApiKeySchema = z.string().optional()
 
 export type DeletePetHeaderApiKeySchemaType = z.infer<typeof deletePetHeaderApiKeySchema>
 
-export const deletePetPathPetIdSchema = z.coerce.bigint().describe('Pet id to delete')
+export const deletePetPathPetIdSchema = z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('Pet id to delete')
 
 export type DeletePetPathPetIdSchemaType = z.infer<typeof deletePetPathPetIdSchema>
 
@@ -26,7 +26,7 @@ export const deletePetErrorSchema = deletePetStatus400Schema
 export type DeletePetErrorSchemaType = z.infer<typeof deletePetErrorSchema>
 
 export const deletePetPathSchema = z.object({
-  petId: z.coerce.bigint().describe('Pet id to delete'),
+  petId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('Pet id to delete'),
 })
 
 export type DeletePetPathSchemaType = z.infer<typeof deletePetPathSchema>

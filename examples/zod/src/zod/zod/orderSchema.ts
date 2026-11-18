@@ -8,10 +8,14 @@ import { z } from '../../zod.ts'
 export const orderSchema = z.object({
   id: z.coerce
     .bigint()
+    .min(-9223372036854775808n)
+    .max(9223372036854775807n)
     .optional()
     .meta({ examples: [10] }),
   petId: z.coerce
     .bigint()
+    .min(-9223372036854775808n)
+    .max(9223372036854775807n)
     .optional()
     .meta({ examples: [198772] }),
   quantity: z

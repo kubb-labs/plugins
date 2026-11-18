@@ -9,7 +9,7 @@ import { categorySchema } from './categorySchema'
 import { tagSchema } from './tagSchema'
 
 export const addPetRequestSchema = z.object({
-  id: z.coerce.bigint().optional().meta({ examples: [10] }),
+  id: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).optional().meta({ examples: [10] }),
   name: z.string().meta({ examples: ['doggie'] }),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),

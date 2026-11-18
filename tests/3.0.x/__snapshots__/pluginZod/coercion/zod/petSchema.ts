@@ -9,7 +9,7 @@ import { petStatusEnumSchema } from './petStatusEnumSchema'
 import { tagSchema } from './tagSchema'
 
 export const petSchema = z.object({
-  id: z.coerce.bigint().optional().meta({ examples: [10] }),
+  id: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).optional().meta({ examples: [10] }),
   name: z.coerce.string().meta({ examples: ['doggie'] }),
   log: z.coerce.string().min(2).max(42).regex(/^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$/).optional().meta({ examples: ['my_log_destination'] }),
   category: categorySchema.optional(),

@@ -6,7 +6,7 @@
 import * as z from 'zod/mini'
 import { apiResponseSchema } from './apiResponseSchema'
 
-export const uploadFilePathPetIdSchema = z.coerce.bigint()
+export const uploadFilePathPetIdSchema = z.coerce.bigint().check(z.minimum(-9223372036854775808n), z.maximum(9223372036854775807n))
 
 export const uploadFileQueryAdditionalMetadataSchema = z.optional(z.string())
 
@@ -17,7 +17,7 @@ export const uploadFileResponseSchema = uploadFileStatus200Schema
 export const uploadFileBodySchema = z.optional(z.instanceof(Blob))
 
 export const uploadFilePathSchema = z.object({
-  petId: z.coerce.bigint(),
+  petId: z.coerce.bigint().check(z.minimum(-9223372036854775808n), z.maximum(9223372036854775807n)),
 })
 
 export const uploadFileQuerySchema = z.object({

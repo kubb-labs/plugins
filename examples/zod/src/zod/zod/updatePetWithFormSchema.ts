@@ -5,7 +5,11 @@
 
 import { z } from '../../zod.ts'
 
-export const updatePetWithFormPathPetIdSchema = z.coerce.bigint().describe('ID of pet that needs to be updated')
+export const updatePetWithFormPathPetIdSchema = z.coerce
+  .bigint()
+  .min(-9223372036854775808n)
+  .max(9223372036854775807n)
+  .describe('ID of pet that needs to be updated')
 
 export type UpdatePetWithFormPathPetIdSchemaType = z.infer<typeof updatePetWithFormPathPetIdSchema>
 
@@ -30,7 +34,7 @@ export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
 export type UpdatePetWithFormErrorSchemaType = z.infer<typeof updatePetWithFormErrorSchema>
 
 export const updatePetWithFormPathSchema = z.object({
-  petId: z.coerce.bigint().describe('ID of pet that needs to be updated'),
+  petId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet that needs to be updated'),
 })
 
 export type UpdatePetWithFormPathSchemaType = z.infer<typeof updatePetWithFormPathSchema>

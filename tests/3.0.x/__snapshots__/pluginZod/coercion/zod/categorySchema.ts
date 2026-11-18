@@ -6,6 +6,6 @@
 import * as z from 'zod'
 
 export const categorySchema = z.object({
-  id: z.coerce.bigint().optional().meta({ examples: [1] }),
+  id: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).optional().meta({ examples: [1] }),
   name: z.coerce.string().optional().meta({ examples: ['Dogs'] }),
 })

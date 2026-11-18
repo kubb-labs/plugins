@@ -6,7 +6,7 @@
 import * as z from 'zod'
 import { apiResponseSchema } from './apiResponseSchema'
 
-export const uploadFilePathPetIdSchema = z.coerce.bigint().describe('ID of pet to update')
+export const uploadFilePathPetIdSchema = z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet to update')
 
 export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
@@ -17,7 +17,7 @@ export const uploadFileResponseSchema = uploadFileStatus200Schema
 export const uploadFileBodySchema = z.instanceof(Blob).optional()
 
 export const uploadFilePathSchema = z.object({
-  petId: z.coerce.bigint().describe('ID of pet to update'),
+  petId: z.coerce.bigint().min(-9223372036854775808n).max(9223372036854775807n).describe('ID of pet to update'),
 })
 
 export const uploadFileQuerySchema = z.object({

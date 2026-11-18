@@ -105,7 +105,7 @@ Coerces only the primitives you pick.
 
 ::
 
-Coerced fields lose some format checks, such as `jwt` and the `int32` range. See [Coerce input with Zod](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/coercion).
+Coerced fields lose some format checks, such as `jwt`. See [Coerce input with Zod](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/coercion).
 
 ### guidType
 

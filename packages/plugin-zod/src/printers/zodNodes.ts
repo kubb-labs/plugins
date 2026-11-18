@@ -9,6 +9,7 @@ import {
   isObjectSchemaNode,
   preserveRequiredProperties,
   strictOneOfNode,
+  withFormatRange,
 } from '@internals/shared'
 import {
   buildEnum,
@@ -195,7 +196,7 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
       return `${base}${dialect.numbers(node)}`
     },
     integer(node) {
-      if (shouldCoerce(this.options.coercion, 'numbers')) return `${dialect.coercedInt}${dialect.numbers(node)}`
+      if (shouldCoerce(this.options.coercion, 'numbers')) return `${dialect.coercedInt}${dialect.numbers(withFormatRange(node, 'integer'))}`
       if (node.format === 'int32') return `z.int32()${dialect.numbers(node)}`
       if (node.format === 'uint32') return `z.uint32()${dialect.numbers(node)}`
 
