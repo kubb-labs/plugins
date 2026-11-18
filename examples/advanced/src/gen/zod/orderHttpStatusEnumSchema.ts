@@ -1,5 +1,8 @@
 import * as z from 'zod'
 
+/**
+ * HTTP Status
+ */
 export const orderHttpStatusEnumSchema = z
   .union([z.literal(200), z.literal(400), z.literal(500)])
   .describe('HTTP Status')

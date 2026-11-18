@@ -1,6 +1,9 @@
 import * as z from 'zod'
 import { petEventSchema } from '../petEventSchema'
 
+/**
+ * ID of pet to stream events for
+ */
 export const streamPetEventsPathPetIdSchema = z.int().describe('ID of pet to stream events for')
 
 export type StreamPetEventsPathPetIdSchemaType = z.infer<typeof streamPetEventsPathPetIdSchema>
@@ -14,7 +17,7 @@ export const streamPetEventsResponseSchema = streamPetEventsStatus200Schema
 export type StreamPetEventsResponseSchemaType = z.infer<typeof streamPetEventsResponseSchema>
 
 export const streamPetEventsPathSchema = z.object({
-  petId: z.int().describe('ID of pet to stream events for'),
+  petId: streamPetEventsPathPetIdSchema,
 })
 
 export type StreamPetEventsPathSchemaType = z.infer<typeof streamPetEventsPathSchema>

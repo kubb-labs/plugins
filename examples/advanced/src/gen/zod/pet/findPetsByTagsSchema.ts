@@ -2,14 +2,23 @@ import * as z from 'zod'
 import { findPetsByTagsXEXAMPLESchema } from '../findPetsByTagsXEXAMPLESchema'
 import { petSchema } from '../petSchema'
 
+/**
+ * Tags to filter by
+ */
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
 export type FindPetsByTagsQueryTagsSchemaType = z.infer<typeof findPetsByTagsQueryTagsSchema>
 
+/**
+ * to request with required page number or pagination
+ */
 export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to request with required page number or pagination')
 
 export type FindPetsByTagsQueryPageSchemaType = z.infer<typeof findPetsByTagsQueryPageSchema>
 
+/**
+ * to request with required page size
+ */
 export const findPetsByTagsQueryPageSizeSchema = z.number().optional().describe('to request with required page size')
 
 export type FindPetsByTagsQueryPageSizeSchemaType = z.infer<typeof findPetsByTagsQueryPageSizeSchema>
@@ -43,15 +52,15 @@ export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
 export type FindPetsByTagsErrorSchemaType = z.infer<typeof findPetsByTagsErrorSchema>
 
 export const findPetsByTagsQuerySchema = z.object({
-  tags: z.array(z.string()).optional().describe('Tags to filter by'),
-  page: z.string().optional().describe('to request with required page number or pagination'),
-  pageSize: z.number().optional().describe('to request with required page size'),
+  tags: findPetsByTagsQueryTagsSchema,
+  page: findPetsByTagsQueryPageSchema,
+  pageSize: findPetsByTagsQueryPageSizeSchema,
 })
 
 export type FindPetsByTagsQuerySchemaType = z.infer<typeof findPetsByTagsQuerySchema>
 
 export const findPetsByTagsHeadersSchema = z.object({
-  'X-EXAMPLE': findPetsByTagsXEXAMPLESchema.describe('Header parameters'),
+  'X-EXAMPLE': findPetsByTagsHeaderXEXAMPLESchema,
 })
 
 export type FindPetsByTagsHeadersSchemaType = z.infer<typeof findPetsByTagsHeadersSchema>
