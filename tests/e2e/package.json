@@ -34,7 +34,7 @@
     "axios": "^1.21.1",
     "cypress": "^16.3.0",
     "kubb": "catalog:",
-    "msw": "^3.0.5",
+    "msw": "^3.0.6",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "react": "^19.3.1",
@@ -48,5 +48,5 @@
     "node": ">=22.22",
     "pnpm": ">=11.0.0"
   },
-  "packageManager": "pnpm@12.3.4"
+  "packageManager": "pnpm@12.21.0"
 }
