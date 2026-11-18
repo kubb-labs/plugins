@@ -1,5 +1,8 @@
 import * as z from 'zod'
 
+/**
+ * @deprecated
+ */
 export const tagTagSchema = z.object({
   id: z.int().optional().default(1),
   name: z.string().optional(),

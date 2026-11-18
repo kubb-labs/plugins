@@ -6,10 +6,16 @@ export const createPetsQueryBoolParamSchema = createPetsBoolParamSchema.optional
 
 export type CreatePetsQueryBoolParamSchemaType = z.infer<typeof createPetsQueryBoolParamSchema>
 
+/**
+ * UUID
+ */
 export const createPetsPathUuidSchema = z.string().describe('UUID')
 
 export type CreatePetsPathUuidSchemaType = z.infer<typeof createPetsPathUuidSchema>
 
+/**
+ * Offset * /
+ */
 export const createPetsQueryOffsetSchema = z.int().optional().describe('Offset */')
 
 export type CreatePetsQueryOffsetSchemaType = z.infer<typeof createPetsQueryOffsetSchema>
@@ -22,6 +28,9 @@ export const createPetsStatus201Schema = z.unknown()
 
 export type CreatePetsStatus201SchemaType = z.infer<typeof createPetsStatus201Schema>
 
+/**
+ * Pet not found
+ */
 export const createPetsStatusDefaultSchema = z.unknown().describe('Pet not found')
 
 export type CreatePetsStatusDefaultSchemaType = z.infer<typeof createPetsStatusDefaultSchema>
@@ -42,20 +51,20 @@ export const createPetsBodySchema = z.object({
 export type CreatePetsBodySchemaType = z.infer<typeof createPetsBodySchema>
 
 export const createPetsPathSchema = z.object({
-  uuid: z.string().describe('UUID'),
+  uuid: createPetsPathUuidSchema,
 })
 
 export type CreatePetsPathSchemaType = z.infer<typeof createPetsPathSchema>
 
 export const createPetsQuerySchema = z.object({
-  bool_param: createPetsBoolParamSchema.optional(),
-  offset: z.int().optional().describe('Offset */'),
+  bool_param: createPetsQueryBoolParamSchema,
+  offset: createPetsQueryOffsetSchema,
 })
 
 export type CreatePetsQuerySchemaType = z.infer<typeof createPetsQuerySchema>
 
 export const createPetsHeadersSchema = z.object({
-  'X-EXAMPLE': createPetsXEXAMPLESchema.describe('Header parameters'),
+  'X-EXAMPLE': createPetsHeaderXEXAMPLESchema,
 })
 
 export type CreatePetsHeadersSchemaType = z.infer<typeof createPetsHeadersSchema>
