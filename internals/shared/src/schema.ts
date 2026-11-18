@@ -139,8 +139,9 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   // A binary schema parses to a `Blob`, which a spec default, a string, cannot be.
   if (resolved?.type === 'blob') return null
   if (resolved && ast.schema.narrow(resolved, 'bigint')) {
-    if (typeof value === 'bigint') return `BigInt(${value})`
-    if (typeof value === 'number' && Number.isInteger(value)) return `BigInt(${value})`
+    // A string keeps a value above the safe integer range exact, where a number literal is already rounded.
+    if (typeof value === 'bigint') return `BigInt('${value}')`
+    if (typeof value === 'number' && Number.isInteger(value)) return `BigInt('${value}')`
     return null
   }
   if (resolved && ast.schema.narrow(resolved, 'array')) {

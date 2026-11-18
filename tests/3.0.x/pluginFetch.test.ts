@@ -113,7 +113,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
 
 describe(`plugin-fetch options ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-${name}-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-fetch-${name}-`))
     const output = path.join(tmpDir, name)
     const { files, diagnostics } = await createKubb(
       {
@@ -144,7 +144,7 @@ describe(`plugin-fetch options ${version}`, () => {
   })
 
   test('Node imports the client runtime with .ts specifiers', async () => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-ts-extension-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-fetch-ts-extension-`))
     const output = path.join(tmpDir, 'gen')
     const { diagnostics } = await createKubb(
       {
@@ -188,7 +188,7 @@ describe(`plugin-fetch options ${version}`, () => {
       expected: 'defaultConfig: ClientConfig = { baseURL: `${import.meta.env.VITE_API_SERVER}`, ',
     },
   ])('emits $name baseURL in the client config', async ({ name, baseURL, expected }) => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-base-url-${name}-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-fetch-base-url-${name}-`))
     const output = path.join(tmpDir, 'gen')
     const { files, diagnostics } = await createKubb(
       {
@@ -228,7 +228,7 @@ describe(`plugin-fetch options ${version}`, () => {
   // TS2300 duplicate-identifier error. Asserted on the barrel string so it stays robust across
   // environments.
   test('sdk classes keep a distinct name from schema models in the barrel', async () => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-barrel-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-fetch-barrel-`))
     const output = path.join(tmpDir, 'gen')
     const { files, diagnostics } = await createKubb(
       {

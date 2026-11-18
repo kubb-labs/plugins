@@ -1,4 +1,4 @@
-import { defaultLiteral, formatDefault, hasInputChecks, type NumericConstraints } from '@internals/shared'
+import { defaultLiteral, formatDefault, hasInputChecks, type NumericBounds } from '@internals/shared'
 import { buildObject, toRegExpString } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
@@ -117,17 +117,24 @@ export type ModifierOptions = {
   examples?: Array<unknown>
 }
 
+// A bigint bound prints as `BigInt('…')`, which is exact and compiles below ES2020, where a `1n` literal does not.
+function bigintLiteral(value: number | string, isBigint: boolean): number | string {
+  return isBigint ? `BigInt('${value}')` : value
+}
+
 /**
  * Build `.min()` / `.max()` / `.gt()` / `.lt()` constraint chains for numbers
  * using the standard chainable Zod v4 API.
  */
-export function numberConstraints({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): string {
+export function numberConstraints({ min, max, exclusive, multipleOf }: NumericBounds, isBigint = false): string {
+  const literal = (value: number | string) => bigintLiteral(value, isBigint)
+
   return [
-    min !== undefined ? `.min(${min}${suffix})` : '',
-    max !== undefined ? `.max(${max}${suffix})` : '',
-    exclusive?.min !== undefined ? `.gt(${exclusive.min}${suffix})` : '',
-    exclusive?.max !== undefined ? `.lt(${exclusive.max}${suffix})` : '',
-    multipleOf !== undefined ? `.multipleOf(${multipleOf}${suffix})` : '',
+    min !== undefined ? `.min(${literal(min)})` : '',
+    max !== undefined ? `.max(${literal(max)})` : '',
+    exclusive?.min !== undefined ? `.gt(${literal(exclusive.min)})` : '',
+    exclusive?.max !== undefined ? `.lt(${literal(exclusive.max)})` : '',
+    multipleOf !== undefined ? `.multipleOf(${literal(multipleOf)})` : '',
   ].join('')
 }
 
@@ -146,13 +153,14 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
 /**
  * Build `.check(z.minimum(), z.maximum())` for `zod/mini` numeric constraints.
  */
-export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): string {
+export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericBounds, isBigint = false): string {
+  const literal = (value: number | string) => bigintLiteral(value, isBigint)
   const checks = [
-    min !== undefined && `z.minimum(${min}${suffix})`,
-    max !== undefined && `z.maximum(${max}${suffix})`,
-    exclusive?.min !== undefined && `z.gt(${exclusive.min}${suffix})`,
-    exclusive?.max !== undefined && `z.lt(${exclusive.max}${suffix})`,
-    multipleOf !== undefined && `z.multipleOf(${multipleOf}${suffix})`,
+    min !== undefined && `z.minimum(${literal(min)})`,
+    max !== undefined && `z.maximum(${literal(max)})`,
+    exclusive?.min !== undefined && `z.gt(${literal(exclusive.min)})`,
+    exclusive?.max !== undefined && `z.lt(${literal(exclusive.max)})`,
+    multipleOf !== undefined && `z.multipleOf(${literal(multipleOf)})`,
   ].filter(Boolean)
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
@@ -295,7 +303,7 @@ export function getMemberConstraint({
   member: ast.SchemaNode
   regexType?: LengthConstraints['regexType']
   lengths: (constraints: LengthConstraints) => string
-  numbers: (constraints: NumericConstraints) => string
+  numbers: (constraints: NumericBounds) => string
 }): string | undefined {
   // Checks a suffix cannot carry stay on the member's own schema.
   if (hasInputChecks(member) || ast.schema.narrow(member, 'array')?.contains) return undefined

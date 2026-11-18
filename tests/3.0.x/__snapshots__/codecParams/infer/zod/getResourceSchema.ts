@@ -33,20 +33,20 @@ export const getResourceResponseSchema = getResourceStatus200Schema
 export type GetResourceResponseSchemaType = z.infer<typeof getResourceResponseSchema>
 
 export const getResourcePathSchema = z.object({
-  resource: z.url(),
+  resource: getResourcePathResourceSchema,
 })
 
 export type GetResourcePathSchemaType = z.infer<typeof getResourcePathSchema>
 
 export const getResourceQuerySchema = z.object({
-  callback: z.url().optional(),
-  revision: z.int().optional(),
+  callback: getResourceQueryCallbackSchema,
+  revision: getResourceQueryRevisionSchema,
 })
 
 export type GetResourceQuerySchemaType = z.infer<typeof getResourceQuerySchema>
 
 export const getResourceHeadersSchema = z.object({
-  'X-Origin': z.url().optional(),
+  'X-Origin': getResourceHeaderXOriginSchema,
 })
 
 export type GetResourceHeadersSchemaType = z.infer<typeof getResourceHeadersSchema>

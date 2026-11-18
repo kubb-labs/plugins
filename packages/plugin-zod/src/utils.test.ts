@@ -67,7 +67,7 @@ describe('applyModifiers', () => {
 
   test('bigint schema coerces a numeric default to a BigInt literal', () => {
     const schema = ast.factory.createSchema({ type: 'bigint' })
-    expect(applyModifiers({ value: 'z.bigint()', schema, defaultValue: 1 })).toBe('z.bigint().default(BigInt(1))')
+    expect(applyModifiers({ value: 'z.bigint()', schema, defaultValue: 1 })).toBe("z.bigint().default(BigInt('1'))")
   })
 
   test('array schema emits an array-literal default', () => {

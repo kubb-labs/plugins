@@ -6,14 +6,26 @@
 import * as z from 'zod/mini'
 import { petSchema } from './petSchema'
 
+/**
+ * Tags to filter by
+ */
 export const findPetsByTagsQueryTagsSchema = z.optional(
   z.array(z.string()).check(z.refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })),
 )
 
+/**
+ * to request with required page number or pagination
+ */
 export const findPetsByTagsQueryPageSchema = z.optional(z.string())
 
+/**
+ * to request with required page size
+ */
 export const findPetsByTagsQueryPageSizeSchema = z.optional(z.string())
 
+/**
+ * Header parameters
+ */
 export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE'])
 
 export const findPetsByTagsStatus200SchemaJson = z.array(z.lazy(() => petSchema))
@@ -29,11 +41,11 @@ export const findPetsByTagsResponseSchema = findPetsByTagsStatus200Schema
 export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
 
 export const findPetsByTagsQuerySchema = z.object({
-  tags: z.optional(z.array(z.string()).check(z.refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' }))),
-  page: z.optional(z.string()),
-  pageSize: z.optional(z.string()),
+  tags: findPetsByTagsQueryTagsSchema,
+  page: findPetsByTagsQueryPageSchema,
+  pageSize: findPetsByTagsQueryPageSizeSchema,
 })
 
 export const findPetsByTagsHeadersSchema = z.object({
-  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']),
+  'X-EXAMPLE': findPetsByTagsHeaderXEXAMPLESchema,
 })

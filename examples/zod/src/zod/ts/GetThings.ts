@@ -3,6 +3,14 @@
  * Do not edit manually.
  */
 
+export type GetThingsPath = {
+  /**
+   * @description UUID
+   * @type string
+   */
+  uuid: string
+}
+
 export type GetThingsQuery = {
   /**
    * @description Maximum number of things to return
@@ -23,15 +31,19 @@ export type GetThingsQuery = {
 
 export type GetThingsStatus201 = unknown
 
-/**
- * @description Pet not found
- * @type unknown
- */
-export type GetThingsStatusDefault = unknown
+export type GetThingsStatusDefault = {
+  /**
+   * @description
+   * Format: `int32`
+   * @type integer | undefined
+   */
+  code?: number
+  message?: string
+}
 
 export type GetThingsOptions = {
   body?: never
-  path?: never
+  path: GetThingsPath
   query?: GetThingsQuery
   headers?: never
 }

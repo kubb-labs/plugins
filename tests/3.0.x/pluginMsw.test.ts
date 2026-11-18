@@ -125,7 +125,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
 
 describe(`plugin-msw options ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-${name}-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-${name}-`))
     const output = path.join(tmpDir, name)
     const { files, diagnostics } = await createKubb(
       {
@@ -155,7 +155,7 @@ describe(`plugin-msw options ${version}`, () => {
   })
 
   test('a macro that changes the method on plugin-msw only keeps the plugin-ts and plugin-faker names', async () => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-mswMethodMacro-${Date.now()}`)
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-mswMethodMacro-`))
     const output = path.join(tmpDir, 'mswMethodMacro')
     const getAsPost = defineMacro({
       name: 'get-as-post',

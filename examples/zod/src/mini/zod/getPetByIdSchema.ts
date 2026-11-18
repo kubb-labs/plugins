@@ -6,7 +6,10 @@
 import * as z from 'zod/mini'
 import { petSchema } from './petSchema'
 
-export const getPetByIdPathPetIdSchema = z.coerce.bigint()
+/**
+ * ID of pet to return
+ */
+export const getPetByIdPathPetIdSchema = z.pipe(z.coerce.bigint(), z.int64())
 
 export const getPetByIdStatus200SchemaJson = z.lazy(() => petSchema)
 
@@ -23,5 +26,5 @@ export const getPetByIdResponseSchema = getPetByIdStatus200Schema
 export const getPetByIdErrorSchema = z.union([getPetByIdStatus400Schema, getPetByIdStatus404Schema])
 
 export const getPetByIdPathSchema = z.object({
-  petId: z.coerce.bigint(),
+  petId: getPetByIdPathPetIdSchema,
 })

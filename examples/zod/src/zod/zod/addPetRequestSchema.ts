@@ -10,6 +10,7 @@ import { tagSchema } from './tagSchema'
 export const addPetRequestSchema = z.object({
   id: z.coerce
     .bigint()
+    .pipe(z.int64())
     .optional()
     .meta({ examples: [10] }),
   name: z.string().meta({ examples: ['doggie'] }),

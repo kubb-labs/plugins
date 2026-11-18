@@ -52,26 +52,20 @@ export const scheduleVisitBodySchema = visitRequestInputSchema
 export type ScheduleVisitBodySchemaType = z.input<typeof scheduleVisitBodySchema>
 
 export const scheduleVisitPathSchema = z.object({
-  petId: z.bigint().transform((value) => value.toString()),
-  day: z.date().transform((value) => value.toISOString().slice(0, 10)),
+  petId: scheduleVisitPathPetIdSchema,
+  day: scheduleVisitPathDaySchema,
 })
 
 export type ScheduleVisitPathSchemaType = z.input<typeof scheduleVisitPathSchema>
 
 export const scheduleVisitQuerySchema = z.object({
-  callback: z
-    .instanceof(URL)
-    .transform((url) => url.href)
-    .optional(),
+  callback: scheduleVisitQueryCallbackSchema,
 })
 
 export type ScheduleVisitQuerySchemaType = z.input<typeof scheduleVisitQuerySchema>
 
 export const scheduleVisitHeadersSchema = z.object({
-  'X-Requested-At': z
-    .date()
-    .transform((value) => value.toISOString())
-    .optional(),
+  'X-Requested-At': scheduleVisitHeaderXRequestedAtSchema,
 })
 
 export type ScheduleVisitHeadersSchemaType = z.input<typeof scheduleVisitHeadersSchema>

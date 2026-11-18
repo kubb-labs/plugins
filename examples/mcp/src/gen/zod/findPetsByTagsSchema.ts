@@ -7,10 +7,19 @@ import * as z from 'zod'
 import { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema'
 import { petSchema } from './petSchema'
 
+/**
+ * Tags to filter by
+ */
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
+/**
+ * to request with required page number or pagination
+ */
 export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to request with required page number or pagination')
 
+/**
+ * to request with required page size
+ */
 export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
 export const findPetsByTagsHeaderXEXAMPLESchema = findPetsByTagsXEXAMPLESchema.describe('Header parameters')
@@ -28,11 +37,11 @@ export const findPetsByTagsResponseSchema = findPetsByTagsStatus200Schema
 export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
 
 export const findPetsByTagsQuerySchema = z.object({
-  tags: z.array(z.string()).optional().describe('Tags to filter by'),
-  page: z.string().optional().describe('to request with required page number or pagination'),
-  pageSize: z.string().optional().describe('to request with required page size'),
+  tags: findPetsByTagsQueryTagsSchema,
+  page: findPetsByTagsQueryPageSchema,
+  pageSize: findPetsByTagsQueryPageSizeSchema,
 })
 
 export const findPetsByTagsHeadersSchema = z.object({
-  'X-EXAMPLE': findPetsByTagsXEXAMPLESchema.describe('Header parameters'),
+  'X-EXAMPLE': findPetsByTagsHeaderXEXAMPLESchema,
 })

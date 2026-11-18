@@ -129,7 +129,9 @@ export const printerZodMini = createPrinter<PrinterZodMiniFactory>((options) => 
     nodes: withInputChecks({
       ...buildZodNodes(miniDialect, options.cyclicSchemas),
       bigint(node) {
-        return `z.coerce.bigint()${numberChecksMini(bigintConstraints(node), 'n')}`
+        const checks = numberChecksMini(bigintConstraints(node), true)
+        // `z.int64()` carries the range of the format but takes a bigint only, so the JSON value converts first.
+        return node.format === 'int64' || node.format === 'uint64' ? `z.pipe(z.coerce.bigint(), z.${node.format}()${checks})` : `z.coerce.bigint()${checks}`
       },
       date(node) {
         if (node.representation === 'string') {
