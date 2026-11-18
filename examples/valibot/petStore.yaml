@@ -39,6 +39,12 @@ paths:
       operationId: getThings
       summary: Get a list of things
       parameters:
+        - description: UUID
+          in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
         - in: query
           name: limit
           description: Maximum number of things to return
@@ -58,11 +64,7 @@ paths:
         '201':
           description: Null response
         default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/PetNotFound'
+          $ref: '#/components/responses/PetNotFound'
     post:
       summary: Create a pet
       operationId: createPets
@@ -108,11 +110,7 @@ paths:
         '201':
           description: Null response
         default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/PetNotFound'
+          $ref: '#/components/responses/PetNotFound'
   /pet:
     put:
       tags:

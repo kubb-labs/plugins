@@ -5,6 +5,10 @@
 
 import * as v from 'valibot'
 
+export const getThingsPathUuidSchema = v.string()
+
+export type GetThingsPathUuidSchemaType = v.InferInput<typeof getThingsPathUuidSchema>
+
 export const getThingsQueryLimitSchema = v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100)
 
 export type GetThingsQueryLimitSchemaType = v.InferInput<typeof getThingsQueryLimitSchema>
@@ -17,7 +21,10 @@ export const getThingsStatus201Schema = v.unknown()
 
 export type GetThingsStatus201SchemaType = v.InferOutput<typeof getThingsStatus201Schema>
 
-export const getThingsStatusDefaultSchema = v.unknown()
+export const getThingsStatusDefaultSchema = v.object({
+  code: v.optional(v.pipe(v.number(), v.integer())),
+  message: v.optional(v.string()),
+})
 
 export type GetThingsStatusDefaultSchemaType = v.InferOutput<typeof getThingsStatusDefaultSchema>
 
@@ -28,6 +35,12 @@ export type GetThingsResponseSchemaType = v.InferOutput<typeof getThingsResponse
 export const getThingsErrorSchema = getThingsStatusDefaultSchema
 
 export type GetThingsErrorSchemaType = v.InferOutput<typeof getThingsErrorSchema>
+
+export const getThingsPathSchema = v.object({
+  uuid: v.string(),
+})
+
+export type GetThingsPathSchemaType = v.InferInput<typeof getThingsPathSchema>
 
 export const getThingsQuerySchema = v.object({
   limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100),

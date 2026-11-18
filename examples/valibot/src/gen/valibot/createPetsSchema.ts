@@ -21,7 +21,10 @@ export const createPetsStatus201Schema = v.unknown()
 
 export type CreatePetsStatus201SchemaType = v.InferOutput<typeof createPetsStatus201Schema>
 
-export const createPetsStatusDefaultSchema = v.unknown()
+export const createPetsStatusDefaultSchema = v.object({
+  code: v.optional(v.pipe(v.number(), v.integer())),
+  message: v.optional(v.string()),
+})
 
 export type CreatePetsStatusDefaultSchemaType = v.InferOutput<typeof createPetsStatusDefaultSchema>
 
