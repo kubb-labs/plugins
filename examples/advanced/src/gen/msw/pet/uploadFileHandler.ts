@@ -12,16 +12,12 @@ export function uploadFileHandlerResponse200(data?: ApiResponse) {
   })
 }
 
-export function uploadFileHandler(
-  data?: ApiResponse | HttpResponseResolver<Record<string, string>, Blob extends DefaultBodyType ? Blob : DefaultBodyType>,
-  options?: { baseURL?: string },
-) {
-  return http.post<Record<string, string>, Blob extends DefaultBodyType ? Blob : DefaultBodyType>(
-    `${options?.baseURL ?? ''}/pet/:petId/uploadImage`,
-    function handler(info) {
-      if (typeof data === 'function') return data(info)
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
-      return uploadFileHandlerResponse200(data)
-    },
-  )
+export function uploadFileHandler(data?: ApiResponse | HttpResponseResolver<Record<string, string>, MswBody<Blob>>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, MswBody<Blob>>(`${options?.baseURL ?? ''}/pet/:petId/uploadImage`, function handler(info) {
+    if (typeof data === 'function') return data(info)
+
+    return uploadFileHandlerResponse200(data)
+  })
 }

@@ -51,16 +51,15 @@ export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
   })
 }
 
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
 export function updatePetHandler(
-  data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetBody extends DefaultBodyType ? UpdatePetBody : DefaultBodyType>,
+  data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, MswBody<UpdatePetBody>>,
   options?: { baseURL?: string },
 ) {
-  return http.put<Record<string, string>, UpdatePetBody extends DefaultBodyType ? UpdatePetBody : DefaultBodyType>(
-    `${options?.baseURL ?? 'http://localhost:3000'}/pet`,
-    function handler(info) {
-      if (typeof data === 'function') return data(info)
+  return http.put<Record<string, string>, MswBody<UpdatePetBody>>(`${options?.baseURL ?? 'http://localhost:3000'}/pet`, function handler(info) {
+    if (typeof data === 'function') return data(info)
 
-      return updatePetHandlerResponse200(data)
-    },
-  )
+    return updatePetHandlerResponse200(data)
+  })
 }

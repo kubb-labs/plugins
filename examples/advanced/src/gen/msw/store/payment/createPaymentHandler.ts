@@ -12,16 +12,12 @@ export function createPaymentHandlerResponse201(data?: Payment) {
   })
 }
 
-export function createPaymentHandler(
-  data?: Payment | HttpResponseResolver<Record<string, string>, Payment extends DefaultBodyType ? Payment : DefaultBodyType>,
-  options?: { baseURL?: string },
-) {
-  return http.post<Record<string, string>, Payment extends DefaultBodyType ? Payment : DefaultBodyType>(
-    `${options?.baseURL ?? ''}/store/payments`,
-    function handler(info) {
-      if (typeof data === 'function') return data(info)
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
-      return createPaymentHandlerResponse201(data)
-    },
-  )
+export function createPaymentHandler(data?: Payment | HttpResponseResolver<Record<string, string>, MswBody<Payment>>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, MswBody<Payment>>(`${options?.baseURL ?? ''}/store/payments`, function handler(info) {
+    if (typeof data === 'function') return data(info)
+
+    return createPaymentHandlerResponse201(data)
+  })
 }
