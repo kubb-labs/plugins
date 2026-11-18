@@ -125,13 +125,16 @@ function lengthActions({ min, max, pattern }: LengthConstraints, regexType: Prin
   ].filter((action): action is string => Boolean(action))
 }
 
-function numberActions({ min, max, exclusive, multipleOf }: NumericBounds, suffix: '' | 'n' = ''): Array<string> {
+// A bigint bound prints as `BigInt('…')`, which is exact and compiles below ES2020, where a `1n` literal does not.
+function numberActions({ min, max, exclusive, multipleOf }: NumericBounds, isBigint = false): Array<string> {
+  const literal = (value: number | string) => (isBigint ? `BigInt('${value}')` : value)
+
   return [
-    min !== undefined && `v.minValue(${min}${suffix})`,
-    max !== undefined && `v.maxValue(${max}${suffix})`,
-    exclusive?.min !== undefined && `v.gtValue(${exclusive.min}${suffix})`,
-    exclusive?.max !== undefined && `v.ltValue(${exclusive.max}${suffix})`,
-    multipleOf !== undefined && `v.multipleOf(${multipleOf}${suffix})`,
+    min !== undefined && `v.minValue(${literal(min)})`,
+    max !== undefined && `v.maxValue(${literal(max)})`,
+    exclusive?.min !== undefined && `v.gtValue(${literal(exclusive.min)})`,
+    exclusive?.max !== undefined && `v.ltValue(${literal(exclusive.max)})`,
+    multipleOf !== undefined && `v.multipleOf(${literal(multipleOf)})`,
   ].filter((action): action is string => Boolean(action))
 }
 
@@ -515,7 +518,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       // JSON carries a 64-bit integer as a number or a string, so both convert.
       return pipe('v.union([v.bigint(), v.number(), v.string()])', [
         'v.toBigint()',
-        ...numberActions(withFormatRange({ ...bigintConstraints(node), format: node.format }, 'bigint'), 'n'),
+        ...numberActions(withFormatRange({ ...bigintConstraints(node), format: node.format }, 'bigint'), true),
       ])
     },
     ...directionalNodes,
