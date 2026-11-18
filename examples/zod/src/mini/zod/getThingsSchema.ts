@@ -5,17 +5,26 @@
 
 import * as z from 'zod/mini'
 
+export const getThingsPathUuidSchema = z.string()
+
 export const getThingsQueryLimitSchema = z._default(z.optional(z.int().check(z.minimum(1), z.maximum(100))), 100)
 
 export const getThingsQuerySkipSchema = z._default(z.optional(z.int().check(z.minimum(0))), 0)
 
 export const getThingsStatus201Schema = z.unknown()
 
-export const getThingsStatusDefaultSchema = z.unknown()
+export const getThingsStatusDefaultSchema = z.object({
+  code: z.optional(z.int32()),
+  message: z.optional(z.string()),
+})
 
 export const getThingsResponseSchema = getThingsStatus201Schema
 
 export const getThingsErrorSchema = getThingsStatusDefaultSchema
+
+export const getThingsPathSchema = z.object({
+  uuid: z.string(),
+})
 
 export const getThingsQuerySchema = z.object({
   limit: z._default(z.optional(z.int().check(z.minimum(1), z.maximum(100))), 100),

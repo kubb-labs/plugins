@@ -37,11 +37,15 @@ export type CreatePetsHeaders = {
 
 export type CreatePetsStatus201 = unknown
 
-/**
- * @description Pet not found
- * @type unknown
- */
-export type CreatePetsStatusDefault = unknown
+export type CreatePetsStatusDefault = {
+  /**
+   * @description
+   * Format: `int32`
+   * @type integer | undefined
+   */
+  code?: number
+  message?: string
+}
 
 export type CreatePetsBody = {
   name: string
