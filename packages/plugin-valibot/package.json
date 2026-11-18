@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-valibot",
-  "version": "5.9.5",
+  "version": "0.0.0",
   "description": "Generate Valibot validation schemas with Kubb for runtime data parsing and type safety.",
   "keywords": [
     "code-generation",
