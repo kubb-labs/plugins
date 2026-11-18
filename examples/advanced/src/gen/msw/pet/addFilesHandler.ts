@@ -18,36 +18,30 @@ export function addFilesHandlerResponse405(data?: unknown) {
   })
 }
 
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
 export function addFilesHandler(
   data?:
     | Omit<NonNullable<Pet>, 'name'>
     | HttpResponseResolver<
         Record<string, string>,
+        MswBody<
           | {
               url: string
             }
-          | Omit<NonNullable<Pet>, 'id'> extends DefaultBodyType
-          ?
-              | {
-                  url: string
-                }
-              | Omit<NonNullable<Pet>, 'id'>
-          : DefaultBodyType
+          | Omit<NonNullable<Pet>, 'id'>
+        >
       >,
   options?: { baseURL?: string },
 ) {
   return http.post<
     Record<string, string>,
+    MswBody<
       | {
           url: string
         }
-      | Omit<NonNullable<Pet>, 'id'> extends DefaultBodyType
-      ?
-          | {
-              url: string
-            }
-          | Omit<NonNullable<Pet>, 'id'>
-      : DefaultBodyType
+      | Omit<NonNullable<Pet>, 'id'>
+    >
   >(`${options?.baseURL ?? ''}/pet/files`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

@@ -31,18 +31,15 @@ export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus40
   })
 }
 
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
 export function placeOrderPatchHandler(
-  data?:
-    | PlaceOrderPatchResponse
-    | HttpResponseResolver<Record<string, string>, PlaceOrderPatchBody extends DefaultBodyType ? PlaceOrderPatchBody : DefaultBodyType>,
+  data?: PlaceOrderPatchResponse | HttpResponseResolver<Record<string, string>, MswBody<PlaceOrderPatchBody>>,
   options?: { baseURL?: string },
 ) {
-  return http.patch<Record<string, string>, PlaceOrderPatchBody extends DefaultBodyType ? PlaceOrderPatchBody : DefaultBodyType>(
-    `${options?.baseURL ?? 'http://localhost:3000'}/store/order`,
-    function handler(info) {
-      if (typeof data === 'function') return data(info)
+  return http.patch<Record<string, string>, MswBody<PlaceOrderPatchBody>>(`${options?.baseURL ?? 'http://localhost:3000'}/store/order`, function handler(info) {
+    if (typeof data === 'function') return data(info)
 
-      return placeOrderPatchHandlerResponse200(data)
-    },
-  )
+    return placeOrderPatchHandlerResponse200(data)
+  })
 }

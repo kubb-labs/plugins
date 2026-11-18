@@ -42,16 +42,12 @@ export function addPetHandlerResponse405(data?: AddPetStatus405) {
   })
 }
 
-export function addPetHandler(
-  data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetBody extends DefaultBodyType ? AddPetBody : DefaultBodyType>,
-  options?: { baseURL?: string },
-) {
-  return http.post<Record<string, string>, AddPetBody extends DefaultBodyType ? AddPetBody : DefaultBodyType>(
-    `${options?.baseURL ?? 'http://localhost:3000'}/pet`,
-    function handler(info) {
-      if (typeof data === 'function') return data(info)
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
-      return addPetHandlerResponse200(data)
-    },
-  )
+export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, MswBody<AddPetBody>>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, MswBody<AddPetBody>>(`${options?.baseURL ?? 'http://localhost:3000'}/pet`, function handler(info) {
+    if (typeof data === 'function') return data(info)
+
+    return addPetHandlerResponse200(data)
+  })
 }

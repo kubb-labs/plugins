@@ -59,6 +59,8 @@ export function updatePetHandlerResponse405(data?: unknown) {
   })
 }
 
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
 export function updatePetHandler(
   data?:
     | (
@@ -67,15 +69,12 @@ export function updatePetHandler(
             id?: number
           }
       )
-    | HttpResponseResolver<Record<string, string>, Omit<NonNullable<Pet>, 'id'> extends DefaultBodyType ? Omit<NonNullable<Pet>, 'id'> : DefaultBodyType>,
+    | HttpResponseResolver<Record<string, string>, MswBody<Omit<NonNullable<Pet>, 'id'>>>,
   options?: { baseURL?: string },
 ) {
-  return http.put<Record<string, string>, Omit<NonNullable<Pet>, 'id'> extends DefaultBodyType ? Omit<NonNullable<Pet>, 'id'> : DefaultBodyType>(
-    `${options?.baseURL ?? ''}/pet`,
-    function handler(info) {
-      if (typeof data === 'function') return data(info)
+  return http.put<Record<string, string>, MswBody<Omit<NonNullable<Pet>, 'id'>>>(`${options?.baseURL ?? ''}/pet`, function handler(info) {
+    if (typeof data === 'function') return data(info)
 
-      return updatePetHandlerResponse200(data)
-    },
-  )
+    return updatePetHandlerResponse200(data)
+  })
 }

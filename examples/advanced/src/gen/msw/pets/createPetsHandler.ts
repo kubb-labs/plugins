@@ -8,6 +8,8 @@ export function createPetsHandlerResponse201(data?: unknown) {
   })
 }
 
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
 export function createPetsHandler(
   data?:
     | string
@@ -17,29 +19,19 @@ export function createPetsHandler(
     | object
     | HttpResponseResolver<
         Record<string, string>,
-        {
+        MswBody<{
           name: string
           tag: string
-        } extends DefaultBodyType
-          ? {
-              name: string
-              tag: string
-            }
-          : DefaultBodyType
+        }>
       >,
   options?: { baseURL?: string },
 ) {
   return http.post<
     Record<string, string>,
-    {
+    MswBody<{
       name: string
       tag: string
-    } extends DefaultBodyType
-      ? {
-          name: string
-          tag: string
-        }
-      : DefaultBodyType
+    }>
   >(`${options?.baseURL ?? ''}/pets/:uuid`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

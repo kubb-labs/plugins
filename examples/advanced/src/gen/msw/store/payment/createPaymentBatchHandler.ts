@@ -9,24 +9,17 @@ export function createPaymentBatchHandlerResponse204(data?: unknown) {
   })
 }
 
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
+
 export function createPaymentBatchHandler(
-  data?:
-    | string
-    | number
-    | boolean
-    | null
-    | object
-    | HttpResponseResolver<Record<string, string>, [Payment, ...string[]] extends DefaultBodyType ? [Payment, ...string[]] : DefaultBodyType>,
+  data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, MswBody<[Payment, ...string[]]>>,
   options?: { baseURL?: string },
 ) {
-  return http.post<Record<string, string>, [Payment, ...string[]] extends DefaultBodyType ? [Payment, ...string[]] : DefaultBodyType>(
-    `${options?.baseURL ?? ''}/store/payments/batch`,
-    function handler(info) {
-      if (typeof data === 'function') return data(info)
+  return http.post<Record<string, string>, MswBody<[Payment, ...string[]]>>(`${options?.baseURL ?? ''}/store/payments/batch`, function handler(info) {
+    if (typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 204,
-      })
-    },
-  )
+    return new HttpResponse<string>(JSON.stringify(data), {
+      status: 204,
+    })
+  })
 }
