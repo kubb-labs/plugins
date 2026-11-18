@@ -5,7 +5,12 @@
 
 import * as v from 'valibot'
 
-export const updatePetWithFormPathPetIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())
+export const updatePetWithFormPathPetIdSchema = v.pipe(
+  v.union([v.bigint(), v.number(), v.string()]),
+  v.toBigint(),
+  v.minValue(-9223372036854775808n),
+  v.maxValue(9223372036854775807n),
+)
 
 export type UpdatePetWithFormPathPetIdSchemaType = v.InferInput<typeof updatePetWithFormPathPetIdSchema>
 
@@ -30,7 +35,7 @@ export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
 export type UpdatePetWithFormErrorSchemaType = v.InferOutput<typeof updatePetWithFormErrorSchema>
 
 export const updatePetWithFormPathSchema = v.object({
-  petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint()),
+  petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
 })
 
 export type UpdatePetWithFormPathSchemaType = v.InferInput<typeof updatePetWithFormPathSchema>

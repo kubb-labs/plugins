@@ -80,6 +80,27 @@ describe('printerValibot', () => {
       [1, '2', 3n],
       [1.5, 'x', -1],
     ],
+    [
+      'int32 keeps to its range, and a tighter bound from the spec wins',
+      createSchema({ type: 'integer', format: 'int32', min: 0 }),
+      'v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(2147483647))',
+      [0, 2147483647],
+      [-1, 2147483648],
+    ],
+    [
+      'int64 keeps to its range',
+      createSchema({ type: 'bigint', format: 'int64' }),
+      'v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))',
+      ['9223372036854775807', -5],
+      ['9223372036854775808'],
+    ],
+    [
+      'uint64 keeps to its range',
+      createSchema({ type: 'bigint', format: 'uint64' }),
+      'v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(0n), v.maxValue(18446744073709551615n))',
+      ['18446744073709551615'],
+      [-1, '18446744073709551616'],
+    ],
     ['date as a string', createSchema({ type: 'date', representation: 'string' }), 'v.pipe(v.string(), v.isoDate())', ['2026-01-31'], ['2026-13-01']],
     [
       'datetime',

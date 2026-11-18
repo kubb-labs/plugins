@@ -20,7 +20,7 @@ export const addPetStatus200Schema = v.union([addPetStatus200SchemaJson, addPetS
 export type AddPetStatus200SchemaType = v.InferOutput<typeof addPetStatus200Schema>
 
 export const addPetStatus405Schema = v.object({
-  code: v.optional(v.pipe(v.number(), v.integer())),
+  code: v.optional(v.pipe(v.number(), v.integer(), v.minValue(-2147483648), v.maxValue(2147483647))),
   message: v.optional(v.string()),
 })
 

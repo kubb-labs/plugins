@@ -6,7 +6,12 @@
 import * as v from 'valibot'
 import { orderSchema } from './orderSchema'
 
-export const getOrderByIdPathOrderIdSchema = v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint())
+export const getOrderByIdPathOrderIdSchema = v.pipe(
+  v.union([v.bigint(), v.number(), v.string()]),
+  v.toBigint(),
+  v.minValue(-9223372036854775808n),
+  v.maxValue(9223372036854775807n),
+)
 
 export type GetOrderByIdPathOrderIdSchemaType = v.InferInput<typeof getOrderByIdPathOrderIdSchema>
 
@@ -39,7 +44,7 @@ export const getOrderByIdErrorSchema = v.union([getOrderByIdStatus400Schema, get
 export type GetOrderByIdErrorSchemaType = v.InferOutput<typeof getOrderByIdErrorSchema>
 
 export const getOrderByIdPathSchema = v.object({
-  orderId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint()),
+  orderId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
 })
 
 export type GetOrderByIdPathSchemaType = v.InferInput<typeof getOrderByIdPathSchema>

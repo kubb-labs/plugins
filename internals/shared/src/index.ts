@@ -49,5 +49,6 @@ export {
   isObjectSchemaNode,
   preserveRequiredProperties,
   strictOneOfNode,
+  withFormatRange,
 } from './schema.ts'
-export type { NumericConstraints } from './schema.ts'
+export type { NumericBounds, NumericConstraints } from './schema.ts'

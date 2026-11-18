@@ -7,9 +7,10 @@ import {
   integerFormatPattern,
   isObjectComposableIntersection,
   isObjectSchemaNode,
-  type NumericConstraints,
+  type NumericBounds,
   preserveRequiredProperties,
   strictOneOfNode,
+  withFormatRange,
 } from '@internals/shared'
 import { buildList, buildObject, objectKey, toRegExpString } from '@internals/utils'
 import { ast, createPrinter, text } from '@kubb/kit'
@@ -116,7 +117,7 @@ function lengthActions({ min, max, pattern }: LengthConstraints, regexType: Prin
   ].filter((action): action is string => Boolean(action))
 }
 
-function numberActions({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): Array<string> {
+function numberActions({ min, max, exclusive, multipleOf }: NumericBounds, suffix: '' | 'n' = ''): Array<string> {
   return [
     min !== undefined && `v.minValue(${min}${suffix})`,
     max !== undefined && `v.maxValue(${max}${suffix})`,
@@ -485,11 +486,14 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
     integer(node) {
       const coerce = shouldCoerce(this.options.coercion, 'numbers')
 
-      return pipe(coerce ? UNKNOWN : 'v.number()', [coerce && 'v.toNumber()', 'v.integer()', ...numberActions(node)])
+      return pipe(coerce ? UNKNOWN : 'v.number()', [coerce && 'v.toNumber()', 'v.integer()', ...numberActions(withFormatRange(node, 'integer'))])
     },
     bigint(node) {
       // JSON carries a 64-bit integer as a number or a string, so both convert.
-      return pipe('v.union([v.bigint(), v.number(), v.string()])', ['v.toBigint()', ...numberActions(bigintConstraints(node), 'n')])
+      return pipe('v.union([v.bigint(), v.number(), v.string()])', [
+        'v.toBigint()',
+        ...numberActions(withFormatRange({ ...bigintConstraints(node), format: node.format }, 'bigint'), 'n'),
+      ])
     },
     ...directionalNodes,
     datetime(node) {
