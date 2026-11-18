@@ -298,6 +298,7 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
   unique: (array) => `${array}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })`,
   extend: (base, shape) => `${base}.extend(${shape})`,
   intersection: (left, right) => `${left}.and(${right})`,
+  pipe: (left, right) => `${left}.pipe(${right})`,
   strictMember: strictOneOfMember,
   useInputVariant: (node, options) => options.direction === 'encode' && containsDirectionalNode({ node, printerOptions: options }),
 }

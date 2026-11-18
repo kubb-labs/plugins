@@ -140,8 +140,8 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   if (resolved?.type === 'blob') return null
   if (resolved && ast.schema.narrow(resolved, 'bigint')) {
     // A string keeps a value above the safe integer range exact, where a number literal is already rounded.
-    if (typeof value === 'bigint') return `BigInt('${value}')`
-    if (typeof value === 'number' && Number.isInteger(value)) return `BigInt('${value}')`
+    // `BigInt(value)` spells a large number out in digits, where `String(1e21)` is `'1e+21'`, which `BigInt` cannot parse.
+    if (typeof value === 'bigint' || (typeof value === 'number' && Number.isInteger(value))) return `BigInt('${BigInt(value)}')`
     return null
   }
   if (resolved && ast.schema.narrow(resolved, 'array')) {

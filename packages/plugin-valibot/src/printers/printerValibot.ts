@@ -141,12 +141,24 @@ function numberActions({ min, max, exclusive, multipleOf }: NumericBounds, isBig
 
 // The actions an `allOf` member adds to a bare string, number, or array. An empty list means the
 // member prints as its own schema.
-function memberActions(member: ast.SchemaNode, regexType: PrinterValibotOptions['regexType']): Array<string> {
+function memberActions({
+  member,
+  base,
+  regexType,
+}: {
+  member: ast.SchemaNode
+  base: ast.SchemaNode
+  regexType: PrinterValibotOptions['regexType']
+}): Array<string> {
   // Checks on the raw input cannot ride along as actions, so that member prints as its own schema.
   if (hasChecks(member)) return []
   if (member.primitive === 'string') return lengthActions(ast.schema.narrow(member, 'string') ?? {}, regexType)
   if (member.primitive === 'number' || member.primitive === 'integer') {
-    return numberActions(ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer') ?? {})
+    const numeric = ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer') ?? {}
+    // The base decides the value the bounds compare with: a bigint base takes bigint bounds.
+    if (base.type === ast.schema.types.bigint) return numberActions(bigintConstraints(numeric), true)
+
+    return [...(member.primitive === 'integer' && base.type !== ast.schema.types.integer ? ['v.integer()'] : []), ...numberActions(numeric)]
   }
   if (member.primitive === 'array') {
     const array = ast.schema.narrow(member, 'array')
@@ -236,11 +248,15 @@ function unwrapChain(node: ast.SchemaNode, direction: PrinterValibotOptions['dir
   const ref = ast.schema.narrow(node, 'ref')
   if (!ref) return ''
   const target = ref.schema ?? ref
-  const hasDefault = target.default !== undefined && !expectsDate(target, direction) && defaultLiteral(target, target.default) !== null
-  const depth = Number(Boolean(target.nullable || target.nullish)) + Number(Boolean(target.optional || target.nullish || hasDefault))
+  // `print` reads the modifiers of a const from its merged schema, so an alias of a nullable schema is nullable twice.
+  const meta = ast.ref.mergeSchema(target)
+  const hasDefault = meta.default !== undefined && !expectsDate(target, direction) && defaultLiteral(target, meta.default) !== null
+  const depth = Number(Boolean(meta.nullable || meta.nullish)) + Number(Boolean(meta.optional || meta.nullish || hasDefault))
+  // An alias const wraps the const it points to, so the chain goes on through it.
+  const inner = target !== ref && target.type === ast.schema.types.ref ? unwrapChain(target, direction) : ''
 
   // `v.omit` and the other object helpers do not take a schema with a pipe.
-  return `${'.wrapped'.repeat(depth)}${hasMetadata(target) ? '.pipe[0]' : ''}`
+  return `${'.wrapped'.repeat(depth)}${inner}${hasMetadata(target) ? '.pipe[0]' : ''}`
 }
 
 function objectEntries(ctx: PrinterContext, properties: Array<ast.PropertyNode>): Array<string> {
@@ -455,6 +471,27 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
   const printNullable = (schema: ast.SchemaNode, output: string | null) => (output && schema.nullable ? `v.nullable(${output})` : output)
   const formatString = (action: string, node: LengthConstraints) => pipe('v.string()', [action, ...lengthActions(node, options.regexType)])
 
+  // Whether an `allOf` prints as one `v.object` with the entries of every member, and not as `v.intersect`.
+  const mergesToObject = (node: ast.SchemaNode): boolean => {
+    const [first, ...rest] = ast.schema.narrow(node, ast.schema.types.intersection)?.members ?? []
+    if (!first || rest.length === 0) return false
+    const baseObject = ast.schema.narrow(ast.ref.mergeSchema(first), ast.schema.types.object)
+    // A rest schema or a key pattern cannot move into the merged object, so that base stays in `v.intersect`.
+    const hasRest =
+      Boolean(baseObject?.patternProperties) || (baseObject?.additionalProperties !== undefined && typeof baseObject.additionalProperties !== 'boolean')
+
+    return !hasRest && isObjectNode(first) && isObjectComposableIntersection(node, cyclicSchemas)
+  }
+  // Whether the schema prints with `.entries`, which `v.omit` reads. A `v.union` and a `v.intersect` have none.
+  const printsEntries = (node: ast.SchemaNode): boolean => {
+    const ref = ast.schema.narrow(node, ast.schema.types.ref)
+    if (ref?.schema && ref.schema !== ref) return printsEntries(ref.schema)
+    // An unresolved ref has no schema to read, so it counts as an object, as it does for `v.variant`.
+    if (ref) return true
+
+    return node.type === ast.schema.types.object ? node.properties.length > 0 : mergesToObject(node)
+  }
+
   // Prints the schema without `keysToOmit`. `v.omit` takes a bare object schema, so each wrapper is peeled off first.
   function omitKeys(this: PrinterContext, { node, transformed, keysToOmit }: { node: ast.SchemaNode; transformed: string; keysToOmit: Array<string> }): string {
     const target = ast.schema.narrow(node, 'ref')?.schema ?? node
@@ -462,14 +499,19 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
 
     // A circular const is typed `v.GenericSchema`, which `v.omit` does not take. The generator prints that object inline.
     if (transformed.startsWith('v.lazy(')) return transformed
-    if (!hasChecks(target)) return `v.omit(${transformed}${unwrapChain(node, this.options.direction)}, ${keys})`
-    // The object is the last item of the `v.pipe` that `withInputChecks` printed. The omitted schema leaves the input checks out.
-    if (node.type === ast.schema.types.ref)
-      return `v.omit(${transformed}${unwrapChain(node, this.options.direction)}.pipe[${countChecks(target) + 1}], ${keys})`
+    const base = `${transformed}${unwrapChain(node, this.options.direction)}`
+    if (!hasChecks(target)) return `v.omit(${base}, ${keys})`
+    // `withInputChecks` printed `v.pipe(v.unknown(), ...checks, object)`. `v.omit` takes the object only, so the checks go back around it.
+    if (node.type === ast.schema.types.ref) {
+      const count = countChecks(target)
+      const checks = Array.from({ length: count }, (_, index) => `${base}.pipe[${index + 1}]`)
+
+      return pipe(UNKNOWN, [...checks, `v.omit(${base}.pipe[${count + 1}], ${keys})`])
+    }
 
     uncheckedNode = node
     try {
-      return `v.omit(${this.transform(node)}, ${keys})`
+      return pipe(UNKNOWN, [...inputChecks(this, node), `v.omit(${this.transform(node)}, ${keys})`])
     } finally {
       uncheckedNode = null
     }
@@ -496,8 +538,12 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       // The string holds wire JSON whichever way the string itself travels, so its schema always decodes.
       const { direction } = this.options
       this.options.direction = 'decode'
-      const content = this.transform(contentNode)
-      this.options.direction = direction
+      let content: string | null
+      try {
+        content = this.transform(contentNode)
+      } finally {
+        this.options.direction = direction
+      }
 
       return pipe(coerce ? UNKNOWN : 'v.string()', [
         ...actions,
@@ -639,10 +685,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       // An object `allOf` is a merge: one `v.object` with the entries of every member stays usable in `v.variant` and `v.omit`.
       const base = ast.ref.mergeSchema(first)
       const baseObject = ast.schema.narrow(base, ast.schema.types.object)
-      // A rest schema or a key pattern cannot move into the merged object, so that base stays in `v.intersect`.
-      const hasRest =
-        Boolean(baseObject?.patternProperties) || (baseObject?.additionalProperties !== undefined && typeof baseObject.additionalProperties !== 'boolean')
-      if (rest.length > 0 && !hasRest && isObjectNode(first) && isObjectComposableIntersection(node, cyclicSchemas)) {
+      if (mergesToObject(node)) {
         // A discriminated `oneOf` base already pins its discriminator to a literal, which a sibling `type: string` would widen.
         const discriminator = ast.schema.narrow(first, ast.schema.types.union)?.discriminatorPropertyName
         // Keyed by name: a property two members declare is one key of the object literal, and the last member wins.
@@ -663,7 +706,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       const schemas = [firstBase]
       const actions: Array<string> = []
       for (const member of rest) {
-        const constraints = memberActions(member, this.options.regexType)
+        const constraints = memberActions({ member, base, regexType: this.options.regexType })
         const transformed = constraints.length ? null : transform(member)
         actions.push(...constraints)
         if (transformed) schemas.push(transformed)
@@ -684,7 +727,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
 
       const { keysToOmit, direction } = this.options
       const meta = ast.ref.mergeSchema(node)
-      const canOmit = keysToOmit?.length && meta.primitive === 'object' && !(meta.type === 'union' && meta.discriminatorPropertyName)
+      const canOmit = keysToOmit?.length && printsEntries(node)
       const value = canOmit ? omitKeys.call(this, { node, transformed, keysToOmit }) : transformed
 
       return applyModifiers({

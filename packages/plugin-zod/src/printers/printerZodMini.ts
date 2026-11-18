@@ -120,6 +120,7 @@ const miniDialect: ZodDialect<PrinterZodMiniOptions> = {
   unique: (array) => `${array}.check(z.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" }))`,
   extend: (base, shape) => `z.extend(${base}, ${shape})`,
   intersection: (left, right) => `z.intersection(${left}, ${right})`,
+  pipe: (left, right) => `z.pipe(${left}, ${right})`,
 }
 
 export const printerZodMini = createPrinter<PrinterZodMiniFactory>((options) => {

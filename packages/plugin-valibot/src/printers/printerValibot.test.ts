@@ -553,20 +553,92 @@ describe('printerValibot', () => {
       expect(print(merge)).toContain('v.intersect([')
     })
 
-    test('omits keys from the object behind the checks', () => {
-      const counted = object({ id: string(), name: string() }, { min: 1 })
+    test('omits keys from the object and keeps the checks around it', () => {
+      const counted = object({ 'id?': string(), 'name?': string() }, { min: 1 })
       const omit = printerValibot({ resolver, keysToOmit: ['id'] })
       const refCode = omit.print(ref('Pet', counted))!
       const inlineCode = omit.print(counted)!
 
-      expect(refCode).toBe("v.omit(petSchema.pipe[2], ['id'])")
-      expect(v.parse(build(refCode, { petSchema: build(print(counted)) }), { id: 'a', name: 'b' })).toEqual({ name: 'b' })
-      expect(v.parse(build(inlineCode), { id: 'a', name: 'b' })).toEqual({ name: 'b' })
+      expect(refCode).toBe("v.pipe(v.unknown(), petSchema.pipe[1], v.omit(petSchema.pipe[2], ['id']))")
+      for (const schema of [build(refCode, { petSchema: build(print(counted)) }), build(inlineCode)]) {
+        expect(v.parse(schema, { id: 'a', name: 'b' })).toEqual({ name: 'b' })
+        // `minProperties: 1` still rejects an empty body.
+        expect(v.is(schema, {})).toBe(false)
+      }
 
-      // Only the omitted object loses its checks. A nested object keeps them.
+      // A nested object keeps its own checks too.
       const nested = omit.print(object({ id: string(), child: object({ 'name?': string() }, { min: 1 }) }, { min: 1 }))!
       expect(v.is(build(nested), { id: 'a', child: {} })).toBe(false)
       expect(v.is(build(nested), { id: 'a', child: { name: 'b' } })).toBe(true)
     })
+
+    test('does not omit keys from a schema without entries', () => {
+      const omit = printerValibot({ resolver, keysToOmit: ['id'] })
+      const a = object({ id: string() })
+      const b = object({ name: string() }, { nullable: true })
+      const union = createSchema({ type: 'union', primitive: 'object', strategy: 'one', members: [a, object({ name: string() })] })
+      const intersection = createSchema({ type: 'intersection', primitive: 'object', members: [ref('A', a), ref('B', b)] })
+
+      expect(omit.print(union)).not.toContain('v.omit(')
+      expect(omit.print(ref('I', intersection))).toBe('iSchema')
+    })
+
+    test('reaches the object behind an alias of a nullable schema', () => {
+      const nullableObject = object({ id: string(), name: string() }, { nullable: true })
+      const alias = ref('N', nullableObject)
+      const code = printerValibot({ resolver, keysToOmit: ['id'] }).print(ref('Alias', alias))!
+      const nSchema = build(print(nullableObject))
+      const aliasSchema = build(print(alias), { nSchema })
+
+      expect(code).toBe("v.omit(aliasSchema.wrapped.wrapped, ['id'])")
+      expect(v.parse(build(code, { aliasSchema }), { name: 'x' })).toEqual({ name: 'x' })
+    })
+  })
+
+  describe('allOf members', () => {
+    test('an integer member keeps v.integer() on a number base', () => {
+      const node = createSchema({
+        type: 'intersection',
+        members: [ref('Num', createSchema({ type: 'number' })), createSchema({ type: 'integer', min: 0 })],
+      })
+      const code = print(node)
+
+      expect(code).toBe('v.pipe(numSchema, v.integer(), v.minValue(0))')
+      expect(v.is(build(code, { numSchema: v.number() }), 1.5)).toBe(false)
+      expect(v.is(build(code, { numSchema: v.number() }), 2)).toBe(true)
+    })
+
+    test('a member of a bigint base takes bigint bounds', () => {
+      const id = createSchema({ type: 'bigint', format: 'int64' })
+      const node = createSchema({ type: 'intersection', members: [ref('Id', id), createSchema({ type: 'integer', min: 0 })] })
+      const code = print(node)
+      const schema = build(code, { idSchema: build(print(id)) })
+
+      expect(code).toBe("v.pipe(idSchema, v.minValue(BigInt('0')))")
+      expect(v.is(schema, 5)).toBe(true)
+      expect(v.is(schema, -1)).toBe(false)
+    })
+  })
+
+  test('a bigint default above the safe integer range prints in full digits', () => {
+    const code = print(createSchema({ type: 'bigint', default: 1e21 }))
+
+    expect(code).toContain("BigInt('1000000000000000000000')")
+    expect(v.parse(build(code), undefined)).toBe(1000000000000000000000n)
+  })
+
+  test('the embedded JSON handler restores the direction when a nested handler throws', () => {
+    const throwing = printerValibot({
+      direction: 'encode',
+      nodes: {
+        number() {
+          throw new Error('boom')
+        },
+      },
+    })
+    const embedded = createSchema({ type: 'string', content: { mediaType: 'application/json', schema: createSchema({ type: 'number' }) } } as never)
+
+    expect(() => throwing.print(embedded)).toThrow('boom')
+    expect(throwing.options.direction).toBe('encode')
   })
 })
