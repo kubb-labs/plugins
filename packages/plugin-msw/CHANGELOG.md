@@ -1,5 +1,11 @@
 # @kubb/plugin-msw
 
+## 6.2.7
+
+### Patch Changes
+
+- [#1508](https://github.com/kubb-labs/plugins/pull/1508) [`607fd33`](https://github.com/kubb-labs/plugins/commit/607fd3380d297b794cbbf58b60843059ffa9427b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Type a handler's request body through a local `MswBody<T>` alias, so `{ ...(await request.json()) }` compiles again. A body type that MSW does not accept, such as `unknown`, `bigint` or `void`, still falls back to `DefaultBodyType`.
+
 ## 6.2.6
 
 ### Patch Changes
