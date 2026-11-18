@@ -8,10 +8,20 @@ import * as v from 'valibot'
 import { animalSchema } from './animalSchema'
 import { petSchema } from './petSchema'
 
-export const addPetBodySchema = v.object({
-  ...animalSchema.entries,
-  createdBy: v.string(),
-  name: v.pipe(v.string(), v.minLength(1)),
-  status: v.optional(v.picklist(['available', 'sold'])),
-  friends: v.optional(v.array(v.lazy(() => petSchema))),
-})
+export const addPetBodySchema = v.intersect([
+  animalSchema,
+  v.object({
+    createdBy: v.string(),
+  }),
+  v.intersect([
+    v.object({
+      createdBy: v.string(),
+    }),
+    v.string(),
+  ]),
+  v.object({
+    name: v.pipe(v.string(), v.minLength(1)),
+    status: v.optional(v.picklist(['available', 'sold'])),
+    friends: v.optional(v.array(v.lazy(() => petSchema))),
+  }),
+])

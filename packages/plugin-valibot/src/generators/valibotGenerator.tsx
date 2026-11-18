@@ -142,7 +142,8 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
           if (node.type === 'intersection') return { ...node, members: (node.members ?? []).map((member) => withoutKeys(member, seen)) }
           if (node.type !== 'ref' || !node.schema || seen.has(node.schema) || !declaresKey(node.schema)) return node
 
-          return withoutKeys(node.schema, seen.add(node.schema))
+          // A copy per branch: the set stops a cycle, and a schema that two members reference prints inline in both.
+          return withoutKeys(node.schema, new Set(seen).add(node.schema))
         }
         const inline = withoutKeys(target)
         if (inline.type === 'object' || inline.type === 'intersection') return renderSchemaEntry({ schema: inline, name, direction })
