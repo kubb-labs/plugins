@@ -99,7 +99,7 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "msw": "^3.0.5"
+    "msw": "^3.0.6"
   },
   "peerDependencies": {
     "msw": "^3.0.0"
