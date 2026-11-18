@@ -7,10 +7,8 @@ import * as v from 'valibot'
 import { orderSchema } from './orderSchema'
 
 export const getOrderByIdPathOrderIdSchema = v.pipe(
-  v.union([v.bigint(), v.number(), v.string()]),
-  v.toBigint(),
-  v.minValue(-9223372036854775808n),
-  v.maxValue(9223372036854775807n),
+  v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  v.description('ID of order that needs to be fetched'),
 )
 
 export type GetOrderByIdPathOrderIdSchemaType = v.InferInput<typeof getOrderByIdPathOrderIdSchema>
@@ -44,7 +42,36 @@ export const getOrderByIdErrorSchema = v.union([getOrderByIdStatus400Schema, get
 export type GetOrderByIdErrorSchemaType = v.InferOutput<typeof getOrderByIdErrorSchema>
 
 export const getOrderByIdPathSchema = v.object({
-  orderId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  orderId: v.pipe(
+    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+    v.description('ID of order that needs to be fetched'),
+  ),
 })
 
 export type GetOrderByIdPathSchemaType = v.InferInput<typeof getOrderByIdPathSchema>
+
+export const getOrderByIdOptionsSchema = v.object({
+  body: v.optional(v.never()),
+  path: getOrderByIdPathSchema,
+  query: v.optional(v.never()),
+  headers: v.optional(v.never()),
+})
+
+export type GetOrderByIdOptionsSchemaType = v.InferInput<typeof getOrderByIdOptionsSchema>
+
+export const getOrderByIdResponsesSchema = v.object({
+  '200': v.union([
+    v.object({
+      contentType: v.literal('application/json'),
+      data: getOrderByIdStatus200SchemaJson,
+    }),
+    v.object({
+      contentType: v.literal('application/xml'),
+      data: getOrderByIdStatus200SchemaXml,
+    }),
+  ]),
+  '400': getOrderByIdStatus400Schema,
+  '404': getOrderByIdStatus404Schema,
+})
+
+export type GetOrderByIdResponsesSchemaType = v.InferOutput<typeof getOrderByIdResponsesSchema>

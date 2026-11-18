@@ -8,14 +8,19 @@ import { categorySchema } from './categorySchema'
 import { tagSchema } from './tagSchema'
 
 export const petSchema: v.GenericSchema = v.object({
-  id: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))),
+  id: v.optional(
+    v.pipe(
+      v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+      v.metadata({ examples: [10] }),
+    ),
+  ),
   parent: v.optional(v.array(v.lazy(() => petSchema))),
-  internalId: v.optional(v.pipe(v.string(), v.regex(/^[0-9]{1,19}$/))),
-  name: v.string(),
+  internalId: v.optional(v.pipe(v.pipe(v.string(), v.regex(/^[0-9]{1,19}$/)), v.metadata({ examples: [10] }))),
+  name: v.pipe(v.string(), v.metadata({ examples: ['doggie'] })),
   category: v.optional(v.lazy(() => categorySchema)),
   photoUrls: v.array(v.string()),
   tags: v.optional(v.array(tagSchema)),
-  status: v.optional(v.picklist(['available', 'pending', 'sold'])),
+  status: v.optional(v.pipe(v.picklist(['available', 'pending', 'sold']), v.description('pet status in the store'))),
 })
 
 export type PetSchemaType = v.InferOutput<typeof petSchema>

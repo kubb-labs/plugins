@@ -7,10 +7,8 @@ import * as v from 'valibot'
 import { petSchema } from './petSchema'
 
 export const getPetByIdPathPetIdSchema = v.pipe(
-  v.union([v.bigint(), v.number(), v.string()]),
-  v.toBigint(),
-  v.minValue(-9223372036854775808n),
-  v.maxValue(9223372036854775807n),
+  v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  v.description('ID of pet to return'),
 )
 
 export type GetPetByIdPathPetIdSchemaType = v.InferInput<typeof getPetByIdPathPetIdSchema>
@@ -44,7 +42,36 @@ export const getPetByIdErrorSchema = v.union([getPetByIdStatus400Schema, getPetB
 export type GetPetByIdErrorSchemaType = v.InferOutput<typeof getPetByIdErrorSchema>
 
 export const getPetByIdPathSchema = v.object({
-  petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  petId: v.pipe(
+    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+    v.description('ID of pet to return'),
+  ),
 })
 
 export type GetPetByIdPathSchemaType = v.InferInput<typeof getPetByIdPathSchema>
+
+export const getPetByIdOptionsSchema = v.object({
+  body: v.optional(v.never()),
+  path: getPetByIdPathSchema,
+  query: v.optional(v.never()),
+  headers: v.optional(v.never()),
+})
+
+export type GetPetByIdOptionsSchemaType = v.InferInput<typeof getPetByIdOptionsSchema>
+
+export const getPetByIdResponsesSchema = v.object({
+  '200': v.union([
+    v.object({
+      contentType: v.literal('application/json'),
+      data: getPetByIdStatus200SchemaJson,
+    }),
+    v.object({
+      contentType: v.literal('application/xml'),
+      data: getPetByIdStatus200SchemaXml,
+    }),
+  ]),
+  '400': getPetByIdStatus400Schema,
+  '404': getPetByIdStatus404Schema,
+})
+
+export type GetPetByIdResponsesSchemaType = v.InferOutput<typeof getPetByIdResponsesSchema>

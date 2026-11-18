@@ -8,22 +8,25 @@ import { petSchema } from './petSchema'
 
 export const findPetsByTagsQueryTagsSchema = v.optional(
   v.pipe(
-    v.array(v.string()),
-    v.check((items) => new Set(items).size === items.length, 'Array entries must be unique'),
+    v.pipe(
+      v.array(v.string()),
+      v.check((items) => new Set(items).size === items.length, 'Array entries must be unique'),
+    ),
+    v.description('Tags to filter by'),
   ),
 )
 
 export type FindPetsByTagsQueryTagsSchemaType = v.InferInput<typeof findPetsByTagsQueryTagsSchema>
 
-export const findPetsByTagsQueryPageSchema = v.optional(v.string())
+export const findPetsByTagsQueryPageSchema = v.optional(v.pipe(v.string(), v.description('to request with required page number or pagination')))
 
 export type FindPetsByTagsQueryPageSchemaType = v.InferInput<typeof findPetsByTagsQueryPageSchema>
 
-export const findPetsByTagsQueryPageSizeSchema = v.optional(v.string())
+export const findPetsByTagsQueryPageSizeSchema = v.optional(v.pipe(v.string(), v.description('to request with required page size')))
 
 export type FindPetsByTagsQueryPageSizeSchemaType = v.InferInput<typeof findPetsByTagsQueryPageSizeSchema>
 
-export const findPetsByTagsHeaderXEXAMPLESchema = v.picklist(['ONE', 'TWO', 'THREE'])
+export const findPetsByTagsHeaderXEXAMPLESchema = v.pipe(v.picklist(['ONE', 'TWO', 'THREE']), v.description('Header parameters'))
 
 export type FindPetsByTagsHeaderXEXAMPLESchemaType = v.InferInput<typeof findPetsByTagsHeaderXEXAMPLESchema>
 
@@ -54,18 +57,46 @@ export type FindPetsByTagsErrorSchemaType = v.InferOutput<typeof findPetsByTagsE
 export const findPetsByTagsQuerySchema = v.object({
   tags: v.optional(
     v.pipe(
-      v.array(v.string()),
-      v.check((items) => new Set(items).size === items.length, 'Array entries must be unique'),
+      v.pipe(
+        v.array(v.string()),
+        v.check((items) => new Set(items).size === items.length, 'Array entries must be unique'),
+      ),
+      v.description('Tags to filter by'),
     ),
   ),
-  page: v.optional(v.string()),
-  pageSize: v.optional(v.string()),
+  page: v.optional(v.pipe(v.string(), v.description('to request with required page number or pagination'))),
+  pageSize: v.optional(v.pipe(v.string(), v.description('to request with required page size'))),
 })
 
 export type FindPetsByTagsQuerySchemaType = v.InferInput<typeof findPetsByTagsQuerySchema>
 
 export const findPetsByTagsHeadersSchema = v.object({
-  'X-EXAMPLE': v.picklist(['ONE', 'TWO', 'THREE']),
+  'X-EXAMPLE': v.pipe(v.picklist(['ONE', 'TWO', 'THREE']), v.description('Header parameters')),
 })
 
 export type FindPetsByTagsHeadersSchemaType = v.InferInput<typeof findPetsByTagsHeadersSchema>
+
+export const findPetsByTagsOptionsSchema = v.object({
+  body: v.optional(v.never()),
+  path: v.optional(v.never()),
+  query: v.optional(findPetsByTagsQuerySchema),
+  headers: findPetsByTagsHeadersSchema,
+})
+
+export type FindPetsByTagsOptionsSchemaType = v.InferInput<typeof findPetsByTagsOptionsSchema>
+
+export const findPetsByTagsResponsesSchema = v.object({
+  '200': v.union([
+    v.object({
+      contentType: v.literal('application/json'),
+      data: findPetsByTagsStatus200SchemaJson,
+    }),
+    v.object({
+      contentType: v.literal('application/xml'),
+      data: findPetsByTagsStatus200SchemaXml,
+    }),
+  ]),
+  '400': findPetsByTagsStatus400Schema,
+})
+
+export type FindPetsByTagsResponsesSchemaType = v.InferOutput<typeof findPetsByTagsResponsesSchema>

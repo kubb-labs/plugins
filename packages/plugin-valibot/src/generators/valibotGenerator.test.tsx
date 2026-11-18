@@ -19,6 +19,7 @@ const defaultOptions: PluginValibot['resolvedOptions'] = {
   inferred: false,
   importPath: 'valibot',
   regexType: 'literal',
+  oneOfType: 'union',
   coercion: false,
   typeGuards: false,
   output: { path: '.', mode: 'directory' },

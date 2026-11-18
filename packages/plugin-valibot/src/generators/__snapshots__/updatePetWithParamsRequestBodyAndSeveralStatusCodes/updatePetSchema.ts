@@ -58,3 +58,20 @@ export const updatePetHeadersSchema = v.object({
 })
 
 export type UpdatePetHeadersSchemaType = v.InferInput<typeof updatePetHeadersSchema>
+
+export const updatePetOptionsSchema = v.object({
+  body: v.optional(updatePetBodySchema),
+  path: updatePetPathSchema,
+  query: v.optional(updatePetQuerySchema),
+  headers: v.optional(updatePetHeadersSchema),
+})
+
+export type UpdatePetOptionsSchemaType = v.InferInput<typeof updatePetOptionsSchema>
+
+export const updatePetResponsesSchema = v.object({
+  '200': updatePetStatus200Schema,
+  '204': updatePetStatus204Schema,
+  '404': updatePetStatus404Schema,
+})
+
+export type UpdatePetResponsesSchemaType = v.InferOutput<typeof updatePetResponsesSchema>

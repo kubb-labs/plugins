@@ -67,8 +67,17 @@ export type ResolverValibot = Resolver & {
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
     headers(node: ast.OperationNode, statusCode: ast.StatusCode): string
     body(node: ast.OperationNode): string
+    /**
+     * Name of the per-status record of an operation's responses. Generated only with `inferred: true`.
+     */
+    responses(node: ast.OperationNode): string
     response(node: ast.OperationNode): string
     error(node: ast.OperationNode): string
+    /**
+     * Inferred type name of an operation's combined `{ body, path, query, headers }` object.
+     * Generated only with `inferred: true`.
+     */
+    options(node: ast.OperationNode): string
   }
 }
 
@@ -117,6 +126,14 @@ export type Options = OutputOptions & {
    */
   regexType?: 'literal' | 'constructor'
   /**
+   * How a `oneOf` is validated, unless it prints as `v.variant(...)`.
+   * - `'union'`: `v.union([...])` with strict object members, which also rejects extra keys the spec allows.
+   * - `'xor'`: `v.union([...])` behind a check that passes only when exactly one member matches.
+   *
+   * @default 'union'
+   */
+  oneOfType?: 'union' | 'xor'
+  /**
    * Override the names the plugin gives to schemas, types, and files.
    */
   resolver?: ResolverPatch<ResolverValibot>
@@ -154,6 +171,7 @@ type ResolvedOptions = {
   importPath: NonNullable<Options['importPath']>
   inferred: NonNullable<Options['inferred']>
   regexType: NonNullable<Options['regexType']>
+  oneOfType: NonNullable<Options['oneOfType']>
   coercion: NonNullable<Options['coercion']>
   typeGuards: NonNullable<Options['typeGuards']>
   printer: Options['printer']

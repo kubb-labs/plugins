@@ -349,12 +349,42 @@ describe('printerValibot', () => {
       expect(v.parse(build(code, scope), { id: 'a', meow: 'b' })).toEqual({ id: 'a', meow: 'b' })
     })
 
+    test("oneOfType 'xor' passes only when exactly one member matches, and keeps extra keys legal", () => {
+      const node = createSchema({ type: 'union', strategy: 'one', members: [object({ id: string() }), object({ name: string() })] })
+      const schema = build(printerValibot({ oneOfType: 'xor' }).print(node)!)
+
+      expect(v.is(schema, { id: 'a', extra: 1 })).toBe(true)
+      expect(v.is(schema, { id: 'a', name: 'b' })).toBe(false)
+      expect(v.is(schema, {})).toBe(false)
+    })
+
     test('a oneOf ref that is not a plain object stays as it is', () => {
       const record = object({}, { additionalProperties: string() })
       const node = createSchema({ type: 'union', strategy: 'one', members: [ref('Tags', record), ref('Pet', { ...petNode, nullable: true })] })
 
       expect(print(node)).toBe('v.union([tagsSchema, petSchema])')
     })
+  })
+
+  test('a description and examples ride along as metadata inside the optional wrapper', () => {
+    const node = object({ 'name?': createSchema({ type: 'string', description: 'A "name"', examples: ['Rex', null] }) }, { description: 'A pet' })
+    const code = print(node)!
+
+    expect(code).toMatchInlineSnapshot(`
+      "v.pipe(v.object({
+        name: v.optional(v.pipe(v.string(), v.description('A "name"'), v.metadata({ examples: ['Rex', null] }))),
+      }), v.description('A pet'))"
+    `)
+    expect(v.getDescription(build(code))).toBe('A pet')
+    expect(v.parse(build(code), {})).toEqual({})
+  })
+
+  test('v.omit reads a described $ref target without its metadata', () => {
+    const described = object({ id: string() }, { name: 'Pet', description: 'A pet' })
+    const code = printerValibot({ resolver, keysToOmit: ['id'] }).print(ref('Pet', described))!
+
+    expect(code).toBe("v.omit(petSchema.pipe[0], ['id'])")
+    expect(v.is(build(code, { petSchema: build(print(described)!) }), {})).toBe(true)
   })
 
   test('printer.nodes overrides a handler and can reuse the built-in output', () => {

@@ -50,4 +50,19 @@ export type PetSchemaType = v.InferOutput<typeof petSchema>
 
 ::
 
-Next, look up [the Valibot call for each OpenAPI format](https://kubb.dev/extensions/kubb-labs/plugin-valibot/guides/format-mappings).
+## Guides
+
+- [Valibot schemas for OpenAPI formats](https://kubb.dev/extensions/kubb-labs/plugin-valibot/guides/format-mappings)
+- [Infer TypeScript types from Valibot schemas](https://kubb.dev/extensions/kubb-labs/plugin-valibot/guides/inferred-types)
+- [Coerce input with Valibot](https://kubb.dev/extensions/kubb-labs/plugin-valibot/guides/coercion)
+- [Customize generated schemas](https://kubb.dev/extensions/kubb-labs/plugin-valibot/guides/customization)
+
+## Differences from the Zod plugin
+
+The two plugins share option names, generated names, and file layout. These Zod options have no Valibot counterpart:
+
+| Zod option           | In this plugin                                                                          |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| `guidType`           | Not needed. `v.uuid()` checks the shape only, so it already accepts any GUID.           |
+| `inferred: 'codec'`  | Always on. A request schema gets `v.InferInput` and every other schema `v.InferOutput`. |
+| `compile` and `mini` | Zod features. Valibot is modular by default.                                            |

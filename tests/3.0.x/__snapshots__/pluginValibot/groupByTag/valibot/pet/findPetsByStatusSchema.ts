@@ -6,7 +6,7 @@
 import * as v from 'valibot'
 import { petSchema } from '../petSchema'
 
-export const findPetsByStatusQueryStatusSchema = v.optional(v.picklist(['available', 'pending', 'sold']), 'available')
+export const findPetsByStatusQueryStatusSchema = v.optional(v.pipe(v.picklist(['available', 'pending', 'sold']), v.description('Status values that need to be considered for filter')), 'available')
 
 export const findPetsByStatusStatus200SchemaJson = v.array(petSchema)
 
@@ -21,5 +21,5 @@ export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
 export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
 
 export const findPetsByStatusQuerySchema = v.object({
-  status: v.optional(v.picklist(['available', 'pending', 'sold']), 'available'),
+  status: v.optional(v.pipe(v.picklist(['available', 'pending', 'sold']), v.description('Status values that need to be considered for filter')), 'available'),
 })
