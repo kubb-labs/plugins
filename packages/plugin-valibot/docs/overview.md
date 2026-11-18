@@ -2,6 +2,8 @@
 
 The Valibot plugin generates a Valibot v1 schema for every schema in your OpenAPI spec, plus the parameter, request, and response schemas of each operation.
 
+Every generated schema is a [Standard Schema](https://standardschema.dev), so any library that takes one can validate with it.
+
 `@kubb/plugin-fetch`, `@kubb/plugin-axios`, and `@kubb/plugin-client` validate with these schemas when you set their `validator` option to `'valibot'`.
 
 ## Setup
