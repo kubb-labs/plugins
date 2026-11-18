@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename)
 const version = '3.0.x'
 
 async function generate(name: string, validator: NonNullable<Parameters<typeof pluginClient>[0]>['validator']) {
-  const tmpDir = path.join(os.tmpdir(), `kubb-test-client-${name}-${Date.now()}`)
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-client-${name}-`))
   const output = path.join(tmpDir, 'gen')
   const { files, diagnostics } = await createKubb(
     {
