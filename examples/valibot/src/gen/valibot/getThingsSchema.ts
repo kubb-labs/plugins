@@ -5,15 +5,18 @@
 
 import * as v from 'valibot'
 
-export const getThingsPathUuidSchema = v.string()
+export const getThingsPathUuidSchema = v.pipe(v.string(), v.description('UUID'))
 
 export type GetThingsPathUuidSchemaType = v.InferInput<typeof getThingsPathUuidSchema>
 
-export const getThingsQueryLimitSchema = v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100)
+export const getThingsQueryLimitSchema = v.optional(
+  v.pipe(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), v.description('Maximum number of things to return')),
+  100,
+)
 
 export type GetThingsQueryLimitSchemaType = v.InferInput<typeof getThingsQueryLimitSchema>
 
-export const getThingsQuerySkipSchema = v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0)
+export const getThingsQuerySkipSchema = v.optional(v.pipe(v.pipe(v.number(), v.integer(), v.minValue(0)), v.description('Number of things to skip')), 0)
 
 export type GetThingsQuerySkipSchemaType = v.InferInput<typeof getThingsQuerySkipSchema>
 
@@ -37,14 +40,30 @@ export const getThingsErrorSchema = getThingsStatusDefaultSchema
 export type GetThingsErrorSchemaType = v.InferOutput<typeof getThingsErrorSchema>
 
 export const getThingsPathSchema = v.object({
-  uuid: v.string(),
+  uuid: v.pipe(v.string(), v.description('UUID')),
 })
 
 export type GetThingsPathSchemaType = v.InferInput<typeof getThingsPathSchema>
 
 export const getThingsQuerySchema = v.object({
-  limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100),
-  skip: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0),
+  limit: v.optional(v.pipe(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), v.description('Maximum number of things to return')), 100),
+  skip: v.optional(v.pipe(v.pipe(v.number(), v.integer(), v.minValue(0)), v.description('Number of things to skip')), 0),
 })
 
 export type GetThingsQuerySchemaType = v.InferInput<typeof getThingsQuerySchema>
+
+export const getThingsOptionsSchema = v.object({
+  body: v.optional(v.never()),
+  path: getThingsPathSchema,
+  query: v.optional(getThingsQuerySchema),
+  headers: v.optional(v.never()),
+})
+
+export type GetThingsOptionsSchemaType = v.InferInput<typeof getThingsOptionsSchema>
+
+export const getThingsResponsesSchema = v.object({
+  '201': getThingsStatus201Schema,
+  default: getThingsStatusDefaultSchema,
+})
+
+export type GetThingsResponsesSchemaType = v.InferOutput<typeof getThingsResponsesSchema>

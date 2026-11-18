@@ -37,3 +37,19 @@ export type PlaceOrderPatchBodySchemaFormUrlEncodedType = v.InferInput<typeof pl
 export const placeOrderPatchBodySchema = v.union([placeOrderPatchBodySchemaJson, placeOrderPatchBodySchemaXml, placeOrderPatchBodySchemaFormUrlEncoded])
 
 export type PlaceOrderPatchBodySchemaType = v.InferInput<typeof placeOrderPatchBodySchema>
+
+export const placeOrderPatchOptionsSchema = v.object({
+  body: v.optional(placeOrderPatchBodySchema),
+  path: v.optional(v.never()),
+  query: v.optional(v.never()),
+  headers: v.optional(v.never()),
+})
+
+export type PlaceOrderPatchOptionsSchemaType = v.InferInput<typeof placeOrderPatchOptionsSchema>
+
+export const placeOrderPatchResponsesSchema = v.object({
+  '200': placeOrderPatchStatus200Schema,
+  '405': placeOrderPatchStatus405Schema,
+})
+
+export type PlaceOrderPatchResponsesSchemaType = v.InferOutput<typeof placeOrderPatchResponsesSchema>

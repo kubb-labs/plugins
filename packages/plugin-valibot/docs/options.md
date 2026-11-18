@@ -18,6 +18,7 @@ Pass these options to `pluginValibot()`. Shared options link to [Shared plugin o
 | [`typeGuards.is`](#typeguards)                                            | Generate the `is*` type guard.                                                       | `true`                                           |
 | [`typeGuards.assert`](#typeguards)                                        | Generate the `assert*` function.                                                     | `true`                                           |
 | [`regexType`](#regextype)                                                 | How an OpenAPI `pattern` is written.                                                 | `'literal'`                                      |
+| [`oneOfType`](#oneoftype)                                                 | How a `oneOf` without a discriminator is validated.                                  | `'union'`                                        |
 | [`printer`](#printer)                                                     | Replace the handler for a schema type.                                               | None                                             |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations and schemas that match.                                         | None                                             |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations and schemas that match.                                              | `[]`                                             |
@@ -127,6 +128,28 @@ Writes `v.regex(new RegExp("^[a-z]+$"))`.
 
 ::
 
+### oneOfType
+
+How a `oneOf` without a discriminator is validated. Use `'xor'` when values may carry extra keys.
+
+|          |                    |
+| -------- | ------------------ |
+| Type     | `'union' \| 'xor'` |
+| Required | `false`            |
+| Default  | `'union'`          |
+
+::field-group
+
+:::field{name="'union'"}
+Writes `v.union([...])` with strict object members, so extra keys fail, even keys the spec allows.
+:::
+
+:::field{name="'xor'"}
+Writes `v.union([...])` behind a `v.check` that passes only when exactly one member matches.
+:::
+
+::
+
 ### printer
 
 Replaces the handler for a schema type such as `'date'`. Each handler returns the Valibot expression as a string. `this.base(node)` returns the built-in output, and `this.transform(node)` recurses into nested nodes. See the [printer guide](https://kubb.dev/docs/5.x/how-to/customize#printers).
@@ -177,8 +200,10 @@ type ResolverValibotPatch = {
     status?(node: OperationNode, statusCode: StatusCode): string
     headers?(node: OperationNode, statusCode: StatusCode): string
     body?(node: OperationNode): string
+    responses?(node: OperationNode): string
     response?(node: OperationNode): string
     error?(node: OperationNode): string
+    options?(node: OperationNode): string
   }
 }
 ```

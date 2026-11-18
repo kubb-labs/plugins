@@ -6,19 +6,17 @@
 import * as v from 'valibot'
 
 export const updatePetWithFormPathPetIdSchema = v.pipe(
-  v.union([v.bigint(), v.number(), v.string()]),
-  v.toBigint(),
-  v.minValue(-9223372036854775808n),
-  v.maxValue(9223372036854775807n),
+  v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  v.description('ID of pet that needs to be updated'),
 )
 
 export type UpdatePetWithFormPathPetIdSchemaType = v.InferInput<typeof updatePetWithFormPathPetIdSchema>
 
-export const updatePetWithFormQueryNameSchema = v.optional(v.string())
+export const updatePetWithFormQueryNameSchema = v.optional(v.pipe(v.string(), v.description('Name of pet that needs to be updated')))
 
 export type UpdatePetWithFormQueryNameSchemaType = v.InferInput<typeof updatePetWithFormQueryNameSchema>
 
-export const updatePetWithFormQueryStatusSchema = v.optional(v.string())
+export const updatePetWithFormQueryStatusSchema = v.optional(v.pipe(v.string(), v.description('Status of pet that needs to be updated')))
 
 export type UpdatePetWithFormQueryStatusSchemaType = v.InferInput<typeof updatePetWithFormQueryStatusSchema>
 
@@ -35,14 +33,32 @@ export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
 export type UpdatePetWithFormErrorSchemaType = v.InferOutput<typeof updatePetWithFormErrorSchema>
 
 export const updatePetWithFormPathSchema = v.object({
-  petId: v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+  petId: v.pipe(
+    v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+    v.description('ID of pet that needs to be updated'),
+  ),
 })
 
 export type UpdatePetWithFormPathSchemaType = v.InferInput<typeof updatePetWithFormPathSchema>
 
 export const updatePetWithFormQuerySchema = v.object({
-  name: v.optional(v.string()),
-  status: v.optional(v.string()),
+  name: v.optional(v.pipe(v.string(), v.description('Name of pet that needs to be updated'))),
+  status: v.optional(v.pipe(v.string(), v.description('Status of pet that needs to be updated'))),
 })
 
 export type UpdatePetWithFormQuerySchemaType = v.InferInput<typeof updatePetWithFormQuerySchema>
+
+export const updatePetWithFormOptionsSchema = v.object({
+  body: v.optional(v.never()),
+  path: updatePetWithFormPathSchema,
+  query: v.optional(updatePetWithFormQuerySchema),
+  headers: v.optional(v.never()),
+})
+
+export type UpdatePetWithFormOptionsSchemaType = v.InferInput<typeof updatePetWithFormOptionsSchema>
+
+export const updatePetWithFormResponsesSchema = v.object({
+  '405': updatePetWithFormStatus405Schema,
+})
+
+export type UpdatePetWithFormResponsesSchemaType = v.InferOutput<typeof updatePetWithFormResponsesSchema>

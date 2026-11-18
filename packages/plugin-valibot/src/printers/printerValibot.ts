@@ -30,6 +30,12 @@ export type PrinterValibotOptions = {
    */
   regexType?: PluginValibot['resolvedOptions']['regexType']
   /**
+   * How a `oneOf` without a discriminator is validated: strict members, or exactly one match.
+   *
+   * @default 'union'
+   */
+  oneOfType?: PluginValibot['resolvedOptions']['oneOfType']
+  /**
    * Convert input before validation: `v.toString()`, `v.toNumber()`, and `v.toDate()`.
    *
    * @default false
@@ -84,6 +90,8 @@ type ModifierOptions = {
   optional?: boolean
   nullish?: boolean
   defaultValue?: unknown
+  description?: string
+  examples?: Array<unknown>
   direction?: PrinterValibotOptions['direction']
 }
 
@@ -197,12 +205,23 @@ function countChecks(node: ast.SchemaNode): number {
 
 // Wraps a value in `v.nullable(...)` and `v.optional(...)`. A default goes in as the second argument
 // of `v.optional`, so `null` stays `null` and only a missing value takes the default.
-function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, direction }: ModifierOptions): string {
-  const inner = nullable || nullish ? `v.nullable(${value})` : value
+function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, description, examples, direction }: ModifierOptions): string {
+  const metadata = [
+    description && `v.description(${text.quote(description)})`,
+    examples?.length && `v.metadata({ examples: [${examples.map((example) => (example === null ? 'null' : formatDefault(example))).join(', ')}] })`,
+  ].filter(Boolean)
+  // Always its own `v.pipe`, so `.pipe[0]` is the schema without the metadata.
+  const described = metadata.length ? `v.pipe(${value}, ${metadata.join(', ')})` : value
+  const inner = nullable || nullish ? `v.nullable(${described})` : described
   const literal = defaultValue !== undefined && !expectsDate(schema, direction) ? defaultLiteral(schema, defaultValue) : null
   if (literal !== null) return `v.optional(${inner}, ${literal})`
 
   return optional || nullish ? `v.optional(${inner})` : inner
+}
+
+// A `$ref` const prints without the metadata of its target, so `print` and `unwrapChain` agree on the shape.
+function hasMetadata(node: ast.SchemaNode): boolean {
+  return node.type !== ast.schema.types.ref && Boolean(node.description || node.examples?.length)
 }
 
 // The `.wrapped` chain that reaches the object behind the `v.optional` and `v.nullable` wrappers
@@ -214,7 +233,8 @@ function unwrapChain(node: ast.SchemaNode, direction: PrinterValibotOptions['dir
   const hasDefault = target.default !== undefined && !expectsDate(target, direction) && defaultLiteral(target, target.default) !== null
   const depth = Number(Boolean(target.nullable || target.nullish)) + Number(Boolean(target.optional || target.nullish || hasDefault))
 
-  return '.wrapped'.repeat(depth)
+  // `v.omit` and the other object helpers do not take a schema with a pipe.
+  return `${'.wrapped'.repeat(depth)}${hasMetadata(target) ? '.pipe[0]' : ''}`
 }
 
 function objectEntries(ctx: PrinterContext, properties: Array<ast.PropertyNode>): Array<string> {
@@ -227,6 +247,9 @@ function objectEntries(ctx: PrinterContext, properties: Array<ast.PropertyNode>)
       optional: schema.optional || required === false,
       nullish: schema.nullish,
       defaultValue: meta.default,
+      // A property that replaces a `$ref`, such as a discriminator, does not take the description of the target.
+      description: schema.type !== ast.schema.types.ref && meta.type === ast.schema.types.ref ? undefined : meta.description,
+      examples: meta.examples,
       direction: ctx.options.direction,
     })
 
@@ -568,7 +591,8 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       const isDiscriminated = !!discriminatorPropertyName && nodeMembers.every(isObjectNode)
       // `v.union` returns the first member that matches, and an object member drops the keys it does not
       // know. A strict member rejects those keys instead, so a `oneOf` value reaches the member it belongs to.
-      const isStrict = node.strategy === 'one' && !isDiscriminated && !unionsWithSiblings.has(node)
+      const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
+      const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !unionsWithSiblings.has(node)
       const members = nodeMembers
         .map((member) => {
           const output = this.transform(isStrict ? strictOneOfNode(member) : member)
@@ -579,7 +603,12 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       if (members.length === 0) return ''
       if (members.length === 1) return members[0]!
 
-      return isDiscriminated ? `v.variant(${text.quote(discriminatorPropertyName)}, ${buildList(members)})` : `v.union(${buildList(members)})`
+      if (isDiscriminated) return `v.variant(${text.quote(discriminatorPropertyName)}, ${buildList(members)})`
+      const union = `v.union(${buildList(members)})`
+      // Valibot has no xor schema, so a check on the raw input counts the members that match.
+      return isXor
+        ? `((schema) => v.pipe(v.unknown(), v.check((value) => schema.options.filter((member) => v.is(member, value)).length === 1, "Value must match exactly one schema"), schema))(${union})`
+        : union
     },
     intersection(node) {
       const members = node.members ?? []
@@ -658,6 +687,8 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
         optional: meta.optional,
         nullish: meta.nullish,
         defaultValue: meta.default,
+        description: hasMetadata(node) ? meta.description : undefined,
+        examples: hasMetadata(node) ? meta.examples : undefined,
         direction,
       })
     },

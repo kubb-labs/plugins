@@ -165,6 +165,24 @@
       ]
     },
     {
+      "key": "oneOfType",
+      "path": ["oneOfType"],
+      "label": "oneOf Type",
+      "description": "How a oneOf is validated: v.union with strict object members, or a check that exactly one member matches",
+      "type": "select",
+      "default": "union",
+      "choices": [
+        {
+          "label": "union",
+          "value": "union"
+        },
+        {
+          "label": "xor",
+          "value": "xor"
+        }
+      ]
+    },
+    {
       "key": "inferred",
       "path": ["inferred"],
       "label": "Inferred",

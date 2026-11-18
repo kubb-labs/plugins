@@ -38,3 +38,18 @@ export const bookStayQuerySchema = v.object({
 })
 
 export type BookStayQuerySchemaType = v.InferInput<typeof bookStayQuerySchema>
+
+export const bookStayOptionsSchema = v.object({
+  body: v.optional(bookStayBodySchema),
+  path: v.optional(v.never()),
+  query: v.optional(bookStayQuerySchema),
+  headers: v.optional(v.never()),
+})
+
+export type BookStayOptionsSchemaType = v.InferInput<typeof bookStayOptionsSchema>
+
+export const bookStayResponsesSchema = v.object({
+  '200': bookStayStatus200Schema,
+})
+
+export type BookStayResponsesSchemaType = v.InferOutput<typeof bookStayResponsesSchema>

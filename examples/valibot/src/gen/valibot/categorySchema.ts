@@ -6,8 +6,13 @@
 import * as v from 'valibot'
 
 export const categorySchema: v.GenericSchema = v.object({
-  id: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))),
-  name: v.optional(v.string()),
+  id: v.optional(
+    v.pipe(
+      v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)),
+      v.metadata({ examples: [1] }),
+    ),
+  ),
+  name: v.optional(v.pipe(v.string(), v.metadata({ examples: ['Dogs'] }))),
   parent: v.optional(v.lazy(() => categorySchema)),
 })
 

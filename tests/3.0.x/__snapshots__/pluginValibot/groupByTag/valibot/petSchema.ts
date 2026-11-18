@@ -8,11 +8,11 @@ import { categorySchema } from './categorySchema'
 import { tagSchema } from './tagSchema'
 
 export const petSchema = v.object({
-  id: v.optional(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n))),
-  name: v.string(),
-  log: v.optional(v.pipe(v.string(), v.minLength(2), v.maxLength(42), v.regex(/^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$/))),
+  id: v.optional(v.pipe(v.pipe(v.union([v.bigint(), v.number(), v.string()]), v.toBigint(), v.minValue(-9223372036854775808n), v.maxValue(9223372036854775807n)), v.metadata({ examples: [10] }))),
+  name: v.pipe(v.string(), v.metadata({ examples: ['doggie'] })),
+  log: v.optional(v.pipe(v.pipe(v.string(), v.minLength(2), v.maxLength(42), v.regex(/^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$/)), v.metadata({ examples: ['my_log_destination'] }))),
   category: v.optional(categorySchema),
   photoUrls: v.array(v.string()),
   tags: v.optional(v.array(tagSchema)),
-  status: v.optional(v.picklist(['available', 'pending', 'sold'])),
+  status: v.optional(v.pipe(v.picklist(['available', 'pending', 'sold']), v.description('pet status in the store'))),
 })

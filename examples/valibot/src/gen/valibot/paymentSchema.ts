@@ -7,62 +7,68 @@ import * as v from 'valibot'
 import { paymentErrorSchema } from './paymentErrorSchema'
 
 export const paymentSchema = v.pipe(
-  v.unknown(),
-  v.check(
-    (value) => typeof value !== 'object' || value === null || Array.isArray(value) || Object.keys(value).length >= 1,
-    'Object must have at least 1 properties',
-  ),
-  v.check(
-    (value) => typeof value !== 'object' || value === null || Array.isArray(value) || Object.keys(value).length <= 10,
-    'Object must have at most 10 properties',
-  ),
-  v.check(
-    (value) =>
-      v.is(
-        v.object({
-          method: v.literal('card'),
-        }),
-        value,
-      )
-        ? typeof value === 'object' && value !== null && ['creditCard'].every((key) => key in value)
-        : true,
-    'Value does not meet a conditional schema',
-  ),
-  v.check(
-    (value) =>
-      typeof value === 'object' && value !== null && ['creditCard'].every((key) => key in value)
-        ? typeof value === 'object' && value !== null && ['billingAddress'].every((key) => key in value)
-        : true,
-    'Value does not meet a conditional schema',
-  ),
-  v.object({
-    id: v.pipe(v.number(), v.integer(), v.gtValue(0)),
-    method: v.optional(v.picklist(['card', 'cash'])),
-    creditCard: v.optional(v.string()),
-    billingAddress: v.optional(v.string()),
-    labels: v.optional(
-      v.pipe(
-        v.array(v.string()),
-        v.check((items) => {
-          const count = items.filter((item) => v.is(v.literal('priority'), item)).length
-          return count >= 1 && count <= 2
-        }, 'Array must contain 1 to 2 matching items'),
-      ),
+  v.pipe(
+    v.unknown(),
+    v.check(
+      (value) => typeof value !== 'object' || value === null || Array.isArray(value) || Object.keys(value).length >= 1,
+      'Object must have at least 1 properties',
     ),
-    lastError: v.optional(
-      v.pipe(
-        v.string(),
-        v.check((value) => {
-          try {
-            return v.is(paymentErrorSchema, JSON.parse(value))
-          } catch {
-            return false
-          }
-        }, 'String must hold JSON that matches its content schema'),
-      ),
+    v.check(
+      (value) => typeof value !== 'object' || value === null || Array.isArray(value) || Object.keys(value).length <= 10,
+      'Object must have at most 10 properties',
     ),
-    signature: v.optional(v.string()),
-  }),
+    v.check(
+      (value) =>
+        v.is(
+          v.object({
+            method: v.literal('card'),
+          }),
+          value,
+        )
+          ? typeof value === 'object' && value !== null && ['creditCard'].every((key) => key in value)
+          : true,
+      'Value does not meet a conditional schema',
+    ),
+    v.check(
+      (value) =>
+        typeof value === 'object' && value !== null && ['creditCard'].every((key) => key in value)
+          ? typeof value === 'object' && value !== null && ['billingAddress'].every((key) => key in value)
+          : true,
+      'Value does not meet a conditional schema',
+    ),
+    v.object({
+      id: v.pipe(v.number(), v.integer(), v.gtValue(0)),
+      method: v.optional(v.picklist(['card', 'cash'])),
+      creditCard: v.optional(v.string()),
+      billingAddress: v.optional(v.string()),
+      labels: v.optional(
+        v.pipe(
+          v.array(v.string()),
+          v.check((items) => {
+            const count = items.filter((item) => v.is(v.literal('priority'), item)).length
+            return count >= 1 && count <= 2
+          }, 'Array must contain 1 to 2 matching items'),
+        ),
+      ),
+      lastError: v.optional(
+        v.pipe(
+          v.pipe(
+            v.string(),
+            v.check((value) => {
+              try {
+                return v.is(paymentErrorSchema, JSON.parse(value))
+              } catch {
+                return false
+              }
+            }, 'String must hold JSON that matches its content schema'),
+          ),
+          v.description('The error of the last failed attempt, as a JSON document'),
+        ),
+      ),
+      signature: v.optional(v.string()),
+    }),
+  ),
+  v.description('A payment for a store order'),
 )
 
 export type PaymentSchemaType = v.InferOutput<typeof paymentSchema>
