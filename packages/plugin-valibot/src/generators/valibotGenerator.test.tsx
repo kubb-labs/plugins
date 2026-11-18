@@ -200,26 +200,29 @@ describe('valibotGenerator operation', () => {
 
   test('a request body that is a circular allOf drops the readOnly keys of every member', async () => {
     const { driver, context } = setup('circularAllOfBody')
+    // This schema declares `id`, so a member that references it prints inline without it.
+    const entityRef = createSchema({
+      type: 'ref',
+      name: 'Entity',
+      ref: '#/components/schemas/Entity',
+      schema: createSchema({
+        type: 'object',
+        primitive: 'object',
+        name: 'Entity',
+        properties: [
+          createProperty({ name: 'id', required: true, schema: createSchema({ type: 'integer' }) }),
+          createProperty({ name: 'createdBy', required: true, schema: createSchema({ type: 'string' }) }),
+        ],
+      }),
+    })
     const target = createSchema({
       type: 'intersection',
       name: 'Pet',
       members: [
         createSchema({ type: 'ref', name: 'Animal', ref: '#/components/schemas/Animal' }),
-        // This member declares `id`, so it prints inline without it.
-        createSchema({
-          type: 'ref',
-          name: 'Entity',
-          ref: '#/components/schemas/Entity',
-          schema: createSchema({
-            type: 'object',
-            primitive: 'object',
-            name: 'Entity',
-            properties: [
-              createProperty({ name: 'id', required: true, schema: createSchema({ type: 'integer' }) }),
-              createProperty({ name: 'createdBy', required: true, schema: createSchema({ type: 'string' }) }),
-            ],
-          }),
-        }),
+        entityRef,
+        // The same schema a second time, nested: it must lose `id` here too.
+        createSchema({ type: 'intersection', members: [entityRef, createSchema({ type: 'string' })] }),
         createSchema({ ...petSchema, name: undefined }),
       ],
     })
