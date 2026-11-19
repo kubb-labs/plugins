@@ -117,7 +117,7 @@ A `ValidationError` from a response body also carries `status`, `method`, `direc
 if (error instanceof ValidationError && error.status === 404) return null
 ```
 
-To recover, pass `onValidationError` on the call or the client. Return `{ value }` to use that value, or nothing to throw the `ValidationError`:
+To recover from a schema failure, pass `onValidationError` on the call or the client. Return `{ value }` to use that value, or nothing to throw the `ValidationError`. Invalid JSON does not reach the handler:
 
 ```typescript
 client.setConfig({
@@ -134,7 +134,7 @@ When the handler returns `{ value }` for an error body, the call throws the `Res
 if (ResponseError.is(error) && error.status === 404) console.warn(error.validationError?.issues)
 ```
 
-With `throwOnError: false`, the call resolves with that value as `error` instead.
+With `throwOnError: false`, the call resolves with that value as `error` instead. A `null` or `''` value resolves as `{ status, statusText }`, like an [empty error body](#empty-error-bodies-and-default-responses).
 
 For which schema checks an error body, see [Error body validation](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/serialization#error-body-validation).
 
