@@ -109,7 +109,7 @@ describe('retry through the axios transport', () => {
     expect([busy.hits.length, missing.hits.length]).toStrictEqual([3, 3])
   })
 
-  test('retries a POST only with an opt-in method or an Idempotency-Key header, and sends the same body', async () => {
+  test('retries a POST only with an opt-in method, and sends the same body', async () => {
     const client = createClient({ baseURL, retry: { limit: 2, ...fast } })
     const body = { name: 'Odie' }
 
@@ -122,13 +122,6 @@ describe('retry through the axios transport', () => {
     expect(optIn.hits.map((hit) => [hit.method, hit.body, hit.headers['content-type']])).toStrictEqual(
       Array.from({ length: 3 }, () => ['POST', '{"name":"Odie"}', 'application/json']),
     )
-
-    const keyed = plan(answer(503), answer(200))
-    expect((await client({ method: 'POST', url: keyed.url, body, headers: { 'Idempotency-Key': 'a1' } })).status).toBe(200)
-    expect(keyed.hits.map((hit) => [hit.body, hit.headers['idempotency-key']])).toStrictEqual([
-      ['{"name":"Odie"}', 'a1'],
-      ['{"name":"Odie"}', 'a1'],
-    ])
   })
 
   test('never retries a ReadableStream body', async () => {

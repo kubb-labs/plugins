@@ -113,7 +113,7 @@ describe('retry', () => {
     expect(sent(busy)).toHaveLength(3)
   })
 
-  test('retries a POST only with a methods opt-in or an Idempotency-Key header, and sends the same body', async () => {
+  test('retries a POST only with a methods opt-in, and sends the same body', async () => {
     const client = createClient({ baseURL, retry: { limit: 2, delay: () => 0 } })
     const body = { name: 'Odie' }
 
@@ -124,10 +124,6 @@ describe('retry', () => {
     const optIn = route(503)
     await expect(client({ url: optIn, method: 'POST', body, retry: { methods: ['POST'] } })).rejects.toMatchObject({ status: 503 })
     expect(sent(optIn).map((hit) => [hit.method, hit.body])).toEqual(Array(3).fill(['POST', '{"name":"Odie"}']))
-
-    const keyed = route(503)
-    await expect(client({ url: keyed, method: 'POST', body, headers: { 'Idempotency-Key': 'a1' } })).rejects.toMatchObject({ status: 503 })
-    expect(sent(keyed).map((hit) => [hit.headers['idempotency-key'], hit.body])).toEqual(Array(3).fill(['a1', '{"name":"Odie"}']))
   })
 
   test('never retries a ReadableStream request body', async () => {

@@ -162,7 +162,7 @@ client.setConfig({
 
 The client retries a status in `statusCodes` and any error the transport throws, such as a network failure. These rules always apply, also when `shouldRetry` returns `true`:
 
-- A method outside `methods`, such as `POST`, is retried only when the call sends an `Idempotency-Key` header. Add the method to `methods` only when the API handles a repeated request.
+- A method outside `methods`, such as `POST`, is never retried. Add the method to `methods` only when the API handles a repeated request.
 - A `ReadableStream` body is never retried, because it cannot be read twice.
 - A `Retry-After` header sets the wait instead of `delay`.
 - An aborted `signal` stops the wait and the retries.

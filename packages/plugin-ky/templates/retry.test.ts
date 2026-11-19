@@ -104,17 +104,15 @@ describe('retry', () => {
     expect([unavailable, missing, custom, skipped].map((url) => seen(url).length)).toStrictEqual([3, 1, 3, 1])
   })
 
-  test('retries a POST only with a methods opt-in or an Idempotency-Key header, and sends the same body each time', async () => {
-    const [plain, optedIn, keyed] = [always(503), always(503), always(503)]
+  test('retries a POST only with a methods opt-in, and sends the same body each time', async () => {
+    const [plain, optedIn] = [always(503), always(503)]
     const body = { name: 'Odie' }
 
     await expect(api()({ method: 'POST', url: plain, body, retry: quick })).rejects.toMatchObject({ status: 503 })
     await expect(api()({ method: 'POST', url: optedIn, body, retry: { methods: ['POST'], ...quick } })).rejects.toMatchObject({ status: 503 })
-    await expect(api()({ method: 'POST', url: keyed, body, headers: { 'Idempotency-Key': 'abc' }, retry: quick })).rejects.toMatchObject({ status: 503 })
 
     expect(seen(plain)).toHaveLength(1)
     expect(seen(optedIn).map((hit) => hit.body)).toStrictEqual(Array(3).fill('{"name":"Odie"}'))
-    expect(seen(keyed).map((hit) => [hit.body, hit.headers['idempotency-key']])).toStrictEqual(Array(3).fill(['{"name":"Odie"}', 'abc']))
   })
 
   test('never retries a ReadableStream request body', async () => {

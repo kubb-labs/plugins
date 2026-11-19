@@ -303,7 +303,7 @@ export type RetryOptions = {
    */
   limit?: number | undefined
   /**
-   * The methods that are safe to send twice. A call with an `Idempotency-Key` header is retried whatever its method.
+   * The methods that are safe to send twice.
    * @default ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']
    */
   methods?: Array<string> | undefined
@@ -1098,10 +1098,9 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     let retryCount = 0
     // Waits and resolves to true when the failed attempt may be sent again.
     const waitForRetry = async (failure: { response?: Response; error?: unknown }): Promise<boolean> => {
-      const replayable =
-        (retry.methods ?? ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']).some(
-          (method) => method.toUpperCase() === resolvedRequest.method.toUpperCase(),
-        ) || getHeader(resolvedRequest.headers, 'idempotency-key') !== undefined
+      const replayable = (retry.methods ?? ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']).some(
+        (method) => method.toUpperCase() === resolvedRequest.method.toUpperCase(),
+      )
       if (retryCount >= retry.limit || signal?.aborted || !replayable || resolvedRequest.body instanceof ReadableStream) return false
       const context: RetryContext = { ...failure, request: resolvedRequest, retryCount: retryCount + 1 }
       const retryable = failure.response ? (retry.statusCodes ?? [408, 429, 500, 502, 503, 504]).includes(failure.response.status) : true

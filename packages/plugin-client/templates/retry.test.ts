@@ -70,19 +70,19 @@ describe('retry', () => {
     expect(transport).toHaveBeenCalledTimes(2)
   })
 
-  test('retries an unsafe method with an Idempotency-Key header or a per-call opt-in', async () => {
+  test('retries an unsafe method only with a per-call opt-in', async () => {
     const transport = vi.fn(async () => busy())
     const client = createClientCore({ defaultTransport: transport, retry: { limit: 1, delay: () => 0 } })
 
-    await expect(client({ url: '/orders', method: 'POST', headers: { 'Idempotency-Key': 'a1' } })).rejects.toMatchObject({ status: 503 })
-    expect(transport).toHaveBeenCalledTimes(2)
+    await expect(client({ url: '/orders', method: 'POST' })).rejects.toMatchObject({ status: 503 })
+    expect(transport).toHaveBeenCalledTimes(1)
 
     // The call keeps the client's limit and delay.
     await expect(client({ url: '/orders', method: 'POST', retry: { methods: ['POST'] } })).rejects.toMatchObject({ status: 503 })
-    expect(transport).toHaveBeenCalledTimes(4)
+    expect(transport).toHaveBeenCalledTimes(3)
 
     await expect(client({ url: '/pets', retry: false })).rejects.toMatchObject({ status: 503 })
-    expect(transport).toHaveBeenCalledTimes(5)
+    expect(transport).toHaveBeenCalledTimes(4)
   })
 
   test('lets shouldRetry decide, within the limit', async () => {
