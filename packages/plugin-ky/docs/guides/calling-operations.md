@@ -113,7 +113,7 @@ When you set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-
 
 ### Retry with the Ky option
 
-Prefer the client's [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#retry-a-failed-call). Do not set both, because each retry of the client would run Ky's retries again.
+Prefer the client's [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#retry-a-failed-call). When it is set for a call, the transport sets Ky's `retry` to `0` for that call, so Ky's option only applies to calls without the client's `retry`.
 
 Set Ky's `retry` option to retry a network error, for every call or for one. Ky retries only the methods in `retry.methods`, which leaves out `POST` and `PATCH`:
 

@@ -154,7 +154,7 @@ await createOrder({ body, retry: { methods: ['POST'] } })
 await chargeCard({ body, retry: false })
 ```
 
-A call's `retry` merges per field over the client's, and `false` or `0` turns it off for that call. The call is then sent once, unless Ky's own retry is on: through `options.retry`, or through a [custom Ky instance](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/transport), which keeps Ky's default of 2. Pass an object for more control:
+A call's `retry` merges per field over the client's, and `false` or `0` turns it off for that call. The call is then sent once, unless Ky's own retry is on: through `options.retry`, or through a [custom Ky instance](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/transport), which keeps Ky's default of 2. A call with the client's `retry` on switches Ky's own retry off, so the two never multiply. Pass an object for more control:
 
 | Option        | What it does                                                                                            | Default                                            |
 | ------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |

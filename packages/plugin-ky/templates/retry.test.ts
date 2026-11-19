@@ -136,7 +136,7 @@ describe('retry next to the retry of Ky', () => {
     expect(beforeRetry).not.toHaveBeenCalled()
   })
 
-  test('multiplies the attempts on a network error when both retries are set, but not on an error status', async () => {
+  test('switches the retry of Ky off when both retries are set, also on a custom instance', async () => {
     const [unavailable, cut] = [always(503), dropped()]
     const beforeRetry = vi.fn()
     const options = { retry: kyRetry, hooks: { beforeRetry: [beforeRetry] } }
@@ -147,12 +147,14 @@ describe('retry next to the retry of Ky', () => {
     expect(beforeRetry).not.toHaveBeenCalled()
 
     await expect(api()({ method: 'GET', url: cut, retry: quick, options })).rejects.toMatchObject({ name: 'NetworkError' })
-    expect(seen(cut)).toHaveLength(9)
+    expect(seen(cut)).toHaveLength(3)
 
-    beforeRetry.mockClear()
-    await expect(api()({ method: 'GET', url: '/x', baseURL: 'http://127.0.0.1:1', retry: { ...quick, onRetry }, options })).rejects.toMatchObject({
-      name: 'NetworkError',
-    })
-    expect([onRetry.mock.calls.length, beforeRetry.mock.calls.length]).toStrictEqual([2, 6])
+    // A custom instance keeps Ky's default of 2 retries until the client's `retry` is set.
+    const custom = createClient({ baseURL, transport: createKyTransport(ky.create({ retry: kyRetry })) })
+    const [alone, together] = [dropped(), dropped()]
+    await expect(custom({ method: 'GET', url: alone })).rejects.toMatchObject({ name: 'NetworkError' })
+    await expect(custom({ method: 'GET', url: together, retry: { ...quick, onRetry } })).rejects.toMatchObject({ name: 'NetworkError' })
+    expect([seen(alone).length, seen(together).length]).toStrictEqual([3, 3])
+    expect([onRetry.mock.calls.length, beforeRetry.mock.calls.length]).toStrictEqual([2, 0])
   })
 })

@@ -441,6 +441,10 @@ export type ResolvedRequest = {
    * Read the response as a stream. A transport that buffers bodies, such as axios, must stream it.
    */
   stream?: boolean
+  /**
+   * The client retries this call itself. A transport with its own retry, such as Ky, switches that off.
+   */
+  retry?: boolean
 }
 
 /**
@@ -1106,6 +1110,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     }
 
     const resolvedRequest = await run.request(request, requestConfig)
+    if (retry.limit > 0) resolvedRequest.retry = true
     const signal = signalOf(resolvedRequest)
     // A stream body, also one from Node or a generator, cannot be read twice.
     const oneShot = resolvedRequest.body instanceof ReadableStream || Symbol.asyncIterator in Object(resolvedRequest.body)

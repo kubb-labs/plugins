@@ -14,4 +14,4 @@ await createOrder({ body, retry: { methods: ['POST'] } })
 await chargeCard({ body, retry: false })
 ```
 
-Retries are off unless you set `retry`. A retry waits with exponential backoff and jitter, follows a `Retry-After` header, and stops when the `signal` aborts. `POST` and `PATCH` are retried only when `retry.methods` names them. A streaming call with `retry` also reopens a dropped Server-Sent Events stream with its `Last-Event-ID`.
+Retries are off unless you set `retry`. A retry waits with exponential backoff and jitter, follows a `Retry-After` header, and stops when the `signal` aborts. `POST` and `PATCH` are retried only when `retry.methods` names them. A streaming call with `retry` also reopens a dropped Server-Sent Events stream with its `Last-Event-ID`. On the Ky client, a call with `retry` set switches Ky's own retry off for that call.
