@@ -150,27 +150,6 @@ export async function* parseJsonLines<TData = unknown>({
   }
 }
 
-// Keeps the error of a failed read, which tells a dropped connection from an error of the parser or of `transform`.
-function watchReads(body: ReadableStream<Uint8Array>): { stream: ReadableStream<Uint8Array>; failure?: unknown } {
-  const reader = body.getReader()
-  const watched: { stream: ReadableStream<Uint8Array>; failure?: unknown } = {
-    stream: new ReadableStream<Uint8Array>({
-      async pull(controller) {
-        try {
-          const { done, value } = await reader.read()
-          if (done) return controller.close()
-          controller.enqueue(value)
-        } catch (error) {
-          watched.failure = error
-          throw error
-        }
-      },
-      cancel: (reason) => reader.cancel(reason),
-    }),
-  }
-  return watched
-}
-
 function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | AsyncIterable<Uint8Array> {
   return !!data && typeof data === 'object' && (Symbol.asyncIterator in data || 'getReader' in data)
 }
@@ -188,9 +167,19 @@ export const eventStream: MediaType = {
   async *stream(body, { config, cursor, reopen }) {
     let current: ReadableStream<Uint8Array> | undefined = body
     while (current) {
-      const watched = reopen ? watchReads(current) : { stream: current, failure: undefined }
+      const source = current
+      let failure: unknown
+      // Keeps the error of a failed read, which tells a dropped connection from an error of the parser or of `transform`.
+      async function* bytes(): AsyncGenerator<Uint8Array> {
+        try {
+          yield* readBytes(source)
+        } catch (error) {
+          failure = error
+          throw error
+        }
+      }
       const events = parseEventStream({
-        stream: watched.stream,
+        stream: bytes(),
         maxEventSize: config.maxEventSize,
         terminator: config.terminator,
         rawData: config.rawData,
@@ -204,7 +193,7 @@ export const eventStream: MediaType = {
         }
         return
       } catch (error) {
-        if (!reopen || error !== watched.failure) throw error
+        if (!reopen || error !== failure) throw error
         current = await reopen({ error, delivered })
       }
     }
