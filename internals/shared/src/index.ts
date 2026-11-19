@@ -36,6 +36,8 @@ export {
 export {
   defaultLiteral,
   formatDefault,
+  getChecks,
+  getObjectKind,
   hasInputChecks,
   integerFormatPattern,
   numericLiteral,
@@ -45,4 +47,4 @@ export {
   strictOneOfNode,
   withFormatRange,
 } from './schema.ts'
-export type { NumericBounds, NumericConstraints } from './schema.ts'
+export type { NumericBounds, NumericConstraints, ObjectKind, ObjectKindOptions, SchemaCheck } from './schema.ts'

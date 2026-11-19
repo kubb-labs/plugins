@@ -1,6 +1,8 @@
 import {
   defaultLiteral,
   formatDefault,
+  getChecks,
+  getObjectKind,
   integerFormatPattern,
   type NumericBounds,
   numericLiteral,
@@ -188,7 +190,7 @@ function expectsDate(node: ast.SchemaNode, direction: PrinterValibotOptions['dir
   return direction === 'encode' && (resolved.type === 'date' || resolved.type === 'time') && resolved.representation !== 'string'
 }
 
-const hasChecks = (node: ast.SchemaNode) => ast.schema.getChecks(node).length > 0
+const hasChecks = (node: ast.SchemaNode) => getChecks(node).length > 0
 
 // Wraps a value in `v.nullable(...)` and `v.optional(...)`. A default goes in as the second argument
 // of `v.optional`, so `null` stays `null` and only a missing value takes the default.
@@ -306,7 +308,7 @@ function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undef
 // The `v.check` actions that run on the raw input, before an object schema drops unknown keys or fills in defaults.
 function inputChecks(ctx: PrinterContext, node: ast.SchemaNode): Array<string> {
   const { min, max } = node.type === 'object' ? node : {}
-  const checks = ast.schema.getChecks(node)
+  const checks = getChecks(node)
   const keyCheck = checks.find((check) => check.kind === 'propertyNames')
   const patternCheck = checks.find((check) => check.kind === 'patternProperties')
   const keySchema = keyCheck ? ctx.transform(keyCheck.schema) : null
@@ -435,13 +437,8 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
   // A const whose schema carries a `default` is a `v.optional(...)` wrapper, which has no `.entries`.
   const isObjectNode = (node: ast.SchemaNode) => {
     const resolved = ast.ref.mergeSchema(node)
-    const kind = ast.schema.getObjectKind(node, { circularSchemas: cyclicSchemas })
-    return (
-      kind !== null &&
-      kind !== 'record' &&
-      resolved.default === undefined &&
-      !ast.schema.getChecks(resolved).some((check) => check.kind === 'patternProperties')
-    )
+    const kind = getObjectKind(node, { circularSchemas: cyclicSchemas })
+    return kind !== null && kind !== 'record' && resolved.default === undefined && !getChecks(resolved).some((check) => check.kind === 'patternProperties')
   }
   // The node `print` reads without its input checks, because `v.omit` needs the bare object. Nested nodes keep theirs.
   let uncheckedNode: ast.SchemaNode | null = null
@@ -459,7 +456,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
     const hasRest =
       Boolean(baseObject?.patternProperties) || (baseObject?.additionalProperties !== undefined && typeof baseObject.additionalProperties !== 'boolean')
 
-    return !hasRest && isObjectNode(first) && ast.schema.getObjectKind(node, { circularSchemas: cyclicSchemas }) === 'composed'
+    return !hasRest && isObjectNode(first) && getObjectKind(node, { circularSchemas: cyclicSchemas }) === 'composed'
   }
   // Whether the schema prints with `.entries`, which `v.omit` reads. A `v.union` and a `v.intersect` have none.
   const printsEntries = (node: ast.SchemaNode): boolean => {
@@ -482,7 +479,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
     if (!hasChecks(target)) return `v.omit(${base}, ${keys})`
     // `withInputChecks` printed `v.pipe(v.unknown(), ...checks, object)`. `v.omit` takes the object only, so the checks go back around it.
     if (node.type === ast.schema.types.ref) {
-      const count = ast.schema.getChecks(target).length
+      const count = getChecks(target).length
       const checks = Array.from({ length: count }, (_, index) => `${base}.pipe[${index + 1}]`)
 
       return pipe(UNKNOWN, [...checks, `v.omit(${base}.pipe[${count + 1}], ${keys})`])

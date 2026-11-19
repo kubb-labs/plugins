@@ -1,7 +1,16 @@
 import { buildList } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { hasInputChecks, integerFormatPattern, preserveRequiredProperties, shouldCoerce, strictOneOfNode, withFormatRange } from '@internals/shared'
+import {
+  getChecks,
+  getObjectKind,
+  hasInputChecks,
+  integerFormatPattern,
+  preserveRequiredProperties,
+  shouldCoerce,
+  strictOneOfNode,
+  withFormatRange,
+} from '@internals/shared'
 import {
   buildEnum,
   buildLiteral,
@@ -148,7 +157,7 @@ export function throwsOnStrictCompile({
 // `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
 // Prints as a plain object schema, which a discriminated union can take as a member.
 function printsAsObject(node: ast.SchemaNode, circularSchemas?: ReadonlySet<string>): boolean {
-  const kind = ast.schema.getObjectKind(node, { circularSchemas })
+  const kind = getObjectKind(node, { circularSchemas })
   return kind !== null && kind !== 'record'
 }
 
@@ -400,7 +409,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 
       // An object `allOf` is a merge, not a runtime intersection: extending keeps it a Zod object
       // (usable in z.discriminatedUnion) instead of a non-discriminable intersection.
-      if (rest.length > 0 && ast.schema.getObjectKind(node, { circularSchemas: cyclicSchemas }) === 'composed') {
+      if (rest.length > 0 && getObjectKind(node, { circularSchemas: cyclicSchemas }) === 'composed') {
         // A discriminated `oneOf` base already pins its discriminator to a literal; a sibling
         // `type: string` extended after it would widen that literal back to any string.
         const discriminator = ast.schema.narrow(first, ast.schema.types.union)?.discriminatorPropertyName
@@ -481,7 +490,7 @@ export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.Prin
     const checkedHandler: Handler<TOptions, K> = function (node) {
       const output = handler.call(this, node)
       if (!output || !hasInputChecks(node)) return output
-      const keyCheck = ast.schema.getChecks(node).find((check) => check.kind === 'propertyNames')
+      const keyCheck = getChecks(node).find((check) => check.kind === 'propertyNames')
       return inputChecks({
         value: output,
         node,

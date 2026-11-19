@@ -1,6 +1,6 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { defaultLiteral, formatDefault, numericLiteral, schemaComments, shouldCoerce, withFormatRange } from './schema.ts'
+import { defaultLiteral, formatDefault, getChecks, getObjectKind, numericLiteral, schemaComments, shouldCoerce, withFormatRange } from './schema.ts'
 
 describe('formatDefault', () => {
   test('object value keeps its contents', () => {
@@ -122,5 +122,82 @@ describe('shouldCoerce', () => {
     expect(shouldCoerce({ numbers: true }, 'numbers')).toBe(true)
     expect(shouldCoerce({ numbers: true }, 'strings')).toBe(false)
     expect(shouldCoerce(undefined, 'strings')).toBe(false)
+  })
+})
+
+const string = ast.factory.createSchema({ type: 'string' })
+const properties = [ast.factory.createProperty({ name: 'id', schema: string, required: true })]
+
+describe('getChecks', () => {
+  test('lists property counts, key checks and conditionals', () => {
+    const conditional = { if: string, then: string }
+    const node = ast.factory.createSchema({ type: 'object', properties, min: 1, max: 3, propertyNames: string, conditionals: [conditional] })
+
+    expect(getChecks(node)).toStrictEqual([
+      { kind: 'minProperties', value: 1 },
+      { kind: 'maxProperties', value: 3 },
+      { kind: 'propertyNames', schema: string },
+      { kind: 'conditional', ...conditional },
+    ])
+  })
+
+  test('leaves the key check of a plain record to the record', () => {
+    expect(getChecks(ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: string, propertyNames: string }))).toStrictEqual([])
+  })
+
+  test('checks pattern keys of a closed object with properties', () => {
+    const patternProperties = { '^x-': string }
+    const node = ast.factory.createSchema({ type: 'object', properties, patternProperties, additionalProperties: false })
+
+    expect(getChecks(node)).toStrictEqual([{ kind: 'patternProperties', patterns: patternProperties }])
+  })
+})
+
+describe('getObjectKind', () => {
+  const object = ast.factory.createSchema({ type: 'object', properties })
+
+  test.each([
+    ['an object with properties', object, 'properties'],
+    ['an empty object', ast.factory.createSchema({ type: 'object', properties: [] }), 'properties'],
+    ['a record', ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: string }), 'record'],
+    ['properties plus a typed rest', ast.factory.createSchema({ type: 'object', properties, additionalProperties: string }), 'mixed'],
+    ['an allOf of objects', ast.factory.createSchema({ type: 'intersection', members: [object, object] }), 'composed'],
+    ['a single-member union', ast.factory.createSchema({ type: 'union', members: [object] }), 'properties'],
+    ['an unresolved ref', ast.factory.createSchema({ type: 'ref', name: 'Pet' }), 'properties'],
+    ['a resolved ref', ast.factory.createSchema({ type: 'ref', name: 'Pet', schema: object }), 'properties'],
+    ['a nullable object', ast.factory.createSchema({ type: 'object', properties, nullable: true }), null],
+    ['an object with a property count', ast.factory.createSchema({ type: 'object', properties, min: 1 }), null],
+    [
+      'an allOf with a record base',
+      ast.factory.createSchema({
+        type: 'intersection',
+        members: [ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: string }), object],
+      }),
+      null,
+    ],
+    ['a string', string, null],
+  ] as const)('%s gives %s', (_, node, expected) => {
+    expect(getObjectKind(node)).toBe(expected)
+  })
+
+  test('follows a chain of refs to its target', () => {
+    const record = ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: string })
+    const inner = ast.factory.createSchema({ type: 'ref', name: 'Inner', schema: record })
+
+    expect(getObjectKind(ast.factory.createSchema({ type: 'ref', name: 'Outer', schema: inner }))).toBe('record')
+    expect(
+      getObjectKind(ast.factory.createSchema({ type: 'ref', name: 'Outer', schema: ast.factory.createSchema({ type: 'ref', name: 'Name', schema: string }) })),
+    ).toBeNull()
+  })
+
+  test('ends on a self-referencing allOf without circularSchemas', () => {
+    const node = ast.factory.createSchema({ type: 'intersection', name: 'Tree', members: [] })
+    Object.assign(node, { members: [ast.factory.createSchema({ type: 'ref', name: 'Tree', schema: node }), object] })
+
+    expect(getObjectKind(node)).toBeNull()
+  })
+
+  test('gives null for a ref into a cycle', () => {
+    expect(getObjectKind(ast.factory.createSchema({ type: 'ref', name: 'Tree', schema: object }), { circularSchemas: new Set(['Tree']) })).toBeNull()
   })
 })
