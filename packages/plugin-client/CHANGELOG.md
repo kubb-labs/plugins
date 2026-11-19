@@ -1,5 +1,26 @@
 # @kubb/plugin-client
 
+## 6.3.0
+
+### Minor Changes
+
+- [#1516](https://github.com/kubb-labs/plugins/pull/1516) [`88228cd`](https://github.com/kubb-labs/plugins/commit/88228cd562165a1bd90ac9a94ab1f7fb8dee00dc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add an opt-in `retry` setting to the generated client, on `client.setConfig` and on each call. It retries a transport error and the statuses 408, 429, 500, 502, 503, and 504, and works the same on fetch, axios, and ky.
+  
+  ```ts
+  client.setConfig({ retry: 2 })
+  
+  await createOrder({ body, retry: { methods: ['POST'] } })
+  await chargeCard({ body, retry: false })
+  ```
+  
+  Retries are off unless you set `retry`. `POST` and `PATCH` are retried only when `retry.methods` names them. A streaming call with `retry` reopens a dropped Server-Sent Events stream with its `Last-Event-ID`. On the Ky client, a call with `retry` on switches Ky's own retry off.
+
+- [#1513](https://github.com/kubb-labs/plugins/pull/1513) [`4a23069`](https://github.com/kubb-labs/plugins/commit/4a23069f87f2d89d72fb77ea4ff5a6524d05f063) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Rename `ParseError` to `ValidationError`, to match `onValidationError`. `ParseError` is still exported as a deprecated alias, so existing imports and `instanceof ParseError` checks keep working. `error.name` is now `'ValidationError'`: update any check on `error.name === 'ParseError'`.
+
+### Patch Changes
+
+- [#1513](https://github.com/kubb-labs/plugins/pull/1513) [`4a23069`](https://github.com/kubb-labs/plugins/commit/4a23069f87f2d89d72fb77ea4ff5a6524d05f063) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep the HTTP status when a response body fails its schema. A `ValidationError` thrown inside a call now carries `status`, `method`, `direction`, and `source`, so `error.status === 404` works when a non-2xx body does not match its error schema.
+
 ## 6.2.0
 
 ### Minor Changes
