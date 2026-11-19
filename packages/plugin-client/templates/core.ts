@@ -292,9 +292,7 @@ export type RetryContext = {
   request: ResolvedRequest
   response?: Response | undefined
   error?: unknown
-  /**
-   * The retry about to run, counted from 1.
-   */
+  // The retry about to run, counted from 1.
   retryCount: number
 }
 
@@ -309,9 +307,7 @@ export type RetryOptions = {
    * @default ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']
    */
   methods?: Array<string> | undefined
-  /**
-   * @default [408, 429, 500, 502, 503, 504]
-   */
+  // Defaults to 408, 429, 500, 502, 503, and 504.
   statusCodes?: Array<number> | undefined
   /**
    * The wait in milliseconds before a retry. A `Retry-After` header wins over it. The default backs off exponentially from
@@ -323,21 +319,12 @@ export type RetryOptions = {
    * abort signal still apply.
    */
   shouldRetry?: ((context: RetryContext) => boolean | undefined | Promise<boolean | undefined>) | undefined
-  /**
-   * Runs before the wait of each retry.
-   */
+  // Runs before the wait of each retry.
   onRetry?: ((context: RetryContext & { delay: number }) => void | Promise<void>) | undefined
 }
 
 /**
  * A retry limit, the retry options, or `false` to send the call once. Retries are off unless set.
- *
- * @example
- * ```ts
- * client.setConfig({ retry: 2 })
- * await createOrder({ body, retry: { methods: ['POST'] } })
- * await chargeCard({ body, retry: false })
- * ```
  */
 export type Retry = false | number | RetryOptions
 
@@ -1115,7 +1102,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         (retry.methods ?? ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']).some(
           (method) => method.toUpperCase() === resolvedRequest.method.toUpperCase(),
         ) || getHeader(resolvedRequest.headers, 'idempotency-key') !== undefined
-      // A stream body cannot be read twice.
       if (retryCount >= retry.limit || signal?.aborted || !replayable || resolvedRequest.body instanceof ReadableStream) return false
       const context: RetryContext = { ...failure, request: resolvedRequest, retryCount: retryCount + 1 }
       const retryable = failure.response ? (retry.statusCodes ?? [408, 429, 500, 502, 503, 504]).includes(failure.response.status) : true
@@ -1123,7 +1109,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       retryCount++
       const delay = retryAfter(failure.response) ?? retry.delay?.(retryCount) ?? Math.min(300 * 2 ** (retryCount - 1), 30_000) * (0.5 + Math.random() / 2)
       await retry.onRetry?.({ ...context, delay })
-      // Releases the connection of the response this retry replaces.
       await failure.response?.body?.cancel().catch(() => {})
       await sleep(delay, signal)
       return true
