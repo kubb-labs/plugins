@@ -150,6 +150,27 @@ export async function* parseJsonLines<TData = unknown>({
   }
 }
 
+// Keeps the error of a failed read, which tells a dropped connection from an error of the parser or of `transform`.
+function watchReads(body: ReadableStream<Uint8Array>): { stream: ReadableStream<Uint8Array>; failure?: unknown } {
+  const reader = body.getReader()
+  const watched: { stream: ReadableStream<Uint8Array>; failure?: unknown } = {
+    stream: new ReadableStream<Uint8Array>({
+      async pull(controller) {
+        try {
+          const { done, value } = await reader.read()
+          if (done) return controller.close()
+          controller.enqueue(value)
+        } catch (error) {
+          watched.failure = error
+          throw error
+        }
+      },
+      cancel: (reason) => reader.cancel(reason),
+    }),
+  }
+  return watched
+}
+
 function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | AsyncIterable<Uint8Array> {
   return !!data && typeof data === 'object' && (Symbol.asyncIterator in data || 'getReader' in data)
 }
@@ -163,9 +184,30 @@ async function* mapEvents(events: AsyncIterable<ServerSentEvent>, transform: (ev
  */
 export const eventStream: MediaType = {
   decode: (response) => response.text(),
-  stream: (body, { config, cursor }) => {
-    const events = parseEventStream({ stream: body, maxEventSize: config.maxEventSize, terminator: config.terminator, rawData: config.rawData, cursor })
-    return config.transform ? mapEvents(events, config.transform) : events
+  // With `retry` on, a stream whose read fails is opened again. A stream that ends and a parser error are not.
+  async *stream(body, { config, cursor, reopen }) {
+    let current: ReadableStream<Uint8Array> | undefined = body
+    while (current) {
+      const watched = reopen ? watchReads(current) : { stream: current, failure: undefined }
+      const events = parseEventStream({
+        stream: watched.stream,
+        maxEventSize: config.maxEventSize,
+        terminator: config.terminator,
+        rawData: config.rawData,
+        cursor,
+      })
+      let delivered = false
+      try {
+        for await (const event of config.transform ? mapEvents(events, config.transform) : events) {
+          delivered = true
+          yield event
+        }
+        return
+      } catch (error) {
+        if (!reopen || error !== watched.failure) throw error
+        current = await reopen({ error, delivered })
+      }
+    }
   },
 }
 
