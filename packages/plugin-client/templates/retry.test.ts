@@ -212,6 +212,11 @@ describe('retry', () => {
     expect(await collect(await client.stream({ url: '/events', headers: { 'Last-Event-ID': '5' } }))).toHaveLength(2)
     expect(sent).toEqual(['5', '5'])
 
+    // An `id:` block without data clears the ID before any event arrives.
+    responses.push(events('id:\n\n', true), events('data: three\n\n'))
+    expect(await collect(await client.stream({ url: '/events', headers: { 'Last-Event-ID': '5' } }))).toHaveLength(1)
+    expect(sent.slice(2)).toEqual(['5', undefined])
+
     const lines = {
       items: ['a', 'b'],
       async *stream(body: ReadableStream<Uint8Array>) {
