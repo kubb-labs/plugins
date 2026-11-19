@@ -5,7 +5,7 @@ import { serializeHeaders } from './serializers/headers.ts'
 import { serializeStyledPath } from './serializers/pathStyles.ts'
 import { serializeStyledQuery } from './serializers/queryStyles.ts'
 import { parseEventStream, parseJsonLines, streamMediaTypes } from './sse.ts'
-import { ParseError, type StandardSchemaValidator } from './standardSchema.ts'
+import { ValidationError, type StandardSchemaValidator } from './standardSchema.ts'
 
 const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: serializeHeaders, cookie: serializeCookies }
 
@@ -324,7 +324,7 @@ describe('streamMediaTypes', () => {
   )
 
   test('a failing validation calls onValidationError and keeps streaming when it is handled', async () => {
-    const onValidationError = vi.fn((_error: ParseError, context: { value: unknown }) => ({ value: { replaced: context.value } }))
+    const onValidationError = vi.fn((_error: ValidationError, context: { value: unknown }) => ({ value: { replaced: context.value } }))
     const result = await stream(streamOf(['data: {"n":1}\n\ndata: "bad"\n\ndata: {"n":2}\n\n']), { onValidationError, validator: { response: validator } })
 
     expect(await collect(result)).toStrictEqual([
@@ -333,13 +333,13 @@ describe('streamMediaTypes', () => {
       message({ data: { n: 2, checked: true } }),
     ])
     expect(onValidationError).toHaveBeenCalledOnce()
-    expect(onValidationError.mock.calls[0]![0]).toBeInstanceOf(ParseError)
+    expect(onValidationError.mock.calls[0]![0]).toBeInstanceOf(ValidationError)
     expect(onValidationError.mock.calls[0]![1]).toMatchObject({ direction: 'response', source: 'body', value: 'bad' })
   })
 
   test('a failing validation ends the stream when no handler takes it', async () => {
     const result = await stream(streamOf(['data: "bad"\n\n']), { onValidationError: () => undefined, validator: { response: validator } })
-    await expect(collect(result)).rejects.toBeInstanceOf(ParseError)
+    await expect(collect(result)).rejects.toBeInstanceOf(ValidationError)
   })
 
   test('reads validate and onValidationError from the client when the call does not set them', async () => {

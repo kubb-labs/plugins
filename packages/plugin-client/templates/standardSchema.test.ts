@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
-import { type StandardSchemaResult, toHeadersStandardSchema } from './standardSchema.ts'
+import { ParseError, type StandardSchemaResult, toHeadersStandardSchema, ValidationError } from './standardSchema.ts'
 
 /**
  * Stands in for a generated `z.object` headers schema: `X-Tenant` is required and upper-cased by a
@@ -56,5 +56,13 @@ describe('toHeadersStandardSchema', () => {
   test('handles an async schema', async () => {
     const result = await toHeadersStandardSchema(headersSchema(true), entries)['~standard'].validate({ 'x-tenant': 'acme' })
     expect(result).toStrictEqual({ value: { 'x-tenant': 'ACME' } })
+  })
+})
+
+describe('ValidationError', () => {
+  test('stays reachable through the deprecated ParseError alias', () => {
+    const error = new ValidationError({ issues: [] })
+    expect(error).toBeInstanceOf(ParseError)
+    expect(error.name).toBe('ValidationError')
   })
 })

@@ -1,7 +1,7 @@
 import type { EventStreamOptions, RequestConfig } from './core.ts'
 import { baseContentType, jsonReplacer } from './serializers.ts'
 import type { RequestBody } from './serializers.ts'
-import { ParseError } from './standardSchema.ts'
+import { ValidationError } from './standardSchema.ts'
 
 /**
  * What a media type handler gets next to the body.
@@ -87,13 +87,13 @@ function encodeOrJson(body: unknown, { contentType }: MediaTypeContext): Request
 }
 
 /**
- * Parses JSON text, throwing a `ParseError` that names the content type when it is not valid JSON.
+ * Parses JSON text, throwing a `ValidationError` that names the content type when it is not valid JSON.
  */
 export function parseJson(text: string, contentType: string | undefined): unknown {
   try {
     return JSON.parse(text)
   } catch (error) {
-    throw new ParseError({ message: `Invalid JSON in a ${baseContentType(contentType)} body`, issues: [{ message: String(error) }], cause: error })
+    throw new ValidationError({ message: `Invalid JSON in a ${baseContentType(contentType)} body`, issues: [{ message: String(error) }], cause: error })
   }
 }
 

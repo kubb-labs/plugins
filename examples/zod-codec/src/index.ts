@@ -61,7 +61,7 @@ async function main() {
   console.log('  received', 'id:', odie?.id, '| homepage instanceof URL:', homepage instanceof URL, '| birthDate:', odie?.birthDate.toISOString())
 
   // An invalid param is rejected before anything is sent. `source` names the slot that failed;
-  // returning nothing from `onValidationError` rethrows the `ParseError`.
+  // returning nothing from `onValidationError` rethrows the `ValidationError`.
   console.log('invalid param')
   const sentBefore = server.requests.length
   const error = await scheduleVisit({

@@ -138,11 +138,11 @@ client.setConfig({
 
 Axios reads every body as bytes, then the runtime decodes it by the response `Content-Type`. Native axios response interceptors see those bytes, so use `client.interceptors.response` to see the decoded body. A `switch (result.contentType)` narrows `data` for an operation that returns several media types.
 
-| Response                                             | `data`                                                                             |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| 204, 205, or 304, a `HEAD` request, or an empty body | `undefined`                                                                        |
-| Invalid JSON under a JSON media type                 | Throws a `ParseError`. Catch it, or register a lenient `application/json` handler. |
-| 2xx with `parseAs` set on the call                   | Read as `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`.              |
+| Response                                             | `data`                                                                                  |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| 204, 205, or 304, a `HEAD` request, or an empty body | `undefined`                                                                             |
+| Invalid JSON under a JSON media type                 | Throws a `ValidationError`. Catch it, or register a lenient `application/json` handler. |
+| 2xx with `parseAs` set on the call                   | Read as `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`.                   |
 
 For a 2xx without a `Content-Type`, see [Default content types](#default-content-types). For binary downloads and vendor types, see [Binary and vendor responses](#binary-and-vendor-responses).
 
@@ -223,4 +223,4 @@ With codecs, pair `request` and `params` with [`pluginZod({ inferred: 'codec' })
 
 ### Error body validation
 
-When `validator` is on and a non-2xx response has a body, the runtime checks it against the schema of its status, then its range such as `5xx`, then `default`. A status the document leaves out keeps its body unchecked. An error body that fails its schema throws a `ParseError` instead of the `ResponseError`, also with `throwOnError: false`. To recover, see [Validation failures](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/error-handling#validation-failures).
+When `validator` is on and a non-2xx response has a body, the runtime checks it against the schema of its status, then its range such as `5xx`, then `default`. A status the document leaves out keeps its body unchecked. An error body that fails its schema throws a `ValidationError` instead of the `ResponseError`, also with `throwOnError: false`. The `ValidationError` keeps the response `status`. To recover, see [Validation failures](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/error-handling#validation-failures).
