@@ -1,4 +1,5 @@
-import { ast, text } from '@kubb/kit'
+import { ast } from '@internals/ast'
+import { text } from '@kubb/kit'
 import { Url } from '@kubb/kit'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'

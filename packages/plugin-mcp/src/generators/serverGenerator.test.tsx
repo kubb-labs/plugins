@@ -1,5 +1,5 @@
+import { ast } from '@internals/ast'
 import { stripTypeScriptTypes } from 'node:module'
-import { ast } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import type { PluginZod } from '@kubb/plugin-zod'

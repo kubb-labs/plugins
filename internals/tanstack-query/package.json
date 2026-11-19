@@ -51,9 +51,11 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@internals/ast": "workspace:*",
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
+    "@kubb/ast": "catalog:",
     "@kubb/kit": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"

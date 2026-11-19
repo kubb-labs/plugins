@@ -1,3 +1,4 @@
+import { ast } from '@internals/ast'
 import {
   defaultLiteral,
   formatDefault,
@@ -13,7 +14,7 @@ import {
   withFormatRange,
 } from '@internals/shared'
 import { buildList, buildObject, objectKey, toRegExpString } from '@internals/utils'
-import { ast, createPrinter, text } from '@kubb/kit'
+import { createPrinter, text } from '@kubb/kit'
 import type { PluginValibot, ResolverValibot } from '../types.ts'
 
 /**

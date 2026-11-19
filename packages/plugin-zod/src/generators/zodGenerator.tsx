@@ -1,3 +1,4 @@
+import { ast } from '@internals/ast'
 import {
   buildContentTypeEntries,
   buildOptionsSchema,
@@ -12,7 +13,7 @@ import {
   shouldCoerce,
   toResponseContent,
 } from '@internals/shared'
-import { ast, defineGenerator } from '@kubb/kit'
+import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Zod } from '../components/Zod.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from '../printers/printerZod.ts'

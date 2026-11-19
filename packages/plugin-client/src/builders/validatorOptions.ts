@@ -1,4 +1,5 @@
-import { ast, text } from '@kubb/kit'
+import { ast } from '@internals/ast'
+import { text } from '@kubb/kit'
 import type { PluginValibot, ResolverValibot } from '@kubb/plugin-valibot'
 import type { PluginZod, ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorLibrary, ValidatorOptions } from '../types.ts'

@@ -1,7 +1,8 @@
+import { ast } from '@internals/ast'
 import { posix } from 'node:path'
 import { toResponseContent } from '@internals/shared'
 import { ensureValidVarName, getRelativePath } from '@internals/utils'
-import { ast, casing } from '@kubb/kit'
+import { casing } from '@kubb/kit'
 import type { ResolverFaker } from './types.ts'
 
 /** The identifier a `dateParser` module is imported and called under: `my-date-lib` becomes `myDateLib`. */

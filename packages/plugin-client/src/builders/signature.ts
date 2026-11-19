@@ -1,4 +1,4 @@
-import { ast } from '@kubb/kit'
+import { ast } from '@internals/ast'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import type { OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'

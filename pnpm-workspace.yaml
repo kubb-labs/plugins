@@ -15,6 +15,7 @@ catalog:
   # Ranges, not pins: these end up in the published dependencies and peerDependencies of every
   # plugin, and a pin there conflicts with any newer Kubb release the user installs.
   '@kubb/adapter-oas': ^5.23.0
+  '@kubb/ast': ^5.23.0
   '@kubb/core': ^5.23.0
   '@kubb/kit': ^5.23.0
   '@kubb/plugin-barrel': ^5.23.0

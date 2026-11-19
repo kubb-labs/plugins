@@ -1,7 +1,7 @@
+import { ast } from '@internals/ast'
 import type { OperationTypeNames } from '@internals/client'
 import { buildOperationComments } from '@internals/shared'
 import { buildJSDoc } from '@internals/utils'
-import { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'

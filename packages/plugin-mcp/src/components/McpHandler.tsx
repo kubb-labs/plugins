@@ -1,5 +1,5 @@
+import { ast } from '@internals/ast'
 import { buildOperationComments, buildRequestParamsSignature, castToClientOptions } from '@internals/shared'
-import { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'

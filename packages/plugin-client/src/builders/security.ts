@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { isValidVarName, objectKey, toLiteral } from '@internals/utils'
-import { ast, text } from '@kubb/kit'
+import { text } from '@kubb/kit'
 
 /**
  * A resolved security scheme. The runtime calls the configured `auth` resolver with this object and places the

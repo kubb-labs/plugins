@@ -1,6 +1,7 @@
+import { ast } from '@internals/ast'
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
 import { operationFileEntry, resolveOperationFile, getStream } from '@internals/shared'
-import { ast, defineGenerator } from '@kubb/kit'
+import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'

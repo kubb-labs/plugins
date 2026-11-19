@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { lazyGetter, objectKey } from '@internals/utils'
-import { ast, createPrinter } from '@kubb/kit'
+import { createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { defaultLiteral, hasInputChecks, shouldCoerce } from '@internals/shared'
 import { applyModifiers, buildObjectShape, lengthConstraints, numberConstraints, patternKeySchema, printWithOmit } from '../utils.ts'

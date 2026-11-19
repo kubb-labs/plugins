@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { createRequire } from 'node:module'
-import { ast, createPrinter, Diagnostics } from '@kubb/kit'
+import { createPrinter, Diagnostics } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'
@@ -271,13 +272,13 @@ export const printerTs = createPrinter<PrinterTs>((options) => {
           const enumNode = ast.schema.narrow(m, ast.schema.types.enum)
           return enumNode?.primitive === 'string'
         })
-        const hasPlainString = members.some((m) => ast.schema.isString(m))
+        const hasPlainString = members.some((m) => ast.schema.is(m, 'string'))
 
         if (hasStringLiteral && hasPlainString) {
           const memberNodes = members
             .map((m) => {
               const print = (node: ast.SchemaNode) =>
-                ast.schema.isString(node)
+                ast.schema.is(node, 'string')
                   ? factory.createIntersectionDeclaration({ nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])] })
                   : this.transform(node)
 

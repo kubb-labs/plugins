@@ -1,5 +1,5 @@
+import { ast } from '@internals/ast'
 import { lazyGetter, objectKey } from '@internals/utils'
-import { ast } from '@kubb/kit'
 import { createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { shouldCoerce } from '@internals/shared'

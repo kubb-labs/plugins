@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
 
+import { ast } from '@internals/ast'
 import type { Config } from '@kubb/kit'
-import { ast } from '@kubb/kit'
 import { resolverClient } from '@kubb/plugin-client'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'

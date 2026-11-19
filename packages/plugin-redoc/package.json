@@ -76,9 +76,11 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@kubb/ast": "catalog:",
     "@kubb/kit": "catalog:"
   },
   "devDependencies": {
+    "@internals/ast": "workspace:*",
     "@kubb/adapter-oas": "catalog:"
   },
   "peerDependencies": {

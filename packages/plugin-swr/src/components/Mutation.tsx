@@ -1,4 +1,4 @@
-import type { ast } from '@kubb/kit'
+import type { ast } from '@internals/ast'
 import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { Function, Type } from '@kubb/renderer-jsx'

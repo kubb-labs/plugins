@@ -1,6 +1,7 @@
+import { ast } from '@internals/ast'
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation, HookFile, MutationKey, resolveHookFile } from '@internals/tanstack-query'
-import { ast, defineGenerator } from '@kubb/kit'
+import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mutation } from '../components/Mutation.tsx'
 import type { PluginSwr } from '../types'

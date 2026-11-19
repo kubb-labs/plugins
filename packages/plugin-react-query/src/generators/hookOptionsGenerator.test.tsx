@@ -1,4 +1,4 @@
-import { ast } from '@kubb/kit'
+import { ast } from '@internals/ast'
 import { describe, expect, test } from 'vitest'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'

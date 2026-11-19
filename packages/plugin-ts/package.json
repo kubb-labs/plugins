@@ -73,11 +73,13 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@kubb/ast": "^5.23.0",
     "@kubb/kit": "^5.23.0",
     "@kubb/renderer-jsx": "^5.23.0",
     "yuku-codegen": "^0.19.0"
   },
   "devDependencies": {
+    "@internals/ast": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
     "@kubb/parser-ts": "catalog:",

@@ -1,5 +1,5 @@
+import type { ast } from '@internals/ast'
 import { getNestedAccessor } from '@internals/utils'
-import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { Function } from '@kubb/renderer-jsx'

@@ -1,4 +1,4 @@
-import type { ast } from '@kubb/kit'
+import type { ast } from '@internals/ast'
 import type { OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildCallConfig } from './callConfig.ts'

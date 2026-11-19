@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
-import { ast, defineGenerator } from '@kubb/kit'
+import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { printerTs } from '../printers/printerTs.ts'

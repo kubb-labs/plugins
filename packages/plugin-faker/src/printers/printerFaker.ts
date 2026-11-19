@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { buildObject, objectKey, toRegExpString } from '@internals/utils'
-import { ast, createPrinter, Diagnostics, text } from '@kubb/kit'
+import { createPrinter, Diagnostics, text } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema, dateParserName, isObjectSchema } from '../utils.ts'
 

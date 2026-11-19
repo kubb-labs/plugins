@@ -1,4 +1,4 @@
-import type { ast } from '@kubb/kit'
+import type { ast } from '@internals/ast'
 import { describe, expect, test } from 'vitest'
 import { buildSecurityMetadata, buildSecuritySchemes, getOperationSecurity, isAuthRequired, resolveCredential } from './security.ts'
 

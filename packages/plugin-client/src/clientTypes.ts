@@ -1,6 +1,7 @@
+import type { ast } from '@internals/ast'
 import type { ReturnTypeOption } from '@internals/client'
 import type { PluginOptions } from '@internals/shared/types'
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, Override, PluginType, Resolver } from '@kubb/kit'
+import type { ResolverPatch, Exclude, Group, Include, Output, Override, PluginType, Resolver } from '@kubb/kit'
 
 /**
  * The schema library a validator reads its schemas from: `@kubb/plugin-zod` or `@kubb/plugin-valibot`.

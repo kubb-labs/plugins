@@ -1,4 +1,4 @@
-import { ast } from '@kubb/kit'
+import { ast } from '@internals/ast'
 import { Const, Function, Schema, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterZodFactory } from '../printers/printerZod.ts'

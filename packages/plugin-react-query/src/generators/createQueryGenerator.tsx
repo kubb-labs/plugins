@@ -1,3 +1,4 @@
+import { ast } from '@internals/ast'
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
 import {
   classifyOperation,
@@ -9,7 +10,7 @@ import {
   resolveHookFile,
   resolvePageParamType,
 } from '@internals/tanstack-query'
-import { ast, defineGenerator } from '@kubb/kit'
+import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Query } from '../components/Query.tsx'
 import { QueryOptions } from '../components/QueryOptions.tsx'

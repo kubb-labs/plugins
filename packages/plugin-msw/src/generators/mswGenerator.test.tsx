@@ -1,10 +1,10 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
+import { ast } from '@internals/ast'
 import { execFile } from 'node:child_process'
 import fs from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { promisify } from 'node:util'
-import { ast } from '@kubb/kit'
 import type { PluginFaker } from '@kubb/plugin-faker'
 import { pluginFakerName, resolverFaker } from '@kubb/plugin-faker'
 import type { PluginTs } from '@kubb/plugin-ts'

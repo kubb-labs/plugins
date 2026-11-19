@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import type { Config, PluginType } from '@kubb/kit'
-import { ast, Diagnostics, memoryStorage } from '@kubb/kit'
+import { Diagnostics, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'

@@ -1,4 +1,4 @@
-import { ast } from '@kubb/kit'
+import { ast } from '@internals/ast'
 import * as v from 'valibot'
 import { describe, expect, test } from 'vitest'
 import type { ResolverValibot } from '../types.ts'

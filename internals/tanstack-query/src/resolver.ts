@@ -1,6 +1,7 @@
+import type { ast } from '@internals/ast'
 import { casing } from '@kubb/kit'
 import { operationKey } from '@internals/shared'
-import type { ast, Resolver } from '@kubb/kit'
+import type { Resolver } from '@kubb/kit'
 
 /**
  * The naming variant of a query namespace: the plain query, or the
