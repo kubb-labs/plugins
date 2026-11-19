@@ -4,7 +4,7 @@ import type { HeadersInit, HttpMethod, RequestBody, Serializers, Styles } from '
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
 import { defaultMediaTypes, isEncodedBody, resolveMediaType } from './mediaTypes'
 import { baseContentType, toValue } from './serializers'
-import { isValidationEnabled, ParseError, runValidator } from './standardSchema'
+import { isValidationEnabled, ValidationError, runValidator } from './standardSchema'
 export * from './mediaTypes'
 export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema'
 
@@ -526,7 +526,7 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
   /**
    * Set when the error body failed its schema and `onValidationError` supplied `data` instead.
    */
-  validationError?: ParseError
+  validationError?: ValidationError
 
   constructor(config: {
     data: TError
@@ -538,7 +538,7 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     response: TResponse
     method?: string | undefined
     url?: string | undefined
-    validationError?: ParseError | undefined
+    validationError?: ValidationError | undefined
   }) {
     // The query and hash stay out of the message, so secrets in them do not reach logs.
     const cleanUrl = config.url?.split(/[?#]/)[0]
@@ -1016,7 +1016,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const result = await run.response(
       {
         data: await decode().catch((error: unknown) => {
-          if (error instanceof ParseError) {
+          if (error instanceof ValidationError) {
             Object.assign(error, { direction: isSuccess ? 'response' : 'error', source: 'body', method: resolvedRequest.method, status })
           }
           throw error
@@ -1052,7 +1052,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       throw error
     }
 
-    let validationError: ParseError | undefined
+    let validationError: ValidationError | undefined
     const data = rawStream
       ? result.data
       : await runValidator({
