@@ -378,6 +378,53 @@ describe('printerValibot', () => {
 
       expect(print(node)).toBe('v.union([tagsSchema, petSchema])')
     })
+
+    const oneOf = createSchema({ type: 'union', strategy: 'one', members: [object({ id: string() }), object({ meow: string() })] })
+
+    test('oneOf members next to sibling properties in an allOf are not strict, so the value can carry those properties', () => {
+      const node = createSchema({ type: 'intersection', members: [object({ name: string() }), oneOf] })
+      const code = print(node)
+
+      expect(code).toMatchInlineSnapshot(`
+        "v.intersect([
+          v.object({
+            name: v.string(),
+          }),
+          v.union([
+            v.object({
+              id: v.string(),
+            }),
+            v.object({
+              meow: v.string(),
+            }),
+          ]),
+        ])"
+      `)
+      expect(v.is(build(code), { name: 'a', id: 'b' })).toBe(true)
+    })
+
+    test('oneOf members stay strict when the union is a property, not next to the allOf properties', () => {
+      const node = createSchema({ type: 'intersection', members: [object({ name: string() }), object({ kind: oneOf })] })
+      const code = print(node)
+
+      expect(code).toMatchInlineSnapshot(`
+        "v.object({
+          ...v.object({
+            name: v.string(),
+          }).entries,
+          kind: v.union([
+            v.strictObject({
+              id: v.string(),
+            }),
+            v.strictObject({
+              meow: v.string(),
+            }),
+          ]),
+        })"
+      `)
+      expect(v.is(build(code), { name: 'a', kind: { id: 'b' } })).toBe(true)
+      expect(v.is(build(code), { name: 'a', kind: { id: 'b', meow: 'c' } })).toBe(false)
+    })
   })
 
   test('a description and examples ride along as metadata inside the optional wrapper', () => {
