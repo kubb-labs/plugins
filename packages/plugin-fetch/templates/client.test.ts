@@ -904,6 +904,9 @@ describe('createClientCore', () => {
     const request = { method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } } as const
     const context = { name: 'ValidationError', status: 404, method: 'GET', direction: 'error', source: 'body' }
     await expect(client(request)).rejects.toMatchObject(context)
+    const requestError = await client({ method: 'POST', url: '/pet', body: {}, validator: { request: toFailingSchema() } }).catch((error: unknown) => error)
+    expect(requestError).toMatchObject({ name: 'ValidationError', direction: 'request', source: 'body' })
+    expect(requestError).not.toHaveProperty('status')
     const onValidationError = vi.fn((_error: unknown, { value }: { value: unknown }) => ({ value }))
     await expect(client({ ...request, onValidationError })).rejects.toMatchObject({ name: 'ResponseError', status: 404, data: { error: 'not found' } })
     expect(onValidationError.mock.calls[0]?.[0]).toMatchObject(context)
@@ -1153,6 +1156,11 @@ describe('media types', () => {
       status: 200,
       direction: 'response',
       source: 'body',
+    })
+    await expect(call(answer('<html>Bad Gateway</html>', { 'content-type': 'application/json' }, 502))).rejects.toMatchObject({
+      name: 'ValidationError',
+      status: 502,
+      direction: 'error',
     })
     expect((await call(answer('Pet deleted', { 'content-type': 'application/x-unknown' }))).data).toBe('Pet deleted')
     expect((await call(answer('{"a":1}', { 'content-type': 'application/x-unknown' }))).data).toStrictEqual({ a: 1 })
