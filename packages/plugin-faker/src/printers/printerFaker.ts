@@ -259,16 +259,6 @@ function itemTypeName(typeName: string, nestedInUnion?: boolean): string {
  * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
  */
 export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = createPrinter<PrinterFakerFactory>((options) => {
-  const printNested = (node: ast.SchemaNode, overrideOptions: Partial<PrinterFakerOptions> = {}): string => {
-    return (
-      printerFaker({
-        ...options,
-        ...overrideOptions,
-        nodes: options.nodes,
-      }).print(node) ?? 'undefined'
-    )
-  }
-
   return {
     name: 'faker',
     options,
@@ -292,7 +282,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
         const contentSchema = ast.schema.getEmbeddedJson(node)
         // The document is typed by its own schema, not by the string that holds it.
-        if (contentSchema) return `JSON.stringify(${printNested(contentSchema, { typeName: undefined, nestedInObject: true, nestedInUnion: false })})`
+        if (contentSchema)
+          return `JSON.stringify(${this.transform(contentSchema, { typeName: undefined, nestedInObject: true, nestedInUnion: false }) ?? 'undefined'})`
 
         const encodingCall = encodingCalls.get(node.content?.encoding?.toLowerCase())
         if (encodingCall) return encodingCall
@@ -396,13 +387,13 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
               const key = `${JSON.stringify(discriminatorPropertyName)}${discriminator.required ? '' : '?'}`
               const typeName = `Extract<NonNullable<${baseTypeName}>, { ${key}: ${parseEnumValue(discriminator.value)} }>`
 
-              return printNested(member, { typeName, nestedInObject: true, nestedInUnion: true })
+              return this.transform(member, { typeName, nestedInObject: true, nestedInUnion: true }) ?? 'undefined'
             }
 
             // Without a discriminator, keep the union type but guard each indexed access (see
             // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
             // rather than erroring with TS2339.
-            return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
+            return this.transform(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true }) ?? 'undefined'
           })
           .filter((item): item is string => Boolean(item))
 
@@ -415,12 +406,13 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const memberRank = (member: ast.SchemaNode) => (member.type === 'ref' ? 0 : member.type === 'union' ? 2 : 1)
         const members = objectMembers.length ? objectMembers.toSorted((a, b) => memberRank(a) - memberRank(b)) : node.members
         const items: Array<string> = (members ?? [])
-          .map((member) =>
-            printNested(member, {
-              nestedInObject: true,
-              // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
-              ...(member.type === 'ref' && ast.ref.getName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
-            }),
+          .map(
+            (member) =>
+              this.transform(member, {
+                nestedInObject: true,
+                // Only a ref to the schema itself is cut: a cycle through another schema is cut at the property that closes it.
+                ...(member.type === 'ref' && ast.ref.getName(member) !== this.options.schemaName ? { cyclicSchemas: undefined } : {}),
+              }) ?? 'undefined',
           )
           // An `allOf` member with no shape (any/unknown/void → 'undefined') adds no
           // constraint. Keeping it would spread `...undefined` into the merged object.
@@ -435,11 +427,12 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         if (node.items?.length === 1 && isCyclicRef(node.items[0]!, this.options)) return this.options.typeName ? `[] as ${this.options.typeName}` : '[]'
 
         const items: Array<string> = (node.items ?? [])
-          .map((member) =>
-            printNested(member, {
-              typeName: this.options.typeName ? itemTypeName(this.options.typeName, this.options.nestedInUnion) : undefined,
-              nestedInObject: true,
-            }),
+          .map(
+            (member) =>
+              this.transform(member, {
+                typeName: this.options.typeName ? itemTypeName(this.options.typeName, this.options.nestedInUnion) : undefined,
+                nestedInObject: true,
+              }) ?? 'undefined',
           )
           .filter((item): item is string => Boolean(item))
 
@@ -460,11 +453,12 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       tuple(node): string {
         const items: Array<string> = (node.items ?? [])
-          .map((member, index) =>
-            printNested(member, {
-              typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${index}]` : undefined,
-              nestedInObject: true,
-            }),
+          .map(
+            (member, index) =>
+              this.transform(member, {
+                typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${index}]` : undefined,
+                nestedInObject: true,
+              }) ?? 'undefined',
           )
           .filter((item): item is string => Boolean(item))
 
@@ -493,7 +487,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         }
         const entries = [...keptProperties, ...extras].map((property): string => {
           const value: string =
-            printNested(property.schema, {
+            this.transform(property.schema, {
               typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,
               nestedInObject: true,
               // A required ref to another schema stays, since `undefined` would fail it: the lazy getter keeps the mock finite,
