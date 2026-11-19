@@ -189,7 +189,7 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
       const contentNode = ast.schema.getEmbeddedJson(node)
       if (!contentNode) return value
       // The string holds wire JSON whichever way the string itself travels, so its schema always decodes.
-      const contentSchema = this.transform(contentNode, { ...this.options, direction: 'decode' })
+      const contentSchema = this.transform(contentNode, { direction: 'decode' })
 
       return contentSchema ? dialect.refine(value, jsonContentCheck(contentSchema)) : value
     },
