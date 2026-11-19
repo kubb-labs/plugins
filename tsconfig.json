@@ -6,6 +6,7 @@
     "types": ["bun-types"],
     "paths": {
       "#mocks": ["./configs/mocks.ts"],
+      "@internals/ast": ["./internals/ast/src/index.ts"],
       "@internals/shared": ["./internals/shared/src/index.ts"],
       "@internals/shared/types": ["./internals/shared/src/types.ts"],
       "@internals/utils": ["./internals/utils/src/index.ts"],
