@@ -72,7 +72,7 @@ function reachesCycle({
 
   return (
     ast.schema.find(node, {
-      followRefs: true,
+      follow: ['ref'],
       predicate(schema) {
         if (schema.type !== ast.schema.types.ref) return false
         const name = ast.ref.getName(schema)

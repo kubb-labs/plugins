@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
+import { operationFileEntry, resolveOperationFile, getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -49,7 +49,10 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     // `mcpGenerator` emits no handler for a stream operation, so it gets no tool either.
     const operationsMapped = nodes
       .filter(ast.http.isOperation)
-      .filter((node) => !isEventStream(node) && !hasStreamVariant(node))
+      .filter((node) => {
+        const stream = getStream(node)
+        return !stream?.shape && !stream?.hasVariant
+      })
       .map((node) => {
         const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
 

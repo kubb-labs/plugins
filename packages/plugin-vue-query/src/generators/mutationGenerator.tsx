@@ -1,4 +1,4 @@
-import { getRequestGroups } from '@internals/shared'
+import { requestGroupOrder } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation, HookFile, MutationKey, resolveHookFile } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -35,7 +35,8 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
     const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, returnType: ctx.options.returnType })
 
     // The contract body unwraps each request group with `toValue()`, so it needs the runtime import.
-    const hasRequestGroups = Object.values(getRequestGroups(node)).some(Boolean)
+    const groups = ast.http.getRequestGroups(node)
+    const hasRequestGroups = requestGroupOrder.some((key) => groups[key])
 
     return (
       <HookFile

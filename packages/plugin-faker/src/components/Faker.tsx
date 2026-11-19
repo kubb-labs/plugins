@@ -4,7 +4,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import { isObjectSchema, resolveFakerTypeUsage, SCALAR_TYPES } from '../utils.ts'
+import { isObjectSchema, resolveFakerTypeUsage } from '../utils.ts'
 
 type Props = {
   name: string
@@ -25,7 +25,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
   const isObject = !!ast.schema.narrow(node, ast.schema.types.object) || (node.type === ast.schema.types.intersection && isObjectSchema(node))
   const isValueIntersection = node.type === ast.schema.types.intersection && !isObject
   const isTuple = node.type === 'tuple'
-  const isScalar = SCALAR_TYPES.has(node.type)
+  const isScalar = ast.schema.is(node, 'scalar')
   const isUnion = node.type === 'union'
 
   const useObjectOverride = canOverride && (isObject || !!keysToOmit?.length)
@@ -40,7 +40,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
       return node.nullable ? `data !== undefined ? data : ${fakerText}` : `data ?? ${fakerText}`
     }
     // A nullable ref to a scalar calls the referenced factory, whose `data` does not take `null`.
-    if (canOverride && node.type === 'ref' && node.nullable && SCALAR_TYPES.has(ast.ref.getSchema(node).type)) {
+    if (canOverride && node.type === 'ref' && node.nullable && ast.schema.is(ast.ref.getSchema(node), 'scalar')) {
       return `data === null ? data : ${fakerText}`
     }
     return fakerText
@@ -55,7 +55,8 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     const returnType = resolvedReturnType
 
     // `as` binds tighter than `??`/`?:`, so tuple/union need parens or `data`'s own type leaks through.
-    const needsCast = canOverride && !!returnType && ((node.type === 'ref' && !SCALAR_TYPES.has(ast.ref.getSchema(node).type)) || isArray || isTuple || isUnion)
+    const needsCast =
+      canOverride && !!returnType && ((node.type === 'ref' && !ast.schema.is(ast.ref.getSchema(node), 'scalar')) || isArray || isTuple || isUnion)
     const needsParens = isTuple || isUnion
     const returnExpression = needsCast ? `${needsParens ? `(${fakerTextWithOverride})` : fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
 

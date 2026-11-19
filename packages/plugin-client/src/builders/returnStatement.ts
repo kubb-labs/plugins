@@ -1,5 +1,5 @@
-import { getEventStream } from '@internals/shared'
 import type { ast } from '@kubb/kit'
+import { getStream } from '@internals/shared'
 import { buildResponseHeadersType, buildResultTypeRef, resultTypeName, type OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildRequestResultGenerics } from './generics.ts'
@@ -58,7 +58,7 @@ export function buildEventStreamReturn({
   returnType: string
   statement: string
 } {
-  const shape = getEventStream(node) ?? 'data'
+  const shape = getStream(node)?.shape ?? 'data'
   const responses = types.response.responses(node)
   const headers = buildResponseHeadersType({ node, types })
   const success = `SuccessOf<${responses}>`
@@ -91,7 +91,7 @@ export function buildEventStreamImports({
   types: OperationTypeNames
   returnType: ReturnTypeOption
 }): Array<string> {
-  const shape = getEventStream(node) ?? 'data'
+  const shape = getStream(node)?.shape ?? 'data'
   const headers = buildResponseHeadersType({ node, types }) !== null
   const result = {
     plain: ['Options', 'StreamResult'],

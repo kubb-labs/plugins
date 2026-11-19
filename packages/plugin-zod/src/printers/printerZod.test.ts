@@ -1371,6 +1371,19 @@ describe('printerZod', () => {
       `)
     })
 
+    test('omits keys from a nullable allOf of objects', () => {
+      const p = printerZod({ keysToOmit: ['id'] })
+      const object = (name: string) =>
+        ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [ast.factory.createProperty({ name, required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+        })
+      const node = ast.factory.createSchema({ type: 'intersection', primitive: 'object', nullable: true, members: [object('id'), object('name')] })
+      // An intersection has no `.omit`, so the members merge into one object first.
+      expect(p.print(node)).toBe('z.object({\n  id: z.string(),\n}).extend({\n  name: z.string(),\n}).omit({ "id": true }).nullable()')
+    })
+
     test('no omit when keysToOmit is empty', () => {
       const p = printerZod({ keysToOmit: [] })
       const node = ast.factory.createSchema({ type: 'string' })

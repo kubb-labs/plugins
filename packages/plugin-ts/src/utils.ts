@@ -60,8 +60,7 @@ export function enumTypeName({ resolver, name, enumOptions, isEnum }: EnumTypeNa
  * a named enum, which keeps the declaration and its references in sync across adapter versions.
  */
 export function isInlineConstEnum(node: ast.EnumSchemaNode, enumSchemaNames?: ReadonlySet<string>): boolean {
-  const isConst = (node.namedEnumValues ?? node.enumValues ?? []).length === 1
-  return isConst && !(node.name && enumSchemaNames?.has(node.name))
+  return ast.schema.is(node, 'const') && !(node.name && enumSchemaNames?.has(node.name))
 }
 
 function isSchemaOptional(schema: ast.SchemaNode): boolean {
@@ -75,15 +74,6 @@ function formatExample(value: unknown): string {
 
   const rendered = JSON.stringify(value) ?? String(value)
   return rendered.replaceAll('*/', '*\\/')
-}
-
-/**
- * Whether a schema is binary, or an array of binary items, so its TypeScript type is `Blob` or `Blob[]`.
- */
-export function isBinarySchema(schema: ast.SchemaNode): boolean {
-  const meta = ast.ref.mergeSchema(schema)
-  const isBlob = (node: ast.SchemaNode) => ast.ref.mergeSchema(node)?.type === 'blob'
-  return !!meta && (isBlob(meta) || (meta.type === 'array' && 'items' in meta && (meta.items ?? []).some(isBlob)))
 }
 
 /**
@@ -133,7 +123,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   // add bytes with no information a reader can't already see in the signature.
   const typeTag =
     // A binary schema's primitive is `string`, which would contradict its `Blob` type.
-    comments.length && !isBinarySchema(schema) && meta && 'primitive' in meta && meta.primitive
+    comments.length && !ast.schema.is(schema, 'binary', { follow: ['ref', 'array'] }) && meta && 'primitive' in meta && meta.primitive
       ? [`@type ${meta.primitive}`, (optional ?? isSchemaOptional(schema)) ? ' | undefined' : null].filter(Boolean).join('')
       : null
 
@@ -172,10 +162,6 @@ type BuildParamsSchemaOptions = {
   serializedExamples?: boolean
 }
 
-type BuildOperationSchemaOptions = {
-  resolver: ResolverTs
-}
-
 /**
  * Builds the object schema for one parameter group or a response's headers. Each entry embeds its own schema and JSDoc,
  * so the group is the only type these entries are exported as.
@@ -198,21 +184,5 @@ export function buildParams({ params, serializedExamples }: BuildParamsSchemaOpt
         }),
       }),
     ),
-  })
-}
-
-export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode | null {
-  const allWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
-  // Only 2xx responses, so an `unknown` error body cannot erase the success typing. Falls back to all responses when no 2xx has a schema.
-  const successWithSchema = allWithSchema.filter((res) => ast.http.status.isSuccess(res))
-  const responsesWithSchema = successWithSchema.length > 0 ? successWithSchema : allWithSchema
-
-  if (responsesWithSchema.length === 0) {
-    return null
-  }
-
-  return ast.factory.createSchema({
-    type: 'union',
-    members: responsesWithSchema.map((res) => ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) })),
   })
 }

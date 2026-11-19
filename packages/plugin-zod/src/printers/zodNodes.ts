@@ -2,12 +2,11 @@ import { buildList } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
-  bigintConstraints,
+  getChecks,
+  getObjectKind,
+  isComposedObject,
   hasInputChecks,
-  hasKeyCheck,
   integerFormatPattern,
-  isObjectComposableIntersection,
-  isObjectSchemaNode,
   preserveRequiredProperties,
   shouldCoerce,
   strictOneOfNode,
@@ -21,7 +20,6 @@ import {
   getMemberConstraint,
   inputChecks,
   jsonContentCheck,
-  isClosedKeySchema,
   type lengthConstraints,
   type numberConstraints,
   type patternKeySchema,
@@ -158,6 +156,12 @@ export function throwsOnStrictCompile({
 }
 
 // `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
+// Prints as a plain object schema, which a discriminated union can take as a member.
+function printsAsObject(node: ast.SchemaNode, circularSchemas?: ReadonlySet<string>): boolean {
+  const kind = getObjectKind(node, { circularSchemas })
+  return kind !== null && kind !== 'record'
+}
+
 function hasPlainDiscriminator({ member, propertyName }: { member: ast.SchemaNode; propertyName: string }): boolean {
   const schemas = ast.schema.findProperties({ node: member, propertyName })
   return schemas.length > 0 && !schemas.some(({ schema }) => ast.schema.getLiterals(ast.ref.mergeSchema(schema)).length > 0)
@@ -291,7 +295,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 
       const result = (() => {
         // Closed key schemas (enums, literals) use z.partialRecord() so missing keys do not fail exhaustiveness.
-        const recordFn = isClosedKeySchema(propertyNamesNode) ? 'z.partialRecord' : 'z.record'
+        const recordFn = propertyNamesNode && ast.schema.is(propertyNamesNode, 'enumLike', { follow: ['ref'] }) ? 'z.partialRecord' : 'z.record'
 
         if (node.additionalProperties && node.additionalProperties !== true) {
           const catchallType = this.transform(node.additionalProperties)
@@ -361,7 +365,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       // `z.coerce.number()`, which z.discriminatedUnion cannot read, so it falls back too.
       const isDiscriminated =
         !!discriminatorPropertyName &&
-        nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemas) && !hasPlainDiscriminator({ member: m, propertyName: discriminatorPropertyName })) &&
+        nodeMembers.every((m) => printsAsObject(m, cyclicSchemas) && !hasPlainDiscriminator({ member: m, propertyName: discriminatorPropertyName })) &&
         !nodeMembers.some((m) => hasCoercedDiscriminator({ member: m, propertyName: discriminatorPropertyName, options: this.options }))
       const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
       // `z.xor` already rejects a value matching several members, and the discriminator already picks one
@@ -406,7 +410,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 
       // An object `allOf` is a merge, not a runtime intersection: extending keeps it a Zod object
       // (usable in z.discriminatedUnion) instead of a non-discriminable intersection.
-      if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemas)) {
+      if (rest.length > 0 && isComposedObject(node, { circularSchemas: cyclicSchemas })) {
         // A discriminated `oneOf` base already pins its discriminator to a literal; a sibling
         // `type: string` extended after it would widen that literal back to any string.
         const discriminator = ast.schema.narrow(first, ast.schema.types.union)?.discriminatorPropertyName
@@ -426,7 +430,8 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         const constraint = getMemberConstraint({ member, regexType: this.options.regexType, lengths: dialect.lengths, numbers: dialect.numbers })
         const numeric = ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer')
         // A bigint base can be a pipe, which has no `.min()`, and its bounds are bigints. The member's bounds run as a bigint schema after it.
-        if (constraint && numeric && isBigintBase) return dialect.pipe(acc, `z.bigint()${dialect.numbers(bigintConstraints(numeric), true)}`)
+        if (constraint && numeric && isBigintBase)
+          return dialect.pipe(acc, `z.bigint()${dialect.numbers(ast.schema.getNumberBounds({ ...numeric, format: undefined, integer: true }), true)}`)
         if (constraint) return acc + constraint
         const transformed = transform(member)
         return transformed ? dialect.intersection(acc, transformed) : acc
@@ -486,10 +491,11 @@ export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.Prin
     const checkedHandler: Handler<TOptions, K> = function (node) {
       const output = handler.call(this, node)
       if (!output || !hasInputChecks(node)) return output
+      const keyCheck = getChecks(node).find((check) => check.kind === 'propertyNames')
       return inputChecks({
         value: output,
         node,
-        keySchema: hasKeyCheck(node) ? this.transform(node.propertyNames) : undefined,
+        keySchema: keyCheck ? this.transform(keyCheck.schema) : undefined,
         conditionals: (node.conditionals ?? []).map(
           (entry) =>
             `z.refine((value) => (${conditionExpression(this, entry.if)} ? ${conditionExpression(this, entry.then)} : ${conditionExpression(this, entry.else)}), { message: "Value does not meet a conditional schema" })`,

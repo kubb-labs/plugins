@@ -11,17 +11,9 @@ export {
   buildResponses,
   buildResponseUnionSchema,
   getContentTypeInfo,
-  getEventStream,
-  hasTextEventData,
-  getFormContentTypes,
   getPerContentTypeName,
-  getRequestGroupOptionality,
-  getRequestGroups,
-  hasRequestContentTypeChoice,
+  getStream,
   getResponseContentTypeInfo,
-  hasEventStreamContent,
-  hasStreamVariant,
-  isEventStream,
   requestGroupOrder,
   operationFileEntry,
   resolveContentTypeVariants,
@@ -32,6 +24,7 @@ export {
   resolveSuccessNames,
   toResponseContent,
 } from './operation.ts'
+export type { ResponseStream } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
 export {
   createCasedFile,
@@ -43,14 +36,13 @@ export {
   resolveOperationName,
 } from './resolver.ts'
 export {
-  bigintConstraints,
   defaultLiteral,
   formatDefault,
+  getChecks,
+  getObjectKind,
   hasInputChecks,
-  hasKeyCheck,
+  isComposedObject,
   integerFormatPattern,
-  isObjectComposableIntersection,
-  isObjectSchemaNode,
   numericLiteral,
   preserveRequiredProperties,
   schemaComments,
@@ -58,4 +50,4 @@ export {
   strictOneOfNode,
   withFormatRange,
 } from './schema.ts'
-export type { NumericBounds, NumericConstraints } from './schema.ts'
+export type { NumericBounds, NumericConstraints, ObjectKind, ObjectKindOptions, SchemaCheck } from './schema.ts'
