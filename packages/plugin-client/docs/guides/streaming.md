@@ -56,6 +56,36 @@ client.stream = async <TResponses, ThrowOnError extends boolean = true, TEvent =
 | `client<TResponses, ThrowOnError>(config)`               | `Promise<RequestResult<TResponses, ThrowOnError>>`       |
 | `client.stream<TResponses, ThrowOnError, TItem>(config)` | `Promise<StreamResult<TResponses, ThrowOnError, TItem>>` |
 
+## Retry SSE connections
+
+Clients built on the shared runtime accept the same `retry` configuration for HTTP calls and SSE streams. Retries are off by default. A number sets the retry limit after the initial attempt. An object defaults to two retries.
+
+```typescript
+client.setConfig({
+  retry: {
+    limit: 3,
+    statusCodes: [408, 429, 500, 502, 503, 504],
+    delay: (retryCount) => 300 * 2 ** (retryCount - 1),
+    backoffLimit: 10_000,
+    jitter: true,
+    onRetry: ({ retryCount, delay }) => console.warn(`Retry ${retryCount} in ${delay}ms`),
+  },
+})
+
+const events = await client.stream({ url: '/events', retry: { limit: 1 } })
+for await (const event of events) console.log(event.data)
+
+await client.stream({ url: '/events', retry: false })
+```
+
+Per-call fields override client defaults and replace arrays. `false` or `0` disables retries. `shouldRetry` receives `{ request, response, error, retryCount }` and can return a boolean or `undefined` to use the default decision. `onRetry` receives that context plus the chosen `delay` in milliseconds.
+
+Failed connections and failed SSE body reads share one retry limit. Reconnection sends the last committed event ID in `Last-Event-ID` and honors the server's `retry:` delay. HTTP failures honor `Retry-After`. Server delays are not jittered. Aborting the call also cancels a pending retry delay.
+
+Retries allow `GET`, `HEAD`, `OPTIONS`, `PUT`, `DELETE`, and `TRACE` by default. Other methods require an `Idempotency-Key` header or explicit opt-in through `methods`, and an API that supports safe replay. A `ReadableStream` request body is never retried. These safeguards and the limit also apply when `shouldRetry` returns `true`. Configuring shared retries disables native Ky retries to avoid multiplying attempts.
+
+A completed stream ends normally. Parsing, transformation, and validation errors do not reconnect. JSON Lines streams retry failed connections only. Stream result metadata describes the initial successful connection, while `lastEventId` continues updating after reconnection. Resuming with an event ID depends on server support and does not guarantee deduplication.
+
 ## Export the stream types
 
 Your module needs these on top of the [contract](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client#check-the-contract):

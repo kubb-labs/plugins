@@ -285,7 +285,32 @@ export type EventStreamOptions = {
   rawData?: boolean | Array<string> | undefined
 }
 
+export type RetryContext = {
+  request: ResolvedRequest
+  response?: Response | undefined
+  error?: unknown
+  retryCount: number
+}
+
+/**
+ * Counts retries after the initial attempt. Per-call fields override client defaults, replacing arrays.
+ * SSE reconnects after failed reads share the same limit as connection attempts.
+ */
+export type RetryOptions = {
+  limit?: number
+  methods?: Array<string>
+  statusCodes?: Array<number>
+  delay?: (retryCount: number) => number
+  backoffLimit?: number
+  jitter?: boolean
+  shouldRetry?: (context: RetryContext) => boolean | undefined
+  onRetry?: (context: RetryContext & { delay: number }) => void | Promise<void>
+}
+
+export type Retry = false | number | RetryOptions
+
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = {
+  retry?: Retry
   baseURL?: string
   url?: string
   method?: HttpMethod
@@ -348,6 +373,7 @@ export type StreamOptions<TData extends DataShape, ThrowOnError extends boolean 
  * Config shared by every call of a client. A call's own config overrides it.
  */
 export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = {
+  retry?: Retry
   baseURL?: string
   headers?: HeadersInit
   credentials?: RequestCredentials
@@ -796,14 +822,45 @@ function isEmpty(response: Response, method: string): boolean {
   return [204, 205, 304].includes(response.status) || method === 'HEAD' || !response.body || response.headers.get('Content-Length') === '0'
 }
 
-function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes; serializer?: Serializers }>(config: T, next: T): T {
+function mergeRetry(config: Retry | undefined, next: Retry | undefined): Retry | undefined {
+  if (next === undefined) return config
+  if (typeof next !== 'object') return next
+  if (typeof config === 'number') return { limit: config, ...next }
+  return { ...(typeof config === 'object' ? config : {}), ...next }
+}
+
+function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes; serializer?: Serializers; retry?: Retry }>(config: T, next: T): T {
   return {
     ...config,
     ...next,
+    retry: mergeRetry(config.retry, next.retry),
     headers: { ...serializeHeaders(config.headers), ...serializeHeaders(next.headers) },
     mediaTypes: { ...config.mediaTypes, ...next.mediaTypes },
     serializer: { ...config.serializer, ...next.serializer },
   }
+}
+
+function waitForRetry({ delay, signal }: { delay: number; signal?: AbortSignal | undefined }): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const abort = () => {
+      clearTimeout(timer)
+      signal?.removeEventListener('abort', abort)
+      reject(signal?.reason)
+    }
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', abort)
+      resolve()
+    }, delay)
+    signal?.addEventListener('abort', abort, { once: true })
+    if (signal?.aborted) abort()
+  })
+}
+
+function isTransportError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false
+  if (error instanceof TypeError) return true
+  const code = (error as Error & { code?: string }).code
+  return ['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'EAI_AGAIN', 'ENOTFOUND', 'ERR_NETWORK'].includes(code ?? '')
 }
 
 // The serializer for `name`, which `.kubb/client.ts` registers for a spec that needs it.
@@ -978,6 +1035,10 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     // Read before the first await, so a `setConfig` during the call does not change it.
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
     const onValidationError = requestConfig.onValidationError ?? config.onValidationError
+    const retryConfig = mergeRetry(config.retry, requestConfig.retry)
+    const retry = typeof retryConfig === 'object' ? retryConfig : { limit: retryConfig || 0 }
+    let retryCount = 0
+    const cursor: { lastEventId: string; retry?: number } = { lastEventId: '' }
     const { request, mediaTypes, validate, responseContentType } = await resolveRequest({ config, requestConfig })
     if (streaming) {
       request.stream = true
@@ -986,7 +1047,51 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     }
 
     const resolvedRequest = await run.request(request, requestConfig)
-    const sent = await transport(resolvedRequest)
+    cursor.lastEventId = getHeader(resolvedRequest.headers, 'last-event-id') ?? ''
+    if (retryConfig !== undefined) resolvedRequest.options = { ...resolvedRequest.options, retry: 0 }
+    const retryAfterFailure = async ({ response, error, streamRead = false }: { response?: Response; error?: unknown; streamRead?: boolean }) => {
+      resolvedRequest.signal?.throwIfAborted()
+      const methods = retry.methods ?? ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']
+      if (
+        retryCount >= (retry.limit ?? 2) ||
+        resolvedRequest.body instanceof ReadableStream ||
+        (!methods.some((method) => method.toUpperCase() === resolvedRequest.method.toUpperCase()) && !getHeader(resolvedRequest.headers, 'idempotency-key'))
+      )
+        return false
+      const context: RetryContext = { request: resolvedRequest, response, error, retryCount: retryCount + 1 }
+      const defaultRetry = streamRead || (response ? (retry.statusCodes ?? [408, 429, 500, 502, 503, 504]).includes(response.status) : isTransportError(error))
+      if (!(retry.shouldRetry?.(context) ?? defaultRetry)) return false
+      const retryAfter = response?.headers.get('retry-after')
+      const serverDelay = (() => {
+        if (retryAfter === null || retryAfter === undefined) return undefined
+        if (/^\d+(\.\d+)?$/.test(retryAfter)) return Number(retryAfter) * 1000
+        return Date.parse(retryAfter) - Date.now()
+      })()
+      const backoff = Math.min(retry.delay?.(context.retryCount) ?? 300 * 2 ** retryCount, retry.backoffLimit ?? Number.POSITIVE_INFINITY)
+      const hintedDelay = streamRead ? cursor.retry : serverDelay
+      const delay =
+        hintedDelay !== undefined && Number.isFinite(hintedDelay) ? Math.max(0, hintedDelay) : backoff * (retry.jitter === false ? 1 : Math.random())
+      retryCount++
+      await response?.body?.cancel().catch(() => {})
+      await retry.onRetry?.({ ...context, delay })
+      await waitForRetry({ delay, signal: resolvedRequest.signal })
+      return true
+    }
+    const connect = async (): Promise<TransportResult<TRequest, TResponse> | Response> => {
+      while (true) {
+        if ((retry.limit ?? 2) > 0) resolvedRequest.signal?.throwIfAborted()
+        let sent: TransportResult<TRequest, TResponse> | Response
+        try {
+          sent = await transport(resolvedRequest)
+        } catch (error) {
+          if (await retryAfterFailure({ error })) continue
+          throw error
+        }
+        const response = isResponse(sent) ? sent : sent.webResponse
+        if (response.ok || !(await retryAfterFailure({ response }))) return sent
+      }
+    }
+    const sent = await connect()
     const {
       webResponse,
       request: nativeRequest,
@@ -997,7 +1102,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const isSuccess = status >= 200 && status < 300
     const header = webResponse.headers.get('Content-Type')
     const contentType = header ?? (isSuccess ? responseContentType : undefined) ?? '*/*'
-    const cursor = { lastEventId: '' }
     const context: MediaTypeContext = { contentType, status, signal: resolvedRequest.signal, config: requestConfig, cursor }
     const streamType = isSuccess ? resolveMediaType({ mediaTypes, contentType, use: 'stream' }) : undefined
     const decode = async (): Promise<unknown> => {
@@ -1069,10 +1173,63 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       if (requestConfig.eventShape === 'event') return { ...(item as object), ...((await validate(item)) as object) }
       return validate(item)
     }
-    const items = readsItems && streamType?.stream && result.data instanceof ReadableStream ? streamType.stream(result.data, context) : undefined
+    async function* streamItems(): AsyncGenerator<unknown> {
+      if (!readsItems || !streamType?.stream || !(result.data instanceof ReadableStream)) return
+      if ((retry.limit ?? 2) <= 0) {
+        yield* streamType.stream(result.data, context)
+        return
+      }
+      let body = result.data as ReadableStream<Uint8Array>
+      while (true) {
+        let readFailed = false
+        const reader = body.getReader()
+        const monitored = new ReadableStream<Uint8Array>(
+          {
+            async pull(controller) {
+              try {
+                const { done, value } = await reader.read()
+                if (done) return controller.close()
+                controller.enqueue(value)
+              } catch (error) {
+                readFailed = true
+                controller.error(error)
+              }
+            },
+            cancel: () => reader.cancel().catch(() => {}),
+          },
+          { highWaterMark: 0 },
+        )
+        try {
+          yield* streamType.stream(monitored, context)
+          return
+        } catch (error) {
+          if (baseContentType(contentType) !== 'text/event-stream' || !readFailed || !(await retryAfterFailure({ error, streamRead: true }))) throw error
+        } finally {
+          await reader.cancel().catch(() => {})
+          reader.releaseLock()
+        }
+        // An empty ID clears the server cursor too, including a caller-supplied header.
+        for (const name of Object.keys(resolvedRequest.headers)) {
+          if (name.toLowerCase() === 'last-event-id') delete resolvedRequest.headers[name]
+        }
+        if (cursor.lastEventId) resolvedRequest.headers['Last-Event-ID'] = cursor.lastEventId
+        const next = await connect()
+        const response = isResponse(next) ? next : next.webResponse
+        if (!response.ok) {
+          await response.body?.cancel().catch(() => {})
+          throw new Error(`SSE reconnect failed with status ${response.status}`)
+        }
+        if (response.status === 204 || !response.body) return
+        if (baseContentType(response.headers.get('content-type')) !== 'text/event-stream') {
+          await response.body.cancel().catch(() => {})
+          throw new TypeError('Expected text/event-stream on SSE reconnect')
+        }
+        body = response.body
+      }
+    }
     return {
       cursor,
-      items: readItems({ items: items ?? emptyItems(), validateItem, signal: resolvedRequest.signal }),
+      items: readItems({ items: streamItems(), validateItem, signal: resolvedRequest.signal }),
       result: {
         status: result.status,
         data: resultSuccess ? data : undefined,
@@ -1144,8 +1301,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
 
   return client
 }
-
-async function* emptyItems(): AsyncGenerator<unknown> {}
 
 /**
  * A client created on first use, so importing an operation runs no setup. Config set before that is passed to `create`.

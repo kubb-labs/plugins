@@ -1,6 +1,6 @@
 import type { EventStreamOptions, MediaType, MediaTypes, ServerSentEvent } from './client.ts'
 
-type Cursor = { lastEventId: string }
+type Cursor = { lastEventId: string; retry?: number }
 
 async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
   if (!('getReader' in stream)) {
@@ -78,7 +78,10 @@ export async function* parseEventStream<TData = unknown>(
         if (!value.includes('\u0000')) pendingId = value
         break
       case 'retry':
-        if (/^\d+$/.test(value)) retry = Number(value)
+        if (/^\d+$/.test(value) && Number.isFinite(Number(value))) {
+          retry = Number(value)
+          cursor.retry = retry
+        }
     }
   }
 
