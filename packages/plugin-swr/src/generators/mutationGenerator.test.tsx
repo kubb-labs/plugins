@@ -26,7 +26,7 @@ const defaultOptions: PluginSwr['resolvedOptions'] = {
   include: undefined,
   override: [],
   output: { path: '.', mode: 'directory' },
-  group: undefined,
+  group: null,
   resolver: resolverSwr,
 }
 

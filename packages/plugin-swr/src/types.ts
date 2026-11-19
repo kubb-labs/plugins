@@ -1,6 +1,7 @@
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
+import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
+import type { ast, ResolverPatch, PluginType, Resolver } from '@kubb/kit'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -129,7 +130,7 @@ type Mutation = {
  *
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
-export type Options = OutputOptions & {
+export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Selects the HTTP client the generated hooks call. Every client plugin speaks the `RequestResult`
    * contract, so the hooks call a contract `<op>` that takes one grouped `options` object.
@@ -146,18 +147,6 @@ export type Options = OutputOptions & {
    * @default 'data'
    */
   returnType?: 'data' | 'full'
-  /**
-   * Tags, operations, or paths to exclude from generation.
-   */
-  exclude?: Array<Exclude>
-  /**
-   * Tags, operations, or paths to include in generation.
-   */
-  include?: Array<Include>
-  /**
-   * Override options for specific tags, operations, or paths.
-   */
-  override?: Array<Override<ResolvedOptions>>
   /**
    * Custom `queryKey` builder. Use to add a version namespace, swap to
    * operation IDs, or shape keys to match an existing invalidation strategy.
@@ -186,12 +175,7 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
-export type ResolvedOptions = {
-  output: Output
-  group: Group | undefined
-  exclude: NonNullable<Options['exclude']>
-  include: Options['include']
-  override: NonNullable<Options['override']>
+export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   /**
    * The resolved contract client the generators import and call.
    */

@@ -73,7 +73,7 @@ export const pluginSwr = defineExtension<PluginSwr>({
       query: resolveQueryConfig(query, { importPath: 'swr' }),
       mutationKey,
       mutation: resolveMutationConfig(mutation, { importPath: 'swr/mutation' }),
-      group: group,
+      group: group ?? null,
       exclude,
       include,
       override,
