@@ -143,13 +143,7 @@ export function createCasedFile(caseLast: (part: string) => string): ResolverFil
 }
 
 /**
- * Builds the top-level `name` and `file` of a plugin whose identifiers and file names share one
- * casing, such as camelCase with a `schema` suffix. Names are memoized and made valid identifiers.
- *
- * @example
- * ```ts
- * createResolver<PluginZod>({ ...createCasedResolver('camel', { suffix: 'schema' }), ... })
- * ```
+ * Builds a memoized, valid-identifier `name` and a `file` that share one casing and affix.
  */
 export function createCasedResolver(
   kind: 'camel' | 'pascal',
@@ -164,9 +158,6 @@ export function createCasedResolver(
   }
 }
 
-/**
- * The `schema` namespace shared by the validator plugins (zod, valibot).
- */
 export type ValidatorSchemaResolver = {
   typeName(name: string): string
   type(name: string): string
@@ -179,13 +170,7 @@ export type ValidatorSchemaResolver = {
 type ValidatorResolver = Resolver & { schema: ValidatorSchemaResolver }
 
 /**
- * Builds the `schema`, `param` and `response` namespaces shared by the validator plugins. Schema
- * types are PascalCase (`PetSchemaType`), and responses add `error` and `options` names.
- *
- * @example
- * ```ts
- * createResolver<PluginZod>({ ...createCasedResolver('camel', { suffix: 'schema' }), ...createValidatorResolver() })
- * ```
+ * Builds the `schema`, `param` and `response` namespaces shared by zod and valibot.
  */
 export function createValidatorResolver(): {
   schema: ValidatorSchemaResolver
@@ -231,17 +216,13 @@ export function createValidatorResolver(): {
   }
 }
 
-/**
- * The top-level `name` of the handler plugins (msw, mcp): camelCase with a `handler` suffix.
- */
+/** The top-level `name` of msw and mcp: camelCase with a `handler` suffix. */
 export function resolveHandlerName(this: Resolver, name: string): string {
   // shortcut: skips ensureValidVarName to keep today's msw and mcp output; align with the other plugins in a breaking release.
   return this.memo(`name:${name}`, () => casing.camel(name, { suffix: 'handler' }))
 }
 
-/**
- * Builds the `handler` namespace shared by the handler plugins: one handler name per operation.
- */
+/** Builds the `handler` namespace shared by msw and mcp. */
 export function createHandlerResolver(): { name(this: Resolver, node: ast.OperationNode): string } {
   return {
     name(node) {
