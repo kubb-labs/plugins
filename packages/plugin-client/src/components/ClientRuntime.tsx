@@ -16,8 +16,9 @@ function buildServersExport(servers: Array<ast.InputServer> | undefined): string
 
 // The form media types, each in its own file under `templates/mediaTypes/`, so a document ships only the ones it uses.
 const formMediaTypes = {
-  'multipart/form-data': { file: 'mediaTypes/formData', name: 'multipartFormData' },
+  // Alphabetical, the order the runtime registers them in.
   'application/x-www-form-urlencoded': { file: 'mediaTypes/urlencoded', name: 'urlencoded' },
+  'multipart/form-data': { file: 'mediaTypes/formData', name: 'multipartFormData' },
 } as const
 
 /**
@@ -44,18 +45,10 @@ export function ClientRuntime({
   if (!templates) return null
   const hasParameter = (match: (parameter: ast.ParameterNode) => boolean) => nodes.some((node) => node.parameters.some(match))
   const streams = nodes.some((node) => ast.http.responses.getStream(node) !== null)
-  const forms = [
-    ...new Set(
-      nodes.flatMap((node) =>
-        (node.requestBody?.content ?? []).flatMap((entry) => {
-          const kind = ast.mediaType.getKind(entry)
-          return kind === 'form' || kind === 'urlencoded' ? [ast.mediaType.getBase(entry) as keyof typeof formMediaTypes] : []
-        }),
-      ),
-    ),
-  ]
-    .sort()
-    .map((contentType) => ({ contentType, ...formMediaTypes[contentType] }))
+  const requestTypes = new Set(nodes.flatMap((node) => (node.requestBody?.content ?? []).map((entry) => ast.mediaType.getBase(entry))))
+  const forms = Object.entries(formMediaTypes)
+    .filter(([contentType]) => requestTypes.has(contentType))
+    .map(([contentType, mediaType]) => ({ contentType, ...mediaType }))
   const queryStyles = nodes.some(hasQueryStyles)
 
   const serializers = [
