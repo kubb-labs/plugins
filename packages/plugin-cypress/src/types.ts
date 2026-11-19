@@ -1,4 +1,5 @@
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
+import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
+import type { ast, ResolverPatch, PluginType, Resolver } from '@kubb/kit'
 
 /**
  * Resolver for Cypress that provides naming methods for test functions.
@@ -11,24 +12,12 @@ export type ResolverCypress = Resolver
  *
  * @default { path: 'cypress', barrel: { type: 'named' } }
  */
-export type Options = OutputOptions & {
+export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Base URL prepended to every request URL. When omitted, requests use the operation path
    * only, so Cypress resolves it against its own `baseUrl`. The adapter's server URL is not used.
    */
   baseURL?: string
-  /**
-   * Skip operations matching at least one entry in the list.
-   */
-  exclude?: Array<Exclude>
-  /**
-   * Restrict generation to operations matching at least one entry in the list.
-   */
-  include?: Array<Include>
-  /**
-   * Apply a different options object to operations matching a pattern.
-   */
-  override?: Array<Override<ResolvedOptions>>
   /**
    * Override how helper names and file paths are built.
    */
@@ -39,12 +28,7 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
-export type ResolvedOptions = {
-  output: Output
-  exclude: Array<Exclude>
-  include: Array<Include> | undefined
-  override: Array<Override<ResolvedOptions>>
-  group: Group | null
+export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   baseURL: Options['baseURL'] | undefined
 }
 

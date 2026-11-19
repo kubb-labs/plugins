@@ -1,4 +1,5 @@
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
+import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
+import type { ast, ResolverPatch, PluginType, Resolver } from '@kubb/kit'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
@@ -89,19 +90,7 @@ export type ResolverFaker = Resolver & {
  *
  * @default { path: 'mocks', barrel: { type: 'named' } }
  */
-export type Options = OutputOptions & {
-  /**
-   * Skip operations matching at least one entry in the list.
-   */
-  exclude?: Array<Exclude>
-  /**
-   * Restrict generation to operations matching at least one entry in the list.
-   */
-  include?: Array<Include>
-  /**
-   * Apply a different options object to operations matching a pattern.
-   */
-  override?: Array<Override<ResolvedOptions>>
+export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Type object factories from generated values and overrides (`'inferred'`) or
    * from the declared API model (`'schema'`).
@@ -160,12 +149,7 @@ export type Options = OutputOptions & {
   }
 }
 
-export type ResolvedOptions = {
-  output: Output
-  group: Group | null
-  exclude: NonNullable<Options['exclude']>
-  include: Options['include']
-  override: NonNullable<Options['override']>
+export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   typeMode: NonNullable<Options['typeMode']>
   dateParser: NonNullable<Options['dateParser']>
   regexGenerator: NonNullable<Options['regexGenerator']>

@@ -1,4 +1,5 @@
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
+import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
+import type { ast, ResolverPatch, PluginType, Resolver } from '@kubb/kit'
 import type { PrinterZodNodes, printerZod } from './printers/printerZod.ts'
 import type { PrinterZodMiniNodes, printerZodMini } from './printers/printerZodMini.ts'
 
@@ -180,19 +181,7 @@ export type CompileOptions = {
  *
  * @default { path: 'zod', barrel: { type: 'named' } }
  */
-export type Options = OutputOptions & {
-  /**
-   * Skip operations matching at least one entry in the list.
-   */
-  exclude?: Array<Exclude>
-  /**
-   * Restrict generation to operations matching at least one entry in the list.
-   */
-  include?: Array<Include>
-  /**
-   * Apply a different options object to operations matching a pattern.
-   */
-  override?: Array<Override<ResolvedOptions>>
+export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Module specifier used in the `import { z } from '...'` statement.
    * Use `'zod/mini'` for the tree-shakeable bundle.
@@ -305,12 +294,7 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
-export type ResolvedOptions = {
-  output: Output
-  exclude: Array<Exclude>
-  include: Array<Include> | undefined
-  override: Array<Override<ResolvedOptions>>
-  group: Group | null
+export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   inferred: boolean | 'codec'
   importPath: NonNullable<Options['importPath']>
   coercion: NonNullable<Options['coercion']>

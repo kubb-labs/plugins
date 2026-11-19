@@ -1,4 +1,5 @@
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
+import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
+import type { ast, ResolverPatch, PluginType, Resolver } from '@kubb/kit'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
  * The concrete resolver type for `@kubb/plugin-ts`.
@@ -226,19 +227,7 @@ type EnumOptions =
  *
  * @default { path: 'types', barrel: { type: 'named' } }
  */
-export type Options = OutputOptions & {
-  /**
-   * Skip operations matching at least one entry in the list.
-   */
-  exclude?: Array<Exclude>
-  /**
-   * Restrict generation to operations matching at least one entry in the list.
-   */
-  include?: Array<Include>
-  /**
-   * Apply a different options object to operations matching a pattern.
-   */
-  override?: Array<Override<ResolvedOptions>>
+export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Whether object schemas are emitted as `type` aliases or `interface` declarations.
    * - `'type'` emits closed type aliases. Safer default for generated code.
@@ -330,12 +319,7 @@ export type ResolvedEnumOptions = {
   keyCasing: EnumKeyCasing
 }
 
-export type ResolvedOptions = {
-  output: Output
-  exclude: Array<Exclude>
-  include: Array<Include> | undefined
-  override: Array<Override<ResolvedOptions>>
-  group: Group | null
+export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   enum: ResolvedEnumOptions
   optionalType: NonNullable<Options['optionalType']>
   arrayType: NonNullable<Options['arrayType']>

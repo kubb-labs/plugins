@@ -1,4 +1,5 @@
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver, ResolverPatch } from '@kubb/kit'
+import type { ResolvedPluginOptions } from '@internals/shared/types'
+import type { ast, Exclude, Include, OutputOptions, Override, PluginType, Resolver, ResolverPatch } from '@kubb/kit'
 import type { PrinterValibotNodes, printerValibot } from './printers/printerValibot.ts'
 
 /**
@@ -162,12 +163,7 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
-type ResolvedOptions = {
-  output: Output
-  exclude: Array<Exclude>
-  include: Array<Include> | undefined
-  override: Array<Override<ResolvedOptions>>
-  group: Group | null
+type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   importPath: NonNullable<Options['importPath']>
   inferred: NonNullable<Options['inferred']>
   regexType: NonNullable<Options['regexType']>
