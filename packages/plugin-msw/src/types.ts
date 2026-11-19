@@ -1,4 +1,5 @@
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
+import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
+import type { ast, ResolverPatch, PluginType, Resolver } from '@kubb/kit'
 
 /**
  * Resolver for MSW that provides naming methods for handler functions.
@@ -25,7 +26,7 @@ export type ResolverMsw = Resolver & {
  *
  * @default { path: 'handlers', barrel: { type: 'named' } }
  */
-export type Options = OutputOptions & {
+export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Base URL prepended to every handler's request URL. A `${...}` expression runs at runtime.
    * Pass `{ baseURL }` as a handler's second argument to override it per call.
@@ -33,18 +34,6 @@ export type Options = OutputOptions & {
    * @note Leave off the trailing slash. Operation paths already start with `/`.
    */
   baseURL?: string
-  /**
-   * Skip operations matching at least one entry in the list.
-   */
-  exclude?: Array<Exclude>
-  /**
-   * Restrict generation to operations matching at least one entry in the list.
-   */
-  include?: Array<Include>
-  /**
-   * Apply a different options object to operations matching a pattern.
-   */
-  override?: Array<Override<ResolvedOptions>>
   /**
    * Override how handler names and file paths are built.
    */
@@ -68,12 +57,7 @@ export type Options = OutputOptions & {
   parser?: 'data' | 'faker'
 }
 
-export type ResolvedOptions = {
-  output: Output
-  group: Group | null
-  exclude: NonNullable<Options['exclude']>
-  include: Options['include']
-  override: NonNullable<Options['override']>
+export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   parser: NonNullable<Options['parser']>
   baseURL: Options['baseURL'] | undefined
   handlers: boolean

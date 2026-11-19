@@ -1,5 +1,6 @@
 import type { ReturnTypeOption } from '@internals/client'
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
+import type { PluginOptions } from '@internals/shared/types'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, Override, PluginType, Resolver } from '@kubb/kit'
 
 /**
  * The schema library a validator reads its schemas from: `@kubb/plugin-zod` or `@kubb/plugin-valibot`.
@@ -63,19 +64,7 @@ export type ResolverClient = Resolver & {
  * response contract and one grouped options object. Each plugin extends this with its own
  * `transport` field.
  */
-export type ClientOptions = OutputOptions & {
-  /**
-   * Skip operations matching at least one entry in the list.
-   */
-  exclude?: Array<Exclude>
-  /**
-   * Restrict generation to operations matching at least one entry in the list.
-   */
-  include?: Array<Include>
-  /**
-   * Apply a different options object to operations matching a pattern.
-   */
-  override?: Array<Override<Omit<ClientResolvedOptions, 'throwOnErrorDefault'>>>
+export type ClientOptions = PluginOptions<Omit<ClientResolvedOptions, 'throwOnErrorDefault'>> & {
   /**
    * Base URL prepended to every request. When omitted, the generated client sets no base URL, so set one at runtime with
    * `client.setConfig({ baseURL })`. The top-level server URL is not used, but an operation with path-level or operation-level `servers` calls it.

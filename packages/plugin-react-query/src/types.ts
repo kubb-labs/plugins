@@ -1,6 +1,7 @@
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
 import type { Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
+import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
+import type { ast, ResolverPatch, PluginType, Resolver } from '@kubb/kit'
 
 export type { Infinite, Transformer } from '@internals/tanstack-query'
 
@@ -191,7 +192,7 @@ type CustomOptions = {
  *
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
-export type Options = OutputOptions & {
+export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Selects the HTTP client the generated hooks call. Every client plugin speaks the `RequestResult`
    * contract, so the hooks call a contract `<op>` that takes one grouped `options` object.
@@ -208,18 +209,6 @@ export type Options = OutputOptions & {
    * @default 'data'
    */
   returnType?: 'data' | 'full'
-  /**
-   * Skip operations matching at least one entry in the list.
-   */
-  exclude?: Array<Exclude>
-  /**
-   * Restrict generation to operations matching at least one entry in the list.
-   */
-  include?: Array<Include>
-  /**
-   * Apply a different options object to operations matching a pattern.
-   */
-  override?: Array<Override<ResolvedOptions>>
   /**
    * Enables `useInfiniteQuery` hooks for cursor- or page-based pagination.
    * Pass an object to configure how the cursor is read, or pass `false` to skip.
@@ -287,12 +276,7 @@ export type Options = OutputOptions & {
  */
 export type ResolvedClient = ResolvedContractClient
 
-export type ResolvedOptions = {
-  output: Output
-  group: Group | null
-  exclude: NonNullable<Options['exclude']>
-  include: Options['include']
-  override: NonNullable<Options['override']>
+export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   /**
    * The resolved contract client the generators import and call.
    */

@@ -15,7 +15,7 @@ const shared: Partial<UserConfig> = {
 
 export default defineConfig([
   {
-    entry: { index: 'src/index.ts' },
+    entry: { index: 'src/index.ts', types: 'src/types.ts' },
     format: 'esm',
     dts: { tsconfig: '../../tsconfig.dts.json' },
     ...shared,

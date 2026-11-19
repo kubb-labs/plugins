@@ -1,5 +1,6 @@
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
+import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
+import type { ast, ResolverPatch, PluginType, Resolver } from '@kubb/kit'
 
 /**
  * Resolver for MCP that provides naming methods for handler functions.
@@ -25,7 +26,7 @@ export type ResolverMcp = Resolver & {
  *
  * @default { path: 'mcp', barrel: { type: 'named' } }
  */
-export type Options = OutputOptions & {
+export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Selects the HTTP client each MCP handler calls. Every client plugin speaks the `RequestResult`
    * contract, so each handler calls a contract `<op>` that takes one grouped `{ path, query, headers,
@@ -38,18 +39,6 @@ export type Options = OutputOptions & {
    */
   client?: ClientSelector
   /**
-   * Skip operations matching at least one entry in the list.
-   */
-  exclude?: Array<Exclude>
-  /**
-   * Restrict generation to operations matching at least one entry in the list.
-   */
-  include?: Array<Include>
-  /**
-   * Apply a different options object to operations matching a pattern.
-   */
-  override?: Array<Override<ResolvedOptions>>
-  /**
    * Override how handler names and file paths are built. Methods you omit fall
    * back to the default `resolverMcp`.
    */
@@ -60,12 +49,7 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
-export type ResolvedOptions = {
-  output: Output
-  exclude: Array<Exclude>
-  include: Array<Include> | undefined
-  override: Array<Override<ResolvedOptions>>
-  group: Group | null
+export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   /**
    * The resolved client strategy the generators branch on.
    */
