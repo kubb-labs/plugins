@@ -125,11 +125,13 @@ client.setConfig({
 })
 ```
 
-When the handler returns `{ value }` for an error body, the call throws the `ResponseError` as usual, with the `ParseError` on `error.validationError`. With `throwOnError: false`, the call resolves with that value as `error` instead:
+When the handler returns `{ value }` for an error body, the call throws the `ResponseError` as usual, with the `ParseError` on `error.validationError`:
 
 ```typescript
 if (ResponseError.is(error) && error.status === 404) console.warn(error.validationError?.issues)
 ```
+
+With `throwOnError: false`, the call resolves with that value as `error` instead.
 
 For which schema checks an error body, see [Error body validation](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization#error-body-validation).
 

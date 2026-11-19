@@ -20,10 +20,10 @@ export type StandardSchemaIssue = {
  */
 export class ParseError extends Error {
   readonly issues: ReadonlyArray<StandardSchemaIssue>
-  readonly direction?: ValidationErrorContext['direction']
-  readonly source?: ValidationErrorContext['source']
-  readonly method?: string
-  readonly status?: number
+  direction?: ValidationErrorContext['direction']
+  source?: ValidationErrorContext['source']
+  method?: string
+  status?: number
   // Declared here and set below, since the `cause` constructor option needs the ES2022 library.
   declare readonly cause?: unknown
 

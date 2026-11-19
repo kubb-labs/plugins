@@ -1018,7 +1018,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const result = await run.response(
       {
         data: await decode().catch((error: unknown) => {
-          // Invalid JSON keeps the status, so a caller can still tell a 404 from a 500.
           if (error instanceof ParseError) {
             Object.assign(error, { direction: isSuccess ? 'response' : 'error', source: 'body', method: resolvedRequest.method, status })
           }
