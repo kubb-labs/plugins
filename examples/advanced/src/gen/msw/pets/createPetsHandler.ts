@@ -1,5 +1,5 @@
+import type { MswBody } from '../../.kubb/mswBody'
 import type { HttpResponseResolver } from 'msw/http'
-import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function createPetsHandlerResponse201(data?: unknown) {
@@ -7,8 +7,6 @@ export function createPetsHandlerResponse201(data?: unknown) {
     status: 201,
   })
 }
-
-type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
 export function createPetsHandler(
   data?:
