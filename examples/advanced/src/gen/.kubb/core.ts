@@ -873,7 +873,7 @@ function resolveRetry(client: Retry | undefined, call: Retry | undefined): Resol
   const toOptions = (retry: Retry | undefined): RetryOptions => (typeof retry === 'number' ? { limit: retry } : retry || {})
   const [base, own] = [toOptions(client), toOptions(call)]
   // The call's `false` turns retries off. Without a call value, the client's decides.
-  const enabled = call === undefined ? client !== undefined && client !== false : call !== false
+  const enabled = call == null ? client != null && client !== false : call !== false
   const limit = enabled ? (own.limit ?? base.limit ?? 2) : 0
   return {
     // `NaN` and `Infinity` count as no retries, since no count ever reaches them.
@@ -911,10 +911,14 @@ function sleep(delay: number, signal: AbortSignal | undefined): Promise<void> {
       clearTimeout(timer)
       reject(signal?.reason)
     }
-    const timer = setTimeout(() => {
-      signal?.removeEventListener('abort', onAbort)
-      resolve()
-    }, delay)
+    // A wait over the timer's maximum would fire at once, so it is capped.
+    const timer = setTimeout(
+      () => {
+        signal?.removeEventListener('abort', onAbort)
+        resolve()
+      },
+      Math.min(delay, 2 ** 31 - 1),
+    )
     signal?.addEventListener('abort', onAbort, { once: true })
   })
 }
@@ -1101,8 +1105,11 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
 
     const resolvedRequest = await run.request(request, requestConfig)
     const signal = signalOf(resolvedRequest)
-    // A method outside `methods` is not safe to send twice, and a stream body cannot be read twice.
-    const limit = retry.methods.includes(resolvedRequest.method.toUpperCase()) && !(resolvedRequest.body instanceof ReadableStream) ? retry.limit : 0
+    const body: unknown = resolvedRequest.body
+    // A stream body, also one from Node or a generator, cannot be read twice.
+    const oneShot = body instanceof ReadableStream || (typeof body === 'object' && body !== null && Symbol.asyncIterator in body)
+    // A method outside `methods` is not safe to send twice.
+    const limit = retry.methods.includes(resolvedRequest.method.toUpperCase()) && !oneShot ? retry.limit : 0
     let retryCount = 0
     // Waits and resolves to true when the failed attempt may be sent again.
     const waitForRetry = async (failure: { response?: Response; error?: unknown }): Promise<boolean> => {
@@ -1114,18 +1121,20 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       const copy = retry.shouldRetry || retry.onRetry ? response?.clone() : undefined
       const context: RetryContext = { ...failure, response: copy ?? response, request: resolvedRequest, retryCount: retryCount + 1 }
       const retryable = !response || retry.statusCodes.includes(response.status)
-      const again = (await retry.shouldRetry?.(context)) ?? retryable
-      if (!again) {
-        release(copy)
-        return false
-      }
-      retryCount++
-      const delay = serverDelay ?? retry.delay?.(retryCount) ?? backoff(retryCount)
+      // The call keeps the response only when a retry is turned down. A hook that throws releases it too.
+      let kept = false
+      let delay = 0
       try {
+        if (!((await retry.shouldRetry?.(context)) ?? retryable)) {
+          kept = true
+          return false
+        }
+        retryCount++
+        delay = serverDelay ?? retry.delay?.(retryCount) ?? backoff(retryCount)
         await retry.onRetry?.({ ...context, delay })
       } finally {
         release(copy)
-        release(response)
+        if (!kept) release(response)
       }
       await sleep(delay, signal)
       return true
