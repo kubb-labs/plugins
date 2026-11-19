@@ -9,29 +9,12 @@ type FileContext = Pick<GeneratorContext, 'config' | 'meta'> & {
   options: { output: Output }
 }
 
-/**
- * Where the current plugin writes its files: the `root`, `output` and `group` every
- * `resolver.file` and `resolver.imports` call takes, read from the generator context.
- * A call that resolves another plugin's file passes that plugin's values instead.
- *
- * @example
- * ```ts
- * const file = resolver.file({ name: node.name, extname: '.ts', ...getFileLocation(ctx) })
- * ```
- */
+/** The `root`, `output` and `group` of the current plugin, for `resolver.file` and `resolver.imports`. */
 export function getFileLocation(ctx: FileLocationContext): { root: string; output: Output; group: Group | undefined } {
   return { root: ctx.root, output: ctx.options.output, group: ctx.options.group ?? undefined }
 }
 
-/**
- * Builds the props of the `<File>` a generator renders for `file`: its `baseName`, `path` and `meta`,
- * plus the `banner` and `footer` the current plugin's `output` sets.
- *
- * @example
- * ```tsx
- * <File {...getFile(ctx, file)}>{children}</File>
- * ```
- */
+/** The props of the `<File>` a generator renders for `file`, with the banner and footer the plugin's `output` sets. */
 export function getFile<TFile extends Pick<ast.FileNode, 'baseName' | 'path' | 'meta'>>(
   ctx: FileContext,
   file: TFile,
