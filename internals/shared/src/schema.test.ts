@@ -1,6 +1,16 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { defaultLiteral, formatDefault, getChecks, getObjectKind, numericLiteral, schemaComments, shouldCoerce, withFormatRange } from './schema.ts'
+import {
+  defaultLiteral,
+  formatDefault,
+  getChecks,
+  getObjectKind,
+  numericLiteral,
+  schemaComments,
+  shouldCoerce,
+  withFormatRange,
+  isComposedObject,
+} from './schema.ts'
 
 describe('formatDefault', () => {
   test('object value keeps its contents', () => {
@@ -199,5 +209,23 @@ describe('getObjectKind', () => {
 
   test('gives null for a ref into a cycle', () => {
     expect(getObjectKind(ast.factory.createSchema({ type: 'ref', name: 'Tree', schema: object }), { circularSchemas: new Set(['Tree']) })).toBeNull()
+  })
+})
+
+describe('isComposedObject', () => {
+  const object = ast.factory.createSchema({
+    type: 'object',
+    properties: [ast.factory.createProperty({ name: 'id', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  })
+
+  test('keeps a nullable or optional allOf composed', () => {
+    expect(isComposedObject(ast.factory.createSchema({ type: 'intersection', members: [object, object] }))).toBe(true)
+    expect(isComposedObject(ast.factory.createSchema({ type: 'intersection', nullable: true, members: [object, object] }))).toBe(true)
+    expect(isComposedObject(ast.factory.createSchema({ type: 'intersection', optional: true, members: [object, object] }))).toBe(true)
+    expect(getObjectKind(ast.factory.createSchema({ type: 'intersection', nullable: true, members: [object, object] }))).toBeNull()
+  })
+
+  test('is false for a schema that is not an allOf', () => {
+    expect(isComposedObject(object)).toBe(false)
   })
 })

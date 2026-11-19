@@ -41,6 +41,7 @@ export {
   getChecks,
   getObjectKind,
   hasInputChecks,
+  isComposedObject,
   integerFormatPattern,
   numericLiteral,
   preserveRequiredProperties,

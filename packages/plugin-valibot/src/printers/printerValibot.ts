@@ -3,6 +3,7 @@ import {
   formatDefault,
   getChecks,
   getObjectKind,
+  isComposedObject,
   integerFormatPattern,
   type NumericBounds,
   numericLiteral,
@@ -456,7 +457,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
     const hasRest =
       Boolean(baseObject?.patternProperties) || (baseObject?.additionalProperties !== undefined && typeof baseObject.additionalProperties !== 'boolean')
 
-    return !hasRest && isObjectNode(first) && getObjectKind(node, { circularSchemas: cyclicSchemas }) === 'composed'
+    return !hasRest && isObjectNode(first) && isComposedObject(node, { circularSchemas: cyclicSchemas })
   }
   // Whether the schema prints with `.entries`, which `v.omit` reads. A `v.union` and a `v.intersect` have none.
   const printsEntries = (node: ast.SchemaNode): boolean => {

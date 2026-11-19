@@ -4,6 +4,7 @@ import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   getChecks,
   getObjectKind,
+  isComposedObject,
   hasInputChecks,
   integerFormatPattern,
   preserveRequiredProperties,
@@ -409,7 +410,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 
       // An object `allOf` is a merge, not a runtime intersection: extending keeps it a Zod object
       // (usable in z.discriminatedUnion) instead of a non-discriminable intersection.
-      if (rest.length > 0 && getObjectKind(node, { circularSchemas: cyclicSchemas }) === 'composed') {
+      if (rest.length > 0 && isComposedObject(node, { circularSchemas: cyclicSchemas })) {
         // A discriminated `oneOf` base already pins its discriminator to a literal; a sibling
         // `type: string` extended after it would widen that literal back to any string.
         const discriminator = ast.schema.narrow(first, ast.schema.types.union)?.discriminatorPropertyName

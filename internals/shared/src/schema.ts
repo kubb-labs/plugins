@@ -299,3 +299,12 @@ export function getObjectKind(node: ast.SchemaNode, { circularSchemas }: ObjectK
 
   return kindOf(node)
 }
+
+/**
+ * Whether an `allOf` merges into one object. Modifiers and input checks on the `allOf` itself do not count, because the
+ * printers apply them around the merged object.
+ */
+export function isComposedObject(node: ast.SchemaNode, options: ObjectKindOptions = {}): boolean {
+  const members = { ...node, nullable: undefined, optional: undefined, nullish: undefined, conditionals: undefined }
+  return getObjectKind(members, options) === 'composed'
+}
