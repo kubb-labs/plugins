@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
+import type { MswBody } from '../../../.kubb/mswBody'
 import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405, PlaceOrderPatchBody } from '../../../models/PlaceOrderPatch'
 import type { HttpResponseResolver } from 'msw/http'
-import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function placeOrderPatchHandlerResponse200(data?: PlaceOrderPatchResponse) {
@@ -30,8 +30,6 @@ export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus40
     status: 405,
   })
 }
-
-type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
 export function placeOrderPatchHandler(
   data?: PlaceOrderPatchResponse | HttpResponseResolver<Record<string, string>, MswBody<PlaceOrderPatchBody>>,

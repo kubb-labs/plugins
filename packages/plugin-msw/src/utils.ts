@@ -1,3 +1,5 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { isValidVarName, toLiteral } from '@internals/utils'
 import { toResponseContent } from '@internals/shared'
 
@@ -195,4 +197,12 @@ export function responseLiteral(body: string, status: number, contentType: strin
   return `new HttpResponse<string>(${body}, {
       status: ${status},${headersBlock(contentType, headers)}
     })`
+}
+
+/** The bundled `MswBody` type that every handler with a request body imports. */
+export const mswBodyTemplate = fileURLToPath(new URL('../templates/mswBody.ts', import.meta.url))
+
+/** Where the build writes `mswBody.ts`, next to the other `.kubb` runtime files. */
+export function mswBodyPath(config: { root: string; output: { path: string } }): string {
+  return path.resolve(config.root, config.output.path, '.kubb', 'mswBody.ts')
 }

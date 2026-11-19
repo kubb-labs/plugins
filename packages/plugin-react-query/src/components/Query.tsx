@@ -1,7 +1,7 @@
 import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildClientOptionType, buildOperationComments } from '@internals/shared'
 import {
@@ -126,16 +126,15 @@ export function Query({
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function
-        name={name}
-        export
-        generics={generics.join(', ')}
-        params={paramsSignature}
-        returnType={undefined}
-        JSDoc={{ comments: buildOperationComments(node) }}
-      >
-        {`
+    <Function
+      name={name}
+      export
+      generics={generics.join(', ')}
+      params={paramsSignature}
+      returnType={undefined}
+      JSDoc={{ comments: buildOperationComments(node) }}
+    >
+      {`
        const { query: queryConfig = {}, client: config = {} } = options ?? {}
        const { client: queryClient, ...resolvedOptions } = queryConfig${resolvedParams ? `\n       const resolvedParams = ${resolvedParams}` : ''}
        const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyArgs})${customOptions ? `\n       const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
@@ -150,7 +149,6 @@ export function Query({
 
        return queryResult
        `}
-      </Function>
-    </File.Source>
+    </Function>
   )
 }

@@ -1,5 +1,5 @@
 import { ast } from '@kubb/kit'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { responseReturn } from '../utils.ts'
 
@@ -16,11 +16,9 @@ export function Response({ name, typeName, response }: Props): KubbReactNode {
   const responseName = `${name}Response${response.statusCode}`
 
   return (
-    <File.Source name={responseName} isIndexable isExportable>
-      <Function name={responseName} export params={params}>
-        {`
+    <Function name={responseName} export params={params}>
+      {`
     ${responseReturn('data', ast.http.status.toCode(response), response)}`}
-      </Function>
-    </File.Source>
+    </Function>
   )
 }

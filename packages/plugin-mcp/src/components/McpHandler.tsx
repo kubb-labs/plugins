@@ -1,7 +1,7 @@
 import { buildOperationComments, buildRequestParamsSignature, castToClientOptions, hasRequestContentTypeChoice } from '@internals/shared'
 import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 type Props = {
@@ -49,21 +49,10 @@ export function McpHandler({ name, clientName, node, resolver, returnType = 'ful
 }`
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function
-        name={name}
-        async
-        export
-        params={paramsSignature}
-        JSDoc={{
-          comments: buildOperationComments(node),
-        }}
-        returnType={'CallToolResult'}
-      >
-        {`const res = await ${clientName}(${callArg})`}
-        <br />
-        {callToolResult}
-      </Function>
-    </File.Source>
+    <Function name={name} async export params={paramsSignature} JSDoc={{ comments: buildOperationComments(node) }} returnType={'CallToolResult'}>
+      {`const res = await ${clientName}(${callArg})`}
+      <br />
+      {callToolResult}
+    </Function>
   )
 }

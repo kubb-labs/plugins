@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
+import type { MswBody } from '../.kubb/mswBody'
 import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderBody } from '../types/PlaceOrder'
 import type { HttpResponseResolver } from 'msw/http'
-import type { DefaultBodyType } from 'msw'
 import { createPlaceOrderResponse } from '../faker/createPlaceOrder'
 import { http, HttpResponse } from 'msw/http'
 
@@ -27,8 +27,6 @@ export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
     status: 405,
   })
 }
-
-type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
 export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, MswBody<PlaceOrderBody>>, options?: { baseURL?: string }) {
   return http.post<Record<string, string>, MswBody<PlaceOrderBody>>(`${options?.baseURL ?? ''}/store/order`, function handler(info) {

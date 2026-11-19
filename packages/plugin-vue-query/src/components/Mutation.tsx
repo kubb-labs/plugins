@@ -1,7 +1,7 @@
 import type { ast } from '@kubb/kit'
 import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import {
   buildCallResultBody,
@@ -67,9 +67,8 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }} generics={['TContext']}>
-        {`
+    <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }} generics={['TContext']}>
+      {`
         const { mutation = {}, client: config = {} } = options ?? {}
         const { client: queryClient, ...mutationOptions } = mutation;
         const mutationKey = mutationOptions?.mutationKey ?? ${mutationKeyName}()
@@ -82,7 +81,6 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
           ...mutationOptions
         }, queryClient)
     `}
-      </Function>
-    </File.Source>
+    </Function>
   )
 }

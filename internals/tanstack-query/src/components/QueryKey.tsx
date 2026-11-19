@@ -1,7 +1,7 @@
 import { ast, Url } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
-import { File, Function, Type } from '@kubb/renderer-jsx'
+import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { KeyVariant, Transformer } from '../types.ts'
 import { buildQueryKeyParams } from '../utils.ts'
@@ -64,14 +64,10 @@ export function QueryKey({ name, node, tsResolver, typeName, transformer, varian
 
   return (
     <>
-      <File.Source name={name} isExportable isIndexable>
-        <Function.Arrow name={name} export params={paramsSignature} singleLine>
-          {`[${keys.join(', ')}] as const`}
-        </Function.Arrow>
-      </File.Source>
-      <File.Source name={typeName} isExportable={exportType} isIndexable={exportType} isTypeOnly>
-        <Type name={typeName} export={exportType}>{`ReturnType<typeof ${name}>`}</Type>
-      </File.Source>
+      <Function.Arrow name={name} export params={paramsSignature} singleLine>
+        {`[${keys.join(', ')}] as const`}
+      </Function.Arrow>
+      <Type name={typeName} export={exportType}>{`ReturnType<typeof ${name}>`}</Type>
     </>
   )
 }

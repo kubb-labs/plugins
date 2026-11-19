@@ -1,7 +1,7 @@
+import type { MswBody } from '../../.kubb/mswBody'
 import type { AddPetRequest } from '../../models/ts/AddPetRequest'
 import type { Pet } from '../../models/ts/Pet'
 import type { HttpResponseResolver } from 'msw/http'
-import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function addPetHandlerResponse405(data?: { code?: number; message?: string }) {
@@ -12,8 +12,6 @@ export function addPetHandlerResponse405(data?: { code?: number; message?: strin
     },
   })
 }
-
-type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
 export function addPetHandler(
   data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, MswBody<AddPetRequest | Omit<NonNullable<Pet>, 'id'>>>,

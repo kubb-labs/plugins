@@ -1,6 +1,6 @@
+import type { MswBody } from '../../.kubb/mswBody'
 import type { ApiResponse } from '../../models/ts/ApiResponse'
 import type { HttpResponseResolver } from 'msw/http'
-import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function uploadFileHandlerResponse200(data?: ApiResponse) {
@@ -11,8 +11,6 @@ export function uploadFileHandlerResponse200(data?: ApiResponse) {
     },
   })
 }
-
-type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
 export function uploadFileHandler(data?: ApiResponse | HttpResponseResolver<Record<string, string>, MswBody<Blob>>, options?: { baseURL?: string }) {
   return http.post<Record<string, string>, MswBody<Blob>>(`${options?.baseURL ?? ''}/pet/:petId/uploadImage`, function handler(info) {

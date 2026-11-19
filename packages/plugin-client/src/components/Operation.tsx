@@ -1,7 +1,7 @@
 import type { OperationTypeNames } from '@internals/client'
 import { buildOperationComments } from '@internals/shared'
 import { ast } from '@kubb/kit'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
@@ -53,21 +53,19 @@ export function Operation({ name, node, types, validatorHooks, returnType, throw
   const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault })
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function
-        name={name}
-        export
-        generics={body.generics}
-        params={body.paramsSignature}
-        returnType={body.returnType}
-        JSDoc={{ comments: buildOperationComments(node, { splitLines: true }) }}
-      >
-        {body.mergeContentType
-          ? 'const { client: apiClient = client, contentType, ...config } = options'
-          : 'const { client: apiClient = client, ...config } = options'}
-        <br />
-        {body.statement}
-      </Function>
-    </File.Source>
+    <Function
+      name={name}
+      export
+      generics={body.generics}
+      params={body.paramsSignature}
+      returnType={body.returnType}
+      JSDoc={{ comments: buildOperationComments(node, { splitLines: true }) }}
+    >
+      {body.mergeContentType
+        ? 'const { client: apiClient = client, contentType, ...config } = options'
+        : 'const { client: apiClient = client, ...config } = options'}
+      <br />
+      {body.statement}
+    </Function>
   )
 }

@@ -1,7 +1,7 @@
 import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildQueryKeyParams, buildResponseTypes, maybeRefOrGetter } from '@internals/tanstack-query'
 import type { HookResultProps } from '@internals/tanstack-query'
@@ -55,9 +55,8 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function name={name} export generics={generics.join(', ')} params={paramsSignature} JSDoc={{ comments: getComments(node) }}>
-        {`
+    <Function name={name} export generics={generics.join(', ')} params={paramsSignature} JSDoc={{ comments: getComments(node) }}>
+      {`
        const { query: queryConfig = {}, client: config = {} } = options ?? {}
        const { client: queryClient, ...resolvedOptions } = queryConfig
        const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? ${queryKeyName}(${queryKeyParamsCall})
@@ -72,7 +71,6 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
 
        return queryResult
        `}
-      </Function>
-    </File.Source>
+    </Function>
   )
 }

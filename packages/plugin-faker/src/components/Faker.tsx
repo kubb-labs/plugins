@@ -62,17 +62,15 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     return (
       <>
         {imports}
-        <File.Source name={name} isExportable isIndexable>
-          <Function
-            export
-            name={name}
-            JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
-            params={canOverride ? paramsSignature : undefined}
-            returnType={returnType ?? undefined}
-          >
-            {`return ${returnExpression}`}
-          </Function>
-        </File.Source>
+        <Function
+          export
+          name={name}
+          JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
+          params={canOverride ? paramsSignature : undefined}
+          returnType={returnType ?? undefined}
+        >
+          {`return ${returnExpression}`}
+        </Function>
       </>
     )
   }
@@ -118,18 +116,16 @@ return {
   return (
     <>
       {imports}
-      <File.Source name={name} isExportable isIndexable>
-        <Function
-          export
-          name={name}
-          JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
-          generics={typeMode === 'schema' ? undefined : `TData extends Partial<${typeName}> = object`}
-          params={typeMode === 'schema' ? `data?: Partial<${typeName}>` : 'data?: TData'}
-          returnType={typeMode === 'schema' || isCyclic ? returnType : undefined}
-        >
-          {functionBody}
-        </Function>
-      </File.Source>
+      <Function
+        export
+        name={name}
+        JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
+        generics={typeMode === 'schema' ? undefined : `TData extends Partial<${typeName}> = object`}
+        params={typeMode === 'schema' ? `data?: Partial<${typeName}>` : 'data?: TData'}
+        returnType={typeMode === 'schema' || isCyclic ? returnType : undefined}
+      >
+        {functionBody}
+      </Function>
     </>
   )
 }
