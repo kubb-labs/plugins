@@ -37,7 +37,7 @@ export class ValidationError extends Error {
 }
 
 /** @deprecated Use `ValidationError`. */
-export const ParseError = ValidationError
+export const ParseError: typeof ValidationError = ValidationError
 /** @deprecated Use `ValidationError`. */
 export type ParseError = ValidationError
 
