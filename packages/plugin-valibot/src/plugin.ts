@@ -53,7 +53,7 @@ export const pluginValibot = defineExtension<PluginValibot>({
       macros: userMacros,
     } = options
 
-    setResolver(userResolver ? Resolver.merge(resolverValibot, userResolver) : resolverValibot)
+    setResolver(userResolver ? Resolver.merge(resolverValibot, ...[userResolver].flat()) : resolverValibot)
     if (userMacros?.length) {
       setMacros(userMacros)
     }

@@ -51,7 +51,7 @@ export const pluginCypress = defineExtension<PluginCypress>({
       macros: userMacros,
     } = options
 
-    const resolver = userResolver ? Resolver.merge<ResolverCypress>(resolverCypress, userResolver) : resolverCypress
+    const resolver = userResolver ? Resolver.merge<ResolverCypress>(resolverCypress, ...[userResolver].flat()) : resolverCypress
 
     setResolver(resolver)
     if (userMacros?.length) {

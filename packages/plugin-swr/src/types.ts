@@ -2,7 +2,7 @@ import type { ast } from '@internals/ast'
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -169,7 +169,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Override naming conventions for function names and types.
    */
-  resolver?: ResolverPatch<ResolverSwr>
+  resolver?: ResolverInput<ResolverSwr>
   /**
    * Macros that rewrite generated nodes before printing.
    */

@@ -43,7 +43,7 @@ export function resolveClientOptions(options: ClientOptions): ClientResolvedOpti
     auth: { mode: auth?.mode ?? 'optional' },
     returnType,
     sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
-    resolver: userResolver ? Resolver.merge<ResolverClient>(resolverClient, userResolver) : resolverClient,
+    resolver: userResolver ? Resolver.merge<ResolverClient>(resolverClient, ...[userResolver].flat()) : resolverClient,
   }
 }
 

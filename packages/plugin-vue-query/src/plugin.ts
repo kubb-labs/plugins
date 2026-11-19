@@ -61,7 +61,7 @@ export const pluginVueQuery = defineExtension<PluginVueQuery>({
       macros: userMacros,
     } = options
 
-    const resolver = userResolver ? Resolver.merge<ResolverVueQuery>(resolverVueQuery, userResolver) : resolverVueQuery
+    const resolver = userResolver ? Resolver.merge<ResolverVueQuery>(resolverVueQuery, ...[userResolver].flat()) : resolverVueQuery
 
     setResolver(resolver)
     if (userMacros?.length) {

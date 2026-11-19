@@ -307,7 +307,7 @@ Overrides generated names. Members you leave out keep `resolverVueQuery`. See [`
 
 |          |                                   |
 | -------- | --------------------------------- |
-| Type     | `ResolverPatch<ResolverVueQuery>` |
+| Type     | `ResolverInput<ResolverVueQuery>` |
 | Required | `false`                           |
 
 ::code-collapse{name="ResolverVueQuery patch members"}

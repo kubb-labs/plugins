@@ -1,5 +1,4 @@
-import { operationKey } from '@internals/shared'
-import { casing, createResolver } from '@kubb/kit'
+import { casing, createResolver, operationKey } from '@kubb/kit'
 import type { PluginMcp } from '../types.ts'
 
 /**

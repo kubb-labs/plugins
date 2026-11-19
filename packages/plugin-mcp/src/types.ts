@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
 /**
  * Resolver for MCP that provides naming methods for handler functions.
@@ -43,7 +43,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
    * Override how handler names and file paths are built. Methods you omit fall
    * back to the default `resolverMcp`.
    */
-  resolver?: ResolverPatch<ResolverMcp>
+  resolver?: ResolverInput<ResolverMcp>
   /**
    * Macros applied to each operation node before printing.
    */

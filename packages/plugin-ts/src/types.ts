@@ -1,6 +1,6 @@
 import type { ast } from '@internals/ast'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
  * The concrete resolver type for `@kubb/plugin-ts`.
@@ -268,7 +268,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
    * full resolver, so `this.default.name(name)` delegates to the built-in implementation.
    */
-  resolver?: ResolverPatch<ResolverTs>
+  resolver?: ResolverInput<ResolverTs>
   /**
    * Macros applied to each schema or operation node before printing.
    * Callbacks you omit fall back to the preset behavior.

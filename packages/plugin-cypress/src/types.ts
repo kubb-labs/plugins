@@ -1,6 +1,6 @@
 import type { ast } from '@internals/ast'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
 /**
  * Resolver for Cypress that provides naming methods for test functions.
@@ -22,7 +22,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Override how helper names and file paths are built.
    */
-  resolver?: ResolverPatch<ResolverCypress>
+  resolver?: ResolverInput<ResolverCypress>
   /**
    * Macros applied to each operation node before printing.
    */

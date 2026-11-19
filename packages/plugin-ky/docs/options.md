@@ -199,7 +199,7 @@ Adds three members to the shared [`resolver`](https://kubb.dev/docs/5.x/referenc
 
 |          |                                 |
 | -------- | ------------------------------- |
-| Type     | `ResolverPatch<ResolverClient>` |
+| Type     | `ResolverInput<ResolverClient>` |
 | Required | `false`                         |
 
 | Member               | Names                                                                 | Example                              |

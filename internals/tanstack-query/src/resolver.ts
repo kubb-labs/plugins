@@ -1,6 +1,5 @@
 import type { ast } from '@internals/ast'
-import { casing } from '@kubb/kit'
-import { operationKey } from '@internals/shared'
+import { casing, operationKey } from '@kubb/kit'
 import type { Resolver } from '@kubb/kit'
 
 /**

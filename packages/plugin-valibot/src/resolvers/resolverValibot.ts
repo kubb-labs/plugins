@@ -1,6 +1,5 @@
-import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, operationKey } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
-import { casing, createResolver } from '@kubb/kit'
+import { casing, createResolver, operationKey, resolverCasedFile, resolverOperationParams, resolverOperationResponse } from '@kubb/kit'
 import type { PluginValibot } from '../types.ts'
 
 /**
@@ -18,7 +17,7 @@ export const resolverValibot = createResolver<PluginValibot>({
   name(name) {
     return this.memo(`name:${name}`, () => ensureValidVarName(casing.camel(name, { suffix: 'schema' })))
   },
-  file: createCasedFile((part) => casing.camel(part, { suffix: 'schema' })),
+  ...resolverCasedFile((part) => casing.camel(part, { suffix: 'schema' })),
   schema: {
     typeName(name) {
       return this.memo(`typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
@@ -39,9 +38,9 @@ export const resolverValibot = createResolver<PluginValibot>({
       return ensureValidVarName(casing.camel(name, { prefix: 'assert' }))
     },
   },
-  param: createOperationParamResolver(),
+  ...resolverOperationParams,
   response: {
-    ...createOperationResponseResolver(),
+    ...resolverOperationResponse.response,
     error(node) {
       const name = this.name(`${node.operationId} Error`)
       return this.resolveName({ key: operationKey(node, 'response', 'error'), name })

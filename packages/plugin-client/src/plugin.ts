@@ -41,7 +41,7 @@ export const pluginClient = defineExtension<PluginClient>({
       resolver: userResolver,
     } = options
 
-    const resolver = userResolver ? Resolver.merge<ResolverClient>(resolverClient, userResolver) : resolverClient
+    const resolver = userResolver ? Resolver.merge<ResolverClient>(resolverClient, ...[userResolver].flat()) : resolverClient
 
     setResolver(resolver)
     setMacros([...defaultMacros, ...(options.macros ?? [])])

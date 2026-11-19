@@ -1,6 +1,6 @@
-import { operationKey, resolveOperationName } from '@internals/shared'
+import { resolveOperationName } from '@internals/shared'
 import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
-import { casing, createResolver } from '@kubb/kit'
+import { casing, createResolver, operationKey } from '@kubb/kit'
 import type { PluginSwr } from '../types.ts'
 
 /**
