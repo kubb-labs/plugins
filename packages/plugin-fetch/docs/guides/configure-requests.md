@@ -13,7 +13,7 @@ Every generated function sends through the shared `client` from `.kubb/client.ts
 | A child client    | `client.extend({ ... })`    | Copies the shared config and runs the parent's interceptors first.                      |
 | One call          | The same key on the call    | Wins over the client for that call.                                                     |
 
-The client takes `baseURL`, `headers`, `auth`, `credentials`, `options`, `transport`, `serializer`, `mediaTypes`, `validate`, and `onValidationError`:
+The client takes `baseURL`, `headers`, `auth`, `credentials`, `options`, `transport`, `serializer`, `mediaTypes`, `validate`, `onValidationError`, and `retry`:
 
 ```typescript
 import { client, createClient } from './gen/.kubb/client'
@@ -124,6 +124,51 @@ client.interceptors.request.eject(id)
 > With `throwOnError: false`, a non-2xx response resolves, so no error handler runs for it. An error thrown while a stream is read, in the `for await` loop, does not reach the error handlers either.
 
 Next, [use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/transport).
+
+## Retry a failed call
+
+Retries are off by default. Set `retry` to send a failed call again, for every call or for one. A number is the limit of retries after the first attempt:
+
+```typescript
+import { client } from './gen/.kubb/client'
+
+client.setConfig({ retry: 2 })
+
+await createOrder({ body, retry: { methods: ['POST'] } })
+await chargeCard({ body, retry: false })
+```
+
+A call's `retry` merges per field over the client's, and `false` or `0` sends that call once. Pass an object for more control:
+
+| Option        | What it does                                                                                            | Default                                            |
+| ------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `limit`       | How many times the call is sent again.                                                                  | `2`                                                |
+| `methods`     | The methods that are safe to send twice.                                                                | `GET`, `HEAD`, `OPTIONS`, `PUT`, `DELETE`, `TRACE` |
+| `statusCodes` | The statuses that are retried.                                                                          | `408`, `429`, `500`, `502`, `503`, `504`           |
+| `delay`       | `(retryCount) => milliseconds` to wait before a retry. `retryCount` starts at 1.                        | Exponential from 300 ms with jitter, up to 30 s    |
+| `shouldRetry` | `({ request, response, error, retryCount })` returns `true` or `false`, or `undefined` for the default. | None                                               |
+| `onRetry`     | Runs before each wait, with the same context plus `delay`.                                              | None                                               |
+
+```typescript
+client.setConfig({
+  retry: {
+    limit: 3,
+    delay: (retryCount) => 1000 * retryCount,
+    shouldRetry: ({ response }) => (response?.headers.get('x-no-retry') === 'true' ? false : undefined),
+    onRetry: ({ retryCount, delay }) => console.warn(`Retry ${retryCount} in ${delay} ms`),
+  },
+})
+```
+
+The client retries a status in `statusCodes` and any error the transport throws, such as a network failure. These rules always apply, also when `shouldRetry` returns `true`:
+
+- A method outside `methods`, such as `POST`, is retried only when the call sends an `Idempotency-Key` header. Add the method to `methods` only when the API handles a repeated request.
+- A `ReadableStream` body is never retried, because it cannot be read twice.
+- A `Retry-After` header sets the wait instead of `delay`.
+- An aborted `signal` stops the wait and the retries.
+- The request interceptors and the `auth` resolver run once, so every retry sends the same headers.
+
+The last response or error is what the call returns or throws. A streaming call uses the same `retry`, see [Stop, abort, and resume](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/server-sent-events#stop-abort-and-resume).
 
 ## Less common cases
 
