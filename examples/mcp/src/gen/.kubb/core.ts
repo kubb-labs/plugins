@@ -523,10 +523,6 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
   headers: ResponseHeaders
   request: TRequest
   response: TResponse
-  /**
-   * Set when the error body failed its schema and `onValidationError` supplied `data` instead.
-   */
-  validationError?: ValidationError
 
   constructor(config: {
     data: TError
@@ -538,7 +534,6 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     response: TResponse
     method?: string | undefined
     url?: string | undefined
-    validationError?: ValidationError | undefined
   }) {
     // The query and hash stay out of the message, so secrets in them do not reach logs.
     const cleanUrl = config.url?.split(/[?#]/)[0]
@@ -553,7 +548,6 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     this.headers = config.headers ?? new Headers()
     this.request = config.request
     this.response = config.response
-    if (config.validationError) this.validationError = config.validationError
   }
 
   /**
@@ -1052,20 +1046,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       throw error
     }
 
-    let validationError: ValidationError | undefined
-    const data = rawStream
-      ? result.data
-      : await runValidator({
-          validator: validatorFor,
-          value: result.data,
-          context: validationContext,
-          onValidationError:
-            onValidationError &&
-            ((error, context) => {
-              validationError = error
-              return onValidationError(error, context)
-            }),
-        })
+    const data = rawStream ? result.data : await runValidator({ validator: validatorFor, value: result.data, context: validationContext, onValidationError })
     if (!resultSuccess && throwOnError) {
       throw new ResponseError({
         data,
@@ -1077,7 +1058,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         response: result.response,
         method: resolvedRequest.method,
         url: resolvedRequest.url,
-        validationError,
       })
     }
 
