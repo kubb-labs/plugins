@@ -308,7 +308,7 @@ export type RetryOptions = {
    * The methods that are safe to send twice.
    * @default ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']
    */
-  methods?: Array<string> | undefined
+  methods?: Array<HttpMethod> | undefined
   /**
    * @default [408, 429, 500, 502, 503, 504]
    */
