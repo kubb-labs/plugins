@@ -1,4 +1,6 @@
 import { ast } from '@kubb/kit'
+import { legacyFunctionPrinter } from './printers/functionPrinter.ts'
+import type { FunctionPrinterOptions } from './printers/functionPrinter.ts'
 
 /** @deprecated Use `ast.factory.createFunctionParameter` from `@kubb/kit`. Removed in Kubb v6. */
 export const createFunctionParameter = ast.factory.createFunctionParameter
@@ -29,10 +31,11 @@ export type TypeLiteralNode = ast.TypeLiteralNode
 /**
  * @deprecated Pass the parameter node to the `params` prop of `Function`, or call `ast.params.print(node, mode)` from `@kubb/kit`. Removed in Kubb v6.
  */
-export function functionPrinter({ mode }: { mode: ast.params.PrintMode }) {
+export function functionPrinter(options: FunctionPrinterOptions) {
+  if (options.transformName || options.transformType) return legacyFunctionPrinter(options)
   return {
     name: 'functionParameters' as const,
-    options: { mode },
-    print: (node: ast.FunctionParametersNode): string => ast.params.print(node, mode),
+    options,
+    print: (node: ast.FunctionParametersNode): string => ast.params.print(node, options.mode),
   }
 }
