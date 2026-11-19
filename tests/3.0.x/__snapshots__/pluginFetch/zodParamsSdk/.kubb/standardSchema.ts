@@ -36,13 +36,9 @@ export class ValidationError extends Error {
   }
 }
 
-/**
- * @deprecated Use `ValidationError`.
- */
+/** @deprecated Use `ValidationError`. */
 export const ParseError = ValidationError
-/**
- * @deprecated Use `ValidationError`.
- */
+/** @deprecated Use `ValidationError`. */
 export type ParseError = ValidationError
 
 /**
