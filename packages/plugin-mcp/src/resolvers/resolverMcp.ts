@@ -1,5 +1,4 @@
-import { createHandlerResolver, resolveHandlerName } from '@internals/shared'
-import { createResolver } from '@kubb/kit'
+import { composeResolver, createHandlerResolver } from '@internals/shared'
 import type { PluginMcp } from '../types.ts'
 
 /**
@@ -14,8 +13,4 @@ import type { PluginMcp } from '../types.ts'
  * resolverMcp.name('addPet') // 'addPetHandler'
  * ```
  */
-export const resolverMcp = createResolver<PluginMcp>({
-  pluginName: 'plugin-mcp',
-  name: resolveHandlerName,
-  handler: createHandlerResolver(),
-})
+export const resolverMcp = composeResolver<PluginMcp>('plugin-mcp', createHandlerResolver())

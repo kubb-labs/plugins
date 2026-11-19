@@ -1,5 +1,4 @@
-import { createCasedResolver, createValidatorResolver } from '@internals/shared'
-import { createResolver } from '@kubb/kit'
+import { composeResolver, createCasedResolver, createOperationResolver, createValidatorResolver } from '@internals/shared'
 import type { PluginValibot } from '../types.ts'
 
 /**
@@ -12,8 +11,9 @@ import type { PluginValibot } from '../types.ts'
  * resolverValibot.schema.typeName('pet') // 'PetSchemaType'
  * ```
  */
-export const resolverValibot = createResolver<PluginValibot>({
-  pluginName: 'plugin-valibot',
-  ...createCasedResolver('camel', { suffix: 'schema' }),
-  ...createValidatorResolver(),
-})
+export const resolverValibot = composeResolver<PluginValibot>(
+  'plugin-valibot',
+  createCasedResolver('camel', { suffix: 'schema' }),
+  createOperationResolver(),
+  createValidatorResolver(),
+)

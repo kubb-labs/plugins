@@ -1,5 +1,4 @@
-import { createCasedResolver, createOperationParamResolver, createOperationResponseResolver } from '@internals/shared'
-import { createResolver } from '@kubb/kit'
+import { composeResolver, createCasedResolver, createOperationResolver } from '@internals/shared'
 import type { PluginFaker } from '../types.ts'
 
 /**
@@ -14,9 +13,4 @@ import type { PluginFaker } from '../types.ts'
  * resolverFaker.name('list pets') // 'createListPets'
  * ```
  */
-export const resolverFaker = createResolver<PluginFaker>({
-  pluginName: 'plugin-faker',
-  ...createCasedResolver('camel', { prefix: 'create' }),
-  param: createOperationParamResolver(),
-  response: createOperationResponseResolver(),
-})
+export const resolverFaker = composeResolver<PluginFaker>('plugin-faker', createCasedResolver('camel', { prefix: 'create' }), createOperationResolver())

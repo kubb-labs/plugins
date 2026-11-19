@@ -34,16 +34,17 @@ export {
 } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
 export {
+  composeResolver,
   createCasedFile,
   createCasedResolver,
   createHandlerResolver,
   createOperationParamResolver,
+  createOperationResolver,
   createOperationResponseResolver,
   createValidatorResolver,
   getCircularNames,
   getEnumNames,
   operationKey,
-  resolveHandlerName,
   resolveOperationName,
 } from './resolver.ts'
 export {

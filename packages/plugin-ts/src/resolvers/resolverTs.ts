@@ -1,5 +1,4 @@
-import { createCasedResolver, createOperationParamResolver, createOperationResponseResolver, operationKey } from '@internals/shared'
-import { createResolver } from '@kubb/kit'
+import { composeResolver, createCasedResolver, createOperationResolver, operationKey } from '@internals/shared'
 import type { PluginTs } from '../types.ts'
 
 /**
@@ -20,12 +19,8 @@ import type { PluginTs } from '../types.ts'
  * resolverTs.response.status(node, 200)            // 'ListPetsStatus200'
  * ```
  */
-export const resolverTs = createResolver<PluginTs>({
-  pluginName: 'plugin-ts',
-  ...createCasedResolver('pascal'),
-  param: createOperationParamResolver(),
+export const resolverTs = composeResolver<PluginTs>('plugin-ts', createCasedResolver('pascal'), createOperationResolver(), {
   response: {
-    ...createOperationResponseResolver(),
     options(node) {
       const name = this.name(`${node.operationId} Options`)
       return this.resolveName({ key: operationKey(node, 'response', 'options'), name })

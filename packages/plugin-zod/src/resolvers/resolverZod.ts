@@ -1,5 +1,4 @@
-import { createCasedResolver, createValidatorResolver } from '@internals/shared'
-import { createResolver } from '@kubb/kit'
+import { composeResolver, createCasedResolver, createOperationResolver, createValidatorResolver } from '@internals/shared'
 import type { PluginZod } from '../types.ts'
 
 /**
@@ -17,8 +16,9 @@ import type { PluginZod } from '../types.ts'
  * resolverZod.schema.typeName('pet')     // 'PetSchemaType'
  * ```
  */
-export const resolverZod = createResolver<PluginZod>({
-  pluginName: 'plugin-zod',
-  ...createCasedResolver('camel', { suffix: 'schema' }),
-  ...createValidatorResolver(),
-})
+export const resolverZod = composeResolver<PluginZod>(
+  'plugin-zod',
+  createCasedResolver('camel', { suffix: 'schema' }),
+  createOperationResolver(),
+  createValidatorResolver(),
+)
