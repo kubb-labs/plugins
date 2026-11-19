@@ -868,26 +868,21 @@ function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes;
 
 type ResolvedRetry = RetryOptions & { limit: number; methods: Array<string>; statusCodes: Array<number> }
 
-// Later sources win per field, and `false` drops what came before it. A limit of 0 means no retries.
-function resolveRetry(...sources: Array<Retry | undefined>): ResolvedRetry {
-  let resolved: RetryOptions | undefined
-  for (const source of sources) {
-    if (source === undefined) continue
-    if (source === false) {
-      resolved = undefined
-      continue
-    }
-    const options = typeof source === 'number' ? { limit: source } : source
-    // An `undefined` field keeps the earlier value.
-    resolved = { ...resolved, ...Object.fromEntries(Object.entries(options).filter(([, value]) => value !== undefined)) }
-  }
-  const limit = resolved ? (resolved.limit ?? 2) : 0
-  // `NaN` and `Infinity` count as no retries, since no count ever reaches them.
+// A call's field wins over the client's, and an `undefined` field keeps the client's value. A limit of 0 means no retries.
+function resolveRetry(client: Retry | undefined, call: Retry | undefined): ResolvedRetry {
+  const toOptions = (retry: Retry | undefined): RetryOptions => (typeof retry === 'number' ? { limit: retry } : retry || {})
+  const [base, own] = [toOptions(client), toOptions(call)]
+  // The call's `false` turns retries off. Without a call value, the client's decides.
+  const enabled = call === undefined ? client !== undefined && client !== false : call !== false
+  const limit = enabled ? (own.limit ?? base.limit ?? 2) : 0
   return {
-    ...resolved,
+    // `NaN` and `Infinity` count as no retries, since no count ever reaches them.
     limit: Number.isFinite(limit) && limit > 0 ? limit : 0,
-    methods: (resolved?.methods ?? ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']).map((method) => method.toUpperCase()),
-    statusCodes: resolved?.statusCodes ?? [408, 429, 500, 502, 503, 504],
+    methods: (own.methods ?? base.methods ?? ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']).map((method) => method.toUpperCase()),
+    statusCodes: own.statusCodes ?? base.statusCodes ?? [408, 429, 500, 502, 503, 504],
+    delay: own.delay ?? base.delay,
+    shouldRetry: own.shouldRetry ?? base.shouldRetry,
+    onRetry: own.onRetry ?? base.onRetry,
   }
 }
 
@@ -922,27 +917,6 @@ function sleep(delay: number, signal: AbortSignal | undefined): Promise<void> {
     }, delay)
     signal?.addEventListener('abort', onAbort, { once: true })
   })
-}
-
-// Keeps the error of a failed read, which tells a dropped connection from an error of the parser or of `transform`.
-function watchReads(body: ReadableStream<Uint8Array>): { stream: ReadableStream<Uint8Array>; failure?: unknown } {
-  const reader = body.getReader()
-  const watched: { stream: ReadableStream<Uint8Array>; failure?: unknown } = {
-    stream: new ReadableStream<Uint8Array>({
-      async pull(controller) {
-        try {
-          const { done, value } = await reader.read()
-          if (done) return controller.close()
-          controller.enqueue(value)
-        } catch (error) {
-          watched.failure = error
-          throw error
-        }
-      },
-      cancel: (reason) => reader.cancel(reason),
-    }),
-  }
-  return watched
 }
 
 // The serializer for `name`, which `.kubb/client.ts` registers for a spec that needs it.
@@ -1169,19 +1143,58 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         if ((response.status >= 200 && response.status < 300) || !(await waitForRetry({ response }))) return attempt
       }
     }
-    const sent = await connect()
-    const {
-      webResponse,
-      request: nativeRequest,
-      response: nativeResponse,
-    } = isResponse(sent) ? { webResponse: sent, request: toNativeRequest(resolvedRequest) as TRequest, response: sent as TResponse & Response } : sent
+    // A transport that answers with a bare `Response` gets the native request built for it.
+    const open = async (): Promise<TransportResult<TRequest, TResponse>> => {
+      const sent = await connect()
+      return isResponse(sent) ? { webResponse: sent, request: toNativeRequest(resolvedRequest) as TRequest, response: sent as TResponse & Response } : sent
+    }
+    const { webResponse, request: nativeRequest, response: nativeResponse } = await open()
 
     const status = webResponse.status
     const isSuccess = status >= 200 && status < 300
     const header = webResponse.headers.get('Content-Type')
     const contentType = header ?? (isSuccess ? responseContentType : undefined) ?? '*/*'
-    const cursor: { lastEventId: string; idSeen?: boolean } = { lastEventId: '' }
+    const cursor = { lastEventId: '', idSeen: false }
     const context: MediaTypeContext = { contentType, status, signal: resolvedRequest.signal, config: requestConfig, cursor }
+    // With retries on, a stream handler may open a dropped stream again from its last event ID.
+    if (limit > 0) {
+      context.reopen = async ({ error, delivered }) => {
+        // A stream that delivered again starts a new run of retries.
+        if (delivered) retryCount = 0
+        if (!(await waitForRetry({ error }))) throw error
+        // Until the stream sends an `id`, the `Last-Event-ID` the caller sent stays. After that, an empty `id:` clears it.
+        if (cursor.idSeen) deleteHeader(resolvedRequest.headers, 'last-event-id')
+        if (cursor.lastEventId) resolvedRequest.headers['Last-Event-ID'] = cursor.lastEventId
+        const { webResponse: response, request, response: native } = await open()
+        // A 204 tells the client to stop reconnecting.
+        if (response.status === 204) return undefined
+        const isOk = response.status >= 200 && response.status < 300
+        // A reopen without a `Content-Type` takes the declared one, as the first response does.
+        const reopened = response.headers.get('Content-Type') ?? contentType
+        if (isOk && response.body && baseContentType(reopened) === baseContentType(contentType)) {
+          context.status = response.status
+          context.contentType = reopened
+          return response.body
+        }
+        release(response)
+        const type = baseContentType(response.headers.get('Content-Type'))
+        const failure = isOk
+          ? new TypeError(`Expected a streamed body, got ${type ?? 'a body without a content type'}`)
+          : new ResponseError({
+              data: undefined,
+              status: response.status,
+              statusText: response.statusText,
+              contentType: type,
+              headers: response.headers,
+              request,
+              response: native,
+              method: resolvedRequest.method,
+              url: resolvedRequest.url,
+            })
+        // Thrown while the caller iterates, so the error interceptors run here.
+        throw await run.error(failure, requestConfig)
+      }
+    }
     const streamType = isSuccess ? resolveMediaType({ mediaTypes, contentType, use: 'stream' }) : undefined
     const decode = async (): Promise<unknown> => {
       if (isEmpty(webResponse, resolvedRequest.method)) return undefined
@@ -1260,63 +1273,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       if (requestConfig.eventShape === 'event') return { ...(item as object), ...((await validate(item)) as object) }
       return validate(item)
     }
-    // With retries on, a Server-Sent Events stream that drops is opened again from its last event ID.
-    async function* reconnecting(first: ReadableStream<Uint8Array>): AsyncGenerator<unknown> {
-      if (!streamType?.stream) return
-      let body = first
-      // Each reopened response brings its own status and content type. The cursor stays the same.
-      let current = context
-      while (true) {
-        const watched = watchReads(body)
-        try {
-          for await (const item of streamType.stream(watched.stream, current)) {
-            // A stream that delivers again starts a new run of retries.
-            retryCount = 0
-            yield item
-          }
-          return
-        } catch (error) {
-          if (error !== watched.failure || !(await waitForRetry({ error }))) throw error
-        }
-        // Until the stream sends an `id`, the `Last-Event-ID` the caller sent stays. After that, an empty `id:` clears it.
-        if (cursor.idSeen) deleteHeader(resolvedRequest.headers, 'last-event-id')
-        if (cursor.lastEventId) resolvedRequest.headers['Last-Event-ID'] = cursor.lastEventId
-        const next = await connect()
-        const response = isResponse(next) ? next : next.webResponse
-        // A 204 tells the client to stop reconnecting.
-        if (response.status === 204) return
-        const reopened = baseContentType(response.headers.get('Content-Type'))
-        // A reopen without a `Content-Type` takes the declared one, as the first response does.
-        if (response.status < 200 || response.status >= 300 || !response.body || (reopened ?? baseContentType(contentType)) !== 'text/event-stream') {
-          await response.body?.cancel().catch(() => {})
-          const error =
-            response.status >= 200 && response.status < 300
-              ? new TypeError(`Expected a streamed body, got ${reopened ?? 'a body without a content type'}`)
-              : new ResponseError({
-                  data: undefined,
-                  status: response.status,
-                  statusText: response.statusText,
-                  contentType: reopened,
-                  headers: response.headers,
-                  request: isResponse(next) ? (toNativeRequest(resolvedRequest) as TRequest) : next.request,
-                  response: (isResponse(next) ? next : next.response) as TResponse,
-                  method: resolvedRequest.method,
-                  url: resolvedRequest.url,
-                })
-          // Thrown while the caller iterates, so the error interceptors run here.
-          throw await run.error(error, requestConfig)
-        }
-        body = response.body
-        current = { ...context, status: response.status, contentType: response.headers.get('Content-Type') ?? contentType }
-      }
-    }
-    const resumes = limit > 0 && baseContentType(contentType) === 'text/event-stream'
-    const items =
-      readsItems && streamType?.stream && result.data instanceof ReadableStream
-        ? resumes
-          ? reconnecting(result.data)
-          : streamType.stream(result.data, context)
-        : undefined
+    const items = readsItems && streamType?.stream && result.data instanceof ReadableStream ? streamType.stream(result.data, context) : undefined
     return {
       cursor,
       items: readItems({ items: items ?? emptyItems(), validateItem, signal: resolvedRequest.signal }),
