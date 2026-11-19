@@ -145,6 +145,20 @@ describe('retry', () => {
     expect(result.lastEventId).toBe('2')
   })
 
+  test('keeps the caller Last-Event-ID until an event arrives, and drops it when the server clears the ID', async () => {
+    const sent: Array<string | undefined> = []
+    const responses = [events('', true), events('id: 6\ndata: six\n\n', true), events('id\ndata: seven\n\n', true), events('data: eight\n\n')]
+    const transport = vi.fn(async (request: ResolvedRequest) => {
+      sent.push(request.headers['Last-Event-ID'] ?? request.headers['last-event-id'])
+      return responses.shift()!
+    })
+    const client = createClientCore({ defaultTransport: transport, mediaTypes: streamMediaTypes, retry: { limit: 3, delay: () => 0 } })
+
+    const result = await client.stream({ url: '/events', headers: { 'last-event-id': '5' } })
+    expect(await collect(result)).toHaveLength(3)
+    expect(sent).toEqual(['5', '5', '6', undefined])
+  })
+
   test('throws the read error when a dropped stream is out of retries or retry is off', async () => {
     const transport = vi.fn(async () => events('data: one\n\n', true))
     const client = createClientCore({ defaultTransport: transport, mediaTypes: streamMediaTypes })

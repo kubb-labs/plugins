@@ -1214,19 +1214,21 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     async function* reconnecting(first: ReadableStream<Uint8Array>): AsyncGenerator<unknown> {
       if (!readStream) return
       let body = first
+      let received = false
       while (true) {
         const watched = watchReads(body)
         try {
-          yield* readStream(watched.stream, context)
+          for await (const item of readStream(watched.stream, context)) {
+            received = true
+            yield item
+          }
           return
         } catch (error) {
           if (!watched.failed || !(await waitForRetry({ error }))) throw error
         }
-        // Without an ID from this stream, a `Last-Event-ID` the caller sent stays.
-        if (cursor.lastEventId) {
-          deleteHeader(resolvedRequest.headers, 'last-event-id')
-          resolvedRequest.headers['Last-Event-ID'] = cursor.lastEventId
-        }
+        // A stream that dropped before its first event keeps the `Last-Event-ID` the caller sent. After that, an empty `id:` clears it.
+        if (received || cursor.lastEventId) deleteHeader(resolvedRequest.headers, 'last-event-id')
+        if (cursor.lastEventId) resolvedRequest.headers['Last-Event-ID'] = cursor.lastEventId
         const next = await connect()
         const response = isResponse(next) ? next : next.webResponse
         // A 204 tells the client to stop reconnecting.
