@@ -109,7 +109,7 @@ try {
 }
 ```
 
-`ValidationError` was called `ParseError`. The old name is still exported and deprecated, and `error.name` is still `'ParseError'`.
+`ValidationError` was called `ParseError`. The old name is still exported and deprecated, so `instanceof ParseError` keeps working. `error.name` is now `'ValidationError'`.
 
 A `ValidationError` from a response body also carries `status`, `method`, `direction` (`'response'` or `'error'`), and `source`. So when a non-2xx body does not match its error schema, the status is still there:
 

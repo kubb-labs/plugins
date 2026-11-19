@@ -60,9 +60,9 @@ describe('toHeadersStandardSchema', () => {
 })
 
 describe('ValidationError', () => {
-  test('stays reachable as ParseError, by class and by name', () => {
+  test('stays reachable through the deprecated ParseError alias', () => {
     const error = new ValidationError({ issues: [] })
     expect(error).toBeInstanceOf(ParseError)
-    expect(error.name).toBe('ParseError')
+    expect(error.name).toBe('ValidationError')
   })
 })

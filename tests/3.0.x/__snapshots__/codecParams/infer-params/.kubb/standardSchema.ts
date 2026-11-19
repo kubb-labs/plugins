@@ -29,8 +29,7 @@ export class ValidationError extends Error {
 
   constructor({ issues, message, cause }: { issues: ReadonlyArray<StandardSchemaIssue>; message?: string; cause?: unknown }) {
     super(message ?? 'Validation failed')
-    // Kept from when the class was called `ParseError`, so checks on `error.name` still match.
-    this.name = 'ParseError'
+    this.name = 'ValidationError'
     this.issues = issues
     if (cause !== undefined) this.cause = cause
   }

@@ -878,19 +878,19 @@ describe('createClientCore', () => {
     const byStatus = { 404: toCodeSchema('not-found'), '5xx': toCodeSchema('upstream') }
 
     expect(await call(404, { code: 'not-found' }, byStatus)).toMatchObject({ status: 404, error: { checkedBy: 'not-found' } })
-    await expect(call(404, { code: 'upstream' }, byStatus)).rejects.toMatchObject({ name: 'ParseError' })
+    await expect(call(404, { code: 'upstream' }, byStatus)).rejects.toMatchObject({ name: 'ValidationError' })
     expect(await call(503, { code: 'upstream' }, byStatus)).toMatchObject({ status: 503, error: { checkedBy: 'upstream' } })
     expect(await call(422, '<html>Unprocessable</html>', byStatus)).toMatchObject({ status: 422, error: '<html>Unprocessable</html>' })
 
     const withDefault = { 404: toCodeSchema('not-found'), default: toCodeSchema('other') }
     expect(await call(502, { code: 'other' }, withDefault)).toMatchObject({ status: 502, error: { checkedBy: 'other' } })
-    await expect(call(502, '<html>Bad Gateway</html>', withDefault)).rejects.toMatchObject({ name: 'ParseError' })
+    await expect(call(502, '<html>Bad Gateway</html>', withDefault)).rejects.toMatchObject({ name: 'ValidationError' })
   })
 
   test('validates the error body of a call that throws, so the ResponseError carries the parsed body', async () => {
     const { client } = createClient({ data: '<html>Bad Gateway</html>', status: 502 })
     const error = vi.fn(() => ({ parsed: true }))
-    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } })).rejects.toMatchObject({ name: 'ValidationError' })
     await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toSchema(error) } })).rejects.toMatchObject({
       name: 'ResponseError',
       status: 502,
@@ -902,19 +902,19 @@ describe('createClientCore', () => {
   test('keeps the status on the ValidationError of an error body, and the issues on the ResponseError', async () => {
     const { client } = createClient({ data: { error: 'not found' }, status: 404 })
     const request = { method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } } as const
-    await expect(client(request)).rejects.toMatchObject({ name: 'ParseError', status: 404, method: 'GET', direction: 'error', source: 'body' })
+    await expect(client(request)).rejects.toMatchObject({ name: 'ValidationError', status: 404, method: 'GET', direction: 'error', source: 'body' })
     await expect(client({ ...request, onValidationError: (_error, { value }) => ({ value }) })).rejects.toMatchObject({
       name: 'ResponseError',
       status: 404,
       data: { error: 'not found' },
-      validationError: { name: 'ParseError', status: 404, issues: [{ message: 'invalid', path: ['name'] }] },
+      validationError: { name: 'ValidationError', status: 404, issues: [{ message: 'invalid', path: ['name'] }] },
     })
   })
 
   test('throws the ValidationError when no onValidationError is set', async () => {
     const { client } = createClient({ data: { id: 1 }, status: 200 })
     await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({
-      name: 'ParseError',
+      name: 'ValidationError',
       issues: [{ message: 'invalid', path: ['name'] }],
     })
   })
@@ -932,7 +932,7 @@ describe('createClientCore', () => {
     const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
     const onValidationError = vi.fn(() => undefined)
     const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
-    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ValidationError' })
     expect(onValidationError).toHaveBeenCalledTimes(1)
   })
 
@@ -955,7 +955,7 @@ describe('createClientCore', () => {
     const result = await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })
     expect(result.data).toStrictEqual({ id: 1 })
     await expect(client({ method: 'POST', url: '/pet', body: { name: 1 }, validator: { request: toFailingSchema() } })).rejects.toMatchObject({
-      name: 'ParseError',
+      name: 'ValidationError',
     })
   })
 
@@ -967,14 +967,14 @@ describe('createClientCore', () => {
         return transport(request)
       },
     })
-    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ValidationError' })
   })
 
   test('lets a per-call validate override the client setting', async () => {
     const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
     const client = createClientCore<string, string>({ defaultTransport: transport, validate: false })
     await expect(client({ method: 'GET', url: '/pet/1', validate: true, validator: { response: toFailingSchema() } })).rejects.toMatchObject({
-      name: 'ParseError',
+      name: 'ValidationError',
     })
   })
 
@@ -1068,8 +1068,8 @@ describe('createClientCore', () => {
 
     const { client: validating } = createClient({ data: { id: 1 } })
     validating.interceptors.error.use((error) => void seen.push(error.name))
-    await expect(validating({ method: 'GET', url: '/pet', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
-    expect(seen).toStrictEqual([network, controller.signal.reason, 'ParseError'])
+    await expect(validating({ method: 'GET', url: '/pet', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ValidationError' })
+    expect(seen).toStrictEqual([network, controller.signal.reason, 'ValidationError'])
   })
 
   test('setConfig merges and getConfig reflects it', () => {
@@ -1150,7 +1150,7 @@ describe('media types', () => {
 
   test('throws a ValidationError for invalid JSON under a JSON media type, and keeps a non-JSON body as text under */*', async () => {
     await expect(call(answer('Pet deleted', { 'content-type': 'application/json' }))).rejects.toMatchObject({
-      name: 'ParseError',
+      name: 'ValidationError',
       message: 'Invalid JSON in a application/json body',
       status: 200,
       direction: 'response',
@@ -1575,7 +1575,7 @@ describe('params validators', () => {
   test('validates an absent group as an empty object, so a missing required param still fails', async () => {
     const { client, calls } = createClient()
     const path = vi.fn((value: unknown) => value)
-    await expect(client({ method: 'GET', url: '/events/{day}', validator: { path: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+    await expect(client({ method: 'GET', url: '/events/{day}', validator: { path: toFailingSchema() } })).rejects.toMatchObject({ name: 'ValidationError' })
     await client({ method: 'GET', url: '/events', validator: { query: toSchema(path) } })
     expect(path).toHaveBeenCalledWith({})
     expect(calls).toHaveLength(1)

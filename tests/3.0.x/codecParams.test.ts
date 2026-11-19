@@ -117,7 +117,7 @@ function readSchemas(client: Client, name: string) {
  */
 async function expectRejected(client: Client, call: (onValidationError: unknown) => Promise<unknown>, source: string) {
   const contexts: Array<ValidationErrorContext> = []
-  await expect(call((_error: unknown, context: ValidationErrorContext) => void contexts.push(context))).rejects.toMatchObject({ name: 'ParseError' })
+  await expect(call((_error: unknown, context: ValidationErrorContext) => void contexts.push(context))).rejects.toMatchObject({ name: 'ValidationError' })
   expect(contexts).toMatchObject([{ direction: 'request', source }])
   expect(client.requests).toHaveLength(0)
 }
@@ -399,7 +399,7 @@ describe('wire value: pluginZod({ inferred: true }) without params validation', 
     const request = { '~standard': { version: 1, vendor: 'test', validate: (value: unknown) => (seen.push(value), { value }) } }
     const transport = async () => Response.json({ startsAt: 'later' })
 
-    await expect(client.putEvent({ path: { day: '2026-10-01' }, body, transport, validator: { request } })).rejects.toMatchObject({ name: 'ParseError' })
+    await expect(client.putEvent({ path: { day: '2026-10-01' }, body, transport, validator: { request } })).rejects.toMatchObject({ name: 'ValidationError' })
     expect(seen).toStrictEqual([body])
   })
 
