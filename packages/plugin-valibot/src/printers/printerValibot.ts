@@ -189,7 +189,6 @@ function expectsDate(node: ast.SchemaNode, direction: PrinterValibotOptions['dir
 }
 
 const hasChecks = (node: ast.SchemaNode) => ast.schema.getChecks(node).length > 0
-const hasPatternKeyCheck = (node: ast.SchemaNode) => ast.schema.getChecks(node).some((check) => check.kind === 'patternProperties')
 
 // Wraps a value in `v.nullable(...)` and `v.optional(...)`. A default goes in as the second argument
 // of `v.optional`, so `null` stays `null` and only a missing value takes the default.
@@ -437,7 +436,12 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
   const isObjectNode = (node: ast.SchemaNode) => {
     const resolved = ast.ref.mergeSchema(node)
     const kind = ast.schema.getObjectKind(node, { circularSchemas: cyclicSchemas })
-    return kind !== null && kind !== 'record' && resolved.default === undefined && !hasPatternKeyCheck(resolved)
+    return (
+      kind !== null &&
+      kind !== 'record' &&
+      resolved.default === undefined &&
+      !ast.schema.getChecks(resolved).some((check) => check.kind === 'patternProperties')
+    )
   }
   // The node `print` reads without its input checks, because `v.omit` needs the bare object. Nested nodes keep theirs.
   let uncheckedNode: ast.SchemaNode | null = null

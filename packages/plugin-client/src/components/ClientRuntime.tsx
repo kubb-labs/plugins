@@ -20,12 +20,6 @@ const formMediaTypes = {
   'application/x-www-form-urlencoded': { file: 'mediaTypes/urlencoded', name: 'urlencoded' },
 } as const
 
-const getFormContentTypes = (node: ast.OperationNode) =>
-  (node.requestBody?.content ?? []).flatMap((entry) => {
-    const kind = ast.mediaType.getKind(entry)
-    return kind === 'form' || kind === 'urlencoded' ? [ast.mediaType.getBase(entry) as keyof typeof formMediaTypes] : []
-  })
-
 /**
  * Writes the runtime a document needs into `.kubb/`: the optional media type, serializer and `sse.ts` files, and a
  * `config.ts` that imports them, which `client.ts` passes to `setConfig`. The footer of `client.ts` gets the named
@@ -50,7 +44,18 @@ export function ClientRuntime({
   if (!templates) return null
   const hasParameter = (match: (parameter: ast.ParameterNode) => boolean) => nodes.some((node) => node.parameters.some(match))
   const streams = nodes.some((node) => ast.http.responses.getStream(node) !== null)
-  const forms = [...new Set(nodes.flatMap(getFormContentTypes))].sort().map((contentType) => ({ contentType, ...formMediaTypes[contentType] }))
+  const forms = [
+    ...new Set(
+      nodes.flatMap((node) =>
+        (node.requestBody?.content ?? []).flatMap((entry) => {
+          const kind = ast.mediaType.getKind(entry)
+          return kind === 'form' || kind === 'urlencoded' ? [ast.mediaType.getBase(entry) as keyof typeof formMediaTypes] : []
+        }),
+      ),
+    ),
+  ]
+    .sort()
+    .map((contentType) => ({ contentType, ...formMediaTypes[contentType] }))
   const queryStyles = nodes.some(hasQueryStyles)
 
   const serializers = [
