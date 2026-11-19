@@ -283,6 +283,49 @@ export type EventStreamOptions = {
   rawData?: boolean | Array<string> | undefined
 }
 
+/**
+ * What `shouldRetry` and `onRetry` get. A failed attempt has a `response`, or the `error` its transport threw.
+ */
+export type RetryContext = {
+  request: ResolvedRequest
+  response?: Response | undefined
+  error?: unknown
+  // The retry about to run, counted from 1.
+  retryCount: number
+}
+
+export type RetryOptions = {
+  /**
+   * How many times a call is sent again after its first attempt. A dropped Server-Sent Events stream draws on the same count.
+   * @default 2
+   */
+  limit?: number | undefined
+  /**
+   * The methods that are safe to send twice. A call with an `Idempotency-Key` header is retried whatever its method.
+   * @default ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']
+   */
+  methods?: Array<string> | undefined
+  // Defaults to 408, 429, 500, 502, 503, and 504.
+  statusCodes?: Array<number> | undefined
+  /**
+   * The wait in milliseconds before a retry. A `Retry-After` header wins over it. The default backs off exponentially from
+   * 300 ms with jitter, up to 30 seconds.
+   */
+  delay?: ((retryCount: number) => number) | undefined
+  /**
+   * Overrides the status and error check. Return `undefined` to keep the default decision. The limit, the methods, and the
+   * abort signal still apply.
+   */
+  shouldRetry?: ((context: RetryContext) => boolean | undefined | Promise<boolean | undefined>) | undefined
+  // Runs before the wait of each retry.
+  onRetry?: ((context: RetryContext & { delay: number }) => void | Promise<void>) | undefined
+}
+
+/**
+ * A retry limit, the retry options, or `false` to send the call once. Retries are off unless set.
+ */
+export type Retry = false | number | RetryOptions
+
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = {
   baseURL?: string
   url?: string
@@ -326,6 +369,10 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
   validate?: ValidateOption
   security?: Array<SecurityRequirement>
   auth?: AuthResolver
+  /**
+   * Merged per field over the client's `retry`.
+   */
+  retry?: Retry | undefined
 }
 
 /**
@@ -360,6 +407,10 @@ export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> =
   onValidationError?: ValidationErrorHandler
   validate?: ValidateOption
   auth?: AuthResolver
+  /**
+   * Sends a failed call again: a transport error, or a status in `statusCodes`.
+   */
+  retry?: Retry | undefined
 }
 
 /**
@@ -804,6 +855,62 @@ function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes;
   }
 }
 
+// Later sources win per field, and `false` drops what came before it. A limit of 0 means no retries.
+function resolveRetry(...sources: Array<Retry | undefined>): RetryOptions & { limit: number } {
+  let resolved: RetryOptions | undefined
+  for (const source of sources) {
+    if (source === undefined) continue
+    if (source === false) resolved = undefined
+    else resolved = { ...resolved, ...(typeof source === 'number' ? { limit: source } : source) }
+  }
+  return { ...resolved, limit: resolved ? (resolved.limit ?? 2) : 0 }
+}
+
+// The milliseconds a `Retry-After` header asks for, given as seconds or as an HTTP date.
+function retryAfter(response: Response | undefined): number | undefined {
+  const value = response?.headers.get('Retry-After')
+  if (!value) return undefined
+  const delay = /^\d+$/.test(value.trim()) ? Number(value) * 1000 : Date.parse(value) - Date.now()
+  return Number.isNaN(delay) ? undefined : Math.max(0, delay)
+}
+
+function sleep(delay: number, signal: AbortSignal | undefined): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(signal.reason)
+    const onAbort = () => {
+      clearTimeout(timer)
+      reject(signal?.reason)
+    }
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort)
+      resolve()
+    }, delay)
+    signal?.addEventListener('abort', onAbort, { once: true })
+  })
+}
+
+// Flags a read that failed, which tells a dropped connection from an error of the parser or of `transform`.
+function watchReads(body: ReadableStream<Uint8Array>): { stream: ReadableStream<Uint8Array>; failed: boolean } {
+  const reader = body.getReader()
+  const watched = {
+    failed: false,
+    stream: new ReadableStream<Uint8Array>({
+      async pull(controller) {
+        try {
+          const { done, value } = await reader.read()
+          if (done) controller.close()
+          else controller.enqueue(value)
+        } catch (error) {
+          watched.failed = true
+          throw error
+        }
+      },
+      cancel: (reason) => reader.cancel(reason),
+    }),
+  }
+  return watched
+}
+
 // The serializer for `name`, which `.kubb/client.ts` registers for a spec that needs it.
 function requireSerializer<TName extends keyof Serializers>(serializers: Serializers, name: TName): NonNullable<Serializers[TName]> {
   const serializer = serializers[name]
@@ -976,6 +1083,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     // Read before the first await, so a `setConfig` during the call does not change it.
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
     const onValidationError = requestConfig.onValidationError ?? config.onValidationError
+    const retry = resolveRetry(config.retry, requestConfig.retry)
     const { request, mediaTypes, validate, responseContentType } = await resolveRequest({ config, requestConfig })
     if (streaming) {
       request.stream = true
@@ -984,7 +1092,39 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     }
 
     const resolvedRequest = await run.request(request, requestConfig)
-    const sent = await transport(resolvedRequest)
+    const signal = signalOf(resolvedRequest)
+    let retryCount = 0
+    // Waits and resolves to true when the failed attempt may be sent again.
+    const waitForRetry = async (failure: { response?: Response; error?: unknown }): Promise<boolean> => {
+      const replayable =
+        (retry.methods ?? ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']).some(
+          (method) => method.toUpperCase() === resolvedRequest.method.toUpperCase(),
+        ) || getHeader(resolvedRequest.headers, 'idempotency-key') !== undefined
+      if (retryCount >= retry.limit || signal?.aborted || !replayable || resolvedRequest.body instanceof ReadableStream) return false
+      const context: RetryContext = { ...failure, request: resolvedRequest, retryCount: retryCount + 1 }
+      const retryable = failure.response ? (retry.statusCodes ?? [408, 429, 500, 502, 503, 504]).includes(failure.response.status) : true
+      if (!((await retry.shouldRetry?.(context)) ?? retryable)) return false
+      retryCount++
+      const delay = retryAfter(failure.response) ?? retry.delay?.(retryCount) ?? Math.min(300 * 2 ** (retryCount - 1), 30_000) * (0.5 + Math.random() / 2)
+      await retry.onRetry?.({ ...context, delay })
+      await failure.response?.body?.cancel().catch(() => {})
+      await sleep(delay, signal)
+      return true
+    }
+    const connect = async (): Promise<Response | TransportResult<TRequest, TResponse>> => {
+      while (true) {
+        let attempt: Response | TransportResult<TRequest, TResponse>
+        try {
+          attempt = await transport(resolvedRequest)
+        } catch (error) {
+          if (await waitForRetry({ error })) continue
+          throw error
+        }
+        const response = isResponse(attempt) ? attempt : attempt.webResponse
+        if ((response.status >= 200 && response.status < 300) || !(await waitForRetry({ response }))) return attempt
+      }
+    }
+    const sent = await connect()
     const {
       webResponse,
       request: nativeRequest,
@@ -1067,7 +1207,55 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       if (requestConfig.eventShape === 'event') return { ...(item as object), ...((await validate(item)) as object) }
       return validate(item)
     }
-    const items = readsItems && streamType?.stream && result.data instanceof ReadableStream ? streamType.stream(result.data, context) : undefined
+    const readStream = streamType?.stream
+    // With retries on, a Server-Sent Events stream that drops is opened again from its last event ID.
+    async function* reconnecting(first: ReadableStream<Uint8Array>): AsyncGenerator<unknown> {
+      if (!readStream) return
+      let body = first
+      let received = false
+      while (true) {
+        const watched = watchReads(body)
+        try {
+          for await (const item of readStream(watched.stream, context)) {
+            received = true
+            yield item
+          }
+          return
+        } catch (error) {
+          if (!watched.failed || !(await waitForRetry({ error }))) throw error
+        }
+        // A stream that dropped before its first event keeps the `Last-Event-ID` the caller sent. After that, an empty `id:` clears it.
+        if (received || cursor.lastEventId) deleteHeader(resolvedRequest.headers, 'last-event-id')
+        if (cursor.lastEventId) resolvedRequest.headers['Last-Event-ID'] = cursor.lastEventId
+        const next = await connect()
+        const response = isResponse(next) ? next : next.webResponse
+        // A 204 tells the client to stop reconnecting.
+        if (response.status === 204) return
+        if (
+          response.status < 200 ||
+          response.status >= 300 ||
+          !response.body ||
+          baseContentType(response.headers.get('Content-Type')) !== 'text/event-stream'
+        ) {
+          await response.body?.cancel().catch(() => {})
+          throw new ResponseError({
+            data: undefined,
+            status: response.status,
+            statusText: response.statusText,
+            contentType: baseContentType(response.headers.get('Content-Type')),
+            headers: response.headers,
+            request: result.request,
+            response: (isResponse(next) ? next : next.response) as TResponse,
+            method: resolvedRequest.method,
+            url: resolvedRequest.url,
+          })
+        }
+        body = response.body
+      }
+    }
+    const resumes = retry.limit > 0 && baseContentType(contentType) === 'text/event-stream'
+    const items =
+      readsItems && readStream && result.data instanceof ReadableStream ? (resumes ? reconnecting(result.data) : readStream(result.data, context)) : undefined
     return {
       cursor,
       items: readItems({ items: items ?? emptyItems(), validateItem, signal: resolvedRequest.signal }),
