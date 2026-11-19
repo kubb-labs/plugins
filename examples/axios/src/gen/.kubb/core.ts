@@ -872,8 +872,8 @@ type ResolvedRetry = RetryOptions & { limit: number; methods: Array<string>; sta
 function resolveRetry(client: Retry | undefined, call: Retry | undefined): ResolvedRetry {
   const toOptions = (retry: Retry | undefined): RetryOptions => (typeof retry === 'number' ? { limit: retry } : retry || {})
   const [base, own] = [toOptions(client), toOptions(call)]
-  // The call's `false` turns retries off. Without a call value, the client's decides.
-  const enabled = call === undefined ? client !== undefined && client !== false : call !== false
+  // The call's value decides whether retries are on. Without one, the client's does.
+  const enabled = (call ?? client ?? false) !== false
   const limit = enabled ? (own.limit ?? base.limit ?? 2) : 0
   return {
     // `NaN` and `Infinity` count as no retries, since no count ever reaches them.
@@ -911,10 +911,14 @@ function sleep(delay: number, signal: AbortSignal | undefined): Promise<void> {
       clearTimeout(timer)
       reject(signal?.reason)
     }
-    const timer = setTimeout(() => {
-      signal?.removeEventListener('abort', onAbort)
-      resolve()
-    }, delay)
+    // A wait over the timer's maximum would fire at once, so it is capped.
+    const timer = setTimeout(
+      () => {
+        signal?.removeEventListener('abort', onAbort)
+        resolve()
+      },
+      Math.min(delay, 2 ** 31 - 1),
+    )
     signal?.addEventListener('abort', onAbort, { once: true })
   })
 }
@@ -1101,9 +1105,14 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
 
     const resolvedRequest = await run.request(request, requestConfig)
     const signal = signalOf(resolvedRequest)
-    // A method outside `methods` is not safe to send twice, and a stream body cannot be read twice.
-    const limit = retry.methods.includes(resolvedRequest.method.toUpperCase()) && !(resolvedRequest.body instanceof ReadableStream) ? retry.limit : 0
+    // A stream body, also one from Node or a generator, cannot be read twice.
+    const oneShot = resolvedRequest.body instanceof ReadableStream || Symbol.asyncIterator in Object(resolvedRequest.body)
+    // A method outside `methods` is not safe to send twice.
+    const limit = retry.methods.includes(resolvedRequest.method.toUpperCase()) && !oneShot ? retry.limit : 0
     let retryCount = 0
+    // A transport that answers with a bare `Response` gets the native request built for it.
+    const toResult = (sent: Response | TransportResult<TRequest, TResponse>): TransportResult<TRequest, TResponse> =>
+      isResponse(sent) ? { webResponse: sent, request: toNativeRequest(resolvedRequest) as TRequest, response: sent as TResponse & Response } : sent
     // Waits and resolves to true when the failed attempt may be sent again.
     const waitForRetry = async (failure: { response?: Response; error?: unknown }): Promise<boolean> => {
       const { response } = failure
@@ -1114,41 +1123,38 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       const copy = retry.shouldRetry || retry.onRetry ? response?.clone() : undefined
       const context: RetryContext = { ...failure, response: copy ?? response, request: resolvedRequest, retryCount: retryCount + 1 }
       const retryable = !response || retry.statusCodes.includes(response.status)
-      const again = (await retry.shouldRetry?.(context)) ?? retryable
-      if (!again) {
-        release(copy)
-        return false
-      }
-      retryCount++
-      const delay = serverDelay ?? retry.delay?.(retryCount) ?? backoff(retryCount)
+      // The call keeps the response only when a retry is turned down. A hook that throws releases it too.
+      let kept = false
+      let delay = 0
       try {
+        if (!((await retry.shouldRetry?.(context)) ?? retryable)) {
+          kept = true
+          return false
+        }
+        retryCount++
+        delay = serverDelay ?? retry.delay?.(retryCount) ?? backoff(retryCount)
         await retry.onRetry?.({ ...context, delay })
       } finally {
         release(copy)
-        release(response)
+        if (!kept) release(response)
       }
       await sleep(delay, signal)
       return true
     }
-    const connect = async (): Promise<Response | TransportResult<TRequest, TResponse>> => {
+    const connect = async (): Promise<TransportResult<TRequest, TResponse>> => {
       while (true) {
-        let attempt: Response | TransportResult<TRequest, TResponse>
+        let sent: Response | TransportResult<TRequest, TResponse>
         try {
-          attempt = await transport(resolvedRequest)
+          sent = await transport(resolvedRequest)
         } catch (error) {
           if (await waitForRetry({ error })) continue
           throw error
         }
-        const response = isResponse(attempt) ? attempt : attempt.webResponse
-        if ((response.status >= 200 && response.status < 300) || !(await waitForRetry({ response }))) return attempt
+        const response = isResponse(sent) ? sent : sent.webResponse
+        if ((response.status >= 200 && response.status < 300) || !(await waitForRetry({ response }))) return toResult(sent)
       }
     }
-    // A transport that answers with a bare `Response` gets the native request built for it.
-    const open = async (): Promise<TransportResult<TRequest, TResponse>> => {
-      const sent = await connect()
-      return isResponse(sent) ? { webResponse: sent, request: toNativeRequest(resolvedRequest) as TRequest, response: sent as TResponse & Response } : sent
-    }
-    const { webResponse, request: nativeRequest, response: nativeResponse } = await open()
+    const { webResponse, request: nativeRequest, response: nativeResponse } = await connect()
 
     const status = webResponse.status
     const isSuccess = status >= 200 && status < 300
@@ -1165,7 +1171,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         // Until the stream sends an `id`, the `Last-Event-ID` the caller sent stays. After that, an empty `id:` clears it.
         if (cursor.idSeen) deleteHeader(resolvedRequest.headers, 'last-event-id')
         if (cursor.lastEventId) resolvedRequest.headers['Last-Event-ID'] = cursor.lastEventId
-        const { webResponse: response, request, response: native } = await open()
+        const { webResponse: response, request, response: native } = await connect()
         // A 204 tells the client to stop reconnecting.
         if (response.status === 204) return undefined
         const isOk = response.status >= 200 && response.status < 300
