@@ -12,6 +12,6 @@
 '@kubb/plugin-zod': patch
 ---
 
-The function-parameter helpers exported by `@kubb/plugin-ts` (`createFunctionParameters`, `createFunctionParameter`, `functionPrinter`, `renderType` and their node types) are deprecated. Use `ast.factory` from `@kubb/kit` and `printParams` from `@kubb/renderer-jsx` instead. They are removed in Kubb v6.
+`@kubb/plugin-ts` deprecates its function-parameter helpers (`createFunctionParameters`, `createFunctionParameter`, `functionPrinter`, `renderType` and their types). Use `ast.factory` from `@kubb/kit` and `printParams` from `@kubb/renderer-jsx`. They are removed in Kubb v6.
 
-`@kubb/plugin-msw` handlers with a request body now import the `MswBody` type from a shared `.kubb/mswBody.ts` file, which the plugin writes once, instead of declaring it in each handler file. Output of the other plugins does not change.
+`@kubb/plugin-msw` handlers import `MswBody` from a shared `.kubb/mswBody.ts` instead of declaring it in each file.
