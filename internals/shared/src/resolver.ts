@@ -1,6 +1,6 @@
 import { ensureValidVarName, toFilePath } from '@internals/utils'
-import { ast, casing, createResolver, Resolver } from '@kubb/kit'
-import type { GeneratorContext, PluginType, ResolverFile, ResolverPatch } from '@kubb/kit'
+import { ast, casing } from '@kubb/kit'
+import type { GeneratorContext, Resolver, ResolverFile, ResolverPartial } from '@kubb/kit'
 
 /**
  * The shared top-level `name` of the operation plugins, computed once per operation name and build.
@@ -142,19 +142,10 @@ export function createCasedFile(caseLast: (part: string) => string): ResolverFil
   }
 }
 
-/** Folds `presets` over a bare resolver with `Resolver.merge`, merging namespaces per method. */
-export function composeResolver<T extends PluginType>(pluginName: T['name'], ...presets: Array<ResolverPatch<T['resolver']>>): T['resolver'] {
-  // shortcut: the bare base is cast to the full type, so a namespace no preset fills is not a type error; drop when @kubb/kit composes presets.
-  return Resolver.merge(createResolver<PluginType<T['name']>>({ pluginName }) as T['resolver'], ...presets)
-}
-
 /**
  * Builds a memoized, valid-identifier `name` and a `file` that share one casing and affix.
  */
-export function createCasedResolver(
-  kind: 'camel' | 'pascal',
-  affix: { prefix?: string; suffix?: string } = {},
-): { name(this: Resolver, name: string): string; file: ResolverFile } {
+export function createCasedResolver(kind: 'camel' | 'pascal', affix: { prefix?: string; suffix?: string } = {}): ResolverPartial {
   const toCase = (part: string) => casing[kind](part, affix)
   return {
     name(name) {
@@ -167,49 +158,37 @@ export function createCasedResolver(
 /**
  * Builds the shared `param` and `response` namespaces of the schema plugins.
  */
-export function createOperationResolver(): { param: OperationParamResolver; response: OperationResponseResolver } {
+export function createOperationResolver(): ResolverPartial<Resolver & { param: OperationParamResolver; response: OperationResponseResolver }> {
   return { param: createOperationParamResolver(), response: createOperationResponseResolver() }
 }
 
-export type ValidatorSchemaResolver = {
-  typeName(name: string): string
-  type(name: string): string
-  inputName(name: string): string
-  inputTypeName(name: string): string
-  isName(name: string): string
-  assertName(name: string): string
+type ValidatorResolver = Resolver & {
+  schema: Record<'typeName' | 'type' | 'inputName' | 'inputTypeName' | 'isName' | 'assertName', (name: string) => string>
+  response: Record<'error' | 'options', (node: ast.OperationNode) => string>
 }
-
-type ValidatorResolver = Resolver & { schema: ValidatorSchemaResolver }
 
 /**
  * Builds the `schema` namespace and the `response.error` and `response.options` names shared by zod and valibot.
  */
-export function createValidatorResolver(): {
-  schema: ValidatorSchemaResolver
-  response: {
-    error(this: ValidatorResolver, node: ast.OperationNode): string
-    options(this: ValidatorResolver, node: ast.OperationNode): string
-  }
-} {
+export function createValidatorResolver(): ResolverPartial<ValidatorResolver> {
   return {
     schema: {
-      typeName(this: ValidatorResolver, name: string) {
+      typeName(name) {
         return this.memo(`typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
       },
-      type(this: ValidatorResolver, name: string) {
+      type(name) {
         return this.memo(`type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
       },
-      inputName(this: ValidatorResolver, name: string) {
+      inputName(name) {
         return this.name(`${name} input`)
       },
-      inputTypeName(this: ValidatorResolver, name: string) {
+      inputTypeName(name) {
         return this.schema.typeName(`${name} input`)
       },
-      isName(this: ValidatorResolver, name: string) {
+      isName(name) {
         return ensureValidVarName(casing.camel(name, { prefix: 'is' }))
       },
-      assertName(this: ValidatorResolver, name: string) {
+      assertName(name) {
         return ensureValidVarName(casing.camel(name, { prefix: 'assert' }))
       },
     },
@@ -227,10 +206,7 @@ export function createValidatorResolver(): {
 }
 
 /** Builds the top-level `name` (camelCase, `handler` suffix) and the `handler` namespace of msw and mcp. */
-export function createHandlerResolver(): {
-  name(this: Resolver, name: string): string
-  handler: { name(this: Resolver, node: ast.OperationNode): string }
-} {
+export function createHandlerResolver(): ResolverPartial<Resolver & { handler: { name(node: ast.OperationNode): string } }> {
   return {
     name(name) {
       // shortcut: skips ensureValidVarName to keep today's msw and mcp output; align with the other plugins in a breaking release.

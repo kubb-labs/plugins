@@ -1,5 +1,6 @@
-import { composeResolver, createCasedResolver, createOperationResolver, operationKey } from '@internals/shared'
-import type { PluginTs } from '../types.ts'
+import { createCasedResolver, createOperationResolver, operationKey } from '@internals/shared'
+import { Resolver } from '@kubb/kit'
+import type { ResolverTs } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-ts`. Decides the names and file paths
@@ -19,7 +20,7 @@ import type { PluginTs } from '../types.ts'
  * resolverTs.response.status(node, 200)            // 'ListPetsStatus200'
  * ```
  */
-export const resolverTs = composeResolver<PluginTs>('plugin-ts', createCasedResolver('pascal'), createOperationResolver(), {
+export const resolverTs = Resolver.merge<ResolverTs>({ pluginName: 'plugin-ts' }, createCasedResolver('pascal'), createOperationResolver(), {
   response: {
     options(node) {
       const name = this.name(`${node.operationId} Options`)

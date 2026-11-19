@@ -34,7 +34,6 @@ export {
 } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
 export {
-  composeResolver,
   createCasedFile,
   createCasedResolver,
   createHandlerResolver,

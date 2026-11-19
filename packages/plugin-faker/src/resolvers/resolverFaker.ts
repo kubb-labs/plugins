@@ -1,5 +1,6 @@
-import { composeResolver, createCasedResolver, createOperationResolver } from '@internals/shared'
-import type { PluginFaker } from '../types.ts'
+import { createCasedResolver, createOperationResolver } from '@internals/shared'
+import { Resolver } from '@kubb/kit'
+import type { ResolverFaker } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-faker`. Decides the names and file
@@ -13,4 +14,8 @@ import type { PluginFaker } from '../types.ts'
  * resolverFaker.name('list pets') // 'createListPets'
  * ```
  */
-export const resolverFaker = composeResolver<PluginFaker>('plugin-faker', createCasedResolver('camel', { prefix: 'create' }), createOperationResolver())
+export const resolverFaker = Resolver.merge<ResolverFaker>(
+  { pluginName: 'plugin-faker' },
+  createCasedResolver('camel', { prefix: 'create' }),
+  createOperationResolver(),
+)

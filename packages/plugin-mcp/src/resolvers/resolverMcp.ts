@@ -1,5 +1,6 @@
-import { composeResolver, createHandlerResolver } from '@internals/shared'
-import type { PluginMcp } from '../types.ts'
+import { createHandlerResolver } from '@internals/shared'
+import { Resolver } from '@kubb/kit'
+import type { ResolverMcp } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-mcp`. Decides the names and file
@@ -13,4 +14,4 @@ import type { PluginMcp } from '../types.ts'
  * resolverMcp.name('addPet') // 'addPetHandler'
  * ```
  */
-export const resolverMcp = composeResolver<PluginMcp>('plugin-mcp', createHandlerResolver())
+export const resolverMcp = Resolver.merge<ResolverMcp>({ pluginName: 'plugin-mcp' }, createHandlerResolver())

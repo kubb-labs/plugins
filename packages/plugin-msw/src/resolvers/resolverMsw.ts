@@ -1,5 +1,6 @@
-import { composeResolver, createHandlerResolver } from '@internals/shared'
-import type { PluginMsw } from '../types.ts'
+import { createHandlerResolver } from '@internals/shared'
+import { Resolver } from '@kubb/kit'
+import type { ResolverMsw } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-msw`. Decides the names and file
@@ -16,7 +17,7 @@ import type { PluginMsw } from '../types.ts'
  * resolverMsw.name('addPet') // 'addPetHandler'
  * ```
  */
-export const resolverMsw = composeResolver<PluginMsw>('plugin-msw', createHandlerResolver(), {
+export const resolverMsw = Resolver.merge<ResolverMsw>({ pluginName: 'plugin-msw' }, createHandlerResolver(), {
   handler: {
     listName() {
       return this.resolveName({ key: ['handlers', 'list'], name: 'handlers' })
