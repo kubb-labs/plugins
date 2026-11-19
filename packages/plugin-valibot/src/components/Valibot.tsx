@@ -57,7 +57,7 @@ export function Valibot({
     <Schema node={node} printer={printer}>
       {(output) => (
         <>
-          <Const export name={name} type={cyclic ? 'v.GenericSchema' : undefined} JSDoc={comments.length ? { comments } : undefined}>
+          <Const export name={name} type={cyclic ? 'v.GenericSchema' : undefined} comments={comments.length ? comments : undefined}>
             {output}
           </Const>
           {inferTypeName && (
@@ -66,7 +66,7 @@ export function Valibot({
             </Type>
           )}
           {shouldGenerateIs && (
-            <Const export name={isName} JSDoc={{ comments: [`Type guard for {@link ${name}}`] }}>
+            <Const export name={isName} comments={[`Type guard for {@link ${name}}`]}>
               {`(data: unknown): data is ${guardType} => v.is(${name}, data)`}
             </Const>
           )}
@@ -76,7 +76,7 @@ export function Valibot({
               name={assertName}
               params="data: unknown"
               returnType={`asserts data is ${guardType}`}
-              JSDoc={{ comments: [`Asserter for {@link ${name}}`, '@throws {v.ValiError} If data is invalid'] }}
+              comments={[`Asserter for {@link ${name}}`, '@throws {v.ValiError} If data is invalid']}
             >
               {`v.assert(${name}, data)`}
             </Function>

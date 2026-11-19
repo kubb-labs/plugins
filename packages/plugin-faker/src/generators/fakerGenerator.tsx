@@ -302,7 +302,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
           <Function
             export
             name={name}
-            JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
+            comments={description ? [`@description ${jsDocEscape(description)}`] : []}
             params={`data?: Partial<${typeReference.typeName}>`}
             returnType={typeReference.typeName}
           >

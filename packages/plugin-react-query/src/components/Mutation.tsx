@@ -1,6 +1,6 @@
-import { ast } from '@kubb/kit'
+import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function } from '@kubb/renderer-jsx'
+import { Function, printParams } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildResponseTypes, resolveMutationRequestType } from '@internals/tanstack-query'
 import type { HookResultProps } from '@internals/tanstack-query'
@@ -44,12 +44,12 @@ export function Mutation({ name, mutationOptionsName, node, tsResolver, mutation
   const resultType = `UseMutationResult<${generics}>`
 
   const mutationOptionsConfigNode = buildMutationConfigParamsNode(node)
-  const mutationOptionsParamsCall = ast.params.print(mutationOptionsConfigNode, 'call')
+  const mutationOptionsParamsCall = printParams(mutationOptionsConfigNode, 'call')
 
   const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType, typedHeaders })
 
   return (
-    <Function name={name} export params={paramsNode} JSDoc={{ comments: getComments(node) }} generics={['TContext']}>
+    <Function name={name} export params={paramsNode} comments={getComments(node)} generics={['TContext']}>
       {`
         const { mutation = {}, client: config = {} } = options ?? {}
         const { client: queryClient, ...mutationOptions } = mutation;

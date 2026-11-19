@@ -1,6 +1,6 @@
 import { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function, Type } from '@kubb/renderer-jsx'
+import { Function, printParams, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall, buildResponseTypes, resolveMutationRequestType } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
@@ -63,7 +63,7 @@ export function Mutation({
   const hasMutationParams = groupedParam !== null
   const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argTypeBody = hasMutationParams ? resolveMutationRequestType(node, tsResolver) : ''
-  const argBindingStr = hasMutationParams ? ast.params.print(groupedParamsNode, 'call') : ''
+  const argBindingStr = hasMutationParams ? printParams(groupedParamsNode, 'call') : ''
   const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false, withContentType: true }), {
     clientReturnType,
     returnType,
@@ -84,7 +84,7 @@ export function Mutation({
       <Type name={mutationArgTypeName} export>
         {hasMutationParams ? argTypeBody : 'never'}
       </Type>
-      <Function name={name} export params={paramsNode} JSDoc={{ comments: getComments(node) }}>
+      <Function name={name} export params={paramsNode} comments={getComments(node)}>
         {`
         const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
         const mutationKey = ${mutationKeyName}()

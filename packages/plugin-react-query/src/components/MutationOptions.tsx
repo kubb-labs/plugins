@@ -1,6 +1,6 @@
 import { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function } from '@kubb/renderer-jsx'
+import { Function, printParams } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall, resolveMutationRequestType } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
@@ -37,7 +37,7 @@ export function MutationOptions({ name, clientName, node, tsResolver, mutationKe
 
   const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const TRequest = resolveMutationRequestType(node, tsResolver)
-  const argBindingStr = hasMutationParams ? ast.params.print(groupedParamsNode, 'call') : '_'
+  const argBindingStr = hasMutationParams ? printParams(groupedParamsNode, 'call') : '_'
   const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false, withContentType: true }), {
     clientReturnType,
     returnType,

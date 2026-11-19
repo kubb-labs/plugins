@@ -3,10 +3,11 @@
  */
 const PARAM_RANK = { required: 0, optional: 1, withDefault: 2, rest: 3 } as const
 
-import { ast } from '@kubb/kit'
+import type { ast } from '@kubb/kit'
 
 // shortcut: the pre-5.23 printer, kept only so `transformName` and `transformType` keep working; delete in Kubb v6.
-const { isIndexedAccessType, isTypeLiteral } = ast.params
+const isTypeLiteral = (type: TypeExpression): type is ast.TypeLiteralNode => typeof type !== 'string' && type.kind === 'TypeLiteral'
+const isIndexedAccessType = (type: TypeExpression): type is ast.IndexedAccessTypeNode => typeof type !== 'string' && type.kind === 'IndexedAccessType'
 type FunctionParameterNode = ast.FunctionParameterNode
 type FunctionParametersNode = ast.FunctionParametersNode
 type ObjectBindingPatternNode = ast.ObjectBindingPatternNode

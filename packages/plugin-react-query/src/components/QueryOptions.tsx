@@ -1,6 +1,6 @@
-import { ast } from '@kubb/kit'
+import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function } from '@kubb/renderer-jsx'
+import { Function, printParams } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildQueryOptionsParams, buildClientCall } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
@@ -18,7 +18,7 @@ export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName,
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
-  const queryKeyParamsCall = ast.params.print(queryKeyParamsNode, 'call')
+  const queryKeyParamsCall = printParams(queryKeyParamsNode, 'call')
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver })
   const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true }), { clientReturnType, returnType })

@@ -122,7 +122,7 @@ export function Query({
   })
 
   return (
-    <Function name={name} export generics={generics.join(', ')} params={paramsNode} returnType={undefined} JSDoc={{ comments: buildOperationComments(node) }}>
+    <Function name={name} export generics={generics.join(', ')} params={paramsNode} returnType={undefined} comments={buildOperationComments(node)}>
       {`
        const { query: queryConfig = {}, client: config = {} } = options ?? {}
        const { client: queryClient, ...resolvedOptions } = queryConfig${resolvedParams ? `\n       const resolvedParams = ${resolvedParams}` : ''}

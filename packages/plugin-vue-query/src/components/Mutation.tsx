@@ -1,6 +1,6 @@
 import { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function } from '@kubb/renderer-jsx'
+import { Function, printParams } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import {
   buildCallResultBody,
@@ -45,7 +45,7 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
   const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
-  const argBindingStr = hasMutationParams ? ast.params.print(groupedParamsNode, 'call') : ''
+  const argBindingStr = hasMutationParams ? printParams(groupedParamsNode, 'call') : ''
   const TRequest = resolveMutationRequestType(node, tsResolver)
   const mutationFnBody = buildCallResultBody(
     buildClientCall(node, {
@@ -62,7 +62,7 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
   const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType, typedHeaders })
 
   return (
-    <Function name={name} export params={paramsNode} JSDoc={{ comments: getComments(node) }} generics={['TContext']}>
+    <Function name={name} export params={paramsNode} comments={getComments(node)} generics={['TContext']}>
       {`
         const { mutation = {}, client: config = {} } = options ?? {}
         const { client: queryClient, ...mutationOptions } = mutation;

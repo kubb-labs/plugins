@@ -1,4 +1,5 @@
 import { ast } from '@kubb/kit'
+import { printParams } from '@kubb/renderer-jsx'
 import { getRequestGroupOptionality } from '@internals/shared'
 import type { OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
@@ -57,7 +58,7 @@ export function buildGroupedOptionsSignature({
   const optionsType = authRequired ? `${baseType} & { auth: NonNullable<${baseType}['auth']> }` : baseType
   const isOptional = !authRequired && getRequestGroupOptionality(node).isOptional
 
-  const paramsSignature = ast.params.print(
+  const paramsSignature = printParams(
     ast.factory.createFunctionParameters({
       params: [ast.factory.createFunctionParameter({ name: 'options', type: optionsType, ...(isOptional ? { default: '{}' } : {}) })],
     }),

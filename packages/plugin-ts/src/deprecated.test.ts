@@ -5,7 +5,7 @@ import { functionPrinter } from './deprecated.ts'
 describe('functionPrinter', () => {
   const params = ast.factory.createFunctionParameters({ params: [ast.factory.createFunctionParameter({ name: 'petId', type: 'string' })] })
 
-  it('prints through ast.params without transforms', () => {
+  it('prints through printParams without transforms', () => {
     expect(functionPrinter({ mode: 'declaration' }).print(params)).toBe('petId: string')
   })
 

@@ -1,7 +1,7 @@
 import { getNestedAccessor } from '@internals/utils'
 import { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function } from '@kubb/renderer-jsx'
+import { Function, printParams } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { CallReturnTypeProps, Infinite } from '../types.ts'
 import {
@@ -73,7 +73,7 @@ export function InfiniteQueryOptions({
 
   const groupedKeyParam = buildGroupedRequestParam(node, { resolver: tsResolver, keys: queryKeyGroupOrder, memberTypeWrapper })
   const queryKeyParamsNode = ast.factory.createFunctionParameters({ params: groupedKeyParam ? [groupedKeyParam] : [] })
-  const queryKeyParamsCall = ast.params.print(queryKeyParamsNode, 'call')
+  const queryKeyParamsCall = printParams(queryKeyParamsNode, 'call')
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver, memberTypeWrapper })
   // The page param replaces the configured query parameter of the request, typed as that parameter.

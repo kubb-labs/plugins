@@ -1,6 +1,6 @@
-import { ast } from '@kubb/kit'
+import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function } from '@kubb/renderer-jsx'
+import { Function, printParams } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildQueryKeyParams, buildQueryOptionsParams, buildResponseTypes } from '@internals/tanstack-query'
 import type { HookResultProps } from '@internals/tanstack-query'
@@ -20,10 +20,10 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   const generics = [TData, TError, `${queryKeyTypeName} | null`]
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
-  const queryKeyParamsCall = ast.params.print(queryKeyParamsNode, 'call')
+  const queryKeyParamsCall = printParams(queryKeyParamsNode, 'call')
 
   const queryOptionsParamsNode = buildQueryOptionsParams(node, { resolver: tsResolver })
-  const queryOptionsParamsCall = ast.params.print(queryOptionsParamsNode, 'call')
+  const queryOptionsParamsCall = printParams(queryOptionsParamsNode, 'call')
 
   const paramsNode = buildHookParams(node, {
     resolver: tsResolver,
@@ -36,7 +36,7 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   })
 
   return (
-    <Function name={name} export params={paramsNode} JSDoc={{ comments: getComments(node) }}>
+    <Function name={name} export params={paramsNode} comments={getComments(node)}>
       {`
        const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 

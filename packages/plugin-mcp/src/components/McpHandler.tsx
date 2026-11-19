@@ -49,16 +49,7 @@ export function McpHandler({ name, clientName, node, resolver, returnType = 'ful
 }`
 
   return (
-    <Function
-      name={name}
-      async
-      export
-      params={paramsSignature}
-      JSDoc={{
-        comments: buildOperationComments(node),
-      }}
-      returnType={'CallToolResult'}
-    >
+    <Function name={name} async export params={paramsSignature} comments={buildOperationComments(node)} returnType={'CallToolResult'}>
       {`const res = await ${clientName}(${callArg})`}
       <br />
       {callToolResult}

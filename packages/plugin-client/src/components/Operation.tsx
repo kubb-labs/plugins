@@ -59,7 +59,7 @@ export function Operation({ name, node, types, validatorHooks, returnType, throw
       generics={body.generics}
       params={body.paramsSignature}
       returnType={body.returnType}
-      JSDoc={{ comments: buildOperationComments(node, { splitLines: true }) }}
+      comments={buildOperationComments(node, { splitLines: true })}
     >
       {body.mergeContentType
         ? 'const { client: apiClient = client, contentType, ...config } = options'
