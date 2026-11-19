@@ -8,7 +8,9 @@ export {
   createIndexedAccessType,
   createObjectBindingPattern,
   createTypeLiteral,
-} from './printers/functionParams.ts'
+  functionPrinter,
+  renderType,
+} from './deprecated.ts'
 export type {
   FunctionParameterNode,
   FunctionParametersNode,
@@ -16,8 +18,7 @@ export type {
   ObjectBindingPatternNode,
   TypeExpression,
   TypeLiteralNode,
-} from './printers/functionParams.ts'
-export { functionPrinter, renderType } from './printers/functionPrinter.ts'
+} from './deprecated.ts'
 export type { PrinterTsFactory, PrinterTsNodes, PrinterTsOptions } from './printers/printerTs.ts'
 export { printerTs } from './printers/printerTs.ts'
 export { resolverTs } from './resolvers/resolverTs.ts'
