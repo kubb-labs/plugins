@@ -272,13 +272,13 @@ export const printerTs = createPrinter<PrinterTs>((options) => {
           const enumNode = ast.schema.narrow(m, ast.schema.types.enum)
           return enumNode?.primitive === 'string'
         })
-        const hasPlainString = members.some((m) => ast.schema.isString(m))
+        const hasPlainString = members.some((m) => ast.schema.is(m, 'string'))
 
         if (hasStringLiteral && hasPlainString) {
           const memberNodes = members
             .map((m) => {
               const print = (node: ast.SchemaNode) =>
-                ast.schema.isString(node)
+                ast.schema.is(node, 'string')
                   ? factory.createIntersectionDeclaration({ nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])] })
                   : this.transform(node)
 
