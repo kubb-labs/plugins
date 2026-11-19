@@ -75,11 +75,11 @@ For a credential that no security scheme describes, such as a request signature,
 
 `client.interceptors` has three stacks. Each handler gets the value the one before it returned:
 
-| Stack      | Runs                                                                    | Gets              | Returns                                        |
-| ---------- | ----------------------------------------------------------------------- | ----------------- | ---------------------------------------------- |
-| `request`  | After the URL, body, and auth are built, before the send.               | `ResolvedRequest` | The request.                                   |
-| `response` | After the body is decoded, before the status check and validator.       | `DecodedResponse` | The result.                                    |
-| `error`    | When a call fails: `ResponseError`, network error, abort, `ParseError`. | The error         | Another error to throw, or nothing to keep it. |
+| Stack      | Runs                                                                         | Gets              | Returns                                        |
+| ---------- | ---------------------------------------------------------------------------- | ----------------- | ---------------------------------------------- |
+| `request`  | After the URL, body, and auth are built, before the send.                    | `ResolvedRequest` | The request.                                   |
+| `response` | After the body is decoded, before the status check and validator.            | `DecodedResponse` | The result.                                    |
+| `error`    | When a call fails: `ResponseError`, network error, abort, `ValidationError`. | The error         | Another error to throw, or nothing to keep it. |
 
 ::code-group
 

@@ -61,7 +61,7 @@ if (result.error !== undefined) console.error(result.status, result.error)
 
 ### validator
 
-Checks requests and responses against the schemas of `@kubb/plugin-zod` or `@kubb/plugin-valibot`. Add `pluginZod()` for `'zod'` or `pluginValibot()` for `'valibot'`. A value that fails its schema throws a `ParseError`.
+Checks requests and responses against the schemas of `@kubb/plugin-zod` or `@kubb/plugin-valibot`. Add `pluginZod()` for `'zod'` or `pluginValibot()` for `'valibot'`. A value that fails its schema throws a `ValidationError`.
 
 |          |                                                                   |
 | -------- | ----------------------------------------------------------------- |

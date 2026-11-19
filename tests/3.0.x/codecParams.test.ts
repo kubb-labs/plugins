@@ -113,7 +113,7 @@ function readSchemas(client: Client, name: string) {
 }
 
 /**
- * Asserts a call is rejected with a `ParseError` reporting the given request `source`, before anything is sent.
+ * Asserts a call is rejected with a `ValidationError` reporting the given request `source`, before anything is sent.
  */
 async function expectRejected(client: Client, call: (onValidationError: unknown) => Promise<unknown>, source: string) {
   const contexts: Array<ValidationErrorContext> = []

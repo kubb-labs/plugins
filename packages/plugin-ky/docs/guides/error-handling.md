@@ -10,8 +10,8 @@ Only a non-2xx response depends on `throwOnError`:
 | ---------------------------------------- | ----------------------------------------------------------------------------------------- |
 | 2xx response                             | Resolves with `data`.                                                                     |
 | Non-2xx response                         | Throws a `ResponseError`. With `throwOnError: false`, resolves with `error` and `status`. |
-| A body fails its schema (`validator` on) | Throws a `ParseError`.                                                                    |
-| Invalid JSON under a JSON media type     | Throws a `ParseError`.                                                                    |
+| A body fails its schema (`validator` on) | Throws a `ValidationError`.                                                               |
+| Invalid JSON under a JSON media type     | Throws a `ValidationError`.                                                               |
 | Network or DNS failure                   | Rejects with the `NetworkError` from Ky.                                                  |
 | No response headers within `timeout`     | Rejects with the `TimeoutError` from Ky.                                                  |
 | Aborted `signal`                         | Rejects with the signal's reason.                                                         |
@@ -42,7 +42,7 @@ class ResponseError extends Error {
   headers: Headers // such as error.headers.get('Retry-After')
   request: Request
   response: Response
-  validationError?: ParseError // set when `onValidationError` replaced a body that failed its schema
+  validationError?: ValidationError // set when `onValidationError` replaced a body that failed its schema
 }
 ```
 
@@ -97,25 +97,27 @@ const pet = await getPetById({ path: { petId: 1 }, throwOnError: true }) // thro
 
 ## Validation failures
 
-With [`validator`](https://kubb.dev/extensions/kubb-labs/plugin-ky/options#validator) on, a body that does not match its Zod schema throws a `ParseError` with the schema's `issues`:
+With [`validator`](https://kubb.dev/extensions/kubb-labs/plugin-ky/options#validator) on, a body that does not match its Zod schema throws a `ValidationError` with the schema's `issues`:
 
 ```typescript
-import { ParseError } from './gen/.kubb/standardSchema'
+import { ValidationError } from './gen/.kubb/standardSchema'
 
 try {
   await getPetById({ path: { petId: 1 } })
 } catch (error) {
-  if (error instanceof ParseError) console.error(error.issues) // [{ message, path }]
+  if (error instanceof ValidationError) console.error(error.issues) // [{ message, path }]
 }
 ```
 
-A `ParseError` from a response body also carries `status`, `method`, `direction` (`'response'` or `'error'`), and `source`. So when a non-2xx body does not match its error schema, the status is still there:
+`ValidationError` was called `ParseError`. The old name is still exported and deprecated, and `error.name` is still `'ParseError'`.
+
+A `ValidationError` from a response body also carries `status`, `method`, `direction` (`'response'` or `'error'`), and `source`. So when a non-2xx body does not match its error schema, the status is still there:
 
 ```typescript
-if (error instanceof ParseError && error.status === 404) return null
+if (error instanceof ValidationError && error.status === 404) return null
 ```
 
-To recover, pass `onValidationError` on the call or the client. Return `{ value }` to use that value, or nothing to throw the `ParseError`:
+To recover, pass `onValidationError` on the call or the client. Return `{ value }` to use that value, or nothing to throw the `ValidationError`:
 
 ```typescript
 client.setConfig({
@@ -126,7 +128,7 @@ client.setConfig({
 })
 ```
 
-When the handler returns `{ value }` for an error body, the call throws the `ResponseError` as usual, with the `ParseError` on `error.validationError`:
+When the handler returns `{ value }` for an error body, the call throws the `ResponseError` as usual, with the `ValidationError` on `error.validationError`:
 
 ```typescript
 if (ResponseError.is(error) && error.status === 404) console.warn(error.validationError?.issues)

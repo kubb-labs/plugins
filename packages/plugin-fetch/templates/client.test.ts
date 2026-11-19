@@ -899,7 +899,7 @@ describe('createClientCore', () => {
     expect(error).toHaveBeenCalledTimes(1)
   })
 
-  test('keeps the status on the ParseError of an error body, and the issues on the ResponseError', async () => {
+  test('keeps the status on the ValidationError of an error body, and the issues on the ResponseError', async () => {
     const { client } = createClient({ data: { error: 'not found' }, status: 404 })
     const request = { method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } } as const
     await expect(client(request)).rejects.toMatchObject({ name: 'ParseError', status: 404, method: 'GET', direction: 'error', source: 'body' })
@@ -911,7 +911,7 @@ describe('createClientCore', () => {
     })
   })
 
-  test('throws the ParseError when no onValidationError is set', async () => {
+  test('throws the ValidationError when no onValidationError is set', async () => {
     const { client } = createClient({ data: { id: 1 }, status: 200 })
     await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({
       name: 'ParseError',
@@ -1148,7 +1148,7 @@ describe('media types', () => {
     },
   )
 
-  test('throws a ParseError for invalid JSON under a JSON media type, and keeps a non-JSON body as text under */*', async () => {
+  test('throws a ValidationError for invalid JSON under a JSON media type, and keeps a non-JSON body as text under */*', async () => {
     await expect(call(answer('Pet deleted', { 'content-type': 'application/json' }))).rejects.toMatchObject({
       name: 'ParseError',
       message: 'Invalid JSON in a application/json body',
