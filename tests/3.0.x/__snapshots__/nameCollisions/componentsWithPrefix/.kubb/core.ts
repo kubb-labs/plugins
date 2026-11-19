@@ -1156,7 +1156,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const isSuccess = status >= 200 && status < 300
     const header = webResponse.headers.get('Content-Type')
     const contentType = header ?? (isSuccess ? responseContentType : undefined) ?? '*/*'
-    const cursor: { lastEventId: string; idSeen?: boolean } = { lastEventId: '' }
+    const cursor = { lastEventId: '', idSeen: false }
     const context: MediaTypeContext = { contentType, status, signal: resolvedRequest.signal, config: requestConfig, cursor }
     // With retries on, a stream handler may open a dropped stream again from its last event ID.
     if (limit > 0) {

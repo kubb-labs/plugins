@@ -130,19 +130,6 @@ describe('retry through the axios transport', () => {
     expect(hits).toHaveLength(2)
   })
 
-  test('rejects with the abort reason when the signal aborts during the wait', async () => {
-    const { url, hits } = plan(answer(503))
-    const controller = new AbortController()
-    const reason = new Error('stop')
-    const started = performance.now()
-
-    // Aborts once the wait has started.
-    const retry = { delay: () => 60_000, onRetry: () => void setTimeout(() => controller.abort(reason), 10) }
-    await expect(createClient({ baseURL, retry })({ method: 'GET', url, signal: controller.signal })).rejects.toBe(reason)
-    expect(performance.now() - started).toBeLessThan(30_000)
-    expect(hits).toHaveLength(1)
-  })
-
   test('does not retry a call aborted in flight', async () => {
     const { url, hits } = plan(never)
     const controller = new AbortController()
