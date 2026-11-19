@@ -1026,7 +1026,17 @@ describe('fakerGenerator — custom imports', () => {
     }
   })
 
-  test('`this.import` in a printer.nodes handler adds the import to the file', async () => {
+  test.each([
+    ['a root schema', ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' })],
+    [
+      'an object property',
+      ast.factory.createSchema({
+        type: ast.schema.types.object,
+        name: 'Counter',
+        properties: [ast.factory.createProperty({ name: 'count', required: true, schema: ast.factory.createSchema({ type: ast.schema.types.bigint }) })],
+      }),
+    ],
+  ])('`this.import` in a printer.nodes handler on %s adds the import to the file', async (_name, schema) => {
     const options: PluginFaker['resolvedOptions'] = {
       ...defaultOptions,
       printer: {
@@ -1044,7 +1054,7 @@ describe('fakerGenerator — custom imports', () => {
       plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorSchema(fakerGenerator, ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' }), {
+    await renderGeneratorSchema(fakerGenerator, schema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

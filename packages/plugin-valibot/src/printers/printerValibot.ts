@@ -444,7 +444,6 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
   }
   // The node `print` reads without its input checks, because `v.omit` needs the bare object. Nested nodes keep theirs.
   let uncheckedNode: ast.SchemaNode | null = null
-  const unionsWithSiblings = new WeakSet<ast.SchemaNode>()
   // An OpenAPI 3.0 `nullable: true` set on an array item or union member, which only a property or a root applies.
   const printNullable = (schema: ast.SchemaNode, output: string | null) => (output && schema.nullable ? `v.nullable(${output})` : output)
   const formatString = (action: string, node: LengthConstraints) => pipe('v.string()', [action, ...lengthActions(node, options.regexType)])
@@ -623,7 +622,11 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       // `v.union` returns the first member that matches, and an object member drops the keys it does not
       // know. A strict member rejects those keys instead, so a `oneOf` value reaches the member it belongs to.
       const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
-      const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !unionsWithSiblings.has(node)
+      // A union next to sibling properties in an `allOf` shares its value with them, so its members cannot be strict.
+      const allOf = ast.schema.narrow(this.parent, ast.schema.types.intersection)
+      const hasSiblingProperties =
+        !!allOf?.members?.includes(node) && allOf.members.some((member) => member.type === ast.schema.types.object && member.properties.length > 0)
+      const isStrict = node.strategy === 'one' && !isXor && !isDiscriminated && !hasSiblingProperties
       const members = nodeMembers
         .map((member) => {
           const output = this.transform(isStrict ? strictOneOfNode(member) : member)
@@ -645,19 +648,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       const members = node.members ?? []
       const [first, ...rest] = members
       if (!first) return ''
-      // A union next to sibling properties shares its value with them, so its members cannot be strict.
-      const hasSiblingProperties = members.some((member) => member.type === ast.schema.types.object && member.properties.length > 0)
-      const transform = (member: ast.SchemaNode) => {
-        if (!hasSiblingProperties) return this.transform(member)
-        unionsWithSiblings.add(member)
-        try {
-          return this.transform(member)
-        } finally {
-          unionsWithSiblings.delete(member)
-        }
-      }
-
-      const firstBase = transform(first)
+      const firstBase = this.transform(first)
       if (!firstBase) return ''
 
       // An object `allOf` is a merge: one `v.object` with the entries of every member stays usable in `v.variant` and `v.omit`.
@@ -685,7 +676,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       const actions: Array<string> = []
       for (const member of rest) {
         const constraints = memberActions({ member, base, regexType: this.options.regexType })
-        const transformed = constraints.length ? null : transform(member)
+        const transformed = constraints.length ? null : this.transform(member)
         actions.push(...constraints)
         if (transformed) schemas.push(transformed)
       }
