@@ -1,6 +1,7 @@
 {
   "internals/client/src/resolveClient.test.ts": "User-facing config diagnostics for client selection; many branches, used by react-query, swr, vue-query and mcp plugins.",
   "internals/client/src/resolveClientOperation.test.ts": "Golden path for client include, exclude and override scoping and importPath resolution in the query plugins.",
+  "internals/shared/src/file.test.ts": "Pins getFile and getFileLocation to the hand-written <File> shell and resolver.file location they replaced in every generator.",
   "internals/shared/src/operation.test.ts": "Branchy parameter grouping, querystring spreading, dedupe (#1349), content types, stream shape detection.",
   "internals/shared/src/schema.test.ts": "isObjectSchemaNode, isObjectComposableIntersection, isPlainInlineObject and defaultLiteral are branchy predicates both schema printers decide on.",
   "internals/tanstack-query/src/components/InfiniteQueryOptions.test.tsx": "Branchy page-param combinations (previousParam mixes, null initialPageParam) the package generator tests do not render.",

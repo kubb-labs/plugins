@@ -1,4 +1,13 @@
-import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
+import {
+  buildOptionsSchema,
+  buildResponses,
+  getEnumNames,
+  getFile,
+  getFileLocation,
+  resolveContentTypeVariants,
+  resolveOperationFile,
+  toResponseContent,
+} from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -16,8 +25,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { enum: enumOptions, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
-    const { config, resolver, root } = ctx
+    const { enum: enumOptions, syntaxType, optionalType, arrayType, printer } = ctx.options
+    const { resolver } = ctx
+    const location = getFileLocation(ctx)
 
     if (enumOptions.type !== 'inlineLiteral') node = resolveInlineEnumNames({ node, owner: node.name ?? '', resolver, enumOptions })
     if (!node.name) {
@@ -28,7 +38,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const enumSchemaNames = getEnumNames(ctx)
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
 
-    const imports = resolver.imports({ node, root, output, group: group ?? undefined, name: importName })
+    const imports = resolver.imports({ node, ...location, name: importName })
 
     const enumNode = ast.schema.narrow(node, ast.schema.types.enum)
     // An inline `const` (single-value enum the adapter did not register) renders as a literal type,
@@ -37,7 +47,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const meta = {
       name: enumOptions.type === 'asConst' && isEnumSchema ? resolver.enum.keyName(node, enumOptions.typeSuffix) : resolver.name(node.name),
-      file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
+      file: resolver.file({ name: node.name, extname: '.ts', ...location }),
     } as const
 
     const schemaPrinter = printerTs({
@@ -53,13 +63,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...getFile(ctx, meta.file)}>
         {imports.map((imp) => (
           <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
         ))}
@@ -69,7 +73,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
   },
   operation(node, ctx) {
     const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer, operations } = ctx.options
-    const { config, resolver, root } = ctx
+    const { resolver, root } = ctx
+    const location = getFileLocation(ctx)
     const inline = operations === 'inline'
 
     const meta = {
@@ -100,7 +105,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       if (!schema) return null
       if (!inline && enumOptions.type !== 'inlineLiteral') schema = resolveInlineEnumNames({ node: schema, owner: node.operationId, resolver, enumOptions })
 
-      const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
+      const imports = resolver.imports({ node: schema, ...location, name: importName })
 
       const schemaPrinter = printerTs({
         optionalType,
@@ -262,13 +267,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const responseType = buildResponseType()
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...getFile(ctx, meta.file)}>
         {paramGroupTypes}
         {responseTypes}
         {responseHeaderTypes}

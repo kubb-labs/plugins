@@ -3,9 +3,11 @@ import {
   buildOptionsSchema,
   buildParamRefsSchema,
   buildParamsSchema,
-  buildResponseUnionSchema,
   buildResponses,
+  buildResponseUnionSchema,
   getCircularNames,
+  getFile,
+  getFileLocation,
   getOasAdapter,
   resolveOperationFile,
   schemaComments,
@@ -45,8 +47,9 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   name: 'valibot',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { adapter, config, resolver, root } = ctx
-    const { output, regexType, oneOfType, coercion, inferred, typeGuards, importPath, group, printer } = ctx.options
+    const { adapter, resolver } = ctx
+    const { regexType, oneOfType, coercion, inferred, typeGuards, importPath, printer } = ctx.options
+    const location = getFileLocation(ctx)
 
     if (!node.name) {
       return
@@ -60,12 +63,12 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     const inputImports = hasDirectionalNode
       ? collectDirectionalRefNames({ node, printerOptions }).map((schemaName) => ({
           name: [resolver.schema.inputName(schemaName)],
-          path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
+          path: resolver.file({ name: schemaName, extname: '.ts', ...location }).path,
         }))
       : []
     const imports = [
       ...new Map(
-        [...resolver.imports({ node, root, output, group: group ?? undefined, checks: true }), ...inputImports].map(
+        [...resolver.imports({ node, ...location, checks: true }), ...inputImports].map(
           (imp) => [`${Array.isArray(imp.name) ? imp.name.join(',') : imp.name}|${imp.path}`, imp] as const,
         ),
       ).values(),
@@ -73,17 +76,11 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     const inputName = resolver.schema.inputName(node.name)
     const meta = {
       name: resolver.name(node.name),
-      file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
+      file: resolver.file({ name: node.name, extname: '.ts', ...location }),
     } as const
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...getFile(ctx, meta.file)}>
         <File.Import name="v" path={importPath} isNameSpace />
         {imports.map((imp) => (
           <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
@@ -119,8 +116,9 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { adapter, config, resolver, root } = ctx
+    const { adapter, resolver, root } = ctx
     const { output, regexType, oneOfType, coercion, inferred, importPath, group, printer } = ctx.options
+    const location = getFileLocation(ctx)
     const dateType = getOasAdapter(adapter).options.dateType
 
     const meta = {
@@ -163,9 +161,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       const inputRefNames = direction === 'encode' ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
       const imports = resolver.imports({
         node: schema,
-        root,
-        output,
-        group: group ?? undefined,
+        ...location,
         checks: true,
         name: (schemaName) => (inputRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
       })
@@ -271,13 +267,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     const responsesSchema = inferred ? renderSchemaEntry({ schema: buildResponses(node, resolver), name: resolver.response.responses(node) }) : null
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...getFile(ctx, meta.file)}>
         <File.Import name="v" path={importPath} isNameSpace />
         {paramSchemas}
         {responseSchemas}

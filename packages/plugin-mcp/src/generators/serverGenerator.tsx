@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
+import { getFile, getFileLocation, hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -19,7 +19,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { config, resolver, plugin, root } = ctx
-    const { output, group } = ctx.options
+    const { output } = ctx.options
+    const location = getFileLocation(ctx)
 
     const pluginZod = ctx.requirePlugin(pluginZodName)
 
@@ -53,7 +54,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       .map((node) => {
         const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
 
-        const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
+        const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), ...location })
         const zodFile = resolveOperationFile({
           ctx,
           node,
@@ -112,13 +113,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
 
     return (
       <>
-        <File
-          baseName={serverFile.baseName}
-          path={serverFile.path}
-          meta={serverFile.meta}
-          banner={resolver.default.banner(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
-          footer={resolver.default.footer(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
-        >
+        <File {...getFile(ctx, serverFile)}>
           <File.Import name={['McpServer']} path={'@modelcontextprotocol/server'} />
           <File.Import name={['serveStdio']} path={'@modelcontextprotocol/server/stdio'} />
           <File.Import name={['z']} path={'zod'} />
@@ -127,13 +122,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           <Server serverName={ctx.meta.title ?? 'server'} serverVersion={ctx.meta.version ?? '0.0.0'} operations={operationsMapped} />
         </File>
 
-        <File
-          baseName={startFile.baseName}
-          path={startFile.path}
-          meta={startFile.meta}
-          banner={resolver.default.banner(ctx.meta, { output, config, file: { path: startFile.path, baseName: startFile.baseName } })}
-          footer={resolver.default.footer(ctx.meta, { output, config, file: { path: startFile.path, baseName: startFile.baseName } })}
-        >
+        <File {...getFile(ctx, startFile)}>
           <File.Import name={['startServer']} root={startFile.path} path={serverFile.path} />
           {/* Not indexable: barrels must not re-export this entry, importing it starts the server. */}
           <File.Source name="start">{'void startServer()'}</File.Source>

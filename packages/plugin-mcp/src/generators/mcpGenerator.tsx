@@ -1,5 +1,5 @@
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
-import { hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
+import { getFile, getFileLocation, hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
@@ -18,8 +18,9 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     if (!ast.http.isOperation(node)) return null
     // A stream has no single JSON body to return as tool output, like the query plugins skip it.
     if (isEventStream(node) || hasStreamVariant(node)) return null
-    const { resolver, root, config } = ctx
-    const { output, client, group } = ctx.options
+    const { resolver, root } = ctx
+    const { output, client } = ctx.options
+    const location = getFileLocation(ctx)
 
     const types = resolveOperationTypes(ctx, resolver.pluginName)
     const tsResolver = types.resolver
@@ -35,7 +36,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const meta = {
       name: resolver.handler.name(node),
-      file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
+      file: resolver.file({ ...operationFileEntry(node, node.operationId), ...location }),
       fileTs: resolveOperationFile({
         ctx,
         node,
@@ -47,13 +48,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     } as const
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...getFile(ctx, meta.file)}>
         {meta.fileTs && optionsName && <File.Import name={[optionsName]} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
         <File.Import name={['CallToolResult', 'ServerContext']} path={'@modelcontextprotocol/server'} isTypeOnly />
 

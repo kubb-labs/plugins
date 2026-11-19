@@ -33,6 +33,7 @@ export {
   toResponseContent,
 } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
+export { getFile, getFileLocation } from './file.ts'
 export {
   createCasedFile,
   createOperationParamResolver,

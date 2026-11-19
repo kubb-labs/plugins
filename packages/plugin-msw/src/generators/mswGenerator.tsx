@@ -1,4 +1,4 @@
-import { getEnumNames, resolveOperationFile } from '@internals/shared'
+import { getEnumNames, getFile, getFileLocation, resolveOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -19,13 +19,14 @@ export const mswGenerator = defineGenerator<PluginMsw>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver, config, root } = ctx
-    const { output, parser, baseURL, group } = ctx.options
+    const { resolver, root } = ctx
+    const { output, parser, baseURL } = ctx.options
+    const location = getFileLocation(ctx)
 
     const fileName = resolver.name(node.operationId)
     const mock = {
       name: resolver.handler.name(node),
-      file: resolver.file({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
+      file: resolver.file({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, ...location }),
     }
 
     const fakerPlugin = parser === 'faker' ? ctx.requirePlugin(pluginFakerName) : null
@@ -91,13 +92,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const requestName = ast.http.requestBody.getSchema(node) ? tsResolver.response.body(node) : null
 
     return (
-      <File
-        baseName={mock.file.baseName}
-        path={mock.file.path}
-        meta={mock.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
-      >
+      <File {...getFile(ctx, mock.file)}>
         <File.Import name={['http', 'HttpResponse']} path="msw/http" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
         {requestName && <File.Import name={['DefaultBodyType']} isTypeOnly path="msw" />}

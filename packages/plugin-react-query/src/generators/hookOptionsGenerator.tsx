@@ -1,4 +1,4 @@
-import { operationFileEntry } from '@internals/shared'
+import { getFile, getFileLocation, operationFileEntry } from '@internals/shared'
 import { matchesInfinite } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
@@ -19,13 +19,14 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-hook-options',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { resolver, config, root } = ctx
-    const { output, customOptions, query, mutation, suspense, infinite, group, override, hooks } = ctx.options
+    const { resolver } = ctx
+    const { customOptions, query, mutation, suspense, infinite, override, hooks } = ctx.options
+    const location = getFileLocation(ctx)
 
     if (!customOptions || !hooks) return null
 
     const name = resolver.hook.optionsName()
-    const resolvedFile = resolver.file({ name, extname: '.ts', root, output, group: group ?? undefined })
+    const resolvedFile = resolver.file({ name, extname: '.ts', ...location })
     const hookOptionsFile = {
       ...resolvedFile,
       baseName: `${name}.ts` as const,
@@ -60,20 +61,14 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         if (!enabled) continue
         const optionsName = ns.optionsName(node)
         const hookName = ns.name(node)
-        const hookFile = resolver.file({ ...operationFileEntry(node, hookName), root, output, group: group ?? undefined })
+        const hookFile = resolver.file({ ...operationFileEntry(node, hookName), ...location })
         imports.push(<File.Import name={[optionsName]} root={hookOptionsFile.path} path={hookFile.path} />)
         hookOptions[hookName] = `Partial<ReturnType<typeof ${optionsName}>>`
       }
     }
 
     return (
-      <File
-        baseName={hookOptionsFile.baseName}
-        path={hookOptionsFile.path}
-        meta={hookOptionsFile.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
-      >
+      <File {...getFile(ctx, hookOptionsFile)}>
         {imports}
         <File.Source name={name} isExportable isIndexable isTypeOnly>
           <Type export name={name}>

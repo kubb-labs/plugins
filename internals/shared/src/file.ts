@@ -1,0 +1,50 @@
+import type { ast, GeneratorContext, Group, Output, Resolver } from '@kubb/kit'
+
+type FileLocationContext = Pick<GeneratorContext, 'root'> & {
+  options: { output: Output; group?: Group | null }
+}
+
+type FileContext = Pick<GeneratorContext, 'config' | 'meta'> & {
+  resolver: Pick<Resolver, 'default'>
+  options: { output: Output }
+}
+
+/**
+ * Where the current plugin writes its files: the `root`, `output` and `group` every
+ * `resolver.file` and `resolver.imports` call takes, read from the generator context.
+ * A call that resolves another plugin's file passes that plugin's values instead.
+ *
+ * @example
+ * ```ts
+ * const file = resolver.file({ name: node.name, extname: '.ts', ...getFileLocation(ctx) })
+ * ```
+ */
+export function getFileLocation(ctx: FileLocationContext): { root: string; output: Output; group: Group | undefined } {
+  return { root: ctx.root, output: ctx.options.output, group: ctx.options.group ?? undefined }
+}
+
+/**
+ * Builds the props of the `<File>` a generator renders for `file`: its `baseName`, `path` and `meta`,
+ * plus the `banner` and `footer` the current plugin's `output` sets.
+ *
+ * @example
+ * ```tsx
+ * <File {...getFile(ctx, file)}>{children}</File>
+ * ```
+ */
+export function getFile<TFile extends Pick<ast.FileNode, 'baseName' | 'path' | 'meta'>>(
+  ctx: FileContext,
+  file: TFile,
+): Pick<TFile, 'baseName' | 'path' | 'meta'> & { banner: string | null; footer: string | null } {
+  const { config, meta, resolver } = ctx
+  const { output } = ctx.options
+  const bannerFile = { path: file.path, baseName: file.baseName }
+
+  return {
+    baseName: file.baseName,
+    path: file.path,
+    meta: file.meta,
+    banner: resolver.default.banner(meta, { output, config, file: bannerFile }),
+    footer: resolver.default.footer(meta, { output, config, file: bannerFile }),
+  }
+}

@@ -1,3 +1,4 @@
+import { getFileLocation } from '@internals/shared'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -16,7 +17,8 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { resolver, root } = ctx
-    const { output, customOptions, query, group, hooks } = ctx.options
+    const { output, customOptions, query, hooks } = ctx.options
+    const location = getFileLocation(ctx)
 
     // The starter file imports the `HookOptions` type, which is only generated alongside the hooks.
     if (!customOptions || !hooks) return null
@@ -39,9 +41,7 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
         extname: '.ts',
         tag: firstNode.tags[0] ?? 'default',
         path: firstNode.path,
-        root,
-        output,
-        group: group ?? undefined,
+        ...location,
       })
       basePath = path.dirname(hookFile.path)
     }
@@ -65,9 +65,7 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
     if (fs.existsSync(file.path)) return null
 
     // Same path `hookOptionsGenerator` writes the type to, so the import resolves without a root barrel.
-    const hookOptionsPath = resolver
-      .file({ name: hookOptionsName, extname: '.ts', root, output, group: group ?? undefined })
-      .path.replace(/[^/\\]+\.ts$/, `${hookOptionsName}.ts`)
+    const hookOptionsPath = resolver.file({ name: hookOptionsName, extname: '.ts', ...location }).path.replace(/[^/\\]+\.ts$/, `${hookOptionsName}.ts`)
 
     return (
       <File baseName={file.baseName} path={file.path}>

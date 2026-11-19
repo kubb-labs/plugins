@@ -1,4 +1,4 @@
-import { operationKey, resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
+import { getFile, getFileLocation, operationKey, resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -15,8 +15,9 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { config, resolver, root } = ctx
-    const { output, baseURL, group } = ctx.options
+    const { resolver, root } = ctx
+    const { output, baseURL } = ctx.options
+    const location = getFileLocation(ctx)
 
     const pluginTs = ctx.requirePlugin(pluginTsName)
 
@@ -27,7 +28,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const meta = {
       name: resolver.resolveName({ key: operationKey(node), name }),
-      file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
+      file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, ...location }),
       fileTs: resolveOperationFile({
         ctx,
         node,
@@ -39,13 +40,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     } as const
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...getFile(ctx, meta.file)}>
         <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>
