@@ -126,7 +126,7 @@ client.setConfig({
 })
 ```
 
-When the handler returns `{ value }` for an error body, the call throws the `ResponseError` as usual, with the `ParseError` on `error.validationError`:
+When the handler returns `{ value }` for an error body, the call throws the `ResponseError` as usual, with the `ParseError` on `error.validationError`. With `throwOnError: false`, the call resolves with that value as `error` instead:
 
 ```typescript
 if (ResponseError.is(error) && error.status === 404) console.warn(error.validationError?.issues)
