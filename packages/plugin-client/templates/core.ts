@@ -1171,12 +1171,12 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         if ((response.status >= 200 && response.status < 300) || !(await waitForRetry({ response }))) return attempt
       }
     }
-    const sent = await connect()
-    const {
-      webResponse,
-      request: nativeRequest,
-      response: nativeResponse,
-    } = isResponse(sent) ? { webResponse: sent, request: toNativeRequest(resolvedRequest) as TRequest, response: sent as TResponse & Response } : sent
+    // A transport that answers with a bare `Response` gets the native request built for it.
+    const open = async (): Promise<TransportResult<TRequest, TResponse>> => {
+      const sent = await connect()
+      return isResponse(sent) ? { webResponse: sent, request: toNativeRequest(resolvedRequest) as TRequest, response: sent as TResponse & Response } : sent
+    }
+    const { webResponse, request: nativeRequest, response: nativeResponse } = await open()
 
     const status = webResponse.status
     const isSuccess = status >= 200 && status < 300
@@ -1262,16 +1262,45 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       if (requestConfig.eventShape === 'event') return { ...(item as object), ...((await validate(item)) as object) }
       return validate(item)
     }
-    // With retries on, a Server-Sent Events stream that drops is opened again from its last event ID.
+    // Opens the stream again from its last event ID. Resolves to nothing when the server says to stop.
+    const reopen = async (): Promise<{ body: ReadableStream<Uint8Array>; context: MediaTypeContext } | undefined> => {
+      // Until the stream sends an `id`, the `Last-Event-ID` the caller sent stays. After that, an empty `id:` clears it.
+      if (cursor.idSeen) deleteHeader(resolvedRequest.headers, 'last-event-id')
+      if (cursor.lastEventId) resolvedRequest.headers['Last-Event-ID'] = cursor.lastEventId
+      const { webResponse: response, request, response: native } = await open()
+      // A 204 tells the client to stop reconnecting.
+      if (response.status === 204) return undefined
+      const isOk = response.status >= 200 && response.status < 300
+      // A reopen without a `Content-Type` takes the declared one, as the first response does.
+      const reopened = response.headers.get('Content-Type') ?? contentType
+      if (isOk && response.body && baseContentType(reopened) === 'text/event-stream') {
+        return { body: response.body, context: { ...context, status: response.status, contentType: reopened } }
+      }
+      release(response)
+      const type = baseContentType(response.headers.get('Content-Type'))
+      const error = isOk
+        ? new TypeError(`Expected a streamed body, got ${type ?? 'a body without a content type'}`)
+        : new ResponseError({
+            data: undefined,
+            status: response.status,
+            statusText: response.statusText,
+            contentType: type,
+            headers: response.headers,
+            request,
+            response: native,
+            method: resolvedRequest.method,
+            url: resolvedRequest.url,
+          })
+      // Thrown while the caller iterates, so the error interceptors run here.
+      throw await run.error(error, requestConfig)
+    }
+    // With retries on, a Server-Sent Events stream that drops is opened again.
     async function* reconnecting(first: ReadableStream<Uint8Array>): AsyncGenerator<unknown> {
-      if (!streamType?.stream) return
-      let body = first
-      // Each reopened response brings its own status and content type. The cursor stays the same.
-      let current = context
-      while (true) {
-        const watched = watchReads(body)
+      let current: Awaited<ReturnType<typeof reopen>> = { body: first, context }
+      while (current && streamType?.stream) {
+        const watched = watchReads(current.body)
         try {
-          for await (const item of streamType.stream(watched.stream, current)) {
+          for await (const item of streamType.stream(watched.stream, current.context)) {
             // A stream that delivers again starts a new run of retries.
             retryCount = 0
             yield item
@@ -1280,36 +1309,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         } catch (error) {
           if (error !== watched.failure || !(await waitForRetry({ error }))) throw error
         }
-        // Until the stream sends an `id`, the `Last-Event-ID` the caller sent stays. After that, an empty `id:` clears it.
-        if (cursor.idSeen) deleteHeader(resolvedRequest.headers, 'last-event-id')
-        if (cursor.lastEventId) resolvedRequest.headers['Last-Event-ID'] = cursor.lastEventId
-        const next = await connect()
-        const response = isResponse(next) ? next : next.webResponse
-        // A 204 tells the client to stop reconnecting.
-        if (response.status === 204) return
-        const reopened = baseContentType(response.headers.get('Content-Type'))
-        // A reopen without a `Content-Type` takes the declared one, as the first response does.
-        if (response.status < 200 || response.status >= 300 || !response.body || (reopened ?? baseContentType(contentType)) !== 'text/event-stream') {
-          await response.body?.cancel().catch(() => {})
-          const error =
-            response.status >= 200 && response.status < 300
-              ? new TypeError(`Expected a streamed body, got ${reopened ?? 'a body without a content type'}`)
-              : new ResponseError({
-                  data: undefined,
-                  status: response.status,
-                  statusText: response.statusText,
-                  contentType: reopened,
-                  headers: response.headers,
-                  request: isResponse(next) ? (toNativeRequest(resolvedRequest) as TRequest) : next.request,
-                  response: (isResponse(next) ? next : next.response) as TResponse,
-                  method: resolvedRequest.method,
-                  url: resolvedRequest.url,
-                })
-          // Thrown while the caller iterates, so the error interceptors run here.
-          throw await run.error(error, requestConfig)
-        }
-        body = response.body
-        current = { ...context, status: response.status, contentType: response.headers.get('Content-Type') ?? contentType }
+        current = await reopen()
       }
     }
     const resumes = limit > 0 && baseContentType(contentType) === 'text/event-stream'
