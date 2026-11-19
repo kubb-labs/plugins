@@ -84,7 +84,7 @@ describe('retry', () => {
     expect(sent(recovers)).toHaveLength(2)
 
     const shorthand = route(503)
-    await expect(createClient({ baseURL, retry: 1 })({ url: shorthand })).rejects.toMatchObject({ status: 503 })
+    await expect(createClient({ baseURL, retry: 1 })({ url: shorthand })).rejects.toMatchObject({ status: 503, data: { status: 503 } })
     expect(sent(shorthand)).toHaveLength(2)
 
     const limited = route(503)

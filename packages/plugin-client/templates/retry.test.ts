@@ -75,6 +75,38 @@ describe('retry', () => {
     expect(transport).toHaveBeenCalledTimes(7)
   })
 
+  test('sends a call once for a null retry and for a body that can be read once', async () => {
+    const transport = vi.fn(async () => busy())
+
+    // JavaScript callers can pass `null`, which the types rule out.
+    await expect(createClientCore({ defaultTransport: transport })({ url: '/pets', retry: null as never })).rejects.toMatchObject({ status: 503 })
+    expect(transport).toHaveBeenCalledOnce()
+
+    async function* chunks() {
+      yield new Uint8Array([1])
+    }
+    const client = createClientCore({
+      defaultTransport: transport,
+      retry: { delay: () => 0 },
+      mediaTypes: { 'application/octet-stream': { encode: () => chunks() as never } },
+    })
+    await expect(client({ url: '/files', method: 'PUT', body: {}, contentType: { request: 'application/octet-stream' } })).rejects.toMatchObject({
+      status: 503,
+    })
+    expect(transport).toHaveBeenCalledTimes(2)
+  })
+
+  test('releases the response when shouldRetry throws', async () => {
+    const cancel = vi.fn()
+    const transport = vi.fn(async () => new Response(new ReadableStream({ cancel }), { status: 503 }))
+    const shouldRetry = () => {
+      throw new Error('hook failed')
+    }
+
+    await expect(createClientCore({ defaultTransport: transport, retry: { shouldRetry } })({ url: '/pets' })).rejects.toThrow('hook failed')
+    await vi.waitFor(() => expect(cancel).toHaveBeenCalledOnce())
+  })
+
   test('reads a fractional Retry-After as seconds, and returns the response when the wait is over a minute', async () => {
     const onRetry = vi.fn()
     const answers = [new Response(null, { status: 503, headers: { 'retry-after': '0.01' } }), ok()]
