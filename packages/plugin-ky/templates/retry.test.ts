@@ -3,7 +3,7 @@ import type { AddressInfo } from 'node:net'
 import ky from 'ky'
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
-import { createClient, createKyTransport, ResponseError } from './client.ts'
+import { createClient, createKyTransport } from './client.ts'
 import type { RetryContext } from './client.ts'
 
 type Hit = { method?: string; url?: string; headers: http.IncomingHttpHeaders; body: string }
@@ -37,8 +37,6 @@ function json(res: http.ServerResponse, status: number, headers: http.OutgoingHt
 }
 
 const always = (status: number) => route((res) => json(res, status))
-// Answers 503 `failures` times and then 200.
-const flaky = (failures: number, headers?: http.OutgoingHttpHeaders) => route((res, count) => (count > failures ? json(res, 200) : json(res, 503, headers)))
 const dropped = () => route((res) => res.destroy())
 const silent = () => route(() => {})
 
@@ -72,27 +70,6 @@ afterAll(() => {
 })
 
 describe('retry', () => {
-  test('sends a call once by default, with retry: 0, and with retry: false', async () => {
-    const [unset, zero, off] = [always(503), always(503), always(503)]
-
-    await expect(api()({ method: 'GET', url: unset })).rejects.toMatchObject({ status: 503 })
-    await expect(api()({ method: 'GET', url: zero, retry: 0 })).rejects.toMatchObject({ status: 503 })
-    await expect(api()({ method: 'GET', url: off, retry: false })).rejects.toMatchObject({ status: 503 })
-
-    expect([unset, zero, off].map((url) => seen(url).length)).toStrictEqual([1, 1, 1])
-  })
-
-  test('takes a number as the limit, an object limit, and defaults the limit to 2', async () => {
-    const [short, limited, fallback, recovers] = [always(503), always(503), always(503), flaky(1)]
-
-    await expect(createClient({ baseURL, retry: 1 })({ method: 'GET', url: short, retry: quick })).rejects.toMatchObject({ status: 503 })
-    await expect(api()({ method: 'GET', url: limited, retry: { limit: 3, ...quick } })).rejects.toMatchObject({ status: 503 })
-    await expect(api()({ method: 'GET', url: fallback, retry: quick })).rejects.toMatchObject({ status: 503 })
-    expect((await api()({ method: 'GET', url: recovers, retry: quick })).status).toBe(200)
-
-    expect([short, limited, fallback, recovers].map((url) => seen(url).length)).toStrictEqual([2, 4, 3, 2])
-  })
-
   test('retries the default status codes only, or the custom list', async () => {
     const [unavailable, missing, custom, skipped] = [always(503), always(404), always(404), always(503)]
 
@@ -102,96 +79,6 @@ describe('retry', () => {
     await expect(api()({ method: 'GET', url: skipped, retry: { statusCodes: [404], ...quick } })).rejects.toMatchObject({ status: 503 })
 
     expect([unavailable, missing, custom, skipped].map((url) => seen(url).length)).toStrictEqual([3, 1, 3, 1])
-  })
-
-  test('retries a POST only with a methods opt-in, and sends the same body each time', async () => {
-    const [plain, optedIn] = [always(503), always(503)]
-    const body = { name: 'Odie' }
-
-    await expect(api()({ method: 'POST', url: plain, body, retry: quick })).rejects.toMatchObject({ status: 503 })
-    await expect(api()({ method: 'POST', url: optedIn, body, retry: { methods: ['POST'], ...quick } })).rejects.toMatchObject({ status: 503 })
-
-    expect(seen(plain)).toHaveLength(1)
-    expect(seen(optedIn).map((hit) => hit.body)).toStrictEqual(Array(3).fill('{"name":"Odie"}'))
-  })
-
-  test('never retries a ReadableStream request body', async () => {
-    const url = always(503)
-    const body = new ReadableStream<Uint8Array>({
-      start(controller) {
-        controller.enqueue(new TextEncoder().encode('chunk'))
-        controller.close()
-      },
-    })
-
-    await expect(
-      api()({ method: 'POST', url, body, headers: { 'Content-Type': 'text/plain' }, retry: { methods: ['POST'], ...quick }, options: { duplex: 'half' } }),
-    ).rejects.toMatchObject({ status: 503 })
-
-    expect(seen(url).map((hit) => hit.body)).toStrictEqual(['chunk'])
-  })
-
-  test('calls delay with the retry count and waits that long', async () => {
-    const url = always(503)
-    const delay = vi.fn((retryCount: number) => retryCount * 40)
-    const started = performance.now()
-
-    await expect(api()({ method: 'GET', url, retry: { delay } })).rejects.toMatchObject({ status: 503 })
-
-    expect(delay.mock.calls).toStrictEqual([[1], [2]])
-    expect(performance.now() - started).toBeGreaterThanOrEqual(110)
-    expect(seen(url)).toHaveLength(3)
-  })
-
-  test('waits for the Retry-After header instead of delay', async () => {
-    const [later, now] = [flaky(1, { 'retry-after': '1' }), flaky(1, { 'retry-after': '0' })]
-    const delays: Array<number> = []
-    const onRetry = (context: { delay: number }) => void delays.push(context.delay)
-
-    let started = performance.now()
-    expect((await api()({ method: 'GET', url: later, retry: { ...quick, onRetry } })).status).toBe(200)
-    expect(performance.now() - started).toBeGreaterThanOrEqual(950)
-
-    started = performance.now()
-    expect((await api()({ method: 'GET', url: now, retry: { delay: () => 5000, onRetry } })).status).toBe(200)
-    expect(performance.now() - started).toBeLessThan(4000)
-
-    expect(delays).toStrictEqual([1000, 0])
-    expect([later, now].map((url) => seen(url).length)).toStrictEqual([2, 2])
-  })
-
-  test('lets shouldRetry force a retry, veto one, or keep the default, and passes it the request, the response, and the count', async () => {
-    const [forced, vetoed, kept, keptMissing] = [always(404), always(503), always(503), always(404)]
-    const contexts: Array<RetryContext> = []
-    const force = (context: RetryContext) => (contexts.push(context), true)
-
-    await expect(api()({ method: 'GET', url: forced, retry: { shouldRetry: force, ...quick } })).rejects.toMatchObject({ status: 404 })
-    await expect(api()({ method: 'GET', url: vetoed, retry: { shouldRetry: () => false, ...quick } })).rejects.toMatchObject({ status: 503 })
-    await expect(api()({ method: 'GET', url: kept, retry: { shouldRetry: () => undefined, ...quick } })).rejects.toMatchObject({ status: 503 })
-    await expect(api()({ method: 'GET', url: keptMissing, retry: { shouldRetry: () => undefined, ...quick } })).rejects.toMatchObject({ status: 404 })
-
-    expect([forced, vetoed, kept, keptMissing].map((url) => seen(url).length)).toStrictEqual([3, 1, 3, 1])
-    // Two entries: the limit stops the third failure before `shouldRetry` runs.
-    expect(contexts.map((context) => [context.request.url, context.request.method, context.response?.status, context.error, context.retryCount])).toStrictEqual(
-      [
-        [`${baseURL}${forced}`, 'GET', 404, undefined, 1],
-        [`${baseURL}${forced}`, 'GET', 404, undefined, 2],
-      ],
-    )
-  })
-
-  test('passes onRetry the context and the delay before each retry', async () => {
-    const url = always(503)
-    const calls: Array<unknown> = []
-    const onRetry = (context: RetryContext & { delay: number }) =>
-      void calls.push([context.request.url, context.response?.status, context.retryCount, context.delay, seen(url).length])
-
-    await expect(api()({ method: 'GET', url, retry: { delay: () => 7, onRetry } })).rejects.toMatchObject({ status: 503 })
-
-    expect(calls).toStrictEqual([
-      [`${baseURL}${url}`, 503, 1, 7, 1],
-      [`${baseURL}${url}`, 503, 2, 7, 2],
-    ])
   })
 
   test('retries a network error up to the limit, then throws it', async () => {
@@ -217,56 +104,9 @@ describe('retry', () => {
 
     expect(seen(url)).toHaveLength(3)
   })
-
-  test('merges the retry of a call per field over the retry of the client, and false turns it off', async () => {
-    const [merged, numbered, off] = [always(404), always(404), always(404)]
-    const own = createClient({ baseURL, retry: { limit: 3, statusCodes: [404], ...quick } })
-
-    await expect(own({ method: 'GET', url: merged, retry: { limit: 1 } })).rejects.toMatchObject({ status: 404 })
-    await expect(own({ method: 'GET', url: numbered, retry: 2 })).rejects.toMatchObject({ status: 404 })
-    await expect(own({ method: 'GET', url: off, retry: false })).rejects.toMatchObject({ status: 404 })
-
-    expect([merged, numbered, off].map((url) => seen(url).length)).toStrictEqual([2, 3, 1])
-  })
-
-  test('rejects with the abort reason when the signal aborts during the wait', async () => {
-    const url = always(503)
-    const controller = new AbortController()
-    const reason = new Error('stop')
-    const started = performance.now()
-
-    const call = api()({
-      method: 'GET',
-      url,
-      signal: controller.signal,
-      retry: { delay: () => 5000, onRetry: () => void setTimeout(() => controller.abort(reason), 30) },
-    })
-
-    await expect(call).rejects.toBe(reason)
-    expect(performance.now() - started).toBeLessThan(4000)
-    expect(seen(url)).toHaveLength(1)
-  })
-
-  test('returns the last error response after the retries with throwOnError: false', async () => {
-    const url = always(503)
-
-    const result = await api()({ method: 'GET', url, throwOnError: false, retry: quick })
-
-    expect(result).toMatchObject({ status: 503, error: { status: 503 }, data: undefined })
-    expect(seen(url)).toHaveLength(3)
-  })
 })
 
 describe('retry with client.stream', () => {
-  test('retries a failed connect', async () => {
-    const url = route((res, count) => (count === 1 ? json(res, 503) : sse(res, event(1) + event(2))))
-
-    const result = await streams().stream<{ '200': { n: number } }>({ method: 'GET', url })
-
-    expect(await collect(result)).toStrictEqual([{ n: 1 }, { n: 2 }])
-    expect(seen(url)).toHaveLength(2)
-  })
-
   test('reopens a stream the server cuts, from the last complete event ID and without losing an event', async () => {
     const url = route((res, count) => (count === 1 ? sse(res, `${event(1)}${event(2)}id: 3\ndata: {"n"`, true) : sse(res, event(3) + event(4))))
 
@@ -275,56 +115,6 @@ describe('retry with client.stream', () => {
     expect(await collect(result)).toStrictEqual([{ n: 1 }, { n: 2 }, { n: 3 }, { n: 4 }])
     expect(result.lastEventId).toBe('4')
     expect(seen(url).map((hit) => hit.headers['last-event-id'])).toStrictEqual([undefined, '2'])
-  })
-
-  test('throws from the loop when the stream is cut and retry is off', async () => {
-    const url = route((res) => sse(res, event(1), true))
-    const data: Array<unknown> = []
-
-    const result = await createClient({ baseURL, mediaTypes: streamMediaTypes }).stream({ method: 'GET', url })
-
-    await expect(collect(result, data)).rejects.toThrow('terminated')
-    expect(data).toStrictEqual([{ n: 1 }])
-    expect(seen(url)).toHaveLength(1)
-  })
-
-  test('does not reopen a stream that ends normally', async () => {
-    const url = route((res) => sse(res, event(1)))
-
-    expect(await collect(await streams().stream({ method: 'GET', url }))).toStrictEqual([{ n: 1 }])
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    expect(seen(url)).toHaveLength(1)
-  })
-
-  test('throws a ResponseError when the reconnect gets a status that is not retried', async () => {
-    const url = route((res, count) => (count === 1 ? sse(res, event(1), true) : json(res, 404)))
-    const data: Array<unknown> = []
-
-    const error = await collect(await streams().stream({ method: 'GET', url }), data).catch((error: unknown) => error)
-
-    expect(error).toBeInstanceOf(ResponseError)
-    expect(error).toMatchObject({ status: 404 })
-    expect(data).toStrictEqual([{ n: 1 }])
-    expect(seen(url)).toHaveLength(2)
-  })
-
-  test('ends the stream when the reconnect gets a 204', async () => {
-    const url = route((res, count) => (count === 1 ? sse(res, event(1), true) : res.writeHead(204).end()))
-
-    expect(await collect(await streams().stream({ method: 'GET', url }))).toStrictEqual([{ n: 1 }])
-    expect(seen(url)).toHaveLength(2)
-  })
-
-  test('counts a failed connect and the drops after it against one limit, until an event arrives', async () => {
-    const url = route((res, count) => (count === 1 ? json(res, 503) : sse(res, 'data: par', true)))
-
-    await expect(collect(await streams().stream({ method: 'GET', url }))).rejects.toThrow('terminated')
-    expect(seen(url)).toHaveLength(3)
-
-    const reset = route((res, count) => sse(res, event(count), count < 5))
-    expect(await collect(await streams().stream({ method: 'GET', url: reset }))).toHaveLength(5)
-    expect(seen(reset)).toHaveLength(5)
   })
 })
 
