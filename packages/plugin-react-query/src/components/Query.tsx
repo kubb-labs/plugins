@@ -1,5 +1,6 @@
 import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
+import { functionPrinter } from '@kubb/plugin-ts'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildClientOptionType, buildOperationComments } from '@internals/shared'
@@ -35,6 +36,8 @@ type Props = {
     queryParam?: Infinite['queryParam']
   }
 } & HookResultProps
+
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 const OBSERVER_OPTIONS_NAMES = {
   infinite: { suspense: 'UseSuspenseInfiniteQueryOptions', standard: 'InfiniteQueryObserverOptions' },
@@ -120,9 +123,17 @@ export function Query({
   client?: ${buildClientOptionType()}
 }`,
   })
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <Function name={name} export generics={generics.join(', ')} params={paramsNode} returnType={undefined} comments={buildOperationComments(node)}>
+    <Function
+      name={name}
+      export
+      generics={generics.join(', ')}
+      params={paramsSignature}
+      returnType={undefined}
+      JSDoc={{ comments: buildOperationComments(node) }}
+    >
       {`
        const { query: queryConfig = {}, client: config = {} } = options ?? {}
        const { client: queryClient, ...resolvedOptions } = queryConfig${resolvedParams ? `\n       const resolvedParams = ${resolvedParams}` : ''}

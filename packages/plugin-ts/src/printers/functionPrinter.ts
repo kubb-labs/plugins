@@ -3,15 +3,8 @@
  */
 const PARAM_RANK = { required: 0, optional: 1, withDefault: 2, rest: 3 } as const
 
-import type { ast } from '@kubb/kit'
-
-// shortcut: the pre-5.23 printer, kept only so `transformName` and `transformType` keep working; delete in Kubb v6.
-const isTypeLiteral = (type: TypeExpression): type is ast.TypeLiteralNode => typeof type !== 'string' && type.kind === 'TypeLiteral'
-const isIndexedAccessType = (type: TypeExpression): type is ast.IndexedAccessTypeNode => typeof type !== 'string' && type.kind === 'IndexedAccessType'
-type FunctionParameterNode = ast.FunctionParameterNode
-type FunctionParametersNode = ast.FunctionParametersNode
-type ObjectBindingPatternNode = ast.ObjectBindingPatternNode
-type TypeExpression = ast.TypeExpression
+import { isIndexedAccessType, isTypeLiteral } from './functionParams.ts'
+import type { FunctionParameterNode, FunctionParametersNode, ObjectBindingPatternNode, TypeExpression } from './functionParams.ts'
 
 /**
  * Renders a {@link TypeExpression} to its TypeScript source.
@@ -23,7 +16,7 @@ type TypeExpression = ast.TypeExpression
  * `transformType` is applied once to the fully rendered type, matching how the
  * printer wrapped reference types before the `ts.factory` model.
  */
-function renderType(type: TypeExpression, transformType?: (type: string) => string): string {
+export function renderType(type: TypeExpression, transformType?: (type: string) => string): string {
   const rendered = renderTypeExpression(type)
   return transformType ? transformType(rendered) : rendered
 }
@@ -182,7 +175,7 @@ function printParameter(node: FunctionParameterNode, options: FunctionPrinterOpt
  * printer.print(sig)  // → "petId: string, config: Config = {}"
  * ```
  */
-export function legacyFunctionPrinter(options: FunctionPrinterOptions) {
+export function functionPrinter(options: FunctionPrinterOptions) {
   return {
     name: 'functionParameters' as const,
     options,

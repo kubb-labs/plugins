@@ -11,7 +11,8 @@ import {
   requestGroupOrder,
 } from '@internals/shared'
 import { ast } from '@kubb/kit'
-import type { PluginTs, ResolverTs } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
+import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
 import { buildResponseHeadersType, buildResultTypeRef } from '@internals/client'
 import type { ReturnTypeOption } from '@internals/client'
 import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
@@ -56,7 +57,7 @@ export function buildGroupedRequestParam(
     /** Binds the variables whole, so destructuring does not drop the chosen media type. */
     withContentType?: boolean
   },
-): ast.FunctionParameterNode | null {
+): FunctionParameterNode | null {
   const { resolver, keys = requestGroupOrder, memberTypeWrapper, withContentType = false } = options
   const { groups, hasRequiredPath, hasRequiredQuery, hasRequiredHeader } = getRequestGroupOptionality(node)
   const names = keys.filter((key) => groups[key])
@@ -81,7 +82,7 @@ export function buildGroupedRequestParam(
   // that is required elsewhere does not leak into a binding that does not carry it.
   const optionsName = resolver.response.options(node)
   if (withContentType && hasRequestContentTypeChoice(node)) {
-    return ast.factory.createFunctionParameter({ name: 'variables', type: optionsName, optional: false })
+    return createFunctionParameter({ name: 'variables', type: optionsName, optional: false })
   }
 
   // `cookies` is on the options type only when the operation has cookie parameters, so it is omitted only then.
@@ -95,16 +96,16 @@ export function buildGroupedRequestParam(
       optional: !requiredByGroup[name],
     }))
 
-    return ast.factory.createFunctionParameter({
-      name: ast.factory.createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
-      type: ast.factory.createTypeLiteral({ members }),
+    return createFunctionParameter({
+      name: createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
+      type: createTypeLiteral({ members }),
       optional: false,
       ...(isOptional ? { default: '{}' } : {}),
     })
   }
 
-  return ast.factory.createFunctionParameter({
-    name: ast.factory.createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
+  return createFunctionParameter({
+    name: createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
     type: optionsType,
     optional: false,
     ...(isOptional ? { default: '{}' } : {}),
@@ -120,18 +121,18 @@ export function buildGroupedRequestParam(
 export function buildQueryOptionsParams(
   node: ast.OperationNode,
   options: { resolver: ResolverTs; memberTypeWrapper?: (type: string) => string },
-): ast.FunctionParametersNode {
+): FunctionParametersNode {
   const { resolver, memberTypeWrapper } = options
 
   const groupedParam = buildGroupedRequestParam(node, { resolver, memberTypeWrapper })
 
-  const configParam = ast.factory.createFunctionParameter({
+  const configParam = createFunctionParameter({
     name: 'config',
     type: buildClientOptionType(),
     default: '{}',
   })
 
-  return ast.factory.createFunctionParameters({ params: [groupedParam, configParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
+  return createFunctionParameters({ params: [groupedParam, configParam].filter((param): param is FunctionParameterNode => param !== null) })
 }
 
 /**
@@ -471,11 +472,11 @@ export function hasQueryKeyParams(node: ast.OperationNode): boolean {
 export function buildQueryKeyParams(
   node: ast.OperationNode,
   options: { resolver: PluginTs['resolver']; memberTypeWrapper?: (type: string) => string },
-): ast.FunctionParametersNode {
+): FunctionParametersNode {
   const { resolver, memberTypeWrapper } = options
   const groupedParam = buildGroupedRequestParam(node, { resolver, keys: queryKeyGroupOrder, memberTypeWrapper })
 
-  return ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  return createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
 }
 
 /**
@@ -484,12 +485,12 @@ export function buildQueryKeyParams(
 export function buildHookParams(
   node: ast.OperationNode,
   options: { resolver: ResolverTs; optionsType: string; memberTypeWrapper?: (type: string) => string; withRequest?: boolean },
-): ast.FunctionParametersNode {
+): FunctionParametersNode {
   const { resolver, optionsType, memberTypeWrapper, withRequest = true } = options
-  const optionsParam = ast.factory.createFunctionParameter({ name: 'options', type: optionsType, default: '{}' })
+  const optionsParam = createFunctionParameter({ name: 'options', type: optionsType, default: '{}' })
   const groupedParam = withRequest ? buildGroupedRequestParam(node, { resolver, memberTypeWrapper }) : null
 
-  return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
+  return createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is FunctionParameterNode => param !== null) })
 }
 
 /**

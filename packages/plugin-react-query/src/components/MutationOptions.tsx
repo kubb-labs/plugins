@@ -1,6 +1,7 @@
-import { ast } from '@kubb/kit'
-import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function, printParams } from '@kubb/renderer-jsx'
+import type { ast } from '@kubb/kit'
+import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall, resolveMutationRequestType } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
@@ -15,10 +16,13 @@ type Props = {
   tsResolver: ResolverTs
 } & CallReturnTypeProps
 
-export function buildMutationConfigParamsNode(node: ast.OperationNode): ast.FunctionParametersNode {
-  return ast.factory.createFunctionParameters({
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
+const callPrinter = functionPrinter({ mode: 'call' })
+
+export function buildMutationConfigParamsNode(node: ast.OperationNode): FunctionParametersNode {
+  return createFunctionParameters({
     params: [
-      ast.factory.createFunctionParameter({
+      createFunctionParameter({
         name: 'config',
         type: buildRequestConfigType(node),
         default: '{}',
@@ -31,20 +35,21 @@ export function MutationOptions({ name, clientName, node, tsResolver, mutationKe
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const configParamsNode = buildMutationConfigParamsNode(node)
+  const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
 
-  const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const TRequest = resolveMutationRequestType(node, tsResolver)
-  const argBindingStr = hasMutationParams ? printParams(groupedParamsNode, 'call') : '_'
+  const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : '_'
   const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false, withContentType: true }), {
     clientReturnType,
     returnType,
   })
 
   return (
-    <Function name={name} export params={configParamsNode} generics={['TContext = unknown']}>
+    <Function name={name} export params={paramsSignature} generics={['TContext = unknown']}>
       {`
       const mutationKey = ${mutationKeyName}()
       return mutationOptions<${TData}, ${TError}, ${TRequest}, TContext>({

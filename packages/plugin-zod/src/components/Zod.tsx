@@ -126,7 +126,7 @@ export function Zod({
             export
             name={name}
             type={needsAnnotation ? (mini ? 'z.ZodMiniType' : 'z.ZodType') : undefined}
-            comments={comments.length ? comments : undefined}
+            JSDoc={comments.length ? { comments } : undefined}
           >
             {toValue(output)}
           </Const>
@@ -136,7 +136,7 @@ export function Zod({
             </Type>
           )}
           {shouldGenerateIs && (
-            <Const export name={isName} comments={[`Type guard for {@link ${name}}`]}>
+            <Const export name={isName} JSDoc={{ comments: [`Type guard for {@link ${name}}`] }}>
               {mini
                 ? `(data: unknown): data is ${targetType} => z.validate(${name}, data)`
                 : `(data: unknown): data is ${targetType} => ${name}.validate(data)`}
@@ -148,7 +148,7 @@ export function Zod({
               name={assertName}
               params="data: unknown"
               returnType={`asserts data is ${targetType}`}
-              comments={[`Asserter for {@link ${name}}`, '@throws {z.ZodError} If data is invalid']}
+              JSDoc={{ comments: [`Asserter for {@link ${name}}`, '@throws {z.ZodError} If data is invalid'] }}
             >
               {mini ? `if (!z.validate(${name}, data)) {\n  z.parse(${name}, data)\n}` : `if (!${name}.validate(data)) {\n  ${name}.parse(data)\n}`}
             </Function>

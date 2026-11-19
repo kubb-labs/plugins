@@ -1,6 +1,7 @@
 import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function, printParams } from '@kubb/renderer-jsx'
+import { functionPrinter } from '@kubb/plugin-ts'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildQueryKeyParams, buildResponseTypes, maybeRefOrGetter } from '@internals/tanstack-query'
 import type { HookResultProps } from '@internals/tanstack-query'
@@ -20,6 +21,9 @@ type Props = {
   infinite?: boolean
 } & HookResultProps
 
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
+const callPrinter = functionPrinter({ mode: 'call' })
+
 export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, infinite, returnType, typedHeaders }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
   const optionsName = infinite ? 'UseInfiniteQueryOptions' : 'UseQueryOptions'
@@ -34,10 +38,10 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   const castGenerics = infinite ? [TData, TError, TData, 'TQueryKey', TData] : [TData, TError, 'TData', TData, 'TQueryKey']
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver, memberTypeWrapper: maybeRefOrGetter })
-  const queryKeyParamsCall = printParams(queryKeyParamsNode, 'call')
+  const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
-  const queryOptionsParamsCall = printParams(queryOptionsParamsNode, 'call')
+  const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
   // Vue-query wraps each grouped operation param with MaybeRefOrGetter
   const paramsNode = buildHookParams(node, {
@@ -48,9 +52,10 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   client?: ${buildClientOptionType()}
 }`,
   })
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <Function name={name} export generics={generics.join(', ')} params={paramsNode} comments={getComments(node)}>
+    <Function name={name} export generics={generics.join(', ')} params={paramsSignature} JSDoc={{ comments: getComments(node) }}>
       {`
        const { query: queryConfig = {}, client: config = {} } = options ?? {}
        const { client: queryClient, ...resolvedOptions } = queryConfig

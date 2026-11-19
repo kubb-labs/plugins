@@ -1,5 +1,6 @@
 import { ast, Url } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
+import { functionPrinter } from '@kubb/plugin-ts'
 import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { KeyVariant, Transformer } from '../types.ts'
@@ -24,6 +25,8 @@ type Props = {
    */
   exportType?: boolean
 }
+
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 /**
  * Default `queryKey` builder. Call it from a custom builder to extend the default key.
@@ -56,11 +59,12 @@ export const queryKeyTransformer: Transformer = ({ node, variant }) => {
 
 export function QueryKey({ name, node, tsResolver, typeName, transformer, variant = 'query', memberTypeWrapper, exportType }: Props): KubbReactNode {
   const paramsNode = buildQueryKeyParams(node, { resolver: tsResolver, memberTypeWrapper })
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = (transformer ?? queryKeyTransformer)({ node, casing: 'camelcase', variant })
 
   return (
     <>
-      <Function.Arrow name={name} export params={paramsNode} singleLine>
+      <Function.Arrow name={name} export params={paramsSignature} singleLine>
         {`[${keys.join(', ')}] as const`}
       </Function.Arrow>
       <Type name={typeName} export={exportType}>{`ReturnType<typeof ${name}>`}</Type>

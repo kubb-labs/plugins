@@ -1,6 +1,7 @@
 import type { ast } from '@kubb/kit'
-import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function, printParams } from '@kubb/renderer-jsx'
+import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
+import { functionPrinter } from '@kubb/plugin-ts'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildResponseTypes, resolveMutationRequestType } from '@internals/tanstack-query'
 import type { HookResultProps } from '@internals/tanstack-query'
@@ -18,10 +19,13 @@ type Props = {
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
 } & HookResultProps
 
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
+const callPrinter = functionPrinter({ mode: 'call' })
+
 function buildMutationParamsNode(
   node: ast.OperationNode,
   options: { resolver: ResolverTs; returnType: ReturnTypeOption; typedHeaders?: boolean },
-): ast.FunctionParametersNode {
+): FunctionParametersNode {
   const { resolver, returnType, typedHeaders } = options
   const { TData, TError } = buildResponseTypes(node, resolver, { returnType, typedHeaders })
   const generics = [TData, TError, resolveMutationRequestType(node, resolver), 'TContext'].join(', ')
@@ -44,12 +48,13 @@ export function Mutation({ name, mutationOptionsName, node, tsResolver, mutation
   const resultType = `UseMutationResult<${generics}>`
 
   const mutationOptionsConfigNode = buildMutationConfigParamsNode(node)
-  const mutationOptionsParamsCall = printParams(mutationOptionsConfigNode, 'call')
+  const mutationOptionsParamsCall = callPrinter.print(mutationOptionsConfigNode) ?? ''
 
   const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType, typedHeaders })
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <Function name={name} export params={paramsNode} comments={getComments(node)} generics={['TContext']}>
+    <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }} generics={['TContext']}>
       {`
         const { mutation = {}, client: config = {} } = options ?? {}
         const { client: queryClient, ...mutationOptions } = mutation;

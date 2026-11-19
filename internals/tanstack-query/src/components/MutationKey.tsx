@@ -1,4 +1,5 @@
-import { ast, Url } from '@kubb/kit'
+import { type ast, Url } from '@kubb/kit'
+import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { Transformer } from '../types.ts'
@@ -12,6 +13,8 @@ type Props = {
    */
   typeName?: string
 }
+
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 /**
  * Default `mutationKey` builder. Call it from a custom builder to extend the default key.
@@ -29,13 +32,14 @@ export const mutationKeyTransformer: Transformer = ({ node }) => {
 }
 
 export function MutationKey({ name, node, transformer, typeName }: Props): KubbReactNode {
-  const paramsNode = ast.factory.createFunctionParameters({ params: [] })
+  const paramsNode = createFunctionParameters({ params: [] })
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   // Mutations always use 'mutation' as they do not have suspense or infinite variants.
   const keys = (transformer ?? mutationKeyTransformer)({ node, casing: 'camelcase', variant: 'mutation' })
 
   return (
     <>
-      <Function.Arrow name={name} export params={paramsNode} singleLine>
+      <Function.Arrow name={name} export params={paramsSignature} singleLine>
         {`[${keys.join(', ')}] as const`}
       </Function.Arrow>
       {typeName && <Type export name={typeName}>{`ReturnType<typeof ${name}>`}</Type>}

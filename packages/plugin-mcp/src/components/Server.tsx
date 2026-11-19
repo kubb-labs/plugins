@@ -123,10 +123,12 @@ server.registerTool(${JSON.stringify(tool.name)}, {
         name="toolSchema"
         generics="T extends z.ZodType"
         params="schema: T"
-        comments={[
-          'Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.',
-          'A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.',
-        ]}
+        JSDoc={{
+          comments: [
+            'Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.',
+            'A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.',
+          ],
+        }}
       >
         {`const standard = schema['~standard']
 const convert = (io: 'input' | 'output') => (options: Parameters<typeof standard.jsonSchema.input>[0]) =>

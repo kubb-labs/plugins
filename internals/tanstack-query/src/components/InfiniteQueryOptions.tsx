@@ -1,7 +1,8 @@
 import { getNestedAccessor } from '@internals/utils'
-import { ast } from '@kubb/kit'
+import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { Function, printParams } from '@kubb/renderer-jsx'
+import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { CallReturnTypeProps, Infinite } from '../types.ts'
 import {
@@ -45,6 +46,9 @@ type Props = {
   unwrapName?: (name: string) => string
 } & CallReturnTypeProps
 
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
+const callPrinter = functionPrinter({ mode: 'call' })
+
 export function InfiniteQueryOptions({
   name,
   clientName,
@@ -72,10 +76,11 @@ export function InfiniteQueryOptions({
   const { queryParamsTypeName, pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })
 
   const groupedKeyParam = buildGroupedRequestParam(node, { resolver: tsResolver, keys: queryKeyGroupOrder, memberTypeWrapper })
-  const queryKeyParamsNode = ast.factory.createFunctionParameters({ params: groupedKeyParam ? [groupedKeyParam] : [] })
-  const queryKeyParamsCall = printParams(queryKeyParamsNode, 'call')
+  const queryKeyParamsNode = createFunctionParameters({ params: groupedKeyParam ? [groupedKeyParam] : [] })
+  const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver, memberTypeWrapper })
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   // The page param replaces the configured query parameter of the request, typed as that parameter.
   const pageParam = queryParam && queryParamsTypeName ? queryParam : undefined
   const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName, pageParam }), { clientReturnType, returnType })
@@ -115,7 +120,7 @@ export function InfiniteQueryOptions({
   const queryFnArgs = pageParam ? '{ signal, pageParam }' : '{ signal }'
 
   return (
-    <Function name={name} export params={paramsNode}>
+    <Function name={name} export params={paramsSignature}>
       {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
 return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, ${queryKeyType}, ${pageParamType}>({
