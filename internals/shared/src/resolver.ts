@@ -142,10 +142,7 @@ export function createCasedFile(caseLast: (part: string) => string): ResolverFil
   }
 }
 
-/**
- * Builds a resolver by folding `presets` over a bare one with `Resolver.merge`. Namespaces merge per
- * method, so a later preset can add `response.options` and keep the rest.
- */
+/** Folds `presets` over a bare resolver with `Resolver.merge`, merging namespaces per method. */
 export function composeResolver<T extends PluginType>(pluginName: T['name'], ...presets: Array<ResolverPatch<T['resolver']>>): T['resolver'] {
   // shortcut: the bare base is cast to the full type, so a namespace no preset fills is not a type error; drop when @kubb/kit composes presets.
   return Resolver.merge(createResolver<PluginType<T['name']>>({ pluginName }) as T['resolver'], ...presets)
