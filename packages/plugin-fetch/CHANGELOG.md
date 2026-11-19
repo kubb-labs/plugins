@@ -1,5 +1,22 @@
 # @kubb/plugin-fetch
 
+## 6.4.0
+
+### Minor Changes
+
+- [#1540](https://github.com/kubb-labs/plugins/pull/1540) [`0ac3c3f`](https://github.com/kubb-labs/plugins/commit/0ac3c3f3fd00b2cd02df0caebe8605ae8592fc32) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - The `resolver` option now takes an array of resolver parts as well as one patch. The parts merge left to right over the plugin's default resolver.
+  
+  ```ts
+  import { casing, resolverCasedFile } from '@kubb/kit'
+  
+  pluginTs({ resolver: [resolverCasedFile(casing.camel), { name: (name) => `Api${name}` }] })
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`0ac3c3f`](https://github.com/kubb-labs/plugins/commit/0ac3c3f3fd00b2cd02df0caebe8605ae8592fc32)]:
+  - @kubb/plugin-client@6.4.0
+
 ## 6.3.0
 
 ### Minor Changes
