@@ -1,5 +1,5 @@
 import { getResponseHeadersTypeNames, type OperationTypeNames, type OperationTypeSource } from '@internals/client'
-import { operationKey, resolveOperationFile } from '@internals/shared'
+import { operationKey } from '@internals/shared'
 import { ast, type Generator } from '@kubb/kit'
 import type { ContractClientFactory } from '../types.ts'
 import { getOperationSecurity, isAuthRequired, type SecurityRequirement } from './security.ts'
@@ -12,11 +12,14 @@ export type OperationData = {
   node: ast.HttpOperationNode
   name: string
   types: OperationTypeNames
-  typeFile: ast.FileNode
   /**
-   * `null` unless `validator` turns a direction on.
+   * The plugin the operation's types come from, for a `File.Import` with `plugin`.
    */
-  schemaFile: ast.FileNode | null
+  typePlugin: string
+  /**
+   * The plugin the validator schemas come from. `null` unless `validator` turns a direction on.
+   */
+  schemaPlugin: string | null
   validatorHooks: ValidatorHooks
   /**
    * The names of the headers types the result references.
@@ -32,8 +35,8 @@ export type OperationData = {
  * schemas come from, and its validator hooks, security, base URL and response headers types.
  */
 export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOperationNode; ctx: GeneratorContext; types: OperationTypeSource }): OperationData {
-  const { resolver, root } = ctx
-  const { output, validator, importPath } = ctx.options
+  const { resolver } = ctx
+  const { validator, importPath } = ctx.options
   const library = resolveValidatorLibrary(validator)
   const schemaPlugin = library === 'valibot' ? ctx.getPlugin(pluginValibotName) : library === 'zod' ? ctx.getPlugin(pluginZodName) : null
   const schemaResolver = !schemaPlugin ? null : library === 'valibot' ? ctx.getResolver(pluginValibotName) : ctx.getResolver(pluginZodName)
@@ -42,18 +45,8 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
     node,
     name: resolver.resolveName({ key: operationKey(node), name: resolver.name(node.operationId) }),
     types,
-    typeFile: resolveOperationFile({ ctx, node, resolver: types.resolver, root, output: types.output ?? output, group: types.group }),
-    schemaFile:
-      schemaResolver && schemaPlugin?.options
-        ? resolveOperationFile({
-            ctx,
-            node,
-            resolver: schemaResolver,
-            root,
-            output: schemaPlugin.options.output ?? output,
-            group: schemaPlugin.options.group ?? undefined,
-          })
-        : null,
+    typePlugin: types.resolver.pluginName,
+    schemaPlugin: schemaResolver && schemaPlugin ? schemaResolver.pluginName : null,
     validatorHooks: buildValidatorHooks({ node, validator, schemaResolver }),
     headerTypeNames: getResponseHeadersTypeNames({ node, types }),
     // The fetch and axios clients write `securitySchemes` into `.kubb/client.ts`. A custom client module has none.

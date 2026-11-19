@@ -3,12 +3,25 @@ import { ast } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import type { PluginZod } from '@kubb/plugin-zod'
-import { resolverZod } from '@kubb/plugin-zod'
+import { pluginZod, resolverZod } from '@kubb/plugin-zod'
+import { resolverClient } from '@kubb/plugin-client'
 import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderGeneratorOperations, testConfig } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMultiPluginDriver,
+  matchFiles,
+  rawSources,
+  renderContext,
+  renderGeneratorOperation,
+  renderGeneratorOperations,
+  setupPlugins,
+  testConfig,
+} from '#mocks'
 import { resolverMcp } from '../resolvers/resolverMcp.ts'
 import type { PluginMcp } from '../types.ts'
+import { mcpGenerator } from './mcpGenerator.tsx'
 import { serverGenerator } from './serverGenerator.tsx'
 
 const defaultOptions: PluginMcp['resolvedOptions'] = {
@@ -32,6 +45,15 @@ const mockedZodPlugin = createMockedPlugin<PluginZod>({
   options: { output: { path: '.', mode: 'directory' }, group: null } as PluginZod['resolvedOptions'],
   resolver: resolverZod,
 })
+
+const mockedAxiosPlugin = createMockedPlugin({
+  name: 'plugin-axios',
+  options: { output: { path: './clients', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
+  resolver: resolverClient,
+})
+
+// plugin-zod renders the schemas the server imports, in the same folder as the mocked plugin-zod above.
+const contextPlugins = await setupPlugins([pluginZod()], { 'plugin-zod': { output: { path: '.', mode: 'directory' }, group: null } })
 
 describe('serverGenerator — Operations', () => {
   const nodes: Array<ast.OperationNode> = [
@@ -95,30 +117,13 @@ describe('serverGenerator — tool schemas', () => {
 
 async function renderServer(nodes: Array<ast.OperationNode>) {
   const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
-  const driver = createMockedPluginDriver({
-    name: 'showPetById',
-    plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-  })
-  // Also register zod plugin — serverGenerator needs it for zod schema imports
-  const originalGetPlugin = driver.getPlugin.bind(driver)
-  driver.getPlugin = ((pluginName: string) => {
-    if (pluginName === 'plugin-zod') return mockedZodPlugin
-    return originalGetPlugin(pluginName)
-  }) as typeof driver.getPlugin
+  const driver = createMultiPluginDriver('showPetById', { 'plugin-ts': mockedTsPlugin, 'plugin-zod': mockedZodPlugin, 'plugin-axios': mockedAxiosPlugin })
+  const opts = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options: defaultOptions, resolver: resolverMcp }
 
-  driver.getResolver = ((pluginName: string) => {
-    if (pluginName === 'plugin-zod') return mockedZodPlugin.resolver
-    return mockedTsPlugin.resolver
-  }) as typeof driver.getResolver
-
-  await renderGeneratorOperations(serverGenerator, nodes, {
-    config: testConfig,
-    adapter: createMockedAdapter(),
-    driver,
-    plugin,
-    options: defaultOptions,
-    resolver: resolverMcp,
-  })
+  await renderGeneratorOperations(serverGenerator, nodes, opts)
+  // The handlers the server imports.
+  for (const node of nodes) await renderGeneratorOperation(mcpGenerator, node, { ...opts, context: true })
+  await renderContext(driver, contextPlugins)
 
   return driver
 }

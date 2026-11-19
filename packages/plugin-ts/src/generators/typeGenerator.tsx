@@ -61,7 +61,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {imports.map((imp) => (
-          <File.Import key={[node.name, imp.name, imp.isTypeOnly].join('-')} name={imp.name as Array<string>} plugin={resolver.pluginName} isTypeOnly />
+          <File.Import key={[node.name, imp.name, imp.isTypeOnly].join('-')} name={imp.name as Array<string>} plugin={ctx.plugin.name} isTypeOnly />
         ))}
         <Type name={meta.name} node={node} enum={enumOptions} resolver={resolver} printer={schemaPrinter} />
       </File>
@@ -120,7 +120,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       return (
         <>
           {imports.map((imp) => (
-            <File.Import key={[name, imp.name, imp.isTypeOnly].join('-')} name={imp.name as Array<string>} plugin={resolver.pluginName} isTypeOnly />
+            <File.Import key={[name, imp.name, imp.isTypeOnly].join('-')} name={imp.name as Array<string>} plugin={ctx.plugin.name} isTypeOnly />
           ))}
           <Type name={name} node={schema} enum={enumOptions} resolver={resolver} printer={schemaPrinter} inline={inline} />
         </>

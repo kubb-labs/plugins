@@ -48,19 +48,17 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   }, [] as Array<Controller>)
 }
 
-function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationData) => { file: ast.FileNode | null; names: Array<string> }) {
-  const namesByPath = new Map<string, Set<string>>()
-  const filesByPath = new Map<string, ast.FileNode>()
+function collectImportsByPlugin(ops: Array<OperationData>, pick: (op: OperationData) => { plugin: string | null; names: Array<string> }) {
+  const namesByPlugin = new Map<string, Set<string>>()
 
   ops.forEach((op) => {
-    const { file, names } = pick(op)
-    if (!file || names.length === 0) return
-    const set = memo(namesByPath, file.path, () => new Set<string>())
+    const { plugin, names } = pick(op)
+    if (!plugin || names.length === 0) return
+    const set = memo(namesByPlugin, plugin, () => new Set<string>())
     names.forEach((n) => set.add(n))
-    filesByPath.set(file.path, file)
   })
 
-  return { namesByPath, filesByPath }
+  return namesByPlugin
 }
 
 /**
@@ -112,13 +110,13 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
       const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
 
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
-        const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
-          file: op.typeFile,
+        const typeNamesByPlugin = collectImportsByPlugin(ops, (op) => ({
+          plugin: op.typePlugin,
           names: [op.types.response.options(op.node), op.types.response.responses(op.node), ...op.headerTypeNames],
         }))
-        const { namesByPath: schemaNamesByPath, filesByPath: schemaFilesByPath } = validatorEnabled
-          ? collectImportsByFile(ops, (op) => ({ file: op.schemaFile, names: op.validatorHooks.importedSchemaNames }))
-          : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, ast.FileNode>() }
+        const schemaNamesByPlugin = validatorEnabled
+          ? collectImportsByPlugin(ops, (op) => ({ plugin: op.schemaPlugin, names: op.validatorHooks.importedSchemaNames }))
+          : new Map<string, Set<string>>()
         const resultOps = ops.filter((op) => !isEventStream(op.node))
         const typedHeaders = (op: OperationData) => op.headerTypeNames.length > 0
         const resultName = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
@@ -154,14 +152,12 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
 
             {validator === 'zod' && ops.some((op) => ast.http.requestBody.getSchema(op.node) != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
-            {Array.from(typeNamesByPath.entries()).map(([filePath, set]) => (
-              <File.Import key={filePath} name={Array.from(set)} root={file.path} path={typeFilesByPath.get(filePath)!.path} isTypeOnly />
+            {Array.from(typeNamesByPlugin.entries()).map(([plugin, set]) => (
+              <File.Import key={plugin} name={Array.from(set)} plugin={plugin} isTypeOnly />
             ))}
 
             {validatorEnabled &&
-              Array.from(schemaNamesByPath.entries()).map(([filePath, set]) => (
-                <File.Import key={filePath} name={Array.from(set)} root={file.path} path={schemaFilesByPath.get(filePath)!.path} />
-              ))}
+              Array.from(schemaNamesByPlugin.entries()).map(([plugin, set]) => <File.Import key={plugin} name={Array.from(set)} plugin={plugin} />)}
 
             {ops.some((op) => op.validatorHooks.headers) && <File.Import name={['toHeadersStandardSchema']} root={file.path} path={standardSchemaPath} />}
 
@@ -180,8 +176,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
           <File key={sdkFile.path} baseName={sdkFile.baseName} path={sdkFile.path} meta={sdkFile.meta} banner={banner(sdkFile)} footer={footer(sdkFile)}>
             <File.Import name={['createClient']} root={sdkFile.path} path={clientPath} />
             <File.Import name={['ClientConfig', 'ClientInstance']} root={sdkFile.path} path={clientPath} isTypeOnly />
-            {controllers.map(({ name, file }) => (
-              <File.Import key={name} name={[name]} root={sdkFile.path} path={file.path} />
+            {controllers.map(({ name }) => (
+              <File.Import key={name} name={[name]} plugin={ctx.plugin.name} />
             ))}
             <SdkFacade name={resolver.className(name)} members={members} />
           </File>

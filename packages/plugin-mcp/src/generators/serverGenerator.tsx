@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
+import { hasStreamVariant, isEventStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -19,9 +19,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { config, resolver, plugin, root } = ctx
-    const { output, group } = ctx.options
-
-    const pluginZod = ctx.requirePlugin(pluginZodName)
+    const { output } = ctx.options
 
     const zodResolver = ctx.getResolver(pluginZodName)
 
@@ -53,16 +51,6 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       .map((node) => {
         const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
 
-        const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
-        const zodFile = resolveOperationFile({
-          ctx,
-          node,
-          resolver: zodResolver,
-          root,
-          output: pluginZod.options?.output ?? output,
-          group: pluginZod.options?.group ?? undefined,
-        })
-
         const requestName = ast.http.requestBody.getSchema(node) ? zodResolver.response.body(node) : null
         const successStatus = ast.http.responses.findPrimary(node)?.statusCode
         const responseName = successStatus ? zodResolver.response.status(node, successStatus) : null
@@ -78,7 +66,6 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           },
           mcp: {
             name: resolver.handler.name(node),
-            file: mcpFile,
           },
           zod: {
             pathParams: resolveParams(pathParams),
@@ -87,7 +74,6 @@ export const serverGenerator = defineGenerator<PluginMcp>({
             cookieParams: resolveOptional(cookieParams),
             requestName,
             responseName,
-            file: zodFile,
           },
         }
       })
@@ -105,8 +91,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       const uniqueNames = [...new Set(zodNames)].sort()
 
       return [
-        <File.Import key={mcp.name} name={[mcp.name]} root={serverFile.path} path={mcp.file.path} />,
-        uniqueNames.length > 0 && <File.Import key={`zod-${mcp.name}`} name={uniqueNames} root={serverFile.path} path={zod.file.path} />,
+        <File.Import key={mcp.name} name={[mcp.name]} plugin={plugin.name} />,
+        uniqueNames.length > 0 && <File.Import key={`zod-${mcp.name}`} name={uniqueNames} plugin={pluginZodName} />,
       ].filter(Boolean)
     })
 
@@ -134,7 +120,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           banner={resolver.default.banner(ctx.meta, { output, config, file: { path: startFile.path, baseName: startFile.baseName } })}
           footer={resolver.default.footer(ctx.meta, { output, config, file: { path: startFile.path, baseName: startFile.baseName } })}
         >
-          <File.Import name={['startServer']} root={startFile.path} path={serverFile.path} />
+          <File.Import name={['startServer']} plugin={plugin.name} />
           {/* Not indexable: barrels must not re-export this entry, importing it starts the server. */}
           <File.Source name="start">{'void startServer()'}</File.Source>
         </File>

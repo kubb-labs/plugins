@@ -19,19 +19,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
 
     const handlerNames = nodes.map((node) => resolver.handler.name(node))
 
-    const imports = nodes.map((node, index) => {
-      const operationName = handlerNames[index]!
-      const operationFile = resolver.file({
-        name: resolver.name(node.operationId),
-        extname: '.ts',
-        tag: node.tags[0] ?? 'default',
-        path: node.path,
-        root,
-        output,
-        group: group ?? undefined,
-      })
-      return ast.factory.createImport({ name: [operationName], root: file.path, path: operationFile.path })
-    })
+    const imports = handlerNames.map((name) => ast.factory.createImport({ name: [name], plugin: ctx.plugin.name }))
 
     const handlers = handlerNames.map((name) => `${name}(undefined, options)`)
 

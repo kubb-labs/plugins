@@ -92,7 +92,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       >
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {imports.map((name) => (
-          <File.Import key={[node.name, name].join('-')} name={name} plugin={resolver.pluginName} />
+          <File.Import key={[node.name, name].join('-')} name={name} plugin={ctx.plugin.name} />
         ))}
 
         <Zod
@@ -170,7 +170,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       return (
         <>
           {imports.map((imp) => (
-            <File.Import key={[name, imp.name].join('-')} name={imp.name as Array<string>} plugin={resolver.pluginName} />
+            <File.Import key={[name, imp.name].join('-')} name={imp.name as Array<string>} plugin={ctx.plugin.name} />
           ))}
           {/* Operation schemas reference (and import) the component schemas, which carry the
               `z.ZodType` annotation at their own definition when cyclic. Annotating the operation

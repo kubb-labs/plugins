@@ -49,7 +49,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
         {optionsName && <File.Import name={[optionsName]} plugin={tsResolver.pluginName} isTypeOnly />}
         <File.Import name={['CallToolResult', 'ServerContext']} path={'@modelcontextprotocol/server'} isTypeOnly />
 
-        <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
+        <File.Import name={[contractOp.name]} plugin={contractOp.plugin} />
 
         <McpHandler name={meta.name} clientName={contractOp.name} node={node} resolver={tsResolver} returnType={contractOp.returnType} />
       </File>

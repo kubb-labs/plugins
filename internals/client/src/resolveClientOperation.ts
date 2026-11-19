@@ -24,7 +24,10 @@ export type ReturnTypeOption = 'full' | 'data' | 'plain'
  */
 export type ClientOperation = {
   name: string
-  path: string
+  /**
+   * The client plugin that emits `name`, for a `File.Import` with `plugin`.
+   */
+  plugin: string
   clientPath: string
   clientPathIsFile: boolean
   returnType: ReturnTypeOption
@@ -112,7 +115,7 @@ export function resolveClientOperation(options: {
 
     return {
       name: resolver.resolveName({ key: operationKey(node), name }),
-      path: file.path,
+      plugin: clientPlugin.pluginName,
       clientPath: importPath === undefined ? path.resolve(root, '.kubb/client.ts') : resolveImportPath({ importPath, operationFile: file.path }),
       clientPathIsFile: importPath === undefined || isRelativeImport(importPath),
       returnType: operationOptions.returnType ?? 'full',

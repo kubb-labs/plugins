@@ -4,7 +4,8 @@ import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { customHookOptionsFileGenerator } from './customHookOptionsFileGenerator.tsx'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperations, testConfig } from '#mocks'
+import { hookOptionsGenerator } from './hookOptionsGenerator.tsx'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperations, resolveImports, testConfig } from '#mocks'
 
 function createOptions(overrides: Partial<PluginReactQuery['resolvedOptions']> = {}): PluginReactQuery['resolvedOptions'] {
   return {
@@ -37,14 +38,12 @@ async function renderCustomHookOptionsFile(options: PluginReactQuery['resolvedOp
   const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
   const driver = createMockedPluginDriver({ name: 'customHookOptions', config: testConfig })
 
-  await renderGeneratorOperations(customHookOptionsFileGenerator, [], {
-    config: testConfig,
-    adapter: createMockedAdapter(),
-    driver,
-    plugin,
-    options,
-    resolver: resolverReactQuery,
-  })
+  const opts = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverReactQuery }
+
+  await renderGeneratorOperations(customHookOptionsFileGenerator, [], opts)
+  // The HookOptions type the file imports.
+  await renderGeneratorOperations(hookOptionsGenerator, [], { ...opts, context: true })
+  resolveImports(driver)
 
   return driver.fileManager.files
 }

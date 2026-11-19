@@ -103,7 +103,7 @@ export function HookFile({ hook, imports, children }: HookFileProps): KubbReactN
 
   return (
     <File baseName={file.baseName} path={file.path} meta={file.meta} banner={banner} footer={footer}>
-      <File.Import name={[contractOp.name]} root={file.path} path={contractOp.path} />
+      <File.Import name={[contractOp.name]} plugin={contractOp.plugin} />
       <File.Import
         name={['RequestConfig', 'ResponseErrorConfig', resultTypeName]}
         root={contractOp.clientPathIsFile ? file.path : undefined}

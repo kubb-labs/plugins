@@ -93,14 +93,19 @@ describe('resolveClientOperation', () => {
       expect(resolveWith(returnTypeOverride, listPets)?.returnType).toBe('data')
     })
 
-    test('imports from the output path an override moves the operation to', () => {
+    test('resolves a relative importPath from the folder an override moves the operation to', () => {
       const moved = {
         output: { path: './clients', mode: 'directory' },
-        override: [{ type: 'operationId', pattern: 'getPetById', options: { output: { path: './admin', mode: 'directory' } } }],
+        importPath: './client',
+        override: [{ type: 'operationId', pattern: 'getPetById', options: { output: { path: './admin', mode: 'directory' }, importPath: './client' } }],
       }
 
-      expect(resolveWith(moved, getPetById)?.path).toBe(path.resolve('/root', 'admin', 'getPetById.ts'))
-      expect(resolveWith(moved, listPets)?.path).toBe(path.resolve('/root', 'clients', 'listPets.ts'))
+      expect(resolveWith(moved, getPetById)?.clientPath).toBe(path.resolve('/root', 'admin', 'client'))
+      expect(resolveWith(moved, listPets)?.clientPath).toBe(path.resolve('/root', 'clients', 'client'))
+    })
+
+    test('names the client plugin, so the import resolves to wherever it emitted the operation', () => {
+      expect(resolveWith(returnTypeOverride, getPetById)?.plugin).toBe('plugin-axios')
     })
 
     test('returns null for an operation the client plugin excludes, since it emits no <op>', () => {

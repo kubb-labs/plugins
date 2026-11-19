@@ -100,7 +100,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParserName(dateParser)} />}
         {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[meta.typeName]} />}
         {usedImports.map((imp) => (
-          <File.Import key={[schemaName, imp.name].join('-')} name={imp.name as Array<string>} plugin={resolver.pluginName} />
+          <File.Import key={[schemaName, imp.name].join('-')} name={imp.name as Array<string>} plugin={ctx.plugin.name} />
         ))}
         {seed !== undefined ? <File.Source name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</File.Source> : undefined}
         <Faker
@@ -258,7 +258,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <>
           {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
           {imports.map((imp) => (
-            <File.Import key={[name, imp.name].join('-')} name={imp.name as Array<string>} plugin={resolver.pluginName} />
+            <File.Import key={[name, imp.name].join('-')} name={imp.name as Array<string>} plugin={ctx.plugin.name} />
           ))}
           <Faker
             name={name}

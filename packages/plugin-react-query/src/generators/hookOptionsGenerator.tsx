@@ -1,4 +1,3 @@
-import { operationFileEntry } from '@internals/shared'
 import { matchesInfinite } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
@@ -60,8 +59,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         if (!enabled) continue
         const optionsName = ns.optionsName(node)
         const hookName = ns.name(node)
-        const hookFile = resolver.file({ ...operationFileEntry(node, hookName), root, output, group: group ?? undefined })
-        imports.push(<File.Import name={[optionsName]} root={hookOptionsFile.path} path={hookFile.path} />)
+        imports.push(<File.Import name={[optionsName]} plugin={ctx.plugin.name} />)
         hookOptions[hookName] = `Partial<ReturnType<typeof ${optionsName}>>`
       }
     }

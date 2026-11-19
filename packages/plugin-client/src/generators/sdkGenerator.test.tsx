@@ -1,9 +1,9 @@
 import type { Config, PluginType } from '@kubb/kit'
 import { ast, Diagnostics, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
-import { resolverTs } from '@kubb/plugin-ts'
+import { pluginTs, resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperations } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperations, renderContext, setupPlugins } from '#mocks'
 import { resolverClient } from '../resolver.ts'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
 import { createSdkGenerator } from './sdkGenerator.tsx'
@@ -41,6 +41,9 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   options: { output: { path: '.', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
+
+// plugin-ts renders the types the clients import, with the options of the mocked plugin-ts above.
+const contextPlugins = await setupPlugins([pluginTs()], { 'plugin-ts': { output: { path: '.', mode: 'directory' }, group: null } })
 
 const operationNodes: Array<ast.OperationNode> = [
   ast.factory.createOperation({
@@ -148,6 +151,8 @@ describe('sdkGenerator operations', () => {
       options,
       resolver: resolverClient,
     })
+
+    await renderContext(driver, contextPlugins)
 
     await matchFiles(driver.fileManager.files, props.name)
   })

@@ -3,7 +3,7 @@
 import { ast } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { pluginTs, resolverTs } from '@kubb/plugin-ts'
-import { resolverClient } from '@kubb/plugin-client'
+import { resolverClient, pluginClient } from '@kubb/plugin-client'
 import type { ClientResolvedOptions } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
 import {
@@ -52,8 +52,25 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   resolver: resolverTs,
 })
 
-// plugin-ts renders the types the hooks import, with the options of the mocked plugin-ts above.
-const contextPlugins = await setupPlugins([pluginTs()], { 'plugin-ts': { output: { path: '.', mode: 'directory' }, group: null } })
+// plugin-ts renders the types the hooks import, and plugin-client the client functions, under the mocked plugin-axios name.
+const tsContext = await setupPlugins([pluginTs()], { 'plugin-ts': { output: { path: '.', mode: 'directory' }, group: null } })
+// plugin-client renders the client functions the hooks import, under the name of the mocked client each case uses.
+// Only one per case: both mocks write to `./clients`, so two would declare each function in one file.
+const clientContext = {
+  'plugin-axios': (await setupPlugins([pluginClient()], { 'plugin-client': { output: { path: './clients', mode: 'directory' }, group: null } })).map(
+    (plugin) => ({
+      ...plugin,
+      name: 'plugin-axios',
+    }),
+  ),
+  'plugin-client': await setupPlugins([pluginClient()], {
+    'plugin-client': { output: { path: './clients', mode: 'directory' }, group: null, importPath: '../../client', returnType: 'plain' },
+  }),
+}
+const contextFor = (options: PluginReactQuery['resolvedOptions']) => [
+  ...tsContext,
+  ...clientContext[(options.client as { pluginName: keyof typeof clientContext }).pluginName],
+]
 
 const mockedAxiosPlugin = createMockedPlugin({
   name: 'plugin-axios',
@@ -215,7 +232,7 @@ describe('queryGenerator operation', () => {
       resolver: resolverReactQuery,
     })
 
-    await renderContext(driver, contextPlugins)
+    await renderContext(driver, contextFor(options))
 
     await matchFiles(driver.fileManager.files, props.name)
   })

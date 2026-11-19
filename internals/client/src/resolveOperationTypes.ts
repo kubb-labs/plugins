@@ -1,4 +1,4 @@
-import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
+import { type ast, Diagnostics, type GeneratorContext } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import type { PluginZod, ResolverZod } from '@kubb/plugin-zod'
 
@@ -71,17 +71,9 @@ export function getResponseHeadersTypeNames({ node, types }: { node: ast.Operati
  */
 export type OperationTypeSource = OperationTypeNames & {
   /**
-   * `plugin-ts` shaped resolver of the plugin supplying the names, also used to resolve the file they are exported from.
+   * `plugin-ts` shaped resolver of the plugin supplying the names. Its `pluginName` is the plugin to import them from.
    */
   resolver: ResolverTs
-  /**
-   * The supplying plugin's own `output`, when it configured one.
-   */
-  output: Output | undefined
-  /**
-   * The supplying plugin's own `group`, when it configured one.
-   */
-  group: Group | undefined
 }
 
 /**
@@ -135,7 +127,7 @@ export function resolveOperationTypes(ctx: OperationTypesContext, pluginName: st
 
     if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
       const resolver = ctx.getResolver(pluginTsName)
-      return { response: resolver.response, resolver, output: pluginTs.options?.output, group: pluginTs.options?.group ?? undefined }
+      return { response: resolver.response, resolver }
     }
 
     if (!pluginZod?.options?.inferred) {
@@ -150,7 +142,7 @@ export function resolveOperationTypes(ctx: OperationTypesContext, pluginName: st
     }
 
     const resolver = toZodTypeResolver(ctx.getResolver(pluginZodName))
-    return { response: resolver.response, resolver, output: pluginZod.options.output, group: pluginZod.options.group ?? undefined }
+    return { response: resolver.response, resolver }
   })
 }
 
