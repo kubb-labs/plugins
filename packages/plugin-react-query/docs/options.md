@@ -358,7 +358,7 @@ Exported name of the function.
 
 ### resolver
 
-Overrides generated names. Members you leave out keep `resolverReactQuery`. See [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) for the shared members.
+Overrides generated names. Members you leave out keep `resolverReactQuery`. See [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) for the shared members. Pass an array to merge several patches over `resolverReactQuery`, left to right.
 
 |          |                                     |
 | -------- | ----------------------------------- |

@@ -175,6 +175,8 @@ pluginValibot({
 
 ## Resolver members
 
+`resolver` takes one patch or an array of patches. An array merges over `resolverValibot` from left to right.
+
 Besides the shared members of [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverValibot` has these. Members you leave out keep the default.
 
 ::code-collapse{name="ResolverValibot patch members"}

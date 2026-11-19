@@ -195,7 +195,7 @@ const pets = new PetClient(api.client) // a tag class also accepts an existing c
 
 ### resolver
 
-Adds three members to the shared [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver). Members you leave out keep `resolverClient`.
+Adds three members to the shared [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver). Members you leave out keep `resolverClient`. Pass an array to merge several patches over `resolverClient`, left to right.
 
 |          |                                 |
 | -------- | ------------------------------- |

@@ -106,6 +106,8 @@ getPetHandler(() => getPetHandlerResponse404())
 
 ## Resolver members
 
+`resolver` takes one patch or an array of patches. An array merges over `resolverMsw` from left to right.
+
 Members you leave out of a `resolver` patch keep `resolverMsw`. Besides the shared `name`, `file`, and `imports` members of [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverMsw` has these:
 
 ```typescript [Partial override]

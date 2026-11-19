@@ -17,7 +17,7 @@ Pass these options to `pluginClient()`. Shared options link to [Shared plugin op
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                                    | None                                             |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                                         | `[]`                                             |
 | [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern, except `returnType` and `throwOnErrorDefault`. | `[]`                                             |
-| [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) | Customize generated names and file paths.                                           | `resolverClient`                                 |
+| [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) | Customize generated names and file paths. Takes one patch or an array of patches.   | `resolverClient`                                 |
 | [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                                                  | `[]`, run after the built-in client macros       |
 
 ## Option details

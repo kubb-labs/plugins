@@ -56,6 +56,8 @@ See [Tool calls and results](https://kubb.dev/extensions/kubb-labs/plugin-mcp/gu
 
 ## Resolver members
 
+`resolver` takes one patch or an array of patches. An array merges over `resolverMcp` from left to right.
+
 Members you leave out of a `resolver` patch keep `resolverMcp`. Besides the shared `name`, `file`, and `imports` members of [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverMcp` has these:
 
 ```typescript [Partial override]
