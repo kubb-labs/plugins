@@ -48,6 +48,21 @@ catalog:
 #  kubb: link:../kubb/packages/kubb
 #  unplugin-kubb: link:../kubb/packages/unplugin-kubb
 
+overrides:
+  '@kubb/adapter-oas': 0.0.0-canary-20261119190110
+  '@kubb/ast': 0.0.0-canary-20261119190110
+  '@kubb/cli': 0.0.0-canary-20261119190110
+  '@kubb/core': 0.0.0-canary-20261119190110
+  '@kubb/kit': 0.0.0-canary-20261119190110
+  '@kubb/mcp': 0.0.0-canary-20261119190110
+  '@kubb/plugin-barrel': 0.0.0-canary-20261119190110
+  '@kubb/parser-md': 0.0.0-canary-20261119190110
+  '@kubb/parser-ts': 0.0.0-canary-20261119190110
+  '@kubb/renderer-jsx': 0.0.0-canary-20261119190110
+  '@kubb/studio': 0.0.0-canary-20261119190110
+  kubb: 0.0.0-canary-20261119190110
+  unplugin-kubb: 0.0.0-canary-20261119190110
+
 minimumReleaseAge: 2880 # 48 hours, matches CI's SAFE_CHAIN_MINIMUM_PACKAGE_AGE_HOURS
 minimumReleaseAgeExclude:
   - '@kubb/*'
