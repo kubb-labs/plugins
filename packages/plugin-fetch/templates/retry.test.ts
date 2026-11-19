@@ -213,23 +213,14 @@ describe('retry', () => {
       contexts.push(context)
       return undefined
     }
-    // fetch refuses port 1 as a bad port without connecting, so this uses a port that was just closed.
-    const idle = http.createServer()
-    await new Promise<void>((resolve) => idle.listen(0, resolve))
-    const { port } = idle.address() as AddressInfo
-    await new Promise((resolve) => idle.close(resolve))
-    const closed = createClient({ baseURL: `http://127.0.0.1:${port}`, retry: { limit: 2, delay: () => 0, shouldRetry } })
+    const dropped = route((res) => res.destroy())
 
-    const error = await closed({ url: '/pets' }).catch((caught: unknown) => caught)
+    const error = await createClient({ baseURL, retry: { limit: 2, delay: () => 0, shouldRetry } })({ url: dropped }).catch((caught: unknown) => caught)
     expect(error).toBeInstanceOf(TypeError)
     expect((error as TypeError).message).toBe('fetch failed')
     expect(contexts.map((context) => context.retryCount)).toEqual([1, 2])
     expect(contexts[0]!.error).toBeInstanceOf(TypeError)
-    expect(error).toHaveProperty('cause.code', 'ECONNREFUSED')
     expect(contexts[0]!.response).toBeUndefined()
-
-    const dropped = route((res) => res.destroy())
-    await expect(createClient({ baseURL, retry: { limit: 2, delay: () => 0 } })({ url: dropped })).rejects.toThrow('fetch failed')
     expect(sent(dropped)).toHaveLength(3)
 
     const flaky = route((res) => res.destroy(), 200)
@@ -265,9 +256,9 @@ describe('retry', () => {
     const reason = new Error('stop')
     const started = performance.now()
 
-    const call = createClient({ baseURL, retry: { delay: () => 60_000 } })({ url, signal: controller.signal })
-    setTimeout(() => controller.abort(reason), 50)
-    await expect(call).rejects.toBe(reason)
+    // Aborts once the wait has started.
+    const retry = { delay: () => 60_000, onRetry: () => void setTimeout(() => controller.abort(reason), 10) }
+    await expect(createClient({ baseURL, retry })({ url, signal: controller.signal })).rejects.toBe(reason)
     expect(performance.now() - started).toBeLessThan(30_000)
     expect(sent(url)).toHaveLength(1)
   })

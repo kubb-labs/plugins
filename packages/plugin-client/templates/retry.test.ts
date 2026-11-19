@@ -200,6 +200,29 @@ describe('retry', () => {
     expect(sent).toEqual(['5', '5', '6', undefined])
   })
 
+  test('keeps the caller Last-Event-ID when the events carry no ID, and calls a stream handler on its media type', async () => {
+    const sent: Array<string | undefined> = []
+    const responses = [events('data: one\n\n', true), events('data: two\n\n')]
+    const transport = async (request: ResolvedRequest) => {
+      sent.push(request.headers['Last-Event-ID'])
+      return responses.shift()!
+    }
+    const client = createClientCore({ defaultTransport: transport, mediaTypes: streamMediaTypes, retry: { limit: 1, delay: () => 0 } })
+
+    expect(await collect(await client.stream({ url: '/events', headers: { 'Last-Event-ID': '5' } }))).toHaveLength(2)
+    expect(sent).toEqual(['5', '5'])
+
+    const lines = {
+      items: ['a', 'b'],
+      async *stream(body: ReadableStream<Uint8Array>) {
+        await body.cancel()
+        yield* this.items
+      },
+    }
+    const custom = createClientCore({ defaultTransport: async () => events('x'), mediaTypes: { 'text/event-stream': lines } })
+    expect(await collect(await custom.stream({ url: '/events' }))).toEqual(['a', 'b'])
+  })
+
   test('throws the read error when a dropped stream is out of retries or retry is off', async () => {
     const transport = vi.fn(async () => events('data: on', true))
     const client = createClientCore({ defaultTransport: transport, mediaTypes: streamMediaTypes })

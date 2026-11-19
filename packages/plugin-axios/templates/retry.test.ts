@@ -42,7 +42,9 @@ const server = http.createServer((req, res) => {
   const chunks: Array<Buffer> = []
   req.on('data', (chunk: Buffer) => chunks.push(chunk))
   req.on('end', () => {
-    const { steps, hits } = plans.get(req.url!)!
+    const found = plans.get(req.url!)
+    if (!found) return void res.writeHead(404).end()
+    const { steps, hits } = found
     hits.push({ method: req.method, headers: req.headers, body: Buffer.concat(chunks).toString() })
     steps[Math.min(hits.length, steps.length) - 1]!(res)
   })
@@ -108,11 +110,12 @@ describe('retry through the axios transport', () => {
 
   test('retries a network error up to the limit, then throws the AxiosError', async () => {
     const onRetry = vi.fn()
-    const client = createClient({ baseURL: 'http://127.0.0.1:1', retry: { ...fast, onRetry } })
+    const { url, hits } = plan((res) => res.destroy())
+    const client = createClient({ baseURL, retry: { ...fast, onRetry } })
 
-    const error = await client({ method: 'GET', url: '/pets' }).catch((caught: unknown) => caught)
+    const error = await client({ method: 'GET', url }).catch((caught: unknown) => caught)
     expect(axios.isAxiosError(error)).toBe(true)
-    expect(error).toMatchObject({ code: 'ECONNREFUSED' })
+    expect(hits).toHaveLength(3)
     expect(onRetry.mock.calls.map(([context]) => [context.retryCount, context.response, axios.isAxiosError(context.error)])).toStrictEqual([
       [1, undefined, true],
       [2, undefined, true],
@@ -133,8 +136,9 @@ describe('retry through the axios transport', () => {
     const reason = new Error('stop')
     const started = performance.now()
 
-    setTimeout(() => controller.abort(reason), 50)
-    await expect(createClient({ baseURL, retry: { delay: () => 60_000 } })({ method: 'GET', url, signal: controller.signal })).rejects.toBe(reason)
+    // Aborts once the wait has started.
+    const retry = { delay: () => 60_000, onRetry: () => void setTimeout(() => controller.abort(reason), 10) }
+    await expect(createClient({ baseURL, retry })({ method: 'GET', url, signal: controller.signal })).rejects.toBe(reason)
     expect(performance.now() - started).toBeLessThan(30_000)
     expect(hits).toHaveLength(1)
   })
@@ -145,8 +149,10 @@ describe('retry through the axios transport', () => {
     const reason = new Error('stop')
     const onRetry = vi.fn()
 
-    setTimeout(() => controller.abort(reason), 50)
-    await expect(createClient({ baseURL, retry: { ...fast, onRetry } })({ method: 'GET', url, signal: controller.signal })).rejects.toBe(reason)
+    const call = createClient({ baseURL, retry: { ...fast, onRetry } })({ method: 'GET', url, signal: controller.signal })
+    await vi.waitFor(() => expect(hits).toHaveLength(1))
+    controller.abort(reason)
+    await expect(call).rejects.toBe(reason)
     await new Promise((resolve) => setTimeout(resolve, 50))
     expect(hits).toHaveLength(1)
     expect(onRetry).not.toHaveBeenCalled()

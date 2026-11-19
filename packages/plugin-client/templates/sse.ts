@@ -1,6 +1,7 @@
 import type { EventStreamOptions, MediaType, MediaTypes, ServerSentEvent } from './client.ts'
 
-type Cursor = { lastEventId: string }
+// `idSeen` is set once the stream sends an `id`, even an empty one that clears the ID.
+type Cursor = { lastEventId: string; idSeen?: boolean }
 
 async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
   if (!('getReader' in stream)) {
@@ -62,6 +63,7 @@ export async function* parseEventStream<TData = unknown>(
   let retry: number | undefined
   let size = 0
   let pendingId = cursor.lastEventId
+  let sawId = false
 
   const readField = (part: string) => {
     const index = part.indexOf(':')
@@ -75,7 +77,10 @@ export async function* parseEventStream<TData = unknown>(
         type = value
         break
       case 'id':
-        if (!value.includes('\u0000')) pendingId = value
+        if (!value.includes('\u0000')) {
+          pendingId = value
+          sawId = true
+        }
         break
       case 'retry':
         if (/^\d+$/.test(value)) retry = Number(value)
@@ -87,6 +92,7 @@ export async function* parseEventStream<TData = unknown>(
       if (!part) {
         // Committed at the blank line, so a dropped stream never reports an ID past the last full event.
         cursor.lastEventId = pendingId
+        if (sawId) cursor.idSeen = true
         if (data.length) {
           const raw = data.join('\n')
           if (raw === terminator) return

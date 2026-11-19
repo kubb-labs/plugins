@@ -17,7 +17,7 @@ export type MediaTypeContext = {
   /**
    * Where a stream records the last event ID it read, for `StreamResult.lastEventId`.
    */
-  cursor?: { lastEventId: string } | undefined
+  cursor?: { lastEventId: string; idSeen?: boolean } | undefined
 }
 
 /**

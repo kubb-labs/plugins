@@ -154,7 +154,7 @@ await createOrder({ body, retry: { methods: ['POST'] } })
 await chargeCard({ body, retry: false })
 ```
 
-A call's `retry` merges per field over the client's, and `false` or `0` sends that call once. Pass an object for more control:
+A call's `retry` merges per field over the client's, and `false` or `0` turns it off for that call. The call is then sent once, unless Ky's own `options.retry` is set. Pass an object for more control:
 
 | Option        | What it does                                                                                            | Default                                            |
 | ------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
