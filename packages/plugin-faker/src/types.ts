@@ -1,6 +1,6 @@
 import type { ast } from '@internals/ast'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
@@ -136,7 +136,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
    * Override the naming of generated factory helpers. Common use: append `Mock` or
    * `Factory` so helpers do not clash with imported types.
    */
-  resolver?: ResolverPatch<ResolverFaker>
+  resolver?: ResolverInput<ResolverFaker>
   /**
    * Macros applied to schema and operation nodes before printing.
    */

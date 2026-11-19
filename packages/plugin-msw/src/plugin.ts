@@ -59,7 +59,7 @@ export const pluginMsw = defineExtension<PluginMsw>({
       macros: userMacros,
     } = options
 
-    const resolver = userResolver ? Resolver.merge<ResolverMsw>(resolverMsw, userResolver) : resolverMsw
+    const resolver = userResolver ? Resolver.merge<ResolverMsw>(resolverMsw, ...[userResolver].flat()) : resolverMsw
 
     setResolver(resolver)
     if (userMacros?.length) {

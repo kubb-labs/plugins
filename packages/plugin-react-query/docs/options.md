@@ -362,7 +362,7 @@ Overrides generated names. Members you leave out keep `resolverReactQuery`. See 
 
 |          |                                     |
 | -------- | ----------------------------------- |
-| Type     | `ResolverPatch<ResolverReactQuery>` |
+| Type     | `ResolverInput<ResolverReactQuery>` |
 | Required | `false`                             |
 
 ::code-collapse{name="ResolverReactQuery patch members"}

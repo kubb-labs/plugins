@@ -72,7 +72,7 @@ export const pluginReactQuery = defineExtension<PluginReactQuery>({
       macros: userMacros,
     } = options
 
-    const resolver = userResolver ? Resolver.merge<ResolverReactQuery>(resolverReactQuery, userResolver) : resolverReactQuery
+    const resolver = userResolver ? Resolver.merge<ResolverReactQuery>(resolverReactQuery, ...[userResolver].flat()) : resolverReactQuery
 
     setResolver(resolver)
     if (userMacros?.length) {

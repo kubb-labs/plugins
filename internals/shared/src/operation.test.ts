@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { casing, createResolver } from '@kubb/kit'
+import { casing, createResolver, resolverCasedFile } from '@kubb/kit'
 import type { Group, Memo, Output, PluginType, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import {
@@ -23,8 +23,6 @@ import {
   type ResponseNameResolver,
   type ResponseStatusNameResolver,
 } from './operation.ts'
-
-import { createCasedFile } from './resolver.ts'
 
 type TestPlugin = PluginType<
   'test',
@@ -452,7 +450,7 @@ describe('resolveOperationFile', () => {
   })
 
   describe('when an operation file matches a schema file', () => {
-    const pascalResolver = createResolver<PluginType<'plugin-ts'>>({ pluginName: 'plugin-ts', file: createCasedFile(casing.pascal) })
+    const pascalResolver = createResolver<PluginType<'plugin-ts'>>({ pluginName: 'plugin-ts', ...resolverCasedFile(casing.pascal) })
     const output = { path: 'types', mode: 'directory' } as const
     const schemas = (...names: Array<string>) => names.map((name) => ast.factory.createSchema({ type: 'object', name }))
     const resolve = (operationId: string, options: { schemas: ReturnType<typeof schemas>; output?: Output; group?: Group }) =>

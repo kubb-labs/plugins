@@ -26,15 +26,7 @@ export {
 } from './operation.ts'
 export type { ResponseStream } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
-export {
-  createCasedFile,
-  createOperationParamResolver,
-  createOperationResponseResolver,
-  getCircularNames,
-  getEnumNames,
-  operationKey,
-  resolveOperationName,
-} from './resolver.ts'
+export { getCircularNames, getEnumNames, resolveOperationName } from './resolver.ts'
 export {
   defaultLiteral,
   formatDefault,

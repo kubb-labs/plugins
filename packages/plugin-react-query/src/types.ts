@@ -2,7 +2,7 @@ import type { ast } from '@internals/ast'
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
 import type { Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
 export type { Infinite, Transformer } from '@internals/tanstack-query'
 
@@ -253,7 +253,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
    * Override how hook names and file paths are built. Methods you omit fall
    * back to the default `resolverReactQuery`.
    */
-  resolver?: ResolverPatch<ResolverReactQuery>
+  resolver?: ResolverInput<ResolverReactQuery>
   /**
    * Set to `true` to also generate `use*` hook functions. By default only the
    * `queryOptions`, `mutationOptions`, `queryKey`, and `mutationKey` helpers are

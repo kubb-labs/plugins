@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
-import { operationKey, resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
-import { defineGenerator } from '@kubb/kit'
+import { resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
+import { defineGenerator, operationKey } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'

@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import type { ReturnTypeOption } from '@internals/client'
 import type { PluginOptions } from '@internals/shared/types'
-import type { ResolverPatch, Exclude, Group, Include, Output, Override, PluginType, Resolver } from '@kubb/kit'
+import type { Exclude, Group, Include, Output, Override, PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
 /**
  * The schema library a validator reads its schemas from: `@kubb/plugin-zod` or `@kubb/plugin-valibot`.
@@ -173,7 +173,7 @@ export type ClientOptions = PluginOptions<Omit<ClientResolvedOptions, 'throwOnEr
   /**
    * Override how names and file paths are built. Methods you omit fall back to the default resolver.
    */
-  resolver?: ResolverPatch<ResolverClient>
+  resolver?: ResolverInput<ResolverClient>
   /**
    * Macros applied to each operation node before code is printed.
    */

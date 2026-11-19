@@ -59,7 +59,7 @@ export const pluginMcp = defineExtension<PluginMcp>({
       macros: userMacros,
     } = options
 
-    const resolver = userResolver ? Resolver.merge<ResolverMcp>(resolverMcp, userResolver) : resolverMcp
+    const resolver = userResolver ? Resolver.merge<ResolverMcp>(resolverMcp, ...[userResolver].flat()) : resolverMcp
 
     setResolver(resolver)
     if (userMacros?.length) {

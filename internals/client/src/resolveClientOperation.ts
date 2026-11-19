@@ -1,6 +1,7 @@
 import type { ast } from '@internals/ast'
 import path from 'node:path'
-import { operationFileEntry, operationKey } from '@internals/shared'
+import { operationFileEntry } from '@internals/shared'
+import { operationKey } from '@kubb/kit'
 import type { Exclude, Group, Include, Memo, Output, Override, Resolver } from '@kubb/kit'
 
 /**

@@ -1,6 +1,6 @@
 import type { ast } from '@internals/ast'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 import type { PrinterZodNodes, printerZod } from './printers/printerZod.ts'
 import type { PrinterZodMiniNodes, printerZodMini } from './printers/printerZodMini.ts'
 
@@ -265,7 +265,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
    * Override how schema and operation names are built. Methods you omit fall back
    * to the default `resolverZod`.
    */
-  resolver?: ResolverPatch<ResolverZod>
+  resolver?: ResolverInput<ResolverZod>
   /**
    * Generate TypeScript type guards (`is*`) and assertion functions (`assert*`) for schemas
    * using Zod v4's native `validate` API.

@@ -1,6 +1,6 @@
 import type { ast } from '@internals/ast'
 import type { ResolvedPluginOptions } from '@internals/shared/types'
-import type { Exclude, Include, OutputOptions, Override, PluginType, Resolver, ResolverPatch } from '@kubb/kit'
+import type { Exclude, Include, OutputOptions, Override, PluginType, Resolver, ResolverInput } from '@kubb/kit'
 import type { PrinterValibotNodes, printerValibot } from './printers/printerValibot.ts'
 
 /**
@@ -138,7 +138,7 @@ export type Options = OutputOptions & {
   /**
    * Override the names the plugin gives to schemas, types, and files.
    */
-  resolver?: ResolverPatch<ResolverValibot>
+  resolver?: ResolverInput<ResolverValibot>
   /**
    * Replace the printed output of a schema node type.
    *

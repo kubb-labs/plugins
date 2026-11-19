@@ -57,7 +57,7 @@ export const pluginFaker = defineExtension<PluginFaker>({
       macros: userMacros,
     } = options
 
-    setResolver(userResolver ? Resolver.merge(resolverFaker, userResolver) : resolverFaker)
+    setResolver(userResolver ? Resolver.merge(resolverFaker, ...[userResolver].flat()) : resolverFaker)
     if (userMacros?.length) {
       setMacros(userMacros)
     }

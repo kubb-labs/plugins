@@ -187,7 +187,7 @@ Overrides generated file and symbol names. Members you leave out keep `resolverS
 
 |          |                              |
 | -------- | ---------------------------- |
-| Type     | `ResolverPatch<ResolverSwr>` |
+| Type     | `ResolverInput<ResolverSwr>` |
 | Required | `false`                      |
 
 ::code-collapse{name="ResolverSwr patch members"}

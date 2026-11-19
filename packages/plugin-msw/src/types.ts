@@ -1,6 +1,6 @@
 import type { ast } from '@internals/ast'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
 /**
  * Resolver for MSW that provides naming methods for handler functions.
@@ -38,7 +38,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Override how handler names and file paths are built.
    */
-  resolver?: ResolverPatch<ResolverMsw>
+  resolver?: ResolverInput<ResolverMsw>
   /**
    * Macros applied to operation nodes before printing.
    */

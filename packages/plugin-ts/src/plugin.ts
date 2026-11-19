@@ -62,7 +62,7 @@ export const pluginTs = defineExtension<PluginTs>({
       keyCasing: enumOptions.keyCasing ?? 'none',
     }
 
-    setResolver(userResolver ? Resolver.merge(resolverTs, userResolver) : resolverTs)
+    setResolver(userResolver ? Resolver.merge(resolverTs, ...[userResolver].flat()) : resolverTs)
     if (userMacros?.length) {
       setMacros(userMacros)
     }

@@ -61,7 +61,7 @@ export const pluginZod = defineExtension<PluginZod>({
       macros: userMacros,
     } = options
 
-    setResolver(userResolver ? Resolver.merge(resolverZod, userResolver) : resolverZod)
+    setResolver(userResolver ? Resolver.merge(resolverZod, ...[userResolver].flat()) : resolverZod)
     if (userMacros?.length) {
       setMacros(userMacros)
     }

@@ -2,7 +2,7 @@ import type { ast } from '@internals/ast'
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
 import type { Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
 export type { Infinite, Transformer } from '@internals/tanstack-query'
 
@@ -135,7 +135,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
   /**
    * Override how composable names and file paths are built.
    */
-  resolver?: ResolverPatch<ResolverVueQuery>
+  resolver?: ResolverInput<ResolverVueQuery>
   /**
    * Set to `true` to also generate `use*` composable functions. By default only the
    * `queryOptions`, `queryKey`, and `mutationKey` helpers are emitted.
