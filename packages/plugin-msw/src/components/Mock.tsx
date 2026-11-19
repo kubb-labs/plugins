@@ -1,6 +1,6 @@
 import { ast, text } from '@kubb/kit'
 import { Url } from '@kubb/kit'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { getExampleBody, getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
 
@@ -49,13 +49,6 @@ export function Mock({ baseURL = '', name, fakerName, responseName, typeName, re
 
   return (
     <>
-      {requestBodyType && (
-        <File.Source name="MswBody" isTypeOnly>
-          {/* A generic alias keeps an object body spreadable, which the same conditional written inline does not (TS2698).
-          Distribution sends `unknown`, `bigint`, `void` or a union holding `unknown` to `DefaultBodyType`. */}
-          {'type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType'}
-        </File.Source>
-      )}
       <Function name={name} export params={params}>
         {`return ${httpCall}(${urlLiteral}, function handler(info) {
     ${methodGuard}if(typeof data === 'function') return data(info)

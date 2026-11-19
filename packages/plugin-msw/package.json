@@ -39,6 +39,7 @@
   ],
   "files": [
     "dist",
+    "templates",
     "kubb-extension.json",
     "docs",
     "!/**/**.test.**",

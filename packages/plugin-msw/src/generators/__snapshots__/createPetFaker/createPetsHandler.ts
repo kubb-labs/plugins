@@ -4,9 +4,9 @@
  * Source: text content
  */
 
+import type { MswBody } from './.kubb/mswBody'
 import type { CreatePetsResponse, CreatePetsBody } from './CreatePets'
 import type { HttpResponseResolver } from 'msw/http'
-import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
@@ -14,8 +14,6 @@ export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
     status: 201,
   })
 }
-
-type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
 export function createPetsHandler(
   data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, MswBody<CreatePetsBody>>,
