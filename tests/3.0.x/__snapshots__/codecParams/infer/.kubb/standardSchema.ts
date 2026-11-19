@@ -23,9 +23,6 @@ export class ParseError extends Error {
   readonly direction?: ValidationErrorContext['direction']
   readonly source?: ValidationErrorContext['source']
   readonly method?: string
-  /**
-   * The HTTP status of the response whose body failed. Unset for a request value.
-   */
   readonly status?: number
   // Declared here and set below, since the `cause` constructor option needs the ES2022 library.
   declare readonly cause?: unknown

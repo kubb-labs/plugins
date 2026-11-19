@@ -1055,7 +1055,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       throw error
     }
 
-    // Reaches the `ResponseError` only when the handler supplied a value, since the `ParseError` is thrown otherwise.
     let validationError: ParseError | undefined
     const data = rawStream
       ? result.data
