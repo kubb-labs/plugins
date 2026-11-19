@@ -1,7 +1,7 @@
 import type { ast } from '@kubb/kit'
 import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall, resolveMutationRequestType } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
@@ -49,9 +49,8 @@ export function MutationOptions({ name, clientName, node, tsResolver, mutationKe
   })
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function name={name} export params={paramsSignature} generics={['TContext = unknown']}>
-        {`
+    <Function name={name} export params={paramsSignature} generics={['TContext = unknown']}>
+      {`
       const mutationKey = ${mutationKeyName}()
       return mutationOptions<${TData}, ${TError}, ${TRequest}, TContext>({
         mutationKey,
@@ -60,7 +59,6 @@ export function MutationOptions({ name, clientName, node, tsResolver, mutationKe
         },
       })
 `}
-      </Function>
-    </File.Source>
+    </Function>
   )
 }

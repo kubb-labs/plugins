@@ -6,7 +6,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mock } from '../components/Mock.tsx'
 import { Response } from '../components/Response.tsx'
 import type { PluginMsw } from '../types'
-import { hasResponseSchema } from '../utils.ts'
+import { hasResponseSchema, mswBodyPath } from '../utils.ts'
 
 /**
  * Built-in operation generator for `@kubb/plugin-msw`. Emits one MSW handler
@@ -75,7 +75,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       >
         <File.Import name={['http', 'HttpResponse']} path="msw/http" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
-        {requestName && <File.Import name={['DefaultBodyType']} isTypeOnly path="msw" />}
+        {requestName && <File.Import name={['MswBody']} isTypeOnly root={mock.file.path} path={mswBodyPath(config)} />}
         <File.Import
           name={Array.from(new Set([...(hasResponseNameCollision ? [] : [type.responseName]), ...responseTypeNames, ...(requestName ? [requestName] : [])]))}
           plugin={pluginTsName}

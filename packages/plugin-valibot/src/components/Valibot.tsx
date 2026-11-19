@@ -1,5 +1,5 @@
 import type { ast } from '@kubb/kit'
-import { Const, File, Function, Type } from '@kubb/renderer-jsx'
+import { Const, Function, Schema, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterValibotFactory } from '../printers/printerValibot.ts'
 import type { PluginValibot } from '../types.ts'
@@ -48,62 +48,41 @@ export function Valibot({
   cyclic,
   comments = [],
 }: Props): KubbReactNode {
-  const output = printer.print(node)
-  const printerImports = printer.drainImports()
-
-  if (!output) {
-    return
-  }
-
   // `v.is` and `v.assert` narrow to the value the schema accepts, before any conversion.
   const guardType = `v.InferInput<typeof ${name}>`
   const shouldGenerateIs = isName && (typeof typeGuards === 'object' ? (typeGuards.is ?? true) : Boolean(typeGuards))
   const shouldGenerateAssert = assertName && (typeof typeGuards === 'object' ? (typeGuards.assert ?? true) : Boolean(typeGuards))
 
   return (
-    <>
-      {printerImports.map((imp) => (
-        <File.Import
-          key={[name, imp.path, imp.name].join('-')}
-          name={imp.name}
-          path={imp.path}
-          root={imp.root}
-          isTypeOnly={imp.isTypeOnly}
-          isNameSpace={imp.isNameSpace}
-        />
-      ))}
-      <File.Source name={name} isExportable isIndexable>
-        <Const export name={name} type={cyclic ? 'v.GenericSchema' : undefined} JSDoc={comments.length ? { comments } : undefined}>
-          {output}
-        </Const>
-      </File.Source>
-      {inferTypeName && (
-        <File.Source name={inferTypeName} isExportable isIndexable isTypeOnly>
-          <Type export name={inferTypeName}>
-            {`v.${inferKind}<typeof ${name}>`}
-          </Type>
-        </File.Source>
-      )}
-      {shouldGenerateIs && (
-        <File.Source name={isName} isExportable isIndexable>
-          <Const export name={isName} JSDoc={{ comments: [`Type guard for {@link ${name}}`] }}>
-            {`(data: unknown): data is ${guardType} => v.is(${name}, data)`}
+    <Schema node={node} printer={printer}>
+      {(output) => (
+        <>
+          <Const export name={name} type={cyclic ? 'v.GenericSchema' : undefined} JSDoc={comments.length ? { comments } : undefined}>
+            {output}
           </Const>
-        </File.Source>
+          {inferTypeName && (
+            <Type export name={inferTypeName}>
+              {`v.${inferKind}<typeof ${name}>`}
+            </Type>
+          )}
+          {shouldGenerateIs && (
+            <Const export name={isName} JSDoc={{ comments: [`Type guard for {@link ${name}}`] }}>
+              {`(data: unknown): data is ${guardType} => v.is(${name}, data)`}
+            </Const>
+          )}
+          {shouldGenerateAssert && (
+            <Function
+              export
+              name={assertName}
+              params="data: unknown"
+              returnType={`asserts data is ${guardType}`}
+              JSDoc={{ comments: [`Asserter for {@link ${name}}`, '@throws {v.ValiError} If data is invalid'] }}
+            >
+              {`v.assert(${name}, data)`}
+            </Function>
+          )}
+        </>
       )}
-      {shouldGenerateAssert && (
-        <File.Source name={assertName} isExportable isIndexable>
-          <Function
-            export
-            name={assertName}
-            params="data: unknown"
-            returnType={`asserts data is ${guardType}`}
-            JSDoc={{ comments: [`Asserter for {@link ${name}}`, '@throws {v.ValiError} If data is invalid'] }}
-          >
-            {`v.assert(${name}, data)`}
-          </Function>
-        </File.Source>
-      )}
-    </>
+    </Schema>
   )
 }

@@ -1,5 +1,4 @@
-import type { ast } from '@kubb/kit'
-import { getRequestGroupOptionality } from '@internals/shared'
+import { ast } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import type { OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
@@ -58,7 +57,7 @@ export function buildGroupedOptionsSignature({
   const baseType = `${eventStream && returnType !== 'plain' ? 'StreamOptions' : 'Options'}<${optionsName}, ThrowOnError>`
   // `NonNullable` reuses the module's own `auth` type, so a custom `importPath` client needs no extra export.
   const optionsType = authRequired ? `${baseType} & { auth: NonNullable<${baseType}['auth']> }` : baseType
-  const isOptional = !authRequired && getRequestGroupOptionality(node).isOptional
+  const isOptional = !authRequired && ast.http.getRequestGroups(node).isOptional
 
   const paramsSignature =
     declarationPrinter.print(

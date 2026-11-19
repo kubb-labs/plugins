@@ -1,5 +1,5 @@
 import { text } from '@kubb/kit'
-import { Const, File, Function } from '@kubb/renderer-jsx'
+import { Const, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 type ZodParam = {
@@ -117,19 +117,18 @@ server.registerTool(${JSON.stringify(tool.name)}, {
 
   return (
     <>
-      <File.Source name="toolSchema">
-        <Function
-          name="toolSchema"
-          generics="T extends z.ZodType"
-          params="schema: T"
-          JSDoc={{
-            comments: [
-              'Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.',
-              'A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.',
-            ],
-          }}
-        >
-          {`const standard = schema['~standard']
+      <Function
+        name="toolSchema"
+        generics="T extends z.ZodType"
+        params="schema: T"
+        JSDoc={{
+          comments: [
+            'Converts with `unrepresentable: "any"`, because a `bigint` or `Blob` in one tool schema fails every `tools/list` request.',
+            'A `bigint` is listed as an `int64` integer and a `Blob` as an unconstrained value.',
+          ],
+        }}
+      >
+        {`const standard = schema['~standard']
 const convert = (io: 'input' | 'output') => (options: Parameters<typeof standard.jsonSchema.input>[0]) =>
   standard.jsonSchema[io]({
     ...options,
@@ -145,33 +144,26 @@ const convert = (io: 'input' | 'output') => (options: Parameters<typeof standard
   })
 
 return { '~standard': { ...standard, jsonSchema: { input: convert('input'), output: convert('output') } } }`}
-        </Function>
-      </File.Source>
+      </Function>
 
-      <File.Source name="getServer" isExportable isIndexable>
-        <Function name="getServer" export>
-          {`const server = new McpServer({
+      <Function name="getServer" export>
+        {`const server = new McpServer({
   name: ${text.quote(serverName)},
   version: ${text.quote(serverVersion)},
 })
 ${registrations}
 return server`}
-        </Function>
-      </File.Source>
+      </Function>
 
-      <File.Source name="server" isExportable isIndexable>
-        <Const name={'server'} export>
-          {'getServer()'}
-        </Const>
-      </File.Source>
+      <Const name={'server'} export>
+        {'getServer()'}
+      </Const>
 
-      <File.Source name="startServer" isExportable isIndexable>
-        <Function name="startServer" async export>
-          {`return serveStdio(getServer, {
+      <Function name="startServer" async export>
+        {`return serveStdio(getServer, {
     onerror: (error) => console.error('MCP server error:', error),
   })`}
-        </Function>
-      </File.Source>
+      </Function>
     </>
   )
 }

@@ -1,3 +1,5 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { isValidVarName, toLiteral } from '@internals/utils'
 import { toResponseContent } from '@internals/shared'
 
@@ -55,7 +57,7 @@ export function getContentType(response: ast.ResponseNode | null | undefined): s
  */
 export function hasResponseSchema(response: ast.ResponseNode | null | undefined): boolean {
   const schema = response?.content?.find((entry) => entry.schema)?.schema
-  return !!schema && schema.type !== 'void' && schema.type !== 'any' && schema.type !== 'unknown'
+  return !!schema && !ast.schema.is(schema, 'untyped')
 }
 
 /**
@@ -93,7 +95,7 @@ const bigintReplacer = `(_key, value) => {
 /** The `JSON.stringify` call for `body`, with a replacer when the response holds an `int64`, which `JSON.stringify` throws on. */
 function stringify(body: string, response: ast.ResponseNode | null | undefined): string {
   const hasBigint = (response?.content ?? []).some(
-    (entry) => entry.schema && ast.schema.find(entry.schema, { predicate: (schema) => schema.type === 'bigint', followRefs: true }) !== undefined,
+    (entry) => entry.schema && ast.schema.find(entry.schema, { predicate: (schema) => schema.type === 'bigint', follow: ['ref'] }) !== undefined,
   )
   return hasBigint ? `JSON.stringify(${body}, ${bigintReplacer})` : `JSON.stringify(${body})`
 }
@@ -195,4 +197,12 @@ export function responseLiteral(body: string, status: number, contentType: strin
   return `new HttpResponse<string>(${body}, {
       status: ${status},${headersBlock(contentType, headers)}
     })`
+}
+
+/** The bundled `MswBody` type that every handler with a request body imports. */
+export const mswBodyTemplate = fileURLToPath(new URL('../templates/mswBody.ts', import.meta.url))
+
+/** Where the build writes `mswBody.ts`, next to the other `.kubb` runtime files. */
+export function mswBodyPath(config: { root: string; output: { path: string } }): string {
+  return path.resolve(config.root, config.output.path, '.kubb', 'mswBody.ts')
 }

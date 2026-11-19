@@ -2,7 +2,7 @@ import { buildRequestParamsSignature } from '@internals/shared'
 
 import { ast, text, Url } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 type Props = {
@@ -103,10 +103,8 @@ ${compositeLines}  const text = value instanceof Date ? value.toISOString() : St
 }).then((res) => res.body) as ${returnType}`
 
   return (
-    <File.Source name={name} isIndexable isExportable>
-      <Function name={name} export params={paramsSignature} returnType={returnType}>
-        {requestCall}
-      </Function>
-    </File.Source>
+    <Function name={name} export params={paramsSignature} returnType={returnType}>
+      {requestCall}
+    </Function>
   )
 }

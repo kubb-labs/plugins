@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
+import type { MswBody } from '../.kubb/mswBody'
 import type { AddPetResponse, AddPetStatus405, AddPetBody } from '../types/AddPet'
 import type { HttpResponseResolver } from 'msw/http'
-import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function addPetHandlerResponse200(data?: AddPetResponse) {
@@ -33,8 +33,6 @@ export function addPetHandlerResponse405(data?: AddPetStatus405) {
     status: 405,
   })
 }
-
-type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
 export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, MswBody<AddPetBody>>, options?: { baseURL?: string }) {
   return http.post<Record<string, string>, MswBody<AddPetBody>>(`${options?.baseURL ?? ''}/pet`, function handler(info) {

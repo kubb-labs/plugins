@@ -7,15 +7,7 @@ import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import {
-  buildResponseUnionSchema,
-  canOverrideSchema,
-  dateParserName,
-  localeToFakerImport,
-  resolveFakerTypeUsage,
-  resolveTypeReference,
-  SCALAR_TYPES,
-} from '../utils.ts'
+import { buildResponseUnionSchema, canOverrideSchema, dateParserName, localeToFakerImport, resolveFakerTypeUsage, resolveTypeReference } from '../utils.ts'
 
 type RenderUnit = {
   schema: ast.SchemaNode | null
@@ -286,9 +278,9 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       // An object override merges into an object factory. Any other override (an array, a scalar) is complete, so it is returned as is.
       const objectMembers = factories.flatMap((unit) => {
         if (!unit.schema || !canOverrideSchema(unit.schema)) return []
-        const target = ast.ref.getSchema(unit.schema).type
+        const target = ast.ref.getSchema(unit.schema)
         // An unresolved ref has no known shape, so it could be an array factory that would throw on an object.
-        if (target === 'ref' || target === 'array' || target === 'tuple' || SCALAR_TYPES.has(target)) return []
+        if (target.type === 'ref' || target.type === 'array' || target.type === 'tuple' || ast.schema.is(target, 'scalar')) return []
         return [`() => ${unit.name}(data as ${resolveFakerTypeUsage(unit.schema, reference(unit, unit.schema).typeName, true).dataType})`]
       })
       const generated = `data ?? faker.helpers.arrayElement([${factories.map((unit) => `${unit.name}()`).join(', ')}])`
@@ -299,17 +291,15 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return (
         <>
           {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
-          <File.Source name={name} isExportable isIndexable>
-            <Function
-              export
-              name={name}
-              JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
-              params={`data?: Partial<${typeReference.typeName}>`}
-              returnType={typeReference.typeName}
-            >
-              {`return (${body}) as ${typeReference.typeName}`}
-            </Function>
-          </File.Source>
+          <Function
+            export
+            name={name}
+            JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
+            params={`data?: Partial<${typeReference.typeName}>`}
+            returnType={typeReference.typeName}
+          >
+            {`return (${body}) as ${typeReference.typeName}`}
+          </Function>
         </>
       )
     }

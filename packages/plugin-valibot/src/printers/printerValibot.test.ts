@@ -572,6 +572,15 @@ describe('printerValibot', () => {
       expect(v.is(build(nested), { id: 'a', child: { name: 'b' } })).toBe(true)
     })
 
+    test('omits keys from a nullable allOf of objects', () => {
+      const omit = printerValibot({ resolver, keysToOmit: ['id'] })
+      const merge = createSchema({ type: 'intersection', primitive: 'object', nullable: true, members: [object({ id: string() }), object({ name: string() })] })
+      const schema = build(omit.print(merge)!)
+
+      expect(v.parse(schema, { name: 'b' })).toEqual({ name: 'b' })
+      expect(v.parse(schema, null)).toBeNull()
+    })
+
     test('does not omit keys from a schema without entries', () => {
       const omit = printerValibot({ resolver, keysToOmit: ['id'] })
       const a = object({ id: string() })

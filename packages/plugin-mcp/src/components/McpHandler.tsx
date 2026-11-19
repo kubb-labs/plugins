@@ -1,7 +1,7 @@
-import { buildOperationComments, buildRequestParamsSignature, castToClientOptions, hasRequestContentTypeChoice } from '@internals/shared'
-import type { ast } from '@kubb/kit'
+import { buildOperationComments, buildRequestParamsSignature, castToClientOptions } from '@internals/shared'
+import { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 type Props = {
@@ -35,7 +35,7 @@ export function McpHandler({ name, clientName, node, resolver, returnType = 'ful
   // pins the result shape, since `throwOnErrorDefault: false` would otherwise resolve to the full result.
   const callConfig = `{ ${[...callArgs, 'signal: ctx.mcpReq.signal', 'throwOnError: true'].join(', ')} }`
   // Tool arguments carry no media type, so the call takes the client's default one.
-  const callArg = hasRequestContentTypeChoice(node) ? castToClientOptions(callConfig, clientName, returnType) : callConfig
+  const callArg = ast.http.getRequestGroups(node).hasContentTypeChoice ? castToClientOptions(callConfig, clientName, returnType) : callConfig
   const body = returnType === 'data' ? 'res' : 'res.data'
 
   const callToolResult = `return {
@@ -49,21 +49,10 @@ export function McpHandler({ name, clientName, node, resolver, returnType = 'ful
 }`
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function
-        name={name}
-        async
-        export
-        params={paramsSignature}
-        JSDoc={{
-          comments: buildOperationComments(node),
-        }}
-        returnType={'CallToolResult'}
-      >
-        {`const res = await ${clientName}(${callArg})`}
-        <br />
-        {callToolResult}
-      </Function>
-    </File.Source>
+    <Function name={name} async export params={paramsSignature} JSDoc={{ comments: buildOperationComments(node) }} returnType={'CallToolResult'}>
+      {`const res = await ${clientName}(${callArg})`}
+      <br />
+      {callToolResult}
+    </Function>
   )
 }

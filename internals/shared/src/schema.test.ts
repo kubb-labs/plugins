@@ -3,13 +3,13 @@ import { describe, expect, test } from 'vitest'
 import {
   defaultLiteral,
   formatDefault,
-  isObjectComposableIntersection,
-  isObjectSchemaNode,
-  isPlainInlineObject,
+  getChecks,
+  getObjectKind,
   numericLiteral,
   schemaComments,
   shouldCoerce,
   withFormatRange,
+  isComposedObject,
 } from './schema.ts'
 
 describe('formatDefault', () => {
@@ -96,165 +96,6 @@ describe('defaultLiteral', () => {
   })
 })
 
-describe('isObjectSchemaNode', () => {
-  test('plain object with properties returns true', () => {
-    const node = ast.factory.createSchema({
-      type: 'object',
-      properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
-    })
-    expect(isObjectSchemaNode(node)).toBe(true)
-  })
-
-  test('open object with additionalProperties: true returns true', () => {
-    const id = ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })
-    expect(isObjectSchemaNode(ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: true }))).toBe(true)
-    expect(isObjectSchemaNode(ast.factory.createSchema({ type: 'object', properties: [id], additionalProperties: true }))).toBe(true)
-  })
-
-  test('strict object with additionalProperties: false returns true', () => {
-    const node = ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: false })
-    expect(isObjectSchemaNode(node)).toBe(true)
-  })
-
-  test('object with properties and typed additionalProperties returns true (catchall)', () => {
-    const node = ast.factory.createSchema({
-      type: 'object',
-      properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
-      additionalProperties: ast.factory.createSchema({ type: 'string' }),
-    })
-    expect(isObjectSchemaNode(node)).toBe(true)
-  })
-
-  test('dictionary with empty properties and typed additionalProperties returns false (record)', () => {
-    const node = ast.factory.createSchema({
-      type: 'object',
-      properties: [],
-      additionalProperties: ast.factory.createSchema({ type: 'string' }),
-    })
-    expect(isObjectSchemaNode(node)).toBe(false)
-  })
-
-  test('object with empty properties and patternProperties returns false (record)', () => {
-    const node = ast.factory.createSchema({
-      type: 'object',
-      properties: [],
-      patternProperties: { '^[a-z]+$': ast.factory.createSchema({ type: 'string' }) },
-    })
-    expect(isObjectSchemaNode(node)).toBe(false)
-  })
-
-  test('object with empty properties and propertyNames returns false (record)', () => {
-    const node = ast.factory.createSchema({
-      type: 'object',
-      properties: [],
-      propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
-    } as any)
-    expect(isObjectSchemaNode(node)).toBe(false)
-  })
-
-  test('nullable, optional, or nullish object returns false', () => {
-    expect(isObjectSchemaNode(ast.factory.createSchema({ type: 'object', nullable: true }))).toBe(false)
-    expect(isObjectSchemaNode(ast.factory.createSchema({ type: 'object', optional: true }))).toBe(false)
-    expect(isObjectSchemaNode(ast.factory.createSchema({ type: 'object', nullish: true }))).toBe(false)
-  })
-
-  test('ref resolving to record returns false, ref resolving to object returns true', () => {
-    const recordRef = ast.factory.createSchema({
-      type: 'ref',
-      name: 'Dict',
-      ref: '#/components/schemas/Dict',
-      schema: ast.factory.createSchema({
-        type: 'object',
-        properties: [],
-        additionalProperties: ast.factory.createSchema({ type: 'string' }),
-      }),
-    })
-    expect(isObjectSchemaNode(recordRef)).toBe(false)
-
-    const objectRef = ast.factory.createSchema({
-      type: 'ref',
-      name: 'User',
-      ref: '#/components/schemas/User',
-      schema: ast.factory.createSchema({
-        type: 'object',
-        properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
-      }),
-    })
-    expect(isObjectSchemaNode(objectRef)).toBe(true)
-  })
-})
-
-describe('isObjectComposableIntersection', () => {
-  test('intersection with plain object members returns true', () => {
-    const node = ast.factory.createSchema({
-      type: 'intersection',
-      members: [
-        ast.factory.createSchema({
-          type: 'object',
-          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
-        }),
-        ast.factory.createSchema({
-          type: 'object',
-          properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
-        }),
-      ],
-    })
-    expect(isObjectComposableIntersection(node)).toBe(true)
-  })
-
-  test('intersection where a member has propertyNames returns false', () => {
-    const node = ast.factory.createSchema({
-      type: 'intersection',
-      members: [
-        ast.factory.createSchema({
-          type: 'object',
-          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
-        }),
-        ast.factory.createSchema({
-          type: 'object',
-          properties: [],
-          propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
-        } as any),
-      ],
-    })
-    expect(isObjectComposableIntersection(node)).toBe(false)
-  })
-
-  test('intersection where a member has typed additionalProperties returns false', () => {
-    const node = ast.factory.createSchema({
-      type: 'intersection',
-      members: [
-        ast.factory.createSchema({
-          type: 'object',
-          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
-        }),
-        ast.factory.createSchema({
-          type: 'object',
-          properties: [],
-          additionalProperties: ast.factory.createSchema({ type: 'string' }),
-        }),
-      ],
-    })
-    expect(isObjectComposableIntersection(node)).toBe(false)
-  })
-})
-
-describe('isPlainInlineObject', () => {
-  test('plain object returns true', () => {
-    const node = ast.factory.createSchema({
-      type: 'object',
-      properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
-    })
-    expect(isPlainInlineObject(node)).toBe(true)
-  })
-
-  test('nullable, optional, or nullish object returns false', () => {
-    expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', nullable: true }))).toBe(false)
-    expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', optional: true }))).toBe(false)
-    expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', nullish: true }))).toBe(false)
-  })
-})
-
 describe('withFormatRange', () => {
   test('adds the range of the format as digit strings', () => {
     expect(withFormatRange({ format: 'int64' }, 'bigint')).toStrictEqual({ format: 'int64', min: '-9223372036854775808', max: '9223372036854775807' })
@@ -291,5 +132,100 @@ describe('shouldCoerce', () => {
     expect(shouldCoerce({ numbers: true }, 'numbers')).toBe(true)
     expect(shouldCoerce({ numbers: true }, 'strings')).toBe(false)
     expect(shouldCoerce(undefined, 'strings')).toBe(false)
+  })
+})
+
+const string = ast.factory.createSchema({ type: 'string' })
+const properties = [ast.factory.createProperty({ name: 'id', schema: string, required: true })]
+
+describe('getChecks', () => {
+  test('lists property counts, key checks and conditionals', () => {
+    const conditional = { if: string, then: string }
+    const node = ast.factory.createSchema({ type: 'object', properties, min: 1, max: 3, propertyNames: string, conditionals: [conditional] })
+
+    expect(getChecks(node)).toStrictEqual([
+      { kind: 'minProperties', value: 1 },
+      { kind: 'maxProperties', value: 3 },
+      { kind: 'propertyNames', schema: string },
+      { kind: 'conditional', ...conditional },
+    ])
+  })
+
+  test('leaves the key check of a plain record to the record', () => {
+    expect(getChecks(ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: string, propertyNames: string }))).toStrictEqual([])
+  })
+
+  test('checks pattern keys of a closed object with properties', () => {
+    const patternProperties = { '^x-': string }
+    const node = ast.factory.createSchema({ type: 'object', properties, patternProperties, additionalProperties: false })
+
+    expect(getChecks(node)).toStrictEqual([{ kind: 'patternProperties', patterns: patternProperties }])
+  })
+})
+
+describe('getObjectKind', () => {
+  const object = ast.factory.createSchema({ type: 'object', properties })
+
+  test.each([
+    ['an object with properties', object, 'properties'],
+    ['an empty object', ast.factory.createSchema({ type: 'object', properties: [] }), 'properties'],
+    ['a record', ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: string }), 'record'],
+    ['properties plus a typed rest', ast.factory.createSchema({ type: 'object', properties, additionalProperties: string }), 'mixed'],
+    ['an allOf of objects', ast.factory.createSchema({ type: 'intersection', members: [object, object] }), 'composed'],
+    ['a single-member union', ast.factory.createSchema({ type: 'union', members: [object] }), 'properties'],
+    ['an unresolved ref', ast.factory.createSchema({ type: 'ref', name: 'Pet' }), 'properties'],
+    ['a resolved ref', ast.factory.createSchema({ type: 'ref', name: 'Pet', schema: object }), 'properties'],
+    ['a nullable object', ast.factory.createSchema({ type: 'object', properties, nullable: true }), null],
+    ['an object with a property count', ast.factory.createSchema({ type: 'object', properties, min: 1 }), null],
+    [
+      'an allOf with a record base',
+      ast.factory.createSchema({
+        type: 'intersection',
+        members: [ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: string }), object],
+      }),
+      null,
+    ],
+    ['a string', string, null],
+  ] as const)('%s gives %s', (_, node, expected) => {
+    expect(getObjectKind(node)).toBe(expected)
+  })
+
+  test('follows a chain of refs to its target', () => {
+    const record = ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: string })
+    const inner = ast.factory.createSchema({ type: 'ref', name: 'Inner', schema: record })
+
+    expect(getObjectKind(ast.factory.createSchema({ type: 'ref', name: 'Outer', schema: inner }))).toBe('record')
+    expect(
+      getObjectKind(ast.factory.createSchema({ type: 'ref', name: 'Outer', schema: ast.factory.createSchema({ type: 'ref', name: 'Name', schema: string }) })),
+    ).toBeNull()
+  })
+
+  test('ends on a self-referencing allOf without circularSchemas', () => {
+    const node = ast.factory.createSchema({ type: 'intersection', name: 'Tree', members: [] })
+    Object.assign(node, { members: [ast.factory.createSchema({ type: 'ref', name: 'Tree', schema: node }), object] })
+
+    expect(getObjectKind(node)).toBeNull()
+  })
+
+  test('gives null for a ref into a cycle', () => {
+    expect(getObjectKind(ast.factory.createSchema({ type: 'ref', name: 'Tree', schema: object }), { circularSchemas: new Set(['Tree']) })).toBeNull()
+  })
+})
+
+describe('isComposedObject', () => {
+  const object = ast.factory.createSchema({
+    type: 'object',
+    properties: [ast.factory.createProperty({ name: 'id', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  })
+
+  test('keeps a nullable or optional allOf composed', () => {
+    expect(isComposedObject(ast.factory.createSchema({ type: 'intersection', members: [object, object] }))).toBe(true)
+    expect(isComposedObject(ast.factory.createSchema({ type: 'intersection', nullable: true, members: [object, object] }))).toBe(true)
+    expect(isComposedObject(ast.factory.createSchema({ type: 'intersection', optional: true, members: [object, object] }))).toBe(true)
+    expect(getObjectKind(ast.factory.createSchema({ type: 'intersection', nullable: true, members: [object, object] }))).toBeNull()
+  })
+
+  test('is false for a schema that is not an allOf', () => {
+    expect(isComposedObject(object)).toBe(false)
   })
 })

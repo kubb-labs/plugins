@@ -143,7 +143,7 @@ function buildContentTypeInfo(contentTypes: string[]): ContentTypeInfo {
 }
 
 export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
-  return buildContentTypeInfo(node.requestBody?.content?.map((e) => e.contentType) ?? [])
+  return buildContentTypeInfo(ast.http.getRequestGroups(node).contentTypes)
 }
 
 /**
@@ -154,131 +154,66 @@ export function getResponseContentTypeInfo(node: ast.OperationNode): ContentType
   return buildContentTypeInfo(ast.http.responses.findPrimary(node)?.content?.map((e) => e.contentType) ?? [])
 }
 
-type ResponseType = 'blob' | 'text' | 'stream'
-
-type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | null; stream?: ast.ContentNode['stream'] }
-
-/**
- * How an operation streams its primary success response item by item, when that response declares one content type:
- * - `'event'` for `text/event-stream` whose `itemSchema` types the whole event with its own `event` and `data`
- * - `'data'` for `text/event-stream` typed by its payload only
- * - `'line'` for JSON Lines, one parsed JSON value per line
- *
- * Returns `null` for any other response, and for a response that also declares another content type, which stays a normal
- * call with its query hooks.
- */
-export function getEventStream(node: ast.OperationNode): 'event' | 'data' | 'line' | null {
-  const content = ast.http.responses.findPrimary(node)?.content ?? []
-  if (content.length !== 1) return null
-  const entry = content[0]!
-  const framing = getStreamFraming(entry)
-  if (framing === 'events') return entry.stream?.shape ?? 'data'
-  return framing === 'lines' ? 'line' : null
+/** How an operation streams its success responses, as {@link getStream} returns it. */
+export type ResponseStream = {
+  /** `event` for a whole typed event, `data` for a typed payload, `line` for a JSON Lines value. */
+  shape: 'event' | 'data' | 'line' | null
+  /** Whether events keep `data` as text: all of them, the named ones, or none. */
+  textEvents: boolean | Array<string>
+  /** Whether the primary success response offers `text/event-stream`. */
+  hasEventStream: boolean
+  /** Whether a success response offers a stream next to other content types. */
+  hasVariant: boolean
 }
 
-/**
- * How a content entry is framed as a stream: `'events'` for Server-Sent Events, `'lines'` for JSON Lines.
- */
-export function getStreamFraming(entry: Pick<ast.ContentNode, 'contentType' | 'stream'>): 'events' | 'lines' | undefined {
-  if (ast.mediaType.getBase(entry) === 'text/event-stream') return 'events'
-  // `multipart/mixed` with an `itemSchema` also has `stream`, but it is a stream of parts, not of JSON values.
-  return entry.stream && ast.mediaType.isStream(entry) ? 'lines' : undefined
-}
+const isText = (schema: ast.SchemaNode | null | undefined) => !!schema && ast.schema.is(schema, 'text', { follow: ['ref'] })
 
-/**
- * Whether an operation streams its primary success response, as Server-Sent Events or JSON Lines. The client generator uses
- * this to return a typed stream of items instead of a one-shot `RequestResult`.
- */
-export function isEventStream(node: ast.OperationNode): boolean {
-  return getEventStream(node) !== null
-}
+function getTextEvents(entry: ast.ContentNode, shape: ResponseStream['shape']): ResponseStream['textEvents'] {
+  if (shape === 'data') return isText(entry.stream?.schema ?? entry.schema)
+  if (shape !== 'event' || !entry.stream?.schema) return false
 
-// A stream without a schema is a `blob` with a string primitive, so it keeps the JSON-parse default.
-function isTextSchema(schema: ast.SchemaNode | null | undefined): boolean {
-  if (!schema) return false
-  const resolved = ast.ref.getSchema(schema)
-  return resolved.type !== 'blob' && resolved.primitive === 'string'
-}
-
-/**
- * Whether an operation streams Server-Sent Events whose `data` the document types as a string, so the client keeps each
- * `data` as text instead of JSON-parsing it. With an event-shaped `itemSchema` where only some events type `data` as a
- * string, it returns the names of those events, or `false` when one of them has no fixed name.
- */
-export function hasTextEventData(node: ast.OperationNode): boolean | Array<string> {
-  const shape = getEventStream(node)
-  const entry = ast.http.responses.findPrimary(node)?.content?.[0]
-  if (!entry || (shape !== 'data' && shape !== 'event')) return false
-  if (shape === 'data') return isTextSchema(entry.stream?.schema ?? entry.schema)
-
-  const item = entry.stream?.schema ? ast.ref.getSchema(entry.stream.schema) : undefined
-  if (!item) return false
-  const events = item.type === 'union' ? (ast.schema.narrow(item, 'union')?.members ?? []) : [item]
+  const item = ast.ref.getSchema(entry.stream.schema)
+  const events = ast.schema.narrow(item, 'union')?.members ?? [item]
   // A discriminator makes each event an intersection of its `$ref` and the pinned `event`, so every part is read.
   const propertySchemas = (event: ast.SchemaNode, propertyName: string) => ast.schema.findProperties({ node: event, propertyName }).map(({ schema }) => schema)
   const textEvents = events.filter((event) => {
     const dataSchemas = propertySchemas(event, 'data')
-    return dataSchemas.length > 0 && dataSchemas.every(isTextSchema)
+    return dataSchemas.length > 0 && dataSchemas.every(isText)
   })
   if (textEvents.length === events.length) return events.length > 0
 
   const eventNames = textEvents.map((event) => propertySchemas(event, 'event').flatMap((schema) => ast.schema.getLiterals(ast.ref.getSchema(schema))))
-  return eventNames.length > 0 && eventNames.every((values) => values.length > 0) && [...new Set(eventNames.flat().map(String))]
+  // An event without a fixed name cannot be told apart from the others.
+  if (!eventNames.length || eventNames.some((values) => !values.length)) return false
+  return [...new Set(eventNames.flat().map(String))]
 }
 
-/**
- * Whether the primary success response offers `text/event-stream`, alone or next to other content types. The client asks
- * for the stream by default and ships the `sse.ts` runtime, so a mixed response can be read as events too.
- */
-export function hasEventStreamContent(node: ast.OperationNode): boolean {
+/** How an operation streams its success responses, or `null` when none offers a stream. */
+export function getStream(node: Pick<ast.HttpOperationNode, 'responses'>): ResponseStream | null {
   const entries = ast.http.responses.findPrimary(node)?.content ?? []
+  const entry = entries.length === 1 ? entries[0] : undefined
+  const kind = entry ? ast.mediaType.getKind(entry) : null
+  const shape = kind === 'eventStream' ? (entry?.stream?.shape ?? 'data') : kind === 'lineStream' ? 'line' : null
   // Next to another type, a stream without a schema gets no typed variant, so it keeps the plain call.
-  return entries.some((entry) => getStreamFraming(entry) === 'events' && (entries.length === 1 || Boolean(entry.schema)))
-}
-
-/**
- * Whether a success response offers a stream media type next to other content types. The client returns that variant's
- * body as a `ReadableStream`, so the stream runtime is registered and a hook's data type includes the stream.
- */
-export function hasStreamVariant(node: ast.OperationNode): boolean {
-  return ast.http.responses.filterSuccess(node).some((response) => {
-    const variants = (response.content ?? []).filter((entry) => entry.schema)
-    return variants.length > 1 && variants.some((entry) => ast.mediaType.isStream(entry))
+  const hasEventStream = entries.some((item) => ast.mediaType.getKind(item) === 'eventStream' && (entries.length === 1 || !!item.schema))
+  const hasVariant = ast.http.responses.filterSuccess(node).some((response) => {
+    const variants = (response.content ?? []).filter((item) => item.schema)
+    return variants.length > 1 && variants.some(ast.mediaType.isStream)
   })
+  if (!shape && !hasEventStream && !hasVariant) return null
+
+  return { shape, textEvents: entry ? getTextEvents(entry, shape) : false, hasEventStream, hasVariant }
 }
 
-const formContentTypes = ['multipart/form-data', 'application/x-www-form-urlencoded'] as const
+type ResponseType = 'blob' | 'text' | 'stream'
 
-/**
- * The form media types the operation's request body offers, `multipart/form-data` and `application/x-www-form-urlencoded`,
- * which the client needs a handler for.
- */
-export function getFormContentTypes(node: ast.OperationNode): Array<(typeof formContentTypes)[number]> {
-  const request = new Set((node.requestBody?.content ?? []).map((entry) => ast.mediaType.getBase(entry)))
-  return formContentTypes.filter((contentType) => request.has(contentType))
-}
+type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | null; stream?: ast.ContentNode['stream'] }
 
-/**
- * Parser for one response content entry.
- *
- * JSON stays unset so the runtime detects it. `text/event-stream` and JSON Lines are streams. A binary schema
- * (`format: binary` / `contentMediaType`) is a blob even when the media type is not a well-known
- * binary type. Other `text/*` is text, and `application/octet-stream`, `application/pdf`,
- * `image/*`, `audio/*`, and `video/*` are blobs.
- */
-function responseTypeForContent(entry: ResponseContentEntry): ResponseType | undefined {
-  const baseType = ast.mediaType.getBase(entry)
-  if (!baseType) return undefined
-  if (getStreamFraming(entry)) return 'stream'
-  if (ast.mediaType.isJson(baseType)) return undefined
-  if (entry.schema?.type === 'blob') return 'blob'
-  if (baseType.startsWith('text/')) return 'text'
-  if (isBinaryContentType(baseType)) return 'blob'
-  return undefined
-}
-
-function isBinaryContentType(baseType: string): boolean {
-  return baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)
+const responseTypes: Partial<Record<NonNullable<ReturnType<typeof ast.mediaType.getKind>>, ResponseType>> = {
+  eventStream: 'stream',
+  lineStream: 'stream',
+  binary: 'blob',
+  text: 'text',
 }
 
 /**
@@ -323,7 +258,7 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
 
   const baseType = ast.mediaType.getBase(contentType)
   const resolved = ast.ref.getSchema(schema)
-  if (isBinaryContentType(baseType)) {
+  if (ast.mediaType.getKind(baseType) === 'binary') {
     return resolved.type === 'blob' ? entry : { ...entry, schema: ast.factory.createSchema({ type: 'blob' }), keysToOmit: null }
   }
   const isPlainMediaType = Boolean(baseType) && !ast.mediaType.isJson(baseType) && !baseType.includes('*')
@@ -334,7 +269,8 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
   }
   if (resolved.primitive === 'string') return entry
 
-  const responseType = responseTypeForContent(entry)
+  const kind = ast.mediaType.getKind(entry)
+  const responseType = kind ? responseTypes[kind] : undefined
   // A response without a body, such as a 405, has no schema to read. Only `text/*` is always text.
   if (responseType !== 'text' && (resolved.type === 'unknown' || resolved.type === 'any' || resolved.type === 'void')) return entry
   const isVendorJson = /^[^/]+\/vnd\./.test(baseType) && !/(xml|yaml|yml|csv)$/.test(baseType)
@@ -386,7 +322,7 @@ export function buildClientOptionType(options: { omit?: Array<string> } = {}): s
  * generated call.
  */
 export function buildRequestConfigType(node: ast.OperationNode): string {
-  if (hasRequestContentTypeChoice(node)) {
+  if (ast.http.getRequestGroups(node).hasContentTypeChoice) {
     return buildClientOptionType({ omit: ['contentType'] })
   }
 
@@ -404,62 +340,6 @@ export function buildRequestConfigType(node: ast.OperationNode): string {
 /** The grouped request options, in the order generated signatures and calls list them. */
 export const requestGroupOrder = ['path', 'query', 'body', 'headers', 'cookies'] as const
 
-export type RequestGroups = {
-  path: boolean
-  query: boolean
-  body: boolean
-  headers: boolean
-  cookies: boolean
-}
-
-/**
- * Which of the grouped request options an operation carries.
- */
-export function getRequestGroups(node: ast.OperationNode): RequestGroups {
-  const { path, query, header, cookie } = ast.http.groupParameters(node)
-  return {
-    path: path.length > 0,
-    query: query.length > 0,
-    body: Boolean(ast.http.requestBody.getSchema(node)),
-    headers: header.length > 0,
-    cookies: cookie.length > 0,
-  }
-}
-
-export type RequestGroupOptionality = {
-  groups: RequestGroups
-  hasRequiredPath: boolean
-  hasRequiredQuery: boolean
-  hasRequiredHeader: boolean
-  /**
-   * Whether the grouped request parameter can default to `{}`. True only when no group carries a
-   * required member, so every member is safe to omit.
-   */
-  isOptional: boolean
-}
-
-/**
- * Resolves which grouped request options an operation carries together with whether each group
- * holds a required member. The grouped parameter stays optional only when nothing inside it is
- * required, matching the generated `RequestConfig` type.
- */
-export function getRequestGroupOptionality(node: ast.OperationNode): RequestGroupOptionality {
-  const groups = getRequestGroups(node)
-  const { path, query, header } = ast.http.groupParameters(node)
-  const hasRequiredPath = path.some((param) => param.required)
-  const hasRequiredQuery = query.some((param) => param.required)
-  const hasRequiredHeader = header.some((param) => param.required)
-
-  return {
-    groups,
-    hasRequiredPath,
-    hasRequiredQuery,
-    hasRequiredHeader,
-    // `cookies` never makes the parameter required: a browser sends its cookies itself and cannot set a `Cookie` header.
-    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !(groups.body && node.requestBody?.required === true),
-  }
-}
-
 export type RequestOptionsNameResolver = RequestConfigResolver & {
   response: {
     options(node: ast.OperationNode): string
@@ -476,17 +356,17 @@ export function buildRequestParamsSignature(
   node: ast.OperationNode,
   resolver: RequestOptionsNameResolver,
   options: { isConfigurable?: boolean } = {},
-): { signature: string; groups: RequestGroups; names: Array<keyof RequestGroups> } {
+): { signature: string; groups: ast.http.RequestGroups; names: Array<(typeof requestGroupOrder)[number]> } {
   const { isConfigurable = true } = options
-  const { groups, isOptional } = getRequestGroupOptionality(node)
+  const groups = ast.http.getRequestGroups(node)
 
   const names = requestGroupOrder.filter((key) => groups[key])
 
   // These callers never carry the `contentType` that several media types require.
-  const optionsType = hasRequestContentTypeChoice(node)
+  const optionsType = groups.hasContentTypeChoice
     ? `Pick<${resolver.response.options(node)}, ${names.map((name) => `'${name}'`).join(' | ')}>`
     : resolver.response.options(node)
-  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${optionsType}${isOptional ? ' = {}' : ''}` : null
+  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${optionsType}${groups.isOptional ? ' = {}' : ''}` : null
   const configParam = isConfigurable ? `config: ${buildRequestConfigType(node)} = {}` : null
 
   return {
@@ -514,13 +394,6 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
   }
 
   return filteredComments.flatMap((text) => text.split(/\r?\n/).map((line) => line.trim())).filter((comment): comment is string => Boolean(comment))
-}
-
-/**
- * Whether the operation declares more than one request media type with a schema, so a caller must pick one on `contentType`.
- */
-export function hasRequestContentTypeChoice(node: ast.OperationNode): boolean {
-  return (node.requestBody?.content ?? []).filter((entry) => entry.schema).length > 1
 }
 
 /**
@@ -578,7 +451,9 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
     })
 
   const variants =
-    pairContentTypes && hasRequestContentTypeChoice(node) ? resolveContentTypeVariants(node.requestBody?.content ?? [], resolver.response.body(node)) : []
+    pairContentTypes && ast.http.getRequestGroups(node).hasContentTypeChoice
+      ? resolveContentTypeVariants(node.requestBody?.content ?? [], resolver.response.body(node))
+      : []
   if (variants.length < 2) {
     return createOptions(hasBody ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) }) : createNever())
   }

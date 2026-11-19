@@ -10,6 +10,7 @@ import { pluginFaker, pluginFakerName, resolverFaker } from '@kubb/plugin-faker'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { pluginTs, resolverTs } from '@kubb/plugin-ts'
 import * as msw from 'msw'
+import { mswBodyTemplate } from '../utils.ts'
 import { describe, expect, onTestFinished, test } from 'vitest'
 import {
   createMockedAdapter,
@@ -269,6 +270,8 @@ describe('mswGenerator request body types', () => {
     const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.msw-'))
     onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
     await fs.writeFile(path.join(dir, 'handler.ts'), source!)
+    await fs.mkdir(path.join(dir, '.kubb'))
+    await fs.copyFile(mswBodyTemplate, path.join(dir, '.kubb', 'mswBody.ts'))
     await fs.writeFile(
       path.join(dir, 'CreatePets.ts'),
       `export type CreatePetsBody = ${bodyType}

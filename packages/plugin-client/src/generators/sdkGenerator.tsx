@@ -1,6 +1,6 @@
 import path from 'node:path'
+import { getStream } from '@internals/shared'
 import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
-import { isEventStream } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { ast, defineGenerator, Diagnostics, memo } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
@@ -117,7 +117,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
         const schemaNamesByPlugin = validatorEnabled
           ? collectImportsByPlugin(ops, (op) => ({ plugin: op.schemaPlugin, names: op.validatorHooks.importedSchemaNames }))
           : new Map<string, Set<string>>()
-        const resultOps = ops.filter((op) => !isEventStream(op.node))
+        const resultOps = ops.filter((op) => !getStream(op.node)?.shape)
         const typedHeaders = (op: OperationData) => op.headerTypeNames.length > 0
         const resultName = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
 
@@ -142,7 +142,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
                   ...(returnType === 'data' ? [] : ['Unwrappable']),
                   ...(resultOps.some((op) => !typedHeaders(op)) ? [resultName] : []),
                   ...(resultOps.some(typedHeaders) ? [resultTypeName(resultName, true)] : []),
-                  ...ops.filter((op) => isEventStream(op.node)).flatMap((op) => buildEventStreamImports({ node: op.node, types: op.types, returnType })),
+                  ...ops.filter((op) => getStream(op.node)?.shape).flatMap((op) => buildEventStreamImports({ node: op.node, types: op.types, returnType })),
                 ]),
               )}
               root={file.path}

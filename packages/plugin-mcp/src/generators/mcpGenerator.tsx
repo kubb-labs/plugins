@@ -1,5 +1,5 @@
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
-import { hasStreamVariant, isEventStream, operationFileEntry } from '@internals/shared'
+import { operationFileEntry, getStream } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
@@ -17,7 +17,8 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     // A stream has no single JSON body to return as tool output, like the query plugins skip it.
-    if (isEventStream(node) || hasStreamVariant(node)) return null
+    const stream = getStream(node)
+    if (stream?.shape || stream?.hasVariant) return null
     const { resolver, root, config } = ctx
     const { output, client, group } = ctx.options
 

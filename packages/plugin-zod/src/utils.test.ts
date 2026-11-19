@@ -1,15 +1,6 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import {
-  applyMiniModifiers,
-  applyModifiers,
-  isClosedKeySchema,
-  lengthChecksMini,
-  lengthConstraints,
-  numberChecksMini,
-  numberConstraints,
-  omitUnwrapChain,
-} from './utils.ts'
+import { applyMiniModifiers, applyModifiers, lengthChecksMini, lengthConstraints, numberChecksMini, numberConstraints, omitUnwrapChain } from './utils.ts'
 
 describe('numberConstraints', () => {
   test('no constraints returns empty string', () => {
@@ -148,57 +139,5 @@ describe('omitUnwrapChain', () => {
       schema: ast.factory.createSchema({ type: 'object', nullable: true }),
     })
     expect(omitUnwrapChain(node)).toBe('.unwrap()')
-  })
-})
-
-describe('isClosedKeySchema', () => {
-  test('returns true for enum schemas (including single-value enums)', () => {
-    const multi = ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'editor'] })
-    expect(isClosedKeySchema(multi)).toBe(true)
-
-    const single = ast.factory.createSchema({ type: 'enum', enumValues: ['admin'] })
-    expect(isClosedKeySchema(single)).toBe(true)
-  })
-
-  test('returns true for union of enum schemas', () => {
-    const node = ast.factory.createSchema({
-      type: 'union',
-      members: [
-        ast.factory.createSchema({ type: 'enum', enumValues: ['admin'] }),
-        ast.factory.createSchema({ type: 'enum', enumValues: ['editor', 'viewer'] }),
-      ],
-    })
-    expect(isClosedKeySchema(node)).toBe(true)
-  })
-
-  test('returns false for union containing a string schema', () => {
-    const node = ast.factory.createSchema({
-      type: 'union',
-      members: [ast.factory.createSchema({ type: 'enum', enumValues: ['admin'] }), ast.factory.createSchema({ type: 'string' })],
-    })
-    expect(isClosedKeySchema(node)).toBe(false)
-  })
-
-  test('returns false for string schemas (plain and pattern)', () => {
-    expect(isClosedKeySchema(ast.factory.createSchema({ type: 'string' }))).toBe(false)
-    expect(isClosedKeySchema(ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }))).toBe(false)
-  })
-
-  test('resolves ref to enum schema', () => {
-    const refToEnum = ast.factory.createSchema({
-      type: 'ref',
-      name: 'RoleEnum',
-      ref: '#/components/schemas/RoleEnum',
-      schema: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'editor'] }),
-    })
-    expect(isClosedKeySchema(refToEnum)).toBe(true)
-
-    const refToString = ast.factory.createSchema({
-      type: 'ref',
-      name: 'Str',
-      ref: '#/components/schemas/Str',
-      schema: ast.factory.createSchema({ type: 'string' }),
-    })
-    expect(isClosedKeySchema(refToString)).toBe(false)
   })
 })

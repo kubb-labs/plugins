@@ -2,7 +2,7 @@ import { createRequire } from 'node:module'
 import { ast, createPrinter, Diagnostics } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
-import { buildPropertyJSDocComments, enumTypeName, isBinarySchema, isInlineConstEnum } from '../utils.ts'
+import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'
 
 const { isNonNullable } = factory
 
@@ -337,7 +337,7 @@ export const printerTs = createPrinter<PrinterTs>((options) => {
           })
 
           // A binary property is a file part of a form upload, where only a `File` carries a filename.
-          const binaryRemark = isBinarySchema(property.schema)
+          const binaryRemark = ast.schema.is(property.schema, 'binary', { follow: ['ref', 'array'] })
             ? '@remarks Pass a `File` to send its filename. A plain `Blob` is sent with the filename `blob`.'
             : undefined
           const comments = [...buildPropertyJSDocComments(property.schema, optional), binaryRemark]

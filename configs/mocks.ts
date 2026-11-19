@@ -105,7 +105,7 @@ export function createMockedSetupContext<TFactory extends PluginType = PluginTyp
   const registered = plugins.map((name) => ({ name }) as unknown as Plugin)
 
   return {
-    config: { plugins: registered } as unknown as Config,
+    config: { root: '.', output: { path: './gen' }, plugins: registered } as unknown as Config,
     options,
     addGenerator: vi.fn(),
     setResolver: vi.fn(),

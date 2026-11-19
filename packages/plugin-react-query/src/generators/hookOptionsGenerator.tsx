@@ -73,13 +73,11 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
       >
         {imports}
-        <File.Source name={name} isExportable isIndexable isTypeOnly>
-          <Type export name={name}>
-            {`{ ${Object.keys(hookOptions)
-              .map((key) => `${JSON.stringify(key)}: ${hookOptions[key]}`)
-              .join(', ')} }`}
-          </Type>
-        </File.Source>
+        <Type export name={name}>
+          {`{ ${Object.keys(hookOptions)
+            .map((key) => `${JSON.stringify(key)}: ${hookOptions[key]}`)
+            .join(', ')} }`}
+        </Type>
       </File>
     )
   },

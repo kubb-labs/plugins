@@ -1,5 +1,5 @@
 import { ast } from '@kubb/kit'
-import { Const, File, Function, Type } from '@kubb/renderer-jsx'
+import { Const, Function, Schema, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterZodFactory } from '../printers/printerZod.ts'
 import type { PrinterZodMiniFactory } from '../printers/printerZodMini.ts'
@@ -72,7 +72,7 @@ function reachesCycle({
 
   return (
     ast.schema.find(node, {
-      followRefs: true,
+      follow: ['ref'],
       predicate(schema) {
         if (schema.type !== ast.schema.types.ref) return false
         const name = ast.ref.getName(schema)
@@ -99,13 +99,6 @@ export function Zod({
   siblings,
   comments = [],
 }: Props): KubbReactNode {
-  const output = printer.print(node)
-  const printerImports = printer.drainImports()
-
-  if (!output) {
-    return
-  }
-
   // A cyclic object emits its self-references as deferred getters (`get prop() { … }`), so its
   // initializer never references itself directly and TypeScript infers it fine — annotating it would
   // only strip the `ZodObject` methods (`.omit()`, `.strict()`). Only non-object cyclic schemas (a
@@ -119,61 +112,49 @@ export function Zod({
     isStrict &&
     (throwsOnStrictCompile({ node, options: printer.options, siblings }) || reachesCycle({ node, siblings, cyclicSchemas: printer.options.cyclicSchemas }))
   const shouldCompile = Boolean(compile) && !isAlias && !isCyclic && !throwsOnCompile
-  const value = shouldCompile ? (isStrict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output
+  const toValue = (output: string) => (shouldCompile ? (isStrict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output)
 
   const targetType = inferTypeName ?? `z.infer<typeof ${name}>`
   const shouldGenerateIs = isName && (typeof typeGuards === 'object' ? (typeGuards.is ?? true) : Boolean(typeGuards))
   const shouldGenerateAssert = assertName && (typeof typeGuards === 'object' ? (typeGuards.assert ?? true) : Boolean(typeGuards))
 
   return (
-    <>
-      {printerImports.map((imp) => (
-        <File.Import
-          key={[name, imp.path, imp.name].join('-')}
-          name={imp.name}
-          path={imp.path}
-          root={imp.root}
-          isTypeOnly={imp.isTypeOnly}
-          isNameSpace={imp.isNameSpace}
-        />
-      ))}
-      <File.Source name={name} isExportable isIndexable>
-        <Const
-          export
-          name={name}
-          type={needsAnnotation ? (mini ? 'z.ZodMiniType' : 'z.ZodType') : undefined}
-          JSDoc={comments.length ? { comments } : undefined}
-        >
-          {value}
-        </Const>
-      </File.Source>
-      {inferTypeName && (
-        <File.Source name={inferTypeName} isExportable isIndexable isTypeOnly>
-          <Type export name={inferTypeName}>
-            {`z.${inferKind}<typeof ${name}>`}
-          </Type>
-        </File.Source>
-      )}
-      {shouldGenerateIs && (
-        <File.Source name={isName} isExportable isIndexable>
-          <Const export name={isName} JSDoc={{ comments: [`Type guard for {@link ${name}}`] }}>
-            {mini ? `(data: unknown): data is ${targetType} => z.validate(${name}, data)` : `(data: unknown): data is ${targetType} => ${name}.validate(data)`}
-          </Const>
-        </File.Source>
-      )}
-      {shouldGenerateAssert && (
-        <File.Source name={assertName} isExportable isIndexable>
-          <Function
+    <Schema node={node} printer={printer}>
+      {(output) => (
+        <>
+          <Const
             export
-            name={assertName}
-            params="data: unknown"
-            returnType={`asserts data is ${targetType}`}
-            JSDoc={{ comments: [`Asserter for {@link ${name}}`, '@throws {z.ZodError} If data is invalid'] }}
+            name={name}
+            type={needsAnnotation ? (mini ? 'z.ZodMiniType' : 'z.ZodType') : undefined}
+            JSDoc={comments.length ? { comments } : undefined}
           >
-            {mini ? `if (!z.validate(${name}, data)) {\n  z.parse(${name}, data)\n}` : `if (!${name}.validate(data)) {\n  ${name}.parse(data)\n}`}
-          </Function>
-        </File.Source>
+            {toValue(output)}
+          </Const>
+          {inferTypeName && (
+            <Type export name={inferTypeName}>
+              {`z.${inferKind}<typeof ${name}>`}
+            </Type>
+          )}
+          {shouldGenerateIs && (
+            <Const export name={isName} JSDoc={{ comments: [`Type guard for {@link ${name}}`] }}>
+              {mini
+                ? `(data: unknown): data is ${targetType} => z.validate(${name}, data)`
+                : `(data: unknown): data is ${targetType} => ${name}.validate(data)`}
+            </Const>
+          )}
+          {shouldGenerateAssert && (
+            <Function
+              export
+              name={assertName}
+              params="data: unknown"
+              returnType={`asserts data is ${targetType}`}
+              JSDoc={{ comments: [`Asserter for {@link ${name}}`, '@throws {z.ZodError} If data is invalid'] }}
+            >
+              {mini ? `if (!z.validate(${name}, data)) {\n  z.parse(${name}, data)\n}` : `if (!${name}.validate(data)) {\n  ${name}.parse(data)\n}`}
+            </Function>
+          )}
+        </>
       )}
-    </>
+    </Schema>
   )
 }

@@ -1,7 +1,7 @@
 import type { ast } from '@kubb/kit'
 import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
-import { File, Function, Type } from '@kubb/renderer-jsx'
+import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall, buildResponseTypes, resolveMutationRequestType } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
@@ -86,14 +86,11 @@ export function Mutation({
 
   return (
     <>
-      <File.Source name={mutationArgTypeName} isExportable isIndexable isTypeOnly>
-        <Type name={mutationArgTypeName} export>
-          {hasMutationParams ? argTypeBody : 'never'}
-        </Type>
-      </File.Source>
-      <File.Source name={name} isExportable isIndexable>
-        <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }}>
-          {`
+      <Type name={mutationArgTypeName} export>
+        {hasMutationParams ? argTypeBody : 'never'}
+      </Type>
+      <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }}>
+        {`
         const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
         const mutationKey = ${mutationKeyName}()
 
@@ -105,8 +102,7 @@ export function Mutation({
           mutationOptions
         )
     `}
-        </Function>
-      </File.Source>
+      </Function>
     </>
   )
 }
