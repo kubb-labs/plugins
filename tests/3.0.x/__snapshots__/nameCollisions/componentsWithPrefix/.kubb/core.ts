@@ -863,8 +863,10 @@ function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes;
   }
 }
 
+type ResolvedRetry = RetryOptions & { limit: number; methods: Array<string>; statusCodes: Array<number> }
+
 // Later sources win per field, and `false` drops what came before it. A limit of 0 means no retries.
-function resolveRetry(...sources: Array<Retry | undefined>): RetryOptions & { limit: number } {
+function resolveRetry(...sources: Array<Retry | undefined>): ResolvedRetry {
   let resolved: RetryOptions | undefined
   for (const source of sources) {
     if (source === undefined) continue
@@ -878,7 +880,22 @@ function resolveRetry(...sources: Array<Retry | undefined>): RetryOptions & { li
   }
   const limit = resolved ? (resolved.limit ?? 2) : 0
   // `NaN` and `Infinity` count as no retries, since no count ever reaches them.
-  return { ...resolved, limit: Number.isFinite(limit) && limit > 0 ? limit : 0 }
+  return {
+    ...resolved,
+    limit: Number.isFinite(limit) && limit > 0 ? limit : 0,
+    methods: (resolved?.methods ?? ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']).map((method) => method.toUpperCase()),
+    statusCodes: resolved?.statusCodes ?? [408, 429, 500, 502, 503, 504],
+  }
+}
+
+// Exponential from 300 ms, up to 30 seconds, with jitter so clients do not retry in step.
+function backoff(retryCount: number): number {
+  return Math.min(300 * 2 ** (retryCount - 1), 30_000) * (0.5 + Math.random() / 2)
+}
+
+// Not awaited: a body with a copy settles its cancel only once both are released.
+function release(response: Response | undefined): void {
+  void response?.body?.cancel().catch(() => {})
 }
 
 // The milliseconds a `Retry-After` header asks for, given as seconds or as an HTTP date.
@@ -1107,33 +1124,31 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
 
     const resolvedRequest = await run.request(request, requestConfig)
     const signal = signalOf(resolvedRequest)
+    // A method outside `methods` is not safe to send twice, and a stream body cannot be read twice.
+    const limit = retry.methods.includes(resolvedRequest.method.toUpperCase()) && !(resolvedRequest.body instanceof ReadableStream) ? retry.limit : 0
     let retryCount = 0
     // Waits and resolves to true when the failed attempt may be sent again.
     const waitForRetry = async (failure: { response?: Response; error?: unknown }): Promise<boolean> => {
-      const replayable = (retry.methods ?? ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'TRACE']).some(
-        (method) => method.toUpperCase() === resolvedRequest.method.toUpperCase(),
-      )
-      if (retryCount >= retry.limit || signal?.aborted || !replayable || resolvedRequest.body instanceof ReadableStream) return false
-      // Longer than a minute is the server saying to come back later, so the call gets the response.
-      const serverDelay = retryAfter(failure.response)
-      if (serverDelay !== undefined && serverDelay > 60_000) return false
+      const { response } = failure
+      const serverDelay = retryAfter(response)
+      // A `Retry-After` over a minute is the server saying to come back later, so the call gets the response.
+      if (retryCount >= limit || signal?.aborted || (serverDelay ?? 0) > 60_000) return false
       // The hooks get a copy, so one that reads the body leaves it for the client.
-      const copy = retry.shouldRetry || retry.onRetry ? failure.response?.clone() : undefined
-      const context: RetryContext = { ...failure, response: copy ?? failure.response, request: resolvedRequest, retryCount: retryCount + 1 }
-      const retryable = failure.response ? (retry.statusCodes ?? [408, 429, 500, 502, 503, 504]).includes(failure.response.status) : true
-      // Not awaited: a body with a copy settles its cancel only once both are released.
-      const release = (response: Response | undefined) => void response?.body?.cancel().catch(() => {})
-      if (!((await retry.shouldRetry?.(context)) ?? retryable)) {
+      const copy = retry.shouldRetry || retry.onRetry ? response?.clone() : undefined
+      const context: RetryContext = { ...failure, response: copy ?? response, request: resolvedRequest, retryCount: retryCount + 1 }
+      const retryable = !response || retry.statusCodes.includes(response.status)
+      const again = (await retry.shouldRetry?.(context)) ?? retryable
+      if (!again) {
         release(copy)
         return false
       }
       retryCount++
-      const delay = serverDelay ?? retry.delay?.(retryCount) ?? Math.min(300 * 2 ** (retryCount - 1), 30_000) * (0.5 + Math.random() / 2)
+      const delay = serverDelay ?? retry.delay?.(retryCount) ?? backoff(retryCount)
       try {
         await retry.onRetry?.({ ...context, delay })
       } finally {
         release(copy)
-        release(failure.response)
+        release(response)
       }
       await sleep(delay, signal)
       return true
@@ -1292,7 +1307,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         current = { ...context, status: response.status, contentType: response.headers.get('Content-Type') ?? contentType }
       }
     }
-    const resumes = retry.limit > 0 && baseContentType(contentType) === 'text/event-stream'
+    const resumes = limit > 0 && baseContentType(contentType) === 'text/event-stream'
     const items =
       readsItems && streamType?.stream && result.data instanceof ReadableStream
         ? resumes
