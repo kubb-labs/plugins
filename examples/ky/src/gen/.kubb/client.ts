@@ -82,8 +82,7 @@ export const isResponseError = core.isResponseError as <TResponses = unknown, TR
  */
 export function createKyTransport(instance: KyInstance): Transport {
   // The core splits success from error and reads the body, so Ky must resolve every status with the body unread.
-  // With the client's `retry` set, Ky's own retry is off, so the two do not multiply.
-  return (request) => instance(request.url, { ...toRequestInit(request), throwHttpErrors: false, ...(request.retry ? { retry: 0 } : {}) })
+  return (request) => instance(request.url, { ...toRequestInit(request), throwHttpErrors: false })
 }
 
 // Ky retries by default. The client sends each call once unless `options.retry` asks for more.

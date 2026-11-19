@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { MswBody } from '../../../.kubb/mswBody'
 import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405, UpdatePetBody } from '../../../models/UpdatePet'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function updatePetHandlerResponse200(data?: UpdatePetResponse) {
@@ -50,6 +50,8 @@ export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
     status: 405,
   })
 }
+
+type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType
 
 export function updatePetHandler(
   data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, MswBody<UpdatePetBody>>,
