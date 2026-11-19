@@ -58,10 +58,23 @@ export function createMockedPluginDriver(options: { name?: string; plugin?: Norm
     fileManager: createFileManager(),
     contextFiles: createFileManager(),
     renderedNodes: [],
+    renders: [],
   } as unknown as KubbDriver
 }
 
-type MockedDriver = KubbDriver & { contextFiles: KubbDriver['fileManager']; renderedNodes?: Array<ast.SchemaNode | ast.OperationNode> }
+type MockedDriver = KubbDriver & {
+  contextFiles: KubbDriver['fileManager']
+  renderedNodes?: Array<ast.SchemaNode | ast.OperationNode>
+  renders?: Array<{ generator: Generator<any>; opts: RenderGeneratorOptions<any> }>
+}
+
+/** Records a render of a file under test, for {@link renderContext}. */
+function record(opts: RenderGeneratorOptions<any>, generator: Generator<any>, nodes: Array<ast.SchemaNode | ast.OperationNode>): void {
+  if (opts.context) return
+  const driver = opts.driver as MockedDriver
+  driver.renderedNodes?.push(...nodes)
+  if (!driver.renders?.some((render) => render.generator === generator)) driver.renders?.push({ generator, opts })
+}
 
 function contextFiles(driver: KubbDriver): KubbDriver['fileManager'] {
   return (driver as MockedDriver).contextFiles
@@ -209,7 +222,7 @@ async function renderNode<TOptions extends PluginType, TNode extends ast.SchemaN
   const transformedNode = opts.plugin.macros?.length ? ast.macro.apply(node, opts.plugin.macros) : node
   const matches = generator.match ? await generator.match(transformedNode, ctx) : true
   if (!matches) return
-  if (!opts.context) (opts.driver as MockedDriver).renderedNodes?.push(node)
+  record(opts, generator, [node])
   await filesFor(opts).dispatch({ result: await generate(transformedNode, ctx), renderer: generator.renderer, plugin: opts.plugin.name })
 }
 
@@ -225,11 +238,15 @@ export async function setupPlugins(plugins: Array<Plugin>, overrides: Record<str
 }
 
 /**
- * Renders every node the test rendered through each plugin's generators as context, then calls {@link resolveImports}.
- * Pass the plugins the files under test import from, set up with {@link setupPlugins}.
+ * Renders what the files under test import from, as context, then calls {@link resolveImports}: every rendered node
+ * through each of `plugins` (set up with {@link setupPlugins}), and every schema those nodes `$ref`, through the
+ * generators the test rendered. A referenced schema the test set on `driver.inputNode` renders as is, any other as an
+ * empty object with that name.
  */
-export async function renderContext(driver: KubbDriver, plugins: Array<NormalizedPlugin>): Promise<void> {
-  const nodes = (driver as MockedDriver).renderedNodes ?? []
+export async function renderContext(driver: KubbDriver, plugins: Array<NormalizedPlugin> = []): Promise<void> {
+  const { renderedNodes: nodes = [], renders = [] } = driver as MockedDriver
+  const operations = nodes.filter((node): node is ast.OperationNode => node.kind === ast.node.kinds.operation)
+
   for (const plugin of plugins) {
     const opts = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options: plugin.options, resolver: plugin.resolver, context: true }
     for (const generator of plugin.generators ?? []) {
@@ -237,10 +254,39 @@ export async function renderContext(driver: KubbDriver, plugins: Array<Normalize
         if (node.kind === ast.node.kinds.schema) await renderGeneratorSchema(generator, node, opts)
         else await renderGeneratorOperation(generator, node as ast.OperationNode, opts)
       }
-      if (generator.operations)
-        await renderGeneratorOperations(generator, nodes.filter((node) => node.kind === ast.node.kinds.operation) as Array<ast.OperationNode>, opts)
+      if (generator.operations) await renderGeneratorOperations(generator, operations, opts)
     }
   }
+
+  // Schemas by name: the test's `inputNode`, plus the target each `$ref` carries.
+  const known = new Map<string, ast.SchemaNode>((driver.inputNode?.schemas ?? []).flatMap((schema) => (schema.name ? [[schema.name, schema] as const] : [])))
+  const learn = (node: ast.Node) => {
+    for (const ref of ast.node.collect<ast.SchemaNode>(node, { schema: (schema) => (schema.type === ast.schema.types.ref ? schema : undefined) })) {
+      const target = (ref as ast.RefSchemaNode).schema
+      if (ref.name && target && !known.has(ref.name)) known.set(ref.name, { ...target, name: ref.name })
+    }
+  }
+  nodes.forEach(learn)
+
+  // Every schema the nodes reference, followed through the known schemas.
+  const refNames = new Set([
+    ...ast.graph.getUsedNames(operations, []),
+    ...nodes.flatMap((node) => (node.kind === ast.node.kinds.schema ? ast.graph.getImportedNames(node as ast.SchemaNode, { checks: true }) : [])),
+  ])
+  for (const name of refNames) {
+    const schema = known.get(name)
+    if (!schema) continue
+    learn(schema)
+    for (const next of ast.graph.getImportedNames(schema, { checks: true })) refNames.add(next)
+  }
+
+  for (const { generator, opts } of renders) {
+    for (const name of refNames) {
+      const schema = known.get(name) ?? ast.factory.createSchema({ type: 'object', name, properties: [] })
+      await renderGeneratorSchema(generator, schema, { ...opts, context: true })
+    }
+  }
+
   resolveImports(driver)
 }
 
@@ -279,7 +325,7 @@ export async function renderGeneratorOperations<TOptions extends PluginType>(
   if (!generator.operations) return
   const context = createMockedPluginContext(opts)
   const transformedNodes = opts.plugin.macros?.length ? nodes.map((node) => ast.macro.apply(node, opts.plugin.macros!)) : nodes
-  if (!opts.context) (opts.driver as MockedDriver).renderedNodes?.push(...nodes)
+  record(opts, generator, nodes)
   const result = await generator.operations(transformedNodes, { ...context, options: opts.options })
   await filesFor(opts).dispatch({ result, renderer: generator.renderer, plugin: opts.plugin.name })
 }

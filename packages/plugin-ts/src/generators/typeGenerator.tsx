@@ -28,7 +28,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const enumSchemaNames = getEnumNames(ctx)
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
 
-    const imports = resolver.imports({ node, root, output, group: group ?? undefined, name: importName })
+    const imports = resolver.imports({ node, name: importName })
 
     const enumNode = ast.schema.narrow(node, ast.schema.types.enum)
     // An inline `const` (single-value enum the adapter did not register) renders as a literal type,
@@ -61,7 +61,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {imports.map((imp) => (
-          <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
+          <File.Import key={[node.name, imp.name, imp.isTypeOnly].join('-')} name={imp.name as Array<string>} plugin={resolver.pluginName} isTypeOnly />
         ))}
         <Type name={meta.name} node={node} enum={enumOptions} resolver={resolver} printer={schemaPrinter} />
       </File>
@@ -100,7 +100,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       if (!schema) return null
       if (!inline && enumOptions.type !== 'inlineLiteral') schema = resolveInlineEnumNames({ node: schema, owner: node.operationId, resolver, enumOptions })
 
-      const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
+      const imports = resolver.imports({ node: schema, name: importName })
 
       const schemaPrinter = printerTs({
         optionalType,
@@ -120,7 +120,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       return (
         <>
           {imports.map((imp) => (
-            <File.Import key={[name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
+            <File.Import key={[name, imp.name, imp.isTypeOnly].join('-')} name={imp.name as Array<string>} plugin={resolver.pluginName} isTypeOnly />
           ))}
           <Type name={name} node={schema} enum={enumOptions} resolver={resolver} printer={schemaPrinter} inline={inline} />
         </>

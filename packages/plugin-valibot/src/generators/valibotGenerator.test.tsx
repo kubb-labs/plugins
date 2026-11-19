@@ -8,6 +8,7 @@ import {
   renderGeneratorOperation,
   renderGeneratorSchema,
   testConfig,
+  renderContext,
 } from '#mocks'
 import { resolverValibot } from '../resolvers/resolverValibot.ts'
 import type { PluginValibot } from '../types.ts'
@@ -86,6 +87,8 @@ describe('valibotGenerator schema', () => {
 
     await renderGeneratorSchema(valibotGenerator, node, { ...context, driver })
 
+    await renderContext(driver)
+
     await matchFiles(driver.fileManager.files, name)
   })
 
@@ -93,6 +96,8 @@ describe('valibotGenerator schema', () => {
     const { driver, context } = setup('typeGuards', { typeGuards: true })
 
     await renderGeneratorSchema(valibotGenerator, createSchema({ type: 'integer', name: 'PetId' }), { ...context, driver })
+
+    await renderContext(driver)
 
     await matchFiles(driver.fileManager.files, 'typeGuards')
   })
@@ -111,6 +116,8 @@ describe('valibotGenerator schema', () => {
 
     await renderGeneratorSchema(valibotGenerator, node, { ...context, driver })
 
+    await renderContext(driver)
+
     await matchFiles(driver.fileManager.files, 'inputVariant')
   })
 
@@ -119,6 +126,8 @@ describe('valibotGenerator schema', () => {
     driver.inputNode = ast.factory.createInput({ schemas: [petSchema] })
 
     await renderGeneratorSchema(valibotGenerator, petSchema, { ...context, driver })
+
+    await renderContext(driver)
 
     await matchFiles(driver.fileManager.files, 'circular')
   })
@@ -196,6 +205,8 @@ describe('valibotGenerator operation', () => {
 
     await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
 
+    await renderContext(driver)
+
     await matchFiles(driver.fileManager.files, 'circularBody')
   })
 
@@ -239,6 +250,8 @@ describe('valibotGenerator operation', () => {
 
     await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
 
+    await renderContext(driver)
+
     await matchFiles(driver.fileManager.files, 'circularAllOfBody')
   })
 
@@ -257,6 +270,8 @@ describe('valibotGenerator operation', () => {
 
     await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
 
+    await renderContext(driver)
+
     await matchFiles(driver.fileManager.files, 'codec')
   })
 
@@ -264,6 +279,8 @@ describe('valibotGenerator operation', () => {
     const { driver, context } = setup(name, options)
 
     await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
+
+    await renderContext(driver)
 
     await matchFiles(driver.fileManager.files, name)
   })

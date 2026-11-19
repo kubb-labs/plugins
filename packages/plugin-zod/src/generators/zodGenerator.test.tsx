@@ -15,6 +15,7 @@ import {
   matchFiles,
   rawSources,
   renderGeneratorOperation,
+  renderContext,
   renderGeneratorSchema,
   testConfig,
 } from '#mocks'
@@ -328,6 +329,8 @@ describe('zodGenerator — Schema', () => {
       resolver,
     })
 
+    await renderContext(driver)
+
     await matchFiles(driver.fileManager.files, props.name)
   })
 
@@ -347,6 +350,8 @@ describe('zodGenerator — Schema', () => {
       options: defaultOptions,
       resolver,
     })
+
+    await renderContext(driver)
 
     await matchFiles(driver.fileManager.files, 'catCycle')
   })
@@ -831,6 +836,8 @@ describe('zodGenerator — Operation', () => {
       resolver,
     })
 
+    await renderContext(driver)
+
     await matchFiles(driver.fileManager.files, props.name)
   })
 })
@@ -858,6 +865,8 @@ describe('zodGenerator — transformers', () => {
       options: defaultOptions,
       resolver,
     })
+
+    await renderContext(driver)
 
     await matchFiles(driver.fileManager.files, 'transformers removeOptionalProperties')
   })
@@ -893,6 +902,8 @@ describe('zodGenerator — transformers', () => {
       options: defaultOptions,
       resolver,
     })
+
+    await renderContext(driver)
 
     await matchFiles(driver.fileManager.files, 'transformers integerToString')
   })

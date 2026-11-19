@@ -58,18 +58,10 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     // Rendered twice: the schema decodes, and its `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions })
     const inputImports = hasDirectionalNode
-      ? collectDirectionalRefNames({ node, printerOptions }).map((schemaName) => ({
-          name: [resolver.schema.inputName(schemaName)],
-          path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-        }))
+      ? collectDirectionalRefNames({ node, printerOptions }).map((schemaName) => [resolver.schema.inputName(schemaName)])
       : []
-    const imports = [
-      ...new Map(
-        [...resolver.imports({ node, root, output, group: group ?? undefined, checks: true }), ...inputImports].map(
-          (imp) => [`${Array.isArray(imp.name) ? imp.name.join(',') : imp.name}|${imp.path}`, imp] as const,
-        ),
-      ).values(),
-    ]
+    const refImports = resolver.imports({ node, checks: true }).map((imp) => imp.name as Array<string>)
+    const imports = [...new Map([...refImports, ...inputImports].map((name) => [name.join(','), name] as const)).values()]
     const inputName = resolver.schema.inputName(node.name)
     const meta = {
       name: resolver.name(node.name),
@@ -85,8 +77,8 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name="v" path={importPath} isNameSpace />
-        {imports.map((imp) => (
-          <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+        {imports.map((name) => (
+          <File.Import key={[node.name, name].join('-')} name={name} plugin={resolver.pluginName} />
         ))}
 
         <Valibot
@@ -163,9 +155,6 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       const inputRefNames = direction === 'encode' ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
       const imports = resolver.imports({
         node: schema,
-        root,
-        output,
-        group: group ?? undefined,
         checks: true,
         name: (schemaName) => (inputRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
       })
@@ -173,7 +162,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       return (
         <>
           {imports.map((imp) => (
-            <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+            <File.Import key={[name, imp.name].join('-')} name={imp.name as Array<string>} plugin={resolver.pluginName} />
           ))}
           {/* A circular component schema carries the `v.GenericSchema` annotation at its own definition.
               Annotating the operation schema too would erase its inferred type to `unknown`. */}

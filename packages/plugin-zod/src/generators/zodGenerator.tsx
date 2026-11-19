@@ -68,18 +68,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const hasDirectionalNode = !mini && containsDirectionalNode({ node, printerOptions })
 
     const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions }) : [])
-    const importEntries = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
-    const inputImportEntries = hasDirectionalNode
-      ? [...directionalRefNames].map((schemaName) => ({
-          name: [resolver.schema.inputName(schemaName)],
-          path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-        }))
-      : []
-    const imports = [
-      ...new Map(
-        [...importEntries, ...inputImportEntries].map((imp) => [`${Array.isArray(imp.name) ? imp.name.join(',') : imp.name}|${imp.path}`, imp] as const),
-      ).values(),
-    ]
+    const importEntries = resolver.imports({ node, checks: true }).map((imp) => imp.name as Array<string>)
+    const inputImportEntries = hasDirectionalNode ? [...directionalRefNames].map((schemaName) => [resolver.schema.inputName(schemaName)]) : []
+    const imports = [...new Map([...importEntries, ...inputImportEntries].map((name) => [name.join(','), name] as const)).values()]
 
     const meta = {
       name: resolver.name(node.name),
@@ -100,8 +91,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
-        {imports.map((imp) => (
-          <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+        {imports.map((name) => (
+          <File.Import key={[node.name, name].join('-')} name={name} plugin={resolver.pluginName} />
         ))}
 
         <Zod
@@ -172,9 +163,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
       const schemaPrinter = getPrinter(resolver, { ...printerOptions, keysToOmit }, mini, direction)
       const imports = resolver.imports({
         node: schema,
-        root,
-        output,
-        group: group ?? undefined,
         checks: true,
         name: (schemaName) => (directionalRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
       })
@@ -182,7 +170,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       return (
         <>
           {imports.map((imp) => (
-            <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+            <File.Import key={[name, imp.name].join('-')} name={imp.name as Array<string>} plugin={resolver.pluginName} />
           ))}
           {/* Operation schemas reference (and import) the component schemas, which carry the
               `z.ZodType` annotation at their own definition when cyclic. Annotating the operation

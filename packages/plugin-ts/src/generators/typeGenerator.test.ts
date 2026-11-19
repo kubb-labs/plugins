@@ -10,6 +10,7 @@ import {
   rawSources,
   renderGeneratorOperation,
   renderGeneratorSchema,
+  resolveImports,
   testConfig,
 } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
@@ -161,6 +162,12 @@ describe('typeGenerator — custom resolver', () => {
       options,
       resolver: apiResolver,
     })
+    // The referenced schemas, as context, so the imports resolve to their files.
+    for (const name of ['NewPet', 'Pet', 'ErrorResponse']) {
+      const schema = ast.factory.createSchema({ type: 'object', name, properties: [] })
+      await renderGeneratorSchema(typeGenerator, schema, { config: testConfig, adapter, driver, plugin, options, resolver: apiResolver, context: true })
+    }
+    resolveImports(driver)
 
     const source = rawSources(driver.fileManager.files).join('\n')
 

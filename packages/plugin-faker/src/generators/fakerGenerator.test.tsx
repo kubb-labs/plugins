@@ -16,6 +16,8 @@ import {
   rawSources,
   renderGeneratorOperation,
   renderGeneratorSchema,
+  renderContext,
+  resolveImports,
   testConfig,
 } from '#mocks'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
@@ -354,6 +356,7 @@ describe('fakerGenerator — schema', () => {
       })
     }
 
+    resolveImports(driver)
     const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.faker-'))
     onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
     for (const file of driver.fileManager.files) {
@@ -435,6 +438,8 @@ const custom: true = child.custom`,
       options: resolvedOptions,
       resolver: resolverFaker,
     })
+
+    await renderContext(driver)
 
     await matchFiles(driver.fileManager.files, name)
   })
@@ -597,6 +602,7 @@ describe('fakerGenerator — operation', () => {
         resolver: resolverFaker,
       })
     }
+    resolveImports(driver)
     const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.faker-'))
     onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
     const paths: Array<string> = []
@@ -909,6 +915,8 @@ body.id
       options: resolvedOptions,
       resolver: resolverFaker,
     })
+
+    await renderContext(driver)
 
     await matchFiles(driver.fileManager.files, name)
   })
