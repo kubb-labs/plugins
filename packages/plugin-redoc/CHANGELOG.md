@@ -1,5 +1,11 @@
 # @kubb/plugin-redoc
 
+## 5.2.6
+
+### Patch Changes
+
+- [#1537](https://github.com/kubb-labs/plugins/pull/1537) [`02b78e4`](https://github.com/kubb-labs/plugins/commit/02b78e446dce19df167f582853851cb63f75660b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Depend on `@kubb/ast` directly, at the same version as `@kubb/kit`. Generated code does not change.
+
 ## 5.2.5
 
 ### Patch Changes

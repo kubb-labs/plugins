@@ -1,5 +1,15 @@
 # @kubb/plugin-client
 
+## 6.3.1
+
+### Patch Changes
+
+- [#1537](https://github.com/kubb-labs/plugins/pull/1537) [`02b78e4`](https://github.com/kubb-labs/plugins/commit/02b78e446dce19df167f582853851cb63f75660b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Depend on `@kubb/ast` directly, at the same version as `@kubb/kit`. Generated code does not change.
+
+- [#1535](https://github.com/kubb-labs/plugins/pull/1535) [`0441805`](https://github.com/kubb-labs/plugins/commit/0441805441348a5f64cf633cbea38b81072fc0bb) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - `@kubb/plugin-msw` handlers import `MswBody` from a shared `.kubb/mswBody.ts` instead of declaring it in each file.
+- Updated dependencies [[`02b78e4`](https://github.com/kubb-labs/plugins/commit/02b78e446dce19df167f582853851cb63f75660b), [`0441805`](https://github.com/kubb-labs/plugins/commit/0441805441348a5f64cf633cbea38b81072fc0bb)]:
+  - @kubb/plugin-ts@5.5.7
+
 ## 6.3.0
 
 ### Minor Changes
