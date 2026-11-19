@@ -51,8 +51,8 @@ const server = http.createServer((req, res) => {
 })
 
 beforeAll(async () => {
-  await new Promise<void>((resolve) => server.listen(0, resolve))
-  baseURL = `http://localhost:${(server.address() as AddressInfo).port}`
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
+  baseURL = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
 })
 
 afterAll(() => {
@@ -111,7 +111,7 @@ describe('retry through the axios transport', () => {
   test('retries a network error up to the limit, then throws the AxiosError', async () => {
     const onRetry = vi.fn()
     const { url, hits } = plan((res) => res.destroy())
-    const client = createClient({ baseURL, retry: { ...fast, onRetry } })
+    const client = createClient({ baseURL, options: { proxy: false }, retry: { ...fast, onRetry } })
 
     const error = await client({ method: 'GET', url }).catch((caught: unknown) => caught)
     expect(axios.isAxiosError(error)).toBe(true)

@@ -877,8 +877,8 @@ function resolveRetry(...sources: Array<Retry | undefined>): RetryOptions & { li
     resolved = { ...resolved, ...Object.fromEntries(Object.entries(options).filter(([, value]) => value !== undefined)) }
   }
   const limit = resolved ? (resolved.limit ?? 2) : 0
-  // `NaN` counts as no retries, since no count ever reaches it.
-  return { ...resolved, limit: limit > 0 ? limit : 0 }
+  // `NaN` and `Infinity` count as no retries, since no count ever reaches them.
+  return { ...resolved, limit: Number.isFinite(limit) && limit > 0 ? limit : 0 }
 }
 
 // The milliseconds a `Retry-After` header asks for, given as seconds or as an HTTP date.
@@ -1238,10 +1238,12 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     async function* reconnecting(first: ReadableStream<Uint8Array>): AsyncGenerator<unknown> {
       if (!streamType?.stream) return
       let body = first
+      // Each reopened response brings its own status and content type. The cursor stays the same.
+      let current = context
       while (true) {
         const watched = watchReads(body)
         try {
-          for await (const item of streamType.stream(watched.stream, context)) {
+          for await (const item of streamType.stream(watched.stream, current)) {
             // A stream that delivers again starts a new run of retries.
             retryCount = 0
             yield item
@@ -1279,6 +1281,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
           throw await run.error(error, requestConfig)
         }
         body = response.body
+        current = { ...context, status: response.status, contentType: response.headers.get('Content-Type') ?? contentType }
       }
     }
     const resumes = retry.limit > 0 && baseContentType(contentType) === 'text/event-stream'

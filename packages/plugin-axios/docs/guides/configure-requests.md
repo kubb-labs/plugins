@@ -157,7 +157,7 @@ A call's `retry` merges per field over the client's, and `false` or `0` sends th
 
 | Option        | What it does                                                                                            | Default                                            |
 | ------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `limit`       | How many times the call is sent again.                                                                  | `2`                                                |
+| `limit`       | How many times the call is sent again. `NaN` and `Infinity` mean none.                                  | `2`                                                |
 | `methods`     | The methods that are safe to send twice.                                                                | `GET`, `HEAD`, `OPTIONS`, `PUT`, `DELETE`, `TRACE` |
 | `statusCodes` | The statuses that are retried.                                                                          | `408`, `429`, `500`, `502`, `503`, `504`           |
 | `delay`       | `(retryCount) => milliseconds` to wait before a retry. `retryCount` starts at 1.                        | Exponential from 300 ms with jitter, up to 30 s    |

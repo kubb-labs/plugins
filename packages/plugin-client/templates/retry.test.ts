@@ -127,19 +127,20 @@ describe('retry', () => {
     }
   })
 
-  test('ignores a NaN limit and an undefined field, and leaves the body for the client after a hook reads it', async () => {
+  test('ignores a NaN or infinite limit and an undefined field, and leaves the body for the client after a hook reads it', async () => {
     const transport = vi.fn(async () => busy())
     const client = createClientCore({ defaultTransport: transport, retry: { limit: 3, delay: () => 0 } })
 
     await expect(client({ url: '/pets', retry: Number.NaN })).rejects.toMatchObject({ status: 503 })
-    expect(transport).toHaveBeenCalledTimes(1)
+    await expect(client({ url: '/pets', retry: Number.POSITIVE_INFINITY })).rejects.toMatchObject({ status: 503 })
+    expect(transport).toHaveBeenCalledTimes(2)
 
     await expect(client({ url: '/pets', retry: { limit: undefined } })).rejects.toMatchObject({ status: 503 })
-    expect(transport).toHaveBeenCalledTimes(5)
+    expect(transport).toHaveBeenCalledTimes(6)
 
     const shouldRetry = async ({ response }: { response?: Response | undefined }) => (await response?.text()) !== 'busy'
     await expect(client({ url: '/pets', retry: { shouldRetry } })).rejects.toMatchObject({ status: 503, data: 'busy' })
-    expect(transport).toHaveBeenCalledTimes(6)
+    expect(transport).toHaveBeenCalledTimes(7)
   })
 
   test('reads a fractional Retry-After as seconds, and returns the response when the wait is over a minute', async () => {
