@@ -1,5 +1,17 @@
 # @kubb/plugin-swr
 
+## 5.10.1
+
+### Patch Changes
+
+- [#1537](https://github.com/kubb-labs/plugins/pull/1537) [`02b78e4`](https://github.com/kubb-labs/plugins/commit/02b78e446dce19df167f582853851cb63f75660b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Depend on `@kubb/ast` directly, at the same version as `@kubb/kit`. Generated code does not change.
+
+- [#1535](https://github.com/kubb-labs/plugins/pull/1535) [`0441805`](https://github.com/kubb-labs/plugins/commit/0441805441348a5f64cf633cbea38b81072fc0bb) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - `@kubb/plugin-msw` handlers import `MswBody` from a shared `.kubb/mswBody.ts` instead of declaring it in each file.
+
+- [#1530](https://github.com/kubb-labs/plugins/pull/1530) [`681c8f1`](https://github.com/kubb-labs/plugins/commit/681c8f139dbc514c9fcb562d70cd3bbbbd1b4bfe) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - The resolved `group` option is now `null` instead of `undefined` when it is not set, matching the other plugins. This only matters if a custom generator reads `ctx.options.group`.
+- Updated dependencies [[`02b78e4`](https://github.com/kubb-labs/plugins/commit/02b78e446dce19df167f582853851cb63f75660b), [`0441805`](https://github.com/kubb-labs/plugins/commit/0441805441348a5f64cf633cbea38b81072fc0bb)]:
+  - @kubb/plugin-ts@5.5.7
+
 ## 5.10.0
 
 ### Minor Changes
