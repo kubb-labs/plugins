@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { operationFileEntry, resolveOperationFile } from '@internals/shared'
+import { operationFileEntry, resolveOperationFile, getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -50,7 +50,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     const operationsMapped = nodes
       .filter(ast.http.isOperation)
       .filter((node) => {
-        const stream = ast.http.responses.getStream(node)
+        const stream = getStream(node)
         return !stream?.shape && !stream?.hasVariant
       })
       .map((node) => {

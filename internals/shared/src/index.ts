@@ -12,6 +12,7 @@ export {
   buildResponseUnionSchema,
   getContentTypeInfo,
   getPerContentTypeName,
+  getStream,
   getResponseContentTypeInfo,
   requestGroupOrder,
   operationFileEntry,
@@ -23,6 +24,7 @@ export {
   resolveSuccessNames,
   toResponseContent,
 } from './operation.ts'
+export type { ResponseStream } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
 export {
   createCasedFile,

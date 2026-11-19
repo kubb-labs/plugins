@@ -1,4 +1,5 @@
 import { toLiteral } from '@internals/utils'
+import { getStream } from '@internals/shared'
 
 import { ast, text } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
@@ -41,7 +42,7 @@ export function buildCallConfig({
   throwOnErrorDefault: boolean
   returnType: ReturnTypeOption
 }): { callConfig: string; mergeContentType: boolean; eventStream: boolean } {
-  const responseStream = ast.http.responses.getStream(node)
+  const responseStream = getStream(node)
   const stream = responseStream?.shape ?? null
   const content = ast.http.responses.findPrimary(node)?.content ?? []
   const securityLiteral = buildSecurityMetadata({ security })

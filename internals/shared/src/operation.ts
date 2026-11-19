@@ -154,6 +154,57 @@ export function getResponseContentTypeInfo(node: ast.OperationNode): ContentType
   return buildContentTypeInfo(ast.http.responses.findPrimary(node)?.content?.map((e) => e.contentType) ?? [])
 }
 
+/** How an operation streams its success responses, as {@link getStream} returns it. */
+export type ResponseStream = {
+  /** `event` for a whole typed event, `data` for a typed payload, `line` for a JSON Lines value. */
+  shape: 'event' | 'data' | 'line' | null
+  /** Whether events keep `data` as text: all of them, the named ones, or none. */
+  textEvents: boolean | Array<string>
+  /** Whether the primary success response offers `text/event-stream`. */
+  hasEventStream: boolean
+  /** Whether a success response offers a stream next to other content types. */
+  hasVariant: boolean
+}
+
+const isText = (schema: ast.SchemaNode | null | undefined) => !!schema && ast.schema.is(schema, 'text', { follow: ['ref'] })
+
+function getTextEvents(entry: ast.ContentNode, shape: ResponseStream['shape']): ResponseStream['textEvents'] {
+  if (shape === 'data') return isText(entry.stream?.schema ?? entry.schema)
+  if (shape !== 'event' || !entry.stream?.schema) return false
+
+  const item = ast.ref.getSchema(entry.stream.schema)
+  const events = ast.schema.narrow(item, 'union')?.members ?? [item]
+  // A discriminator makes each event an intersection of its `$ref` and the pinned `event`, so every part is read.
+  const propertySchemas = (event: ast.SchemaNode, propertyName: string) => ast.schema.findProperties({ node: event, propertyName }).map(({ schema }) => schema)
+  const textEvents = events.filter((event) => {
+    const dataSchemas = propertySchemas(event, 'data')
+    return dataSchemas.length > 0 && dataSchemas.every(isText)
+  })
+  if (textEvents.length === events.length) return events.length > 0
+
+  const eventNames = textEvents.map((event) => propertySchemas(event, 'event').flatMap((schema) => ast.schema.getLiterals(ast.ref.getSchema(schema))))
+  // An event without a fixed name cannot be told apart from the others.
+  if (!eventNames.length || eventNames.some((values) => !values.length)) return false
+  return [...new Set(eventNames.flat().map(String))]
+}
+
+/** How an operation streams its success responses, or `null` when none offers a stream. */
+export function getStream(node: Pick<ast.HttpOperationNode, 'responses'>): ResponseStream | null {
+  const entries = ast.http.responses.findPrimary(node)?.content ?? []
+  const entry = entries.length === 1 ? entries[0] : undefined
+  const kind = entry ? ast.mediaType.getKind(entry) : null
+  const shape = kind === 'eventStream' ? (entry?.stream?.shape ?? 'data') : kind === 'lineStream' ? 'line' : null
+  // Next to another type, a stream without a schema gets no typed variant, so it keeps the plain call.
+  const hasEventStream = entries.some((item) => ast.mediaType.getKind(item) === 'eventStream' && (entries.length === 1 || !!item.schema))
+  const hasVariant = ast.http.responses.filterSuccess(node).some((response) => {
+    const variants = (response.content ?? []).filter((item) => item.schema)
+    return variants.length > 1 && variants.some(ast.mediaType.isStream)
+  })
+  if (!shape && !hasEventStream && !hasVariant) return null
+
+  return { shape, textEvents: entry ? getTextEvents(entry, shape) : false, hasEventStream, hasVariant }
+}
+
 type ResponseType = 'blob' | 'text' | 'stream'
 
 type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | null; stream?: ast.ContentNode['stream'] }

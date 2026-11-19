@@ -1,4 +1,5 @@
 import { objectKey } from '@internals/utils'
+import { getStream } from '@internals/shared'
 import path from 'node:path'
 
 import { ast, text } from '@kubb/kit'
@@ -44,7 +45,7 @@ export function ClientRuntime({
 }): KubbReactNode {
   if (!templates) return null
   const hasParameter = (match: (parameter: ast.ParameterNode) => boolean) => nodes.some((node) => node.parameters.some(match))
-  const streams = nodes.some((node) => ast.http.responses.getStream(node) !== null)
+  const streams = nodes.some((node) => getStream(node) !== null)
   const requestTypes = new Set(nodes.flatMap((node) => (node.requestBody?.content ?? []).map((entry) => ast.mediaType.getBase(entry))))
   const forms = Object.entries(formMediaTypes)
     .filter(([contentType]) => requestTypes.has(contentType))

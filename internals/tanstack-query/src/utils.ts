@@ -1,4 +1,4 @@
-import { getResponseContentTypeInfo, resolveErrorNames, resolveSuccessNames, buildClientOptionType, requestGroupOrder } from '@internals/shared'
+import { getResponseContentTypeInfo, resolveErrorNames, resolveSuccessNames, buildClientOptionType, requestGroupOrder, getStream } from '@internals/shared'
 import { ast } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
@@ -227,7 +227,7 @@ export function buildResponseTypes(
     const successNames = resolveSuccessNames(node, resolver)
     const bodyName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
     // The client resolves a stream variant of a mixed response to its raw body.
-    const responseName = ast.http.responses.getStream(node)?.hasVariant ? `${bodyName} | ReadableStream<Uint8Array>` : bodyName
+    const responseName = getStream(node)?.hasVariant ? `${bodyName} | ReadableStream<Uint8Array>` : bodyName
     const errorNames = resolveErrorNames(node, resolver)
 
     return {
@@ -306,7 +306,7 @@ type ClassifyOperationParams = {
  * directly, so they do not generate query or mutation hooks.
  */
 export function classifyOperation(node: ast.HttpOperationNode, { query, mutation }: ClassifyOperationParams): OperationClassification {
-  if (ast.http.responses.getStream(node)?.shape) return { isQuery: false, isMutation: false }
+  if (getStream(node)?.shape) return { isQuery: false, isMutation: false }
 
   const isQuery = !!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase())
   const queryMethods = new Set(query ? query.methods : [])

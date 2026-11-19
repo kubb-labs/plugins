@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { resolveOperationTypes, resultTypeName } from '@internals/client'
-import { operationFileEntry } from '@internals/shared'
+import { operationFileEntry, getStream } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -42,7 +42,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
       // alongside its other runtime helpers.
       const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
-      const stream = ast.http.responses.getStream(node)?.shape ?? null
+      const stream = getStream(node)?.shape ?? null
 
       const clientValueImports = [
         ...{
