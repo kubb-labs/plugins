@@ -1,7 +1,6 @@
-import type { ast } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildQueryKeyParams, buildQueryOptionsParams, buildResponseTypes } from '@internals/tanstack-query'
 import type { HookResultProps } from '@internals/tanstack-query'
@@ -16,18 +15,15 @@ type Props = {
   tsResolver: ResolverTs
 } & HookResultProps
 
-const declarationPrinter = functionPrinter({ mode: 'declaration' })
-const callPrinter = functionPrinter({ mode: 'call' })
-
 export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, returnType, typedHeaders }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
   const generics = [TData, TError, `${queryKeyTypeName} | null`]
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
-  const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
+  const queryKeyParamsCall = ast.params.print(queryKeyParamsNode, 'call')
 
   const queryOptionsParamsNode = buildQueryOptionsParams(node, { resolver: tsResolver })
-  const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
+  const queryOptionsParamsCall = ast.params.print(queryOptionsParamsNode, 'call')
 
   const paramsNode = buildHookParams(node, {
     resolver: tsResolver,
@@ -38,12 +34,10 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   immutable?: boolean
 }`,
   })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }}>
-        {`
+    <Function name={name} export params={paramsNode} JSDoc={{ comments: getComments(node) }}>
+      {`
        const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
        const queryKey = ${queryKeyName}(${queryKeyParamsCall})
@@ -61,7 +55,6 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
         }
        )
        `}
-      </Function>
-    </File.Source>
+    </Function>
   )
 }

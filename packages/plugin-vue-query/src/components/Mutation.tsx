@@ -1,7 +1,6 @@
-import type { ast } from '@kubb/kit'
-import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
-import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { ast } from '@kubb/kit'
+import type { ResolverTs } from '@kubb/plugin-ts'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import {
   buildCallResultBody,
@@ -23,13 +22,10 @@ type Props = {
   tsResolver: ResolverTs
 } & CallReturnTypeProps
 
-const declarationPrinter = functionPrinter({ mode: 'declaration' })
-const callPrinter = functionPrinter({ mode: 'call' })
-
 function buildMutationParamsNode(
   node: ast.OperationNode,
   options: { resolver: ResolverTs; returnType: ReturnTypeOption; typedHeaders?: boolean },
-): FunctionParametersNode {
+): ast.FunctionParametersNode {
   const { resolver, returnType, typedHeaders } = options
   const { TData, TError } = buildResponseTypes(node, resolver, { returnType, typedHeaders })
 
@@ -48,8 +44,8 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
-  const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
-  const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
+  const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  const argBindingStr = hasMutationParams ? ast.params.print(groupedParamsNode, 'call') : ''
   const TRequest = resolveMutationRequestType(node, tsResolver)
   const mutationFnBody = buildCallResultBody(
     buildClientCall(node, {
@@ -64,12 +60,10 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
 
   const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType, typedHeaders })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }} generics={['TContext']}>
-        {`
+    <Function name={name} export params={paramsNode} JSDoc={{ comments: getComments(node) }} generics={['TContext']}>
+      {`
         const { mutation = {}, client: config = {} } = options ?? {}
         const { client: queryClient, ...mutationOptions } = mutation;
         const mutationKey = mutationOptions?.mutationKey ?? ${mutationKeyName}()
@@ -82,7 +76,6 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
           ...mutationOptions
         }, queryClient)
     `}
-      </Function>
-    </File.Source>
+    </Function>
   )
 }

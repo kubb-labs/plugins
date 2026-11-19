@@ -1,7 +1,6 @@
-import type { ast } from '@kubb/kit'
-import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
-import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
-import { File, Function, Type } from '@kubb/renderer-jsx'
+import { ast } from '@kubb/kit'
+import type { ResolverTs } from '@kubb/plugin-ts'
+import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall, buildResponseTypes, resolveMutationRequestType } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
@@ -18,9 +17,6 @@ type Props = {
   tsResolver: ResolverTs
 } & CallReturnTypeProps
 
-const declarationPrinter = functionPrinter({ mode: 'declaration' })
-const callPrinter = functionPrinter({ mode: 'call' })
-
 function buildMutationParamsNode(
   node: ast.OperationNode,
   options: {
@@ -30,13 +26,13 @@ function buildMutationParamsNode(
     returnType: ReturnTypeOption
     typedHeaders?: boolean
   },
-): FunctionParametersNode {
+): ast.FunctionParametersNode {
   const { mutationKeyTypeName, mutationArgTypeName, resolver, returnType, typedHeaders } = options
   const { TData, TError } = buildResponseTypes(node, resolver, { returnType, typedHeaders })
 
-  return createFunctionParameters({
+  return ast.factory.createFunctionParameters({
     params: [
-      createFunctionParameter({
+      ast.factory.createFunctionParameter({
         name: 'options',
         type: `{
   mutation?: SWRMutationConfiguration<${TData}, ${TError}, ${mutationKeyTypeName} | null, ${mutationArgTypeName}> & { throwOnError?: boolean },
@@ -65,9 +61,9 @@ export function Mutation({
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
-  const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argTypeBody = hasMutationParams ? resolveMutationRequestType(node, tsResolver) : ''
-  const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
+  const argBindingStr = hasMutationParams ? ast.params.print(groupedParamsNode, 'call') : ''
   const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false, withContentType: true }), {
     clientReturnType,
     returnType,
@@ -82,18 +78,14 @@ export function Mutation({
     returnType,
     typedHeaders,
   })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
     <>
-      <File.Source name={mutationArgTypeName} isExportable isIndexable isTypeOnly>
-        <Type name={mutationArgTypeName} export>
-          {hasMutationParams ? argTypeBody : 'never'}
-        </Type>
-      </File.Source>
-      <File.Source name={name} isExportable isIndexable>
-        <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }}>
-          {`
+      <Type name={mutationArgTypeName} export>
+        {hasMutationParams ? argTypeBody : 'never'}
+      </Type>
+      <Function name={name} export params={paramsNode} JSDoc={{ comments: getComments(node) }}>
+        {`
         const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
         const mutationKey = ${mutationKeyName}()
 
@@ -105,8 +97,7 @@ export function Mutation({
           mutationOptions
         )
     `}
-        </Function>
-      </File.Source>
+      </Function>
     </>
   )
 }

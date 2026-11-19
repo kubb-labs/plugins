@@ -56,15 +56,13 @@ export function Mock({ baseURL = '', name, fakerName, responseName, typeName, re
           {'type MswBody<T> = T extends DefaultBodyType ? T : DefaultBodyType'}
         </File.Source>
       )}
-      <File.Source name={name} isIndexable isExportable>
-        <Function name={name} export params={params}>
-          {`return ${httpCall}(${urlLiteral}, function handler(info) {
+      <Function name={name} export params={params}>
+        {`return ${httpCall}(${urlLiteral}, function handler(info) {
     ${methodGuard}if(typeof data === 'function') return data(info)
 
     ${responseStatements}
   })`}
-        </Function>
-      </File.Source>
+      </Function>
     </>
   )
 }
