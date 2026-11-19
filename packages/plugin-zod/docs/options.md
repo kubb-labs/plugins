@@ -282,6 +282,8 @@ To convert requests and responses differently, branch on `this.options.direction
 
 ## Resolver members
 
+`resolver` takes one patch or an array of patches. An array merges over `resolverZod` from left to right.
+
 Besides the shared members of [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverZod` has these. Members you leave out keep the default.
 
 ::code-collapse{name="ResolverZod patch members"}

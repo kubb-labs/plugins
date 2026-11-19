@@ -276,6 +276,8 @@ Replaces the handler for a schema type such as `'integer'` or `'date'`. Each han
 
 ## Resolver members
 
+`resolver` takes one patch or an array of patches. An array merges over `resolverTs` from left to right.
+
 Members you leave out of a `resolver` patch keep `resolverTs`. Besides the shared `name`, `file`, and `imports` members of [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverTs` has these:
 
 ::code-collapse{name="ResolverTs patch members"}

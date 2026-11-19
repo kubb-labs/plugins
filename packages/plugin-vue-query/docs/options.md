@@ -303,7 +303,7 @@ Deprecated. Use `nextParam` and `previousParam`. A top-level response field, not
 
 ### resolver
 
-Overrides generated names. Members you leave out keep `resolverVueQuery`. See [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) for the shared members.
+Overrides generated names. Members you leave out keep `resolverVueQuery`. See [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) for the shared members. Pass an array to merge several patches over `resolverVueQuery`, left to right.
 
 |          |                                   |
 | -------- | --------------------------------- |

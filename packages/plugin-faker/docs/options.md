@@ -186,6 +186,8 @@ pluginFaker({
 
 ## Resolver members
 
+`resolver` takes one patch or an array of patches. An array merges over `resolverFaker` from left to right.
+
 A `resolver` patch can add a `Mock` suffix so factories do not clash with imported types. Members you leave out of the patch keep `resolverFaker`. Besides the shared `name`, `file`, and `imports` members of [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver), `resolverFaker` has these:
 
 ::code-collapse{name="ResolverFaker patch members"}

@@ -183,7 +183,7 @@ mutationKey: (props) => [JSON.stringify('v2'), ...mutationKeyTransformer(props)]
 
 ### resolver
 
-Overrides generated file and symbol names. Members you leave out keep `resolverSwr`. See [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) for the shared `name`, `file`, and `imports` members.
+Overrides generated file and symbol names. Members you leave out keep `resolverSwr`. See [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver) for the shared `name`, `file`, and `imports` members. Pass an array to merge several patches over `resolverSwr`, left to right.
 
 |          |                              |
 | -------- | ---------------------------- |
