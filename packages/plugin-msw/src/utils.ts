@@ -1,9 +1,10 @@
+import { ast } from '@internals/ast'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { isValidVarName, toLiteral } from '@internals/utils'
 import { toResponseContent } from '@internals/shared'
 
-import { ast, text } from '@kubb/kit'
+import { text } from '@kubb/kit'
 
 // Headers use the `simple` style, so an array or object is sent comma-separated.
 function toSimpleStyle(value: unknown): string {

@@ -1,4 +1,5 @@
-import { ast, casing, text } from '@kubb/kit'
+import { ast } from '@internals/ast'
+import { casing, text } from '@kubb/kit'
 import { generate } from 'yuku-codegen'
 
 /**

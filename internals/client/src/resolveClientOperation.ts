@@ -1,6 +1,7 @@
+import type { ast } from '@internals/ast'
 import path from 'node:path'
 import { operationFileEntry, operationKey } from '@internals/shared'
-import type { ast, Exclude, Group, Include, Memo, Output, Override, Resolver } from '@kubb/kit'
+import type { Exclude, Group, Include, Memo, Output, Override, Resolver } from '@kubb/kit'
 
 /**
  * Shape of the value a generated operation function resolves to.

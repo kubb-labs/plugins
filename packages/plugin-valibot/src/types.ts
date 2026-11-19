@@ -1,5 +1,6 @@
+import type { ast } from '@internals/ast'
 import type { ResolvedPluginOptions } from '@internals/shared/types'
-import type { ast, Exclude, Include, OutputOptions, Override, PluginType, Resolver, ResolverPatch } from '@kubb/kit'
+import type { Exclude, Include, OutputOptions, Override, PluginType, Resolver, ResolverPatch } from '@kubb/kit'
 import type { PrinterValibotNodes, printerValibot } from './printers/printerValibot.ts'
 
 /**

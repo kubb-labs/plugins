@@ -36,6 +36,18 @@ export default defineConfig({
     'typescript/prefer-function-type': 'error',
     'react/self-closing-comp': 'error',
     'react/no-array-index-key': 'warn',
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@kubb/kit',
+            importNames: ['ast'],
+            message: "Import `ast` from '@internals/ast', which adds the plugin-only helpers.",
+          },
+        ],
+      },
+    ],
   },
   overrides: [
     {

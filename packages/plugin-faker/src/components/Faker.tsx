@@ -1,5 +1,5 @@
+import { ast } from '@internals/ast'
 import { jsDocEscape, objectKey } from '@internals/utils'
-import { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'

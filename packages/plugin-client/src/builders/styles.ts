@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { isValidVarName } from '@internals/utils'
-import { ast, text } from '@kubb/kit'
+import { text } from '@kubb/kit'
 
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
 

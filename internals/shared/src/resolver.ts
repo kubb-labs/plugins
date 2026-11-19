@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { ensureValidVarName, toFilePath } from '@internals/utils'
-import { ast, casing } from '@kubb/kit'
+import { casing } from '@kubb/kit'
 import type { GeneratorContext, Resolver, ResolverFile } from '@kubb/kit'
 
 /**

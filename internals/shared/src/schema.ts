@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
-import { ast, text } from '@kubb/kit'
+import { text } from '@kubb/kit'
 
 /**
  * Marks a property required in a later `allOf` member when an earlier member already requires it.

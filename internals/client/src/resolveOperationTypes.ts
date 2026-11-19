@@ -1,4 +1,5 @@
-import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
+import type { ast } from '@internals/ast'
+import { Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import type { PluginZod, ResolverZod } from '@kubb/plugin-zod'
 

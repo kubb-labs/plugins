@@ -1,5 +1,6 @@
+import type { ast } from '@internals/ast'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ast, ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
 
 /**
  * Resolver for MSW that provides naming methods for handler functions.

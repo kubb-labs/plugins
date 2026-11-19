@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { buildList } from '@internals/utils'
-import { ast, text } from '@kubb/kit'
+import { text } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   getChecks,

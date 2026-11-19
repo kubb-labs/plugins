@@ -1,6 +1,7 @@
+import { ast } from '@internals/ast'
 import { type NumericBounds, defaultLiteral, formatDefault, hasInputChecks, numericLiteral } from '@internals/shared'
 import { buildObject, toRegExpString } from '@internals/utils'
-import { ast, text } from '@kubb/kit'
+import { text } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
 
 /**

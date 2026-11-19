@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { buildResponses } from '@internals/shared'
-import { ast, Resolver } from '@kubb/kit'
+import { Resolver } from '@kubb/kit'
 import { describe, expect, it } from 'vitest'
 import { print } from './factory.ts'
 import { printerTs } from './printers/printerTs.ts'

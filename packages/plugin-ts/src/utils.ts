@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
-import { ast, text } from '@kubb/kit'
+import { text } from '@kubb/kit'
 import { getEnumNames } from './components/Enum.tsx'
 import type { PluginTs, ResolverTs } from './types.ts'
 

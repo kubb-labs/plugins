@@ -1,8 +1,9 @@
+import { ast } from '@internals/ast'
 import { objectKey } from '@internals/utils'
 import { getStream } from '@internals/shared'
 import path from 'node:path'
 
-import { ast, text } from '@kubb/kit'
+import { text } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import { buildSecuritySchemes } from '../builders/security.ts'
 import { hasQueryStyles } from '../builders/styles.ts'

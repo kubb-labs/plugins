@@ -1,5 +1,5 @@
+import type { ast } from '@internals/ast'
 import { macroDedupeUnion } from '@kubb/kit'
-import type { ast } from '@kubb/kit'
 
 /**
  * Macros the client plugins apply by default, ahead of any user macros. `macroDedupeUnion`

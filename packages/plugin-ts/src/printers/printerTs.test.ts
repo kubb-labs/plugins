@@ -1,4 +1,5 @@
-import { ast, Diagnostics } from '@kubb/kit'
+import { ast } from '@internals/ast'
+import { Diagnostics } from '@kubb/kit'
 import { describe, expect, it } from 'vitest'
 import { format } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'

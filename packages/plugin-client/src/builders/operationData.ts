@@ -1,6 +1,7 @@
+import { ast } from '@internals/ast'
 import { getResponseHeadersTypeNames, type OperationTypeNames, type OperationTypeSource } from '@internals/client'
 import { operationKey, resolveOperationFile } from '@internals/shared'
-import { ast, type Generator } from '@kubb/kit'
+import { type Generator } from '@kubb/kit'
 import type { ContractClientFactory } from '../types.ts'
 import { getOperationSecurity, isAuthRequired, type SecurityRequirement } from './security.ts'
 import { buildValidatorHooks, type ValidatorHooks } from './validator.ts'

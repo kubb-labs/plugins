@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
-import { ast, type Group, type Memo, type Output, type Resolver, type ResolverFileParams } from '@kubb/kit'
+import { type Group, type Memo, type Output, type Resolver, type ResolverFileParams } from '@kubb/kit'
 
 /**
  * Builds the `ResolverFileParams` every operation generator passes to

@@ -1,4 +1,4 @@
-import { ast } from '@kubb/kit'
+import { ast } from '@internals/ast'
 import { describe, expect, test } from 'vitest'
 import { getExampleBody, getMockHeaders, responseLiteral } from './utils.ts'
 

@@ -1,4 +1,4 @@
-import { ast } from '@kubb/kit'
+import { ast } from '@internals/ast'
 import { describe, expect, test } from 'vitest'
 import { applyMiniModifiers, applyModifiers, lengthChecksMini, lengthConstraints, numberChecksMini, numberConstraints, omitUnwrapChain } from './utils.ts'
 

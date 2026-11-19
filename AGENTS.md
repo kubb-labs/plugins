@@ -47,6 +47,7 @@ Each plugin in the `packages/` directory follows a consistent structure:
 
 The `internals/` directory provides shared utilities:
 
+- `ast` holds the `ast` namespace plugins import (`import { ast } from '@internals/ast'`): all of `@kubb/ast`, plus helpers only plugins need
 - `tanstack-query` holds shared TanStack Query utilities
 - `utils` holds general utility functions
 

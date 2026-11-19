@@ -1,6 +1,7 @@
+import type { ast } from '@internals/ast'
 import { getResponseHeadersTypeNames, resolveOperationTypes } from '@internals/client'
 import { operationFileEntry, resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
-import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
+import { Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'

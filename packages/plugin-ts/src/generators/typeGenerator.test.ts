@@ -1,6 +1,7 @@
+import { ast } from '@internals/ast'
 import path from 'node:path'
 import type { Group } from '@kubb/kit'
-import { ast, casing, Resolver } from '@kubb/kit'
+import { casing, Resolver } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import {
   createMockedAdapter,

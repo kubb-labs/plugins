@@ -1,4 +1,4 @@
-import { ast } from '@kubb/kit'
+import { ast } from '@internals/ast'
 import type { ValidatorOptions } from '../types.ts'
 import {
   buildErrorParse,

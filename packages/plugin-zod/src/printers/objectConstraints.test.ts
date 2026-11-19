@@ -1,5 +1,5 @@
+import { ast } from '@internals/ast'
 import { adapterOas } from '@kubb/adapter-oas'
-import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import * as z from 'zod'
 import * as mini from 'zod/mini'
