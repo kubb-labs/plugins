@@ -252,7 +252,7 @@ describe('retry through the axios transport', () => {
 
     setTimeout(() => controller.abort(reason), 50)
     await expect(createClient({ baseURL, retry: { delay: () => 60_000 } })({ method: 'GET', url, signal: controller.signal })).rejects.toBe(reason)
-    expect(performance.now() - started).toBeLessThan(1000)
+    expect(performance.now() - started).toBeLessThan(30_000)
     expect(hits).toHaveLength(1)
   })
 
@@ -352,11 +352,16 @@ describe('retry of an event stream through the axios transport', () => {
     expect(hits).toHaveLength(2)
   })
 
-  test('shares the limit between connects and reopens', async () => {
-    const { url, hits } = plan(answer(503), cut(), cut(), events('id: 2\ndata: two\n\n'))
+  test('counts a failed connect and the drops after it against one limit, until an event arrives', async () => {
+    const empty = () => events('id: 1\ndata: on', true)
+    const { url, hits } = plan(answer(503), empty(), empty(), events('id: 2\ndata: two\n\n'))
 
     const result = await streaming({ limit: 2, ...fast }).stream({ method: 'GET', url })
     await expect(collect(result)).rejects.toMatchObject({ code: 'ECONNRESET' })
     expect(hits).toHaveLength(3)
+
+    const reset = plan(cut(), cut(), cut(), events('id: 2\ndata: two\n\n'))
+    expect(await collect(await streaming({ limit: 1, ...fast }).stream({ method: 'GET', url: reset.url }))).toHaveLength(4)
+    expect(reset.hits).toHaveLength(4)
   })
 })

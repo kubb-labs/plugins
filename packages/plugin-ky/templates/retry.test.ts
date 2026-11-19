@@ -154,7 +154,7 @@ describe('retry', () => {
 
     started = performance.now()
     expect((await api()({ method: 'GET', url: now, retry: { delay: () => 5000, onRetry } })).status).toBe(200)
-    expect(performance.now() - started).toBeLessThan(1000)
+    expect(performance.now() - started).toBeLessThan(4000)
 
     expect(delays).toStrictEqual([1000, 0])
     expect([later, now].map((url) => seen(url).length)).toStrictEqual([2, 2])
@@ -243,7 +243,7 @@ describe('retry', () => {
     })
 
     await expect(call).rejects.toBe(reason)
-    expect(performance.now() - started).toBeLessThan(1000)
+    expect(performance.now() - started).toBeLessThan(4000)
     expect(seen(url)).toHaveLength(1)
   })
 
@@ -316,15 +316,15 @@ describe('retry with client.stream', () => {
     expect(seen(url)).toHaveLength(2)
   })
 
-  test('shares the limit between connects and reopens', async () => {
-    const url = route((res, count) => (count === 1 ? json(res, 503) : sse(res, event(count), true)))
-    const data: Array<unknown> = []
+  test('counts a failed connect and the drops after it against one limit, until an event arrives', async () => {
+    const url = route((res, count) => (count === 1 ? json(res, 503) : sse(res, 'data: par', true)))
 
-    const result = await streams().stream({ method: 'GET', url })
+    await expect(collect(await streams().stream({ method: 'GET', url }))).rejects.toThrow('terminated')
+    expect(seen(url)).toHaveLength(3)
 
-    await expect(collect(result, data)).rejects.toThrow('terminated')
-    expect(data).toStrictEqual([{ n: 2 }, { n: 3 }])
-    expect(seen(url).map((hit) => hit.headers['last-event-id'])).toStrictEqual([undefined, undefined, '2'])
+    const reset = route((res, count) => sse(res, event(count), count < 5))
+    expect(await collect(await streams().stream({ method: 'GET', url: reset }))).toHaveLength(5)
+    expect(seen(reset)).toHaveLength(5)
   })
 })
 

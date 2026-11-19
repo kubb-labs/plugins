@@ -156,7 +156,7 @@ const { stream } = await streamChat({ body, onValidationError: (error, { value }
 - Pass `signal` to stop from outside. The call or the loop rejects with the signal's reason.
 - A dropped connection ends the loop with the transport's error, unless [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/configure-requests#retry-a-failed-call) is set.
 
-With `retry`, the runtime retries a failed connect, and reopens a dropped `text/event-stream` with the last event ID in a `Last-Event-ID` header. The connects and the reopens of one call share the retry limit. A stream that ends, a parse error, and a JSON Lines stream are never reopened. A server that ignores `Last-Event-ID` sends its events again from the start.
+With `retry`, the runtime retries a failed connect, and reopens a dropped `text/event-stream` with the last event ID in a `Last-Event-ID` header. The limit counts failures in a row: a failed connect and the drops after it count together, and the count starts over once the stream delivers an event. A reopen that fails throws from the loop, after the error interceptors, also with `throwOnError: false`. A stream that ends, a parse error, and a JSON Lines stream are never reopened. A server that ignores `Last-Event-ID` sends its events again from the start.
 
 `streamChat` is a `POST`, which `retry` leaves alone unless `retry.methods` names it:
 

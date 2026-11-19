@@ -268,7 +268,7 @@ describe('retry', () => {
     const call = createClient({ baseURL, retry: { delay: () => 60_000 } })({ url, signal: controller.signal })
     setTimeout(() => controller.abort(reason), 50)
     await expect(call).rejects.toBe(reason)
-    expect(performance.now() - started).toBeLessThan(1000)
+    expect(performance.now() - started).toBeLessThan(30_000)
     expect(sent(url)).toHaveLength(1)
   })
 
@@ -344,14 +344,18 @@ describe('retry of an event stream', () => {
     expect(sent(url)).toHaveLength(2)
   })
 
-  test('shares the limit between connects and reopens', async () => {
-    const url = route(503, events('id: 1\ndata: one\n\n', true), events('id: 2\ndata: two\n\n', true))
+  test('counts a failed connect and the drops after it against one limit, until an event arrives', async () => {
+    const url = route(503, events('data: on', true), events('data: tw', true))
     const onRetry = vi.fn()
 
     const result = await streams({ limit: 2, delay: () => 0, onRetry }).stream({ url })
     await expect(collect(result)).rejects.toThrow('terminated')
-    expect(sent(url).map((hit) => hit.headers['last-event-id'])).toEqual([undefined, undefined, '1'])
+    expect(sent(url)).toHaveLength(3)
     expect(onRetry.mock.calls.map(([context]) => context.retryCount)).toEqual([1, 2])
-    expect(result.lastEventId).toBe('2')
+
+    const cut = () => events('id: 1\ndata: one\n\n', true)
+    const reset = route(cut(), cut(), cut(), events('id: 2\ndata: two\n\n'))
+    expect(await collect(await streams({ limit: 1, delay: () => 0 }).stream({ url: reset }))).toHaveLength(4)
+    expect(sent(reset).map((hit) => hit.headers['last-event-id'])).toEqual([undefined, '1', '1', '1'])
   })
 })

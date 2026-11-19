@@ -863,17 +863,24 @@ function resolveRetry(...sources: Array<Retry | undefined>): RetryOptions & { li
   for (const source of sources) {
     if (source === undefined) continue
     if (source === false) resolved = undefined
-    else resolved = { ...resolved, ...(typeof source === 'number' ? { limit: source } : source) }
+    else {
+      const options = typeof source === 'number' ? { limit: source } : source
+      // An `undefined` field keeps the earlier value.
+      resolved = { ...resolved, ...Object.fromEntries(Object.entries(options).filter(([, value]) => value !== undefined)) }
+    }
   }
-  return { ...resolved, limit: resolved ? (resolved.limit ?? 2) : 0 }
+  const limit = resolved ? (resolved.limit ?? 2) : 0
+  // `NaN` counts as no retries, since no count ever reaches it.
+  return { ...resolved, limit: limit > 0 ? limit : 0 }
 }
 
 // The milliseconds a `Retry-After` header asks for, given as seconds or as an HTTP date.
 function retryAfter(response: Response | undefined): number | undefined {
   const value = response?.headers.get('Retry-After')
   if (!value) return undefined
-  const delay = /^\d+$/.test(value.trim()) ? Number(value) * 1000 : Date.parse(value) - Date.now()
-  return Number.isNaN(delay) ? undefined : Math.max(0, delay)
+  const delay = /^\d+(\.\d+)?$/.test(value.trim()) ? Number(value) * 1000 : Date.parse(value) - Date.now()
+  // A date long past is not a wait, so the configured delay applies.
+  return Number.isNaN(delay) || delay < -60_000 ? undefined : Math.max(0, delay)
 }
 
 function sleep(delay: number, signal: AbortSignal | undefined): Promise<void> {
@@ -1102,13 +1109,24 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         (method) => method.toUpperCase() === resolvedRequest.method.toUpperCase(),
       )
       if (retryCount >= retry.limit || signal?.aborted || !replayable || resolvedRequest.body instanceof ReadableStream) return false
-      const context: RetryContext = { ...failure, request: resolvedRequest, retryCount: retryCount + 1 }
+      // Longer than a minute is the server saying to come back later, so the call gets the response.
+      const serverDelay = retryAfter(failure.response)
+      if (serverDelay !== undefined && serverDelay > 60_000) return false
+      // The hooks get a copy, so one that reads the body leaves it for the client.
+      const hooked = retry.shouldRetry || retry.onRetry ? failure.response?.clone() : failure.response
+      const context: RetryContext = { ...failure, ...(hooked ? { response: hooked } : {}), request: resolvedRequest, retryCount: retryCount + 1 }
       const retryable = failure.response ? (retry.statusCodes ?? [408, 429, 500, 502, 503, 504]).includes(failure.response.status) : true
-      if (!((await retry.shouldRetry?.(context)) ?? retryable)) return false
+      // Not awaited: a body with a copy settles its cancel only once both are released.
+      const release = (response: Response | undefined) => void response?.body?.cancel().catch(() => {})
+      if (!((await retry.shouldRetry?.(context)) ?? retryable)) {
+        if (hooked !== failure.response) release(hooked)
+        return false
+      }
       retryCount++
-      const delay = retryAfter(failure.response) ?? retry.delay?.(retryCount) ?? Math.min(300 * 2 ** (retryCount - 1), 30_000) * (0.5 + Math.random() / 2)
+      const delay = serverDelay ?? retry.delay?.(retryCount) ?? Math.min(300 * 2 ** (retryCount - 1), 30_000) * (0.5 + Math.random() / 2)
       await retry.onRetry?.({ ...context, delay })
-      await failure.response?.body?.cancel().catch(() => {})
+      release(failure.response)
+      if (hooked !== failure.response) release(hooked)
       await sleep(delay, signal)
       return true
     }
@@ -1219,6 +1237,8 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         try {
           for await (const item of readStream(watched.stream, context)) {
             received = true
+            // A stream that delivers again starts a new run of retries.
+            retryCount = 0
             yield item
           }
           return
@@ -1239,17 +1259,23 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
           baseContentType(response.headers.get('Content-Type')) !== 'text/event-stream'
         ) {
           await response.body?.cancel().catch(() => {})
-          throw new ResponseError({
-            data: undefined,
-            status: response.status,
-            statusText: response.statusText,
-            contentType: baseContentType(response.headers.get('Content-Type')),
-            headers: response.headers,
-            request: result.request,
-            response: (isResponse(next) ? next : next.response) as TResponse,
-            method: resolvedRequest.method,
-            url: resolvedRequest.url,
-          })
+          const reopened = baseContentType(response.headers.get('Content-Type'))
+          const error =
+            response.status >= 200 && response.status < 300
+              ? new TypeError(`Expected a streamed body, got ${reopened ?? 'a body without a content type'}`)
+              : new ResponseError({
+                  data: undefined,
+                  status: response.status,
+                  statusText: response.statusText,
+                  contentType: reopened,
+                  headers: response.headers,
+                  request: result.request,
+                  response: (isResponse(next) ? next : next.response) as TResponse,
+                  method: resolvedRequest.method,
+                  url: resolvedRequest.url,
+                })
+          // Thrown while the caller iterates, so the error interceptors run here.
+          throw await run.error(error, requestConfig)
         }
         body = response.body
       }

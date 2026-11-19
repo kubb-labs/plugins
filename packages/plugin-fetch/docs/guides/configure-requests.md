@@ -160,11 +160,12 @@ client.setConfig({
 })
 ```
 
-The client retries a status in `statusCodes` and any error the transport throws, such as a network failure. These rules always apply, also when `shouldRetry` returns `true`:
+The client retries a status in `statusCodes` and any error the transport throws, such as a network failure. A thrown error that cannot succeed, such as a URL that does not parse, is retried too, so return `false` from `shouldRetry` for an error you know is final. These rules always apply, also when `shouldRetry` returns `true`:
 
 - A method outside `methods`, such as `POST`, is never retried. Add the method to `methods` only when the API handles a repeated request.
 - A `ReadableStream` body is never retried, because it cannot be read twice.
-- A `Retry-After` header sets the wait instead of `delay`.
+- A `Retry-After` header sets the wait instead of `delay`. When it asks for more than a minute, the call is not retried and gets the response.
+- `shouldRetry` and `onRetry` get a copy of the response, so they can read its body.
 - An aborted `signal` stops the wait and the retries.
 - The request interceptors and the `auth` resolver run once, so every retry sends the same headers.
 

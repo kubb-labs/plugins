@@ -127,6 +127,47 @@ describe('retry', () => {
     }
   })
 
+  test('ignores a NaN limit and an undefined field, and leaves the body for the client after a hook reads it', async () => {
+    const transport = vi.fn(async () => busy())
+    const client = createClientCore({ defaultTransport: transport, retry: { limit: 3, delay: () => 0 } })
+
+    await expect(client({ url: '/pets', retry: Number.NaN })).rejects.toMatchObject({ status: 503 })
+    expect(transport).toHaveBeenCalledTimes(1)
+
+    await expect(client({ url: '/pets', retry: { limit: undefined } })).rejects.toMatchObject({ status: 503 })
+    expect(transport).toHaveBeenCalledTimes(5)
+
+    const shouldRetry = async ({ response }: { response?: Response | undefined }) => (await response?.text()) !== 'busy'
+    await expect(client({ url: '/pets', retry: { shouldRetry } })).rejects.toMatchObject({ status: 503, data: 'busy' })
+    expect(transport).toHaveBeenCalledTimes(6)
+  })
+
+  test('reads a fractional Retry-After as seconds, and returns the response when the wait is over a minute', async () => {
+    const onRetry = vi.fn()
+    const answers = [new Response(null, { status: 503, headers: { 'retry-after': '0.01' } }), ok()]
+    const client = createClientCore({ defaultTransport: async () => answers.shift()!, retry: { delay: () => 0, onRetry } })
+
+    expect((await client({ url: '/pets' })).status).toBe(200)
+    expect(onRetry).toHaveBeenCalledWith(expect.objectContaining({ delay: 10 }))
+
+    const limited = vi.fn(async () => new Response(null, { status: 429, headers: { 'retry-after': '3600' } }))
+    await expect(client({ url: '/pets', transport: limited })).rejects.toMatchObject({ status: 429 })
+    expect(limited).toHaveBeenCalledOnce()
+  })
+
+  test('runs the error interceptors on a failed reopen, and throws a TypeError for a reopen that is not a stream', async () => {
+    const client = createClientCore({ defaultTransport: async () => busy(), mediaTypes: streamMediaTypes, retry: { limit: 1, delay: () => 0 } })
+    const seen = vi.fn()
+    client.interceptors.error.use((error) => void seen(error.name))
+
+    const denied = [events('data: one\n\n', true), new Response(null, { status: 401 })]
+    await expect(collect(await client.stream({ url: '/events', transport: async () => denied.shift()! }))).rejects.toMatchObject({ status: 401 })
+    expect(seen).toHaveBeenCalledWith('ResponseError')
+
+    const page = [events('data: one\n\n', true), new Response('<html>', { headers: { 'content-type': 'text/html' } })]
+    await expect(collect(await client.stream({ url: '/events', transport: async () => page.shift()! }))).rejects.toThrow(TypeError)
+  })
+
   test('reopens a dropped event stream from its last event ID', async () => {
     const requests: Array<ResolvedRequest> = []
     const responses = [busy(), events('id: 1\ndata: one\n\nid: 2\ndata: tw', true), events('id: 2\ndata: two\n\n')]
@@ -160,7 +201,7 @@ describe('retry', () => {
   })
 
   test('throws the read error when a dropped stream is out of retries or retry is off', async () => {
-    const transport = vi.fn(async () => events('data: one\n\n', true))
+    const transport = vi.fn(async () => events('data: on', true))
     const client = createClientCore({ defaultTransport: transport, mediaTypes: streamMediaTypes })
 
     await expect(collect(await client.stream({ url: '/events' }))).rejects.toThrow('terminated')
@@ -168,6 +209,15 @@ describe('retry', () => {
 
     await expect(collect(await client.stream({ url: '/events', retry: { limit: 1, delay: () => 0 } }))).rejects.toThrow('terminated')
     expect(transport).toHaveBeenCalledTimes(3)
+  })
+
+  test('starts the retry count over once a reopened stream delivers an event', async () => {
+    const responses = [events('data: 1\n\n', true), events('data: 2\n\n', true), events('data: 3\n\n', true), events('data: 4\n\n')]
+    const transport = vi.fn(async () => responses.shift()!)
+    const client = createClientCore({ defaultTransport: transport, mediaTypes: streamMediaTypes, retry: { limit: 1, delay: () => 0 } })
+
+    expect(await collect(await client.stream({ url: '/events' }))).toHaveLength(4)
+    expect(transport).toHaveBeenCalledTimes(4)
   })
 
   test('does not reopen a stream for a parser error or an error status', async () => {
