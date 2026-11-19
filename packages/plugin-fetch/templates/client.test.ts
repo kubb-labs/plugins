@@ -899,16 +899,14 @@ describe('createClientCore', () => {
     expect(error).toHaveBeenCalledTimes(1)
   })
 
-  test('keeps the status on the ValidationError of an error body, and the issues on the ResponseError', async () => {
+  test('keeps the status on the ValidationError of an error body, also for the handler', async () => {
     const { client } = createClient({ data: { error: 'not found' }, status: 404 })
     const request = { method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } } as const
-    await expect(client(request)).rejects.toMatchObject({ name: 'ValidationError', status: 404, method: 'GET', direction: 'error', source: 'body' })
-    await expect(client({ ...request, onValidationError: (_error, { value }) => ({ value }) })).rejects.toMatchObject({
-      name: 'ResponseError',
-      status: 404,
-      data: { error: 'not found' },
-      validationError: { name: 'ValidationError', status: 404, issues: [{ message: 'invalid', path: ['name'] }] },
-    })
+    const context = { name: 'ValidationError', status: 404, method: 'GET', direction: 'error', source: 'body' }
+    await expect(client(request)).rejects.toMatchObject(context)
+    const onValidationError = vi.fn((_error: unknown, { value }: { value: unknown }) => ({ value }))
+    await expect(client({ ...request, onValidationError })).rejects.toMatchObject({ name: 'ResponseError', status: 404, data: { error: 'not found' } })
+    expect(onValidationError.mock.calls[0]?.[0]).toMatchObject(context)
   })
 
   test('throws the ValidationError when no onValidationError is set', async () => {

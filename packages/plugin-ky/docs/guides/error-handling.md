@@ -42,7 +42,6 @@ class ResponseError extends Error {
   headers: Headers // such as error.headers.get('Retry-After')
   request: Request
   response: Response
-  validationError?: ValidationError // set when `onValidationError` replaced a body that failed its schema
 }
 ```
 
@@ -128,13 +127,7 @@ client.setConfig({
 })
 ```
 
-When the handler returns `{ value }` for an error body, the call throws the `ResponseError` as usual, with the `ValidationError` on `error.validationError`:
-
-```typescript
-if (ResponseError.is(error) && error.status === 404) console.warn(error.validationError?.issues)
-```
-
-With `throwOnError: false`, the call resolves with that value as `error` instead. A `null` or `''` value resolves as `{ status, statusText }`, like an [empty error body](#empty-error-bodies-and-default-responses).
+When the handler returns `{ value }` for an error body, the call throws the `ResponseError` as usual, with that value as `data`. The handler's `error` carries the `status`, so read the `issues` there. With `throwOnError: false`, the call resolves with that value as `error` instead. A `null` or `''` value resolves as `{ status, statusText }`, like an [empty error body](#empty-error-bodies-and-default-responses).
 
 For which schema checks an error body, see [Error body validation](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/serialization#error-body-validation).
 
