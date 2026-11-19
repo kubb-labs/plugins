@@ -1,4 +1,4 @@
-import { getContentTypeInfo, getResponseContentTypeInfo, hasEventStreamContent, isEventStream } from '@internals/shared'
+import { getContentTypeInfo, getResponseContentTypeInfo } from '@internals/shared'
 import { ast, text } from '@kubb/kit'
 
 /**
@@ -16,8 +16,9 @@ export function buildContentType({ node }: { node: ast.HttpOperationNode }): { l
   const requestContentType = hasRequestBody ? defaultContentType : null
   // A stream asks for its own media type, and a response that offers events next to JSON asks for the events, so a client whose
   // default `Accept` prefers JSON, such as axios, gets the stream. The caller picks another type with `contentType.response`.
-  const streamType = isEventStream(node) ? ast.mediaType.getBase(getResponseContentTypeInfo(node).defaultContentType) : null
-  const response = streamType || hasEventStreamContent(node) ? `response: ${text.quote(streamType ?? 'text/event-stream')}` : null
+  const stream = ast.http.responses.getStream(node)
+  const streamType = stream?.shape ? ast.mediaType.getBase(getResponseContentTypeInfo(node).defaultContentType) : null
+  const response = streamType || stream?.hasEventStream ? `response: ${text.quote(streamType ?? 'text/event-stream')}` : null
 
   if (!requestContentType) return { literal: response && `contentType: { ${response} }`, merge: false }
 

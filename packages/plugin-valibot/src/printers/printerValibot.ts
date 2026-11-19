@@ -1,12 +1,7 @@
 import {
-  bigintConstraints,
   defaultLiteral,
   formatDefault,
-  hasInputChecks,
-  hasKeyCheck,
   integerFormatPattern,
-  isObjectComposableIntersection,
-  isObjectSchemaNode,
   type NumericBounds,
   numericLiteral,
   preserveRequiredProperties,
@@ -153,7 +148,7 @@ function memberActions({
   if (member.primitive === 'number' || member.primitive === 'integer') {
     const numeric = ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer') ?? {}
     // The base decides the value the bounds compare with: a bigint base takes bigint bounds.
-    if (base.type === ast.schema.types.bigint) return numberActions(bigintConstraints(numeric), true)
+    if (base.type === ast.schema.types.bigint) return numberActions(ast.schema.getNumberBounds({ ...numeric, format: undefined, integer: true }), true)
 
     return [...(member.primitive === 'integer' && base.type !== ast.schema.types.integer ? ['v.integer()'] : []), ...numberActions(numeric)]
   }
@@ -193,28 +188,8 @@ function expectsDate(node: ast.SchemaNode, direction: PrinterValibotOptions['dir
   return direction === 'encode' && (resolved.type === 'date' || resolved.type === 'time') && resolved.representation !== 'string'
 }
 
-// An object with `properties`, `patternProperties`, and `additionalProperties: false` takes a key that
-// is declared or matches a pattern. Its rest schema checks the values, so the keys need their own check.
-function hasPatternKeyCheck(node: ast.SchemaNode): node is ast.ObjectSchemaNode & { patternProperties: Record<string, ast.SchemaNode> } {
-  return node.type === 'object' && node.additionalProperties === false && node.properties.length > 0 && Boolean(node.patternProperties)
-}
-
-function hasChecks(node: ast.SchemaNode): boolean {
-  return hasInputChecks(node) || hasPatternKeyCheck(node)
-}
-
-// How many `v.check` actions `withInputChecks` puts before the schema of a node.
-function countChecks(node: ast.SchemaNode): number {
-  const object = ast.schema.narrow(node, 'object')
-
-  return (
-    Number(object?.min !== undefined) +
-    Number(object?.max !== undefined) +
-    Number(hasKeyCheck(node)) +
-    Number(hasPatternKeyCheck(node)) +
-    (node.conditionals?.length ?? 0)
-  )
-}
+const hasChecks = (node: ast.SchemaNode) => ast.schema.getChecks(node).length > 0
+const hasPatternKeyCheck = (node: ast.SchemaNode) => ast.schema.getChecks(node).some((check) => check.kind === 'patternProperties')
 
 // Wraps a value in `v.nullable(...)` and `v.optional(...)`. A default goes in as the second argument
 // of `v.optional`, so `null` stays `null` and only a missing value takes the default.
@@ -332,9 +307,12 @@ function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undef
 // The `v.check` actions that run on the raw input, before an object schema drops unknown keys or fills in defaults.
 function inputChecks(ctx: PrinterContext, node: ast.SchemaNode): Array<string> {
   const { min, max } = node.type === 'object' ? node : {}
-  const keySchema = hasKeyCheck(node) ? ctx.transform(node.propertyNames) : null
-  const patternKeys = hasPatternKeyCheck(node)
-    ? `${JSON.stringify(node.properties.map((property) => property.name))}.includes(key) || ${Object.keys(node.patternProperties)
+  const checks = ast.schema.getChecks(node)
+  const keyCheck = checks.find((check) => check.kind === 'propertyNames')
+  const patternCheck = checks.find((check) => check.kind === 'patternProperties')
+  const keySchema = keyCheck ? ctx.transform(keyCheck.schema) : null
+  const patternKeys = patternCheck
+    ? `${JSON.stringify(ast.schema.narrow(node, 'object')!.properties.map((property) => property.name))}.includes(key) || ${Object.keys(patternCheck.patterns)
         .map((pattern) => `${toRegExpString(pattern, ctx.options.regexType === 'constructor' ? 'RegExp' : null)}.test(key)`)
         .join(' || ')}`
     : null
@@ -429,7 +407,7 @@ export function containsDirectionalNode({ node, printerOptions }: { node: ast.Sc
       ? resolver.memo(`valibotDirectionalNodes:${shouldCoerce(coercion, 'dates')}:${dateType}`, () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>())
       : undefined
 
-  return ast.schema.find(node, { predicate: (schema) => variesByDirection({ node: schema, printerOptions }), followRefs: true, cache }) !== undefined
+  return ast.schema.find(node, { predicate: (schema) => variesByDirection({ node: schema, printerOptions }), follow: ['ref'], cache }) !== undefined
 }
 
 /**
@@ -453,12 +431,13 @@ export function collectDirectionalRefNames({ node, printerOptions }: { node: ast
  * ```
  */
 export const printerValibot = createPrinter<PrinterValibotFactory>((options) => {
-  // Read once: `isObjectSchemaNode` and `strictMember` need the full set for every node.
+  // Read once: `getObjectKind` and `strictMember` need the full set for every node.
   const { cyclicSchemas } = options
   // A const whose schema carries a `default` is a `v.optional(...)` wrapper, which has no `.entries`.
   const isObjectNode = (node: ast.SchemaNode) => {
     const resolved = ast.ref.mergeSchema(node)
-    return isObjectSchemaNode(node, cyclicSchemas) && resolved.default === undefined && !hasPatternKeyCheck(resolved)
+    const kind = ast.schema.getObjectKind(node, { circularSchemas: cyclicSchemas })
+    return kind !== null && kind !== 'record' && resolved.default === undefined && !hasPatternKeyCheck(resolved)
   }
   // The node `print` reads without its input checks, because `v.omit` needs the bare object. Nested nodes keep theirs.
   let uncheckedNode: ast.SchemaNode | null = null
@@ -476,7 +455,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
     const hasRest =
       Boolean(baseObject?.patternProperties) || (baseObject?.additionalProperties !== undefined && typeof baseObject.additionalProperties !== 'boolean')
 
-    return !hasRest && isObjectNode(first) && isObjectComposableIntersection(node, cyclicSchemas)
+    return !hasRest && isObjectNode(first) && ast.schema.getObjectKind(node, { circularSchemas: cyclicSchemas }) === 'composed'
   }
   // Whether the schema prints with `.entries`, which `v.omit` reads. A `v.union` and a `v.intersect` have none.
   const printsEntries = (node: ast.SchemaNode): boolean => {
@@ -499,7 +478,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
     if (!hasChecks(target)) return `v.omit(${base}, ${keys})`
     // `withInputChecks` printed `v.pipe(v.unknown(), ...checks, object)`. `v.omit` takes the object only, so the checks go back around it.
     if (node.type === ast.schema.types.ref) {
-      const count = countChecks(target)
+      const count = ast.schema.getChecks(target).length
       const checks = Array.from({ length: count }, (_, index) => `${base}.pipe[${index + 1}]`)
 
       return pipe(UNKNOWN, [...checks, `v.omit(${base}.pipe[${count + 1}], ${keys})`])
@@ -564,7 +543,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       // JSON carries a 64-bit integer as a number or a string, so both convert.
       return pipe('v.union([v.bigint(), v.number(), v.string()])', [
         'v.toBigint()',
-        ...numberActions(withFormatRange({ ...bigintConstraints(node), format: node.format }, 'bigint'), true),
+        ...numberActions(withFormatRange({ ...ast.schema.getNumberBounds(node), format: node.format }, 'bigint'), true),
       ])
     },
     ...directionalNodes,

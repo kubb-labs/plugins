@@ -9,14 +9,6 @@ import {
   buildOptionsSchema,
   buildRequestConfigType,
   getContentTypeInfo,
-  hasRequestContentTypeChoice,
-  getEventStream,
-  getStreamFraming,
-  hasTextEventData,
-  getRequestGroupOptionality,
-  hasEventStreamContent,
-  hasStreamVariant,
-  isEventStream,
   resolveErrorNames,
   resolveOperationFile,
   resolveOperationTypeNames,
@@ -29,6 +21,16 @@ import {
   type ResponseNameResolver,
   type ResponseStatusNameResolver,
 } from './operation.ts'
+
+// The stream and request helpers moved to `ast.http`. These pin the answers the plugins read from it.
+const hasRequestContentTypeChoice = (node: ast.OperationNode) => ast.http.getRequestGroups(node).hasContentTypeChoice
+const getRequestGroupOptionality = (node: ast.OperationNode) => ast.http.getRequestGroups(node)
+const getStreamFraming = ast.mediaType.getStreamFraming
+const getEventStream = (node: ast.OperationNode) => ast.http.responses.getStream(node)?.shape ?? null
+const isEventStream = (node: ast.OperationNode) => getEventStream(node) !== null
+const hasTextEventData = (node: ast.OperationNode) => ast.http.responses.getStream(node)?.textEvents ?? false
+const hasEventStreamContent = (node: ast.OperationNode) => ast.http.responses.getStream(node)?.hasEventStream ?? false
+const hasStreamVariant = (node: ast.OperationNode) => ast.http.responses.getStream(node)?.hasVariant ?? false
 import { createCasedFile } from './resolver.ts'
 
 type TestPlugin = PluginType<

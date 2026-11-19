@@ -1,7 +1,7 @@
 import { lazyGetter, objectKey } from '@internals/utils'
 import { ast, createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { bigintConstraints, defaultLiteral, hasInputChecks, shouldCoerce } from '@internals/shared'
+import { defaultLiteral, hasInputChecks, shouldCoerce } from '@internals/shared'
 import { applyModifiers, buildObjectShape, lengthConstraints, numberConstraints, patternKeySchema, printWithOmit } from '../utils.ts'
 import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
@@ -249,7 +249,7 @@ export function containsDirectionalNode({ node, printerOptions }: { node: ast.Sc
   return (
     ast.schema.find(node, {
       predicate: (schema) => variesByDirection({ node: schema, printerOptions }),
-      followRefs: true,
+      follow: ['ref'],
       cache: getDirectionalCache(printerOptions),
     }) !== undefined
   )
@@ -306,7 +306,7 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
 const scalarNodes: PrinterZodNodes = {
   ...buildScalarNodes(standardDialect),
   bigint(node) {
-    const constraints = numberConstraints(bigintConstraints(node), true)
+    const constraints = numberConstraints(ast.schema.getNumberBounds(node), true)
     // `z.int64()` carries the range of the format but takes a bigint only, so the JSON value converts first.
     return node.format === 'int64' || node.format === 'uint64' ? `z.coerce.bigint().pipe(z.${node.format}()${constraints})` : `z.coerce.bigint()${constraints}`
   },

@@ -1,15 +1,9 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import {
-  applyMiniModifiers,
-  applyModifiers,
-  isClosedKeySchema,
-  lengthChecksMini,
-  lengthConstraints,
-  numberChecksMini,
-  numberConstraints,
-  omitUnwrapChain,
-} from './utils.ts'
+import { applyMiniModifiers, applyModifiers, lengthChecksMini, lengthConstraints, numberChecksMini, numberConstraints, omitUnwrapChain } from './utils.ts'
+
+// zod picks `z.partialRecord` for these keys.
+const isClosedKeySchema = (node: ast.SchemaNode) => ast.schema.is(node, 'enumLike', { follow: ['ref'] })
 
 describe('numberConstraints', () => {
   test('no constraints returns empty string', () => {

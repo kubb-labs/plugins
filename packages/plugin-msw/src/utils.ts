@@ -55,7 +55,7 @@ export function getContentType(response: ast.ResponseNode | null | undefined): s
  */
 export function hasResponseSchema(response: ast.ResponseNode | null | undefined): boolean {
   const schema = response?.content?.find((entry) => entry.schema)?.schema
-  return !!schema && schema.type !== 'void' && schema.type !== 'any' && schema.type !== 'unknown'
+  return !!schema && !ast.schema.is(schema, 'untyped')
 }
 
 /**
@@ -93,7 +93,7 @@ const bigintReplacer = `(_key, value) => {
 /** The `JSON.stringify` call for `body`, with a replacer when the response holds an `int64`, which `JSON.stringify` throws on. */
 function stringify(body: string, response: ast.ResponseNode | null | undefined): string {
   const hasBigint = (response?.content ?? []).some(
-    (entry) => entry.schema && ast.schema.find(entry.schema, { predicate: (schema) => schema.type === 'bigint', followRefs: true }) !== undefined,
+    (entry) => entry.schema && ast.schema.find(entry.schema, { predicate: (schema) => schema.type === 'bigint', follow: ['ref'] }) !== undefined,
   )
   return hasBigint ? `JSON.stringify(${body}, ${bigintReplacer})` : `JSON.stringify(${body})`
 }

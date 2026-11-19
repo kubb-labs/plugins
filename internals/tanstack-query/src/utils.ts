@@ -1,15 +1,4 @@
-import {
-  getRequestGroupOptionality,
-  getRequestGroups,
-  getResponseContentTypeInfo,
-  hasRequestContentTypeChoice,
-  hasStreamVariant,
-  isEventStream,
-  resolveErrorNames,
-  resolveSuccessNames,
-  buildClientOptionType,
-  requestGroupOrder,
-} from '@internals/shared'
+import { getResponseContentTypeInfo, resolveErrorNames, resolveSuccessNames, buildClientOptionType, requestGroupOrder } from '@internals/shared'
 import { ast } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
@@ -59,7 +48,7 @@ export function buildGroupedRequestParam(
   },
 ): FunctionParameterNode | null {
   const { resolver, keys = requestGroupOrder, memberTypeWrapper, withContentType = false } = options
-  const { groups, hasRequiredPath, hasRequiredQuery, hasRequiredHeader } = getRequestGroupOptionality(node)
+  const groups = ast.http.getRequestGroups(node)
   const names = keys.filter((key) => groups[key])
 
   if (names.length === 0) {
@@ -67,10 +56,10 @@ export function buildGroupedRequestParam(
   }
 
   const requiredByGroup: Record<RequestGroupKey, boolean> = {
-    path: hasRequiredPath,
-    query: hasRequiredQuery,
+    path: groups.required.path,
+    query: groups.required.query,
     body: groups.body,
-    headers: hasRequiredHeader,
+    headers: groups.required.headers,
     cookies: false,
   }
 
@@ -81,7 +70,7 @@ export function buildGroupedRequestParam(
   // Drop the groups this binding never destructures (the query key omits `headers`), so a group
   // that is required elsewhere does not leak into a binding that does not carry it.
   const optionsName = resolver.response.options(node)
-  if (withContentType && hasRequestContentTypeChoice(node)) {
+  if (withContentType && groups.hasContentTypeChoice) {
     return createFunctionParameter({ name: 'variables', type: optionsName, optional: false })
   }
 
@@ -156,7 +145,7 @@ export function buildClientCall(
   options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string; withContentType?: boolean; pageParam?: string },
 ): string {
   const { clientName, signal = false, unwrapName, withContentType = false, pageParam } = options
-  const { groups } = getRequestGroupOptionality(node)
+  const groups = ast.http.getRequestGroups(node)
   const names = requestGroupOrder.filter((key) => groups[key])
   const member = (name: RequestGroupKey) => {
     const value = unwrapName ? unwrapName(name) : name
@@ -166,7 +155,7 @@ export function buildClientCall(
 
   const args = [
     '...config',
-    ...(withContentType && hasRequestContentTypeChoice(node) ? ['...variables'] : names.map(member)),
+    ...(withContentType && groups.hasContentTypeChoice ? ['...variables'] : names.map(member)),
     signal ? 'signal: config.signal ?? signal' : null,
     'throwOnError: true',
   ].filter((part): part is string => part !== null)
@@ -238,7 +227,7 @@ export function buildResponseTypes(
     const successNames = resolveSuccessNames(node, resolver)
     const bodyName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
     // The client resolves a stream variant of a mixed response to its raw body.
-    const responseName = hasStreamVariant(node) ? `${bodyName} | ReadableStream<Uint8Array>` : bodyName
+    const responseName = ast.http.responses.getStream(node)?.hasVariant ? `${bodyName} | ReadableStream<Uint8Array>` : bodyName
     const errorNames = resolveErrorNames(node, resolver)
 
     return {
@@ -317,7 +306,7 @@ type ClassifyOperationParams = {
  * directly, so they do not generate query or mutation hooks.
  */
 export function classifyOperation(node: ast.HttpOperationNode, { query, mutation }: ClassifyOperationParams): OperationClassification {
-  if (isEventStream(node)) return { isQuery: false, isMutation: false }
+  if (ast.http.responses.getStream(node)?.shape) return { isQuery: false, isMutation: false }
 
   const isQuery = !!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase())
   const queryMethods = new Set(query ? query.methods : [])
@@ -460,7 +449,7 @@ export const queryKeyGroupOrder = ['path', 'query', 'body'] as const
  * only when one is accepted.
  */
 export function hasQueryKeyParams(node: ast.OperationNode): boolean {
-  const groups = getRequestGroups(node)
+  const groups = ast.http.getRequestGroups(node)
   return queryKeyGroupOrder.some((key) => groups[key])
 }
 
@@ -503,7 +492,7 @@ export function resolveMutationRequestType(node: ast.OperationNode, resolver: Re
 
   const optionsName = resolver.response.options(node)
   const response = getResponseContentTypeInfo(node)
-  if (!hasRequestContentTypeChoice(node) || !response.isMultipleContentTypes) return optionsName
+  if (!ast.http.getRequestGroups(node).hasContentTypeChoice || !response.isMultipleContentTypes) return optionsName
 
   // An inline options type is a union, so it needs parentheses. `string` keeps its bare request media type form assignable.
   const base = /^[\w$]+$/.test(optionsName) ? optionsName : `(${optionsName})`
@@ -514,7 +503,7 @@ export function resolveMutationRequestType(node: ast.OperationNode, resolver: Re
  * Builds the object literal that unwraps each request group's getter before it reaches `queryKey`/`queryOptions`; `null` without a request group.
  */
 export function buildResolvedRequestParams(node: ast.OperationNode): string | null {
-  const groups = getRequestGroups(node)
+  const groups = ast.http.getRequestGroups(node)
   const names = requestGroupOrder.filter((key) => groups[key])
   if (names.length === 0) return null
   return `{ ${names.map((name) => `${name}: typeof ${name} === 'function' ? ${name}() : ${name}`).join(', ')} }`

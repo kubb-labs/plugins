@@ -4,7 +4,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
-import { buildParams, buildResponseComments, buildResponseUnion, enumTypeName, getExampleValues, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
+import { buildParams, buildResponseComments, enumTypeName, getExampleValues, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
 
 /**
  * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -252,7 +252,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       return renderSchemaType({
         schema: {
-          ...(buildResponseUnion(node, { resolver }) ?? ast.factory.createSchema({ type: 'unknown' })),
+          ...(ast.http.responses.getUnion(node, resolver) ?? ast.factory.createSchema({ type: 'unknown' })),
           description: 'Union of all possible responses',
         },
         name: responseName,

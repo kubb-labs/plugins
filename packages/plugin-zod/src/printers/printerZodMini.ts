@@ -1,8 +1,8 @@
 import { lazyGetter, objectKey } from '@internals/utils'
-import type { ast } from '@kubb/kit'
+import { ast } from '@kubb/kit'
 import { createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { bigintConstraints, shouldCoerce } from '@internals/shared'
+import { shouldCoerce } from '@internals/shared'
 import { applyMiniModifiers, buildObjectShape, lengthChecksMini, numberChecksMini, patternKeySchemaMini, printWithOmit } from '../utils.ts'
 import { buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
@@ -130,7 +130,7 @@ export const printerZodMini = createPrinter<PrinterZodMiniFactory>((options) => 
     nodes: withInputChecks({
       ...buildZodNodes(miniDialect, options.cyclicSchemas),
       bigint(node) {
-        const checks = numberChecksMini(bigintConstraints(node), true)
+        const checks = numberChecksMini(ast.schema.getNumberBounds(node), true)
         // `z.int64()` carries the range of the format but takes a bigint only, so the JSON value converts first.
         return node.format === 'int64' || node.format === 'uint64' ? `z.pipe(z.coerce.bigint(), z.${node.format}()${checks})` : `z.coerce.bigint()${checks}`
       },

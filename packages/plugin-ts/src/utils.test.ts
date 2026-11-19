@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { print } from './factory.ts'
 import { printerTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
-import { buildParams, buildPropertyJSDocComments, buildResponseComments, getExampleValues, isBinarySchema, resolveInlineEnumNames } from './utils.ts'
+import { buildParams, buildPropertyJSDocComments, buildResponseComments, getExampleValues, resolveInlineEnumNames } from './utils.ts'
 
 describe('resolveInlineEnumNames', () => {
   it.each(['Key', 'Value'])('checks the emitted enum alias with suffix %s', (typeSuffix) => {
@@ -187,12 +187,9 @@ describe('buildPropertyJSDocComments', () => {
     expect(comments).not.toContain('@description')
   })
 
-  it('detects a binary schema or a binary array, and leaves the @type tag off it', () => {
+  it('leaves the @type tag off a binary schema', () => {
     const blob = ast.factory.createSchema({ type: 'blob', primitive: 'string', description: 'The photo' })
 
-    expect(isBinarySchema(blob)).toBe(true)
-    expect(isBinarySchema(ast.factory.createSchema({ type: 'array', primitive: 'array', items: [blob] }))).toBe(true)
-    expect(isBinarySchema(ast.factory.createSchema({ type: 'array', primitive: 'array', items: [ast.factory.createSchema({ type: 'string' })] }))).toBe(false)
     // `@type string` would contradict the `Blob` type next to it.
     expect(buildPropertyJSDocComments(blob)).toStrictEqual(['@description The photo'])
   })

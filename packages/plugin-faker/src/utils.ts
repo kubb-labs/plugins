@@ -113,22 +113,6 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
   })
 }
 
-export const SCALAR_TYPES = new Set<ast.SchemaNode['type']>([
-  'string',
-  'email',
-  'url',
-  'uuid',
-  'number',
-  'integer',
-  'bigint',
-  'boolean',
-  'date',
-  'time',
-  'datetime',
-  'blob',
-  'enum',
-])
-
 /**
  * Resolves a type reference, determining if it needs an import statement or inline type reference.
  * Takes into account whether the type can be overridden and the file paths.
@@ -211,7 +195,7 @@ export function resolveFakerTypeUsage(
 } {
   // A nullable scalar inlines its primitive, so reapply the nullability the type plugin emitted.
   const resolvedNode = ast.ref.getSchema(node)
-  const scalarType = SCALAR_TYPES.has(resolvedNode.type)
+  const scalarType = ast.schema.is(resolvedNode, 'scalar')
     ? `${getScalarType(resolvedNode, typeName)}${node.nullable || resolvedNode.nullable ? ' | null' : ''}`
     : undefined
 

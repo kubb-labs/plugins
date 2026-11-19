@@ -1,5 +1,4 @@
 import { toLiteral } from '@internals/utils'
-import { getEventStream, hasTextEventData } from '@internals/shared'
 
 import { ast, text } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
@@ -42,7 +41,8 @@ export function buildCallConfig({
   throwOnErrorDefault: boolean
   returnType: ReturnTypeOption
 }): { callConfig: string; mergeContentType: boolean; eventStream: boolean } {
-  const stream = getEventStream(node)
+  const responseStream = ast.http.responses.getStream(node)
+  const stream = responseStream?.shape ?? null
   const content = ast.http.responses.findPrimary(node)?.content ?? []
   const securityLiteral = buildSecurityMetadata({ security })
   // A `'plain'` client is the user's own, which may type `styles` as `unknown`, so it keeps the generated styles as a default.
@@ -57,7 +57,7 @@ export function buildCallConfig({
     ? `throwOnError: resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault})`
     : `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`
 
-  const rawData = hasTextEventData(node)
+  const rawData = responseStream?.textEvents ?? false
   const callConfig = `{ ${[
     `method: ${text.quote(node.method.toUpperCase())}`,
     `url: ${text.quote(node.path)}`,

@@ -4,25 +4,6 @@ import { ast, text } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
 
 /**
- * Whether the schema node represents a closed or finite set of keys (e.g. enum, literal,
- * or union of enums/literals).
- *
- * In Zod v4, passing a closed key schema to `z.record()` enforces exhaustiveness (all keys
- * must exist in the input). OpenAPI 3.1 `propertyNames` only validates present keys without
- * requiring all keys to exist, so closed key schemas use `z.partialRecord()` instead.
- */
-export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
-  if (!node) return false
-  const resolved = ast.ref.mergeSchema(node)
-  if (resolved.type === 'enum') return true
-  if (resolved.type === 'union') {
-    const members = resolved.members ?? []
-    return members.length > 0 && members.every(isClosedKeySchema)
-  }
-  return false
-}
-
-/**
  * Build the Zod schema for a set of literal enum values.
  * `z.enum()` only accepts string members in Zod v4, so a numeric, boolean, or
  * mixed set is emitted as a single `z.literal(…)` or a `z.union([z.literal(…), …])`.

@@ -1,6 +1,5 @@
 import { objectKey } from '@internals/utils'
 import path from 'node:path'
-import { getFormContentTypes, hasEventStreamContent, hasStreamVariant, isEventStream } from '@internals/shared'
 
 import { ast, text } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
@@ -20,6 +19,12 @@ const formMediaTypes = {
   'multipart/form-data': { file: 'mediaTypes/formData', name: 'multipartFormData' },
   'application/x-www-form-urlencoded': { file: 'mediaTypes/urlencoded', name: 'urlencoded' },
 } as const
+
+const getFormContentTypes = (node: ast.OperationNode) =>
+  (node.requestBody?.content ?? []).flatMap((entry) => {
+    const kind = ast.mediaType.getKind(entry)
+    return kind === 'form' || kind === 'urlencoded' ? [ast.mediaType.getBase(entry) as keyof typeof formMediaTypes] : []
+  })
 
 /**
  * Writes the runtime a document needs into `.kubb/`: the optional media type, serializer and `sse.ts` files, and a
@@ -44,7 +49,7 @@ export function ClientRuntime({
 }): KubbReactNode {
   if (!templates) return null
   const hasParameter = (match: (parameter: ast.ParameterNode) => boolean) => nodes.some((node) => node.parameters.some(match))
-  const streams = nodes.some((node) => hasEventStreamContent(node) || isEventStream(node) || hasStreamVariant(node))
+  const streams = nodes.some((node) => ast.http.responses.getStream(node) !== null)
   const forms = [...new Set(nodes.flatMap(getFormContentTypes))].sort().map((contentType) => ({ contentType, ...formMediaTypes[contentType] }))
   const queryStyles = nodes.some(hasQueryStyles)
 

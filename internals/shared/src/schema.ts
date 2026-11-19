@@ -2,69 +2,6 @@ import { jsDocEscape } from '@internals/utils'
 import { ast, text } from '@kubb/kit'
 
 /**
- * Whether the node is a plain inline object whose properties can merge into another object schema.
- * Input checks, `additionalProperties`, `patternProperties`, `propertyNames`, and a nullable or
- * optional wrapper rule it out.
- */
-export function isPlainInlineObject(node: ast.SchemaNode): boolean {
-  if (node.type !== 'object') return false
-  if (hasInputChecks(node)) return false
-  if (node.nullable || node.optional || node.nullish) return false
-
-  const hasAdditionalProperties = node.additionalProperties !== undefined
-  const hasPatternProperties = Boolean(node.patternProperties)
-
-  return !hasAdditionalProperties && !hasPatternProperties && !node.propertyNames
-}
-
-/**
- * Whether a node prints as a plain object schema, which other schemas can extend or discriminate on.
- * Covers object nodes, a `$ref` that resolves to an object or is still unresolved, a union with one
- * object member, and an object-composable `allOf`.
- *
- * A nullable or optional node, a node with input checks, and a ref into `cyclicSchemas` do not count.
- */
-export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
-  if (node.nullable || node.optional || node.nullish) return false
-  if (hasInputChecks(node)) return false
-  if (node.type === 'object') {
-    const hasProperties = Boolean(node.properties?.length)
-    const hasTypedAdditionalProperties = Boolean(node.additionalProperties && node.additionalProperties !== true)
-    const hasPatternProperties = Boolean(node.patternProperties)
-
-    const isRecord = !hasProperties && (hasTypedAdditionalProperties || hasPatternProperties || node.propertyNames)
-
-    return !isRecord
-  }
-
-  if (node.type === 'ref') {
-    const refName = ast.ref.getName(node)
-    if (refName && cyclicSchemas?.has(refName)) return false
-    const resolved = ast.ref.mergeSchema(node)
-    // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's
-    // prior optimism that only a resolved intersection blocks a discriminated union).
-    return resolved.type === 'ref' || isObjectSchemaNode(resolved, cyclicSchemas)
-  }
-
-  if (node.type === 'union') {
-    const members = node.members ?? []
-    return members.length === 1 && isObjectSchemaNode(members[0]!, cyclicSchemas)
-  }
-
-  return isObjectComposableIntersection(node, cyclicSchemas)
-}
-
-/**
- * Whether an `allOf` is an object base plus inline object members, so it can print as one object
- * schema and not as an intersection.
- */
-export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
-  if (node.type !== 'intersection') return false
-  const [first, ...rest] = node.members ?? []
-  return !!first && isObjectSchemaNode(first, cyclicSchemas) && rest.every(isPlainInlineObject)
-}
-
-/**
  * Marks a property required in a later `allOf` member when an earlier member already requires it.
  */
 export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Array<ast.SchemaNode> {
@@ -185,13 +122,6 @@ export function integerFormatPattern(format: string | undefined): string | undef
 }
 
 /**
- * Numeric bounds for a bigint: the inclusive, whole, safe bounds faker mocks against, and a whole, safe `multipleOf`.
- */
-export function bigintConstraints({ min, max, exclusive, multipleOf }: NumericConstraints): NumericConstraints {
-  return { ...ast.schema.getNumberBounds({ min, max, exclusive, integer: true }), multipleOf: Number.isSafeInteger(multipleOf) ? multipleOf : undefined }
-}
-
-/**
  * Numeric limits whose `min` and `max` may be digit strings, for 64-bit bounds a `number` cannot hold.
  */
 export type NumericBounds = Omit<NumericConstraints, 'min' | 'max'> & { min?: number | string; max?: number | string }
@@ -230,21 +160,10 @@ export function withFormatRange(node: NumericConstraints & { format?: string }, 
 }
 
 /**
- * Whether `propertyNames` needs its own check. A record schema checks its keys, but an object with
- * `properties` and a record keyed by `patternProperties` do not.
- */
-export function hasKeyCheck(node: ast.SchemaNode): node is ast.ObjectSchemaNode & { propertyNames: ast.SchemaNode } {
-  if (node.type !== 'object' || !node.propertyNames) return false
-  const hasTypedAdditionalProperties = Boolean(node.additionalProperties && node.additionalProperties !== true)
-
-  return node.properties.length > 0 || (Boolean(node.patternProperties) && !hasTypedAdditionalProperties)
-}
-
-/**
  * Whether the node has checks that run on the raw input: `conditionals`, property counts, or a key check.
  */
 export function hasInputChecks(node: ast.SchemaNode): boolean {
-  return Boolean(node.conditionals?.length) || (node.type === 'object' && (node.min !== undefined || node.max !== undefined)) || hasKeyCheck(node)
+  return ast.schema.getChecks(node).some((check) => check.kind !== 'patternProperties')
 }
 
 /**
