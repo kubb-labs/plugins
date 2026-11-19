@@ -298,6 +298,11 @@ export type RetryContext = {
   retryCount: number
 }
 
+/**
+ * The statuses that are commonly retried, for autocomplete. Any other status is accepted too.
+ */
+export type RetryStatusCode = 408 | 413 | 425 | 429 | 500 | 502 | 503 | 504 | (number & {})
+
 export type RetryOptions = {
   /**
    * How many times a call is sent again after its first attempt. A dropped Server-Sent Events stream draws on the same count.
@@ -312,7 +317,7 @@ export type RetryOptions = {
   /**
    * @default [408, 429, 500, 502, 503, 504]
    */
-  statusCodes?: Array<number> | undefined
+  statusCodes?: Array<RetryStatusCode> | undefined
   /**
    * The wait in milliseconds before a retry. A `Retry-After` header wins over it. The default backs off exponentially from
    * 300 ms with jitter, up to 30 seconds.
