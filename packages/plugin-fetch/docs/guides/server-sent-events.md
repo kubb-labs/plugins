@@ -157,7 +157,7 @@ To resume, send a new call with a `Last-Event-ID` header. `lastEventId` is the `
 
 ```typescript
 import { ResponseError } from './gen/.kubb/client'
-import { ParseError } from './gen/.kubb/standardSchema'
+import { ValidationError } from './gen/.kubb/standardSchema'
 
 async function* resumeChat(attempts = 3) {
   let lastEventId = ''
@@ -171,7 +171,7 @@ async function* resumeChat(attempts = 3) {
       }
       return
     } catch (error) {
-      if (attempt === attempts || ResponseError.is(error) || error instanceof ParseError) throw error
+      if (attempt === attempts || ResponseError.is(error) || error instanceof ValidationError) throw error
     }
   }
 }
@@ -179,7 +179,7 @@ async function* resumeChat(attempts = 3) {
 for await (const event of resumeChat()) render(event)
 ```
 
-The loop retries a failed connect and a dropped connection. It rethrows the last failure, so a cut stream never looks complete. It also rethrows a `ResponseError` and a `ParseError` at once, because a retry cannot fix them and would skip the failing event. Rethrow your abort reason the same way when you pass `signal`. An error from `render` is thrown outside the generator, so it is never retried.
+The loop retries a failed connect and a dropped connection. It rethrows the last failure, so a cut stream never looks complete. It also rethrows a `ResponseError` and a `ValidationError` at once, because a retry cannot fix them and would skip the failing event. Rethrow your abort reason the same way when you pass `signal`. An error from `render` is thrown outside the generator, so it is never retried.
 
 For cleared IDs and resuming with `returnType: 'data'`, see [Event IDs when you resume](#event-ids-when-you-resume).
 
@@ -192,7 +192,7 @@ For cleared IDs and resuming with `returnType: 'data'`, see [Event IDs when you 
 | 2xx response whose body is not a stream, such as JSON | The call throws a `TypeError` with the body as its `cause`.                                        |
 | 2xx response with an empty body                       | No error. The stream is empty.                                                                     |
 | Dropped connection or abort                           | The loop throws.                                                                                   |
-| An item fails its schema                              | The loop throws a `ParseError`, unless `onValidationError` returns `{ value }`.                    |
+| An item fails its schema                              | The loop throws a `ValidationError`, unless `onValidationError` returns `{ value }`.               |
 | An event is larger than `maxEventSize`                | The loop throws a `RangeError`.                                                                    |
 | A JSON line is not valid JSON                         | The loop throws a `SyntaxError`.                                                                   |
 

@@ -142,7 +142,7 @@ These compile without errors, so check them by hand:
 | Requests  | A space in a query value: `+`.                                          | `%20`                                                                                                                                                                           |
 | Requests  | `spaceDelimited` and `pipeDelimited` repeated the key.                  | `explode` defaults to `false`, so an array goes out as `ids=1%7C2`.                                                                                                             |
 | Requests  | A `style: cookie` parameter was percent-encoded.                        | Sent as is. A value it cannot send, such as one with `;`, throws a `TypeError`.                                                                                                 |
-| Responses | Invalid JSON under a JSON media type became a string.                   | Throws a `ParseError`. Catch it, or register a lenient `application/json` entry.                                                                                                |
+| Responses | Invalid JSON under a JSON media type became a string.                   | Throws a `ValidationError`. Catch it, or register a lenient `application/json` entry.                                                                                           |
 
 Also new in v6:
 

@@ -10,8 +10,8 @@ Only a non-2xx response depends on `throwOnError`:
 | ---------------------------------------- | ----------------------------------------------------------------------------------------- |
 | 2xx response                             | Resolves with `data`.                                                                     |
 | Non-2xx response                         | Throws a `ResponseError`. With `throwOnError: false`, resolves with `error` and `status`. |
-| A body fails its schema (`validator` on) | Throws a `ParseError`.                                                                    |
-| Invalid JSON under a JSON media type     | Throws a `ParseError`.                                                                    |
+| A body fails its schema (`validator` on) | Throws a `ValidationError`.                                                               |
+| Invalid JSON under a JSON media type     | Throws a `ValidationError`.                                                               |
 | Network failure, DNS failure, or timeout | Rejects with the native `AxiosError`.                                                     |
 | Aborted `signal`                         | Rejects with the signal's reason.                                                         |
 
@@ -95,19 +95,27 @@ const pet = await getPetById({ path: { petId: 1 }, throwOnError: true }) // thro
 
 ## Validation failures
 
-With [`validator`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator) on, a body that does not match its Zod schema throws a `ParseError` with the schema's `issues`:
+With [`validator`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator) on, a body that does not match its Zod schema throws a `ValidationError` with the schema's `issues`:
 
 ```typescript
-import { ParseError } from './gen/.kubb/standardSchema'
+import { ValidationError } from './gen/.kubb/standardSchema'
 
 try {
   await getPetById({ path: { petId: 1 } })
 } catch (error) {
-  if (error instanceof ParseError) console.error(error.issues) // [{ message, path }]
+  if (error instanceof ValidationError) console.error(error.issues) // [{ message, path }]
 }
 ```
 
-To recover, pass `onValidationError` on the call or the client. Return `{ value }` to use that value, or nothing to throw the `ParseError`:
+`ValidationError` was called `ParseError`. The old name is still exported and deprecated, so `instanceof ParseError` keeps working. `error.name` is now `'ValidationError'`.
+
+A `ValidationError` from a response body also carries `status`, `method`, `direction` (`'response'` or `'error'`), and `source`. So when a non-2xx body does not match its error schema, the status is still there:
+
+```typescript
+if (error instanceof ValidationError && error.status === 404) return null
+```
+
+To recover from a schema failure, pass `onValidationError` on the call or the client. Return `{ value }` to use that value, or nothing to throw the `ValidationError`:
 
 ```typescript
 client.setConfig({
@@ -117,6 +125,8 @@ client.setConfig({
   },
 })
 ```
+
+Invalid JSON does not reach the handler. When the handler returns `{ value }` for an error body, the call throws the `ResponseError` as usual, with that value as `data`. With `throwOnError: false`, the call resolves with that value as `error` instead. A `null`, `undefined`, or `''` value resolves as `{ status, statusText }`, like an [empty error body](#empty-error-bodies-and-default-responses).
 
 For which schema checks an error body, see [Error body validation](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization#error-body-validation).
 
