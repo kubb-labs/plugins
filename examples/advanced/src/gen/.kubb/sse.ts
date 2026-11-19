@@ -1,6 +1,7 @@
 import type { EventStreamOptions, MediaType, MediaTypes, ServerSentEvent } from './client'
 
-type Cursor = { lastEventId: string }
+// `idSeen` is set once the stream sends an `id`, even an empty one that clears the ID.
+type Cursor = { lastEventId: string; idSeen?: boolean }
 
 async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
   if (!('getReader' in stream)) {
@@ -62,6 +63,7 @@ export async function* parseEventStream<TData = unknown>(
   let retry: number | undefined
   let size = 0
   let pendingId = cursor.lastEventId
+  let sawId = false
 
   const readField = (part: string) => {
     const index = part.indexOf(':')
@@ -75,7 +77,10 @@ export async function* parseEventStream<TData = unknown>(
         type = value
         break
       case 'id':
-        if (!value.includes('\u0000')) pendingId = value
+        if (!value.includes('\u0000')) {
+          pendingId = value
+          sawId = true
+        }
         break
       case 'retry':
         if (/^\d+$/.test(value)) retry = Number(value)
@@ -87,6 +92,7 @@ export async function* parseEventStream<TData = unknown>(
       if (!part) {
         // Committed at the blank line, so a dropped stream never reports an ID past the last full event.
         cursor.lastEventId = pendingId
+        if (sawId) cursor.idSeen = true
         if (data.length) {
           const raw = data.join('\n')
           if (raw === terminator) return
@@ -157,9 +163,40 @@ async function* mapEvents(events: AsyncIterable<ServerSentEvent>, transform: (ev
  */
 export const eventStream: MediaType = {
   decode: (response) => response.text(),
-  stream: (body, { config, cursor }) => {
-    const events = parseEventStream({ stream: body, maxEventSize: config.maxEventSize, terminator: config.terminator, rawData: config.rawData, cursor })
-    return config.transform ? mapEvents(events, config.transform) : events
+  // With `retry` on, a stream whose read fails is opened again. A stream that ends and a parser error are not.
+  async *stream(body, { config, cursor, reopen }) {
+    let current: ReadableStream<Uint8Array> | undefined = body
+    while (current) {
+      const source = current
+      let failure: unknown
+      // Keeps the error of a failed read, which tells a dropped connection from an error of the parser or of `transform`.
+      async function* bytes(): AsyncGenerator<Uint8Array> {
+        try {
+          yield* readBytes(source)
+        } catch (error) {
+          failure = error
+          throw error
+        }
+      }
+      const events = parseEventStream({
+        stream: bytes(),
+        maxEventSize: config.maxEventSize,
+        terminator: config.terminator,
+        rawData: config.rawData,
+        cursor,
+      })
+      let delivered = false
+      try {
+        for await (const event of config.transform ? mapEvents(events, config.transform) : events) {
+          delivered = true
+          yield event
+        }
+        return
+      } catch (error) {
+        if (!reopen || error !== failure) throw error
+        current = await reopen({ error, delivered })
+      }
+    }
   },
 }
 

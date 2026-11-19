@@ -13,7 +13,7 @@ Every generated function sends through the shared `client` from `.kubb/client.ts
 | A child client    | `client.extend({ ... })`    | Copies the shared config and runs the parent's interceptors first.                      |
 | One call          | The same key on the call    | Wins over the client for that call.                                                     |
 
-The client takes `baseURL`, `headers`, `auth`, `credentials`, `options`, `transport`, `serializer`, `mediaTypes`, `validate`, and `onValidationError`:
+The client takes `baseURL`, `headers`, `auth`, `credentials`, `options`, `transport`, `serializer`, `mediaTypes`, `validate`, `onValidationError`, and `retry`:
 
 ```typescript
 import { client, createClient } from './gen/.kubb/client'
@@ -140,6 +140,51 @@ client.setConfig({
 For the order hooks and core handlers run in, see [Hook order](#hook-order).
 
 Next, [use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/transport).
+
+## Retry a failed call
+
+Retries are off by default. Set `retry` on the client or on one call. A number is how many times a failed call is sent again:
+
+```typescript
+import { client } from './gen/.kubb/client'
+
+client.setConfig({ retry: 2 })
+
+await createOrder({ body, retry: { methods: ['POST'] } })
+await chargeCard({ body, retry: false })
+```
+
+A call's `retry` merges per field over the client's, and `false` sends that call once. With `retry` on, Ky's own retry is off for that call. Pass an object for more control:
+
+| Option        | What it does                                                                         | Default                                            |
+| ------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| `limit`       | How many times the call is sent again.                                               | `2`                                                |
+| `methods`     | The methods that are safe to send twice.                                             | `GET`, `HEAD`, `OPTIONS`, `PUT`, `DELETE`, `TRACE` |
+| `statusCodes` | The statuses that are retried.                                                       | `408`, `429`, `500`, `502`, `503`, `504`           |
+| `delay`       | `(retryCount) => milliseconds` to wait. `retryCount` starts at 1.                    | Exponential from 300 ms with jitter, up to 30 s    |
+| `shouldRetry` | `({ request, response, error, retryCount })` returns `true`, `false`, or `undefined` | The status and error check                         |
+| `onRetry`     | Runs before each wait, with the same context plus `delay`.                           | None                                               |
+
+```typescript
+client.setConfig({
+  retry: {
+    limit: 3,
+    delay: (retryCount) => 1000 * retryCount,
+    shouldRetry: ({ response }) => (response?.headers.get('x-no-retry') === 'true' ? false : undefined),
+    onRetry: ({ retryCount, delay }) => console.warn(`Retry ${retryCount} in ${delay} ms`),
+  },
+})
+```
+
+The client retries a status in `statusCodes` and any error the transport throws, including its `timeout`. These rules always apply, also when `shouldRetry` returns `true`:
+
+- `POST` and `PATCH` are retried only when `methods` names them.
+- A stream body is never retried, because it cannot be read twice.
+- A `Retry-After` header sets the wait. When it asks for more than a minute, the call is not retried.
+- An aborted `signal` stops the wait and the retries.
+- The request interceptors and the `auth` resolver run once, so every retry sends the same headers.
+
+A streaming call uses the same `retry`, see [Stop, abort, and resume](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/server-sent-events#stop-abort-and-resume).
 
 ## Less common cases
 

@@ -90,7 +90,7 @@ await getPetById({ path: { petId: 1 }, options: { timeout: 5000, retry: { limit:
 
 `client.setConfig({ options })` sets shared defaults, and per-call options win. Kubb sets the method, headers, body, and signal over them, and sets `throwHttpErrors: false` to keep control of status handling. `options` does not take `json`, `prefix`, or `searchParams`, because Kubb builds the body and the URL: pass `body`, `baseURL`, and `query` on the call.
 
-The client sets `retry: 0`, so a call is sent once, where Ky's own default is 2. See [Retry a call](#retry-a-call) to turn it on. Ky's `timeout` default stays: 10 seconds to get the response headers, or `false` to wait without a limit.
+The client sets Ky's `retry` to `0`, so a call is sent once, where Ky's own default is 2. To retry, set the client's [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#retry-a-failed-call), or [Ky's own option](#retry-with-the-ky-option). Ky's `timeout` default stays: 10 seconds to get the response headers, or `false` to wait without a limit.
 
 ## Build a URL without sending
 
@@ -111,7 +111,9 @@ Next, [handle errors](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/err
 
 When you set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#pathparamscasing), the HTTP request stays the same, because path parameter names never reach the wire. The exception is the `matrix` style, which sends the name (`;group-id=42`), so an operation with a matrix path parameter keeps its spec names.
 
-### Retry a call
+### Retry with the Ky option
+
+Prefer the client's [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#retry-a-failed-call), which also retries an error status. A call with it on sets Ky's `retry` to `0`.
 
 Set Ky's `retry` option to retry a network error, for every call or for one. Ky retries only the methods in `retry.methods`, which leaves out `POST` and `PATCH`:
 

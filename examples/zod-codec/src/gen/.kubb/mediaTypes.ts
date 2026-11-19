@@ -17,7 +17,13 @@ export type MediaTypeContext = {
   /**
    * Where a stream records the last event ID it read, for `StreamResult.lastEventId`.
    */
-  cursor?: { lastEventId: string } | undefined
+  cursor?: { lastEventId: string; idSeen?: boolean } | undefined
+  /**
+   * Set when `retry` is on. Opens the stream again after a read failed with `error`, and resolves to the new body, or to
+   * nothing when the server says to stop. It rejects with `error` when no retry is left. Pass `delivered` when the stream
+   * yielded an item since it was opened.
+   */
+  reopen?: ((failure: { error: unknown; delivered: boolean }) => Promise<ReadableStream<Uint8Array> | undefined>) | undefined
 }
 
 /**

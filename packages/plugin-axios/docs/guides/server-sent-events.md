@@ -154,9 +154,17 @@ const { stream } = await streamChat({ body, onValidationError: (error, { value }
 
 - `break` out of the loop to stop. The runtime cancels the reader and releases the connection.
 - Pass `signal` to stop from outside. The call or the loop rejects with the signal's reason.
-- A dropped connection ends the loop with the transport's error. The runtime does not reconnect, so the retry policy is up to your app.
+- A dropped connection ends the loop with the transport's error, unless [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/configure-requests#retry-a-failed-call) is set.
 
-To resume, send a new call with a `Last-Event-ID` header. `lastEventId` is the `id` of the last event the server completed. Declare `Last-Event-ID` as a header parameter, so the call accepts it in `headers`:
+With `retry`, the runtime retries a failed connect and reopens a dropped `text/event-stream` with a `Last-Event-ID` header. The limit counts failures in a row and starts over once the stream delivers an event. A reopen that fails throws from the loop, also with `throwOnError: false`. A stream that ends and a JSON Lines stream are not reopened.
+
+`streamChat` is a `POST`, so `retry.methods` has to name it:
+
+```typescript
+for await (const event of await streamChat({ body, retry: { limit: 3, methods: ['POST'] } })) render(event)
+```
+
+To resume by hand, leave `retry` off and send a new call with a `Last-Event-ID` header. `lastEventId` is the `id` of the last event the server completed. Declare `Last-Event-ID` as a header parameter, so the call accepts it in `headers`:
 
 ```typescript
 import { ResponseError } from './gen/.kubb/client'
@@ -290,7 +298,7 @@ When the server leaves a field out of an event, or sends JSON Lines:
 
 When you [resume a stream](#stop-abort-and-resume):
 
-- The runtime does not reconnect, because many streams end on purpose and the retry policy belongs to your app.
+- The runtime reconnects only when `retry` is set, because many streams end on purpose.
 - `lastEventId` is empty until the server sends an `id`, and an empty `id:` clears it.
 - The resume loop copies `lastEventId` after each event, so after a clear it sends no `Last-Event-ID`. A connection that drops before its first event keeps the ID from the connection before.
 - With `returnType: 'data'`, the items alone carry no `lastEventId`, so pass `throwOnError: false` to get the full result.
