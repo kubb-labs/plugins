@@ -4,7 +4,7 @@ import type { HeadersInit, HttpMethod, RequestBody, Serializers, Styles } from '
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
 import { defaultMediaTypes, isEncodedBody, resolveMediaType } from './mediaTypes'
 import { baseContentType, toValue } from './serializers'
-import { isValidationEnabled, runValidator } from './standardSchema'
+import { isValidationEnabled, ParseError, runValidator } from './standardSchema'
 export * from './mediaTypes'
 export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema'
 
@@ -525,6 +525,10 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
   headers: ResponseHeaders
   request: TRequest
   response: TResponse
+  /**
+   * Set when the error body failed its schema and `onValidationError` supplied `data` instead.
+   */
+  validationError?: ParseError
 
   constructor(config: {
     data: TError
@@ -536,6 +540,7 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     response: TResponse
     method?: string | undefined
     url?: string | undefined
+    validationError?: ParseError | undefined
   }) {
     // The query and hash stay out of the message, so secrets in them do not reach logs.
     const cleanUrl = config.url?.split(/[?#]/)[0]
@@ -550,6 +555,7 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     this.headers = config.headers ?? new Headers()
     this.request = config.request
     this.response = config.response
+    if (config.validationError) this.validationError = config.validationError
   }
 
   /**
@@ -1011,7 +1017,13 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
 
     const result = await run.response(
       {
-        data: await decode(),
+        data: await decode().catch((error: unknown) => {
+          // Invalid JSON keeps the status, so a caller can still tell a 404 from a 500.
+          if (error instanceof ParseError) {
+            Object.assign(error, { direction: isSuccess ? 'response' : 'error', source: 'body', method: resolvedRequest.method, status })
+          }
+          throw error
+        }),
         status,
         statusText: webResponse.statusText,
         headers: webResponse.headers,
@@ -1043,7 +1055,21 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       throw error
     }
 
-    const data = rawStream ? result.data : await runValidator({ validator: validatorFor, value: result.data, context: validationContext, onValidationError })
+    // Reaches the `ResponseError` only when the handler supplied a value, since the `ParseError` is thrown otherwise.
+    let validationError: ParseError | undefined
+    const data = rawStream
+      ? result.data
+      : await runValidator({
+          validator: validatorFor,
+          value: result.data,
+          context: validationContext,
+          onValidationError:
+            onValidationError &&
+            ((error, context) => {
+              validationError = error
+              return onValidationError(error, context)
+            }),
+        })
     if (!resultSuccess && throwOnError) {
       throw new ResponseError({
         data,
@@ -1055,6 +1081,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         response: result.response,
         method: resolvedRequest.method,
         url: resolvedRequest.url,
+        validationError,
       })
     }
 

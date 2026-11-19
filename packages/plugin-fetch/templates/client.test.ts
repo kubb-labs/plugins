@@ -899,6 +899,18 @@ describe('createClientCore', () => {
     expect(error).toHaveBeenCalledTimes(1)
   })
 
+  test('keeps the status on the ParseError of an error body, and the issues on the ResponseError', async () => {
+    const { client } = createClient({ data: { error: 'not found' }, status: 404 })
+    const request = { method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } } as const
+    await expect(client(request)).rejects.toMatchObject({ name: 'ParseError', status: 404, method: 'GET', direction: 'error', source: 'body' })
+    await expect(client({ ...request, onValidationError: (_error, { value }) => ({ value }) })).rejects.toMatchObject({
+      name: 'ResponseError',
+      status: 404,
+      data: { error: 'not found' },
+      validationError: { name: 'ParseError', status: 404, issues: [{ message: 'invalid', path: ['name'] }] },
+    })
+  })
+
   test('throws the ParseError when no onValidationError is set', async () => {
     const { client } = createClient({ data: { id: 1 }, status: 200 })
     await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({
@@ -1140,6 +1152,9 @@ describe('media types', () => {
     await expect(call(answer('Pet deleted', { 'content-type': 'application/json' }))).rejects.toMatchObject({
       name: 'ParseError',
       message: 'Invalid JSON in a application/json body',
+      status: 200,
+      direction: 'response',
+      source: 'body',
     })
     expect((await call(answer('Pet deleted', { 'content-type': 'application/x-unknown' }))).data).toBe('Pet deleted')
     expect((await call(answer('{"a":1}', { 'content-type': 'application/x-unknown' }))).data).toStrictEqual({ a: 1 })

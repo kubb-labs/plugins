@@ -15,10 +15,18 @@ export type StandardSchemaIssue = {
 }
 
 /**
- * Thrown when validation fails, with the schema's `issues`.
+ * Thrown when validation fails, with the schema's `issues`. A failure inside a call also carries which value failed,
+ * so `error.status` still tells a 404 from a 500 when an error body does not match its schema.
  */
 export class ParseError extends Error {
   readonly issues: ReadonlyArray<StandardSchemaIssue>
+  readonly direction?: ValidationErrorContext['direction']
+  readonly source?: ValidationErrorContext['source']
+  readonly method?: string
+  /**
+   * The HTTP status of the response whose body failed. Unset for a request value.
+   */
+  readonly status?: number
   // Declared here and set below, since the `cause` constructor option needs the ES2022 library.
   declare readonly cause?: unknown
 
@@ -133,7 +141,10 @@ export async function runValidator<T>({
   try {
     return await validateStandardSchema(validator, value)
   } catch (error) {
-    if (!onValidationError || !(error instanceof ParseError)) throw error
+    if (!(error instanceof ParseError)) throw error
+    // The URL stays off the error, so secrets in its query do not reach logs.
+    Object.assign(error, { direction: context.direction, source: context.source, method: context.method, status: context.status })
+    if (!onValidationError) throw error
     const handled = await onValidationError(error, { ...context, value })
     if (!handled) throw error
     return handled.value as T

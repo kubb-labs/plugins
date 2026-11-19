@@ -223,4 +223,4 @@ With codecs, pair `request` and `params` with [`pluginZod({ inferred: 'codec' })
 
 ### Error body validation
 
-When `validator` is on and a non-2xx response has a body, the runtime checks it against the schema of its status, then its range such as `5xx`, then `default`. A status the document leaves out keeps its body unchecked. An error body that fails its schema throws a `ParseError` instead of the `ResponseError`, also with `throwOnError: false`. To recover, see [Validation failures](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/error-handling#validation-failures).
+When `validator` is on and a non-2xx response has a body, the runtime checks it against the schema of its status, then its range such as `5xx`, then `default`. A status the document leaves out keeps its body unchecked. An error body that fails its schema throws a `ParseError` instead of the `ResponseError`, also with `throwOnError: false`. The `ParseError` keeps the response `status`. To recover, see [Validation failures](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/error-handling#validation-failures).

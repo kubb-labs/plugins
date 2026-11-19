@@ -42,6 +42,7 @@ class ResponseError extends Error {
   headers: Headers // such as error.headers.get('Retry-After')
   request: Request
   response: Response
+  validationError?: ParseError // set when `onValidationError` replaced a body that failed its schema
 }
 ```
 
@@ -108,6 +109,12 @@ try {
 }
 ```
 
+A `ParseError` from a response body also carries `status`, `method`, `direction` (`'response'` or `'error'`), and `source`. So when a non-2xx body does not match its error schema, the status is still there:
+
+```typescript
+if (error instanceof ParseError && error.status === 404) return null
+```
+
 To recover, pass `onValidationError` on the call or the client. Return `{ value }` to use that value, or nothing to throw the `ParseError`:
 
 ```typescript
@@ -117,6 +124,12 @@ client.setConfig({
     return { value }
   },
 })
+```
+
+When the handler returns `{ value }` for an error body, the call throws the `ResponseError` as usual, with the `ParseError` on `error.validationError`:
+
+```typescript
+if (ResponseError.is(error) && error.status === 404) console.warn(error.validationError?.issues)
 ```
 
 For which schema checks an error body, see [Error body validation](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/serialization#error-body-validation).
