@@ -3,7 +3,7 @@ import { defaultMediaTypes, isEncodedBody, resolveMediaType } from './mediaTypes
 import type { MediaTypeContext, MediaTypes } from './mediaTypes.ts'
 import { baseContentType, toValue } from './serializers.ts'
 import type { HeadersInit, HttpMethod, RequestBody, Serializers, Styles } from './serializers.ts'
-import { isValidationEnabled, ValidationError, runValidator, type StandardSchemaValidator } from './standardSchema.ts'
+import { isValidationEnabled, runValidator, type StandardSchemaValidator, ValidationError } from './standardSchema.ts'
 import type { ValidateOption, ValidationErrorHandler } from './standardSchema.ts'
 
 export * from './mediaTypes.ts'
@@ -1013,7 +1013,10 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       {
         data: await decode().catch((error: unknown) => {
           if (error instanceof ValidationError) {
-            Object.assign(error, { direction: isSuccess ? 'response' : 'error', source: 'body', method: resolvedRequest.method, status })
+            error.direction = isSuccess ? 'response' : 'error'
+            error.source = 'body'
+            error.method = resolvedRequest.method
+            error.status = status
           }
           throw error
         }),

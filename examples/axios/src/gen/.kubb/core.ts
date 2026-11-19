@@ -4,7 +4,7 @@ import type { HeadersInit, HttpMethod, RequestBody, Serializers, Styles } from '
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
 import { defaultMediaTypes, isEncodedBody, resolveMediaType } from './mediaTypes'
 import { baseContentType, toValue } from './serializers'
-import { isValidationEnabled, ValidationError, runValidator } from './standardSchema'
+import { isValidationEnabled, runValidator, ValidationError } from './standardSchema'
 export * from './mediaTypes'
 export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema'
 
@@ -1011,7 +1011,10 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       {
         data: await decode().catch((error: unknown) => {
           if (error instanceof ValidationError) {
-            Object.assign(error, { direction: isSuccess ? 'response' : 'error', source: 'body', method: resolvedRequest.method, status })
+            error.direction = isSuccess ? 'response' : 'error'
+            error.source = 'body'
+            error.method = resolvedRequest.method
+            error.status = status
           }
           throw error
         }),
