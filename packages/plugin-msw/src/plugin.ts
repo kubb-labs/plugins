@@ -1,4 +1,4 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from '@kubb/kit'
+import { addGenerator, defineExtension, injectFile, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginFakerName } from '@kubb/plugin-faker'
@@ -6,6 +6,7 @@ import { pluginTsName } from '@kubb/plugin-ts'
 import { handlersGenerator } from './generators/handlersGenerator.ts'
 import { mswGenerator } from './generators/mswGenerator.tsx'
 import { resolverMsw } from './resolvers/resolverMsw.ts'
+import { mswBodyPath, mswBodyTemplate } from './utils.ts'
 import type { PluginMsw, ResolverMsw } from './types.ts'
 
 /**
@@ -66,6 +67,7 @@ export const pluginMsw = defineExtension<PluginMsw>({
     }
 
     addGenerator(mswGenerator)
+    injectFile({ baseName: 'mswBody.ts', path: mswBodyPath(useConfig()), copy: mswBodyTemplate })
     if (handlers) {
       addGenerator(handlersGenerator)
     }

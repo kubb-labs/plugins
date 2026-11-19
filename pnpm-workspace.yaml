@@ -14,17 +14,17 @@ allowBuilds:
 catalog:
   # Ranges, not pins: these end up in the published dependencies and peerDependencies of every
   # plugin, and a pin there conflicts with any newer Kubb release the user installs.
-  '@kubb/adapter-oas': ^5.22.0
-  '@kubb/core': ^5.22.0
-  '@kubb/kit': ^5.22.0
-  '@kubb/plugin-barrel': ^5.22.0
-  '@kubb/renderer-jsx': ^5.22.0
-  '@kubb/parser-ts': ^5.22.0
+  '@kubb/adapter-oas': 0.0.0-canary-20261119190110
+  '@kubb/core': 0.0.0-canary-20261119190110
+  '@kubb/kit': 0.0.0-canary-20261119190110
+  '@kubb/plugin-barrel': 0.0.0-canary-20261119190110
+  '@kubb/renderer-jsx': 0.0.0-canary-20261119190110
+  '@kubb/parser-ts': 0.0.0-canary-20261119190110
   '@types/node': 22.20.5
   '@types/react': ^19.3.0
   '@vitest/coverage-v8': ^5.1.0
   '@vitest/ui': ^5.1.0
-  kubb: ^5.22.0
+  kubb: 0.0.0-canary-20261119190110
   oxfmt: ^0.78.0
   oxlint: ^1.93.0
   prettier: ^3.10.1
@@ -47,21 +47,6 @@ catalog:
 #  '@kubb/tui': link:../kubb/packages/tui
 #  kubb: link:../kubb/packages/kubb
 #  unplugin-kubb: link:../kubb/packages/unplugin-kubb
-
-overrides:
-  '@kubb/adapter-oas': 0.0.0-canary-20261119190110
-  '@kubb/ast': 0.0.0-canary-20261119190110
-  '@kubb/cli': 0.0.0-canary-20261119190110
-  '@kubb/core': 0.0.0-canary-20261119190110
-  '@kubb/kit': 0.0.0-canary-20261119190110
-  '@kubb/mcp': 0.0.0-canary-20261119190110
-  '@kubb/plugin-barrel': 0.0.0-canary-20261119190110
-  '@kubb/parser-md': 0.0.0-canary-20261119190110
-  '@kubb/parser-ts': 0.0.0-canary-20261119190110
-  '@kubb/renderer-jsx': 0.0.0-canary-20261119190110
-  '@kubb/studio': 0.0.0-canary-20261119190110
-  kubb: 0.0.0-canary-20261119190110
-  unplugin-kubb: 0.0.0-canary-20261119190110
 
 minimumReleaseAge: 2880 # 48 hours, matches CI's SAFE_CHAIN_MINIMUM_PACKAGE_AGE_HOURS
 minimumReleaseAgeExclude:

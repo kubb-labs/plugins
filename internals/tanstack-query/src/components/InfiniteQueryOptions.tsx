@@ -2,7 +2,7 @@ import { getNestedAccessor } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { CallReturnTypeProps, Infinite } from '../types.ts'
 import {
@@ -120,9 +120,8 @@ export function InfiniteQueryOptions({
   const queryFnArgs = pageParam ? '{ signal, pageParam }' : '{ signal }'
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function name={name} export params={paramsSignature}>
-        {`
+    <Function name={name} export params={paramsSignature}>
+      {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
 return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, ${queryKeyType}, ${pageParamType}>({
   queryKey,
@@ -132,7 +131,6 @@ return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${que
   ${queryOptionsArr.join(',\n  ')}
 })
 `}
-      </Function>
-    </File.Source>
+    </Function>
   )
 }

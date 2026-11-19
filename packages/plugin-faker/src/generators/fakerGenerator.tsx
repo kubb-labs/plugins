@@ -291,17 +291,15 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return (
         <>
           {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
-          <File.Source name={name} isExportable isIndexable>
-            <Function
-              export
-              name={name}
-              JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
-              params={`data?: Partial<${typeReference.typeName}>`}
-              returnType={typeReference.typeName}
-            >
-              {`return (${body}) as ${typeReference.typeName}`}
-            </Function>
-          </File.Source>
+          <Function
+            export
+            name={name}
+            JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
+            params={`data?: Partial<${typeReference.typeName}>`}
+            returnType={typeReference.typeName}
+          >
+            {`return (${body}) as ${typeReference.typeName}`}
+          </Function>
         </>
       )
     }

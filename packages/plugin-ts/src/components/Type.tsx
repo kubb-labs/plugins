@@ -1,5 +1,5 @@
 import { ast } from '@kubb/kit'
-import { File } from '@kubb/renderer-jsx'
+import { File, Type as TypeDeclaration } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { printerTs, type PrinterTsFactory } from '../printers/printerTs.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
@@ -32,11 +32,11 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
       ?.replace(/\/\*\*[\s\S]*?\*\/\s*/g, '')
     if (!expression) return
 
-    // The file is never written; the expression as its text keeps the imports it needs in use.
+    // The file is never written. The body becomes the inline expression and keeps its imports in use.
     return (
-      <File.Source name={name} isTypeOnly isExportable isIndexable inline={{ expression }}>
+      <TypeDeclaration export name={name} inline>
         {expression}
-      </File.Source>
+      </TypeDeclaration>
     )
   }
 

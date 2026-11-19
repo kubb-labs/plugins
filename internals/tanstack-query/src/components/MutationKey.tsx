@@ -1,6 +1,6 @@
 import { type ast, Url } from '@kubb/kit'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
-import { File, Function, Type } from '@kubb/renderer-jsx'
+import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { Transformer } from '../types.ts'
 
@@ -39,16 +39,10 @@ export function MutationKey({ name, node, transformer, typeName }: Props): KubbR
 
   return (
     <>
-      <File.Source name={name} isExportable isIndexable>
-        <Function.Arrow name={name} export params={paramsSignature} singleLine>
-          {`[${keys.join(', ')}] as const`}
-        </Function.Arrow>
-      </File.Source>
-      {typeName && (
-        <File.Source name={typeName} isExportable isIndexable isTypeOnly>
-          <Type export name={typeName}>{`ReturnType<typeof ${name}>`}</Type>
-        </File.Source>
-      )}
+      <Function.Arrow name={name} export params={paramsSignature} singleLine>
+        {`[${keys.join(', ')}] as const`}
+      </Function.Arrow>
+      {typeName && <Type export name={typeName}>{`ReturnType<typeof ${name}>`}</Type>}
     </>
   )
 }
