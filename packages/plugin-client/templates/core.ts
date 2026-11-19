@@ -1107,9 +1107,8 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
 
     const resolvedRequest = await run.request(request, requestConfig)
     const signal = signalOf(resolvedRequest)
-    const body: unknown = resolvedRequest.body
     // A stream body, also one from Node or a generator, cannot be read twice.
-    const oneShot = body instanceof ReadableStream || (typeof body === 'object' && body !== null && Symbol.asyncIterator in body)
+    const oneShot = resolvedRequest.body instanceof ReadableStream || Symbol.asyncIterator in Object(resolvedRequest.body)
     // A method outside `methods` is not safe to send twice.
     const limit = retry.methods.includes(resolvedRequest.method.toUpperCase()) && !oneShot ? retry.limit : 0
     let retryCount = 0
