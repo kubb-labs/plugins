@@ -6,12 +6,22 @@ import path from 'node:path'
 import { promisify } from 'node:util'
 import { ast } from '@kubb/kit'
 import type { PluginFaker } from '@kubb/plugin-faker'
-import { pluginFakerName, resolverFaker } from '@kubb/plugin-faker'
+import { pluginFaker, pluginFakerName, resolverFaker } from '@kubb/plugin-faker'
 import type { PluginTs } from '@kubb/plugin-ts'
-import { resolverTs } from '@kubb/plugin-ts'
+import { pluginTs, resolverTs } from '@kubb/plugin-ts'
 import * as msw from 'msw'
 import { describe, expect, onTestFinished, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderGeneratorOperation, testConfig } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMockedPluginDriver,
+  matchFiles,
+  rawSources,
+  renderContext,
+  renderGeneratorOperation,
+  setupPlugins,
+  testConfig,
+} from '#mocks'
 import { resolverMsw } from '../resolvers/resolverMsw.ts'
 import type { PluginMsw } from '../types.ts'
 import { mswGenerator } from './mswGenerator.tsx'
@@ -190,6 +200,14 @@ async function renderOperation(props: RenderProps) {
     options,
     resolver: resolverMsw,
   })
+
+  // plugin-ts and plugin-faker render what the handler imports, in the same folder as the mocks above.
+  const sameFolder = { output: { path: '.', mode: 'directory' }, group: null }
+  const contextPlugins = await setupPlugins([pluginTs(), pluginFaker()], {
+    'plugin-ts': { ...sameFolder, ...(props.tsEnum ? { enum: props.tsEnum } : {}) },
+    [pluginFakerName]: sameFolder,
+  })
+  await renderContext(driver, contextPlugins)
 
   return driver.fileManager.files
 }

@@ -2,9 +2,18 @@
 
 import { ast } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
-import { resolverTs } from '@kubb/plugin-ts'
+import { pluginTs, resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMockedPluginDriver,
+  matchFiles,
+  renderContext,
+  renderGeneratorOperation,
+  setupPlugins,
+  testConfig,
+} from '#mocks'
 import { resolverCypress } from '../resolvers/resolverCypress.ts'
 import type { PluginCypress } from '../types.ts'
 import { cypressGenerator } from './cypressGenerator.tsx'
@@ -23,6 +32,9 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   options: { output: { path: '.', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
+
+// plugin-ts renders the types the requests import, in the same folder as the mocked plugin-ts above.
+const contextPlugins = await setupPlugins([pluginTs()], { 'plugin-ts': { output: { path: '.', mode: 'directory' }, group: null } })
 
 describe('cypressGenerator — baseURL', () => {
   const node = ast.factory.createOperation({
@@ -56,6 +68,7 @@ describe('cypressGenerator — baseURL', () => {
       options,
       resolver: resolverCypress,
     })
+    await renderContext(driver, contextPlugins)
     await matchFiles(driver.fileManager.files, 'baseURL template')
   })
 })
@@ -85,6 +98,8 @@ describe('cypressGenerator — numeric body', () => {
       options: defaultOptions,
       resolver: resolverCypress,
     })
+
+    await renderContext(driver, contextPlugins)
 
     await matchFiles(driver.fileManager.files, 'patchCounter')
   })
@@ -138,6 +153,8 @@ describe('cypressGenerator — cookie parameters', () => {
       options: defaultOptions,
       resolver: resolverCypress,
     })
+
+    await renderContext(driver, contextPlugins)
 
     await matchFiles(driver.fileManager.files, 'getCookies')
   })

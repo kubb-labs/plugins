@@ -1,9 +1,18 @@
 import { ast } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
-import { resolverTs } from '@kubb/plugin-ts'
+import { pluginTs, resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@kubb/plugin-client'
 import { describe, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMultiPluginDriver,
+  matchFiles,
+  renderGeneratorOperation,
+  testConfig,
+  renderContext,
+  setupPlugins,
+} from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
@@ -38,6 +47,9 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   options: { output: { path: '.', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
+
+// plugin-ts renders the types the hooks import, with the options of the mocked plugin-ts above.
+const contextPlugins = await setupPlugins([pluginTs()], { 'plugin-ts': { output: { path: '.', mode: 'directory' }, group: null } })
 
 const mockedAxiosPlugin = createMockedPlugin({
   name: 'plugin-axios',
@@ -95,6 +107,8 @@ describe('suspenseQueryGenerator operation', () => {
       options,
       resolver: resolverReactQuery,
     })
+
+    await renderContext(driver, contextPlugins)
 
     await matchFiles(driver.fileManager.files, props.name)
   })

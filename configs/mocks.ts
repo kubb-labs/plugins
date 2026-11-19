@@ -1,5 +1,5 @@
 import path, { resolve } from 'node:path'
-import { KubbDriver } from '@kubb/core'
+import { KubbDriver, resolveSymbols } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import type {
   Adapter,
@@ -7,18 +7,15 @@ import type {
   Config,
   Generator,
   GeneratorContext,
-  Group,
   KubbHooks,
   KubbPluginSetupContext,
   Memo,
   NormalizedPlugin,
-  Output,
   Parser,
   Plugin,
   PluginType,
 } from '@kubb/kit'
 import { ast, casing, Diagnostics, Hookable, memo, memoryStorage } from '@kubb/kit'
-import { resolveOperationFile } from '../internals/shared/src/operation.ts'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'
@@ -46,19 +43,43 @@ function pluginNotFoundError({ pluginName, requiredBy }: { pluginName: string; r
 
 /**
  * Creates a driver for generator tests. `getPlugin` and `getResolver` return `options.plugin` and
- * its resolver for any name, and files land in a real file manager.
+ * its resolver for any name, and files land in a real file manager. Files a test renders with
+ * `context: true` land in a second one, so imports can resolve against them without being snapshotted.
  */
 export function createMockedPluginDriver(options: { name?: string; plugin?: NormalizedPlugin; config?: Config } = {}): KubbDriver {
   const config = options.config ?? ({ root: '.', output: { path: './path' } } as Config)
-  const { fileManager } = new KubbDriver(config, { hooks: new Hookable<KubbHooks>() })
+  const createFileManager = () => new KubbDriver(config, { hooks: new Hookable<KubbHooks>() }).fileManager
 
   return {
     config,
     getPlugin: (_pluginName: string) => options.plugin,
     getResolver: (_pluginName: string) => options.plugin?.resolver,
     memo: memoOn(new Map()),
-    fileManager,
+    fileManager: createFileManager(),
+    contextFiles: createFileManager(),
+    renderedNodes: [],
   } as unknown as KubbDriver
+}
+
+type MockedDriver = KubbDriver & { contextFiles: KubbDriver['fileManager']; renderedNodes?: Array<ast.SchemaNode | ast.OperationNode> }
+
+function contextFiles(driver: KubbDriver): KubbDriver['fileManager'] {
+  return (driver as MockedDriver).contextFiles
+}
+
+/**
+ * Fills in the path of every `plugin` import in the rendered files, the way a build does after its generators. Render
+ * what those imports point at first, with `context: true`. Throws when an import names something nobody rendered.
+ */
+export function resolveImports(driver: KubbDriver): void {
+  const own = driver.fileManager.files
+  const ownPaths = new Set(own.map((file) => file.path))
+  const { files, problems } = resolveSymbols([...own, ...contextFiles(driver).files])
+  const ownProblems = problems.filter((problem) => ownPaths.has(problem.file))
+  if (ownProblems.length) {
+    throw new Error(ownProblems.map(({ file, kind, name, plugin }) => `${file}: "${name}" from ${plugin} is ${kind}`).join('\n'))
+  }
+  driver.fileManager.add(...files.filter((file) => ownPaths.has(file.path)))
 }
 
 /**
@@ -131,6 +152,19 @@ type RenderGeneratorOptions<TOptions extends PluginType> = {
   plugin: NormalizedPlugin<TOptions>
   options: TOptions['resolvedOptions']
   resolver: TOptions['resolver']
+  /**
+   * Render into the driver's context files: what the files under test import from, never snapshotted.
+   */
+  context?: boolean
+}
+
+function filesFor<TOptions extends PluginType>(opts: RenderGeneratorOptions<TOptions>): KubbDriver['fileManager'] {
+  return opts.context ? contextFiles(opts.driver) : opts.driver.fileManager
+}
+
+/** Stamps the emitting plugin on each source, as core does for `addFile` and `upsertFile`. */
+function withPlugin(files: Array<ast.FileNode>, plugin: string): Array<ast.FileNode> {
+  return files.map((file) => ({ ...file, sources: file.sources.map((source) => ({ ...source, plugin: source.plugin ?? plugin })) }))
 }
 
 function createMockedPluginContext<TOptions extends PluginType>(opts: RenderGeneratorOptions<TOptions>): Omit<GeneratorContext<TOptions>, 'options'> {
@@ -151,8 +185,8 @@ function createMockedPluginContext<TOptions extends PluginType>(opts: RenderGene
     meta: opts.meta ?? {},
     schemas: opts.driver.inputNode?.schemas ?? [],
     memo: opts.driver.memo.bind(opts.driver),
-    addFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.add(...files),
-    upsertFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.upsert(...files),
+    addFile: async (...files: Array<ast.FileNode>) => filesFor(opts).add(...withPlugin(files, opts.plugin.name)),
+    upsertFile: async (...files: Array<ast.FileNode>) => filesFor(opts).upsert(...withPlugin(files, opts.plugin.name)),
     hooks: opts.driver.hooks ?? new Hookable<KubbHooks>(),
     warn: (message: string) => console.warn(message),
     error: (message: string) => console.error(message),
@@ -175,29 +209,39 @@ async function renderNode<TOptions extends PluginType, TNode extends ast.SchemaN
   const transformedNode = opts.plugin.macros?.length ? ast.macro.apply(node, opts.plugin.macros) : node
   const matches = generator.match ? await generator.match(transformedNode, ctx) : true
   if (!matches) return
-  await opts.driver.fileManager.dispatch({ result: await generate(transformedNode, ctx), renderer: generator.renderer })
-  if (transformedNode.kind === ast.node.kinds.operation) resolvePluginImports(transformedNode as ast.OperationNode, ctx)
+  if (!opts.context) (opts.driver as MockedDriver).renderedNodes?.push(node)
+  await filesFor(opts).dispatch({ result: await generate(transformedNode, ctx), renderer: generator.renderer, plugin: opts.plugin.name })
 }
 
 /**
- * Core fills in a `plugin` import once every plugin has run. A test renders one generator, so this points each one at
- * the file the target plugin writes for the operation, the way `resolveOperationFile` computes it.
+ * Sets up real plugins the way a build does, so {@link renderContext} renders with their resolved options, resolver
+ * and generators. `overrides` replaces resolved options per plugin name, such as `output` and `group`.
  */
-function resolvePluginImports<TOptions extends PluginType>(node: ast.OperationNode, ctx: GeneratorContext<TOptions>): void {
-  const { fileManager } = ctx.driver
-  for (const file of fileManager.files) {
-    if (!file.imports.some((imp) => imp.plugin)) continue
-    const imports = file.imports.map((imp) => {
-      if (!imp.plugin) return imp
-      const target = ctx.getPlugin(imp.plugin)
-      const options = target?.options as { output?: Output; group?: Group | null } | undefined
-      const output = options?.output ?? (ctx.options as { output: Output }).output
-      const group = options?.group ?? undefined
-      const { path } = resolveOperationFile({ ctx, node, resolver: ctx.getResolver(imp.plugin), root: ctx.root, output, group })
-      return { ...imp, path, root: file.path, plugin: null }
-    })
-    fileManager.add(ast.factory.createFile({ ...file, imports }))
+export async function setupPlugins(plugins: Array<Plugin>, overrides: Record<string, object> = {}): Promise<Array<NormalizedPlugin>> {
+  const driver = new KubbDriver({ ...testConfig, adapter: undefined, plugins } as unknown as Config, { hooks: new Hookable<KubbHooks>() })
+  await driver.setup()
+  await driver.setupHooks()
+  return [...driver.plugins.values()].map((plugin) => ({ ...plugin, options: { ...plugin.options, ...overrides[plugin.name] } }))
+}
+
+/**
+ * Renders every node the test rendered through each plugin's generators as context, then calls {@link resolveImports}.
+ * Pass the plugins the files under test import from, set up with {@link setupPlugins}.
+ */
+export async function renderContext(driver: KubbDriver, plugins: Array<NormalizedPlugin>): Promise<void> {
+  const nodes = (driver as MockedDriver).renderedNodes ?? []
+  for (const plugin of plugins) {
+    const opts = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options: plugin.options, resolver: plugin.resolver, context: true }
+    for (const generator of plugin.generators ?? []) {
+      for (const node of nodes) {
+        if (node.kind === ast.node.kinds.schema) await renderGeneratorSchema(generator, node, opts)
+        else await renderGeneratorOperation(generator, node as ast.OperationNode, opts)
+      }
+      if (generator.operations)
+        await renderGeneratorOperations(generator, nodes.filter((node) => node.kind === ast.node.kinds.operation) as Array<ast.OperationNode>, opts)
+    }
   }
+  resolveImports(driver)
 }
 
 /**
@@ -235,8 +279,9 @@ export async function renderGeneratorOperations<TOptions extends PluginType>(
   if (!generator.operations) return
   const context = createMockedPluginContext(opts)
   const transformedNodes = opts.plugin.macros?.length ? nodes.map((node) => ast.macro.apply(node, opts.plugin.macros!)) : nodes
+  if (!opts.context) (opts.driver as MockedDriver).renderedNodes?.push(...nodes)
   const result = await generator.operations(transformedNodes, { ...context, options: opts.options })
-  await opts.driver.fileManager.dispatch({ result, renderer: generator.renderer })
+  await filesFor(opts).dispatch({ result, renderer: generator.renderer, plugin: opts.plugin.name })
 }
 
 async function matchFilesBase(
@@ -303,6 +348,10 @@ export function rawSources(files: Array<ast.FileNode> | undefined): Array<string
  * line straight after an opening bracket and no snapshot would notice.
  */
 function assertCleanRawOutput(files: Array<ast.FileNode> | undefined): void {
+  for (const file of files ?? []) {
+    const unresolved = file.imports.filter((imp) => imp.plugin)
+    expect(unresolved, `${file.path} has plugin imports; call resolveImports(driver) first`).toStrictEqual([])
+  }
   for (const source of rawSources(files)) {
     expect(source, 'raw output has no double blank lines').not.toMatch(/\n[ \t]*\n[ \t]*\n/)
     expect(source, 'raw output has no blank line right after an opening bracket').not.toMatch(/[([{][ \t]*\n[ \t]*\n/)

@@ -4,7 +4,7 @@ import type { Config } from '@kubb/kit'
 import { ast } from '@kubb/kit'
 import { resolverClient } from '@kubb/plugin-client'
 import type { PluginTs } from '@kubb/plugin-ts'
-import { resolverTs } from '@kubb/plugin-ts'
+import { pluginTs, resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import {
   createMockedAdapter,
@@ -14,6 +14,8 @@ import {
   rawSources,
   renderGeneratorOperation,
   testConfig as baseConfig,
+  renderContext,
+  setupPlugins,
 } from '#mocks'
 import { resolverMcp } from '../resolvers/resolverMcp.ts'
 import type { PluginMcp } from '../types.ts'
@@ -37,6 +39,9 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   options: { output: { path: '.', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
+
+// plugin-ts renders the types the hooks import, with the options of the mocked plugin-ts above.
+const contextPlugins = await setupPlugins([pluginTs()], { 'plugin-ts': { output: { path: '.', mode: 'directory' }, group: null } })
 
 const mockedAxiosPlugin = createMockedPlugin({
   name: 'plugin-axios',
@@ -119,6 +124,8 @@ describe('mcpGenerator — cookie parameters', () => {
       options: defaultOptions,
       resolver: resolverMcp,
     })
+
+    await renderContext(driver, contextPlugins)
 
     await matchFiles(driver.fileManager.files, name)
   })
