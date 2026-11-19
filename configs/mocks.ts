@@ -7,15 +7,18 @@ import type {
   Config,
   Generator,
   GeneratorContext,
+  Group,
   KubbHooks,
   KubbPluginSetupContext,
   Memo,
   NormalizedPlugin,
+  Output,
   Parser,
   Plugin,
   PluginType,
 } from '@kubb/kit'
 import { ast, casing, Diagnostics, Hookable, memo, memoryStorage } from '@kubb/kit'
+import { resolveOperationFile } from '../internals/shared/src/operation.ts'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'
@@ -173,6 +176,28 @@ async function renderNode<TOptions extends PluginType, TNode extends ast.SchemaN
   const matches = generator.match ? await generator.match(transformedNode, ctx) : true
   if (!matches) return
   await opts.driver.fileManager.dispatch({ result: await generate(transformedNode, ctx), renderer: generator.renderer })
+  if (transformedNode.kind === ast.node.kinds.operation) resolvePluginImports(transformedNode as ast.OperationNode, ctx)
+}
+
+/**
+ * Core fills in a `plugin` import once every plugin has run. A test renders one generator, so this points each one at
+ * the file the target plugin writes for the operation, the way `resolveOperationFile` computes it.
+ */
+function resolvePluginImports<TOptions extends PluginType>(node: ast.OperationNode, ctx: GeneratorContext<TOptions>): void {
+  const { fileManager } = ctx.driver
+  for (const file of fileManager.files) {
+    if (!file.imports.some((imp) => imp.plugin)) continue
+    const imports = file.imports.map((imp) => {
+      if (!imp.plugin) return imp
+      const target = ctx.getPlugin(imp.plugin)
+      const options = target?.options as { output?: Output; group?: Group | null } | undefined
+      const output = options?.output ?? (ctx.options as { output: Output }).output
+      const group = options?.group ?? undefined
+      const { path } = resolveOperationFile({ ctx, node, resolver: ctx.getResolver(imp.plugin), root: ctx.root, output, group })
+      return { ...imp, path, root: file.path, plugin: null }
+    })
+    fileManager.add(ast.factory.createFile({ ...file, imports }))
+  }
 }
 
 /**

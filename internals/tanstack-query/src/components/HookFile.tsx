@@ -1,5 +1,5 @@
 import { getResponseHeadersTypeNames, resolveOperationTypes } from '@internals/client'
-import { operationFileEntry, resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
@@ -26,7 +26,6 @@ type ResolveHookFileOptions = {
 
 type ResolvedHookFile = {
   file: ast.FileNode
-  fileTs: ast.FileNode
   tsResolver: ResolverTs
   contractOp: ClientOperation
   importedTypeNames: Array<string>
@@ -61,14 +60,6 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
   const headerTypeNames = returnType === 'data' || !contractOp.typedHeaders ? [] : getResponseHeadersTypeNames({ node, types: tsResolver })
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
-  const fileTs = resolveOperationFile({
-    ctx,
-    node,
-    resolver: tsResolver,
-    root,
-    output: types.output ?? output,
-    group: types.group,
-  })
   const importedTypeNames = [
     tsResolver.response.options(node),
     tsResolver.response.responses(node),
@@ -85,7 +76,6 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
 
   return {
     file,
-    fileTs,
     tsResolver,
     contractOp,
     importedTypeNames,
@@ -109,7 +99,7 @@ type HookFileProps = {
  * The `<File>` shell shared by the TanStack hook generators; renders `children` after the imports.
  */
 export function HookFile({ hook, imports, children }: HookFileProps): KubbReactNode {
-  const { file, fileTs, contractOp, importedTypeNames, resultTypeName, banner, footer } = hook
+  const { file, tsResolver, contractOp, importedTypeNames, resultTypeName, banner, footer } = hook
 
   return (
     <File baseName={file.baseName} path={file.path} meta={file.meta} banner={banner} footer={footer}>
@@ -122,7 +112,7 @@ export function HookFile({ hook, imports, children }: HookFileProps): KubbReactN
       />
 
       {imports}
-      {fileTs && importedTypeNames.length > 0 && <File.Import name={Array.from(new Set(importedTypeNames))} root={file.path} path={fileTs.path} isTypeOnly />}
+      {importedTypeNames.length > 0 && <File.Import name={Array.from(new Set(importedTypeNames))} plugin={tsResolver.pluginName} isTypeOnly />}
 
       {children}
     </File>
