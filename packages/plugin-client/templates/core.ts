@@ -875,8 +875,8 @@ function resolveRetry(client: Retry | undefined, call: Retry | undefined): Resol
   const toOptions = (retry: Retry | undefined): RetryOptions => (typeof retry === 'number' ? { limit: retry } : retry || {})
   const [base, own] = [toOptions(client), toOptions(call)]
   // The call's value decides whether retries are on. Without one, the client's does.
-  const active = call ?? client
-  const limit = active == null || active === false ? 0 : (own.limit ?? base.limit ?? 2)
+  const enabled = (call ?? client ?? false) !== false
+  const limit = enabled ? (own.limit ?? base.limit ?? 2) : 0
   return {
     // `NaN` and `Infinity` count as no retries, since no count ever reaches them.
     limit: Number.isFinite(limit) && limit > 0 ? limit : 0,
@@ -1113,7 +1113,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const limit = retry.methods.includes(resolvedRequest.method.toUpperCase()) && !oneShot ? retry.limit : 0
     let retryCount = 0
     // A transport that answers with a bare `Response` gets the native request built for it.
-    const attempt = (sent: Response | TransportResult<TRequest, TResponse>): TransportResult<TRequest, TResponse> =>
+    const toResult = (sent: Response | TransportResult<TRequest, TResponse>): TransportResult<TRequest, TResponse> =>
       isResponse(sent) ? { webResponse: sent, request: toNativeRequest(resolvedRequest) as TRequest, response: sent as TResponse & Response } : sent
     // Waits and resolves to true when the failed attempt may be sent again.
     const waitForRetry = async (failure: { response?: Response; error?: unknown }): Promise<boolean> => {
@@ -1153,7 +1153,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
           throw error
         }
         const response = isResponse(sent) ? sent : sent.webResponse
-        if ((response.status >= 200 && response.status < 300) || !(await waitForRetry({ response }))) return attempt(sent)
+        if ((response.status >= 200 && response.status < 300) || !(await waitForRetry({ response }))) return toResult(sent)
       }
     }
     const { webResponse, request: nativeRequest, response: nativeResponse } = await connect()
