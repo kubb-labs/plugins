@@ -18,7 +18,7 @@
 The `resolver` option now takes an array of resolver parts as well as one patch. The parts merge left to right over the plugin's default resolver.
 
 ```ts
-import { resolverCasedFile } from '@kubb/kit'
+import { casing, resolverCasedFile } from '@kubb/kit'
 
 pluginTs({ resolver: [resolverCasedFile(casing.camel), { name: (name) => `Api${name}` }] })
 ```
