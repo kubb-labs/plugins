@@ -90,7 +90,7 @@ await getPetById({ path: { petId: 1 }, options: { timeout: 5000, retry: { limit:
 
 `client.setConfig({ options })` sets shared defaults, and per-call options win. Kubb sets the method, headers, body, and signal over them, and sets `throwHttpErrors: false` to keep control of status handling. `options` does not take `json`, `prefix`, or `searchParams`, because Kubb builds the body and the URL: pass `body`, `baseURL`, and `query` on the call.
 
-The client sets Ky's `retry` to `0`, so a call is sent once, where Ky's own default is 2. To retry, set the client's own [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#retry-a-failed-call), which also retries an error status. [Retry with the Ky option](#retry-with-the-ky-option) covers Ky's `retry`. Ky's `timeout` default stays: 10 seconds to get the response headers, or `false` to wait without a limit.
+The client sets Ky's `retry` to `0`, so a call is sent once, where Ky's own default is 2. To retry, set the client's [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#retry-a-failed-call), or [Ky's own option](#retry-with-the-ky-option). Ky's `timeout` default stays: 10 seconds to get the response headers, or `false` to wait without a limit.
 
 ## Build a URL without sending
 
@@ -113,7 +113,7 @@ When you set [`pathParamsCasing: 'camelcase'`](https://kubb.dev/extensions/kubb-
 
 ### Retry with the Ky option
 
-Prefer the client's [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#retry-a-failed-call). When it is set for a call, the transport sets Ky's `retry` to `0` for that call, so Ky's option only applies to calls without the client's `retry`.
+Prefer the client's [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-ky/guides/configure-requests#retry-a-failed-call), which also retries an error status. A call with it on sets Ky's `retry` to `0`.
 
 Set Ky's `retry` option to retry a network error, for every call or for one. Ky retries only the methods in `retry.methods`, which leaves out `POST` and `PATCH`:
 

@@ -127,7 +127,7 @@ Next, [use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-fetc
 
 ## Retry a failed call
 
-Retries are off by default. Set `retry` to send a failed call again, for every call or for one. A number is the limit of retries after the first attempt:
+Retries are off by default. Set `retry` on the client or on one call. A number is how many times a failed call is sent again:
 
 ```typescript
 import { client } from './gen/.kubb/client'
@@ -138,16 +138,16 @@ await createOrder({ body, retry: { methods: ['POST'] } })
 await chargeCard({ body, retry: false })
 ```
 
-A call's `retry` merges per field over the client's, and `false` or `0` sends that call once. Pass an object for more control:
+A call's `retry` merges per field over the client's, and `false` sends that call once. Pass an object for more control:
 
-| Option        | What it does                                                                                            | Default                                            |
-| ------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `limit`       | How many times the call is sent again. `NaN` and `Infinity` mean none.                                  | `2`                                                |
-| `methods`     | The methods that are safe to send twice.                                                                | `GET`, `HEAD`, `OPTIONS`, `PUT`, `DELETE`, `TRACE` |
-| `statusCodes` | The statuses that are retried.                                                                          | `408`, `429`, `500`, `502`, `503`, `504`           |
-| `delay`       | `(retryCount) => milliseconds` to wait before a retry. `retryCount` starts at 1.                        | Exponential from 300 ms with jitter, up to 30 s    |
-| `shouldRetry` | `({ request, response, error, retryCount })` returns `true` or `false`, or `undefined` for the default. | None                                               |
-| `onRetry`     | Runs before each wait, with the same context plus `delay`.                                              | None                                               |
+| Option        | What it does                                                                         | Default                                            |
+| ------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| `limit`       | How many times the call is sent again.                                               | `2`                                                |
+| `methods`     | The methods that are safe to send twice.                                             | `GET`, `HEAD`, `OPTIONS`, `PUT`, `DELETE`, `TRACE` |
+| `statusCodes` | The statuses that are retried.                                                       | `408`, `429`, `500`, `502`, `503`, `504`           |
+| `delay`       | `(retryCount) => milliseconds` to wait. `retryCount` starts at 1.                    | Exponential from 300 ms with jitter, up to 30 s    |
+| `shouldRetry` | `({ request, response, error, retryCount })` returns `true`, `false`, or `undefined` | The status and error check                         |
+| `onRetry`     | Runs before each wait, with the same context plus `delay`.                           | None                                               |
 
 ```typescript
 client.setConfig({
@@ -160,16 +160,15 @@ client.setConfig({
 })
 ```
 
-The client retries a status in `statusCodes` and any error the transport throws, such as a network failure. A thrown error that cannot succeed, such as a URL that does not parse, is retried too, so return `false` from `shouldRetry` for an error you know is final. These rules always apply, also when `shouldRetry` returns `true`:
+The client retries a status in `statusCodes` and any error the transport throws. These rules always apply, also when `shouldRetry` returns `true`:
 
-- A method outside `methods`, such as `POST`, is never retried. Add the method to `methods` only when the API handles a repeated request.
-- A `ReadableStream` body is never retried, because it cannot be read twice.
-- A `Retry-After` header sets the wait instead of `delay`. When it asks for more than a minute, the call is not retried and gets the response.
-- `shouldRetry` and `onRetry` get a copy of the response, so they can read its body.
+- `POST` and `PATCH` are retried only when `methods` names them.
+- A stream body is never retried, because it cannot be read twice.
+- A `Retry-After` header sets the wait. When it asks for more than a minute, the call is not retried.
 - An aborted `signal` stops the wait and the retries.
 - The request interceptors and the `auth` resolver run once, so every retry sends the same headers.
 
-The last response or error is what the call returns or throws. A streaming call uses the same `retry`, see [Stop, abort, and resume](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/server-sent-events#stop-abort-and-resume).
+A streaming call uses the same `retry`, see [Stop, abort, and resume](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/server-sent-events#stop-abort-and-resume).
 
 ## Less common cases
 

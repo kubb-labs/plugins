@@ -156,17 +156,15 @@ const { stream } = await streamChat({ body, onValidationError: (error, { value }
 - Pass `signal` to stop from outside. The call or the loop rejects with the signal's reason.
 - A dropped connection ends the loop with the transport's error, unless [`retry`](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/configure-requests#retry-a-failed-call) is set.
 
-With `retry`, the runtime retries a failed connect, and reopens a dropped `text/event-stream` with the last event ID in a `Last-Event-ID` header. The limit counts failures in a row: a failed connect and the drops after it count together, and the count starts over once the stream delivers an event. A reopen that fails throws from the loop, after the error interceptors, also with `throwOnError: false`. A stream that ends, a parse error, and a JSON Lines stream are never reopened. A server that ignores `Last-Event-ID` sends its events again from the start.
+With `retry`, the runtime retries a failed connect and reopens a dropped `text/event-stream` with a `Last-Event-ID` header. The limit counts failures in a row and starts over once the stream delivers an event. A reopen that fails throws from the loop, also with `throwOnError: false`. A stream that ends and a JSON Lines stream are not reopened.
 
-`streamChat` is a `POST`, which `retry` leaves alone unless `retry.methods` names it:
+`streamChat` is a `POST`, so `retry.methods` has to name it:
 
 ```typescript
 for await (const event of await streamChat({ body, retry: { limit: 3, methods: ['POST'] } })) render(event)
 ```
 
-To write your own policy, leave `retry` off and resume by hand.
-
-To resume by hand, send a new call with a `Last-Event-ID` header. `lastEventId` is the `id` of the last event the server completed. Declare `Last-Event-ID` as a header parameter, so the call accepts it in `headers`:
+To resume by hand, leave `retry` off and send a new call with a `Last-Event-ID` header. `lastEventId` is the `id` of the last event the server completed. Declare `Last-Event-ID` as a header parameter, so the call accepts it in `headers`:
 
 ```typescript
 import { ResponseError } from './gen/.kubb/client'
