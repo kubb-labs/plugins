@@ -73,11 +73,13 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@kubb/ast": "0.0.0-canary-20261119190110",
     "@kubb/kit": "0.0.0-canary-20261119190110",
     "@kubb/renderer-jsx": "0.0.0-canary-20261119190110",
     "yuku-codegen": "^0.19.0"
   },
   "devDependencies": {
+    "@internals/ast": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
     "@kubb/parser-ts": "catalog:",

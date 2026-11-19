@@ -89,11 +89,13 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@kubb/ast": "0.0.0-canary-20261119190110",
     "@kubb/kit": "0.0.0-canary-20261119190110",
     "@kubb/plugin-ts": "workspace:^",
     "@kubb/renderer-jsx": "0.0.0-canary-20261119190110"
   },
   "devDependencies": {
+    "@internals/ast": "workspace:*",
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",

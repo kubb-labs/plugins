@@ -1,4 +1,5 @@
-import { ast, Resolver } from '@kubb/kit'
+import { ast } from '@internals/ast'
+import { Resolver } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import { printerFaker } from './printerFaker.ts'

@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { getEnumNames, resolveOperationFile } from '@internals/shared'
-import { ast, defineGenerator } from '@kubb/kit'
+import { defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'

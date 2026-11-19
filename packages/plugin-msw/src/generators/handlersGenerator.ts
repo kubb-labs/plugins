@@ -1,4 +1,5 @@
-import { ast, casing, defineGenerator } from '@kubb/kit'
+import { ast } from '@internals/ast'
+import { casing, defineGenerator } from '@kubb/kit'
 import type { PluginMsw } from '../types'
 
 /**

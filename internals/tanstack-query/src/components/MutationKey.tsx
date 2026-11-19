@@ -1,4 +1,5 @@
-import { type ast, Url } from '@kubb/kit'
+import type { ast } from '@internals/ast'
+import { Url } from '@kubb/kit'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'

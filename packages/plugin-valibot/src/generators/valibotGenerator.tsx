@@ -1,3 +1,4 @@
+import { ast } from '@internals/ast'
 import {
   buildContentTypeEntries,
   buildOptionsSchema,
@@ -11,7 +12,7 @@ import {
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
-import { ast, defineGenerator } from '@kubb/kit'
+import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerValibot } from '../printers/printerValibot.ts'

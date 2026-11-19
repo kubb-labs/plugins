@@ -1,7 +1,8 @@
+import type { ast } from '@internals/ast'
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
 import type { Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
-import type { ast, ResolverPatch, PluginType, Resolver } from '@kubb/kit'
+import type { ResolverPatch, PluginType, Resolver } from '@kubb/kit'
 
 export type { Infinite, Transformer } from '@internals/tanstack-query'
 

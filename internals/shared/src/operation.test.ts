@@ -1,4 +1,5 @@
-import { ast, casing, createResolver } from '@kubb/kit'
+import { ast } from '@internals/ast'
+import { casing, createResolver } from '@kubb/kit'
 import type { Group, Memo, Output, PluginType, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import {

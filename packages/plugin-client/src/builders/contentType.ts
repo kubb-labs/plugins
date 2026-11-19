@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { getContentTypeInfo, getResponseContentTypeInfo, getStream } from '@internals/shared'
-import { ast, text } from '@kubb/kit'
+import { text } from '@kubb/kit'
 
 /**
  * Builds the `contentType` entry baked into the call config. It holds the request default when the operation has a body

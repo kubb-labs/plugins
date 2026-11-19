@@ -1,6 +1,7 @@
+import { ast } from '@internals/ast'
 import { operationFileEntry } from '@internals/shared'
 import { matchesInfinite } from '@internals/tanstack-query'
-import { ast, defineGenerator } from '@kubb/kit'
+import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'

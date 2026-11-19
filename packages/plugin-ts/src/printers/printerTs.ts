@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import { createRequire } from 'node:module'
-import { ast, createPrinter, Diagnostics } from '@kubb/kit'
+import { createPrinter, Diagnostics } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'

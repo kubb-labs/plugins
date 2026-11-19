@@ -1,6 +1,6 @@
+import type { ast } from '@internals/ast'
 import { ensureValidVarName } from '@internals/utils'
 import { casing, text } from '@kubb/kit'
-import type { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import * as factory from '../factory.ts'

@@ -1,5 +1,6 @@
+import { ast } from '@internals/ast'
 import path from 'node:path'
-import { ast, createResolver } from '@kubb/kit'
+import { createResolver } from '@kubb/kit'
 import type { Memo, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import { resolveClientOperation } from './resolveClientOperation.ts'

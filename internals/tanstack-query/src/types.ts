@@ -1,5 +1,5 @@
+import type { ast } from '@internals/ast'
 import type { ReturnTypeOption } from '@internals/client'
-import type { ast } from '@kubb/kit'
 
 export type ParamsCasing = 'camelcase' | undefined
 

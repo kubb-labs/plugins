@@ -1,7 +1,8 @@
+import { ast } from '@internals/ast'
 import { toLiteral } from '@internals/utils'
 import { getStream } from '@internals/shared'
 
-import { ast, text } from '@kubb/kit'
+import { text } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
 import { buildSecurityMetadata, type SecurityRequirement } from './security.ts'

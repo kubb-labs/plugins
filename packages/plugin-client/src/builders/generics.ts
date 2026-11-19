@@ -1,4 +1,4 @@
-import type { ast } from '@kubb/kit'
+import type { ast } from '@internals/ast'
 import { buildResponseHeadersType, buildResultTypeRef, type OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 

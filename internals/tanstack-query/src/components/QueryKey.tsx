@@ -1,4 +1,5 @@
-import { ast, Url } from '@kubb/kit'
+import { ast } from '@internals/ast'
+import { Url } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Function, Type } from '@kubb/renderer-jsx'

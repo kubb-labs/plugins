@@ -176,6 +176,9 @@ catalogs:
     '@kubb/adapter-oas':
       specifier: 0.0.0-canary-20261119190110
       version: 0.0.0-canary-20261119190110
+    '@kubb/ast':
+      specifier: 0.0.0-canary-20261119190110
+      version: 0.0.0-canary-20261119190110
     '@kubb/core':
       specifier: 0.0.0-canary-20261119190110
       version: 0.0.0-canary-20261119190110
@@ -833,11 +836,27 @@ importers:
         specifier: 'catalog:'
         version: 7.0.2
 
+  internals/ast:
+    dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 0.0.0-canary-20261119190110
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.20.5
+
   internals/client:
     dependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../ast
       '@internals/shared':
         specifier: workspace:*
         version: link:../shared
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 'catalog:'
         version: 0.0.0-canary-20261119190110
@@ -854,9 +873,15 @@ importers:
 
   internals/shared:
     dependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../ast
       '@internals/utils':
         specifier: workspace:*
         version: link:../utils
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 'catalog:'
         version: 0.0.0-canary-20261119190110
@@ -870,6 +895,9 @@ importers:
 
   internals/tanstack-query:
     dependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../ast
       '@internals/client':
         specifier: workspace:*
         version: link:../client
@@ -879,6 +907,9 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../utils
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 'catalog:'
         version: 0.0.0-canary-20261119190110
@@ -921,6 +952,9 @@ importers:
 
   packages/plugin-client:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -931,6 +965,9 @@ importers:
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/client':
         specifier: workspace:*
         version: link:../../internals/client
@@ -952,6 +989,9 @@ importers:
 
   packages/plugin-cypress:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -962,6 +1002,9 @@ importers:
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
@@ -974,6 +1017,9 @@ importers:
 
   packages/plugin-faker:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -987,6 +1033,9 @@ importers:
       '@faker-js/faker':
         specifier: ^10.6.0
         version: 10.6.0
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
@@ -1025,6 +1074,9 @@ importers:
 
   packages/plugin-mcp:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -1038,6 +1090,9 @@ importers:
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/client':
         specifier: workspace:*
         version: link:../../internals/client
@@ -1059,6 +1114,9 @@ importers:
 
   packages/plugin-msw:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -1072,6 +1130,9 @@ importers:
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
@@ -1084,6 +1145,9 @@ importers:
 
   packages/plugin-react-query:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -1094,6 +1158,9 @@ importers:
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/client':
         specifier: workspace:*
         version: link:../../internals/client
@@ -1115,16 +1182,25 @@ importers:
 
   packages/plugin-redoc:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 'catalog:'
         version: 0.0.0-canary-20261119190110
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 0.0.0-canary-20261119190110(openapi-types@12.1.3)
 
   packages/plugin-swr:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -1135,6 +1211,9 @@ importers:
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/client':
         specifier: workspace:*
         version: link:../../internals/client
@@ -1156,6 +1235,9 @@ importers:
 
   packages/plugin-ts:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -1169,6 +1251,9 @@ importers:
         specifier: ^0.19.0
         version: 0.19.0
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
@@ -1184,6 +1269,9 @@ importers:
 
   packages/plugin-valibot:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -1191,6 +1279,9 @@ importers:
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
@@ -1203,6 +1294,9 @@ importers:
 
   packages/plugin-vue-query:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -1213,6 +1307,9 @@ importers:
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/client':
         specifier: workspace:*
         version: link:../../internals/client
@@ -1237,6 +1334,9 @@ importers:
 
   packages/plugin-zod:
     dependencies:
+      '@kubb/ast':
+        specifier: 0.0.0-canary-20261119190110
+        version: 0.0.0-canary-20261119190110
       '@kubb/kit':
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
@@ -1244,6 +1344,9 @@ importers:
         specifier: 0.0.0-canary-20261119190110
         version: 0.0.0-canary-20261119190110
     devDependencies:
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:../../internals/ast
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
