@@ -35,11 +35,15 @@ export {
 export { getOasAdapter } from './adapter.ts'
 export {
   createCasedFile,
+  createCasedResolver,
+  createHandlerResolver,
   createOperationParamResolver,
   createOperationResponseResolver,
+  createValidatorResolver,
   getCircularNames,
   getEnumNames,
   operationKey,
+  resolveHandlerName,
   resolveOperationName,
 } from './resolver.ts'
 export {

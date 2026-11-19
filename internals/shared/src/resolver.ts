@@ -142,6 +142,115 @@ export function createCasedFile(caseLast: (part: string) => string): ResolverFil
   }
 }
 
+/**
+ * Builds the top-level `name` and `file` of a plugin whose identifiers and file names share one
+ * casing, such as camelCase with a `schema` suffix. Names are memoized and made valid identifiers.
+ *
+ * @example
+ * ```ts
+ * createResolver<PluginZod>({ ...createCasedResolver('camel', { suffix: 'schema' }), ... })
+ * ```
+ */
+export function createCasedResolver(
+  kind: 'camel' | 'pascal',
+  affix: { prefix?: string; suffix?: string } = {},
+): { name(this: Resolver, name: string): string; file: ResolverFile } {
+  const toCase = (part: string) => casing[kind](part, affix)
+  return {
+    name(name) {
+      return this.memo(`name:${name}`, () => ensureValidVarName(toCase(name)))
+    },
+    file: createCasedFile(toCase),
+  }
+}
+
+/**
+ * The `schema` namespace shared by the validator plugins (zod, valibot).
+ */
+export type ValidatorSchemaResolver = {
+  typeName(name: string): string
+  type(name: string): string
+  inputName(name: string): string
+  inputTypeName(name: string): string
+  isName(name: string): string
+  assertName(name: string): string
+}
+
+type ValidatorResolver = Resolver & { schema: ValidatorSchemaResolver }
+
+/**
+ * Builds the `schema`, `param` and `response` namespaces shared by the validator plugins. Schema
+ * types are PascalCase (`PetSchemaType`), and responses add `error` and `options` names.
+ *
+ * @example
+ * ```ts
+ * createResolver<PluginZod>({ ...createCasedResolver('camel', { suffix: 'schema' }), ...createValidatorResolver() })
+ * ```
+ */
+export function createValidatorResolver(): {
+  schema: ValidatorSchemaResolver
+  param: OperationParamResolver
+  response: OperationResponseResolver & {
+    error(this: ValidatorResolver, node: ast.OperationNode): string
+    options(this: ValidatorResolver, node: ast.OperationNode): string
+  }
+} {
+  return {
+    schema: {
+      typeName(this: ValidatorResolver, name: string) {
+        return this.memo(`typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
+      },
+      type(this: ValidatorResolver, name: string) {
+        return this.memo(`type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
+      },
+      inputName(this: ValidatorResolver, name: string) {
+        return this.name(`${name} input`)
+      },
+      inputTypeName(this: ValidatorResolver, name: string) {
+        return this.schema.typeName(`${name} input`)
+      },
+      isName(this: ValidatorResolver, name: string) {
+        return ensureValidVarName(casing.camel(name, { prefix: 'is' }))
+      },
+      assertName(this: ValidatorResolver, name: string) {
+        return ensureValidVarName(casing.camel(name, { prefix: 'assert' }))
+      },
+    },
+    param: createOperationParamResolver(),
+    response: {
+      ...createOperationResponseResolver(),
+      error(node) {
+        const name = this.name(`${node.operationId} Error`)
+        return this.resolveName({ key: operationKey(node, 'response', 'error'), name })
+      },
+      options(node) {
+        const name = this.schema.type(this.name(`${node.operationId} Options`))
+        return this.resolveName({ key: operationKey(node, 'response', 'options'), name })
+      },
+    },
+  }
+}
+
+/**
+ * The top-level `name` of the handler plugins (msw, mcp): camelCase with a `handler` suffix.
+ */
+export function resolveHandlerName(this: Resolver, name: string): string {
+  // shortcut: skips ensureValidVarName to keep today's msw and mcp output; align with the other plugins in a breaking release.
+  return this.memo(`name:${name}`, () => casing.camel(name, { suffix: 'handler' }))
+}
+
+/**
+ * Builds the `handler` namespace shared by the handler plugins: one handler name per operation.
+ */
+export function createHandlerResolver(): { name(this: Resolver, node: ast.OperationNode): string } {
+  return {
+    name(node) {
+      const name = this.name(node.operationId)
+      return this.resolveName({ key: operationKey(node, 'handler', 'name'), name })
+    },
+  }
+}
+
 type SchemaIndexContext = Pick<GeneratorContext, 'memo' | 'schemas'>
 
 /**

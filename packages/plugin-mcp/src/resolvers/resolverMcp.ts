@@ -1,5 +1,5 @@
-import { operationKey } from '@internals/shared'
-import { casing, createResolver } from '@kubb/kit'
+import { createHandlerResolver, resolveHandlerName } from '@internals/shared'
+import { createResolver } from '@kubb/kit'
 import type { PluginMcp } from '../types.ts'
 
 /**
@@ -16,13 +16,6 @@ import type { PluginMcp } from '../types.ts'
  */
 export const resolverMcp = createResolver<PluginMcp>({
   pluginName: 'plugin-mcp',
-  name(name) {
-    return this.memo(`name:${name}`, () => casing.camel(name, { suffix: 'handler' }))
-  },
-  handler: {
-    name(node) {
-      const name = this.name(node.operationId)
-      return this.resolveName({ key: operationKey(node, 'handler', 'name'), name })
-    },
-  },
+  name: resolveHandlerName,
+  handler: createHandlerResolver(),
 })
