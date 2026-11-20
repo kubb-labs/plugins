@@ -19,13 +19,32 @@ import { ast, casing, Diagnostics, Hookable, memo, memoryStorage } from '@kubb/k
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'
-import { expect, vi } from 'vitest'
+import { expect, type Mock, vi } from 'vitest'
 
 // Test helpers copied from kubb's former `kubb/kit/testing` entry, so kubb ships no Vitest-backed API.
 
 function memoOn(store: Map<string, unknown>): Memo {
-  return ((key: string, compute: () => unknown) => memo(store, key, compute)) as Memo
+  const cached = (key: string, compute: () => unknown) => memo(store, key, compute)
+  return Object.assign(cached, {
+    get: (key: string) => store.get(key),
+    set: (key: string, value: unknown) => void store.set(key, value),
+    has: (key: string) => store.has(key),
+  }) as unknown as Memo
 }
+
+/**
+ * A plugin for generator tests. It carries the `resolver` and `macros` the render helpers read,
+ * whatever fields the installed `NormalizedPlugin` has.
+ */
+export type MockedPlugin<TOptions extends PluginType = PluginType> = NormalizedPlugin<TOptions> & {
+  resolver?: TOptions['resolver']
+  macros?: Array<ast.Macro>
+}
+
+/**
+ * A driver for generator tests, with a `getResolver` the test can replace.
+ */
+export type MockedPluginDriver = KubbDriver & { getResolver: (pluginName: string) => unknown }
 
 function pluginNotFoundError({ pluginName, requiredBy }: { pluginName: string; requiredBy?: string }) {
   const by = requiredBy ? ` by "${requiredBy}"` : ''
@@ -45,7 +64,7 @@ function pluginNotFoundError({ pluginName, requiredBy }: { pluginName: string; r
  * Creates a driver for generator tests. `getPlugin` and `getResolver` return `options.plugin` and
  * its resolver for any name, and files land in a real file manager.
  */
-export function createMockedPluginDriver(options: { name?: string; plugin?: NormalizedPlugin; config?: Config } = {}): KubbDriver {
+export function createMockedPluginDriver(options: { name?: string; plugin?: MockedPlugin; config?: Config } = {}): MockedPluginDriver {
   const config = options.config ?? ({ root: '.', output: { path: './path' } } as Config)
   const { fileManager } = new KubbDriver(config, { hooks: new Hookable<KubbHooks>() })
 
@@ -55,21 +74,33 @@ export function createMockedPluginDriver(options: { name?: string; plugin?: Norm
     getResolver: (_pluginName: string) => options.plugin?.resolver,
     memo: memoOn(new Map()),
     fileManager,
-  } as unknown as KubbDriver
+  } as unknown as MockedPluginDriver
 }
 
 /**
- * Creates a `kubb:plugin:setup` context. `requirePlugin` fails for names `plugins` does not list.
+ * A `kubb:plugin:setup` context whose setup methods are spies.
+ */
+export type MockedSetupContext<TFactory extends PluginType = PluginType> = KubbPluginSetupContext<TFactory> & {
+  plugin: { name: string }
+  memo: { get(key: string): unknown }
+  addGenerator: Mock
+  setResolver: Mock
+  addMacro: Mock
+  setMacros: Mock
+}
+
+/**
+ * Creates a `kubb:plugin:setup` context for the plugin `plugin-mock`. `requirePlugin` fails for names `plugins` does not list.
  */
 export function createMockedSetupContext<TFactory extends PluginType = PluginType>({
   plugins = [],
   options = {} as TFactory['options'],
-}: { plugins?: Array<string>; options?: TFactory['options'] } = {}): KubbPluginSetupContext<TFactory> {
+}: { plugins?: Array<string>; options?: TFactory['options'] } = {}): MockedSetupContext<TFactory> {
   const registered = plugins.map((name) => ({ name }) as unknown as Plugin)
-
-  return {
+  const ctx = {
     config: { root: '.', output: { path: './gen' }, plugins: registered } as unknown as Config,
     options,
+    plugin: { name: 'plugin-mock', meta: { name: 'plugin-mock' } },
     addGenerator: vi.fn(),
     setResolver: vi.fn(),
     addMacro: vi.fn(),
@@ -83,6 +114,16 @@ export function createMockedSetupContext<TFactory extends PluginType = PluginTyp
     }) as KubbPluginSetupContext<TFactory>['requirePlugin'],
     memo: memoOn(new Map()),
   }
+  return ctx as unknown as MockedSetupContext<TFactory>
+}
+
+/**
+ * Returns the generators a plugin registered during a mocked setup. A kit that stores them in memo
+ * and a kit that calls `ctx.addGenerator` both count.
+ */
+export function registeredGenerators(ctx: MockedSetupContext): Array<unknown> {
+  const stored = ctx.memo.get(`${ctx.plugin.name}:generators`) as Array<unknown> | undefined
+  return [...ctx.addGenerator.mock.calls.flat(), ...(stored ?? [])]
 }
 
 /**
@@ -109,7 +150,7 @@ export function createMockedPlugin<TOptions extends PluginType = PluginType>(par
   resolver?: TOptions['resolver']
   macros?: Array<ast.Macro>
   dependencies?: Array<string>
-}): NormalizedPlugin<TOptions> {
+}): MockedPlugin<TOptions> {
   return {
     name: params.name,
     options: params.options,
@@ -117,15 +158,15 @@ export function createMockedPlugin<TOptions extends PluginType = PluginType>(par
     macros: params.macros,
     dependencies: params.dependencies,
     hooks: {},
-  } as unknown as NormalizedPlugin<TOptions>
+  } as unknown as MockedPlugin<TOptions>
 }
 
 type RenderGeneratorOptions<TOptions extends PluginType> = {
   config: Config
   adapter: Adapter
   meta?: ast.InputMeta
-  driver: KubbDriver
-  plugin: NormalizedPlugin<TOptions>
+  driver: MockedPluginDriver
+  plugin: MockedPlugin<TOptions>
   options: TOptions['resolvedOptions']
   resolver: TOptions['resolver']
 }
