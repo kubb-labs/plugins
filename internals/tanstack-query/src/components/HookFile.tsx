@@ -27,9 +27,7 @@ type ResolvedHookFile = {
   file: ast.FileNode
   tsResolver: ResolverTs
   contractOp: ClientOperation
-  /**
-   * The operation type names, grouped into imports from the types plugin's file.
-   */
+  /** The operation type names, grouped into imports from the types plugin's file. */
   typeImports: ReadonlyArray<ast.ImportNode>
   /**
    * The client's result type the hook names with `returnType: 'full'`.

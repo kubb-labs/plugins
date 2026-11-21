@@ -128,9 +128,6 @@ export function resolveTypeReference({
   node: ast.SchemaNode
   canOverride: boolean
   name: string
-  /**
-   * The type name with its import from plugin-ts, from `from(pluginTsName).file(node).name(typeName)`.
-   */
   type: RefName
   filePath: string
 }): { import: ast.ImportNode | null; typeName: string } {

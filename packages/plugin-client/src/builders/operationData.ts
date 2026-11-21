@@ -12,9 +12,7 @@ export type OperationData = {
   node: ast.HttpOperationNode
   name: string
   types: OperationTypeNames
-  /**
-   * The options, responses and headers type names, each with its import from the types plugin's file.
-   */
+  /** The options, responses and headers type names, each with its import. */
   typeNames: Array<RefName>
   /**
    * Empty unless `validator` turns a direction on.
