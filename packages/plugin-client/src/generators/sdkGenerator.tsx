@@ -4,7 +4,7 @@ import { getStream } from '@internals/shared'
 import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
 import { ensureValidVarName } from '@internals/utils'
 import { defineGenerator, Diagnostics, memo } from '@kubb/kit'
-import type { Generator } from '@kubb/kit'
+import type { FileTarget, Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
@@ -49,9 +49,9 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   }, [] as Array<Controller>)
 }
 
-function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationData) => { file: ast.FileNode | null; names: Array<string> }) {
+function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationData) => { file: FileTarget | null; names: Array<string> }) {
   const namesByPath = new Map<string, Set<string>>()
-  const filesByPath = new Map<string, ast.FileNode>()
+  const filesByPath = new Map<string, FileTarget>()
 
   ops.forEach((op) => {
     const { file, names } = pick(op)
@@ -102,7 +102,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
         })
       }
 
-      const types = resolveOperationTypes(ctx, ctx.plugin.name)
+      const types = resolveOperationTypes()
 
       const validatorEnabled = isValidatorEnabled(validator)
       const controllers = buildControllers(nodes, ctx, types)
@@ -119,7 +119,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
         }))
         const { namesByPath: schemaNamesByPath, filesByPath: schemaFilesByPath } = validatorEnabled
           ? collectImportsByFile(ops, (op) => ({ file: op.schemaFile, names: op.validatorHooks.importedSchemaNames }))
-          : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, ast.FileNode>() }
+          : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, FileTarget>() }
         const resultOps = ops.filter((op) => !getStream(op.node)?.shape)
         const typedHeaders = (op: OperationData) => op.headerTypeNames.length > 0
         const resultName = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'

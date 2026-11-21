@@ -8,7 +8,6 @@ import {
   buildResponses,
   getCircularNames,
   getOasAdapter,
-  resolveOperationFile,
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
@@ -45,7 +44,7 @@ export const createPrinterZod: PrinterFactory<PluginZod> = (ctx) => {
     resolver: ctx.resolver,
     // A `printer.nodes` override can print differently per call, so its lookups are not cached.
     directionalCache: printer?.nodes ? undefined : new WeakMap(),
-    cyclicSchemas: getCircularNames(ctx),
+    cyclicSchemas: getCircularNames(),
     nodes: printer?.nodes,
   }
   return mini ? printerZodMini(options as PrinterZodMiniOptions) : printerZod(options)
@@ -61,7 +60,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   name: 'zod',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { config, resolver, root } = ctx
+    const { resolver, root } = ctx
     const { output, compile, mini, inferred, typeGuards, importPath, group } = ctx.options
 
     if (!node.name) {
@@ -70,7 +69,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
     const printerOptions = ctx.printer.options as PrinterZodOptions
-    const cyclicSchemas = getCircularNames(ctx)
+    const cyclicSchemas = getCircularNames()
 
     // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions, mini })
@@ -91,7 +90,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const meta = {
       name: resolver.name(node.name),
-      file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
+      file: ctx.file(node),
     } as const
 
     const isName = typeGuards ? resolver.schema.isName(node.name) : null
@@ -100,13 +99,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const schemaPrinter = ctx.printer.with({ direction: 'decode' })
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {imports.map((imp) => (
           <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
@@ -147,13 +140,13 @@ export const zodGenerator = defineGenerator<PluginZod>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { config, resolver, root } = ctx
+    const { resolver, root } = ctx
     const { output, compile, mini, inferred, importPath, group } = ctx.options
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
 
     const meta = {
-      file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
+      file: ctx.file(node),
     } as const
 
     const printerOptions = ctx.printer.options as PrinterZodOptions
@@ -308,13 +301,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const responsesSchema = inferred ? renderSchemaEntry({ schema: buildResponses(node, resolver), name: resolver.response.responses(node) }) : null
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {paramSchemas}
         {responseSchemas}

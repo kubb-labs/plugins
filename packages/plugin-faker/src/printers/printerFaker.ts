@@ -522,5 +522,5 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
  */
 export const createPrinterFaker: PrinterFactory<PluginFaker> = (ctx) => {
   const { dateParser, regexGenerator, printer } = ctx.options
-  return printerFaker({ resolver: ctx.resolver, dateParser, regexGenerator, nodes: printer?.nodes, cyclicSchemas: getCircularNames(ctx) })
+  return printerFaker({ resolver: ctx.resolver, dateParser, regexGenerator, nodes: printer?.nodes, cyclicSchemas: getCircularNames() })
 }

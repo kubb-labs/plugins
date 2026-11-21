@@ -12,7 +12,6 @@ import {
   getContentTypeInfo,
   getStream,
   resolveErrorNames,
-  resolveOperationFile,
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveStatusCodeNames,
@@ -384,108 +383,6 @@ describe('toResponseContent', () => {
     const unknown = ast.factory.createSchema({ type: 'unknown' })
     expect(typeOf('application/x-www-form-urlencoded', unknown).schema).toBe(unknown)
     expect(typeOf('text/plain', unknown).schema).toStrictEqual(ast.factory.createSchema({ type: 'string' }))
-  })
-})
-
-describe('resolveOperationFile', () => {
-  function createTestMemo(): Memo {
-    const store = new Map<string, unknown>()
-    return ((key: string, compute: () => unknown) => {
-      if (!store.has(key)) store.set(key, compute())
-      return store.get(key)
-    }) as Memo
-  }
-
-  const ctxOf = (memo: Memo, schemas: Array<ast.SchemaNode> = []) => ({ memo, schemas })
-
-  function createFileResolver(pluginName: string) {
-    return { pluginName, file: vi.fn(() => ast.factory.createFile({ path: '/root/getPetById.ts', baseName: 'getPetById.ts' as const })) }
-  }
-
-  const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
-
-  test('reuses the cached file for the same dependency plugin and node instead of resolving again', () => {
-    const dependencyResolver = createFileResolver('plugin-ts')
-    const memo = createTestMemo()
-
-    const first = resolveOperationFile({ ctx: ctxOf(memo), node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
-    const second = resolveOperationFile({ ctx: ctxOf(memo), node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
-
-    expect(second).toBe(first)
-    expect(dependencyResolver.file).toHaveBeenCalledOnce()
-  })
-
-  test('resolves independently per dependency plugin name, even sharing the same memo', () => {
-    const tsResolver = createFileResolver('plugin-ts')
-    const zodResolver = createFileResolver('plugin-zod')
-    const memo = createTestMemo()
-
-    resolveOperationFile({ ctx: ctxOf(memo), node, resolver: tsResolver, root: '/root', output: { path: '.' } })
-    resolveOperationFile({ ctx: ctxOf(memo), node, resolver: zodResolver, root: '/root', output: { path: '.' } })
-
-    expect(tsResolver.file).toHaveBeenCalledOnce()
-    expect(zodResolver.file).toHaveBeenCalledOnce()
-  })
-
-  test('resolves each operation on its own when they have no method or path', () => {
-    const tsResolver = createFileResolver('plugin-ts')
-    const memo = createTestMemo()
-
-    resolveOperationFile({
-      ctx: ctxOf(memo),
-      node: ast.factory.createOperation({ operationId: 'publishPet' }),
-      resolver: tsResolver,
-      root: '/root',
-      output: { path: '.' },
-    })
-    resolveOperationFile({
-      ctx: ctxOf(memo),
-      node: ast.factory.createOperation({ operationId: 'publishOrder' }),
-      resolver: tsResolver,
-      root: '/root',
-      output: { path: '.' },
-    })
-
-    expect(tsResolver.file).toHaveBeenCalledTimes(2)
-  })
-
-  describe('when an operation file matches a schema file', () => {
-    const pascalResolver = createResolver<PluginType<'plugin-ts'>>({ pluginName: 'plugin-ts', ...resolverCasedFile(casing.pascal) })
-    const output = { path: 'types', mode: 'directory' } as const
-    const schemas = (...names: Array<string>) => names.map((name) => ast.factory.createSchema({ type: 'object', name }))
-    const resolve = (operationId: string, options: { schemas: ReturnType<typeof schemas>; output?: Output; group?: Group }) =>
-      resolveOperationFile({
-        ctx: ctxOf(createTestMemo(), options.schemas),
-        node: ast.factory.createOperation({ operationId, method: 'GET', path: '/points', tags: ['geo'] }),
-        resolver: pascalResolver,
-        root: '/root',
-        output: options.output ?? output,
-        group: options.group,
-      }).path
-
-    test('adds an `Operation` suffix when the names match', () => {
-      expect(resolve('point', { schemas: schemas('Point') })).toBe('/root/types/PointOperation.ts')
-    })
-
-    test('adds the suffix when the names differ only in case', () => {
-      expect(resolve('office_weatherstory', { schemas: schemas('OfficeWeatherStory') })).toBe('/root/types/OfficeWeatherstoryOperation.ts')
-    })
-
-    test('adds the suffix again when the suffixed name is also a schema', () => {
-      expect(resolve('point', { schemas: schemas('PointOperation', 'Point') })).toBe('/root/types/PointOperationOperation.ts')
-    })
-
-    test('keeps the name when no schema file matches', () => {
-      expect(resolve('point', { schemas: schemas('Gridpoint') })).toBe('/root/types/Point.ts')
-    })
-
-    test('keeps the name when grouping puts the operation in another folder', () => {
-      expect(resolve('point', { schemas: schemas('Point'), group: { type: 'tag' } })).toBe('/root/types/geo/Point.ts')
-    })
-
-    test('keeps the single output file when every declaration shares it', () => {
-      expect(resolve('point', { schemas: schemas('Point'), output: { path: 'types.ts', mode: 'file' } })).toBe('/root/types.ts')
-    })
   })
 })
 

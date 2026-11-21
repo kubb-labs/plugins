@@ -8,7 +8,6 @@ import {
   buildResponses,
   getCircularNames,
   getOasAdapter,
-  resolveOperationFile,
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
@@ -35,7 +34,7 @@ export const createPrinterValibot: PrinterFactory<PluginValibot> = (ctx) => {
     resolver: ctx.resolver,
     // A `printer.nodes` override can print differently per call, so its lookups are not cached.
     directionalCache: printer?.nodes ? undefined : new WeakMap(),
-    cyclicSchemas: getCircularNames(ctx),
+    cyclicSchemas: getCircularNames(),
     nodes: printer?.nodes,
   })
 }
@@ -51,14 +50,14 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   name: 'valibot',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { config, resolver, root } = ctx
+    const { resolver, root } = ctx
     const { output, inferred, typeGuards, importPath, group } = ctx.options
 
     if (!node.name) {
       return
     }
 
-    const cyclicSchemas = getCircularNames(ctx)
+    const cyclicSchemas = getCircularNames()
     const printerOptions = ctx.printer.options
     // Rendered twice: the schema decodes, and its `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions })
@@ -78,17 +77,11 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     const inputName = resolver.schema.inputName(node.name)
     const meta = {
       name: resolver.name(node.name),
-      file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
+      file: ctx.file(node),
     } as const
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         <File.Import name="v" path={importPath} isNameSpace />
         {imports.map((imp) => (
           <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
@@ -124,14 +117,14 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { config, resolver, root } = ctx
+    const { resolver, root } = ctx
     const { output, inferred, importPath, group } = ctx.options
 
     const meta = {
-      file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
+      file: ctx.file(node),
     } as const
 
-    const cyclicSchemas = getCircularNames(ctx)
+    const cyclicSchemas = getCircularNames()
     const printerOptions = ctx.printer.options
 
     function renderSchemaEntry({
@@ -275,13 +268,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     const responsesSchema = inferred ? renderSchemaEntry({ schema: buildResponses(node, resolver), name: resolver.response.responses(node) }) : null
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         <File.Import name="v" path={importPath} isNameSpace />
         {paramSchemas}
         {responseSchemas}

@@ -413,7 +413,7 @@ export const createPrinterTs: PrinterFactory<PluginTs> = (ctx) => {
     enum: enumOptions,
     syntaxType,
     resolver: ctx.resolver,
-    enumSchemaNames: getEnumNames(ctx),
+    enumSchemaNames: getEnumNames(),
     nodes: printer?.nodes,
   })
 }

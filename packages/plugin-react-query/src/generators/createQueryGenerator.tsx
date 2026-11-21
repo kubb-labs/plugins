@@ -75,9 +75,9 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
       const queryOptionsName = variantResolver.optionsName(node)
       const queryKeyName = variantResolver.keyName(node)
       const queryKeyTypeName = variantResolver.keyTypeName(node)
-      const tsResolver = resolveOperationTypes(ctx, resolver.pluginName).resolver
+      const tsResolver = resolveOperationTypes().resolver
 
-      const hook = resolveHookFile(node, ctx, {
+      const hook = resolveHookFile(node, {
         name: queryName,
         output,
         group,
