@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
+import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, toResponseContent } from '@internals/shared'
 import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -17,7 +17,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { enum: enumOptions, output, group } = ctx.options
-    const { config, resolver, root } = ctx
+    const { resolver, root } = ctx
 
     if (enumOptions.type !== 'inlineLiteral') node = resolveInlineEnumNames({ node, owner: node.name ?? '', resolver, enumOptions })
     if (!node.name) {
@@ -25,7 +25,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     }
     // Enum schema names, so the ref handler and the imports
     // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
-    const enumSchemaNames = getEnumNames(ctx)
+    const enumSchemaNames = getEnumNames()
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
 
     const imports = resolver.imports({ node, root, output, group: group ?? undefined, name: importName })
@@ -37,19 +37,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const meta = {
       name: enumOptions.type === 'asConst' && isEnumSchema ? resolver.enum.keyName(node, enumOptions.typeSuffix) : resolver.name(node.name),
-      file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
+      file: ctx.file(node),
     } as const
 
     const schemaPrinter = ctx.printer.with({ name: meta.name, description: node.description })
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         {imports.map((imp) => (
           <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
         ))}
@@ -59,16 +53,16 @@ export const typeGenerator = defineGenerator<PluginTs>({
   },
   operation(node, ctx) {
     const { enum: enumOptions, group, output, operations } = ctx.options
-    const { config, resolver, root } = ctx
+    const { resolver, root } = ctx
     const inline = operations === 'inline'
 
     const meta = {
-      file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
+      file: ctx.file(node),
     } as const
 
     // Enum schema names, so the ref handler and the imports
     // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
-    const enumSchemaNames = getEnumNames(ctx)
+    const enumSchemaNames = getEnumNames()
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
     const inlinePrinter = inline ? ctx.printer : null
 
@@ -237,13 +231,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const responseType = buildResponseType()
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         {paramGroupTypes}
         {responseTypes}
         {responseHeaderTypes}

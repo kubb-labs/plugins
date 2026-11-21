@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
-import { operationFileEntry, resolveOperationFile, getStream } from '@internals/shared'
+import { operationFileEntry, getStream } from '@internals/shared'
 import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
@@ -23,7 +23,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const { resolver, root, config } = ctx
     const { output, client, group } = ctx.options
 
-    const types = resolveOperationTypes(ctx, resolver.pluginName)
+    const types = resolveOperationTypes()
     const tsResolver = types.resolver
 
     // The registered contract client plugin owns the `<op>` the handler imports and calls.
@@ -38,14 +38,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const meta = {
       name: resolver.handler.name(node),
       file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
-      fileTs: resolveOperationFile({
-        ctx,
-        node,
-        resolver: tsResolver,
-        root,
-        output: types.output ?? output,
-        group: types.group,
-      }),
+      fileTs: ctx.file(node, { plugin: tsResolver.pluginName }),
     } as const
 
     return (

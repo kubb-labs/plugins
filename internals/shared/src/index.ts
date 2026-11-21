@@ -18,7 +18,6 @@ export {
   operationFileEntry,
   resolveContentTypeVariants,
   resolveErrorNames,
-  resolveOperationFile,
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveSuccessNames,

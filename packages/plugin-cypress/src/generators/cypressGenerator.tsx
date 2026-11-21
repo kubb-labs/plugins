@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
+import { resolveOperationTypeNames } from '@internals/shared'
 import { defineGenerator, operationKey } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -19,7 +19,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const { config, resolver, root } = ctx
     const { output, baseURL, group } = ctx.options
 
-    const pluginTs = ctx.requirePlugin(pluginTsName)
+    ctx.requirePlugin(pluginTsName)
 
     const tsResolver = ctx.getResolver(pluginTsName)
 
@@ -29,14 +29,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const meta = {
       name: resolver.resolveName({ key: operationKey(node), name }),
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
-      fileTs: resolveOperationFile({
-        ctx,
-        node,
-        resolver: tsResolver,
-        root,
-        output: pluginTs.options?.output ?? output,
-        group: pluginTs.options?.group,
-      }),
+      fileTs: ctx.file(node, { plugin: tsResolver.pluginName }),
     } as const
 
     return (

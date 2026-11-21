@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
-import { operationFileEntry, resolveOperationFile, getStream } from '@internals/shared'
+import { operationFileEntry, getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -22,7 +22,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     const { config, resolver, plugin, root } = ctx
     const { output, group } = ctx.options
 
-    const pluginZod = ctx.requirePlugin(pluginZodName)
+    ctx.requirePlugin(pluginZodName)
 
     const zodResolver = ctx.getResolver(pluginZodName)
 
@@ -58,14 +58,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
 
         const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
-        const zodFile = resolveOperationFile({
-          ctx,
-          node,
-          resolver: zodResolver,
-          root,
-          output: pluginZod.options?.output ?? output,
-          group: pluginZod.options?.group ?? undefined,
-        })
+        const zodFile = ctx.file(node, { plugin: zodResolver.pluginName })
 
         const requestName = ast.http.requestBody.getSchema(node) ? zodResolver.response.body(node) : null
         const successStatus = ast.http.responses.findPrimary(node)?.statusCode

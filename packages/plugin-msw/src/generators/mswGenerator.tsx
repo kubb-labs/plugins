@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { getEnumNames, resolveOperationFile } from '@internals/shared'
+import { getEnumNames } from '@internals/shared'
 import { defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -35,14 +35,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       fakerPlugin && fakerResolver
         ? {
             name: fakerResolver.response.response(node),
-            file: resolveOperationFile({
-              ctx,
-              node,
-              resolver: fakerResolver,
-              root,
-              output: fakerPlugin.options?.output ?? output,
-              group: fakerPlugin.options?.group ?? undefined,
-            }),
+            file: ctx.file(node, { plugin: fakerResolver.pluginName }),
           }
         : null
 
@@ -50,21 +43,14 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const tsResolver = ctx.getResolver(pluginTsName)
 
     const type = {
-      file: resolveOperationFile({
-        ctx,
-        node,
-        resolver: tsResolver,
-        root,
-        output: pluginTs.options?.output ?? output,
-        group: pluginTs.options?.group,
-      }),
+      file: ctx.file(node, { plugin: tsResolver.pluginName }),
       responseName: tsResolver.response.response(node),
     }
 
     const successResponses = ast.http.responses.filterSuccess(node)
     const referencedNames = ast.http.responses.getImportedNames(node.responses)
     const enumOptions = pluginTs.options?.enum
-    const enumNames = getEnumNames(ctx)
+    const enumNames = getEnumNames()
     const hasResponseNameCollision = referencedNames.some((name) => {
       return enumTypeName({ resolver: tsResolver, name, enumOptions, isEnum: enumNames.has(name) }) === type.responseName
     })
