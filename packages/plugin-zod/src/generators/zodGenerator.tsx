@@ -36,7 +36,7 @@ function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction
  * `printer.nodes` override differ per node and have no string key, so they get a fresh printer.
  */
 function getPrinter(ctx: Pick<GeneratorContext, 'memo'>, options: PrinterZodOptions, mini: boolean, direction: 'encode' | 'decode') {
-  const build = () => (mini ? printerZodMini(options as PrinterZodMiniOptions) : printerZod({ ...options, direction }))
+  const build = () => (mini ? printerZodMini({ ...(options as PrinterZodMiniOptions), direction }) : printerZod({ ...options, direction }))
   if (options.nodes || options.keysToOmit?.length) return build()
   const { coercion, guidType, regexType, oneOfType, dateType } = options
   const coerce = (['dates', 'strings', 'numbers'] as const).map((type) => shouldCoerce(coercion, type))
@@ -76,9 +76,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
     }
 
     // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
-    const hasDirectionalNode = !mini && containsDirectionalNode({ node, printerOptions })
+    const hasDirectionalNode = containsDirectionalNode({ node, printerOptions, mini })
 
-    const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions }) : [])
+    const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions, mini }) : [])
     const importEntries = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
     const inputImportEntries = hasDirectionalNode
       ? [...directionalRefNames].map((schemaName) => ({
@@ -189,7 +189,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       if (!schema) return null
       siblings.set(name, schema)
 
-      const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
+      const directionalRefNames = direction === 'encode' ? new Set(collectDirectionalRefNames({ node: schema, printerOptions, mini })) : null
       const schemaPrinter = getPrinter(ctx, { ...printerOptions, keysToOmit }, mini, direction)
       const imports = resolver.imports({
         node: schema,

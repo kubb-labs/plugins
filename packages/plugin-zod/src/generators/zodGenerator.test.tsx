@@ -1022,6 +1022,24 @@ describe('zodGenerator — inferred aliases', () => {
     expect(source).toContain('export type SlotInputSchemaType = z.input<typeof slotInputSchema>')
   })
 
+  test('mini: true emits the encode variant of a codec component', async () => {
+    const source = await renderSchema(slotSchema, { ...resolveOptions('codec'), mini: true, importPath: 'zod/mini' })
+    expect(source).toContain('export const slotSchema = z.object({\n  startsAt: z.iso.time().transform((value) => Temporal.PlainTime.from(value)),')
+    expect(source).toContain('export const slotInputSchema = z.object({\n  startsAt: z.instanceof(Temporal.PlainTime).transform((value) => value.toString()),')
+    expect(source).toContain('export type SlotInputSchemaType = z.input<typeof slotInputSchema>')
+  })
+
+  test('mini: true encodes request bodies and decodes responses', async () => {
+    const source = await renderOperation(bookSlot, { ...resolveOptions('codec'), mini: true, importPath: 'zod/mini' })
+    expect(source).toMatch(/export const bookSlotBodySchema = [^\n]*\n\s*startsAt: z\.instanceof\(Temporal\.PlainTime\)/)
+    expect(source).toMatch(/export const bookSlotStatus200Schema = [^\n]*\n\s*startsAt: z\.iso\.time\(\)\.transform/)
+  })
+
+  test('mini: true without a printer override emits no encode variant', async () => {
+    const source = await renderSchema(slotSchema, { ...defaultOptions, inferred: 'codec', mini: true, importPath: 'zod/mini' })
+    expect(source).not.toContain('slotInputSchema')
+  })
+
   test('inferred: true keeps z.infer for every operation schema', async () => {
     const source = await renderOperation(bookSlot, resolveOptions(true))
     expect(source).not.toMatch(/z\.(input|output)</)

@@ -72,7 +72,7 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
    */
   strictMember?: (member: string, schema: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>) => string
   /**
-   * Whether a `$ref` resolves to its `${name}InputSchema` variant. `zod/mini` is direction-free, so it leaves this unset.
+   * Whether a `$ref` resolves to its `${name}InputSchema` variant.
    */
   useInputVariant?: (node: ast.SchemaNode, options: TOptions) => boolean
 }
