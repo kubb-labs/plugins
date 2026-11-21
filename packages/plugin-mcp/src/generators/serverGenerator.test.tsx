@@ -99,15 +99,17 @@ async function renderServer(nodes: Array<ast.OperationNode>) {
     name: 'showPetById',
     plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
   })
-  // Also register zod plugin — serverGenerator needs it for zod schema imports
+  // Register the zod plugin for the schema imports, and plugin-mcp itself for the handler imports, as the driver does.
   const originalGetPlugin = driver.getPlugin.bind(driver)
   driver.getPlugin = ((pluginName: string) => {
     if (pluginName === 'plugin-zod') return mockedZodPlugin
+    if (pluginName === 'plugin-mcp') return plugin
     return originalGetPlugin(pluginName)
   }) as typeof driver.getPlugin
 
   driver.getResolver = ((pluginName: string) => {
     if (pluginName === 'plugin-zod') return mockedZodPlugin.resolver
+    if (pluginName === 'plugin-mcp') return resolverMcp
     return mockedTsPlugin.resolver
   }) as typeof driver.getResolver
 
