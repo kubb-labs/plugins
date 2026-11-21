@@ -9,10 +9,7 @@ import { Enum, getEnumNames } from './Enum.tsx'
 type Props = {
   name: string
   node: ast.SchemaNode
-  /**
-   * Pre-configured printer instance created by the generator.
-   * The plugin's `ctx.printer`, with per-node options from `printer.with(...)`.
-   */
+  /** The plugin's `ctx.printer`, with per-node options from `printer.with(...)`. */
   printer: ast.Printer<PrinterTsFactory>
   enum: PluginTs['resolvedOptions']['enum']
   resolver: ResolverTs

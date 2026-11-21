@@ -5,7 +5,7 @@ import { createRequire } from 'node:module'
 import path from 'node:path'
 import { promisify } from 'node:util'
 import { parserTs } from '@kubb/parser-ts'
-import { createPrinterTs, type PluginTs, resolverTs, typeGenerator } from '@kubb/plugin-ts'
+import { type PluginTs, resolverTs, typeGenerator } from '@kubb/plugin-ts'
 import { describe, expect, onTestFinished, test } from 'vitest'
 import {
   createMockedAdapter,
@@ -18,6 +18,7 @@ import {
   renderGeneratorSchema,
   testConfig,
 } from '#mocks'
+import { createPrinterTs } from '../../../plugin-ts/src/printers/printerTs.ts'
 import { createPrinterFaker } from '../printers/printerFaker.ts'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import type { PluginFaker } from '../types.ts'
