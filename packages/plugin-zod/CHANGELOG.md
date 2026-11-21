@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.11.1
+
+### Patch Changes
+
+- [#1546](https://github.com/kubb-labs/plugins/pull/1546) [`2f23021`](https://github.com/kubb-labs/plugins/commit/2f23021e5c6671acf03833569b455e79a17bec35) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - With `mini: true`, `printer.nodes` handlers now receive `this.options.direction`. A handler that prints differently per direction now gets an `${name}InputSchema` variant, and request bodies and parameters use the encode output, the same as with the classic printer.
+
 ## 5.11.0
 
 ### Minor Changes
