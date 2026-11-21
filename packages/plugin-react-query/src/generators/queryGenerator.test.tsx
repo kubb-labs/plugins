@@ -7,7 +7,8 @@ import { resolverClient } from '@kubb/plugin-client'
 import type { ClientResolvedOptions } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
-import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
+import { hookFileName, mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
+import { Resolver } from '@kubb/kit'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
@@ -164,6 +165,18 @@ const headersOnlyNode = ast.factory.createOperation({
 })
 
 describe('queryGenerator operation', () => {
+  test('a name override renames the hook and keeps its file name', () => {
+    const resolver = Resolver.merge(resolverReactQuery, {
+      name(name: string) {
+        return `${name}Api`
+      },
+    })
+
+    expect(resolver.suspenseQuery.name(getPetByIdNode)).toBe('useGetPetByIdApiSuspense')
+    expect(hookFileName(resolver, getPetByIdNode, 'Suspense')).toBe('useGetPetByIdSuspense')
+    expect(resolver.fileNaming.name(getPetByIdNode, resolver.suspenseQuery.optionsName(getPetByIdNode))).toBe('useGetPetByIdSuspense')
+  })
+
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
     { name: 'getPetById', node: getPetByIdNode, options: {} },

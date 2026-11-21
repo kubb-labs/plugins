@@ -4,11 +4,13 @@ import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared
 import { code, Diagnostics, from, type GeneratorContext, type Group, type Output, useKubb } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
+import { type HookFileVariant, hookFileName } from '../resolver.ts'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { ClientOperation, ReturnTypeOption } from '@internals/client'
 
 type ResolveHookFileOptions = {
-  name: string
+  /** The hook's variant, which names its file through `hookFileName`. */
+  variant?: HookFileVariant
   output: Output
   group?: Group | null
   contractOp: ClientOperation
@@ -44,7 +46,7 @@ type ResolvedHookFile = {
  */
 export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFileOptions): ResolvedHookFile {
   const ctx = useKubb<GeneratorContext>()
-  const { name, output, group, contractOp, keyTypeName, extraTypeNames = [], returnType = 'data' } = options
+  const { variant = '', output, group, contractOp, keyTypeName, extraTypeNames = [], returnType = 'data' } = options
   const { config, root, resolver } = ctx
   if (returnType !== 'data' && contractOp.returnType === 'data') {
     throw new Diagnostics.Error({
@@ -60,7 +62,7 @@ export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFil
   const tsResolver = types.resolver
   const headerTypeNames = returnType === 'data' || !contractOp.typedHeaders ? [] : getResponseHeadersTypeNames({ node, types: tsResolver })
 
-  const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
+  const file = resolver.file({ ...operationFileEntry(node, hookFileName(resolver, node, variant)), root, output, group: group ?? undefined })
   const typeSource = from('types')
   const importedTypeNames = [
     tsResolver.response.options(node),

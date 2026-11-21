@@ -31,3 +31,5 @@ plugin-ts and `pluginZod({ inferred })` now `provide('types')`. Codec types from
 Generated output is unchanged.
 
 The msw, cypress, mcp and client resolvers now name their own files with the resolver's `file.name` and `file.suffix`, and react-query's resolver says which hook file holds each hook's options. Generators pass only the node to `ctx.file` and `from(…).import(node, name)`. Generated file names are unchanged.
+
+TanStack hook files (react-query, vue-query, swr) and msw handler files are named from the `operationId`, apart from the resolver's `name`, so a `name` override renames hooks and handlers but keeps their files.

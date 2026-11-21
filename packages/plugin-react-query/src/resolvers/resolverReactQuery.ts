@@ -1,5 +1,5 @@
 import { resolveOperationName } from '@internals/shared'
-import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
+import { createMutationResolver, createQueryResolver, hookFileName } from '@internals/tanstack-query'
 import { createResolver, operationKey } from '@kubb/kit'
 import type { PluginReactQuery, ResolverReactQuery } from '../types.ts'
 
@@ -29,8 +29,15 @@ export const resolverReactQuery = createResolver<PluginReactQuery>({
     name(node, exportName) {
       if (node.kind !== 'Operation' || !exportName) return undefined
       const resolver = this as unknown as ResolverReactQuery
-      const namespaces = [resolver.query, resolver.suspenseQuery, resolver.infiniteQuery, resolver.suspenseInfiniteQuery, resolver.mutation]
-      return namespaces.find((ns) => ns.name(node) === exportName || ns.optionsName(node) === exportName)?.name(node)
+      const namespaces = [
+        [resolver.query, ''],
+        [resolver.suspenseQuery, 'Suspense'],
+        [resolver.infiniteQuery, 'Infinite'],
+        [resolver.suspenseInfiniteQuery, 'SuspenseInfinite'],
+        [resolver.mutation, 'mutation'],
+      ] as const
+      const match = namespaces.find(([ns]) => ns.name(node) === exportName || ns.optionsName(node) === exportName)
+      return match ? hookFileName(this, node, match[1]) : undefined
     },
   },
   name: resolveOperationName,
