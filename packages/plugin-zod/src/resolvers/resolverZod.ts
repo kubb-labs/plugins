@@ -25,10 +25,10 @@ export const resolverZod = createResolver<PluginZod>({
   ...resolverCasedFile((part) => casing.camel(part, { suffix: 'schema' })),
   schema: {
     typeName(name) {
-      return this.memo(`typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
+      return this.memo(`plugin-zod:typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
     },
     type(name) {
-      return this.memo(`type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
+      return this.memo(`plugin-zod:type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
     },
     inputName(name) {
       return this.name(`${name} input`)

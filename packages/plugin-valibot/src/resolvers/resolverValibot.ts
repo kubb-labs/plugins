@@ -20,10 +20,10 @@ export const resolverValibot = createResolver<PluginValibot>({
   ...resolverCasedFile((part) => casing.camel(part, { suffix: 'schema' })),
   schema: {
     typeName(name) {
-      return this.memo(`typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
+      return this.memo(`plugin-valibot:typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
     },
     type(name) {
-      return this.memo(`type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
+      return this.memo(`plugin-valibot:type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
     },
     inputName(name) {
       return this.name(`${name} input`)

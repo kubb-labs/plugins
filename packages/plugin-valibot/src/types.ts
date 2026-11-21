@@ -182,8 +182,10 @@ declare global {
       'plugin-valibot': PluginValibot
     }
     interface MemoRegistry {
-      valibotPrinter: ReturnType<typeof printerValibot>
-      valibotDirectionalNodes: WeakMap<ast.SchemaNode, ast.SchemaNode | null>
+      'plugin-valibot:typeName': string
+      'plugin-valibot:type': string
+      'plugin-valibot:printer': ReturnType<typeof printerValibot>
+      'plugin-valibot:directionalNodes': WeakMap<ast.SchemaNode, ast.SchemaNode | null>
     }
   }
 }

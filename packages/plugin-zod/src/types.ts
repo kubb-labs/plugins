@@ -316,10 +316,10 @@ declare global {
       'plugin-zod': PluginZod
     }
     interface MemoRegistry {
-      typeName: string
-      type: string
-      zodPrinter: ReturnType<typeof printerZod> | ReturnType<typeof printerZodMini>
-      zodDirectionalNodes: WeakMap<ast.SchemaNode, ast.SchemaNode | null>
+      'plugin-zod:typeName': string
+      'plugin-zod:type': string
+      'plugin-zod:printer': ReturnType<typeof printerZod> | ReturnType<typeof printerZodMini>
+      'plugin-zod:directionalNodes': WeakMap<ast.SchemaNode, ast.SchemaNode | null>
     }
   }
 }

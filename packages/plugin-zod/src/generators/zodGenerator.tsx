@@ -13,14 +13,14 @@ import {
   shouldCoerce,
   toResponseContent,
 } from '@internals/shared'
-import { defineGenerator } from '@kubb/kit'
+import { defineGenerator, type GeneratorContext, memo } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Zod } from '../components/Zod.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from '../printers/printerZod.ts'
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
-import type { PluginZod, ResolverZod } from '../types'
+import type { PluginZod } from '../types'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
@@ -35,12 +35,12 @@ function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction
  * The printer for one direction, built once per plugin per build. A `keysToOmit` list and a
  * `printer.nodes` override differ per node and have no string key, so they get a fresh printer.
  */
-function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boolean, direction: 'encode' | 'decode') {
+function getPrinter(ctx: Pick<GeneratorContext, 'memo'>, options: PrinterZodOptions, mini: boolean, direction: 'encode' | 'decode') {
   const build = () => (mini ? printerZodMini(options as PrinterZodMiniOptions) : printerZod({ ...options, direction }))
   if (options.nodes || options.keysToOmit?.length) return build()
   const { coercion, guidType, regexType, oneOfType, dateType } = options
   const coerce = (['dates', 'strings', 'numbers'] as const).map((type) => shouldCoerce(coercion, type))
-  return resolver.memo(`zodPrinter:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
+  return memo.scope(ctx, 'plugin-zod')(`printer:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
 }
 
 /**
@@ -63,7 +63,17 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterZodOptions = {
+      coercion,
+      guidType,
+      regexType,
+      oneOfType,
+      dateType,
+      resolver,
+      memo: ctx.memo,
+      cyclicSchemas,
+      nodes: printer?.nodes,
+    }
 
     // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
     const hasDirectionalNode = !mini && containsDirectionalNode({ node, printerOptions })
@@ -90,7 +100,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const isName = typeGuards ? resolver.schema.isName(node.name) : null
     const assertName = typeGuards ? resolver.schema.assertName(node.name) : null
 
-    const schemaPrinter = getPrinter(resolver, printerOptions, mini, 'decode')
+    const schemaPrinter = getPrinter(ctx, printerOptions, mini, 'decode')
 
     return (
       <File
@@ -123,7 +133,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           <Zod
             name={resolver.schema.inputName(node.name)}
             node={node}
-            printer={getPrinter(resolver, printerOptions, mini, 'encode')}
+            printer={getPrinter(ctx, printerOptions, mini, 'encode')}
             inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
             inferKind={aliasKind(inferred, 'encode')}
             typeGuards={typeGuards}
@@ -151,7 +161,17 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterZodOptions = {
+      coercion,
+      guidType,
+      regexType,
+      oneOfType,
+      dateType,
+      resolver,
+      memo: ctx.memo,
+      cyclicSchemas,
+      nodes: printer?.nodes,
+    }
     // The schemas of this file by name, so a union of them can tell what its members print.
     const siblings = new Map<string, ast.SchemaNode>()
 
@@ -170,7 +190,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       siblings.set(name, schema)
 
       const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
-      const schemaPrinter = getPrinter(resolver, { ...printerOptions, keysToOmit }, mini, direction)
+      const schemaPrinter = getPrinter(ctx, { ...printerOptions, keysToOmit }, mini, direction)
       const imports = resolver.imports({
         node: schema,
         root,

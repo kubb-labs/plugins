@@ -12,12 +12,12 @@ import {
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
-import { defineGenerator } from '@kubb/kit'
+import { defineGenerator, type GeneratorContext, memo } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerValibot } from '../printers/printerValibot.ts'
 import type { PrinterValibotOptions } from '../printers/printerValibot.ts'
-import type { PluginValibot, ResolverValibot } from '../types.ts'
+import type { PluginValibot } from '../types.ts'
 
 type Direction = NonNullable<PrinterValibotOptions['direction']>
 
@@ -25,12 +25,12 @@ type Direction = NonNullable<PrinterValibotOptions['direction']>
  * The printer for one direction, built once per plugin per build. A `keysToOmit` list and a
  * `printer.nodes` override differ per node and have no string key, so they get a fresh printer.
  */
-function getPrinter(resolver: ResolverValibot, options: PrinterValibotOptions, direction: Direction) {
+function getPrinter(ctx: Pick<GeneratorContext, 'memo'>, options: PrinterValibotOptions, direction: Direction) {
   const build = () => printerValibot({ ...options, direction })
   if (options.nodes || options.keysToOmit?.length) return build()
 
-  return resolver.memo(
-    `valibotPrinter:${[direction, JSON.stringify(options.coercion), options.regexType, options.oneOfType, options.dateType].join(':')}`,
+  return memo.scope(ctx, 'plugin-valibot')(
+    `printer:${[direction, JSON.stringify(options.coercion), options.regexType, options.oneOfType, options.dateType].join(':')}`,
     build,
   )
 }
@@ -55,7 +55,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
 
     const cyclicSchemas = getCircularNames(ctx)
     const dateType = getOasAdapter(adapter).options.dateType
-    const printerOptions: PrinterValibotOptions = { regexType, oneOfType, coercion, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterValibotOptions = { regexType, oneOfType, coercion, dateType, resolver, memo: ctx.memo, cyclicSchemas, nodes: printer?.nodes }
     // Rendered twice: the schema decodes, and its `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions })
     const inputImports = hasDirectionalNode
@@ -93,7 +93,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
         <Valibot
           name={meta.name}
           node={node}
-          printer={getPrinter(resolver, printerOptions, 'decode')}
+          printer={getPrinter(ctx, printerOptions, 'decode')}
           inferTypeName={inferred ? resolver.schema.typeName(node.name) : null}
           typeGuards={typeGuards}
           isName={resolver.schema.isName(node.name)}
@@ -105,7 +105,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
           <Valibot
             name={inputName}
             node={node}
-            printer={getPrinter(resolver, printerOptions, 'encode')}
+            printer={getPrinter(ctx, printerOptions, 'encode')}
             inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
             inferKind="InferInput"
             typeGuards={typeGuards}
@@ -129,7 +129,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     } as const
 
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterValibotOptions = { regexType, oneOfType, coercion, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterValibotOptions = { regexType, oneOfType, coercion, dateType, resolver, memo: ctx.memo, cyclicSchemas, nodes: printer?.nodes }
 
     function renderSchemaEntry({
       schema,
@@ -181,7 +181,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
           <Valibot
             name={name}
             node={schema}
-            printer={getPrinter(resolver, { ...printerOptions, keysToOmit }, direction)}
+            printer={getPrinter(ctx, { ...printerOptions, keysToOmit }, direction)}
             inferTypeName={inferred ? resolver.schema.type(name) : null}
             inferKind={inferKinds[direction]}
             comments={schemaComments(schema)}
