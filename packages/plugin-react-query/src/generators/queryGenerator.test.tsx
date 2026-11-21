@@ -174,7 +174,7 @@ describe('queryGenerator operation', () => {
 
     expect(resolver.suspenseQuery.name(getPetByIdNode)).toBe('useGetPetByIdApiSuspense')
     expect(hookFileName(resolver, getPetByIdNode, 'Suspense')).toBe('useGetPetByIdSuspense')
-    expect(resolver.fileNaming.name(getPetByIdNode, resolver.suspenseQuery.optionsName(getPetByIdNode))).toBe('useGetPetByIdSuspense')
+    expect(resolver.fileName(getPetByIdNode, resolver.suspenseQuery.optionsName(getPetByIdNode))).toBe('useGetPetByIdSuspense')
   })
 
   const testData = [

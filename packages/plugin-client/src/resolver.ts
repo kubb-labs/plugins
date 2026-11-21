@@ -15,7 +15,6 @@ import type { PluginContractClient, ResolverClient } from './types.ts'
  */
 export const resolverClient: ResolverClient = createResolver<PluginContractClient>({
   pluginName: 'plugin-contract-client',
-  file: { suffix: false },
   name: resolveOperationName,
   className(name) {
     return ensureValidVarName(casing.pascal(name))
