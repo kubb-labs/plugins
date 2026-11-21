@@ -10,6 +10,7 @@ import { pluginFakerName, resolverFaker } from '@kubb/plugin-faker'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import * as msw from 'msw'
+import { Resolver } from '@kubb/kit'
 import { mswBodyTemplate } from '../utils.ts'
 import { describe, expect, onTestFinished, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderGeneratorOperation, testConfig } from '#mocks'
@@ -151,6 +152,7 @@ type RenderProps = {
   options: Partial<PluginMsw['resolvedOptions']>
   tsEnum?: PluginTs['resolvedOptions']['enum']
   enumNames?: Array<string>
+  resolver?: typeof resolverMsw
 }
 
 async function renderOperation(props: RenderProps) {
@@ -158,7 +160,8 @@ async function renderOperation(props: RenderProps) {
     ...defaultOptions,
     ...props.options,
   }
-  const plugin = createMockedPlugin<PluginMsw>({ name: 'plugin-msw', options, resolver: resolverMsw })
+  const resolver = props.resolver ?? resolverMsw
+  const plugin = createMockedPlugin<PluginMsw>({ name: 'plugin-msw', options, resolver })
   const driver = createMockedPluginDriver({ name: props.name })
   driver.inputNode = ast.factory.createInput({
     schemas: (props.enumNames ?? []).map((name) => ast.factory.createSchema({ type: 'enum', name, enumValues: [] })),
@@ -189,13 +192,25 @@ async function renderOperation(props: RenderProps) {
     driver,
     plugin,
     options,
-    resolver: resolverMsw,
+    resolver,
   })
 
   return driver.fileManager.files
 }
 
 describe('mswGenerator operation', () => {
+  test('a name override renames the handler and keeps its file name', async () => {
+    const resolver = Resolver.merge(resolverMsw, {
+      name(name: string) {
+        return `${name}Mock`
+      },
+    })
+    const files = await renderOperation({ name: 'nameOverride', node: showPetByIdNode, options: {}, resolver })
+
+    expect(files.map((file) => file.baseName)).toStrictEqual(['showPetByIdHandler.ts'])
+    expect(resolver.handler.name(showPetByIdNode)).toBe('showPetByIdMock')
+  })
+
   const testData: Array<RenderProps> = [
     { name: 'showPetById', node: showPetByIdNode, options: {} },
     { name: 'getPets', node: listPetsNode, options: {} },

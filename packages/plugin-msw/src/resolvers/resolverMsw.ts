@@ -20,8 +20,9 @@ export const resolverMsw = createResolver<PluginMsw>({
   pluginName: 'plugin-msw',
   file: {
     suffix: false,
+    // The default handler name, not `this.name`, so a `name` override renames identifiers and leaves files alone.
     name(node) {
-      return node.kind === 'Operation' ? this.name(node.operationId) : undefined
+      return node.kind === 'Operation' ? casing.camel(node.operationId, { suffix: 'handler' }) : undefined
     },
   },
   name(name) {
