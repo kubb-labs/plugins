@@ -8,7 +8,6 @@ export function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
 
   return {
     ...resolver,
-    isTypeOnly: true,
     // A spread drops class methods. `memo` gets its own key space, apart from the zod names.
     file: resolver.file.bind(resolver),
     memo: (key: string, compute: () => unknown) => resolver.memo(`zodTypes:${key}`, compute),

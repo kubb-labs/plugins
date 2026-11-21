@@ -39,7 +39,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     return (
       <File {...meta.file}>
         {imports.map((imp) => (
-          <File.Import key={imp.path} name={imp.name} root={meta.file.path} path={imp.path} isTypeOnly={imp.isTypeOnly} />
+          <File.Import key={imp.path} name={imp.name} root={meta.file.path} path={imp.path} isTypeOnly />
         ))}
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>

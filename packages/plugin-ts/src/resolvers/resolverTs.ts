@@ -22,7 +22,6 @@ import type { PluginTs } from '../types.ts'
  */
 export const resolverTs = createResolver<PluginTs>({
   pluginName: 'plugin-ts',
-  isTypeOnly: true,
   name(name) {
     return this.memo(`name:${name}`, () => ensureValidVarName(casing.pascal(name)))
   },

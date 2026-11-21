@@ -65,21 +65,18 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const request = ast.http.requestBody.getSchema(node) ? typeRefs.response.body(node) : null
     const requestName = request?.name ?? null
-    const { imports } = code.join([
-      ...(hasResponseNameCollision ? [] : [responseType]),
-      ...types.map(([, typeName]) => typeName),
-      request,
-      hasSuccessSchema && faker,
-    ])
+    const { imports: typeImports } = code.join([...(hasResponseNameCollision ? [] : [responseType]), ...types.map(([, typeName]) => typeName), request])
+    const fakerImport = hasSuccessSchema ? faker?.import : null
 
     return (
       <File {...mock.file}>
         <File.Import name={['http', 'HttpResponse']} path="msw/http" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
         {requestName && <File.Import name={['MswBody']} isTypeOnly root={mock.file.path} path={mswBodyPath(config)} />}
-        {imports.map((imp) => (
-          <File.Import key={`${imp.path}:${imp.isTypeOnly}`} name={imp.name} root={mock.file.path} path={imp.path} isTypeOnly={imp.isTypeOnly} />
+        {typeImports.map((imp) => (
+          <File.Import key={imp.path} name={imp.name} root={mock.file.path} path={imp.path} isTypeOnly />
         ))}
+        {fakerImport && <File.Import name={fakerImport.name} root={mock.file.path} path={fakerImport.path} />}
 
         {types.map(([response, typeName]) => (
           <Response key={response.statusCode} typeName={typeName.name} response={response} name={mock.name} />
