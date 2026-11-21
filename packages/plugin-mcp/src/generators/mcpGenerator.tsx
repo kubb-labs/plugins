@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
-import { operationFileEntry, getStream } from '@internals/shared'
+import { getStream } from '@internals/shared'
 import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
@@ -20,8 +20,8 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     // A stream has no single JSON body to return as tool output, like the query plugins skip it.
     const stream = getStream(node)
     if (stream?.shape || stream?.hasVariant) return null
-    const { resolver, root, config } = ctx
-    const { output, client, group } = ctx.options
+    const { resolver, root } = ctx
+    const { output, client } = ctx.options
 
     const types = resolveOperationTypes()
     const tsResolver = types.resolver
@@ -37,18 +37,12 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const meta = {
       name: resolver.handler.name(node),
-      file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
+      file: ctx.file(node, { suffix: false }),
       fileTs: ctx.file(node, { plugin: tsResolver.pluginName }),
     } as const
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         {meta.fileTs && optionsName && <File.Import name={[optionsName]} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
         <File.Import name={['CallToolResult', 'ServerContext']} path={'@modelcontextprotocol/server'} isTypeOnly />
 

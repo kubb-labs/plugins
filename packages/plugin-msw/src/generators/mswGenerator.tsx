@@ -20,13 +20,12 @@ export const mswGenerator = defineGenerator<PluginMsw>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver, config, root } = ctx
-    const { output, parser, baseURL, group } = ctx.options
+    const { resolver, config } = ctx
+    const { parser, baseURL } = ctx.options
 
-    const fileName = resolver.name(node.operationId)
     const mock = {
       name: resolver.handler.name(node),
-      file: resolver.file({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
+      file: ctx.file(node, { name: resolver.name(node.operationId), suffix: false }),
     }
 
     const fakerPlugin = parser === 'faker' ? ctx.requirePlugin(pluginFakerName) : null
@@ -78,13 +77,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const requestName = ast.http.requestBody.getSchema(node) ? tsResolver.response.body(node) : null
 
     return (
-      <File
-        baseName={mock.file.baseName}
-        path={mock.file.path}
-        meta={mock.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
-      >
+      <File {...mock.file}>
         <File.Import name={['http', 'HttpResponse']} path="msw/http" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
         {requestName && <File.Import name={['MswBody']} isTypeOnly root={mock.file.path} path={mswBodyPath(config)} />}
