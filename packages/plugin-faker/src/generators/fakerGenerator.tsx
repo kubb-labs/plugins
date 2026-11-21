@@ -1,12 +1,11 @@
 import { ast } from '@internals/ast'
-import { getCircularNames, getPerContentTypeName, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
+import { getPerContentTypeName, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
 import { jsDocEscape } from '@internals/utils'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { defineGenerator } from '@kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
 import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
-import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import { buildResponseUnionSchema, canOverrideSchema, dateParserName, localeToFakerImport, resolveFakerTypeUsage, resolveTypeReference } from '../utils.ts'
 
@@ -32,7 +31,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { config, resolver, root } = ctx
-    const { output, group, dateParser, regexGenerator, seed, locale, printer, typeMode } = ctx.options
+    const { output, group, dateParser, regexGenerator, seed, locale, typeMode } = ctx.options
     const pluginTs = ctx.requirePlugin(pluginTsName)
 
     if (!node.name) {
@@ -57,16 +56,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       }),
     } as const
     const canOverride = canOverrideSchema(node)
-    const cyclicSchemas = getCircularNames(ctx)
-    const printerInstance = printerFaker({
-      resolver,
-      schemaName,
-      typeName: meta.typeName,
-      dateParser,
-      regexGenerator,
-      nodes: printer?.nodes,
-      cyclicSchemas,
-    })
+    const printerInstance = ctx.printer.with({ schemaName, typeName: meta.typeName })
     const fakerText = printerInstance.print(node) ?? 'undefined'
     const typeReference = resolveTypeReference({
       node,
@@ -110,7 +100,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   },
   operation(node, ctx) {
     const { config, resolver, root } = ctx
-    const { output, group, dateParser, regexGenerator, seed, locale, printer, typeMode } = ctx.options
+    const { output, group, dateParser, regexGenerator, seed, locale, typeMode } = ctx.options
     const pluginTs = ctx.requirePlugin(pluginTsName)
 
     const tsResolver = ctx.getResolver(pluginTsName)
@@ -192,7 +182,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ...dataUnits.map((unit) => unit.name),
       ...(hasResponseNameCollision ? [] : [responseName]),
     ])
-    const cyclicSchemas = getCircularNames(ctx)
 
     const meta = {
       file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
@@ -224,16 +213,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       }
 
       const canOverride = canOverrideSchema(schema)
-      const printerInstance = printerFaker({
-        resolver,
-        schemaName: name,
-        typeName,
-        dateParser,
-        regexGenerator,
-        nodes: printer?.nodes,
-        cyclicSchemas,
-        nestedInObject: !!keysToOmit?.length,
-      })
+      const printerInstance = ctx.printer.with({ schemaName: name, typeName, nestedInObject: !!keysToOmit?.length })
       const fakerText = printerInstance.print(schema) ?? 'undefined'
       const usedImports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)
       const { imports, aliases } = aliasConflictingImports(usedImports, localHelperNames)

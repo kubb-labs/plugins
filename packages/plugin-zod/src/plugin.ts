@@ -1,7 +1,7 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from '@kubb/kit'
+import { addGenerator, defineExtension, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { zodGenerator } from './generators/zodGenerator.tsx'
+import { createPrinterZod, zodGenerator } from './generators/zodGenerator.tsx'
 import { resolverZod } from './resolvers/resolverZod.ts'
 import type { PluginZod } from './types.ts'
 
@@ -65,6 +65,7 @@ export const pluginZod = defineExtension<PluginZod>({
     if (userMacros?.length) {
       setMacros(userMacros)
     }
+    setPrinter(createPrinterZod)
     addGenerator(zodGenerator)
 
     return {

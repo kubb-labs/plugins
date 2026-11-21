@@ -22,7 +22,7 @@ import {
 import type { PrinterZodNodes } from '../printers/printerZod.ts'
 import { resolverZod } from '../resolvers/resolverZod.ts'
 import type { PluginZod } from '../types.ts'
-import { zodGenerator } from './zodGenerator.tsx'
+import { createPrinterZod, zodGenerator } from './zodGenerator.tsx'
 
 const temporalNodes: PrinterZodNodes = {
   time() {
@@ -168,6 +168,7 @@ describe('zodGenerator — Schema', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
     const source = rawSources(driver.fileManager.files)[0]!
     const expression = source.slice(source.indexOf('export const petSchema =') + 'export const petSchema ='.length)
@@ -327,6 +328,7 @@ describe('zodGenerator — Schema', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     await matchFiles(driver.fileManager.files, props.name)
@@ -347,6 +349,7 @@ describe('zodGenerator — Schema', () => {
       plugin,
       options: defaultOptions,
       resolver,
+      printer: createPrinterZod,
     })
 
     await matchFiles(driver.fileManager.files, 'catCycle')
@@ -381,6 +384,7 @@ describe('zodGenerator — Schema', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -418,6 +422,7 @@ describe('zodGenerator — Schema', () => {
       plugin,
       options: defaultOptions,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -830,6 +835,7 @@ describe('zodGenerator — Operation', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     await matchFiles(driver.fileManager.files, props.name)
@@ -858,6 +864,7 @@ describe('zodGenerator — transformers', () => {
       plugin,
       options: defaultOptions,
       resolver,
+      printer: createPrinterZod,
     })
 
     await matchFiles(driver.fileManager.files, 'transformers removeOptionalProperties')
@@ -893,6 +900,7 @@ describe('zodGenerator — transformers', () => {
       plugin,
       options: defaultOptions,
       resolver,
+      printer: createPrinterZod,
     })
 
     await matchFiles(driver.fileManager.files, 'transformers integerToString')
@@ -942,6 +950,7 @@ describe('zodGenerator — inferred aliases', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
     return rawSources(driver.fileManager.files)[0]
   }
@@ -957,6 +966,7 @@ describe('zodGenerator — inferred aliases', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
     return rawSources(driver.fileManager.files)[0]
   }
@@ -1081,6 +1091,7 @@ describe('zodGenerator — Type Guards', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files)[0]
@@ -1104,6 +1115,7 @@ describe('zodGenerator — Type Guards', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files)[0]
@@ -1125,6 +1137,7 @@ describe('zodGenerator — Type Guards', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files)[0]
@@ -1146,6 +1159,7 @@ describe('zodGenerator — Type Guards', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files)[0]
@@ -1168,6 +1182,7 @@ describe('zodGenerator — Type Guards', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files)[0]
@@ -1193,6 +1208,7 @@ describe('zodGenerator — Compile Option', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1212,6 +1228,7 @@ describe('zodGenerator — Compile Option', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1260,6 +1277,7 @@ describe('zodGenerator — Compile Option', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1288,6 +1306,7 @@ describe('zodGenerator — Compile Option', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1325,6 +1344,7 @@ describe('zodGenerator — Compile Option', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1372,6 +1392,7 @@ describe('zodGenerator — Compile Option', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1428,6 +1449,7 @@ describe('zodGenerator — Compile Option', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1463,6 +1485,7 @@ describe('zodGenerator — Compile Option', () => {
       plugin,
       options,
       resolver,
+      printer: createPrinterZod,
     })
 
     const expression = rawSources(driver.fileManager.files)
@@ -1490,6 +1513,7 @@ describe('custom imports', () => {
       plugin,
       options: resolved,
       resolver,
+      printer: createPrinterZod,
     })
 
     return driver.fileManager.files

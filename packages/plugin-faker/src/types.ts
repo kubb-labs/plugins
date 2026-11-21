@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
 import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
-import type { PrinterFakerNodes } from './printers/printerFaker.ts'
+import type { PrinterFakerFactory, PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
  * Resolver for Faker that provides naming methods for mock functions.
@@ -159,7 +159,7 @@ export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   printer: Options['printer']
 }
 
-export type PluginFaker = PluginType<'plugin-faker', Options, ResolvedOptions, ResolverFaker>
+export type PluginFaker = PluginType<'plugin-faker', Options, ResolvedOptions, ResolverFaker, ast.Printer<PrinterFakerFactory>>
 
 declare global {
   namespace Kubb {
