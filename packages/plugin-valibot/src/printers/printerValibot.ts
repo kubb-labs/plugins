@@ -14,8 +14,7 @@ import {
   withFormatRange,
 } from '@internals/shared'
 import { buildList, buildObject, objectKey, toRegExpString } from '@internals/utils'
-import { createPrinter, text, useMemo } from '@kubb/kit'
-import { pluginValibotName } from '../plugin.ts'
+import { createPrinter, text } from '@kubb/kit'
 import type { PluginValibot, ResolverValibot } from '../types.ts'
 
 /**
@@ -61,6 +60,11 @@ export type PrinterValibotOptions = {
    * Turns a schema name from the spec into the name of its generated const.
    */
   resolver?: ResolverValibot
+  /**
+   * Caches the directional-node lookups of `containsDirectionalNode`. The `setPrinter` factory creates
+   * one per printer, so the cache lives as long as that printer. Without it, nothing is cached.
+   */
+  directionalCache?: WeakMap<ast.SchemaNode, ast.SchemaNode | null>
   /**
    * Property names to drop from the printed object with `v.omit(...)`.
    */
@@ -398,15 +402,6 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
   return call('decode') !== call('encode')
 }
 
-// One `find` cache per build and option set. A `printer.nodes` override has no string key, so it searches without one.
-function getDirectionalCache({ nodes, coercion, dateType }: PrinterValibotOptions) {
-  if (nodes) return undefined
-  return useMemo(
-    `${pluginValibotName}:directionalNodes:${shouldCoerce(coercion, 'dates')}:${dateType}`,
-    () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>(),
-  )
-}
-
 /**
  * Whether the schema contains a node that prints differently per direction, so it decodes on
  * responses and encodes on requests. Follows a `$ref` through its resolved schema.
@@ -417,7 +412,7 @@ export function containsDirectionalNode({ node, printerOptions }: { node: ast.Sc
     ast.schema.find(node, {
       predicate: (schema) => variesByDirection({ node: schema, printerOptions }),
       follow: ['ref'],
-      cache: getDirectionalCache(printerOptions),
+      cache: printerOptions.directionalCache,
     }) !== undefined
   )
 }

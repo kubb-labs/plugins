@@ -184,7 +184,6 @@ declare global {
     interface MemoRegistry {
       'plugin-valibot:typeName': string
       'plugin-valibot:type': string
-      'plugin-valibot:directionalNodes': WeakMap<ast.SchemaNode, ast.SchemaNode | null>
     }
   }
 }

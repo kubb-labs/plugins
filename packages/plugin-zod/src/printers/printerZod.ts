@@ -1,8 +1,7 @@
 import { ast } from '@internals/ast'
 import { lazyGetter, objectKey } from '@internals/utils'
-import { createPrinter, useMemo } from '@kubb/kit'
+import { createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { pluginZodName } from '../plugin.ts'
 import { defaultLiteral, hasInputChecks, shouldCoerce } from '@internals/shared'
 import { applyModifiers, buildObjectShape, lengthConstraints, numberConstraints, patternKeySchema, printWithOmit } from '../utils.ts'
 import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
@@ -75,6 +74,11 @@ export type PrinterZodOptions = {
    * Transforms raw schema names into valid JavaScript identifiers.
    */
   resolver?: ResolverZod
+  /**
+   * Caches the directional-node lookups of `containsDirectionalNode`. The `setPrinter` factory creates
+   * one per printer, so the cache lives as long as that printer. Without it, nothing is cached.
+   */
+  directionalCache?: WeakMap<ast.SchemaNode, ast.SchemaNode | null>
   /**
    * Properties to exclude using `.omit({ key: true })`.
    */
@@ -262,15 +266,9 @@ export function containsDirectionalNode({
     ast.schema.find(node, {
       predicate: (schema) => variesByDirection({ node: schema, printerOptions, mini }),
       follow: ['ref'],
-      cache: getDirectionalCache(printerOptions),
+      cache: printerOptions.directionalCache,
     }) !== undefined
   )
-}
-
-// One `find` cache per build and option set. A `printer.nodes` override has no string key, so it searches without one.
-function getDirectionalCache({ nodes, coercion, dateType }: PrinterZodOptions) {
-  if (nodes) return undefined
-  return useMemo(`${pluginZodName}:directionalNodes:${shouldCoerce(coercion, 'dates')}:${dateType}`, () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>())
 }
 
 /**
