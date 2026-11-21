@@ -9,6 +9,7 @@
 '@kubb/plugin-react-query': patch
 '@kubb/plugin-vue-query': patch
 '@kubb/plugin-swr': patch
+'@kubb/plugin-faker': patch
 ---
 
 Import names from other plugins with kit's `from` and `code`. plugin-ts marks its resolver `isTypeOnly`, so `from('plugin-ts').resolver` imports its names with `import type`. These plugins now take their imports from `from(plugin).resolver`:
@@ -20,5 +21,8 @@ Import names from other plugins with kit's `from` and `code`. plugin-ts marks it
 - plugin-client: the type and validator schema imports of each operation and SDK class. The SDK's own grouping of imports per file is gone, because `code.join` groups them.
 - plugin-react-query, plugin-vue-query and plugin-swr: the hook files' type imports, and react-query's hook options imports.
 - plugin-msw: the handlers file's imports.
+- plugin-faker: the plugin-ts type imports, and the inline `import('…')` type when a faker has the same name as its type.
+
+plugin-ts and `pluginZod({ inferred })` now `provide('types')`. Codec types from zod win over plugin-ts, and plain inferred zod types are the fallback without plugin-ts, as before. The client, query and MCP plugins read operation types through `from('types')` and `getResolver('types')`. Zod-backed types import with `import type`.
 
 Generated output is unchanged.

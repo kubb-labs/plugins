@@ -43,7 +43,7 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
 
   const validatorHooks = buildValidatorHooks({ node, validator, schemaResolver })
   const headerTypeNames = getResponseHeadersTypeNames({ node, types })
-  const typeFile = from(types.resolver.pluginName).file(node)
+  const typeFile = from('types').file(node)
   const schemaFile = schemaResolver && schemaPlugin?.options ? from(schemaResolver.pluginName).file(node) : null
 
   return {
