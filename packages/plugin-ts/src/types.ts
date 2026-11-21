@@ -336,5 +336,9 @@ declare global {
     interface PluginRegistry {
       'plugin-ts': PluginTs
     }
+    interface ProvideRegistry {
+      /** Operation and schema type names, from plugin-ts or `pluginZod({ inferred })`. */
+      types: ResolverTs
+    }
   }
 }

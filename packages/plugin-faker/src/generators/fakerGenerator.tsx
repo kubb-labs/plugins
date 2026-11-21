@@ -2,7 +2,7 @@ import { ast } from '@internals/ast'
 import { getPerContentTypeName, resolveContentTypeVariants, toResponseContent } from '@internals/shared'
 import { jsDocEscape } from '@internals/utils'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
-import { defineGenerator } from '@kubb/kit'
+import { defineGenerator, from } from '@kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
 import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
@@ -43,11 +43,12 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const schemaName = node.name
     const isEnumSchema = !!ast.schema.narrow(node, ast.schema.types.enum)
     const schemaTypeName = enumTypeName({ resolver: tsResolver, name: schemaName, enumOptions: pluginTs.options?.enum, isEnum: isEnumSchema })
+    const types = from(pluginTsName)
     const meta = {
       name: resolver.name(schemaName),
       file: ctx.file(node),
       typeName: schemaTypeName,
-      typeFile: ctx.file(node, { plugin: pluginTsName }),
+      typeOf: (typeName: string) => types.import(node, typeName),
     } as const
     const canOverride = canOverrideSchema(node)
     const printerInstance = ctx.printer.with({ schemaName, typeName: meta.typeName })
@@ -56,9 +57,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       node,
       canOverride,
       name: meta.name,
-      typeName: meta.typeName,
+      type: meta.typeOf(meta.typeName),
       filePath: meta.file.path,
-      typeFilePath: meta.typeFile.path,
     })
 
     const imports = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
@@ -69,7 +69,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParserName(dateParser)} />}
-        {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[meta.typeName]} />}
+        {typeReference.import && <File.Import isTypeOnly root={meta.file.path} path={typeReference.import.path} name={[meta.typeName]} />}
         {usedImports.map((imp) => (
           <File.Import key={[schemaName, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
         ))}
@@ -171,9 +171,10 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ...(hasResponseNameCollision ? [] : [responseName]),
     ])
 
+    const types = from(pluginTsName)
     const meta = {
       file: ctx.file(node),
-      typeFile: ctx.file(node, { plugin: tsResolver.pluginName }),
+      typeOf: (typeName: string) => types.import(node, typeName),
     } as const
 
     function resolveMockImports(schema: ast.SchemaNode) {
@@ -203,14 +204,13 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         node: schema,
         canOverride,
         name,
-        typeName,
+        type: meta.typeOf(typeName),
         filePath: meta.file.path,
-        typeFilePath: meta.typeFile.path,
       })
 
       return (
         <>
-          {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
+          {typeReference.import && <File.Import isTypeOnly root={meta.file.path} path={typeReference.import.path} name={[typeName]} />}
           {imports.map((imp) => (
             <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
           ))}
@@ -235,7 +235,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       schema: ast.SchemaNode,
     ) {
       const reference = (unit: Pick<RenderUnit, 'name' | 'typeName'>, node: ast.SchemaNode) =>
-        resolveTypeReference({ node, canOverride: true, name: unit.name, typeName: unit.typeName, filePath: meta.file.path, typeFilePath: meta.typeFile.path })
+        resolveTypeReference({ node, canOverride: true, name: unit.name, type: meta.typeOf(unit.typeName), filePath: meta.file.path })
       const typeReference = reference({ name, typeName }, schema)
       // An object override merges into an object factory. Any other override (an array, a scalar) is complete, so it is returned as is.
       const objectMembers = factories.flatMap((unit) => {
@@ -252,7 +252,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
       return (
         <>
-          {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
+          {typeReference.import && <File.Import isTypeOnly root={meta.file.path} path={typeReference.import.path} name={[typeName]} />}
           <Function
             export
             name={name}

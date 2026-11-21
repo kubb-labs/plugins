@@ -37,7 +37,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const meta = {
       name: resolver.handler.name(node),
-      file: ctx.file(node, { suffix: false }),
+      file: ctx.file(node),
       fileTs: ctx.file(node, { plugin: tsResolver.pluginName }),
     } as const
 

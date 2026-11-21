@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { casing, defineGenerator } from '@kubb/kit'
+import { casing, code, defineGenerator, from } from '@kubb/kit'
 import type { PluginMsw } from '../types'
 
 /**
@@ -20,11 +20,10 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
 
     const handlerNames = nodes.map((node) => resolver.handler.name(node))
 
-    const imports = nodes.map((node, index) => {
-      const operationName = handlerNames[index]!
-      const operationFile = ctx.file(node, { name: resolver.name(node.operationId), suffix: false })
-      return ast.factory.createImport({ name: [operationName], root: file.path, path: operationFile.path })
-    })
+    const own = from(ctx.plugin.name)
+    const imports = code
+      .join(nodes.map((node, index) => own.import(node, handlerNames[index]!)))
+      .imports.map((imp) => ast.factory.createImport({ name: imp.name, path: imp.path, root: file.path }))
 
     const handlers = handlerNames.map((name) => `${name}(undefined, options)`)
 

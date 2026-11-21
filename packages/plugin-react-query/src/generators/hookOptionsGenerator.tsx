@@ -1,9 +1,7 @@
 import { ast } from '@internals/ast'
-import { operationFileEntry } from '@internals/shared'
 import { matchesInfinite } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/kit'
+import { code, defineGenerator, from, type RefName } from '@kubb/kit'
 import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
-import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
 import { classifyOperation, resolveOperationOverrides } from '@internals/tanstack-query'
 
@@ -33,7 +31,8 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       path: resolvedFile.path.replace(/[^/\\]+\.ts$/, `${name}.ts`),
     }
 
-    const imports: Array<KubbReactNode> = []
+    const own = from(ctx.plugin.name)
+    const optionsNames: Array<RefName> = []
     const hookOptions: Record<string, string> = {}
 
     for (const node of nodes) {
@@ -61,8 +60,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         if (!enabled) continue
         const optionsName = ns.optionsName(node)
         const hookName = ns.name(node)
-        const hookFile = resolver.file({ ...operationFileEntry(node, hookName), root, output, group: group ?? undefined })
-        imports.push(<File.Import name={[optionsName]} root={hookOptionsFile.path} path={hookFile.path} />)
+        optionsNames.push(own.import(node, optionsName))
         hookOptions[hookName] = `Partial<ReturnType<typeof ${optionsName}>>`
       }
     }
@@ -75,7 +73,9 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         banner={resolver.default.banner(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
       >
-        {imports}
+        {code.join(optionsNames).imports.map((imp) => (
+          <File.Import key={imp.path} name={imp.name} root={hookOptionsFile.path} path={imp.path} />
+        ))}
         <Type export name={name}>
           {`{ ${Object.keys(hookOptions)
             .map((key) => `${JSON.stringify(key)}: ${hookOptions[key]}`)

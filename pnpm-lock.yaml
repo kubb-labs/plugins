@@ -1353,6 +1353,9 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
+      '@kubb/plugin-ts':
+        specifier: workspace:^
+        version: link:../plugin-ts
       zod:
         specifier: ^4.6.7
         version: 4.6.7

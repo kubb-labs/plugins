@@ -18,6 +18,8 @@ import type { PluginReactQuery } from '../types'
 
 type Variant = 'query' | 'suspenseQuery' | 'infiniteQuery' | 'suspenseInfiniteQuery'
 
+const fileVariants = { query: '', suspenseQuery: 'Suspense', infiniteQuery: 'Infinite', suspenseInfiniteQuery: 'SuspenseInfinite' } as const
+
 const OBSERVER_IMPORTS: Record<Variant, Array<string>> = {
   query: ['QueryObserverOptions', 'UseQueryResult'],
   suspenseQuery: ['UseSuspenseQueryOptions', 'UseSuspenseQueryResult'],
@@ -78,7 +80,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
       const tsResolver = resolveOperationTypes().resolver
 
       const hook = resolveHookFile(node, {
-        name: queryName,
+        variant: fileVariants[variant],
         output,
         group,
         contractOp,

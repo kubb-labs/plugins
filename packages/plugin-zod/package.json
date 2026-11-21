@@ -83,6 +83,7 @@
     "@internals/ast": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
+    "@kubb/plugin-ts": "workspace:^",
     "zod": "^4.6.7"
   },
   "peerDependencies": {

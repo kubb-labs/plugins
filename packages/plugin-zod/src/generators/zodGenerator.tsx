@@ -11,13 +11,14 @@ import {
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
-import { defineGenerator, type PrinterFactory } from '@kubb/kit'
+import { defineGenerator, from, type PrinterFactory } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Zod } from '../components/Zod.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from '../printers/printerZod.ts'
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
+import { pluginZodName } from '../plugin.ts'
 import type { PluginZod } from '../types'
 
 /**
@@ -76,12 +77,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions, mini }) : [])
     const importEntries = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
-    const inputImportEntries = hasDirectionalNode
-      ? [...directionalRefNames].map((schemaName) => ({
-          name: [resolver.schema.inputName(schemaName)],
-          path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-        }))
-      : []
+    const zod = from(pluginZodName).resolver
+    const inputImportEntries = [...directionalRefNames].flatMap((schemaName) => zod.schema.inputName(schemaName).import ?? [])
     const imports = [
       ...new Map(
         [...importEntries, ...inputImportEntries].map((imp) => [`${Array.isArray(imp.name) ? imp.name.join(',') : imp.name}|${imp.path}`, imp] as const),

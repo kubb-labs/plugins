@@ -186,6 +186,8 @@ function withPrinter<TOptions extends PluginType>(ctx: PrinterContext<TOptions>,
 function createMockedPluginContext<TOptions extends PluginType>(
   opts: RenderGeneratorOptions<TOptions>,
 ): Omit<GeneratorContext<TOptions>, 'options' | 'printer'> {
+  // A real build registers the plugin under test, so it can look itself up by name.
+  const getPlugin = (name: string) => opts.driver.getPlugin(name) ?? (name === opts.plugin.name ? opts.plugin : undefined)
   return {
     config: opts.config,
     root: resolve(opts.config.root, opts.config.output.path),
@@ -193,16 +195,16 @@ function createMockedPluginContext<TOptions extends PluginType>(
     resolver: opts.resolver,
     plugin: opts.plugin,
     driver: opts.driver,
-    getPlugin: (name: string) => opts.driver.getPlugin(name),
-    getResolver: (name: string) => opts.driver.getResolver(name),
+    getPlugin,
+    getResolver: (name: string) => opts.driver.getResolver(name) ?? (name === opts.plugin.name ? opts.resolver : undefined),
     requirePlugin: (pluginName: string) => {
-      const plugin = opts.driver.getPlugin(pluginName)
+      const plugin = getPlugin(pluginName)
       if (!plugin) throw pluginNotFoundError({ pluginName, requiredBy: opts.plugin.name })
       return plugin
     },
     meta: opts.meta ?? {},
     schemas: opts.driver.inputNode?.schemas ?? [],
-    memo: opts.driver.memo.bind(opts.driver),
+    memo: opts.driver.memo,
     addFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.add(...files),
     upsertFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.upsert(...files),
     hooks: opts.driver.hooks ?? new Hookable<KubbHooks>(),

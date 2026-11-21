@@ -59,7 +59,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     const queryKeyTypeName = resolver.infiniteQuery.keyTypeName(node)
 
     const hook = resolveHookFile(node, {
-      name: queryName,
+      variant: 'Infinite',
       output,
       group,
       contractOp,

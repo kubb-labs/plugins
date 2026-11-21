@@ -2,10 +2,11 @@ import { ast } from '@internals/ast'
 import path from 'node:path'
 import { getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
-import { defineGenerator } from '@kubb/kit'
+import { code, defineGenerator, from, type RefName } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
+import { pluginMcpName } from '../plugin.ts'
 import type { PluginMcp } from '../types.ts'
 
 /**
@@ -24,7 +25,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
 
     ctx.requirePlugin(pluginZodName)
 
-    const zodResolver = ctx.getResolver(pluginZodName)
+    const handlers = from(pluginMcpName).resolver
+    const schemas = from(pluginZodName).resolver
 
     const fileAt = <TName extends `${string}.${string}`>(baseName: TName) => ({
       baseName,
@@ -57,15 +59,15 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       .map((node) => {
         const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
 
-        const mcpFile = ctx.file(node, { suffix: false })
-        const zodFile = ctx.file(node, { plugin: zodResolver.pluginName })
-
-        const requestName = ast.http.requestBody.getSchema(node) ? zodResolver.response.body(node) : null
+        const handler = handlers.handler.name(node)
+        const request = ast.http.requestBody.getSchema(node) ? schemas.response.body(node) : null
         const successStatus = ast.http.responses.findPrimary(node)?.statusCode
-        const responseName = successStatus ? zodResolver.response.status(node, successStatus) : null
+        const response = successStatus ? schemas.response.status(node, successStatus) : null
+        const paramRefs = [...pathParams, ...queryParams, ...headerParams, ...cookieParams].map((p) => schemas.param.name(node, p))
 
-        const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.param.name(node, p) }))
+        const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: schemas.param.name(node, p).name }))
         const resolveOptional = (params: typeof pathParams) => (params.length ? resolveParams(params) : null)
+        const schemaRefs = [...paramRefs, request, response].filter((schema): schema is RefName => schema !== null)
 
         return {
           tool: {
@@ -74,38 +76,24 @@ export const serverGenerator = defineGenerator<PluginMcp>({
             description: node.description || `Make a ${node.method.toUpperCase()} request to ${node.path}`,
           },
           mcp: {
-            name: resolver.handler.name(node),
-            file: mcpFile,
+            name: handler.name,
           },
           zod: {
             pathParams: resolveParams(pathParams),
             queryParams: resolveOptional(queryParams),
             headerParams: resolveOptional(headerParams),
             cookieParams: resolveOptional(cookieParams),
-            requestName,
-            responseName,
-            file: zodFile,
+            requestName: request?.name ?? null,
+            responseName: response?.name ?? null,
           },
+          // The handler, then its zod schemas in name order.
+          source: code.join([handler, ...schemaRefs.sort((a, b) => a.name.localeCompare(b.name))]),
         }
       })
 
-    const imports = operationsMapped.flatMap(({ mcp, zod }) => {
-      const zodNames = [
-        ...zod.pathParams.map((p) => p.schemaName),
-        ...(typeof zod.queryParams === 'string' ? [zod.queryParams] : (zod.queryParams ?? []).map((p) => p.schemaName)),
-        ...(zod.headerParams ?? []).map((p) => p.schemaName),
-        ...(zod.cookieParams ?? []).map((p) => p.schemaName),
-        zod.requestName,
-        zod.responseName,
-      ].filter((name): name is string => Boolean(name))
-
-      const uniqueNames = [...new Set(zodNames)].sort()
-
-      return [
-        <File.Import key={mcp.name} name={[mcp.name]} root={serverFile.path} path={mcp.file.path} />,
-        uniqueNames.length > 0 && <File.Import key={`zod-${mcp.name}`} name={uniqueNames} root={serverFile.path} path={zod.file.path} />,
-      ].filter(Boolean)
-    })
+    const imports = operationsMapped.flatMap(({ mcp, source }) =>
+      source.imports.map((imp) => <File.Import key={`${mcp.name}:${imp.path}`} name={imp.name} root={serverFile.path} path={imp.path} />),
+    )
 
     return (
       <>
