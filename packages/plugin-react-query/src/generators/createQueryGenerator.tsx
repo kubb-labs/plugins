@@ -57,7 +57,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
     operation(node, ctx) {
       if (!ast.http.isOperation(node)) return null
       const { resolver } = ctx
-      const { output, query, infinite: infiniteConfig, client, group, customOptions, hooks } = ctx.options
+      const { query, infinite: infiniteConfig, client, customOptions, hooks } = ctx.options
 
       const infiniteOptions = infinite && infiniteConfig && typeof infiniteConfig === 'object' ? infiniteConfig : null
       if (infinite && !infiniteOptions) return null
@@ -81,8 +81,6 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
 
       const hook = resolveHookFile(node, {
         variant: fileVariants[variant],
-        output,
-        group,
         contractOp,
         returnType: ctx.options.returnType,
         keyTypeName: queryKeyTypeName,

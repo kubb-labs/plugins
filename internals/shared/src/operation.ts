@@ -1,26 +1,6 @@
 import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
-import type { Resolver, ResolverFileParams } from '@kubb/kit'
-
-/**
- * Builds the `ResolverFileParams` every operation generator passes to
- * `resolver.file`: a file named `name`, tagged by the operation's first
- * tag (or `'default'`), at the operation's path. Centralizes the entry object
- * that was repeated at dozens of call sites across the client and query plugins.
- *
- * @example
- * ```ts
- * resolver.file(operationFileEntry(node, node.operationId), { root, output, group })
- * ```
- */
-export function operationFileEntry(node: ast.OperationNode, name: string, extname: ResolverFileParams['extname'] = '.ts'): ResolverFileParams {
-  return {
-    name,
-    extname,
-    tag: node.tags[0] ?? 'default',
-    path: node.path,
-  }
-}
+import type { Resolver } from '@kubb/kit'
 
 export type ContentTypeInfo = {
   contentTypes: string[]

@@ -39,7 +39,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { resolver } = ctx
-    const { output, query, infinite, client, group } = ctx.options
+    const { query, infinite, client } = ctx.options
 
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
     if (!infiniteOptions) return null
@@ -60,8 +60,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
 
     const hook = resolveHookFile(node, {
       variant: 'Infinite',
-      output,
-      group,
       contractOp,
       returnType: ctx.options.returnType,
       keyTypeName: queryKeyTypeName,
