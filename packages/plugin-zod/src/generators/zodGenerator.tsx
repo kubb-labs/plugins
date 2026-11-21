@@ -20,6 +20,7 @@ import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from 
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
+import { pluginZodName } from '../plugin.ts'
 import type { PluginZod } from '../types'
 
 /**
@@ -40,7 +41,7 @@ function getPrinter(ctx: Pick<GeneratorContext, 'memo'>, options: PrinterZodOpti
   if (options.nodes || options.keysToOmit?.length) return build()
   const { coercion, guidType, regexType, oneOfType, dateType } = options
   const coerce = (['dates', 'strings', 'numbers'] as const).map((type) => shouldCoerce(coercion, type))
-  return memo.scope(ctx, 'plugin-zod')(`printer:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
+  return memo.scope(ctx, pluginZodName)(`printer:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
 }
 
 /**
@@ -70,7 +71,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       oneOfType,
       dateType,
       resolver,
-      memo: ctx.memo,
+      buildMemo: ctx.memo,
       cyclicSchemas,
       nodes: printer?.nodes,
     }
@@ -168,7 +169,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       oneOfType,
       dateType,
       resolver,
-      memo: ctx.memo,
+      buildMemo: ctx.memo,
       cyclicSchemas,
       nodes: printer?.nodes,
     }

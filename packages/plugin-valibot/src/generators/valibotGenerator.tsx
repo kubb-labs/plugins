@@ -17,6 +17,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerValibot } from '../printers/printerValibot.ts'
 import type { PrinterValibotOptions } from '../printers/printerValibot.ts'
+import { pluginValibotName } from '../plugin.ts'
 import type { PluginValibot } from '../types.ts'
 
 type Direction = NonNullable<PrinterValibotOptions['direction']>
@@ -29,7 +30,7 @@ function getPrinter(ctx: Pick<GeneratorContext, 'memo'>, options: PrinterValibot
   const build = () => printerValibot({ ...options, direction })
   if (options.nodes || options.keysToOmit?.length) return build()
 
-  return memo.scope(ctx, 'plugin-valibot')(
+  return memo.scope(ctx, pluginValibotName)(
     `printer:${[direction, JSON.stringify(options.coercion), options.regexType, options.oneOfType, options.dateType].join(':')}`,
     build,
   )
@@ -55,7 +56,16 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
 
     const cyclicSchemas = getCircularNames(ctx)
     const dateType = getOasAdapter(adapter).options.dateType
-    const printerOptions: PrinterValibotOptions = { regexType, oneOfType, coercion, dateType, resolver, memo: ctx.memo, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterValibotOptions = {
+      regexType,
+      oneOfType,
+      coercion,
+      dateType,
+      resolver,
+      buildMemo: ctx.memo,
+      cyclicSchemas,
+      nodes: printer?.nodes,
+    }
     // Rendered twice: the schema decodes, and its `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions })
     const inputImports = hasDirectionalNode
@@ -129,7 +139,16 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     } as const
 
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterValibotOptions = { regexType, oneOfType, coercion, dateType, resolver, memo: ctx.memo, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterValibotOptions = {
+      regexType,
+      oneOfType,
+      coercion,
+      dateType,
+      resolver,
+      buildMemo: ctx.memo,
+      cyclicSchemas,
+      nodes: printer?.nodes,
+    }
 
     function renderSchemaEntry({
       schema,

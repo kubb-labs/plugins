@@ -16,6 +16,7 @@ import {
 import { buildList, buildObject, objectKey, toRegExpString } from '@internals/utils'
 import { createPrinter, type Memo, memo, text } from '@kubb/kit'
 import type { PluginValibot, ResolverValibot } from '../types.ts'
+import { pluginValibotName } from '../plugin.ts'
 
 /**
  * Partial map of node-type overrides for the Valibot printer, keyed by `SchemaType`. Each function
@@ -63,7 +64,7 @@ export type PrinterValibotOptions = {
   /**
    * The build memo, where the printer caches its directional-node lookups. Without it, nothing is cached.
    */
-  memo?: Memo
+  buildMemo?: Memo
   /**
    * Property names to drop from the printed object with `v.omit(...)`.
    */
@@ -407,11 +408,11 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
  */
 export function containsDirectionalNode({ node, printerOptions }: { node: ast.SchemaNode | undefined; printerOptions: PrinterValibotOptions }): boolean {
   if (!node) return false
-  const { memo: buildMemo, nodes, coercion, dateType } = printerOptions
+  const { buildMemo, nodes, coercion, dateType } = printerOptions
   // A `printer.nodes` override has no string key, so it searches without a cache.
   const cache =
     buildMemo && !nodes
-      ? memo.scope({ memo: buildMemo }, 'plugin-valibot')(
+      ? memo.scope({ memo: buildMemo }, pluginValibotName)(
           `directionalNodes:${shouldCoerce(coercion, 'dates')}:${dateType}`,
           () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>(),
         )

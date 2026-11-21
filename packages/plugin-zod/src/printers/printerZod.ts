@@ -2,6 +2,7 @@ import { ast } from '@internals/ast'
 import { lazyGetter, objectKey } from '@internals/utils'
 import { createPrinter, type Memo, memo } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
+import { pluginZodName } from '../plugin.ts'
 import { defaultLiteral, hasInputChecks, shouldCoerce } from '@internals/shared'
 import { applyModifiers, buildObjectShape, lengthConstraints, numberConstraints, patternKeySchema, printWithOmit } from '../utils.ts'
 import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
@@ -77,7 +78,7 @@ export type PrinterZodOptions = {
   /**
    * The build memo, where the printer caches its directional-node lookups. Without it, nothing is cached.
    */
-  memo?: Memo
+  buildMemo?: Memo
   /**
    * Properties to exclude using `.omit({ key: true })`.
    */
@@ -274,9 +275,9 @@ export function containsDirectionalNode({
  * The `find` cache for {@link containsDirectionalNode}, one per plugin per build and per option set
  * the probe reads. A `printer.nodes` override has no string key, so it searches without a cache.
  */
-function getDirectionalCache({ memo: buildMemo, nodes, coercion, dateType }: PrinterZodOptions) {
+function getDirectionalCache({ buildMemo, nodes, coercion, dateType }: PrinterZodOptions) {
   if (!buildMemo || nodes) return undefined
-  return memo.scope({ memo: buildMemo }, 'plugin-zod')(
+  return memo.scope({ memo: buildMemo }, pluginZodName)(
     `directionalNodes:${shouldCoerce(coercion, 'dates')}:${dateType}`,
     () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>(),
   )
