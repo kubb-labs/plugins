@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import type { ResolvedPluginOptions } from '@internals/shared/types'
 import type { Exclude, Include, OutputOptions, Override, PluginType, Resolver, ResolverInput } from '@kubb/kit'
-import type { PrinterValibotNodes, printerValibot } from './printers/printerValibot.ts'
+import type { PrinterValibotFactory, PrinterValibotNodes } from './printers/printerValibot.ts'
 
 /**
  * The names the plugin gives to generated schemas and their inferred types.
@@ -174,7 +174,7 @@ type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   printer: Options['printer']
 }
 
-export type PluginValibot = PluginType<'plugin-valibot', Options, ResolvedOptions, ResolverValibot>
+export type PluginValibot = PluginType<'plugin-valibot', Options, ResolvedOptions, ResolverValibot, ast.Printer<PrinterValibotFactory>>
 
 declare global {
   namespace Kubb {
@@ -184,7 +184,6 @@ declare global {
     interface MemoRegistry {
       'plugin-valibot:typeName': string
       'plugin-valibot:type': string
-      'plugin-valibot:printer': ReturnType<typeof printerValibot>
       'plugin-valibot:directionalNodes': WeakMap<ast.SchemaNode, ast.SchemaNode | null>
     }
   }

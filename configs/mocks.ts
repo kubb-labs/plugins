@@ -169,9 +169,23 @@ type RenderGeneratorOptions<TOptions extends PluginType> = {
   plugin: MockedPlugin<TOptions>
   options: TOptions['resolvedOptions']
   resolver: TOptions['resolver']
+  /** The plugin's `setPrinter` factory. The generator reads its result as `ctx.printer`. */
+  printer?: (ctx: GeneratorContext<TOptions>) => GeneratorContext<TOptions>['printer']
 }
 
-function createMockedPluginContext<TOptions extends PluginType>(opts: RenderGeneratorOptions<TOptions>): Omit<GeneratorContext<TOptions>, 'options'> {
+// Adds `ctx.printer`, like kit's visitor does for a plugin that calls `setPrinter`.
+function withPrinter<TOptions extends PluginType>(
+  ctx: Omit<GeneratorContext<TOptions>, 'printer'>,
+  opts: RenderGeneratorOptions<TOptions>,
+): GeneratorContext<TOptions> {
+  const generatorContext = { ...ctx, printer: undefined } as GeneratorContext<TOptions>
+  generatorContext.printer = opts.printer?.(generatorContext) as GeneratorContext<TOptions>['printer']
+  return generatorContext
+}
+
+function createMockedPluginContext<TOptions extends PluginType>(
+  opts: RenderGeneratorOptions<TOptions>,
+): Omit<GeneratorContext<TOptions>, 'options' | 'printer'> {
   return {
     config: opts.config,
     root: resolve(opts.config.root, opts.config.output.path),
@@ -195,7 +209,7 @@ function createMockedPluginContext<TOptions extends PluginType>(opts: RenderGene
     warn: (message: string) => console.warn(message),
     error: (message: string) => console.error(message),
     info: (message: string) => console.info(message),
-  } as unknown as Omit<GeneratorContext<TOptions>, 'options'>
+  } as unknown as Omit<GeneratorContext<TOptions>, 'options' | 'printer'>
 }
 
 async function renderNode<TOptions extends PluginType, TNode extends ast.SchemaNode | ast.OperationNode>({
@@ -209,7 +223,7 @@ async function renderNode<TOptions extends PluginType, TNode extends ast.SchemaN
   opts: RenderGeneratorOptions<TOptions>
   generate: (node: TNode, ctx: GeneratorContext<TOptions>) => ReturnType<NonNullable<Generator<TOptions>['schema']>>
 }): Promise<void> {
-  const ctx = { ...createMockedPluginContext(opts), options: opts.options }
+  const ctx = withPrinter({ ...createMockedPluginContext(opts), options: opts.options }, opts)
   const transformedNode = opts.plugin.macros?.length ? ast.macro.apply(node, opts.plugin.macros) : node
   const matches = generator.match ? await generator.match(transformedNode, ctx) : true
   if (!matches) return
@@ -251,7 +265,7 @@ export async function renderGeneratorOperations<TOptions extends PluginType>(
   if (!generator.operations) return
   const context = createMockedPluginContext(opts)
   const transformedNodes = opts.plugin.macros?.length ? nodes.map((node) => ast.macro.apply(node, opts.plugin.macros!)) : nodes
-  const result = await generator.operations(transformedNodes, { ...context, options: opts.options })
+  const result = await generator.operations(transformedNodes, withPrinter({ ...context, options: opts.options }, opts))
   await opts.driver.fileManager.dispatch({ result, renderer: generator.renderer })
 }
 

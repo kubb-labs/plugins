@@ -12,28 +12,31 @@ import {
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
-import { defineGenerator, type GeneratorContext, memo } from '@kubb/kit'
+import { defineGenerator, type GeneratorContext } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerValibot } from '../printers/printerValibot.ts'
-import type { PrinterValibotOptions } from '../printers/printerValibot.ts'
-import { pluginValibotName } from '../plugin.ts'
+import type { PrinterValibotFactory, PrinterValibotOptions } from '../printers/printerValibot.ts'
 import type { PluginValibot } from '../types.ts'
 
 type Direction = NonNullable<PrinterValibotOptions['direction']>
 
 /**
- * The printer for one direction, built once per plugin per build. A `keysToOmit` list and a
- * `printer.nodes` override differ per node and have no string key, so they get a fresh printer.
+ * The `setPrinter` factory of `@kubb/plugin-valibot`. Generators pass `direction` and `keysToOmit`
+ * per node through `printer.with(...)`.
  */
-function getPrinter(ctx: Pick<GeneratorContext, 'memo'>, options: PrinterValibotOptions, direction: Direction) {
-  const build = () => printerValibot({ ...options, direction })
-  if (options.nodes || options.keysToOmit?.length) return build()
-
-  return memo.scope(ctx, pluginValibotName)(
-    `printer:${[direction, JSON.stringify(options.coercion), options.regexType, options.oneOfType, options.dateType].join(':')}`,
-    build,
-  )
+export function createPrinterValibot(ctx: GeneratorContext<PluginValibot>): ast.Printer<PrinterValibotFactory> {
+  const { regexType, oneOfType, coercion, printer } = ctx.options
+  return printerValibot({
+    regexType,
+    oneOfType,
+    coercion,
+    dateType: getOasAdapter(ctx.adapter).options.dateType,
+    resolver: ctx.resolver,
+    buildMemo: ctx.memo,
+    cyclicSchemas: getCircularNames(ctx),
+    nodes: printer?.nodes,
+  })
 }
 
 // A request schema is typed by the value the caller passes, every other schema by the value it returns.
@@ -47,25 +50,15 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   name: 'valibot',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { adapter, config, resolver, root } = ctx
-    const { output, regexType, oneOfType, coercion, inferred, typeGuards, importPath, group, printer } = ctx.options
+    const { config, resolver, root } = ctx
+    const { output, inferred, typeGuards, importPath, group } = ctx.options
 
     if (!node.name) {
       return
     }
 
     const cyclicSchemas = getCircularNames(ctx)
-    const dateType = getOasAdapter(adapter).options.dateType
-    const printerOptions: PrinterValibotOptions = {
-      regexType,
-      oneOfType,
-      coercion,
-      dateType,
-      resolver,
-      buildMemo: ctx.memo,
-      cyclicSchemas,
-      nodes: printer?.nodes,
-    }
+    const printerOptions = ctx.printer.options
     // Rendered twice: the schema decodes, and its `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions })
     const inputImports = hasDirectionalNode
@@ -103,7 +96,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
         <Valibot
           name={meta.name}
           node={node}
-          printer={getPrinter(ctx, printerOptions, 'decode')}
+          printer={ctx.printer.with({ direction: 'decode' })}
           inferTypeName={inferred ? resolver.schema.typeName(node.name) : null}
           typeGuards={typeGuards}
           isName={resolver.schema.isName(node.name)}
@@ -115,7 +108,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
           <Valibot
             name={inputName}
             node={node}
-            printer={getPrinter(ctx, printerOptions, 'encode')}
+            printer={ctx.printer.with({ direction: 'encode' })}
             inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
             inferKind="InferInput"
             typeGuards={typeGuards}
@@ -130,25 +123,15 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { adapter, config, resolver, root } = ctx
-    const { output, regexType, oneOfType, coercion, inferred, importPath, group, printer } = ctx.options
-    const dateType = getOasAdapter(adapter).options.dateType
+    const { config, resolver, root } = ctx
+    const { output, inferred, importPath, group } = ctx.options
 
     const meta = {
       file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
     } as const
 
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterValibotOptions = {
-      regexType,
-      oneOfType,
-      coercion,
-      dateType,
-      resolver,
-      buildMemo: ctx.memo,
-      cyclicSchemas,
-      nodes: printer?.nodes,
-    }
+    const printerOptions = ctx.printer.options
 
     function renderSchemaEntry({
       schema,
@@ -200,7 +183,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
           <Valibot
             name={name}
             node={schema}
-            printer={getPrinter(ctx, { ...printerOptions, keysToOmit }, direction)}
+            printer={ctx.printer.with({ keysToOmit, direction })}
             inferTypeName={inferred ? resolver.schema.type(name) : null}
             inferKind={inferKinds[direction]}
             comments={schemaComments(schema)}

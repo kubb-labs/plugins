@@ -5,7 +5,7 @@ import { createRequire } from 'node:module'
 import path from 'node:path'
 import { promisify } from 'node:util'
 import { parserTs } from '@kubb/parser-ts'
-import { type PluginTs, resolverTs, typeGenerator } from '@kubb/plugin-ts'
+import { createPrinterTs, type PluginTs, resolverTs, typeGenerator } from '@kubb/plugin-ts'
 import { describe, expect, onTestFinished, test } from 'vitest'
 import {
   createMockedAdapter,
@@ -18,6 +18,7 @@ import {
   renderGeneratorSchema,
   testConfig,
 } from '#mocks'
+import { createPrinterFaker } from '../printers/printerFaker.ts'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import { fakerGenerator } from './fakerGenerator.tsx'
@@ -343,6 +344,7 @@ describe('fakerGenerator — schema', () => {
         plugin: tsPlugin,
         options: tsOptions,
         resolver: resolverTs,
+        printer: createPrinterTs,
       })
       await renderGeneratorSchema(fakerGenerator, node, {
         config: testConfig,
@@ -351,6 +353,7 @@ describe('fakerGenerator — schema', () => {
         plugin,
         options: defaultOptions,
         resolver: resolverFaker,
+        printer: createPrinterFaker,
       })
     }
 
@@ -434,6 +437,7 @@ const custom: true = child.custom`,
       plugin,
       options: resolvedOptions,
       resolver: resolverFaker,
+      printer: createPrinterFaker,
     })
 
     await matchFiles(driver.fileManager.files, name)
@@ -454,6 +458,7 @@ const custom: true = child.custom`,
       plugin,
       options: resolvedOptions,
       resolver: resolverFaker,
+      printer: createPrinterFaker,
     })
 
     const file = driver.fileManager.files.find((item) => item.baseName === 'createEmoji.ts')
@@ -486,6 +491,7 @@ const custom: true = child.custom`,
         plugin,
         options: resolvedOptions,
         resolver: resolverFaker,
+        printer: createPrinterFaker,
       },
     )
 
@@ -569,6 +575,7 @@ describe('fakerGenerator — operation', () => {
         plugin: tsPlugin,
         options: tsOptions,
         resolver: resolverTs,
+        printer: createPrinterTs,
       })
       await renderGeneratorSchema(fakerGenerator, node, {
         config: testConfig,
@@ -577,6 +584,7 @@ describe('fakerGenerator — operation', () => {
         plugin,
         options,
         resolver: resolverFaker,
+        printer: createPrinterFaker,
       })
     }
     for (const node of operations) {
@@ -587,6 +595,7 @@ describe('fakerGenerator — operation', () => {
         plugin: tsPlugin,
         options: tsOptions,
         resolver: resolverTs,
+        printer: createPrinterTs,
       })
       await renderGeneratorOperation(fakerGenerator, node, {
         config: testConfig,
@@ -595,6 +604,7 @@ describe('fakerGenerator — operation', () => {
         plugin,
         options,
         resolver: resolverFaker,
+        printer: createPrinterFaker,
       })
     }
     const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.faker-'))
@@ -908,6 +918,7 @@ body.id
       plugin,
       options: resolvedOptions,
       resolver: resolverFaker,
+      printer: createPrinterFaker,
     })
 
     await matchFiles(driver.fileManager.files, name)
@@ -942,6 +953,7 @@ body.id
       plugin,
       options: resolvedOptions,
       resolver: resolverFaker,
+      printer: createPrinterFaker,
     })
 
     const file = driver.fileManager.files.find((item) => item.baseName === 'createArchiveBook.ts')
@@ -968,7 +980,7 @@ describe('fakerGenerator — custom imports', () => {
       name: 'dateParser',
       plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
-    const context = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverFaker }
+    const context = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverFaker, printer: createPrinterFaker }
 
     await renderGeneratorSchema(fakerGenerator, ast.factory.createSchema({ type: 'date', representation: 'string', name: 'CreatedAt' }), context)
     await renderGeneratorOperation(
@@ -1003,7 +1015,7 @@ describe('fakerGenerator — custom imports', () => {
       name: 'seed',
       plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
-    const context = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverFaker }
+    const context = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverFaker, printer: createPrinterFaker }
 
     await renderGeneratorSchema(fakerGenerator, ast.factory.createSchema({ type: 'string', name: 'Name' }), context)
     await renderGeneratorOperation(
@@ -1061,6 +1073,7 @@ describe('fakerGenerator — custom imports', () => {
       plugin,
       options,
       resolver: resolverFaker,
+      printer: createPrinterFaker,
     })
 
     expect(driver.fileManager.files.flatMap((file) => file.imports.map((imp) => imp.path))).toContain('my-int64/faker')
