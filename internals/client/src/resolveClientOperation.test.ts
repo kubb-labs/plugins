@@ -1,84 +1,82 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
-import { createResolver } from '@kubb/kit'
+import { createResolver, withContext } from '@kubb/kit'
 import type { Memo, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import { resolveClientOperation } from './resolveClientOperation.ts'
 
 function createTestMemo(): Memo {
   const store = new Map<string, unknown>()
-  return ((key: string, compute: () => unknown) => {
+  const memo = (key: string, compute: () => unknown) => {
     if (!store.has(key)) store.set(key, compute())
     return store.get(key)
+  }
+  return Object.assign(memo, {
+    get: (key: string) => store.get(key),
+    set: (key: string, value: unknown) => store.set(key, value),
+    has: (key: string) => store.has(key),
   }) as Memo
 }
 
-function createDriver() {
-  const resolver = createResolver({ pluginName: 'plugin-fetch', name: (name: string) => name, file: { path: () => '/root/getPetById.ts' } })
-  const getResolver = vi.fn(() => resolver)
-  const getPlugin = vi.fn(() => ({ options: {} }))
-  return { getPlugin, getResolver }
+// A generator context for a hook plugin that depends on the client plugin. `pluginOptions: undefined` leaves the client plugin out.
+function createContext(pluginOptions: Record<string, unknown> | undefined, resolver: Resolver = createResolver({ pluginName: 'plugin-axios' }) as Resolver) {
+  const getResolver = vi.fn((_name: string) => resolver)
+  const requirePlugin = (name: string) => {
+    if (pluginOptions === undefined) throw new Error(`Plugin "${name}" not found`)
+    return { options: pluginOptions }
+  }
+  return {
+    getResolver,
+    ctx: {
+      root: '/root',
+      memo: createTestMemo(),
+      schemas: [],
+      config: {},
+      meta: {},
+      plugin: { name: 'plugin-react-query' },
+      resolver: createResolver({ pluginName: 'plugin-react-query' }),
+      options: { output: { path: '.' } },
+      getResolver,
+      requirePlugin,
+    },
+  }
 }
 
+const run = (ctx: object, node: ast.OperationNode, pluginName = 'plugin-axios') => withContext(ctx as never, () => resolveClientOperation(node, pluginName))
+
 describe('resolveClientOperation', () => {
-  test('returns null when no contract client plugin is registered', () => {
-    const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
-    const driver = createDriver()
+  const getPetById = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
+  const listPets = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-    const result = resolveClientOperation({ clientPlugin: null, ctx: { ...driver, memo: createTestMemo() }, node, root: '/root', output: { path: '.' } })
+  test('reports a client plugin that is not registered', () => {
+    const { ctx } = createContext(undefined)
 
-    expect(result).toBeNull()
-    expect(driver.getResolver).not.toHaveBeenCalled()
+    expect(() => run(ctx, getPetById)).toThrow('plugin-axios')
   })
 
   test('reuses the cached result for the same client plugin and node instead of resolving again', () => {
-    const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
-    const driver = createDriver()
-    const memo = createTestMemo()
+    const { ctx, getResolver } = createContext({ output: { path: '.', mode: 'directory' } })
 
-    const first = resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, ctx: { ...driver, memo }, node, root: '/root', output: { path: '.' } })
-    const second = resolveClientOperation({
-      clientPlugin: { pluginName: 'plugin-fetch' },
-      ctx: { ...driver, memo },
-      node,
-      root: '/root',
-      output: { path: '.' },
-    })
+    const first = run(ctx, getPetById)
+    const calls = getResolver.mock.calls.length
+    const second = run(ctx, getPetById)
 
     expect(second).toStrictEqual(first)
-    expect(driver.getResolver).toHaveBeenCalledOnce()
+    expect(getResolver).toHaveBeenCalledTimes(calls)
   })
 
   test('resolves independently per client plugin name, even sharing the same memo', () => {
-    const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
-    const driver = createDriver()
-    const memo = createTestMemo()
+    const { ctx, getResolver } = createContext({ output: { path: '.', mode: 'directory' } })
 
-    resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, ctx: { ...driver, memo }, node, root: '/root', output: { path: '.' } })
-    resolveClientOperation({ clientPlugin: { pluginName: 'plugin-axios' }, ctx: { ...driver, memo }, node, root: '/root', output: { path: '.' } })
+    run(ctx, getPetById, 'plugin-fetch')
+    run(ctx, getPetById, 'plugin-axios')
 
-    expect(driver.getResolver).toHaveBeenCalledTimes(2)
-    expect(driver.getResolver).toHaveBeenNthCalledWith(1, 'plugin-fetch')
-    expect(driver.getResolver).toHaveBeenNthCalledWith(2, 'plugin-axios')
+    expect(getResolver).toHaveBeenCalledWith('plugin-fetch')
+    expect(getResolver).toHaveBeenCalledWith('plugin-axios')
   })
 
-  // A real resolver, so the client plugin's filters go through Kubb's own `resolver.default.options`.
   describe("scoped by the client plugin's per-operation options", () => {
-    const getPetById = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
-    const listPets = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
-
-    function resolveWith(pluginOptions: Record<string, unknown>, node: ast.OperationNode) {
-      const resolver = createResolver({ pluginName: 'plugin-axios' }) as unknown as Resolver
-      const driver = { getPlugin: () => ({ options: pluginOptions }), getResolver: () => resolver }
-
-      return resolveClientOperation({
-        clientPlugin: { pluginName: 'plugin-axios' },
-        ctx: { ...driver, memo: createTestMemo() },
-        node,
-        root: '/root',
-        output: { path: '.', mode: 'directory' },
-      })
-    }
+    const resolveWith = (pluginOptions: Record<string, unknown>, node: ast.OperationNode) => run(createContext(pluginOptions).ctx, node)
 
     const returnTypeOverride = {
       output: { path: './clients', mode: 'directory' },
@@ -131,19 +129,10 @@ describe('resolveClientOperation', () => {
       expect(resolveWith(conflictConfig, otherTaggedPet)).not.toBeNull()
     })
 
-    test('handles missing plugin options gracefully', () => {
-      const resolver = createResolver({ pluginName: 'plugin-axios' }) as unknown as Resolver
-      const driver = { getPlugin: () => undefined, getResolver: () => resolver }
+    test('falls back to the defaults when the client plugin sets no returnType or importPath', () => {
+      const res = resolveWith({ output: { path: '.', mode: 'directory' } }, getPetById)
 
-      const res = resolveClientOperation({
-        clientPlugin: { pluginName: 'plugin-axios' },
-        ctx: { ...driver, memo: createTestMemo() },
-        node: getPetById,
-        root: '/root',
-        output: { path: '.', mode: 'directory' },
-      })
-
-      expect(res?.returnType).toBe('full')
+      expect(res).toMatchObject({ returnType: 'full', clientPath: path.resolve('/root', '.kubb/client.ts'), clientPathIsFile: true, typedHeaders: true })
     })
   })
 })

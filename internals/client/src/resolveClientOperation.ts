@@ -1,8 +1,7 @@
 import type { ast } from '@internals/ast'
 import path from 'node:path'
-import { operationFileEntry } from '@internals/shared'
-import { operationKey } from '@kubb/kit'
-import type { Exclude, Group, Include, Memo, Output, Override, Resolver } from '@kubb/kit'
+import { from, operationKey, useKubb } from '@kubb/kit'
+import type { Exclude, GeneratorContext, Group, Include, Output, Override } from '@kubb/kit'
 
 /**
  * Shape of the value a generated operation function resolves to.
@@ -60,62 +59,34 @@ function resolveImportPath(options: { importPath: string; operationFile: string 
 }
 
 /**
- * Resolves the contract client `<op>` a consumer (query hook, MCP handler) imports, by looking up
- * the registered contract client plugin's resolver and output. Works for any contract client plugin
- * (plugin-fetch, plugin-axios, or plugin-client). Returns `null` when no contract plugin is in play (the inline
- * path), or when the client plugin's `exclude` / `include` leaves this operation out, since it then
- * emits no `<op>` to import. plugin-fetch / plugin-axios inject `.kubb/client.ts` at the global
- * output root, the same path consumers read `RequestConfig` / `ResponseErrorConfig` from.
- * With plugin-client they come from the user's `importPath` module instead.
+ * Resolves the contract client `<op>` a consumer (query hook, MCP handler) imports, from the registered contract client plugin
+ * (plugin-fetch, plugin-axios, or plugin-client). Returns `null` when the client plugin's `exclude` / `include` leaves this
+ * operation out, since it then emits no `<op>` to import. plugin-fetch / plugin-axios inject `.kubb/client.ts` at the global
+ * output root, the same path consumers read `RequestConfig` / `ResponseErrorConfig` from. With plugin-client they come from
+ * the user's `importPath` module instead.
  *
- * The result is cached in `memo` (the build's `ctx.memo`) under the client plugin's name and the operation,
- * so several dependents reading the same client plugin for one operation in a single pass
- * (react-query's query/mutation/infinite generators, vue-query, swr, the MCP handler, ...) share
- * one computed result instead of each re-deriving the name and path.
- *
- * `returnType`, `output`, and `group` are the client plugin's options for this operation, after its
- * `override` entries, the same resolution its own generator sees. A dependent's generated call body
- * and import path therefore match the `<op>` actually emitted, even when an `override` changes it.
+ * Call it from a generator. The result is cached in `ctx.memo` per client plugin and operation, so the query, mutation and
+ * MCP generators share it. `returnType` and `importPath` come from the client plugin's options after its `override` entries,
+ * and `from()` finds its file, so a dependent's call and import match the `<op>` actually emitted.
  */
-export function resolveClientOperation(options: {
-  clientPlugin: { pluginName: string } | null
-  ctx: {
-    getPlugin: (name: string) => { options?: ClientPluginOptions } | undefined
-    getResolver: (name: string) => Resolver
-    memo: Memo
-  }
-  node: ast.OperationNode
-  root: string
-  output: Output
-}): ClientOperation | null {
-  const { clientPlugin, ctx, node, root, output } = options
-  const { memo } = ctx
-  if (!clientPlugin) return null
+export function resolveClientOperation(node: ast.OperationNode, pluginName: string): ClientOperation | null {
+  const ctx = useKubb<GeneratorContext>()
 
-  return memo(`${clientPlugin.pluginName}:clientOperation:${node.operationId}`, () => {
-    const resolver = ctx.getResolver(clientPlugin.pluginName)
-    const pluginOptions = ctx.getPlugin(clientPlugin.pluginName)?.options ?? {}
+  return ctx.memo(`${pluginName}:clientOperation:${node.operationId}`, () => {
+    const resolver = ctx.getResolver(pluginName)
+    const pluginOptions = (ctx.requirePlugin(pluginName).options ?? {}) as ClientPluginOptions
     const { exclude, include, override } = pluginOptions
-    const hasOperationOptions = Boolean(exclude?.length || include?.length || override?.length)
-    // Kubb's resolver always has `default`; the fallback keeps partial or custom resolvers working.
-    const operationOptions =
-      hasOperationOptions && resolver.default ? resolver.default.options(node, { options: pluginOptions, exclude, include, override }) : pluginOptions
+    const operationOptions = resolver.default.options(node, { options: pluginOptions, exclude, include, override })
     if (!operationOptions) return null
 
-    const file = resolver.file({
-      ...operationFileEntry(node, node.operationId),
-      root,
-      output: operationOptions.output ?? output,
-      group: operationOptions.group ?? undefined,
-    })
-
+    const name = resolver.resolveName({ key: operationKey(node), name: resolver.name(node.operationId) })
+    const file = from(pluginName).import(node, name).import!
     const { importPath } = operationOptions
-    const name = resolver.name(node.operationId)
 
     return {
-      name: resolver.resolveName({ key: operationKey(node), name }),
+      name,
       path: file.path,
-      clientPath: importPath === undefined ? path.resolve(root, '.kubb/client.ts') : resolveImportPath({ importPath, operationFile: file.path }),
+      clientPath: importPath === undefined ? path.resolve(ctx.root, '.kubb/client.ts') : resolveImportPath({ importPath, operationFile: file.path }),
       clientPathIsFile: importPath === undefined || isRelativeImport(importPath),
       returnType: operationOptions.returnType ?? 'full',
       typedHeaders: importPath === undefined,

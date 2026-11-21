@@ -18,11 +18,12 @@
 Import names from other plugins with kit's `from` and `code`. Each plugin marks the imports it uses as types with `import type` itself. These plugins now take their imports from `from(plugin).resolver`:
 
 - plugin-msw: its type and faker imports.
-- plugin-mcp: its handler and zod schema imports.
+- plugin-mcp: its handler, zod schema and operation type imports.
 - plugin-zod and plugin-valibot: the `InputSchema` imports of the schemas they reference.
-- plugin-cypress: its type imports, through `from('plugin-ts').file(node)`.
+- plugin-cypress: its type imports, through `from('plugin-ts').import(node, name)`.
 - plugin-client: the type and validator schema imports of each operation and SDK class. The SDK's own grouping of imports per file is gone, because `code.join` groups them.
 - plugin-react-query, plugin-vue-query and plugin-swr: the hook files' type imports, and react-query's hook options imports.
+- The query and MCP plugins: the client `<op>` they call, found through `from(client)` with the client plugin's `exclude`, `include` and `override` rules. A missing client plugin now reports `KUBB_PLUGIN_NOT_FOUND`.
 - plugin-msw: the handlers file's imports.
 - plugin-faker: the plugin-ts type imports, and the inline `import('…')` type when a faker has the same name as its type.
 
