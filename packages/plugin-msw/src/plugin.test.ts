@@ -1,6 +1,6 @@
 import { createKubb } from '@kubb/core'
 import { defineExtension, kubbContext } from '@kubb/kit'
-import { createMockedSetupContext } from '#mocks'
+import { createMockedSetupContext, registeredGenerators } from '#mocks'
 import { describe, expect, test } from 'vitest'
 import { pluginMsw } from './plugin.ts'
 import type { Options, PluginMsw } from './types.ts'
@@ -18,7 +18,7 @@ describe('pluginMsw setup', () => {
 
     kubbContext.run(ctx, () => plugin.setup?.(plugin.options ?? {}, ctx))
 
-    expect(ctx.addGenerator).toHaveBeenCalledTimes(generators)
+    expect(registeredGenerators(ctx)).toHaveLength(generators)
   })
 
   test("parser: 'faker' fails with KUBB_MISSING_DEPENDENCY when plugin-faker is not registered", async () => {
