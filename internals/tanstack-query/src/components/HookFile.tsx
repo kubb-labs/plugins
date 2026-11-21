@@ -76,6 +76,8 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
     ...headerTypeNames,
     ...extraTypeNames,
     ...resolveOperationTypeNames(node, tsResolver, {
+      // The full result only names error statuses (in ResponseErrorConfig); success statuses are unused.
+      responseStatusNames: returnType === 'data' ? undefined : 'error',
       // The joined response alias is unused with the full result, and the printer keeps it as a substring of the responses record name.
       exclude: [keyTypeName, returnType !== 'data' ? tsResolver.response.response(node) : null].filter((name): name is string => Boolean(name)),
       order: 'body-response-first',
