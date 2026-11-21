@@ -318,6 +318,7 @@ declare global {
     interface MemoRegistry {
       'plugin-zod:typeName': string
       'plugin-zod:type': string
+      'plugin-zod:directionalNodes': WeakMap<ast.SchemaNode, ast.SchemaNode | null>
     }
   }
 }
