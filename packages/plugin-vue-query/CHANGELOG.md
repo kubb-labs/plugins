@@ -1,5 +1,11 @@
 # @kubb/plugin-vue-query
 
+## 5.12.1
+
+### Patch Changes
+
+- [#1548](https://github.com/kubb-labs/plugins/pull/1548) [`37b93cf`](https://github.com/kubb-labs/plugins/commit/37b93cf695f27d0390392a914047b5ce87aa1f98) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - With `returnType: 'full'`, hooks no longer import the unused success status type (such as `GetPetLimitsStatus200`) when the operation declares response headers. The import broke builds that enable `noUnusedLocals`.
+
 ## 5.12.0
 
 ### Minor Changes
