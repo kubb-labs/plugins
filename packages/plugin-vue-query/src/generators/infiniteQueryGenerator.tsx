@@ -58,7 +58,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     const queryKeyName = resolver.infiniteQuery.keyName(node)
     const queryKeyTypeName = resolver.infiniteQuery.keyTypeName(node)
 
-    const hook = resolveHookFile(node, ctx, {
+    const hook = resolveHookFile(node, {
       name: queryName,
       output,
       group,
@@ -67,7 +67,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       keyTypeName: queryKeyTypeName,
       extraTypeNames: [
         resolvePageParamType(node, {
-          resolver: resolveOperationTypes(ctx, ctx.resolver.pluginName).resolver,
+          resolver: resolveOperationTypes().resolver,
           initialPageParam: infiniteOptions.initialPageParam,
           queryParam: infiniteOptions.queryParam,
         }).queryParamsTypeName,

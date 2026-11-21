@@ -1,8 +1,8 @@
 import type { ast } from '@internals/ast'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
 import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
-import type { PrinterZodNodes, printerZod } from './printers/printerZod.ts'
-import type { PrinterZodMiniNodes, printerZodMini } from './printers/printerZodMini.ts'
+import type { PrinterZodFactory, PrinterZodNodes } from './printers/printerZod.ts'
+import type { PrinterZodMiniFactory, PrinterZodMiniNodes } from './printers/printerZodMini.ts'
 
 /**
  * Resolver for Zod that provides naming methods for schema types.
@@ -308,7 +308,7 @@ export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   printer: Options['printer']
 }
 
-export type PluginZod = PluginType<'plugin-zod', Options, ResolvedOptions, ResolverZod>
+export type PluginZod = PluginType<'plugin-zod', Options, ResolvedOptions, ResolverZod, ast.Printer<PrinterZodFactory> | ast.Printer<PrinterZodMiniFactory>>
 
 declare global {
   namespace Kubb {
@@ -316,10 +316,8 @@ declare global {
       'plugin-zod': PluginZod
     }
     interface MemoRegistry {
-      typeName: string
-      type: string
-      zodPrinter: ReturnType<typeof printerZod> | ReturnType<typeof printerZodMini>
-      zodDirectionalNodes: WeakMap<ast.SchemaNode, ast.SchemaNode | null>
+      'plugin-zod:typeName': string
+      'plugin-zod:type': string
     }
   }
 }

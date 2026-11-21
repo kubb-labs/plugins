@@ -8,19 +8,17 @@ import {
   buildResponses,
   getCircularNames,
   getOasAdapter,
-  resolveOperationFile,
   schemaComments,
-  shouldCoerce,
   toResponseContent,
 } from '@internals/shared'
-import { defineGenerator } from '@kubb/kit'
+import { defineGenerator, type PrinterFactory } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Zod } from '../components/Zod.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from '../printers/printerZod.ts'
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
-import type { PluginZod, ResolverZod } from '../types'
+import type { PluginZod } from '../types'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
@@ -32,15 +30,24 @@ function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction
 }
 
 /**
- * The printer for one direction, built once per plugin per build. A `keysToOmit` list and a
- * `printer.nodes` override differ per node and have no string key, so they get a fresh printer.
+ * The `setPrinter` factory of `@kubb/plugin-zod`: `printerZod`, or `printerZodMini` with `mini: true`.
+ * Generators pass `direction` and `keysToOmit` per node through `printer.with(...)`.
  */
-function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boolean, direction: 'encode' | 'decode') {
-  const build = () => (mini ? printerZodMini({ ...(options as PrinterZodMiniOptions), direction }) : printerZod({ ...options, direction }))
-  if (options.nodes || options.keysToOmit?.length) return build()
-  const { coercion, guidType, regexType, oneOfType, dateType } = options
-  const coerce = (['dates', 'strings', 'numbers'] as const).map((type) => shouldCoerce(coercion, type))
-  return resolver.memo(`zodPrinter:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
+export const createPrinterZod: PrinterFactory<PluginZod> = (ctx) => {
+  const { coercion, guidType, regexType, oneOfType, mini, printer } = ctx.options
+  const options: PrinterZodOptions = {
+    coercion,
+    guidType,
+    regexType,
+    oneOfType,
+    dateType: getOasAdapter(ctx.adapter).options.dateType,
+    resolver: ctx.resolver,
+    // A `printer.nodes` override can print differently per call, so its lookups are not cached.
+    directionalCache: printer?.nodes ? undefined : new WeakMap(),
+    cyclicSchemas: getCircularNames(),
+    nodes: printer?.nodes,
+  }
+  return mini ? printerZodMini(options as PrinterZodMiniOptions) : printerZod(options)
 }
 
 /**
@@ -53,17 +60,16 @@ export const zodGenerator = defineGenerator<PluginZod>({
   name: 'zod',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, oneOfType, compile, mini, inferred, typeGuards, importPath, group, printer } = ctx.options
-    const dateType = getOasAdapter(adapter).options.dateType
+    const { resolver, root } = ctx
+    const { output, compile, mini, inferred, typeGuards, importPath, group } = ctx.options
 
     if (!node.name) {
       return
     }
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
-    const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions = ctx.printer.options as PrinterZodOptions
+    const cyclicSchemas = getCircularNames()
 
     // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions, mini })
@@ -84,22 +90,16 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const meta = {
       name: resolver.name(node.name),
-      file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
+      file: ctx.file(node),
     } as const
 
     const isName = typeGuards ? resolver.schema.isName(node.name) : null
     const assertName = typeGuards ? resolver.schema.assertName(node.name) : null
 
-    const schemaPrinter = getPrinter(resolver, printerOptions, mini, 'decode')
+    const schemaPrinter = ctx.printer.with({ direction: 'decode' })
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {imports.map((imp) => (
           <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
@@ -123,7 +123,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           <Zod
             name={resolver.schema.inputName(node.name)}
             node={node}
-            printer={getPrinter(resolver, printerOptions, mini, 'encode')}
+            printer={ctx.printer.with({ direction: 'encode' })}
             inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
             inferKind={aliasKind(inferred, 'encode')}
             typeGuards={typeGuards}
@@ -140,18 +140,16 @@ export const zodGenerator = defineGenerator<PluginZod>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, oneOfType, compile, mini, inferred, importPath, group, printer } = ctx.options
-    const dateType = getOasAdapter(adapter).options.dateType
+    const { resolver, root } = ctx
+    const { output, compile, mini, inferred, importPath, group } = ctx.options
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
 
     const meta = {
-      file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
+      file: ctx.file(node),
     } as const
 
-    const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions = ctx.printer.options as PrinterZodOptions
     // The schemas of this file by name, so a union of them can tell what its members print.
     const siblings = new Map<string, ast.SchemaNode>()
 
@@ -170,7 +168,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       siblings.set(name, schema)
 
       const directionalRefNames = direction === 'encode' ? new Set(collectDirectionalRefNames({ node: schema, printerOptions, mini })) : null
-      const schemaPrinter = getPrinter(resolver, { ...printerOptions, keysToOmit }, mini, direction)
+      const schemaPrinter = ctx.printer.with({ keysToOmit, direction })
       const imports = resolver.imports({
         node: schema,
         root,
@@ -303,13 +301,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const responsesSchema = inferred ? renderSchemaEntry({ schema: buildResponses(node, resolver), name: resolver.response.responses(node) }) : null
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {paramSchemas}
         {responseSchemas}

@@ -13,6 +13,7 @@ import {
   renderGeneratorSchema,
   testConfig,
 } from '#mocks'
+import { createPrinterTs } from '../printers/printerTs.ts'
 import { resolverTs } from '../resolvers/resolverTs.ts'
 import type { PluginTs } from '../types.ts'
 import { typeGenerator } from './typeGenerator.tsx'
@@ -110,6 +111,7 @@ describe('typeGenerator — response alias', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -161,6 +163,7 @@ describe('typeGenerator — custom resolver', () => {
       plugin,
       options,
       resolver: apiResolver,
+      printer: createPrinterTs,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -218,7 +221,15 @@ describe("typeGenerator — operations: 'inline'", () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver })
     const driver = createMockedPluginDriver({ name: 'operations inline' })
 
-    await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver })
+    await renderGeneratorOperation(typeGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver,
+      printer: createPrinterTs,
+    })
 
     const [file] = driver.fileManager.files
     expect(file!.sources.length > 0 && file!.sources.every((source) => source.inline)).toBe(true)
@@ -546,6 +557,7 @@ describe('typeGenerator — Operation', () => {
       plugin,
       options: defaultOptions,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, props.name)
@@ -599,6 +611,7 @@ describe('typeGenerator — Operation — group', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     const file = driver.fileManager.files.find((f: ast.FileNode) => f.baseName === expectedBaseName)
@@ -635,6 +648,7 @@ describe('typeGenerator — Operation — group', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     const file = driver.fileManager.files.find((f: ast.FileNode) => f.baseName === 'GetConfig.ts')
@@ -697,6 +711,7 @@ describe('typeGenerator — Operation — output.mode', () => {
       plugin,
       options: defaultOptions,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     const pointers = Object.fromEntries(driver.fileManager.files.flatMap((file) => file.sources.map((source) => [source.name, source.pointer])))
@@ -719,6 +734,7 @@ describe('typeGenerator — Operation — output.mode', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     const file = driver.fileManager.files.at(0)
@@ -739,6 +755,7 @@ describe('typeGenerator — Operation — output.mode', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     const root = path.resolve(testConfig.root, testConfig.output.path, options.output.path)
@@ -760,6 +777,7 @@ describe('typeGenerator — params casing', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'paramsCasing camelcase')
@@ -792,6 +810,7 @@ describe('typeGenerator — params casing', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'paramsCasing distinct names')
@@ -824,6 +843,7 @@ describe('typeGenerator — params casing', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'paramsCasing duplicate names')
@@ -847,6 +867,7 @@ describe('typeGenerator — enumType', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, `enumType ${enumType}`)
@@ -877,6 +898,7 @@ describe('typeGenerator — const (single-value enum)', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, `const ${enumType}`)
@@ -905,6 +927,7 @@ describe('typeGenerator — enumType — empty string value', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, `emptyStringEnum ${enumType}`)
@@ -935,6 +958,7 @@ describe('typeGenerator — enumType — dotted name', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, `enumNames.Type — ${enumType}`)
@@ -958,6 +982,7 @@ describe('typeGenerator — enumKeyCasing', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, `enumKeyCasing ${enumKeyCasing}`)
@@ -977,6 +1002,7 @@ describe('typeGenerator — enumTypeSuffix', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'enumTypeSuffix Key')
@@ -994,6 +1020,7 @@ describe('typeGenerator — enumTypeSuffix', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'enumTypeSuffix Value')
@@ -1011,6 +1038,7 @@ describe('typeGenerator — enumTypeSuffix', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'enumTypeSuffix empty')
@@ -1031,6 +1059,7 @@ describe('typeGenerator — enumConstCasing', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1053,6 +1082,7 @@ describe('typeGenerator — enumConstCasing', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'enumConstCasing pascalCase')
@@ -1073,6 +1103,7 @@ describe('typeGenerator — enumConstCasing', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'enumConstCasing merged name')
@@ -1092,6 +1123,7 @@ describe('typeGenerator — syntaxType', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'syntaxType type')
@@ -1109,6 +1141,7 @@ describe('typeGenerator — syntaxType', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'syntaxType interface')
@@ -1132,6 +1165,7 @@ describe('typeGenerator — optionalType', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, `optionalType ${optionalType}`)
@@ -1153,6 +1187,7 @@ describe('typeGenerator — arrayType', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, `arrayType ${arrayType}`)
@@ -1180,6 +1215,7 @@ describe('typeGenerator — transformers', () => {
       plugin,
       options: defaultOptions,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'transformers removeOptionalProperties')
@@ -1213,6 +1249,7 @@ describe('typeGenerator — transformers', () => {
       plugin,
       options: defaultOptions,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     await matchFiles(driver.fileManager.files, 'transformers integerToString')
@@ -1242,6 +1279,7 @@ describe('typeGenerator — custom imports', () => {
       plugin,
       options,
       resolver: resolverTs,
+      printer: createPrinterTs,
     })
 
     expect(driver.fileManager.files[0]?.imports.map((imp) => imp.path)).toContain('my-int64')

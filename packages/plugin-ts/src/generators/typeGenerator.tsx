@@ -1,9 +1,8 @@
 import { ast } from '@internals/ast'
-import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, resolveOperationFile, toResponseContent } from '@internals/shared'
+import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, toResponseContent } from '@internals/shared'
 import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
-import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
 import { buildParams, buildResponseComments, enumTypeName, getExampleValues, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
 
@@ -17,8 +16,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { enum: enumOptions, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
-    const { config, resolver, root } = ctx
+    const { enum: enumOptions, output, group } = ctx.options
+    const { resolver, root } = ctx
 
     if (enumOptions.type !== 'inlineLiteral') node = resolveInlineEnumNames({ node, owner: node.name ?? '', resolver, enumOptions })
     if (!node.name) {
@@ -26,7 +25,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     }
     // Enum schema names, so the ref handler and the imports
     // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
-    const enumSchemaNames = getEnumNames(ctx)
+    const enumSchemaNames = getEnumNames()
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
 
     const imports = resolver.imports({ node, root, output, group: group ?? undefined, name: importName })
@@ -38,29 +37,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const meta = {
       name: enumOptions.type === 'asConst' && isEnumSchema ? resolver.enum.keyName(node, enumOptions.typeSuffix) : resolver.name(node.name),
-      file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
+      file: ctx.file(node),
     } as const
 
-    const schemaPrinter = printerTs({
-      optionalType,
-      arrayType,
-      enum: enumOptions,
-      name: meta.name,
-      syntaxType,
-      description: node.description,
-      resolver,
-      enumSchemaNames,
-      nodes: printer?.nodes,
-    })
+    const schemaPrinter = ctx.printer.with({ name: meta.name, description: node.description })
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         {imports.map((imp) => (
           <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
         ))}
@@ -69,21 +52,19 @@ export const typeGenerator = defineGenerator<PluginTs>({
     )
   },
   operation(node, ctx) {
-    const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer, operations } = ctx.options
-    const { config, resolver, root } = ctx
+    const { enum: enumOptions, group, output, operations } = ctx.options
+    const { resolver, root } = ctx
     const inline = operations === 'inline'
 
     const meta = {
-      file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
+      file: ctx.file(node),
     } as const
 
     // Enum schema names, so the ref handler and the imports
     // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
-    const enumSchemaNames = getEnumNames(ctx)
+    const enumSchemaNames = getEnumNames()
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
-    const inlinePrinter = inline
-      ? printerTs({ optionalType, arrayType, enum: enumOptions, syntaxType, resolver, enumSchemaNames, nodes: printer?.nodes })
-      : null
+    const inlinePrinter = inline ? ctx.printer : null
 
     function renderSchemaType({
       schema,
@@ -103,20 +84,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
 
-      const schemaPrinter = printerTs({
-        optionalType,
-        arrayType,
-        enum: enumOptions,
-        name,
-        syntaxType,
-        description: schema.description,
-        examples: getExampleValues(examples, true),
-        comments,
-        keysToOmit,
-        resolver,
-        enumSchemaNames,
-        nodes: printer?.nodes,
-      })
+      const schemaPrinter = ctx.printer.with({ name, description: schema.description, examples: getExampleValues(examples, true), comments, keysToOmit })
 
       return (
         <>
@@ -263,13 +231,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const responseType = buildResponseType()
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
+      <File {...meta.file}>
         {paramGroupTypes}
         {responseTypes}
         {responseHeaderTypes}

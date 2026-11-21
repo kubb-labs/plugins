@@ -61,6 +61,11 @@ export type PrinterValibotOptions = {
    */
   resolver?: ResolverValibot
   /**
+   * Caches the directional-node lookups of `containsDirectionalNode`. The `setPrinter` factory creates
+   * one per printer, so the cache lives as long as that printer. Without it, nothing is cached.
+   */
+  directionalCache?: WeakMap<ast.SchemaNode, ast.SchemaNode | null>
+  /**
    * Property names to drop from the printed object with `v.omit(...)`.
    */
   keysToOmit?: Array<string> | null
@@ -403,14 +408,13 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
  */
 export function containsDirectionalNode({ node, printerOptions }: { node: ast.SchemaNode | undefined; printerOptions: PrinterValibotOptions }): boolean {
   if (!node) return false
-  const { resolver, nodes, coercion, dateType } = printerOptions
-  // A `printer.nodes` override has no string key, so it searches without a cache.
-  const cache =
-    resolver && !nodes
-      ? resolver.memo(`valibotDirectionalNodes:${shouldCoerce(coercion, 'dates')}:${dateType}`, () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>())
-      : undefined
-
-  return ast.schema.find(node, { predicate: (schema) => variesByDirection({ node: schema, printerOptions }), follow: ['ref'], cache }) !== undefined
+  return (
+    ast.schema.find(node, {
+      predicate: (schema) => variesByDirection({ node: schema, printerOptions }),
+      follow: ['ref'],
+      cache: printerOptions.directionalCache,
+    }) !== undefined
+  )
 }
 
 /**

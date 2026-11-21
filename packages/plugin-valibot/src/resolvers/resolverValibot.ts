@@ -1,5 +1,6 @@
 import { ensureValidVarName } from '@internals/utils'
 import { casing, createResolver, operationKey, resolverCasedFile, resolverOperationParams, resolverOperationResponse } from '@kubb/kit'
+import { pluginValibotName } from '../plugin.ts'
 import type { PluginValibot } from '../types.ts'
 
 /**
@@ -20,10 +21,10 @@ export const resolverValibot = createResolver<PluginValibot>({
   ...resolverCasedFile((part) => casing.camel(part, { suffix: 'schema' })),
   schema: {
     typeName(name) {
-      return this.memo(`typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
+      return this.memo(`${pluginValibotName}:typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
     },
     type(name) {
-      return this.memo(`type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
+      return this.memo(`${pluginValibotName}:type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
     },
     inputName(name) {
       return this.name(`${name} input`)

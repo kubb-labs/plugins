@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import { File, Type as TypeDeclaration } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { printerTs, type PrinterTsFactory } from '../printers/printerTs.ts'
+import type { PrinterTsFactory } from '../printers/printerTs.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { isInlineConstEnum } from '../utils.ts'
 import { Enum, getEnumNames } from './Enum.tsx'
@@ -9,10 +9,7 @@ import { Enum, getEnumNames } from './Enum.tsx'
 type Props = {
   name: string
   node: ast.SchemaNode
-  /**
-   * Pre-configured printer instance created by the generator.
-   * Created with `printerTs({ ..., nodes: options.printer?.nodes })`.
-   */
+  /** The plugin's `ctx.printer`, with per-node options from `printer.with(...)`. */
   printer: ast.Printer<PrinterTsFactory>
   enum: PluginTs['resolvedOptions']['enum']
   resolver: ResolverTs
@@ -27,7 +24,8 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
     // An inline type has no file to declare its enums in, so they print as literal unions.
     const withoutEnums = ast.node.transform(node, { schema: (n) => (n.type === ast.schema.types.enum && n.name ? { ...n, name: undefined } : undefined) })
     // Property JSDoc would repeat in every file that absorbs the type; the schema files keep theirs.
-    const expression = printerTs({ ...printer.options, name: undefined })
+    const expression = printer
+      .with({ name: undefined })
       .print(withoutEnums)
       ?.replace(/\/\*\*[\s\S]*?\*\/\s*/g, '')
     if (!expression) return

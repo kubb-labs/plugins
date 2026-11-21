@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
 import { resolveOperationTypes, resultTypeName } from '@internals/client'
-import { operationFileEntry, getStream } from '@internals/shared'
+import { getStream } from '@internals/shared'
 import { defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -24,16 +24,16 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
     operation(node, ctx) {
       if (!ast.http.isOperation(node)) return null
 
-      const { config, resolver, root } = ctx
-      const { output, returnType, throwOnErrorDefault, group, importPath } = ctx.options
+      const { root } = ctx
+      const { returnType, throwOnErrorDefault, importPath } = ctx.options
 
-      const resolvedTypes = resolveOperationTypes(ctx, ctx.plugin.name)
+      const resolvedTypes = resolveOperationTypes()
       // A custom client module keeps the two-argument `RequestResult` it documents, so its results get no typed headers.
       const types = importPath === undefined ? resolvedTypes : { ...resolvedTypes, response: { ...resolvedTypes.response, headers: undefined } }
 
       const data = resolveOperationData({ node, ctx, types })
       const { validatorHooks, headerTypeNames } = data
-      const file = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
+      const file = ctx.file(node, { suffix: false })
       const importedTypeNames = [types.response.options(node), types.response.responses(node), ...headerTypeNames]
 
       // A custom client module is emitted verbatim, so `importPath` is used exactly as configured.
@@ -61,13 +61,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
           )
 
       return (
-        <File
-          baseName={file.baseName}
-          path={file.path}
-          meta={file.meta}
-          banner={resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
-          footer={resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
-        >
+        <File {...file}>
           <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
           <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
 

@@ -1,12 +1,10 @@
 import type { ast } from '@internals/ast'
-import { Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
+import { Diagnostics, type GeneratorContext, type Group, type Output, useKubb } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import type { PluginZod, ResolverZod } from '@kubb/plugin-zod'
 
 // A type-only import: the query plugins bundle this file but do not depend on @kubb/plugin-zod.
 const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
-
-type OperationTypesContext = Pick<GeneratorContext, 'memo' | 'getPlugin' | 'getResolver'>
 
 /**
  * The per-operation type names a generated client references: the grouped input, the per-status
@@ -121,15 +119,17 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
  *
  * `pluginZod({ inferred: 'codec' })` wins, so a codec param takes its domain value. Otherwise `plugin-ts`
  * wins when it is in the pipeline, and without it any `pluginZod({ inferred })`. Throws
- * `KUBB_MISSING_DEPENDENCY` for `pluginName` when neither is available.
+ * `KUBB_MISSING_DEPENDENCY` for the current plugin when neither is available. Reads the current generator context.
  *
  * @example
  * ```ts
- * const types = resolveOperationTypes(ctx, ctx.plugin.name)
+ * const types = resolveOperationTypes()
  * types.response.options(node) // 'GetPetByIdOptions', or 'GetPetByIdOptionsSchemaType' from zod
  * ```
  */
-export function resolveOperationTypes(ctx: OperationTypesContext, pluginName: string): OperationTypeSource {
+export function resolveOperationTypes(): OperationTypeSource {
+  const ctx = useKubb<GeneratorContext>()
+  const pluginName = ctx.plugin.name
   return ctx.memo(`operationTypes:${pluginName}`, () => {
     const pluginTs = ctx.getPlugin(pluginTsName)
     const pluginZod = ctx.getPlugin(pluginZodName)

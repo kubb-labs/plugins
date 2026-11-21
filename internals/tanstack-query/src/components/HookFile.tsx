@@ -1,13 +1,11 @@
 import type { ast } from '@internals/ast'
 import { getResponseHeadersTypeNames, resolveOperationTypes } from '@internals/client'
-import { operationFileEntry, resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
-import { Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
+import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
+import { Diagnostics, type FileTarget, type GeneratorContext, type Group, type Output, useKubb } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { ClientOperation, ReturnTypeOption } from '@internals/client'
-
-type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'memo' | 'meta' | 'schemas' | 'getPlugin' | 'getResolver' | 'requirePlugin' | 'resolver'>
 
 type ResolveHookFileOptions = {
   name: string
@@ -27,7 +25,7 @@ type ResolveHookFileOptions = {
 
 type ResolvedHookFile = {
   file: ast.FileNode
-  fileTs: ast.FileNode
+  fileTs: FileTarget
   tsResolver: ResolverTs
   contractOp: ClientOperation
   importedTypeNames: Array<string>
@@ -44,7 +42,8 @@ type ResolvedHookFile = {
  * Resolves what every TanStack hook file shares: its file, the operation types file and names (`@kubb/plugin-ts`, or
  * `pluginZod({ inferred: 'codec' })`), banner and footer.
  */
-export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, options: ResolveHookFileOptions): ResolvedHookFile {
+export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFileOptions): ResolvedHookFile {
+  const ctx = useKubb<GeneratorContext>()
   const { name, output, group, contractOp, keyTypeName, extraTypeNames = [], returnType = 'data' } = options
   const { config, root, resolver } = ctx
   if (returnType !== 'data' && contractOp.returnType === 'data') {
@@ -57,19 +56,12 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
       plugin: resolver.pluginName,
     })
   }
-  const types = resolveOperationTypes(ctx, resolver.pluginName)
+  const types = resolveOperationTypes()
   const tsResolver = types.resolver
   const headerTypeNames = returnType === 'data' || !contractOp.typedHeaders ? [] : getResponseHeadersTypeNames({ node, types: tsResolver })
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
-  const fileTs = resolveOperationFile({
-    ctx,
-    node,
-    resolver: tsResolver,
-    root,
-    output: types.output ?? output,
-    group: types.group,
-  })
+  const fileTs = ctx.file(node, { plugin: tsResolver.pluginName })
   const importedTypeNames = [
     tsResolver.response.options(node),
     tsResolver.response.responses(node),
