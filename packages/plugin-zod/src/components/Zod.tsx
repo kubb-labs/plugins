@@ -110,7 +110,9 @@ export function Zod({
   // Strict compilation throws when the module loads, so a schema Zod refuses stays uncompiled.
   const throwsOnCompile =
     isStrict &&
-    (throwsOnStrictCompile({ node, options: printer.options, siblings }) || reachesCycle({ node, siblings, cyclicSchemas: printer.options.cyclicSchemas }))
+    // The `zod/mini` date handler coerces in both directions, so judge it as decoding.
+    (throwsOnStrictCompile({ node, options: printer.name === 'zod-mini' ? { ...printer.options, direction: undefined } : printer.options, siblings }) ||
+      reachesCycle({ node, siblings, cyclicSchemas: printer.options.cyclicSchemas }))
   const shouldCompile = Boolean(compile) && !isAlias && !isCyclic && !throwsOnCompile
   const toValue = (output: string) => (shouldCompile ? (isStrict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output)
 

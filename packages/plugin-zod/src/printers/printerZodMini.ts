@@ -4,6 +4,7 @@ import { createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { shouldCoerce } from '@internals/shared'
 import { applyMiniModifiers, buildObjectShape, lengthChecksMini, numberChecksMini, patternKeySchemaMini, printWithOmit } from '../utils.ts'
+import { containsDirectionalNode, type PrinterZodOptions } from './printerZod.ts'
 import { buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
 /**
@@ -68,6 +69,15 @@ export type PrinterZodMiniOptions = {
    */
   cyclicSchemas?: ReadonlySet<string>
   /**
+   * Which way a node converts between its wire type and its runtime type:
+   * - `'decode'` (default): wire into runtime, used by response schemas.
+   * - `'encode'`: runtime back to wire, used by request bodies and parameters.
+   *
+   * The built-in handlers ignore it. A `printer.nodes` handler returning different output per
+   * direction makes the generator emit an `${name}InputSchema` variant for that component.
+   */
+  direction?: 'encode' | 'decode'
+  /**
    * Custom handler map for node type overrides.
    */
   nodes?: PrinterZodMiniNodes
@@ -121,6 +131,8 @@ const miniDialect: ZodDialect<PrinterZodMiniOptions> = {
   extend: (base, shape) => `z.extend(${base}, ${shape})`,
   intersection: (left, right) => `z.intersection(${left}, ${right})`,
   pipe: (left, right) => `z.pipe(${left}, ${right})`,
+  useInputVariant: (node, options) =>
+    options.direction === 'encode' && containsDirectionalNode({ node, printerOptions: options as PrinterZodOptions, mini: true }),
 }
 
 export const printerZodMini = createPrinter<PrinterZodMiniFactory>((options) => {

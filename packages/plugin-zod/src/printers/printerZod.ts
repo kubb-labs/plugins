@@ -226,10 +226,11 @@ type DirectionProbeContext = { options: PrinterZodOptions; transform: () => null
  * direction and reports whether the two disagree. That difference is what makes a component
  * need an `${name}InputSchema` variant.
  */
-function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; printerOptions: PrinterZodOptions }): boolean {
+function variesByDirection({ node, printerOptions, mini }: { node: ast.SchemaNode; printerOptions: PrinterZodOptions; mini?: boolean }): boolean {
   if (CONTAINER_TYPES.has(node.type)) return false
 
-  const handler = printerOptions.nodes?.[node.type] ?? scalarNodes[node.type]
+  // The `zod/mini` built-ins print the same either way, so only a `printer.nodes` override can vary.
+  const handler = printerOptions.nodes?.[node.type] ?? (mini ? undefined : scalarNodes[node.type])
   if (!handler) return false
 
   const call = (direction: 'encode' | 'decode') => {
@@ -243,13 +244,22 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
 /**
  * Whether the schema transitively contains a node that prints differently per direction, so it
  * must decode on responses and encode on requests. Follows `$ref`s through their resolved schema.
+ * Pass `mini` for the `zod/mini` printer, whose built-in handlers ignore the direction.
  */
-export function containsDirectionalNode({ node, printerOptions }: { node: ast.SchemaNode | undefined; printerOptions: PrinterZodOptions }): boolean {
-  if (!node) return false
+export function containsDirectionalNode({
+  node,
+  printerOptions,
+  mini,
+}: {
+  node: ast.SchemaNode | undefined
+  printerOptions: PrinterZodOptions
+  mini?: boolean
+}): boolean {
+  if (!node || (mini && !printerOptions.nodes)) return false
 
   return (
     ast.schema.find(node, {
-      predicate: (schema) => variesByDirection({ node: schema, printerOptions }),
+      predicate: (schema) => variesByDirection({ node: schema, printerOptions, mini }),
       follow: ['ref'],
       cache: getDirectionalCache(printerOptions),
     }) !== undefined
@@ -268,10 +278,18 @@ function getDirectionalCache({ resolver, nodes, coercion, dateType }: PrinterZod
 /**
  * Names of the `$ref` schemas the generator should route to their input (encode) variant.
  */
-export function collectDirectionalRefNames({ node, printerOptions }: { node: ast.SchemaNode; printerOptions: PrinterZodOptions }): Array<string> {
+export function collectDirectionalRefNames({
+  node,
+  printerOptions,
+  mini,
+}: {
+  node: ast.SchemaNode
+  printerOptions: PrinterZodOptions
+  mini?: boolean
+}): Array<string> {
   return ast.node.collect<string>(node, {
     schema: (n) =>
-      n.type === ast.schema.types.ref && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.ref.getName(n) ?? undefined) : undefined,
+      n.type === ast.schema.types.ref && n.ref && containsDirectionalNode({ node: n, printerOptions, mini }) ? (ast.ref.getName(n) ?? undefined) : undefined,
   })
 }
 
