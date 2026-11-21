@@ -33,7 +33,8 @@ export const createPrinterValibot: PrinterFactory<PluginValibot> = (ctx) => {
     coercion,
     dateType: getOasAdapter(ctx.adapter).options.dateType,
     resolver: ctx.resolver,
-    buildMemo: ctx.memo,
+    // A `printer.nodes` override can print differently per call, so its lookups are not cached.
+    directionalCache: printer?.nodes ? undefined : new WeakMap(),
     cyclicSchemas: getCircularNames(ctx),
     nodes: printer?.nodes,
   })
