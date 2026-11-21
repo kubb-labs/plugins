@@ -204,7 +204,7 @@ function createMockedPluginContext<TOptions extends PluginType>(
     },
     meta: opts.meta ?? {},
     schemas: opts.driver.inputNode?.schemas ?? [],
-    memo: opts.driver.memo.bind(opts.driver),
+    memo: opts.driver.memo,
     addFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.add(...files),
     upsertFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.upsert(...files),
     hooks: opts.driver.hooks ?? new Hookable<KubbHooks>(),
