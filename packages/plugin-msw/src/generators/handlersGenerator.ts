@@ -20,9 +20,9 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
 
     const handlerNames = nodes.map((node) => resolver.handler.name(node))
 
-    const handlerFiles = from(ctx.plugin.name, { suffix: false })
+    const own = from(ctx.plugin.name)
     const imports = code
-      .join(nodes.map((node, index) => handlerFiles.file(node, { name: resolver.name(node.operationId) }).name(handlerNames[index]!)))
+      .join(nodes.map((node, index) => own.import(node, handlerNames[index]!)))
       .imports.map((imp) => ast.factory.createImport({ name: imp.name, path: imp.path, root: file.path }))
 
     const handlers = handlerNames.map((name) => `${name}(undefined, options)`)

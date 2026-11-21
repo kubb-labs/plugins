@@ -10,6 +10,9 @@
 '@kubb/plugin-vue-query': patch
 '@kubb/plugin-swr': patch
 '@kubb/plugin-faker': patch
+'@kubb/plugin-axios': patch
+'@kubb/plugin-fetch': patch
+'@kubb/plugin-ky': patch
 ---
 
 Import names from other plugins with kit's `from` and `code`. plugin-ts marks its resolver `isTypeOnly`, so `from('plugin-ts').resolver` imports its names with `import type`. These plugins now take their imports from `from(plugin).resolver`:
@@ -26,3 +29,5 @@ Import names from other plugins with kit's `from` and `code`. plugin-ts marks it
 plugin-ts and `pluginZod({ inferred })` now `provide('types')`. Codec types from zod win over plugin-ts, and plain inferred zod types are the fallback without plugin-ts, as before. The client, query and MCP plugins read operation types through `from('types')` and `getResolver('types')`. Zod-backed types import with `import type`.
 
 Generated output is unchanged.
+
+The msw, cypress, mcp and client resolvers now name their own files with the resolver's `file.name` and `file.suffix`, and react-query's resolver says which hook file holds each hook's options. Generators pass only the node to `ctx.file` and `from(…).import(node, name)`. Generated file names are unchanged.

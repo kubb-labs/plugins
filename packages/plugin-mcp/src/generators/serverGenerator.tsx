@@ -25,7 +25,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
 
     ctx.requirePlugin(pluginZodName)
 
-    const handlers = from(pluginMcpName, { suffix: false }).resolver
+    const handlers = from(pluginMcpName).resolver
     const schemas = from(pluginZodName).resolver
 
     const fileAt = <TName extends `${string}.${string}`>(baseName: TName) => ({

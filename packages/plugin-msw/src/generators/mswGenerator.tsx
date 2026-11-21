@@ -25,7 +25,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const mock = {
       name: resolver.handler.name(node),
-      file: ctx.file(node, { name: resolver.name(node.operationId), suffix: false }),
+      file: ctx.file(node),
     }
 
     if (parser === 'faker') ctx.requirePlugin(pluginFakerName)

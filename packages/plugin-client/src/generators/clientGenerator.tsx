@@ -33,7 +33,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
       const data = resolveOperationData({ node, ctx, types })
       const { validatorHooks, headerTypeNames } = data
-      const file = ctx.file(node, { suffix: false })
+      const file = ctx.file(node)
 
       // A custom client module is emitted verbatim, so `importPath` is used exactly as configured.
       // The default `.kubb/client.ts` is a file path and is made relative to the operation file.

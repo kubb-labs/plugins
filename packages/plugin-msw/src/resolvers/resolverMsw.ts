@@ -18,6 +18,12 @@ import type { PluginMsw } from '../types.ts'
  */
 export const resolverMsw = createResolver<PluginMsw>({
   pluginName: 'plugin-msw',
+  file: {
+    suffix: false,
+    name(node) {
+      return node.kind === 'Operation' ? this.name(node.operationId) : undefined
+    },
+  },
   name(name) {
     return this.memo(`name:${name}`, () => casing.camel(name, { suffix: 'handler' }))
   },

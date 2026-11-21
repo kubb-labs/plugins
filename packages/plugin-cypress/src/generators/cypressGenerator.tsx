@@ -23,15 +23,17 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const tsResolver = ctx.getResolver(pluginTsName)
 
-    const typeFile = from(pluginTsName).file(node)
+    const types = from(pluginTsName)
     const { imports } = code.join(
-      [tsResolver.response.options(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })].map((typeName) => typeFile.name(typeName)),
+      [tsResolver.response.options(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })].map((typeName) =>
+        types.import(node, typeName),
+      ),
     )
     const name = resolver.name(node.operationId)
 
     const meta = {
       name: resolver.resolveName({ key: operationKey(node), name }),
-      file: ctx.file(node, { suffix: false }),
+      file: ctx.file(node),
     } as const
 
     return (

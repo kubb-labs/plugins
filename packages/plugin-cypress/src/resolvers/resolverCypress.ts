@@ -16,5 +16,6 @@ import type { PluginCypress } from '../types.ts'
  */
 export const resolverCypress = createResolver<PluginCypress>({
   pluginName: 'plugin-cypress',
+  file: { suffix: false },
   name: resolveOperationName,
 })

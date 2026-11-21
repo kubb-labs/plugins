@@ -15,6 +15,7 @@ import type { PluginMcp } from '../types.ts'
  */
 export const resolverMcp = createResolver<PluginMcp>({
   pluginName: 'plugin-mcp',
+  file: { suffix: false },
   name(name) {
     return this.memo(`name:${name}`, () => casing.camel(name, { suffix: 'handler' }))
   },

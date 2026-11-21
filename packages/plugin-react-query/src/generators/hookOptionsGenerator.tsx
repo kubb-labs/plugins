@@ -31,7 +31,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       path: resolvedFile.path.replace(/[^/\\]+\.ts$/, `${name}.ts`),
     }
 
-    const own = from(ctx.plugin.name, { suffix: false })
+    const own = from(ctx.plugin.name)
     const optionsNames: Array<RefName> = []
     const hookOptions: Record<string, string> = {}
 
@@ -60,7 +60,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         if (!enabled) continue
         const optionsName = ns.optionsName(node)
         const hookName = ns.name(node)
-        optionsNames.push(own.file(node, { name: hookName }).name(optionsName))
+        optionsNames.push(own.import(node, optionsName))
         hookOptions[hookName] = `Partial<ReturnType<typeof ${optionsName}>>`
       }
     }

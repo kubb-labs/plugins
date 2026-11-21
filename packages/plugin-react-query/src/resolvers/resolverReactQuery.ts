@@ -1,7 +1,7 @@
 import { resolveOperationName } from '@internals/shared'
 import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
 import { createResolver, operationKey } from '@kubb/kit'
-import type { PluginReactQuery } from '../types.ts'
+import type { PluginReactQuery, ResolverReactQuery } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-react-query`. Decides the names and
@@ -24,6 +24,15 @@ import type { PluginReactQuery } from '../types.ts'
  */
 export const resolverReactQuery = createResolver<PluginReactQuery>({
   pluginName: 'plugin-react-query',
+  file: {
+    // Each hook has its own file, so a hook's options are imported from the file of the namespace that names them.
+    name(node, exportName) {
+      if (node.kind !== 'Operation' || !exportName) return undefined
+      const resolver = this as unknown as ResolverReactQuery
+      const namespaces = [resolver.query, resolver.suspenseQuery, resolver.infiniteQuery, resolver.suspenseInfiniteQuery, resolver.mutation]
+      return namespaces.find((ns) => ns.name(node) === exportName || ns.optionsName(node) === exportName)?.name(node)
+    },
+  },
   name: resolveOperationName,
   query: createQueryResolver(),
   suspenseQuery: createQueryResolver('Suspense'),

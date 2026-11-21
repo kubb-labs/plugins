@@ -61,7 +61,7 @@ export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFil
   const headerTypeNames = returnType === 'data' || !contractOp.typedHeaders ? [] : getResponseHeadersTypeNames({ node, types: tsResolver })
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
-  const typeFile = from('types').file(node)
+  const typeSource = from('types')
   const importedTypeNames = [
     tsResolver.response.options(node),
     tsResolver.response.responses(node),
@@ -75,7 +75,7 @@ export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFil
       order: 'body-response-first',
       includeParams: false,
     }),
-  ].flatMap((typeName) => (typeName ? [typeFile.name(typeName)] : []))
+  ].flatMap((typeName) => (typeName ? [typeSource.import(node, typeName)] : []))
   const fileMeta = { path: file.path, baseName: file.baseName }
 
   return {

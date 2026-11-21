@@ -41,15 +41,15 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
 
   const validatorHooks = buildValidatorHooks({ node, validator, schemaResolver })
   const headerTypeNames = getResponseHeadersTypeNames({ node, types })
-  const typeFile = from('types').file(node)
-  const schemaFile = schemaResolver && schemaPlugin?.options ? from(schemaResolver.pluginName).file(node) : null
+  const typeSource = from('types')
+  const schemas = schemaResolver && schemaPlugin?.options ? from(schemaResolver.pluginName) : null
 
   return {
     node,
     name: resolver.resolveName({ key: operationKey(node), name: resolver.name(node.operationId) }),
     types,
-    typeNames: [types.response.options(node), types.response.responses(node), ...headerTypeNames].map((name) => typeFile.name(name)),
-    schemaNames: schemaFile ? validatorHooks.importedSchemaNames.map((name) => schemaFile.name(name)) : [],
+    typeNames: [types.response.options(node), types.response.responses(node), ...headerTypeNames].map((name) => typeSource.import(node, name)),
+    schemaNames: schemas ? validatorHooks.importedSchemaNames.map((name) => schemas.import(node, name)) : [],
     validatorHooks,
     headerTypeNames,
     // The fetch and axios clients write `securitySchemes` into `.kubb/client.ts`. A custom client module has none.
