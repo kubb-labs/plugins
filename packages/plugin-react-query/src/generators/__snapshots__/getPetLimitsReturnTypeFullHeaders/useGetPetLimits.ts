@@ -10,7 +10,6 @@ import type {
   GetPetLimitsResponses,
   GetPetLimitsStatus200Headers,
   GetPetLimitsStatus400Headers,
-  GetPetLimitsStatus200,
   GetPetLimitsStatus400,
 } from './GetPetLimits'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
