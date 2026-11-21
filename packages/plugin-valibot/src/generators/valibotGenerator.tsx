@@ -12,11 +12,11 @@ import {
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
-import { defineGenerator, type GeneratorContext } from '@kubb/kit'
+import { defineGenerator, type PrinterFactory } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerValibot } from '../printers/printerValibot.ts'
-import type { PrinterValibotFactory, PrinterValibotOptions } from '../printers/printerValibot.ts'
+import type { PrinterValibotOptions } from '../printers/printerValibot.ts'
 import type { PluginValibot } from '../types.ts'
 
 type Direction = NonNullable<PrinterValibotOptions['direction']>
@@ -25,7 +25,7 @@ type Direction = NonNullable<PrinterValibotOptions['direction']>
  * The `setPrinter` factory of `@kubb/plugin-valibot`. Generators pass `direction` and `keysToOmit`
  * per node through `printer.with(...)`.
  */
-export function createPrinterValibot(ctx: GeneratorContext<PluginValibot>): ast.Printer<PrinterValibotFactory> {
+export const createPrinterValibot: PrinterFactory<PluginValibot> = (ctx) => {
   const { regexType, oneOfType, coercion, printer } = ctx.options
   return printerValibot({
     regexType,

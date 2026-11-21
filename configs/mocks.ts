@@ -7,6 +7,8 @@ import type {
   Config,
   Generator,
   GeneratorContext,
+  PrinterContext,
+  PrinterFactory,
   KubbHooks,
   KubbPluginSetupContext,
   Memo,
@@ -170,16 +172,13 @@ type RenderGeneratorOptions<TOptions extends PluginType> = {
   options: TOptions['resolvedOptions']
   resolver: TOptions['resolver']
   /** The plugin's `setPrinter` factory. The generator reads its result as `ctx.printer`. */
-  printer?: (ctx: GeneratorContext<TOptions>) => GeneratorContext<TOptions>['printer']
+  printer?: PrinterFactory<TOptions>
 }
 
 // Adds `ctx.printer`, like kit's visitor does for a plugin that calls `setPrinter`.
-function withPrinter<TOptions extends PluginType>(
-  ctx: Omit<GeneratorContext<TOptions>, 'printer'>,
-  opts: RenderGeneratorOptions<TOptions>,
-): GeneratorContext<TOptions> {
+function withPrinter<TOptions extends PluginType>(ctx: PrinterContext<TOptions>, opts: RenderGeneratorOptions<TOptions>): GeneratorContext<TOptions> {
   const generatorContext = { ...ctx, printer: undefined } as GeneratorContext<TOptions>
-  generatorContext.printer = opts.printer?.(generatorContext) as GeneratorContext<TOptions>['printer']
+  generatorContext.printer = opts.printer?.(ctx) as GeneratorContext<TOptions>['printer']
   return generatorContext
 }
 

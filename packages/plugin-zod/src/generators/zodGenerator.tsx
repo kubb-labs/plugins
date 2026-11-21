@@ -12,7 +12,7 @@ import {
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
-import { defineGenerator, type GeneratorContext } from '@kubb/kit'
+import { defineGenerator, type PrinterFactory } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Zod } from '../components/Zod.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from '../printers/printerZod.ts'
@@ -34,7 +34,7 @@ function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction
  * The `setPrinter` factory of `@kubb/plugin-zod`: `printerZod`, or `printerZodMini` with `mini: true`.
  * Generators pass `direction` and `keysToOmit` per node through `printer.with(...)`.
  */
-export function createPrinterZod(ctx: GeneratorContext<PluginZod>): NonNullable<PluginZod['printer']> {
+export const createPrinterZod: PrinterFactory<PluginZod> = (ctx) => {
   const { coercion, guidType, regexType, oneOfType, mini, printer } = ctx.options
   const options: PrinterZodOptions = {
     coercion,

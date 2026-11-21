@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import { buildObject, objectKey, toRegExpString } from '@internals/utils'
 import { getCircularNames } from '@internals/shared'
-import { createPrinter, Diagnostics, type GeneratorContext, text } from '@kubb/kit'
+import { createPrinter, Diagnostics, type PrinterFactory, text } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema, dateParserName, isObjectSchema } from '../utils.ts'
 
@@ -520,7 +520,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
  * The `setPrinter` factory of `@kubb/plugin-faker`. Generators get its printer as `ctx.printer` and
  * pass per-node options, such as `schemaName` and `typeName`, through `printer.with(...)`.
  */
-export function createPrinterFaker(ctx: GeneratorContext<PluginFaker>): ast.Printer<PrinterFakerFactory> {
+export const createPrinterFaker: PrinterFactory<PluginFaker> = (ctx) => {
   const { dateParser, regexGenerator, printer } = ctx.options
   return printerFaker({ resolver: ctx.resolver, dateParser, regexGenerator, nodes: printer?.nodes, cyclicSchemas: getCircularNames(ctx) })
 }
