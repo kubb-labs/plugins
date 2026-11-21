@@ -3,8 +3,8 @@ import path from 'node:path'
 import { getStream } from '@internals/shared'
 import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
 import { ensureValidVarName } from '@internals/utils'
-import { defineGenerator, Diagnostics, memo } from '@kubb/kit'
-import type { FileTarget, Generator } from '@kubb/kit'
+import { code, defineGenerator, Diagnostics } from '@kubb/kit'
+import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
@@ -47,21 +47,6 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
 
     return acc
   }, [] as Array<Controller>)
-}
-
-function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationData) => { file: FileTarget | null; names: Array<string> }) {
-  const namesByPath = new Map<string, Set<string>>()
-  const filesByPath = new Map<string, FileTarget>()
-
-  ops.forEach((op) => {
-    const { file, names } = pick(op)
-    if (!file || names.length === 0) return
-    const set = memo(namesByPath, file.path, () => new Set<string>())
-    names.forEach((n) => set.add(n))
-    filesByPath.set(file.path, file)
-  })
-
-  return { namesByPath, filesByPath }
 }
 
 /**
@@ -113,13 +98,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
       const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
 
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
-        const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
-          file: op.typeFile,
-          names: [op.types.response.options(op.node), op.types.response.responses(op.node), ...op.headerTypeNames],
-        }))
-        const { namesByPath: schemaNamesByPath, filesByPath: schemaFilesByPath } = validatorEnabled
-          ? collectImportsByFile(ops, (op) => ({ file: op.schemaFile, names: op.validatorHooks.importedSchemaNames }))
-          : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, FileTarget>() }
+        const typeImports = code.join(ops.flatMap((op) => op.typeNames)).imports
+        const schemaImports = validatorEnabled ? code.join(ops.flatMap((op) => op.schemaNames)).imports : []
         const resultOps = ops.filter((op) => !getStream(op.node)?.shape)
         const typedHeaders = (op: OperationData) => op.headerTypeNames.length > 0
         const resultName = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
@@ -155,14 +135,13 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
 
             {validator === 'zod' && ops.some((op) => ast.http.requestBody.getSchema(op.node) != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
-            {Array.from(typeNamesByPath.entries()).map(([filePath, set]) => (
-              <File.Import key={filePath} name={Array.from(set)} root={file.path} path={typeFilesByPath.get(filePath)!.path} isTypeOnly />
+            {typeImports.map((imp) => (
+              <File.Import key={imp.path} name={imp.name} root={file.path} path={imp.path} isTypeOnly />
             ))}
 
-            {validatorEnabled &&
-              Array.from(schemaNamesByPath.entries()).map(([filePath, set]) => (
-                <File.Import key={filePath} name={Array.from(set)} root={file.path} path={schemaFilesByPath.get(filePath)!.path} />
-              ))}
+            {schemaImports.map((imp) => (
+              <File.Import key={imp.path} name={imp.name} root={file.path} path={imp.path} />
+            ))}
 
             {ops.some((op) => op.validatorHooks.headers) && <File.Import name={['toHeadersStandardSchema']} root={file.path} path={standardSchemaPath} />}
 
