@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { resolveOperationTypeNames } from '@internals/shared'
-import { defineGenerator, operationKey } from '@kubb/kit'
+import { defineGenerator, from, operationKey } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
@@ -23,18 +23,19 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const tsResolver = ctx.getResolver(pluginTsName)
 
+    // Every type name lives in plugin-ts's file for this operation, so the options import gives the path for all of them.
+    const typeImport = from(pluginTsName).resolver.response.options(node).import
     const importedTypeNames = [tsResolver.response.options(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })]
     const name = resolver.name(node.operationId)
 
     const meta = {
       name: resolver.resolveName({ key: operationKey(node), name }),
       file: ctx.file(node, { suffix: false }),
-      fileTs: ctx.file(node, { plugin: tsResolver.pluginName }),
     } as const
 
     return (
       <File {...meta.file}>
-        <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
+        {typeImport && <File.Import name={importedTypeNames} root={meta.file.path} path={typeImport.path} isTypeOnly={typeImport.isTypeOnly} />}
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>
     )

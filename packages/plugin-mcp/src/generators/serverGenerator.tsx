@@ -2,7 +2,7 @@ import { ast } from '@internals/ast'
 import path from 'node:path'
 import { getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
-import { code, defineGenerator, type RefName, ref } from '@kubb/kit'
+import { code, defineGenerator, from, type RefName } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
@@ -25,8 +25,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
 
     ctx.requirePlugin(pluginZodName)
 
-    const handlers = ref(pluginMcpName, { suffix: false })
-    const schemas = ref(pluginZodName)
+    const handlers = from(pluginMcpName, { suffix: false }).resolver
+    const schemas = from(pluginZodName).resolver
 
     const fileAt = <TName extends `${string}.${string}`>(baseName: TName) => ({
       baseName,
