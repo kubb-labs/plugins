@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info: { title: Response name collisions, version: '1' }
+paths:
+  /visits:
+    get:
+      operationId: ListVisits
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ListVisitsResponse' }
+    post:
+      operationId: CreateVisit
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreateVisitResponse' }
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+components:
+  schemas:
+    ListVisitsResponse:
+      type: object
+      properties:
+        items: { type: array, items: { type: string } }
+    CreateVisitResponse:
+      type: object
+      properties:
+        id: { type: string }
+    CreateVisitResponse2:
+      type: string

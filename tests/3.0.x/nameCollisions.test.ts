@@ -73,6 +73,21 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
+  // ─── operation response unions that collide with schema names ────────────
+  {
+    /** Schema `ListVisitsResponse` takes the name of operation `ListVisits`'s response union, and `CreateVisitResponse2` takes the next one (kubb-labs/plugins#1555). */
+    name: 'operationResponseAndSchemas',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/responseNameCollisions.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false }),
+      parsers: [parserTs()],
+      storage: fsStorage(),
+      plugins: allGenerators(pluginFetch({ validator: 'zod' })),
+    },
+  },
+
   // ─── components, operations and inline enums competing for one name ──────
   {
     /** A custom `name` maps distinct schemas onto one identifier, so the allocator has to split them again. */
