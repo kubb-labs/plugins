@@ -1066,7 +1066,7 @@ describe('typeGenerator — enumConstCasing', () => {
 
     expect(source).toContain('export const _110 =')
     expect(source).toContain('export type _110Key = (typeof _110)[keyof typeof _110]')
-    const exports = driver.fileManager.files?.flatMap((file) => file.sources.filter((source) => source.isExport).map((source) => source.name))
+    const exports = driver.fileManager.files?.flatMap((file) => file.sources.filter((source) => source.export).map((source) => source.name))
     expect(exports).toStrictEqual(['_110', '_110Key'])
   })
 

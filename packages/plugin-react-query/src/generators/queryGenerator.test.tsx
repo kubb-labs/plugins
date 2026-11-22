@@ -284,7 +284,7 @@ describe('queryGenerator queryKey', () => {
     const keySource = file?.sources.find((s) => 'name' in s && s.name === 'findPetsByTagsQueryKey')
     expect(keySource).toMatchObject({
       name: 'findPetsByTagsQueryKey',
-      isExport: true,
+      export: true,
       nodes: [
         expect.objectContaining({
           kind: 'ArrowFunction',

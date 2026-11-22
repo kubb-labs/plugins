@@ -57,8 +57,8 @@ describe('customHookOptionsFileGenerator operations', () => {
     expect(file?.baseName).toBe('useOptions.ts')
     // The helper stays private, so barrels re-export only the custom options hook.
     expect(file?.sources).toEqual([
-      expect.objectContaining({ name: 'getCustomHookOptions', isExport: false }),
-      expect.objectContaining({ name: 'useMyHookOptions', isExport: true }),
+      expect.objectContaining({ name: 'getCustomHookOptions', export: false }),
+      expect.objectContaining({ name: 'useMyHookOptions', export: true }),
     ])
   })
 

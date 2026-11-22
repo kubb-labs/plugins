@@ -28,7 +28,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
         sources: [
           ast.factory.createSource({
             name: createHandlersName,
-            isExport: true,
+            export: true,
             nodes: [
               ast.factory.createText(`export function ${createHandlersName}(options?: { baseURL?: string }) {
   return [${handlers.join(', ')}] as const
@@ -37,7 +37,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
           }),
           ast.factory.createSource({
             name: handlersName,
-            isExport: true,
+            export: true,
             nodes: [ast.factory.createText(`export const ${handlersName} = ${createHandlersName}()`)],
           }),
         ],
