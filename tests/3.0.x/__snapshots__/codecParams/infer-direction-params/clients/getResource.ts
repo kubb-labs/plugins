@@ -7,7 +7,7 @@ import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetResourceOptionsSchemaType, GetResourceResponsesSchemaType } from '../zod/getResourceSchema'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema'
-import { getResourceResponseSchema, getResourcePathSchema, getResourceQuerySchema, getResourceHeadersSchema } from '../zod/getResourceSchema'
+import { getResourceHeadersSchema, getResourcePathSchema, getResourceQuerySchema, getResourceResponseSchema } from '../zod/getResourceSchema'
 
 /**
  * `GET /resources/{resource}`

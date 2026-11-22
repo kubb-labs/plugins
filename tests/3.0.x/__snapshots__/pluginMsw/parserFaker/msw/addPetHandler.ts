@@ -4,7 +4,7 @@
 */
 
 import type { MswBody } from '../.kubb/mswBody'
-import type { AddPetResponse, AddPetStatus405, AddPetBody } from '../types/AddPet'
+import type { AddPetBody, AddPetResponse, AddPetStatus405 } from '../types/AddPet'
 import type { HttpResponseResolver } from 'msw/http'
 import { createAddPetResponse } from '../faker/createAddPet'
 import { http, HttpResponse } from 'msw/http'

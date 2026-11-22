@@ -4,7 +4,7 @@
 */
 
 import type { MswBody } from '../.kubb/mswBody'
-import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderBody } from '../types/PlaceOrder'
+import type { PlaceOrderBody, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder'
 import type { HttpResponseResolver } from 'msw/http'
 import { createPlaceOrderResponse } from '../faker/createPlaceOrder'
 import { http, HttpResponse } from 'msw/http'

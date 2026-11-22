@@ -6,7 +6,7 @@
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { ListEventsOptionsSchemaType, ListEventsResponsesSchemaType } from '../zod/listEventsSchema'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
-import { listEventsResponseSchema, listEventsQuerySchema } from '../zod/listEventsSchema'
+import { listEventsQuerySchema, listEventsResponseSchema } from '../zod/listEventsSchema'
 
 /**
  * `GET /events`
