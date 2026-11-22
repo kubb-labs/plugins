@@ -102,7 +102,7 @@
     "@internals/ast": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "msw": "^3.0.6"
+    "msw": "^3.0.7"
   },
   "peerDependencies": {
     "msw": "^3.0.0"
