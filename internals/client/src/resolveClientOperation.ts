@@ -1,6 +1,6 @@
 import type { ast } from '@internals/ast'
 import path from 'node:path'
-import { from, operationKey, useKubb } from '@kubb/kit'
+import { operationKey, useKubb } from '@kubb/kit'
 import type { Exclude, GeneratorContext, Group, Include, Output, Override } from '@kubb/kit'
 
 /**
@@ -80,7 +80,7 @@ export function resolveClientOperation(node: ast.OperationNode, pluginName: stri
     if (!operationOptions) return null
 
     const name = resolver.resolveName({ key: operationKey(node), name: resolver.name(node.operationId) })
-    const file = from(pluginName).import(node, name).import!
+    const file = ctx.from(pluginName).import(node, name).import!
     const { importPath } = operationOptions
 
     return {

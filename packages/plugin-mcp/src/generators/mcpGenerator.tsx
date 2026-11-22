@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
 import { getStream } from '@internals/shared'
-import { defineGenerator, from } from '@kubb/kit'
+import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'
@@ -33,7 +33,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     }
 
     // The handler signature references the grouped `<Name>Options`.
-    const options = from('types').import(node, tsResolver.response.options(node)).import
+    const options = ctx.from('types').import(node, tsResolver.response.options(node)).import
 
     const meta = {
       name: resolver.handler.name(node),

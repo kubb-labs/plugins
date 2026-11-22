@@ -11,7 +11,7 @@ import {
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
-import { defineGenerator, from, type PrinterFactory } from '@kubb/kit'
+import { defineGenerator, type PrinterFactory } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerValibot } from '../printers/printerValibot.ts'
@@ -62,7 +62,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     const printerOptions = ctx.printer.options
     // Rendered twice: the schema decodes, and its `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions })
-    const valibot = from(pluginValibotName).resolver
+    const valibot = ctx.from(pluginValibotName).resolver
     const inputImports = hasDirectionalNode
       ? collectDirectionalRefNames({ node, printerOptions }).flatMap((schemaName) => valibot.schema.inputName(schemaName).import ?? [])
       : []

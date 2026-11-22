@@ -11,7 +11,7 @@ import {
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
-import { defineGenerator, from, type PrinterFactory } from '@kubb/kit'
+import { defineGenerator, type PrinterFactory } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Zod } from '../components/Zod.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from '../printers/printerZod.ts'
@@ -77,7 +77,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions, mini }) : [])
     const importEntries = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
-    const zod = from(pluginZodName).resolver
+    const zod = ctx.from(pluginZodName).resolver
     const inputImportEntries = [...directionalRefNames].flatMap((schemaName) => zod.schema.inputName(schemaName).import ?? [])
     const imports = [
       ...new Map(

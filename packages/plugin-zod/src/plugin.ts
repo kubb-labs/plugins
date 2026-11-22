@@ -1,4 +1,4 @@
-import { addGenerator, defineExtension, getResolver, provide, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
+import { addGenerator, defineExtension, getResolver, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { createPrinterZod, zodGenerator } from './generators/zodGenerator.tsx'
@@ -41,7 +41,7 @@ export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
 export const pluginZod = defineExtension<PluginZod>({
   kind: 'plugin',
   meta: { name: pluginZodName, version, compatibility },
-  setup(options) {
+  setup(options, ctx) {
     const {
       output = { path: 'zod', barrel: { type: 'named' } },
       group,
@@ -66,7 +66,7 @@ export const pluginZod = defineExtension<PluginZod>({
     const resolvedInferred = inferred === 'direction' ? 'codec' : inferred
     // Codec types carry the domain value, so they win over plugin-ts. Plain inferred types are the fallback without it.
     if (resolvedInferred) {
-      provide({
+      ctx.provide({
         name: 'types',
         factory: () => toZodTypeResolver(getResolver(pluginZodName) as ResolverZod),
         priority: resolvedInferred === 'codec' ? 1 : -1,
