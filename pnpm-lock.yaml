@@ -1247,9 +1247,9 @@ importers:
       '@typescript/typescript6':
         specifier: ^6.0.2
         version: 6.0.2
-      yuku-codegen:
-        specifier: ^0.19.0
-        version: 0.19.0
+      yuku:
+        specifier: ^0.28.1
+        version: 0.28.1
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -2818,8 +2818,18 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
+  '@yuku-toolchain/darwin-arm64@0.28.1':
+    resolution: {integrity: sha512-xMtZUwiGvJH90ogLjRrnG5+YEhinKti8qMPF18bd5z0ahSoaHWyBoe16evT7cSUxid0JEaZvh6H3daDPwDw4+g==}
+    cpu: [arm64]
+    os: [darwin]
+
   '@yuku-toolchain/darwin-x64@0.27.0':
     resolution: {integrity: sha512-u+fcqQw0uRj5irtO5f0xu5nGazYRxfBVBNIuhiONWX6Mh2izRONSNXhCwFDaYRqHunublzw2l2aQMB0n5n1t0Q==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@yuku-toolchain/darwin-x64@0.28.1':
+    resolution: {integrity: sha512-aI60ScUkZgVEX5GHZfpiAAfTb9e7L6NUxfSU7Ucn+34GyrtswvBapEntbYKPzUuy5ubtVcD9vSWgptm/mlyTxQ==}
     cpu: [x64]
     os: [darwin]
 
@@ -2828,8 +2838,18 @@ packages:
     cpu: [arm64]
     os: [linux]
 
+  '@yuku-toolchain/linux-arm64@0.28.1':
+    resolution: {integrity: sha512-JYDBUtSI4CHfR9VxSvoJvcD8MS4qhuOk4MAMAqoouHq9Hky/fQbvGkN1VxTiwRtEcYtMp3JUs7vtsSZmbGk4lw==}
+    cpu: [arm64]
+    os: [linux]
+
   '@yuku-toolchain/linux-x64@0.27.0':
     resolution: {integrity: sha512-fe1kN04JPBODrkRZOuI06jIqKyzcyn0ykx+tpiERDwqAh9ALWOtkgfhFjVaOQSu+guhakzY/89xjQdmfY7EJ7w==}
+    cpu: [x64]
+    os: [linux]
+
+  '@yuku-toolchain/linux-x64@0.28.1':
+    resolution: {integrity: sha512-lEWh0UkCr195bQj4DNlpww/B7hPeuotE0hpKbC2oz4STHqYxCEoaMzNOf9vr5Ydjwr9egEDepA0XRsu5xP+z8w==}
     cpu: [x64]
     os: [linux]
 
@@ -2841,8 +2861,18 @@ packages:
     cpu: [arm64]
     os: [win32]
 
+  '@yuku-toolchain/win32-arm64@0.28.1':
+    resolution: {integrity: sha512-CUiumoJIwNiH9Utm5SbG5GaEaJRUatEXgG5HcPj2yEWh4kxTmEbigB346C3HEmtc+zbRLY0T0XsFO5RGSZaj2A==}
+    cpu: [arm64]
+    os: [win32]
+
   '@yuku-toolchain/win32-x64@0.27.0':
     resolution: {integrity: sha512-7LSviI8HtHga0g7G2oT7C/SP2IoLmrg8LYPeWZkp4ljFtaWKJoTRF0Iv0cVt0dR4rehoN/+TjN4r8SoArCKvlg==}
+    cpu: [x64]
+    os: [win32]
+
+  '@yuku-toolchain/win32-x64@0.28.1':
+    resolution: {integrity: sha512-CSTUi/ya58q2PuWTpk//BNSpXgOz7ol45T+SDuU7QfD/vN1FcLjSh99KDQzLf4AbIy43ORUw5UFehhfMGPNj9w==}
     cpu: [x64]
     os: [win32]
 
@@ -4428,6 +4458,15 @@ packages:
       '@yuku-toolchain/wasm':
         optional: true
 
+  yuku@0.28.1:
+    resolution: {integrity: sha512-l899L8rSywcq9OLHf8JNQKpgyrBUL7UNJ7JqefoSVy0oYaFpdf3HoF72EVQFNWYr9HqMw0nGw1r1DefNujOnLQ==}
+    engines: {node: '>=16.4.0'}
+    peerDependencies:
+      '@yuku-toolchain/wasm': 0.28.1
+    peerDependenciesMeta:
+      '@yuku-toolchain/wasm':
+        optional: true
+
   zimmerframe@1.1.5:
     resolution: {integrity: sha512-msJxIvYDYcoNL+PJsu+7qmpDWsYmAxTY+2TNYXXF0hzBzBk0BMecOqDOG/EckUoKCuKwObfbugIl8QpqHDXeFA==}
 
@@ -5467,13 +5506,25 @@ snapshots:
   '@yuku-toolchain/darwin-arm64@0.27.0':
     optional: true
 
+  '@yuku-toolchain/darwin-arm64@0.28.1':
+    optional: true
+
   '@yuku-toolchain/darwin-x64@0.27.0':
+    optional: true
+
+  '@yuku-toolchain/darwin-x64@0.28.1':
     optional: true
 
   '@yuku-toolchain/linux-arm64@0.27.0':
     optional: true
 
+  '@yuku-toolchain/linux-arm64@0.28.1':
+    optional: true
+
   '@yuku-toolchain/linux-x64@0.27.0':
+    optional: true
+
+  '@yuku-toolchain/linux-x64@0.28.1':
     optional: true
 
   '@yuku-toolchain/types@0.19.0': {}
@@ -5481,7 +5532,13 @@ snapshots:
   '@yuku-toolchain/win32-arm64@0.27.0':
     optional: true
 
+  '@yuku-toolchain/win32-arm64@0.28.1':
+    optional: true
+
   '@yuku-toolchain/win32-x64@0.27.0':
+    optional: true
+
+  '@yuku-toolchain/win32-x64@0.28.1':
     optional: true
 
   acorn@8.19.0: {}
@@ -7006,6 +7063,15 @@ snapshots:
       '@yuku-toolchain/linux-x64': 0.27.0
       '@yuku-toolchain/win32-arm64': 0.27.0
       '@yuku-toolchain/win32-x64': 0.27.0
+
+  yuku@0.28.1:
+    optionalDependencies:
+      '@yuku-toolchain/darwin-arm64': 0.28.1
+      '@yuku-toolchain/darwin-x64': 0.28.1
+      '@yuku-toolchain/linux-arm64': 0.28.1
+      '@yuku-toolchain/linux-x64': 0.28.1
+      '@yuku-toolchain/win32-arm64': 0.28.1
+      '@yuku-toolchain/win32-x64': 0.28.1
 
   zimmerframe@1.1.5: {}
 
