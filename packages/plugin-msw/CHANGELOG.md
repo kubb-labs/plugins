@@ -1,5 +1,11 @@
 # @kubb/plugin-msw
 
+## 6.3.2
+
+### Patch Changes
+
+- [#1565](https://github.com/kubb-labs/plugins/pull/1565) [`51c040a`](https://github.com/kubb-labs/plugins/commit/51c040a06b8927ff5cba785b1827f7b47e8f5dde) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - State in the README that the generated handlers need MSW 3. They import from `msw/http`, which MSW 2 does not have, so TypeScript fails with `TS2307: Cannot find module 'msw/http'`.
+
 ## 6.3.1
 
 ### Patch Changes
