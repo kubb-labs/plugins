@@ -23,15 +23,15 @@ catalog:
   '@kubb/parser-ts': 0.0.0-canary-20261122210551
   '@types/node': 22.20.5
   '@types/react': ^19.3.0
-  '@vitest/coverage-v8': ^5.1.0
-  '@vitest/ui': ^5.1.0
+  '@vitest/coverage-v8': ^5.1.1
+  '@vitest/ui': ^5.1.1
   kubb: 0.0.0-canary-20261122210551
-  oxfmt: ^0.78.0
-  oxlint: ^1.93.0
+  oxfmt: ^0.79.0
+  oxlint: ^1.94.0
   prettier: ^3.10.1
   tsdown: ^0.23.7
   typescript: ^7.0.2
-  vitest: ^5.1.0
+  vitest: ^5.1.1
 
 #overrides:
 #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas

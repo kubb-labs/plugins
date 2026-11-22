@@ -34,7 +34,6 @@
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-valibot": "workspace:*",
     "@kubb/plugin-vue-query": "workspace:*",
-    "@kubb/plugin-valibot": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "kubb": "catalog:",
     "zod": "^4.6.7"

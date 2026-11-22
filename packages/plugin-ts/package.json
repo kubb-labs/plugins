@@ -76,7 +76,7 @@
     "@kubb/ast": "0.0.0-canary-20261122210551",
     "@kubb/kit": "0.0.0-canary-20261122210551",
     "@kubb/renderer-jsx": "0.0.0-canary-20261122210551",
-    "yuku-codegen": "^0.19.0"
+    "yuku": "^0.28.1"
   },
   "devDependencies": {
     "@internals/ast": "workspace:*",

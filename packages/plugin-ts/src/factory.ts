@@ -1,9 +1,9 @@
 import { ast } from '@internals/ast'
 import { casing, text } from '@kubb/kit'
-import { generate } from 'yuku-codegen'
+import { print as printYuku } from 'yuku'
 
 /**
- * A TS-ESTree node, the AST shape `yuku-codegen` prints. Nodes built here carry no source positions.
+ * A TS-ESTree node, the AST shape yuku prints. Nodes built here carry no source positions.
  */
 export type TsNode = { type: string; [key: string]: unknown }
 
@@ -19,7 +19,7 @@ export function isNonNullable<T>(value: T | null | undefined): value is T {
  * Prints `node` as TypeScript source with single quotes and two-space indentation.
  */
 export function print(node: TsNode): string {
-  return generate(node as unknown as Parameters<typeof generate>[0], { quotes: 'single' }).code
+  return printYuku(node as unknown as Parameters<typeof printYuku>[0], { quotes: 'single' }).code
 }
 
 /**
@@ -59,7 +59,7 @@ function propertyName(name: string): TsNode {
 
 /**
  * Creates a TypeScript intersection type.
- * Returns the single type if only one is provided. `yuku-codegen` adds the parentheses a union member needs.
+ * Returns the single type if only one is provided. yuku adds the parentheses a union member needs.
  */
 export function createIntersectionDeclaration({ nodes, withParentheses }: { nodes: Array<TsNode>; withParentheses?: boolean }): TsNode | null {
   if (!nodes.length) {
@@ -150,7 +150,7 @@ export function appendJSDocToNode<TNode extends TsNode>({ node, comments }: { no
     return node
   }
 
-  // `yuku-codegen` prints the comment text as is, so a `*/` inside it would end the block early
+  // yuku prints the comment text as is, so a `*/` inside it would end the block early
   const value = `*\n${lines.map((line) => ` * ${line.replaceAll('*/', '*\\/')}`.trimEnd()).join('\n')}\n `
 
   return { ...node, comments: [{ type: 'Block', value, position: 'before', sameLine: false }] }
@@ -334,7 +334,7 @@ export function createEnumDeclaration({
     return [undefined, ...typeAlias(keywordTypeNodes.never)]
   }
 
-  // `yuku-codegen` prints object literals on one line, so each property prints on its own and the lines join here
+  // yuku prints object literals on one line, so each property prints on its own and the lines join here
   const properties = enums
     .map(([key, value, description]) => {
       if (key === null || key === undefined) return undefined
@@ -406,7 +406,7 @@ export function createUrlTemplateType(path: string): TsNode {
   }
 
   const segments = normalized.split(/\{[^}]+\}/)
-  // `yuku-codegen` escapes the cooked text itself when no raw text is given
+  // yuku escapes the cooked text itself when no raw text is given
   const quasis = segments.map((cooked, i) => ({ type: 'TemplateElement', value: { cooked }, tail: i === segments.length - 1 }))
 
   return { type: 'TSTemplateLiteralType', quasis, types: segments.slice(1).map(() => keywordTypeNodes.string) }
