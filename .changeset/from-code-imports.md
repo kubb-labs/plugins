@@ -15,7 +15,7 @@
 '@kubb/plugin-ky': patch
 ---
 
-Plugins import each other's names with kit's `from`, `provide` and `code`, instead of looking up each other's files.
+Plugins find their files with kit's `ctx.file` and import each other's names with `from`, `provide` and `code`, instead of looking up each other's paths.
 
 - A resolver `name` override renames TanStack hooks (react-query, vue-query, swr) and msw handlers, but no longer their files. Those files are named from the `operationId`.
 - Named imports list their names in alphabetical order.
