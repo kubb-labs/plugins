@@ -46,6 +46,12 @@ describe('import utilities', () => {
     expect(aliases).toStrictEqual(new Map([['createPet', 'createPetSchema']]))
   })
 
+  test('aliases conflicting names on an entry that has names', () => {
+    const entry: ImportEntry = { name: ['createPet'], names: [{ name: 'createPet', space: 'value' }], path: './api.ts' }
+
+    expect(aliasConflictingImports([entry], ['createPet']).imports[0]?.names).toStrictEqual([{ name: 'createPet', alias: 'createPetSchema', space: 'value' }])
+  })
+
   test('rewrites aliased import references', () => {
     expect(rewriteAliasedImports('return createPet(data)', new Map([['createPet', 'createPetSchema']]))).toBe('return createPetSchema(data)')
   })

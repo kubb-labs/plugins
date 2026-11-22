@@ -1,7 +1,10 @@
+import type { ast } from '@internals/ast'
+
 export type ImportName = string | { propertyName: string; name?: string }
 
 export type ImportEntry = {
   name: string | Array<ImportName>
+  names?: Array<ast.ModuleName> | null
   path: string
 }
 
@@ -63,7 +66,10 @@ export function aliasConflictingImports<TEntry extends ImportEntry>(
       return { propertyName: item, name: alias }
     })
 
-    return aliasedNames.some((item) => typeof item === 'object' && item.name) ? Object.assign({}, entry, { name: aliasedNames }) : entry
+    if (!aliasedNames.some((item) => typeof item === 'object' && item.name)) return entry
+    // An entry with `names` is read from `names`, so the alias goes there too.
+    const moduleNames = entry.names?.map((item) => (!item.alias && aliases.has(item.name) ? { ...item, alias: aliases.get(item.name) } : item))
+    return Object.assign({}, entry, { name: aliasedNames }, moduleNames ? { names: moduleNames } : {})
   })
 
   return {

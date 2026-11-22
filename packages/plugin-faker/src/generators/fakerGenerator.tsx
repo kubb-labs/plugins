@@ -72,7 +72,12 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         {dateParser !== 'faker' && <File.Import names={[{ name: 'default', alias: dateParserName(dateParser), space: 'value' }]} path={dateParser} />}
         {typeReference.import && <File.Import names={ast.imports.asType(typeReference.import)} root={meta.file.path} path={typeReference.import.path} />}
         {usedImports.map((imp) => (
-          <File.Import key={[schemaName, imp.path].join('-')} names={ast.file.getNames(imp)} root={meta.file.path} path={imp.path} />
+          <File.Import
+            key={[schemaName, imp.path, ...ast.file.getNames(imp).map((item) => item.alias ?? item.name)].join('-')}
+            names={ast.file.getNames(imp)}
+            root={meta.file.path}
+            path={imp.path}
+          />
         ))}
         {seed !== undefined ? <Raw name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</Raw> : undefined}
         <Faker
@@ -213,7 +218,12 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <>
           {typeReference.import && <File.Import names={ast.imports.asType(typeReference.import)} root={meta.file.path} path={typeReference.import.path} />}
           {imports.map((imp) => (
-            <File.Import key={[name, imp.path].join('-')} names={ast.file.getNames(imp)} root={meta.file.path} path={imp.path} />
+            <File.Import
+              key={[name, imp.path, ...ast.file.getNames(imp).map((item) => item.alias ?? item.name)].join('-')}
+              names={ast.file.getNames(imp)}
+              root={meta.file.path}
+              path={imp.path}
+            />
           ))}
           <Faker
             name={name}
