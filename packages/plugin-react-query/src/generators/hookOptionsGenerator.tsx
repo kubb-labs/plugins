@@ -18,13 +18,12 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-hook-options',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { resolver, config, root } = ctx
     const { output, customOptions, query, mutation, suspense, infinite, group, override, hooks } = ctx.options
 
     if (!customOptions || !hooks) return null
 
-    const name = resolver.hook.optionsName()
-    const resolvedFile = resolver.file({ name, extname: '.ts', root, output, group: group ?? undefined })
+    const name = ctx.resolver.hook.optionsName()
+    const resolvedFile = ctx.resolver.file({ name, extname: '.ts', root: ctx.root, output, group: group ?? undefined })
     const hookOptionsFile = {
       ...resolvedFile,
       baseName: `${name}.ts` as const,
@@ -49,11 +48,11 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       const isInfinite = isQuery && !!nodeInfiniteOptions && matchesInfinite(node, nodeInfiniteOptions)
 
       const namespaces: Array<[{ name(node: ast.OperationNode): string; optionsName(node: ast.OperationNode): string }, boolean]> = [
-        [resolver.query, isQuery],
-        [resolver.suspenseQuery, isQuery && isSuspense],
-        [resolver.infiniteQuery, isInfinite],
-        [resolver.suspenseInfiniteQuery, isInfinite && isSuspense],
-        [resolver.mutation, isMutation],
+        [ctx.resolver.query, isQuery],
+        [ctx.resolver.suspenseQuery, isQuery && isSuspense],
+        [ctx.resolver.infiniteQuery, isInfinite],
+        [ctx.resolver.suspenseInfiniteQuery, isInfinite && isSuspense],
+        [ctx.resolver.mutation, isMutation],
       ]
 
       for (const [ns, enabled] of namespaces) {
@@ -70,8 +69,8 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         baseName={hookOptionsFile.baseName}
         path={hookOptionsFile.path}
         meta={hookOptionsFile.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
+        banner={ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
+        footer={ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
       >
         {code.join(optionsNames).imports.map((imp) => (
           <File.Import key={imp.path} name={imp.name} root={hookOptionsFile.path} path={imp.path} />

@@ -12,13 +12,11 @@ import type { PluginMsw } from '../types'
 export const handlersGenerator = defineGenerator<PluginMsw>({
   name: 'plugin-msw',
   operations(nodes, ctx) {
-    const { resolver } = ctx
-
-    const handlersName = resolver.handler.listName()
-    const createHandlersName = resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })
+    const handlersName = ctx.resolver.handler.listName()
+    const createHandlersName = ctx.resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })
     const file = namedFile({ name: handlersName })
 
-    const handlerNames = nodes.map((node) => resolver.handler.name(node))
+    const handlerNames = nodes.map((node) => ctx.resolver.handler.name(node))
 
     const own = ctx.from()
     const imports = code

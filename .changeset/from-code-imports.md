@@ -27,7 +27,7 @@ Import names from other plugins with kit's `from` and `code`. Each plugin marks 
 - plugin-msw: the handlers file's imports.
 - plugin-faker: the plugin-ts type imports, and the inline `import('…')` type when a faker has the same name as its type.
 
-plugin-ts and `pluginZod({ inferred })` now provide the `types` name with `provide({ name: 'types', factory })`. Codec types from zod win over plugin-ts, and plain inferred zod types are the fallback without plugin-ts, as before. The client, query and MCP plugins read operation types through `from('types')` and `getResolver('types')`. Zod-backed types import with `import type`.
+plugin-ts and `pluginZod({ inferred })` now provide the `types` name with `provide('types', factory)`. Codec types from zod win over plugin-ts, and plain inferred zod types are the fallback without plugin-ts, as before. The client, query and MCP plugins read operation types through `from('types')` and `getResolver('types')`. Zod-backed types import with `import type`.
 
 Generated output is unchanged.
 

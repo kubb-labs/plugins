@@ -61,7 +61,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
   name: 'zod',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { resolver, root } = ctx
     const { output, compile, mini, inferred, typeGuards, importPath, group } = ctx.options
 
     if (!node.name) {
@@ -76,7 +75,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions, mini })
 
     const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions, mini }) : [])
-    const importEntries = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
+    const importEntries = ctx.resolver.imports({ node, root: ctx.root, output, group: group ?? undefined, checks: true })
     const zod = ctx.from(pluginZodName).resolver
     const inputImportEntries = [...directionalRefNames].flatMap((schemaName) => zod.schema.inputName(schemaName).import ?? [])
     const imports = [
@@ -86,12 +85,12 @@ export const zodGenerator = defineGenerator<PluginZod>({
     ]
 
     const meta = {
-      name: resolver.name(node.name),
+      name: ctx.resolver.name(node.name),
       file: ctx.file(node),
     } as const
 
-    const isName = typeGuards ? resolver.schema.isName(node.name) : null
-    const assertName = typeGuards ? resolver.schema.assertName(node.name) : null
+    const isName = typeGuards ? ctx.resolver.schema.isName(node.name) : null
+    const assertName = typeGuards ? ctx.resolver.schema.assertName(node.name) : null
 
     const schemaPrinter = ctx.printer.with({ direction: 'decode' })
 
@@ -106,7 +105,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           name={meta.name}
           node={node}
           printer={schemaPrinter}
-          inferTypeName={inferred ? resolver.schema.typeName(node.name) : null}
+          inferTypeName={inferred ? ctx.resolver.schema.typeName(node.name) : null}
           inferKind={aliasKind(inferred, 'decode')}
           typeGuards={typeGuards}
           isName={isName}
@@ -118,14 +117,14 @@ export const zodGenerator = defineGenerator<PluginZod>({
         />
         {hasDirectionalNode && (
           <Zod
-            name={resolver.schema.inputName(node.name)}
+            name={ctx.resolver.schema.inputName(node.name)}
             node={node}
             printer={ctx.printer.with({ direction: 'encode' })}
-            inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
+            inferTypeName={inferred ? ctx.resolver.schema.inputTypeName(node.name) : null}
             inferKind={aliasKind(inferred, 'encode')}
             typeGuards={typeGuards}
-            isName={typeGuards ? resolver.schema.isName(resolver.schema.inputName(node.name)) : null}
-            assertName={typeGuards ? resolver.schema.assertName(resolver.schema.inputName(node.name)) : null}
+            isName={typeGuards ? ctx.resolver.schema.isName(ctx.resolver.schema.inputName(node.name)) : null}
+            assertName={typeGuards ? ctx.resolver.schema.assertName(ctx.resolver.schema.inputName(node.name)) : null}
             mini={mini}
             cyclic={cyclicSchemas.has(node.name)}
             compile={compile}
@@ -137,7 +136,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver, root } = ctx
     const { output, compile, mini, inferred, importPath, group } = ctx.options
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
@@ -166,13 +164,13 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       const directionalRefNames = direction === 'encode' ? new Set(collectDirectionalRefNames({ node: schema, printerOptions, mini })) : null
       const schemaPrinter = ctx.printer.with({ keysToOmit, direction })
-      const imports = resolver.imports({
+      const imports = ctx.resolver.imports({
         node: schema,
-        root,
+        root: ctx.root,
         output,
         group: group ?? undefined,
         checks: true,
-        name: (schemaName) => (directionalRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
+        name: (schemaName) => (directionalRefNames?.has(schemaName) ? ctx.resolver.schema.inputName(schemaName) : ctx.resolver.name(schemaName)),
       })
 
       return (
@@ -188,7 +186,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             name={name}
             node={schema}
             printer={schemaPrinter}
-            inferTypeName={inferred ? resolver.schema.type(name) : null}
+            inferTypeName={inferred ? ctx.resolver.schema.type(name) : null}
             inferKind={aliasKind(inferred, direction)}
             cyclic={false}
             compile={compile}
@@ -207,39 +205,41 @@ export const zodGenerator = defineGenerator<PluginZod>({
       direction?: 'encode' | 'decode',
     ) => <>{buildContentTypeEntries(entries, baseName, decorate).map((entry) => renderSchemaEntry({ ...entry, direction }))}</>
     const renderResponseUnion = (responses: Array<ast.ResponseNode>, name: string, fallbackUnknown: boolean) =>
-      renderSchemaEntry({ schema: buildResponseUnionSchema({ node, responses, name, resolver, fallbackUnknown }), name })
+      renderSchemaEntry({ schema: buildResponseUnionSchema({ node, responses, name, resolver: ctx.resolver, fallbackUnknown }), name })
 
     const paramSchemas = node.parameters.map((param) =>
-      renderSchemaEntry({ schema: param.schema, name: resolver.param.name(node, param), direction: 'encode' }),
+      renderSchemaEntry({ schema: param.schema, name: ctx.resolver.param.name(node, param), direction: 'encode' }),
     )
 
     const responseSchemas = node.responses.map((res) => {
       const content = (res.content ?? []).map((entry, _, content) => toResponseContent(entry, content))
       const variants = content.filter((entry) => entry.schema)
       if (variants.length > 1) {
-        return renderContentTypeVariants(content, resolver.response.status(node, res.statusCode))
+        return renderContentTypeVariants(content, ctx.resolver.response.status(node, res.statusCode))
       }
       const primary = variants[0] ?? content[0]
       return renderSchemaEntry({
         schema: primary?.schema ?? null,
-        name: resolver.response.status(node, res.statusCode),
+        name: ctx.resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
       })
     })
 
     const responseHeaderSchemas = node.responses.map((res) =>
-      res.headers?.length ? renderSchemaEntry({ schema: buildParamsSchema(res.headers), name: resolver.response.headers(node, res.statusCode) }) : null,
+      res.headers?.length ? renderSchemaEntry({ schema: buildParamsSchema(res.headers), name: ctx.resolver.response.headers(node, res.statusCode) }) : null,
     )
 
     const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
     // Validate success (2xx) bodies only. Error bodies are surfaced unparsed, typed by plugin-ts (#369).
     const successResponsesWithSchema = responsesWithSchema.filter((res) => ast.http.status.isSuccess(res))
-    const responseUnionSchema = responsesWithSchema.length > 0 ? renderResponseUnion(successResponsesWithSchema, resolver.response.response(node), true) : null
+    const responseUnionSchema =
+      responsesWithSchema.length > 0 ? renderResponseUnion(successResponsesWithSchema, ctx.resolver.response.response(node), true) : null
 
     // Validate error bodies on the non-throw path. Mirrors the success union but selects every
     // non-2xx response (including the OpenAPI `default`) so it lines up with plugin-ts `ErrorOf` (#369).
     const errorResponsesWithSchema = responsesWithSchema.filter((res) => !ast.http.status.isSuccess(res))
-    const errorUnionSchema = errorResponsesWithSchema.length > 0 ? renderResponseUnion(errorResponsesWithSchema, resolver.response.error(node), false) : null
+    const errorUnionSchema =
+      errorResponsesWithSchema.length > 0 ? renderResponseUnion(errorResponsesWithSchema, ctx.resolver.response.error(node), false) : null
 
     const requestBodyContent = node.requestBody?.content ?? []
     const requestSchema = (() => {
@@ -249,14 +249,14 @@ export const zodGenerator = defineGenerator<PluginZod>({
         if (!entry.schema) return null
         return renderSchemaEntry({
           schema: { ...entry.schema, description: node.requestBody!.description ?? entry.schema.description },
-          name: resolver.response.body(node),
+          name: ctx.resolver.response.body(node),
           keysToOmit: entry.keysToOmit,
           direction: 'encode',
         })
       }
       return renderContentTypeVariants(
         requestBodyContent,
-        resolver.response.body(node),
+        ctx.resolver.response.body(node),
         (schema) => ({
           ...schema,
           description: node.requestBody!.description ?? schema.description,
@@ -280,8 +280,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
       .filter(({ params }) => params.length > 0)
       .map(({ kind, params }) =>
         renderSchemaEntry({
-          schema: buildParamRefsSchema({ node, params, resolver }),
-          name: resolver.param[kind](node, params[0]!),
+          schema: buildParamRefsSchema({ node, params, resolver: ctx.resolver }),
+          name: ctx.resolver.param[kind](node, params[0]!),
           direction: 'encode',
         }),
       )
@@ -291,11 +291,11 @@ export const zodGenerator = defineGenerator<PluginZod>({
     // consumers sourcing types from this plugin instead of `plugin-ts`. Not worth generating when
     // nothing will import them.
     const optionsSchema = inferred
-      ? renderSchemaEntry({ schema: buildOptionsSchema(node, resolver), name: resolver.name(`${node.operationId} Options`), direction: 'encode' })
+      ? renderSchemaEntry({ schema: buildOptionsSchema(node, ctx.resolver), name: ctx.resolver.name(`${node.operationId} Options`), direction: 'encode' })
       : null
 
     // The per-status record a client's `RequestResult` is keyed on. Response bodies, so `output`.
-    const responsesSchema = inferred ? renderSchemaEntry({ schema: buildResponses(node, resolver), name: resolver.response.responses(node) }) : null
+    const responsesSchema = inferred ? renderSchemaEntry({ schema: buildResponses(node, ctx.resolver), name: ctx.resolver.response.responses(node) }) : null
 
     return (
       <File {...meta.file}>

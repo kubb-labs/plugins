@@ -20,7 +20,6 @@ export const serverGenerator = defineGenerator<PluginMcp>({
   name: 'operations',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { config, resolver, plugin, root } = ctx
     const { output } = ctx.options
 
     ctx.requirePlugin(pluginZodName)
@@ -30,8 +29,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
 
     const fileAt = <TName extends `${string}.${string}`>(baseName: TName) => ({
       baseName,
-      path: path.resolve(root, output.path, baseName),
-      meta: { pluginName: plugin.name },
+      path: path.resolve(ctx.root, output.path, baseName),
+      meta: { pluginName: ctx.plugin.name },
     })
     const serverFile = fileAt('server.ts')
     const startFile = fileAt('start.ts')
@@ -44,7 +43,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         [ctx.meta.title || 'server']: {
           type: 'stdio',
           command: 'npx',
-          args: ['tsx', getRelativePath(path.resolve(config.root), startFile.path)],
+          args: ['tsx', getRelativePath(path.resolve(ctx.config.root), startFile.path)],
         },
       },
     }
@@ -101,8 +100,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           baseName={serverFile.baseName}
           path={serverFile.path}
           meta={serverFile.meta}
-          banner={resolver.default.banner(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
-          footer={resolver.default.footer(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
+          banner={ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
+          footer={ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
         >
           <File.Import name={['McpServer']} path={'@modelcontextprotocol/server'} />
           <File.Import name={['serveStdio']} path={'@modelcontextprotocol/server/stdio'} />
@@ -116,8 +115,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           baseName={startFile.baseName}
           path={startFile.path}
           meta={startFile.meta}
-          banner={resolver.default.banner(ctx.meta, { output, config, file: { path: startFile.path, baseName: startFile.baseName } })}
-          footer={resolver.default.footer(ctx.meta, { output, config, file: { path: startFile.path, baseName: startFile.baseName } })}
+          banner={ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: startFile.path, baseName: startFile.baseName } })}
+          footer={ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: startFile.path, baseName: startFile.baseName } })}
         >
           <File.Import name={['startServer']} root={startFile.path} path={serverFile.path} />
           {/* Not indexable: barrels must not re-export this entry, importing it starts the server. */}

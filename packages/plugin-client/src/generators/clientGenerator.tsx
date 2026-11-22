@@ -24,7 +24,6 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
     operation(node, ctx) {
       if (!ast.http.isOperation(node)) return null
 
-      const { root } = ctx
       const { returnType, throwOnErrorDefault, importPath } = ctx.options
 
       const resolvedTypes = resolveOperationTypes()
@@ -37,11 +36,11 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
       // A custom client module is emitted verbatim, so `importPath` is used exactly as configured.
       // The default `.kubb/client.ts` is a file path and is made relative to the operation file.
-      const clientPath = importPath ?? path.resolve(root, '.kubb/client.ts')
+      const clientPath = importPath ?? path.resolve(ctx.root, '.kubb/client.ts')
       const clientRoot = importPath === undefined ? file.path : undefined
       // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
       // alongside its other runtime helpers.
-      const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
+      const standardSchemaPath = importPath ?? path.resolve(ctx.root, '.kubb/standardSchema.ts')
       const stream = getStream(node)?.shape ?? null
 
       const clientValueImports = [

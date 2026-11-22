@@ -23,7 +23,6 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver } = ctx
     const { mutation, client, customOptions, hooks } = ctx.options
 
     const importPath = mutation ? mutation.importPath : '@tanstack/react-query'
@@ -32,9 +31,9 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     const contractOp = resolveClientOperation(node, client.pluginName)
     if (!contractOp) return null
 
-    const mutationHookName = resolver.mutation.name(node)
-    const mutationOptionsName = resolver.mutation.optionsName(node)
-    const mutationKeyName = resolver.mutation.keyName(node)
+    const mutationHookName = ctx.resolver.mutation.name(node)
+    const mutationOptionsName = ctx.resolver.mutation.optionsName(node)
+    const mutationKeyName = ctx.resolver.mutation.keyName(node)
 
     const hook = resolveHookFile(node, { variant: 'mutation', contractOp, returnType: ctx.options.returnType })
     const { tsResolver } = hook
