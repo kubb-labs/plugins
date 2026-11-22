@@ -26,15 +26,12 @@ type Controller = {
  * `Client`/`ApiClient` controller, matching the resolver's default naming.
  */
 function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: GeneratorContext, types: OperationTypeSource): Array<Controller> {
-  const { resolver } = ctx
-  const { group } = ctx.options
-
   return nodes.reduce((acc, operationNode) => {
     if (!ast.http.isOperation(operationNode)) return acc
     const tag = operationNode.tags[0]
-    const name = tag ? ensureValidVarName(resolver.groupName(tag)) : resolver.className('ApiClient')
+    const name = tag ? ensureValidVarName(ctx.resolver.groupName(tag)) : ctx.resolver.className('ApiClient')
     // `group.name` names the folder and file, never the class.
-    const fileName = tag && group ? ensureValidVarName(path.basename(resolver.groupDir(group, tag))) : name
+    const fileName = tag && ctx.options.group ? ensureValidVarName(path.basename(ctx.resolver.groupDir(ctx.options.group, tag))) : name
     const file = namedFile({ name: fileName, tag })
     const operationData = resolveOperationData({ node: operationNode, ctx, types })
     const previous = acc.find((item) => item.file.path === file.path)
