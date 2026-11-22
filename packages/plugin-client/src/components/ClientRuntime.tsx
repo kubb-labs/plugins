@@ -4,7 +4,7 @@ import { getStream } from '@internals/shared'
 import path from 'node:path'
 
 import { text } from '@kubb/kit'
-import { File } from '@kubb/renderer-jsx'
+import { Code, File } from '@kubb/renderer-jsx'
 import { buildSecuritySchemes } from '../builders/security.ts'
 import { hasQueryStyles } from '../builders/styles.ts'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -92,9 +92,9 @@ export function ClientRuntime({
           <File.Import key={name} name={[name]} root={configPath} path={runtimePath(file)} />
         ))}
         <File.Import name={['ClientConfig']} root={configPath} path={runtimePath('core')} isTypeOnly />
-        <File.Source name="defaultConfig" isExportable>
+        <Code name="defaultConfig">
           {`/**\n * The config \`client.ts\` starts with: what this spec needs from the runtime.\n */\nexport const defaultConfig: ClientConfig = { ${config.join(', ')} }`}
-        </File.Source>
+        </Code>
       </File>
       {footer && <File baseName="client.ts" path={path.resolve(root, '.kubb/client.ts')} footer={footer} />}
     </>

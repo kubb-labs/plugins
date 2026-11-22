@@ -195,7 +195,6 @@ function createMockedPluginContext<TOptions extends PluginType>(
     adapter: opts.adapter,
     resolver: opts.resolver,
     plugin: opts.plugin,
-    driver: opts.driver,
     getPlugin,
     getResolver: (name: string) => opts.driver.getResolver(name) ?? (name === opts.plugin.name ? opts.resolver : undefined),
     requirePlugin: (pluginName: string) => {
@@ -208,6 +207,7 @@ function createMockedPluginContext<TOptions extends PluginType>(
     memo: opts.driver.memo,
     addFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.add(...files),
     upsertFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.upsert(...files),
+    getFile: (path: string) => opts.driver.fileManager.files.find((file) => file.path === path),
     hooks: opts.driver.hooks ?? new Hookable<KubbHooks>(),
     warn: (message: string) => console.warn(message),
     error: (message: string) => console.error(message),

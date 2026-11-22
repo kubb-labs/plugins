@@ -2,7 +2,7 @@ import { ast } from '@internals/ast'
 import type { OperationTypeNames } from '@internals/client'
 import { buildOperationComments } from '@internals/shared'
 import { buildJSDoc } from '@internals/utils'
-import { File } from '@kubb/renderer-jsx'
+import { Code } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
@@ -93,8 +93,8 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
   const classCode = `export class ${name} {\n${constructor}\n\n${methods.join('\n\n')}\n}`
 
   return (
-    <File.Source name={name} isExportable isIndexable>
+    <Code name={name} export>
       {classCode}
-    </File.Source>
+    </Code>
   )
 }

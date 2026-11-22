@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import { ensureValidVarName } from '@internals/utils'
 import { casing, text } from '@kubb/kit'
-import { File } from '@kubb/renderer-jsx'
+import { Code } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
@@ -44,7 +44,7 @@ export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.
  * - A `const enum` or plain `enum` declaration (`constEnum` / `enum`)
  * - A union literal type alias (`literal`)
  *
- * The emitted `File.Source` nodes carry the resolved names so that the barrel
+ * The emitted `Code` blocks carry the resolved names so that the barrel
  * index picks up the correct export identifiers.
  */
 export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNode {
@@ -68,19 +68,13 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
   return (
     <>
       {nameNode && (
-        <File.Source name={enumName} pointer={node.pointer} isExportable isIndexable isTypeOnly={false}>
+        <Code name={enumName} pointer={node.pointer} export>
           {nameNode}
-        </File.Source>
+        </Code>
       )}
-      <File.Source
-        name={typeName}
-        pointer={node.pointer}
-        isIndexable={!namesMerge}
-        isExportable={!namesMerge && enumOptions.type !== 'inlineLiteral'}
-        isTypeOnly={['asConst', 'literal', undefined].includes(enumOptions.type)}
-      >
+      <Code name={typeName} pointer={node.pointer} export={!namesMerge} type={['asConst', 'literal', undefined].includes(enumOptions.type)}>
         {typeNode}
-      </File.Source>
+      </Code>
     </>
   )
 }

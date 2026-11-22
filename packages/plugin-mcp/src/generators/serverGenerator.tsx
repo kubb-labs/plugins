@@ -4,7 +4,7 @@ import { getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { code, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRenderer, Raw } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
 import type { PluginMcp } from '../types.ts'
 
@@ -115,11 +115,11 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         >
           <File.Import name={['startServer']} root={startFile.path} path={serverFile.path} />
           {/* Not indexable: barrels must not re-export this entry, importing it starts the server. */}
-          <File.Source name="start">{'void startServer()'}</File.Source>
+          <Raw name="start">{'void startServer()'}</Raw>
         </File>
 
         <File baseName={jsonFile.baseName} path={jsonFile.path} meta={jsonFile.meta}>
-          <File.Source name="server">{`${JSON.stringify(mcpConfig, null, 2)}\n`}</File.Source>
+          <Raw name="server">{`${JSON.stringify(mcpConfig, null, 2)}\n`}</Raw>
         </File>
       </>
     )
