@@ -5,17 +5,17 @@
 
 import type { Order } from './Order'
 
-export type PlaceOrderStatus200 = Order;
+export type PlaceOrderStatus200 = Order
 
-export type PlaceOrderStatus405 = unknown;
+export type PlaceOrderStatus405 = unknown
 
-export type PlaceOrderBodyJson = Order | undefined;
+export type PlaceOrderBodyJson = Order | undefined
 
-export type PlaceOrderBodyXml = Order | undefined;
+export type PlaceOrderBodyXml = Order | undefined
 
-export type PlaceOrderBodyFormUrlEncoded = Order | undefined;
+export type PlaceOrderBodyFormUrlEncoded = Order | undefined
 
-export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded;
+export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded
 
 export type PlaceOrderOptions = {
   body?: PlaceOrderBodyJson;
@@ -41,14 +41,14 @@ export type PlaceOrderOptions = {
   contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
-};
+}
 
 export type PlaceOrderResponses = {
   '200': PlaceOrderStatus200;
   '405': PlaceOrderStatus405;
-};
+}
 
 /**
  * @description Union of all possible responses
  */
-export type PlaceOrderResponse = PlaceOrderStatus200;
+export type PlaceOrderResponse = PlaceOrderStatus200

@@ -3,4 +3,4 @@
 * Do not edit manually.
 */
 
-export type ApiCreateContainerBody2 = string;
+export type ApiCreateContainerBody2 = string

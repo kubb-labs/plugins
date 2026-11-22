@@ -5,20 +5,20 @@
 
 import type { OfficeWeatherStory } from './OfficeWeatherStory'
 
-export type OfficeWeatherstoryStatus200 = OfficeWeatherStory;
+export type OfficeWeatherstoryStatus200 = OfficeWeatherStory
 
 export type OfficeWeatherstoryOptions = {
   body?: never;
   path?: never;
   query?: never;
   headers?: never;
-};
+}
 
 export type OfficeWeatherstoryResponses = {
   '200': OfficeWeatherstoryStatus200;
-};
+}
 
 /**
  * @description Union of all possible responses
  */
-export type OfficeWeatherstoryResponse = OfficeWeatherstoryStatus200;
+export type OfficeWeatherstoryResponse = OfficeWeatherstoryStatus200

@@ -1,6 +1,8 @@
 import { ast } from '@internals/ast'
-import { Code, File, Origin, Type as TypeDeclaration } from '@kubb/renderer-jsx'
+import { File, Origin, Type as TypeDeclaration } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
+import * as factory from '../factory.ts'
+import { getDeclarationParts } from '../printers/printerTs.ts'
 import type { PrinterTsFactory } from '../printers/printerTs.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { isInlineConstEnum } from '../utils.ts'
@@ -47,10 +49,10 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
     },
   })
 
-  const output = printer.print(node)
+  const parts = getDeclarationParts(printer, node)
   const printerImports = printer.drainImports()
 
-  if (!output) {
+  if (!parts) {
     return
   }
 
@@ -74,9 +76,9 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
             <File.Import key={[name, imp.path, imp.name].join('-')} {...imp} />
           ))}
           <Origin pointer={node.pointer}>
-            <Code name={name} export type>
-              {output}
-            </Code>
+            <TypeDeclaration export name={name} syntax={parts.syntax} JSDoc={{ comments: parts.comments }}>
+              {factory.print(parts.type)}
+            </TypeDeclaration>
           </Origin>
         </>
       )}

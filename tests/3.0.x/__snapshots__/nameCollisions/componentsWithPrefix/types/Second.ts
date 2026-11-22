@@ -8,10 +8,10 @@ export const mitigationActionEnum3 = {
   ignore: 'ignore',
 } as const;
 
-export type ApiMitigationActionEnum3Key = (typeof mitigationActionEnum3)[keyof typeof mitigationActionEnum3];
+export type ApiMitigationActionEnum3Key = (typeof mitigationActionEnum3)[keyof typeof mitigationActionEnum3]
 
 export type ApiSecond = {
   [key: string]: {
     mitigation_action?: ApiMitigationActionEnum3Key;
   };
-};
+}

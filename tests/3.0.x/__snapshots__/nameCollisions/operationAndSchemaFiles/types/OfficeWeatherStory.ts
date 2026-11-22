@@ -5,4 +5,4 @@
 
 export type OfficeWeatherStory = {
   title?: string;
-};
+}

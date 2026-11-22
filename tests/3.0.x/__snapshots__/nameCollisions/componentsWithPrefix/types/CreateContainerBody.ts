@@ -5,4 +5,4 @@
 
 export type ApiCreateContainerBody = {
   name?: string;
-};
+}

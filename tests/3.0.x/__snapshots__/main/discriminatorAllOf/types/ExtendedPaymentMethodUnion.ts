@@ -5,4 +5,4 @@
 
 import type { PaymentMethodUnion } from './PaymentMethodUnion'
 
-export type ExtendedPaymentMethodUnion = PaymentMethodUnion;
+export type ExtendedPaymentMethodUnion = PaymentMethodUnion

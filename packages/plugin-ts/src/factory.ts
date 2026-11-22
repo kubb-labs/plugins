@@ -284,15 +284,19 @@ export function createEnumDeclaration({
    * @default 'none'
    */
   enumKeyCasing?: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'
-}): [name: string | undefined, type: string] {
-  const typeAlias = (annotation: TsNode) => createTypeDeclaration({ syntax: 'type', isExportable: true, name: typeName, comments: [], type: annotation })
+}): [name: string | undefined, type: string, alias?: string] {
+  // The third entry is the alias body alone, for callers that declare the alias themselves.
+  const typeAlias = (annotation: TsNode): [string, string] => [
+    createTypeDeclaration({ syntax: 'type', isExportable: true, name: typeName, comments: [], type: annotation }),
+    print(annotation),
+  ]
 
   if (type === 'literal' || type === 'inlineLiteral') {
     const members = enums
       .map(([_key, value]) => (isNonNullable(value) ? { type: 'TSLiteralType', literal: valueToExpression(value) } : undefined))
       .filter(isNonNullable)
 
-    return [undefined, typeAlias(members.length ? createUnionDeclaration({ nodes: members }) : keywordTypeNodes.never)]
+    return [undefined, ...typeAlias(members.length ? createUnionDeclaration({ nodes: members }) : keywordTypeNodes.never)]
   }
 
   if (type === 'enum' || type === 'constEnum') {
@@ -327,7 +331,7 @@ export function createEnumDeclaration({
   // Return undefined for nameNode so the barrel won't try to export a non-existent symbol.
   // Use `never` as the type alias to keep references valid without creating a broken const.
   if (enums.length === 0) {
-    return [undefined, typeAlias(keywordTypeNodes.never)]
+    return [undefined, ...typeAlias(keywordTypeNodes.never)]
   }
 
   // `yuku-codegen` prints object literals on one line, so each property prints on its own and the lines join here
@@ -352,7 +356,7 @@ export function createEnumDeclaration({
 
   return [
     `export const ${identifierName} = {\n${properties.map((property) => text.indent({ text: property })).join(',\n')},\n} as const;`,
-    typeAlias({
+    ...typeAlias({
       type: 'TSIndexedAccessType',
       objectType: { type: 'TSParenthesizedType', typeAnnotation: query },
       indexType: { type: 'TSTypeOperator', operator: 'keyof', typeAnnotation: query },

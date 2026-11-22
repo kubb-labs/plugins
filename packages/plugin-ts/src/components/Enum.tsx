@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import { ensureValidVarName } from '@internals/utils'
 import { casing, text } from '@kubb/kit'
-import { Code, Origin } from '@kubb/renderer-jsx'
+import { Code, Origin, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
@@ -50,7 +50,7 @@ export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.
 export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNode {
   const { enumName, typeName } = getEnumNames({ node, enum: enumOptions, resolver })
 
-  const [nameNode, typeNode] = factory.createEnumDeclaration({
+  const [nameNode, typeNode, alias] = factory.createEnumDeclaration({
     name: enumName,
     typeName,
     enums: (node.namedEnumValues?.map((v) => [text.unquote(v.name.toString()), v.value, v.description]) ??
@@ -72,9 +72,15 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
           {nameNode}
         </Code>
       )}
-      <Code name={typeName} export={!namesMerge} type={['asConst', 'literal', undefined].includes(enumOptions.type)}>
-        {typeNode}
-      </Code>
+      {alias && !namesMerge ? (
+        <Type export name={typeName}>
+          {alias}
+        </Type>
+      ) : (
+        <Code name={typeName} export={!namesMerge}>
+          {typeNode}
+        </Code>
+      )}
     </Origin>
   )
 }
