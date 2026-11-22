@@ -215,11 +215,13 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
     // The response schema covers success (2xx) bodies only.
     const successResponsesWithSchema = responsesWithSchema.filter((res) => ast.http.status.isSuccess(res))
-    const responseUnionSchema = responsesWithSchema.length > 0 ? renderResponseUnion(successResponsesWithSchema, ctx.resolver.response.response(node), true) : null
+    const responseUnionSchema =
+      responsesWithSchema.length > 0 ? renderResponseUnion(successResponsesWithSchema, ctx.resolver.response.response(node), true) : null
 
     // The error schema covers every non-2xx response, including the OpenAPI `default`.
     const errorResponsesWithSchema = responsesWithSchema.filter((res) => !ast.http.status.isSuccess(res))
-    const errorUnionSchema = errorResponsesWithSchema.length > 0 ? renderResponseUnion(errorResponsesWithSchema, ctx.resolver.response.error(node), false) : null
+    const errorUnionSchema =
+      errorResponsesWithSchema.length > 0 ? renderResponseUnion(errorResponsesWithSchema, ctx.resolver.response.error(node), false) : null
 
     const requestBodyContent = node.requestBody?.content ?? []
     const requestSchema = (() => {

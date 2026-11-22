@@ -92,8 +92,10 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
       const clientPath = path.resolve(ctx.root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(ctx.root, '.kubb/standardSchema.ts')
 
-      const banner = (file: ast.FileNode) => ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } })
-      const footer = (file: ast.FileNode) => ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } })
+      const banner = (file: ast.FileNode) =>
+        ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } })
+      const footer = (file: ast.FileNode) =>
+        ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } })
 
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const typeImports = code.join(ops.flatMap((op) => op.typeNames)).imports
