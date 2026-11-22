@@ -9,9 +9,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { ClientOperation, ReturnTypeOption } from '@internals/client'
 
 type ResolveHookFileOptions = {
-  /**
-   * The hook's variant, which names its file through `hookFileName`.
-   */
+  /** The hook's variant, which names its file through `hookFileName`. */
   variant?: HookFileVariant
   contractOp: ClientOperation
   /**
@@ -29,9 +27,7 @@ type ResolvedHookFile = {
   file: FileTarget
   tsResolver: ResolverTs
   contractOp: ClientOperation
-  /**
-   * The imports of the operation type names, from the `types` provider.
-   */
+  /** The imports of the operation type names, from the `types` provider. */
   typeImports: ReadonlyArray<ast.ImportNode>
   /**
    * The client's result type the hook names with `returnType: 'full'`.

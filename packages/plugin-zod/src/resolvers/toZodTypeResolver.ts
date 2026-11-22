@@ -32,9 +32,7 @@ export function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
 declare global {
   namespace Kubb {
     interface MemoRegistry {
-      /**
-       * Every key the zod-backed `ResolverTs` memoizes.
-       */
+      /** Every key the zod-backed `ResolverTs` memoizes. */
       'plugin-zod:types': unknown
     }
   }
