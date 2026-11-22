@@ -14,11 +14,10 @@ import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Query } from '../components/Query.tsx'
 import { QueryOptions } from '../components/QueryOptions.tsx'
+import { hookFileVariants } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types'
 
 type Variant = 'query' | 'suspenseQuery' | 'infiniteQuery' | 'suspenseInfiniteQuery'
-
-const fileVariants = { query: '', suspenseQuery: 'Suspense', infiniteQuery: 'Infinite', suspenseInfiniteQuery: 'SuspenseInfinite' } as const
 
 const OBSERVER_IMPORTS: Record<Variant, Array<string>> = {
   query: ['QueryObserverOptions', 'UseQueryResult'],
@@ -56,7 +55,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
     },
     operation(node, ctx) {
       if (!ast.http.isOperation(node)) return null
-      const { output, query, infinite: infiniteConfig, client, group, customOptions, hooks } = ctx.options
+      const { query, infinite: infiniteConfig, client, customOptions, hooks } = ctx.options
 
       const infiniteOptions = infinite && infiniteConfig && typeof infiniteConfig === 'object' ? infiniteConfig : null
       if (infinite && !infiniteOptions) return null
@@ -67,7 +66,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
         if (pageParamsWarning) ctx.warn(pageParamsWarning)
       }
 
-      const contractOp = resolveClientOperation(node, client.pluginName)
+      const contractOp = resolveClientOperation({ node, pluginName: client.pluginName })
       if (!contractOp) return null
 
       const importPath = query ? query.importPath : '@tanstack/react-query'
@@ -79,9 +78,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
       const tsResolver = resolveOperationTypes().resolver
 
       const hook = resolveHookFile(node, {
-        variant: fileVariants[variant],
-        output,
-        group,
+        variant: hookFileVariants[variant],
         contractOp,
         returnType: ctx.options.returnType,
         keyTypeName: queryKeyTypeName,

@@ -38,7 +38,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { output, query, infinite, client, group } = ctx.options
+    const { query, infinite, client } = ctx.options
 
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
     if (!infiniteOptions) return null
@@ -49,7 +49,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     const importPath = query ? query.importPath : '@tanstack/vue-query'
 
     // The registered contract client plugin owns the `<op>` the composable imports and calls.
-    const contractOp = resolveClientOperation(node, client.pluginName)
+    const contractOp = resolveClientOperation({ node, pluginName: client.pluginName })
     if (!contractOp) return null
 
     const queryName = ctx.resolver.infiniteQuery.name(node)
@@ -59,8 +59,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
 
     const hook = resolveHookFile(node, {
       variant: 'Infinite',
-      output,
-      group,
       contractOp,
       returnType: ctx.options.returnType,
       keyTypeName: queryKeyTypeName,

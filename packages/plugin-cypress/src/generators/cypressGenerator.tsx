@@ -18,16 +18,12 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     if (!ast.http.isOperation(node)) return null
     const { baseURL } = ctx.options
 
-    ctx.requirePlugin(pluginTsName)
-
-    const tsResolver = ctx.getResolver(pluginTsName)
-
     const types = ctx.from(pluginTsName)
-    const { imports } = code.join(
-      [tsResolver.response.options(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })].map((typeName) =>
-        types.import(node, typeName),
-      ),
-    )
+    const tsResolver = ctx.getResolver(pluginTsName)
+    const { imports } = code.join([
+      types.resolver.response.options(node),
+      ...resolveOperationTypeNames(node, tsResolver, { includeParams: false }).map((typeName) => types.ref(node, typeName)),
+    ])
     const name = ctx.resolver.name(node.operationId)
 
     const meta = {
@@ -38,7 +34,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     return (
       <File {...meta.file}>
         {imports.map((imp) => (
-          <File.Import key={imp.path} name={imp.name} root={meta.file.path} path={imp.path} isTypeOnly />
+          <File.Import key={imp.path} {...imp} root={meta.file.path} isTypeOnly />
         ))}
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>

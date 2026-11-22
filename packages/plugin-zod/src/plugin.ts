@@ -1,10 +1,10 @@
-import { addGenerator, defineExtension, getResolver, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
+import { addGenerator, defineExtension, getResolver, provide, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { createPrinterZod, zodGenerator } from './generators/zodGenerator.tsx'
 import { resolverZod } from './resolvers/resolverZod.ts'
 import { toZodTypeResolver } from './resolvers/toZodTypeResolver.ts'
-import type { PluginZod, ResolverZod } from './types.ts'
+import type { PluginZod } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-zod`. Used for driver lookups and
@@ -41,7 +41,7 @@ export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
 export const pluginZod = defineExtension<PluginZod>({
   kind: 'plugin',
   meta: { name: pluginZodName, version, compatibility },
-  setup(options, ctx) {
+  setup(options) {
     const {
       output = { path: 'zod', barrel: { type: 'named' } },
       group,
@@ -64,9 +64,9 @@ export const pluginZod = defineExtension<PluginZod>({
 
     setResolver(userResolver ? Resolver.merge(resolverZod, ...[userResolver].flat()) : resolverZod)
     const resolvedInferred = inferred === 'direction' ? 'codec' : inferred
-    // Codec types carry the domain value, so they win over plugin-ts. Plain inferred types are the fallback without it.
+    // Codec types carry the domain value, so they win over plugin-ts. Plain inferred types are the fallback without plugin-ts.
     if (resolvedInferred) {
-      ctx.provide('types', () => toZodTypeResolver(getResolver(pluginZodName) as ResolverZod), { priority: resolvedInferred === 'codec' ? 1 : -1 })
+      provide('types', () => toZodTypeResolver(getResolver(pluginZodName)), { priority: resolvedInferred === 'codec' ? 1 : -1 })
     }
     if (userMacros?.length) {
       setMacros(userMacros)

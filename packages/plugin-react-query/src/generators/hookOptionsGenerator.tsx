@@ -1,7 +1,8 @@
 import { ast } from '@internals/ast'
-import { matchesInfinite } from '@internals/tanstack-query'
-import { code, defineGenerator, type RefName } from '@kubb/kit'
+import { hookFileName, matchesInfinite } from '@internals/tanstack-query'
+import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
+import { hookFileVariants } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types'
 import { classifyOperation, resolveOperationOverrides } from '@internals/tanstack-query'
 
@@ -30,8 +31,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       path: resolvedFile.path.replace(/[^/\\]+\.ts$/, `${name}.ts`),
     }
 
-    const own = ctx.from()
-    const optionsNames: Array<RefName> = []
+    const optionsImports: Array<ast.ImportNode> = []
     const hookOptions: Record<string, string> = {}
 
     for (const node of nodes) {
@@ -47,19 +47,22 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       const isSuspense = !!suspense
       const isInfinite = isQuery && !!nodeInfiniteOptions && matchesInfinite(node, nodeInfiniteOptions)
 
-      const namespaces: Array<[{ name(node: ast.OperationNode): string; optionsName(node: ast.OperationNode): string }, boolean]> = [
-        [ctx.resolver.query, isQuery],
-        [ctx.resolver.suspenseQuery, isQuery && isSuspense],
-        [ctx.resolver.infiniteQuery, isInfinite],
-        [ctx.resolver.suspenseInfiniteQuery, isInfinite && isSuspense],
-        [ctx.resolver.mutation, isMutation],
-      ]
+      const enabled = {
+        query: isQuery,
+        suspenseQuery: isQuery && isSuspense,
+        infiniteQuery: isInfinite,
+        suspenseInfiniteQuery: isInfinite && isSuspense,
+        mutation: isMutation,
+      }
 
-      for (const [ns, enabled] of namespaces) {
-        if (!enabled) continue
+      for (const namespace of Object.keys(hookFileVariants) as Array<keyof typeof hookFileVariants>) {
+        if (!enabled[namespace]) continue
+        const ns = ctx.resolver[namespace]
         const optionsName = ns.optionsName(node)
         const hookName = ns.name(node)
-        optionsNames.push(own.import(node, optionsName))
+        // Each hook's options live in that hook's own file.
+        const { path } = ctx.file(node, { plugin: ctx.plugin.name, name: hookFileName({ resolver: ctx.resolver, node, variant: hookFileVariants[namespace] }) })
+        optionsImports.push(ast.factory.createImport({ name: [optionsName], path }))
         hookOptions[hookName] = `Partial<ReturnType<typeof ${optionsName}>>`
       }
     }
@@ -72,8 +75,8 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         banner={ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
         footer={ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
       >
-        {code.join(optionsNames).imports.map((imp) => (
-          <File.Import key={imp.path} name={imp.name} root={hookOptionsFile.path} path={imp.path} />
+        {optionsImports.map((imp) => (
+          <File.Import key={imp.path} {...imp} root={hookOptionsFile.path} />
         ))}
         <Type export name={name}>
           {`{ ${Object.keys(hookOptions)

@@ -18,7 +18,6 @@ import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from 
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
-import { pluginZodName } from '../plugin.ts'
 import type { PluginZod } from '../types'
 
 /**
@@ -76,13 +75,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions, mini }) : [])
     const importEntries = ctx.resolver.imports({ node, root: ctx.root, output, group: group ?? undefined, checks: true })
-    const zod = ctx.from(pluginZodName).resolver
+    const zod = ctx.from().resolver
     const inputImportEntries = [...directionalRefNames].flatMap((schemaName) => zod.schema.inputName(schemaName).import ?? [])
-    const imports = [
-      ...new Map(
-        [...importEntries, ...inputImportEntries].map((imp) => [`${Array.isArray(imp.name) ? imp.name.join(',') : imp.name}|${imp.path}`, imp] as const),
-      ).values(),
-    ]
+    const imports = [...importEntries, ...inputImportEntries]
 
     const meta = {
       name: ctx.resolver.name(node.name),

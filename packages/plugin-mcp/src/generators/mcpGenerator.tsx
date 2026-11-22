@@ -26,13 +26,13 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const tsResolver = types.resolver
 
     // The registered contract client plugin owns the `<op>` the handler imports and calls.
-    const contractOp = resolveClientOperation(node, client.pluginName)
+    const contractOp = resolveClientOperation({ node, pluginName: client.pluginName })
     if (!contractOp) {
       return null
     }
 
     // The handler signature references the grouped `<Name>Options`.
-    const options = ctx.from('types').import(node, tsResolver.response.options(node)).import
+    const options = ctx.from('types').resolver.response.options(node).import
 
     const meta = {
       name: ctx.resolver.handler.name(node),
@@ -41,7 +41,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     return (
       <File {...meta.file}>
-        {options && <File.Import name={options.name} root={meta.file.path} path={options.path} isTypeOnly />}
+        {options && <File.Import {...options} root={meta.file.path} isTypeOnly />}
         <File.Import name={['CallToolResult', 'ServerContext']} path={'@modelcontextprotocol/server'} isTypeOnly />
 
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />

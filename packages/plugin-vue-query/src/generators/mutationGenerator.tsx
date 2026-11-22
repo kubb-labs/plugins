@@ -17,7 +17,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { output, query, mutation, client, group, hooks } = ctx.options
+    const { query, mutation, client, hooks } = ctx.options
 
     const { isMutation } = classifyOperation(node, { query, mutation })
 
@@ -26,13 +26,13 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
     const importPath = mutation ? mutation.importPath : '@tanstack/vue-query'
 
     // The registered contract client plugin owns the `<op>` the composable imports and calls.
-    const contractOp = resolveClientOperation(node, client.pluginName)
+    const contractOp = resolveClientOperation({ node, pluginName: client.pluginName })
     if (!contractOp) return null
 
     const mutationHookName = ctx.resolver.mutation.name(node)
     const mutationKeyName = ctx.resolver.mutation.keyName(node)
 
-    const hook = resolveHookFile(node, { variant: 'mutation', output, group, contractOp, returnType: ctx.options.returnType })
+    const hook = resolveHookFile(node, { variant: 'mutation', contractOp, returnType: ctx.options.returnType })
 
     // The contract body unwraps each request group with `toValue()`, so it needs the runtime import.
     const groups = ast.http.getRequestGroups(node)

@@ -69,7 +69,7 @@ export function getResponseHeadersTypeNames({ node, types }: { node: ast.Operati
  */
 export type OperationTypeSource = OperationTypeNames & {
   /**
-   * `plugin-ts` shaped resolver of the plugin supplying the names, also used to resolve the file they are exported from.
+   * `plugin-ts` shaped resolver of the plugin that provides `types`.
    */
   resolver: ResolverTs
 }

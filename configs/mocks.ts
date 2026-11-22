@@ -179,7 +179,7 @@ type RenderGeneratorOptions<TOptions extends PluginType> = {
 function withPrinter<TOptions extends PluginType>(ctx: PrinterContext<TOptions>, opts: RenderGeneratorOptions<TOptions>): GeneratorContext<TOptions> {
   const generatorContext = { ...ctx, printer: undefined } as GeneratorContext<TOptions>
   generatorContext.file = (node, options) => withContext(generatorContext, () => file(node, options))
-  generatorContext.from = (source) => withContext(generatorContext, () => from(source))
+  generatorContext.from = ((source) => withContext(generatorContext, () => from(source))) as GeneratorContext<TOptions>['from']
   generatorContext.printer = (opts.printer && withContext(ctx, () => opts.printer!(ctx))) as GeneratorContext<TOptions>['printer']
   return generatorContext
 }

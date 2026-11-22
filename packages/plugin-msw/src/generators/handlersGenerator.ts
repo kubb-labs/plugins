@@ -17,14 +17,10 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
     const createHandlersName = ctx.resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })
     const file = ctx.resolver.file({ name: handlersName, extname: '.ts', root: ctx.root, output, group: group ?? undefined })
 
-    const handlerNames = nodes.map((node) => ctx.resolver.handler.name(node))
-
-    const own = ctx.from()
-    const imports = code
-      .join(nodes.map((node, index) => own.import(node, handlerNames[index]!)))
-      .imports.map((imp) => ast.factory.createImport({ name: imp.name, path: imp.path, root: file.path }))
-
-    const handlers = handlerNames.map((name) => `${name}(undefined, options)`)
+    const own = ctx.from().resolver
+    const handlerRefs = nodes.map((node) => own.handler.name(node))
+    const imports = code.join(handlerRefs).imports.map((imp) => ({ ...imp, root: file.path }))
+    const handlers = handlerRefs.map((ref) => `${ref}(undefined, options)`)
 
     return [
       ast.factory.createFile({
