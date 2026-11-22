@@ -1,4 +1,5 @@
 import { ast } from '@internals/ast'
+import { namedFile } from '@internals/shared'
 import { casing, code, defineGenerator } from '@kubb/kit'
 import type { PluginMsw } from '../types'
 
@@ -11,11 +12,9 @@ import type { PluginMsw } from '../types'
 export const handlersGenerator = defineGenerator<PluginMsw>({
   name: 'plugin-msw',
   operations(nodes, ctx) {
-    const { output, group } = ctx.options
-
     const handlersName = ctx.resolver.handler.listName()
     const createHandlersName = ctx.resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })
-    const file = ctx.resolver.file({ name: handlersName, extname: '.ts', root: ctx.root, output, group: group ?? undefined })
+    const file = namedFile({ name: handlersName })
 
     const own = ctx.from().resolver
     const handlerRefs = nodes.map((node) => own.handler.name(node))
@@ -24,11 +23,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
 
     return [
       ast.factory.createFile({
-        baseName: file.baseName,
-        path: file.path,
-        meta: file.meta,
-        banner: ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } }),
-        footer: ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } }),
+        ...file,
         imports,
         sources: [
           ast.factory.createSource({

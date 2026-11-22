@@ -15,7 +15,6 @@ export {
   getStream,
   getResponseContentTypeInfo,
   requestGroupOrder,
-  operationFileEntry,
   resolveContentTypeVariants,
   resolveErrorNames,
   resolveOperationTypeNames,
@@ -25,7 +24,7 @@ export {
 } from './operation.ts'
 export type { ResponseStream } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
-export { getCircularNames, getEnumNames, resolveOperationName } from './resolver.ts'
+export { getCircularNames, getEnumNames, namedFile, resolveOperationName } from './resolver.ts'
 export {
   defaultLiteral,
   formatDefault,

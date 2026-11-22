@@ -1,10 +1,10 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
-import { getStream } from '@internals/shared'
+import { getStream, namedFile } from '@internals/shared'
 import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
 import { ensureValidVarName } from '@internals/utils'
 import { code, defineGenerator, Diagnostics } from '@kubb/kit'
-import type { Generator } from '@kubb/kit'
+import type { FileTarget, Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
@@ -16,7 +16,7 @@ import type { ContractClientFactory } from '../types.ts'
 type Controller = {
   name: string
   tag: string | undefined
-  file: ast.FileNode
+  file: FileTarget
   operations: Array<OperationData>
 }
 
@@ -25,15 +25,13 @@ type Controller = {
  * `Client`/`ApiClient` controller, matching the resolver's default naming.
  */
 function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: GeneratorContext, types: OperationTypeSource): Array<Controller> {
-  const { output, group } = ctx.options
-
   return nodes.reduce((acc, operationNode) => {
     if (!ast.http.isOperation(operationNode)) return acc
     const tag = operationNode.tags[0]
     const name = tag ? ensureValidVarName(ctx.resolver.groupName(tag)) : ctx.resolver.className('ApiClient')
     // `group.name` names the folder and file, never the class.
-    const fileName = tag && group ? ensureValidVarName(path.basename(ctx.resolver.groupDir(group, tag))) : name
-    const file = ctx.resolver.file({ name: fileName, extname: '.ts', tag, root: ctx.root, output, group: group ?? undefined })
+    const fileName = tag && ctx.options.group ? ensureValidVarName(path.basename(ctx.resolver.groupDir(ctx.options.group, tag))) : name
+    const file = namedFile({ name: fileName, tag })
     const operationData = resolveOperationData({ node: operationNode, ctx, types })
     const previous = acc.find((item) => item.file.path === file.path)
 
@@ -66,7 +64,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
     name: 'sdk',
     renderer: jsxRenderer,
     operations(nodes, ctx) {
-      const { output, group, validator, returnType, throwOnErrorDefault, sdk } = ctx.options
+      const { output, validator, returnType, throwOnErrorDefault, sdk } = ctx.options
 
       if (!sdk) return null
 
@@ -90,12 +88,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
       const clientPath = path.resolve(ctx.root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(ctx.root, '.kubb/standardSchema.ts')
 
-      const banner = (file: ast.FileNode) =>
-        ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } })
-      const footer = (file: ast.FileNode) =>
-        ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } })
-
-      const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
+      const renderClassFile = ({ name: className, file, operations: ops }: Pick<Controller, 'name' | 'file' | 'operations'>) => {
         const typeImports = code.join(ops.flatMap((op) => op.typeNames)).imports
         const schemaImports = code.join(ops.flatMap((op) => op.schemaNames)).imports
         const resultOps = ops.filter((op) => !getStream(op.node)?.shape)
@@ -103,7 +96,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
         const resultName = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
 
         return (
-          <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
+          <File key={file.path} {...file}>
             <File.Import
               name={[
                 'createClient',
@@ -151,11 +144,11 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
       // `flat` collapses every operation into one class named by `sdk.name`, so callers reach
       // an operation as `new PetStore(config).getPetById(...)` without a per-tag sub-client.
       const renderFacadeFile = (name: string) => {
-        const sdkFile = ctx.resolver.file({ name, extname: '.ts', root: ctx.root, output, group: group ?? undefined })
+        const sdkFile = namedFile({ name })
         const members = controllers.map(({ name, tag }) => ({ className: name, propName: ctx.resolver.propertyName(tag ?? name) }))
 
         return (
-          <File key={sdkFile.path} baseName={sdkFile.baseName} path={sdkFile.path} meta={sdkFile.meta} banner={banner(sdkFile)} footer={footer(sdkFile)}>
+          <File key={sdkFile.path} {...sdkFile}>
             <File.Import name={['createClient']} root={sdkFile.path} path={clientPath} />
             <File.Import name={['ClientConfig', 'ClientInstance']} root={sdkFile.path} path={clientPath} isTypeOnly />
             {controllers.map(({ name, file }) => (
@@ -168,12 +161,12 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
 
       const files =
         sdk.mode === 'flat'
-          ? renderClassFile(
-              ctx.resolver.className(sdk.name ?? 'sdk'),
-              ctx.resolver.file({ name: sdk.name ?? 'sdk', extname: '.ts', root: ctx.root, output, group: group ?? undefined }),
-              controllers.flatMap((controller) => controller.operations),
-            )
-          : [...controllers.map(({ name, file, operations: ops }) => renderClassFile(name, file, ops)), sdk.name && renderFacadeFile(sdk.name)]
+          ? renderClassFile({
+              name: ctx.resolver.className(sdk.name ?? 'sdk'),
+              file: namedFile({ name: sdk.name ?? 'sdk' }),
+              operations: controllers.flatMap((controller) => controller.operations),
+            })
+          : [...controllers.map(renderClassFile), sdk.name && renderFacadeFile(sdk.name)]
 
       return (
         <>
