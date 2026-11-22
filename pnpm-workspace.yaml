@@ -26,7 +26,7 @@ catalog:
   '@vitest/coverage-v8': ^5.1.1
   '@vitest/ui': ^5.1.1
   kubb: ^5.23.2
-  oxfmt: ^0.78.0
+  oxfmt: ^0.79.0
   oxlint: ^1.94.0
   prettier: ^3.10.1
   tsdown: ^0.23.7
