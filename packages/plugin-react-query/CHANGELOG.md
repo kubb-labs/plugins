@@ -1,5 +1,35 @@
 # @kubb/plugin-react-query
 
+## 5.13.0
+
+### Minor Changes
+
+- [#1562](https://github.com/kubb-labs/plugins/pull/1562) [`3c9b702`](https://github.com/kubb-labs/plugins/commit/3c9b702624c9dd06af8719d0c6d254c0a6e0acf8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Allow custom `queryKey` transformers to include header parameters in generated cache keys.
+  
+  Generated key helpers accept optional `headers`, even when the request requires them. Default keys still exclude headers.
+  
+  ```typescript
+  queryKey: (props) => [
+    ...queryKeyTransformer(props),
+    ...(props.node.parameters?.some((param) => param.in === 'header') ? ['...(headers ? [headers] : [])'] : []),
+  ]
+  ```
+
+### Patch Changes
+
+- [#1549](https://github.com/kubb-labs/plugins/pull/1549) [`1cdfb5c`](https://github.com/kubb-labs/plugins/commit/1cdfb5cea7a71928cbb1102a35f82b4cc0efe308) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Plugins find their files with kit's `ctx.file` and import each other's names with `from`, `provide` and `code`, instead of looking up each other's paths.
+  
+  - A resolver `name` override renames TanStack hooks (react-query, vue-query, swr) and msw handlers, but no longer their files. Those files are named from the `operationId`.
+  - Named imports list their names in alphabetical order.
+  - A query or MCP plugin without its client plugin in the config reports `KUBB_PLUGIN_NOT_FOUND`.
+  - Operation types come from plugin-ts, or from `pluginZod({ inferred })`, in the same order as before: codec types first, then plugin-ts, then plain inferred types.
+
+- [#1548](https://github.com/kubb-labs/plugins/pull/1548) [`37b93cf`](https://github.com/kubb-labs/plugins/commit/37b93cf695f27d0390392a914047b5ce87aa1f98) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - With `returnType: 'full'`, hooks no longer import the unused success status type, such as `GetPetLimitsStatus200`, which broke builds with `noUnusedLocals`.
+
+- [#1560](https://github.com/kubb-labs/plugins/pull/1560) [`8567cc1`](https://github.com/kubb-labs/plugins/commit/8567cc1216e12c74acca48a4d72ebd69d26cc432) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb `^5.23.3`, which adds `Code`, `Raw`, `Origin`, `<File inline>` and `ctx.getFile`. These plugins use them.
+- Updated dependencies [[`1cdfb5c`](https://github.com/kubb-labs/plugins/commit/1cdfb5cea7a71928cbb1102a35f82b4cc0efe308), [`8567cc1`](https://github.com/kubb-labs/plugins/commit/8567cc1216e12c74acca48a4d72ebd69d26cc432), [`79b3347`](https://github.com/kubb-labs/plugins/commit/79b334729d0401fee832841337ac57cd1bf3742e), [`1cdfb5c`](https://github.com/kubb-labs/plugins/commit/1cdfb5cea7a71928cbb1102a35f82b4cc0efe308), [`d2af69c`](https://github.com/kubb-labs/plugins/commit/d2af69c51d29ada2f3cf6bc0c9f7bddbc0425db9)]:
+  - @kubb/plugin-ts@5.6.1
+
 ## 5.12.0
 
 ### Minor Changes
