@@ -159,6 +159,17 @@ import { queryKeyTransformer } from '@kubb/plugin-react-query'
 queryKey: (props) => [JSON.stringify('v2'), ...queryKeyTransformer(props)]
 ```
 
+The generated helper also accepts optional `headers` for operations with header parameters. To include them in the cache key, reference the `headers` binding:
+
+```typescript
+queryKey: (props) => [
+  ...queryKeyTransformer(props),
+  ...(props.node.parameters?.some((param) => param.in === 'header') ? ['...(headers ? [headers] : [])'] : []),
+]
+```
+
+Headers stay out of the default key. Include only response-varying values that are safe to store in caches and devtools.
+
 ### mutation
 
 Which operations become mutations and where TanStack Query is imported from. `false` skips mutation output.

@@ -33,7 +33,7 @@ const pet = queryClient.getQueryData(getPetByIdQueryKey({ path: { petId: 1 } }))
 - `url` is the spec path with `:name` placeholders, such as `'/pet/:petId'`.
 - `params` holds the path parameters, when the path has any.
 - `query` and `body` follow when the operation has them and the call passes them.
-- Headers and cookies stay out of the key.
+- Headers and cookies stay out of the default key. A custom `queryKey` transformer can include the generated `headers` binding.
 - Infinite variants add `infinite: true` to the first entry, so they never share a cache entry with the plain query.
 - Each hook returns the key it used as `queryKey` on its result.
 

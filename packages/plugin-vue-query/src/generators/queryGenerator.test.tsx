@@ -73,7 +73,20 @@ const findByTagsNode = ast.factory.createOperation({
 })
 
 describe('queryGenerator operation', () => {
-  const testData = [{ name: 'findByTags', node: findByTagsNode, options: {} }] as const satisfies Array<{
+  const testData = [
+    { name: 'findByTags', node: findByTagsNode, options: {} },
+    {
+      name: 'headersInQueryKey',
+      node: ast.factory.createOperation({
+        ...findByTagsNode,
+        parameters: [
+          ...findByTagsNode.parameters,
+          ast.factory.createParameter({ name: 'X-Locale', in: 'header', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+      }),
+      options: { queryKey: (props) => [...queryKeyTransformer(props), '...(headers ? [headers] : [])'] },
+    },
+  ] as const satisfies Array<{
     name: string
     node: ast.OperationNode
     options: Partial<PluginVueQuery['resolvedOptions']>

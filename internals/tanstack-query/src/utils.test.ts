@@ -1,7 +1,9 @@
 import { ast } from '@internals/ast'
+import { functionPrinter, resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import {
   buildCallResultBody,
+  buildQueryKeyParams,
   classifyOperation,
   getDefaultPageParamsWarning,
   hasQueryKeyParams,
@@ -90,6 +92,16 @@ describe('classifyOperation', () => {
 })
 
 describe('hasQueryKeyParams', () => {
+  test('returns true when operation only has header parameters', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'getProfile',
+      method: 'GET',
+      path: '/profile',
+      parameters: [ast.factory.createParameter({ name: 'X-Locale', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+    expect(hasQueryKeyParams(node)).toBe(true)
+  })
+
   test('returns false when operation has no parameters', () => {
     const node = ast.factory.createOperation({ operationId: 'getRoot', method: 'GET', path: '/' })
     expect(hasQueryKeyParams(node)).toBe(false)
@@ -126,6 +138,26 @@ describe('hasQueryKeyParams', () => {
     })
     expect(hasQueryKeyParams(node)).toBe(true)
   })
+})
+
+describe('buildQueryKeyParams', () => {
+  test.each([undefined, (type: string) => `MaybeRefOrGetter<${type}>`])(
+    'keeps required headers optional in a key helper with wrapper %s',
+    (memberTypeWrapper) => {
+      const node = ast.factory.createOperation({
+        operationId: 'getProfile',
+        method: 'GET',
+        path: '/profile',
+        parameters: [ast.factory.createParameter({ name: 'X-Locale', in: 'header', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+      })
+      const params = buildQueryKeyParams(node, { resolver: resolverTs, memberTypeWrapper })
+      const signature = functionPrinter({ mode: 'declaration' }).print(params)
+
+      expect(signature).toContain('headers?:')
+      expect(signature).toContain('= {}')
+      expect(functionPrinter({ mode: 'call' }).print(params)).toBe('{ headers }')
+    },
+  )
 })
 
 describe('buildCallResultBody', () => {
