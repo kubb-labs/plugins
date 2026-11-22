@@ -2,7 +2,11 @@ import type { ast } from '@internals/ast'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '../types.ts'
 
-/** A `plugin-ts` shaped resolver over the types `pluginZod({ inferred })` exports next to each schema. */
+/**
+
+ * A `plugin-ts` shaped resolver over the types `pluginZod({ inferred })` exports next to each schema.
+
+ */
 export function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
   const type = (name: string) => resolver.schema.type(name)
 
@@ -32,7 +36,9 @@ export function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
 declare global {
   namespace Kubb {
     interface MemoRegistry {
-      /** Every key the zod-backed `ResolverTs` memoizes. */
+      /**
+       * Every key the zod-backed `ResolverTs` memoizes.
+       */
       zodTypes: unknown
     }
   }
