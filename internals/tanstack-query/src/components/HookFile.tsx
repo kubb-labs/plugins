@@ -62,7 +62,7 @@ export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFil
   const tsResolver = types.resolver
   const headerTypeNames = returnType === 'data' || !contractOp.typedHeaders ? [] : getResponseHeadersTypeNames({ node, types: tsResolver })
 
-  const file = resolver.file({ ...operationFileEntry(node, hookFileName(resolver, node, variant)), root, output, group: group ?? undefined })
+  const file = resolver.file({ ...operationFileEntry(node, hookFileName({ resolver, node, variant })), root, output, group: group ?? undefined })
   const typeSource = from('types')
   const importedTypeNames = [
     tsResolver.response.options(node),

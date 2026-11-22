@@ -66,7 +66,11 @@ export const pluginZod = defineExtension<PluginZod>({
     const resolvedInferred = inferred === 'direction' ? 'codec' : inferred
     // Codec types carry the domain value, so they win over plugin-ts. Plain inferred types are the fallback without it.
     if (resolvedInferred) {
-      provide('types', () => toZodTypeResolver(getResolver(pluginZodName) as ResolverZod), { priority: resolvedInferred === 'codec' ? 1 : -1 })
+      provide({
+        name: 'types',
+        factory: () => toZodTypeResolver(getResolver(pluginZodName) as ResolverZod),
+        priority: resolvedInferred === 'codec' ? 1 : -1,
+      })
     }
     if (userMacros?.length) {
       setMacros(userMacros)

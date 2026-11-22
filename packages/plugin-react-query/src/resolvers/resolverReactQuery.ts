@@ -37,7 +37,7 @@ export const resolverReactQuery = createResolver<PluginReactQuery>({
         [resolver.mutation, 'mutation'],
       ] as const
       const match = namespaces.find(([ns]) => ns.name(node) === exportName || ns.optionsName(node) === exportName)
-      return match ? hookFileName(this, node, match[1]) : undefined
+      return match ? hookFileName({ resolver: this, node, variant: match[1] }) : undefined
     },
   },
   name: resolveOperationName,
