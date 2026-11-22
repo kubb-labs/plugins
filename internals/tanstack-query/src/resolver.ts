@@ -30,11 +30,7 @@ export type MutationResolver = {
   keyName(this: Resolver, node: ast.OperationNode): string
 }
 
-/**
-
- * A hook file: one of the query variants, or the mutation hook.
-
- */
+/** A hook file: one of the query variants, or the mutation hook. */
 export type HookFileVariant = QueryVariant | 'mutation'
 
 /**

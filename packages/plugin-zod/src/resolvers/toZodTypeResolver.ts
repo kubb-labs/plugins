@@ -2,19 +2,15 @@ import type { ast } from '@internals/ast'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '../types.ts'
 
-/**
-
- * A `plugin-ts` shaped resolver over the types `pluginZod({ inferred })` exports next to each schema.
-
- */
+/** A `plugin-ts` shaped resolver over the types `pluginZod({ inferred })` exports next to each schema. */
 export function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
   const type = (name: string) => resolver.schema.type(name)
 
   return {
     ...resolver,
-    // A spread drops class methods. `memo` gets its own key space, apart from the zod names.
+    // A spread drops class methods, and `file` reads private fields. `memo` gets its own key space, apart from the zod names.
     file: resolver.file.bind(resolver),
-    memo: (key: string, compute: () => unknown) => resolver.memo(`zodTypes:${key}`, compute),
+    memo: (key: string, compute: () => unknown) => resolver.memo(`plugin-zod:types:${key}`, compute),
     param: {
       name: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.name(node, p)),
       path: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.path(node, p)),
@@ -39,7 +35,7 @@ declare global {
       /**
        * Every key the zod-backed `ResolverTs` memoizes.
        */
-      zodTypes: unknown
+      'plugin-zod:types': unknown
     }
   }
 }
