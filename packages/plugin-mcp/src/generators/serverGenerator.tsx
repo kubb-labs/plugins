@@ -114,7 +114,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           footer={ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: startFile.path, baseName: startFile.baseName } })}
         >
           <File.Import name={['startServer']} root={startFile.path} path={serverFile.path} />
-          {/* Not indexable: barrels must not re-export this entry, importing it starts the server. */}
+          {/* `Raw`, so barrels never re-export this entry: importing it starts the server. */}
           <Raw name="start">{'void startServer()'}</Raw>
         </File>
 

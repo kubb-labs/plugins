@@ -166,14 +166,12 @@ function toNodeHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial<f
   )
 }
 
-type DeclarationSource = { options: PrinterTsOptions; transform: (node: ast.SchemaNode) => factory.TsNode | null }
-
 /**
  * Returns the parts of a named declaration: alias or interface, the type, and its JSDoc lines.
  * `print` joins them into one declaration, and the `Type` component passes them to `<Type>`.
  */
 export function getDeclarationParts(
-  printer: DeclarationSource,
+  printer: { options: PrinterTsOptions; transform: (node: ast.SchemaNode) => factory.TsNode | null },
   node: ast.SchemaNode,
 ): { syntax: 'type' | 'interface'; type: factory.TsNode; comments: Array<string | undefined> } | null {
   const { syntaxType = 'type', description, examples, comments = [], keysToOmit } = printer.options

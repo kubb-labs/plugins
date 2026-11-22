@@ -44,7 +44,7 @@ export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.
  * - A `const enum` or plain `enum` declaration (`constEnum` / `enum`)
  * - A union literal type alias (`literal`)
  *
- * The emitted `Code` blocks carry the resolved names so that the barrel
+ * The emitted blocks carry the resolved names so that the barrel
  * index picks up the correct export identifiers.
  */
 export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNode {
