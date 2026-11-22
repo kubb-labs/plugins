@@ -18,7 +18,6 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver } = ctx
     const { output, query, mutation, client, group, hooks } = ctx.options
 
     const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
@@ -31,10 +30,10 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
     const contractOp = resolveClientOperation(node, client.pluginName)
     if (!contractOp) return null
 
-    const queryName = resolver.query.name(node)
-    const queryOptionsName = resolver.query.optionsName(node)
-    const queryKeyName = resolver.query.keyName(node)
-    const queryKeyTypeName = resolver.query.keyTypeName(node)
+    const queryName = ctx.resolver.query.name(node)
+    const queryOptionsName = ctx.resolver.query.optionsName(node)
+    const queryKeyName = ctx.resolver.query.keyName(node)
+    const queryKeyTypeName = ctx.resolver.query.keyTypeName(node)
 
     const hook = resolveHookFile(node, { output, group, contractOp, keyTypeName: queryKeyTypeName, returnType: ctx.options.returnType })
     const { tsResolver } = hook

@@ -26,16 +26,15 @@ type Controller = {
  * `Client`/`ApiClient` controller, matching the resolver's default naming.
  */
 function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: GeneratorContext, types: OperationTypeSource): Array<Controller> {
-  const { resolver, root } = ctx
   const { output, group } = ctx.options
 
   return nodes.reduce((acc, operationNode) => {
     if (!ast.http.isOperation(operationNode)) return acc
     const tag = operationNode.tags[0]
-    const name = tag ? ensureValidVarName(resolver.groupName(tag)) : resolver.className('ApiClient')
+    const name = tag ? ensureValidVarName(ctx.resolver.groupName(tag)) : ctx.resolver.className('ApiClient')
     // `group.name` names the folder and file, never the class.
-    const fileName = tag && group ? ensureValidVarName(path.basename(resolver.groupDir(group, tag))) : name
-    const file = resolver.file({ name: fileName, extname: '.ts', tag, root, output, group: group ?? undefined })
+    const fileName = tag && group ? ensureValidVarName(path.basename(ctx.resolver.groupDir(group, tag))) : name
+    const file = ctx.resolver.file({ name: fileName, extname: '.ts', tag, root: ctx.root, output, group: group ?? undefined })
     const operationData = resolveOperationData({ node: operationNode, ctx, types })
     const previous = acc.find((item) => item.file.path === file.path)
 
@@ -68,7 +67,6 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
     name: 'sdk',
     renderer: jsxRenderer,
     operations(nodes, ctx) {
-      const { config, resolver, root } = ctx
       const { output, group, validator, returnType, throwOnErrorDefault, sdk } = ctx.options
 
       if (!sdk) return null
@@ -91,11 +89,11 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
 
       const validatorEnabled = isValidatorEnabled(validator)
       const controllers = buildControllers(nodes, ctx, types)
-      const clientPath = path.resolve(root, '.kubb/client.ts')
-      const standardSchemaPath = path.resolve(root, '.kubb/standardSchema.ts')
+      const clientPath = path.resolve(ctx.root, '.kubb/client.ts')
+      const standardSchemaPath = path.resolve(ctx.root, '.kubb/standardSchema.ts')
 
-      const banner = (file: ast.FileNode) => resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
-      const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
+      const banner = (file: ast.FileNode) => ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } })
+      const footer = (file: ast.FileNode) => ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } })
 
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const typeImports = code.join(ops.flatMap((op) => op.typeNames)).imports
@@ -153,8 +151,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
       // `flat` collapses every operation into one class named by `sdk.name`, so callers reach
       // an operation as `new PetStore(config).getPetById(...)` without a per-tag sub-client.
       const renderFacadeFile = (name: string) => {
-        const sdkFile = resolver.file({ name, extname: '.ts', root, output, group: group ?? undefined })
-        const members = controllers.map(({ name, tag }) => ({ className: name, propName: resolver.propertyName(tag ?? name) }))
+        const sdkFile = ctx.resolver.file({ name, extname: '.ts', root: ctx.root, output, group: group ?? undefined })
+        const members = controllers.map(({ name, tag }) => ({ className: name, propName: ctx.resolver.propertyName(tag ?? name) }))
 
         return (
           <File key={sdkFile.path} baseName={sdkFile.baseName} path={sdkFile.path} meta={sdkFile.meta} banner={banner(sdkFile)} footer={footer(sdkFile)}>
@@ -163,7 +161,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
             {controllers.map(({ name, file }) => (
               <File.Import key={name} name={[name]} root={sdkFile.path} path={file.path} />
             ))}
-            <SdkFacade name={resolver.className(name)} members={members} />
+            <SdkFacade name={ctx.resolver.className(name)} members={members} />
           </File>
         )
       }
@@ -171,15 +169,15 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
       const files =
         sdk.mode === 'flat'
           ? renderClassFile(
-              resolver.className(sdk.name ?? 'sdk'),
-              resolver.file({ name: sdk.name ?? 'sdk', extname: '.ts', root, output, group: group ?? undefined }),
+              ctx.resolver.className(sdk.name ?? 'sdk'),
+              ctx.resolver.file({ name: sdk.name ?? 'sdk', extname: '.ts', root: ctx.root, output, group: group ?? undefined }),
               controllers.flatMap((controller) => controller.operations),
             )
           : [...controllers.map(({ name, file, operations: ops }) => renderClassFile(name, file, ops)), sdk.name && renderFacadeFile(sdk.name)]
 
       return (
         <>
-          <ClientRuntime nodes={nodes} root={root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
+          <ClientRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
           {files}
         </>
       )

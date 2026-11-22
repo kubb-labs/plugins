@@ -20,11 +20,10 @@ export const mswGenerator = defineGenerator<PluginMsw>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver, config } = ctx
     const { parser, baseURL } = ctx.options
 
     const mock = {
-      name: resolver.handler.name(node),
+      name: ctx.resolver.handler.name(node),
       file: ctx.file(node),
     }
 
@@ -72,7 +71,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       <File {...mock.file}>
         <File.Import name={['http', 'HttpResponse']} path="msw/http" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
-        {requestName && <File.Import name={['MswBody']} isTypeOnly root={mock.file.path} path={mswBodyPath(config)} />}
+        {requestName && <File.Import name={['MswBody']} isTypeOnly root={mock.file.path} path={mswBodyPath(ctx.config)} />}
         {typeImports.map((imp) => (
           <File.Import key={imp.path} name={imp.name} root={mock.file.path} path={imp.path} isTypeOnly />
         ))}

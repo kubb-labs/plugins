@@ -20,7 +20,6 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     // A stream has no single JSON body to return as tool output, like the query plugins skip it.
     const stream = getStream(node)
     if (stream?.shape || stream?.hasVariant) return null
-    const { resolver } = ctx
     const { client } = ctx.options
 
     const types = resolveOperationTypes()
@@ -36,7 +35,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const options = ctx.from('types').import(node, tsResolver.response.options(node)).import
 
     const meta = {
-      name: resolver.handler.name(node),
+      name: ctx.resolver.handler.name(node),
       file: ctx.file(node),
     } as const
 

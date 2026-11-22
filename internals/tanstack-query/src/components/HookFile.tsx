@@ -47,7 +47,6 @@ type ResolvedHookFile = {
 export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFileOptions): ResolvedHookFile {
   const ctx = useKubb<GeneratorContext>()
   const { variant = '', output, group, contractOp, keyTypeName, extraTypeNames = [], returnType = 'data' } = options
-  const { config, root, resolver } = ctx
   if (returnType !== 'data' && contractOp.returnType === 'data') {
     throw new Diagnostics.Error({
       code: Diagnostics.code.invalidPluginOptions,
@@ -55,14 +54,19 @@ export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFil
       message: `Option \`returnType\` is '${returnType}' for ${node.operationId}, but the client plugin has \`returnType: 'data'\` and only returns the response body.`,
       help: "Set the client plugin's `returnType` to 'full', or set the hook plugin's `returnType` to 'data'.",
       location: { kind: 'config' },
-      plugin: resolver.pluginName,
+      plugin: ctx.resolver.pluginName,
     })
   }
   const types = resolveOperationTypes()
   const tsResolver = types.resolver
   const headerTypeNames = returnType === 'data' || !contractOp.typedHeaders ? [] : getResponseHeadersTypeNames({ node, types: tsResolver })
 
-  const file = resolver.file({ ...operationFileEntry(node, hookFileName({ resolver, node, variant })), root, output, group: group ?? undefined })
+  const file = ctx.resolver.file({
+    ...operationFileEntry(node, hookFileName({ resolver: ctx.resolver, node, variant })),
+    root: ctx.root,
+    output,
+    group: group ?? undefined,
+  })
   const typeSource = ctx.from('types')
   const importedTypeNames = [
     tsResolver.response.options(node),
@@ -87,8 +91,8 @@ export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFil
     typeImports: code.join(importedTypeNames).imports,
     resultTypeName: headerTypeNames.length ? 'RequestResultWithHeaders' : 'RequestResult',
     returnType,
-    banner: resolver.default.banner(ctx.meta, { output, config, file: fileMeta }),
-    footer: resolver.default.footer(ctx.meta, { output, config, file: fileMeta }),
+    banner: ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: fileMeta }),
+    footer: ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: fileMeta }),
   }
 }
 

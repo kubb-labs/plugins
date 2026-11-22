@@ -33,7 +33,6 @@ export type OperationData = {
  * schemas come from, and its validator hooks, security, base URL and response headers types.
  */
 export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOperationNode; ctx: GeneratorContext; types: OperationTypeSource }): OperationData {
-  const { resolver } = ctx
   const { validator, importPath } = ctx.options
   const library = resolveValidatorLibrary(validator)
   const schemaPlugin = library === 'valibot' ? ctx.getPlugin(pluginValibotName) : library === 'zod' ? ctx.getPlugin(pluginZodName) : null
@@ -46,7 +45,7 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
 
   return {
     node,
-    name: resolver.resolveName({ key: operationKey(node), name: resolver.name(node.operationId) }),
+    name: ctx.resolver.resolveName({ key: operationKey(node), name: ctx.resolver.name(node.operationId) }),
     types,
     typeNames: [types.response.options(node), types.response.responses(node), ...headerTypeNames].map((name) => typeSource.import(node, name)),
     schemaNames: schemas ? validatorHooks.importedSchemaNames.map((name) => schemas.import(node, name)) : [],

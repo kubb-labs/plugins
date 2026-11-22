@@ -11,14 +11,13 @@ import type { PluginMsw } from '../types'
 export const handlersGenerator = defineGenerator<PluginMsw>({
   name: 'plugin-msw',
   operations(nodes, ctx) {
-    const { resolver, config, root } = ctx
     const { output, group } = ctx.options
 
-    const handlersName = resolver.handler.listName()
-    const createHandlersName = resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })
-    const file = resolver.file({ name: handlersName, extname: '.ts', root, output, group: group ?? undefined })
+    const handlersName = ctx.resolver.handler.listName()
+    const createHandlersName = ctx.resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })
+    const file = ctx.resolver.file({ name: handlersName, extname: '.ts', root: ctx.root, output, group: group ?? undefined })
 
-    const handlerNames = nodes.map((node) => resolver.handler.name(node))
+    const handlerNames = nodes.map((node) => ctx.resolver.handler.name(node))
 
     const own = ctx.from()
     const imports = code
@@ -32,8 +31,8 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
         baseName: file.baseName,
         path: file.path,
         meta: file.meta,
-        banner: resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
-        footer: resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
+        banner: ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } }),
+        footer: ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } }),
         imports,
         sources: [
           ast.factory.createSource({

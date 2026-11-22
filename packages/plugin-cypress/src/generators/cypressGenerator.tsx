@@ -16,7 +16,6 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver } = ctx
     const { baseURL } = ctx.options
 
     ctx.requirePlugin(pluginTsName)
@@ -29,10 +28,10 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         types.import(node, typeName),
       ),
     )
-    const name = resolver.name(node.operationId)
+    const name = ctx.resolver.name(node.operationId)
 
     const meta = {
-      name: resolver.resolveName({ key: operationKey(node), name }),
+      name: ctx.resolver.resolveName({ key: operationKey(node), name }),
       file: ctx.file(node),
     } as const
 
