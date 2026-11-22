@@ -51,6 +51,8 @@ catalog:
 
 minimumReleaseAge: 2880 # 48 hours, matches CI's SAFE_CHAIN_MINIMUM_PACKAGE_AGE_HOURS
 minimumReleaseAgeExclude:
+  - '@tanstack/react-query@5.108.3'
+  - '@tanstack/query-core@5.108.3'
   - '@kubb/*'
   - 'kubb'
   - 'unplugin-kubb'

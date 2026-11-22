@@ -1,4 +1,5 @@
 {
+  "packages/plugin-react-query/tests/render.browser.test.ts": "Validates issue #1489 in Chromium with TanStack Query 5.108.3, including generated infinite hooks and sibling state updates.",
   "internals/ast/src/auth.test.ts": "Pins dropping undeclared and repeated security requirements while keeping the empty one; moved from @kubb/ast.",
   "internals/ast/src/graph.test.ts": "Pins containsCircular on nested refs and the excludeName self-reference case; moved from @kubb/ast.",
   "internals/ast/src/http/http.test.ts": "Status classes and ranges, parameter grouping with querystring and dedupe, request groups and the response union; moved from @kubb/ast.",

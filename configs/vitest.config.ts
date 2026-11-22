@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     testTimeout: 30_000,
-    exclude: ['**/node_modules/**', '**/dist/**', '**/mocks/**', '**/*.bench.ts'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/mocks/**', '**/*.bench.ts', '**/*.browser.test.ts'],
     coverage: {
       exclude: [
         '**/**/plugin.ts', // exclude because we have e2e
