@@ -62,9 +62,14 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
 
     return (
       <File baseName={file.baseName} path={file.path}>
-        <File.Import name={['QueryClient']} path={reactQueryImportPath} isTypeOnly />
-        <File.Import name={['useQueryClient']} path={reactQueryImportPath} />
-        <File.Import name={[hookOptionsName]} root={file.path} path={hookOptionsPath} isTypeOnly />
+        <File.Import
+          names={[
+            { name: 'useQueryClient', space: 'value' },
+            { name: 'QueryClient', space: 'type' },
+          ]}
+          path={reactQueryImportPath}
+        />
+        <File.Import names={[{ name: hookOptionsName, space: 'type' }]} root={file.path} path={hookOptionsPath} />
         <Function name={customHookOptionsName} params="{ queryClient }: { queryClient: QueryClient }" returnType={`Partial<${hookOptionsName}>`}>
           {`return {
               // TODO: Define custom hook options here

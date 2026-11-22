@@ -24,7 +24,7 @@ function getImportNames(entry: ImportEntry): Array<string> {
 /**
  * Keeps the imports whose names `text` calls, as `name(` or `name<`, minus `skipImportNames`.
  */
-export function filterUsedImports(imports: Array<ImportEntry>, text: string, skipImportNames: Array<string> = []): Array<ImportEntry> {
+export function filterUsedImports<TEntry extends ImportEntry>(imports: Array<TEntry>, text: string, skipImportNames: Array<string> = []): Array<TEntry> {
   const skip = new Set(skipImportNames)
   // One scan of `text` instead of a new RegExp per import name. Generated helpers can use explicit
   // type arguments, such as `createPet<object>()`.
@@ -43,10 +43,10 @@ export function filterUsedImports(imports: Array<ImportEntry>, text: string, ski
   })
 }
 
-export function aliasConflictingImports(
-  imports: Array<ImportEntry>,
+export function aliasConflictingImports<TEntry extends ImportEntry>(
+  imports: Array<TEntry>,
   reservedNames: Iterable<string>,
-): { imports: Array<ImportEntry>; aliases: Map<string, string> } {
+): { imports: Array<TEntry>; aliases: Map<string, string> } {
   const reservedNameSet = new Set(reservedNames)
   const aliases = new Map<string, string>()
 
@@ -63,12 +63,7 @@ export function aliasConflictingImports(
       return { propertyName: item, name: alias }
     })
 
-    return aliasedNames.some((item) => typeof item === 'object' && item.name)
-      ? {
-          ...entry,
-          name: aliasedNames,
-        }
-      : entry
+    return aliasedNames.some((item) => typeof item === 'object' && item.name) ? Object.assign({}, entry, { name: aliasedNames }) : entry
   })
 
   return {

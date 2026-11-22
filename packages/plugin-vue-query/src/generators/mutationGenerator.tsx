@@ -43,8 +43,10 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
         hook={hook}
         imports={
           <>
-            {hasRequestGroups && <File.Import name={['toValue']} path="vue" />}
-            <File.Import name={['MaybeRefOrGetter']} path="vue" isTypeOnly />
+            <File.Import
+              names={[...(hasRequestGroups ? [{ name: 'toValue', space: 'value' as const }] : []), { name: 'MaybeRefOrGetter', space: 'type' }]}
+              path="vue"
+            />
           </>
         }
       >
@@ -52,8 +54,14 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
 
         {mutation && hooks && (
           <>
-            <File.Import name={['useMutation']} path={importPath} />
-            <File.Import name={['MutationObserverOptions', 'QueryClient']} path={importPath} isTypeOnly />
+            <File.Import
+              names={[
+                { name: 'useMutation', space: 'value' },
+                { name: 'MutationObserverOptions', space: 'type' },
+                { name: 'QueryClient', space: 'type' },
+              ]}
+              path={importPath}
+            />
             <Mutation
               name={mutationHookName}
               clientName={contractOp.name}

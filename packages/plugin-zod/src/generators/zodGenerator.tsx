@@ -91,9 +91,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     return (
       <File {...meta.file}>
-        <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
+        <File.Import names={[isZodImport ? { name: '*', alias: 'z', space: 'value' } : { name: 'z', space: 'value' }]} path={importPath} />
         {imports.map((imp) => (
-          <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+          <File.Import key={[node.name, imp.path].join('-')} names={ast.file.getNames(imp)} root={meta.file.path} path={imp.path} />
         ))}
 
         <Zod
@@ -171,7 +171,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       return (
         <>
           {imports.map((imp) => (
-            <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+            <File.Import key={[name, imp.path].join('-')} names={ast.file.getNames(imp)} root={meta.file.path} path={imp.path} />
           ))}
           {/* Operation schemas reference (and import) the component schemas, which carry the
               `z.ZodType` annotation at their own definition when cyclic. Annotating the operation
@@ -294,7 +294,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     return (
       <File {...meta.file}>
-        <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
+        <File.Import names={[isZodImport ? { name: '*', alias: 'z', space: 'value' } : { name: 'z', space: 'value' }]} path={importPath} />
         {paramSchemas}
         {responseSchemas}
         {responseHeaderSchemas}

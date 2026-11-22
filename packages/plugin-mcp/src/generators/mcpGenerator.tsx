@@ -41,10 +41,16 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     return (
       <File {...meta.file}>
-        {options && <File.Import {...options} root={meta.file.path} isTypeOnly />}
-        <File.Import name={['CallToolResult', 'ServerContext']} path={'@modelcontextprotocol/server'} isTypeOnly />
+        {options && <File.Import names={ast.imports.asType(options)} root={meta.file.path} path={options.path} />}
+        <File.Import
+          names={[
+            { name: 'CallToolResult', space: 'type' },
+            { name: 'ServerContext', space: 'type' },
+          ]}
+          path={'@modelcontextprotocol/server'}
+        />
 
-        <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
+        <File.Import names={[{ name: contractOp.name, space: 'value' }]} root={meta.file.path} path={contractOp.path} />
 
         <McpHandler name={meta.name} clientName={contractOp.name} node={node} resolver={tsResolver} returnType={contractOp.returnType} />
       </File>

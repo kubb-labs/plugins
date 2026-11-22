@@ -68,13 +68,19 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     return (
       <File {...mock.file}>
-        <File.Import name={['http', 'HttpResponse']} path="msw/http" />
-        <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
-        {requestName && <File.Import name={['MswBody']} isTypeOnly root={mock.file.path} path={mswBodyPath(ctx.config)} />}
+        <File.Import
+          names={[
+            { name: 'http', space: 'value' },
+            { name: 'HttpResponse', space: 'value' },
+            { name: 'HttpResponseResolver', space: 'type' },
+          ]}
+          path="msw/http"
+        />
+        {requestName && <File.Import names={[{ name: 'MswBody', space: 'type' }]} root={mock.file.path} path={mswBodyPath(ctx.config)} />}
         {typeImports.map((imp) => (
-          <File.Import key={imp.path} {...imp} root={mock.file.path} isTypeOnly />
+          <File.Import key={imp.path} names={ast.imports.asType(imp)} root={mock.file.path} path={imp.path} />
         ))}
-        {fakerImport && <File.Import {...fakerImport} root={mock.file.path} />}
+        {fakerImport && <File.Import names={ast.file.getNames(fakerImport)} root={mock.file.path} path={fakerImport.path} />}
 
         {types.map(([response, type]) => (
           <Response key={response.statusCode} typeName={type.name} response={response} name={mock.name} />
