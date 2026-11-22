@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { Code, File, Type as TypeDeclaration } from '@kubb/renderer-jsx'
+import { Code, File, Origin, Type as TypeDeclaration } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterTsFactory } from '../printers/printerTs.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
@@ -73,9 +73,11 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
           {printerImports.map((imp) => (
             <File.Import key={[name, imp.path, imp.name].join('-')} {...imp} />
           ))}
-          <Code name={name} pointer={node.pointer} export type>
-            {output}
-          </Code>
+          <Origin pointer={node.pointer}>
+            <Code name={name} export type>
+              {output}
+            </Code>
+          </Origin>
         </>
       )}
     </>

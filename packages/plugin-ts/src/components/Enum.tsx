@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import { ensureValidVarName } from '@internals/utils'
 import { casing, text } from '@kubb/kit'
-import { Code } from '@kubb/renderer-jsx'
+import { Code, Origin } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
@@ -66,15 +66,15 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
   const namesMerge = !!nameNode && enumName === typeName
 
   return (
-    <>
+    <Origin pointer={node.pointer}>
       {nameNode && (
-        <Code name={enumName} pointer={node.pointer} export>
+        <Code name={enumName} export>
           {nameNode}
         </Code>
       )}
-      <Code name={typeName} pointer={node.pointer} export={!namesMerge} type={['asConst', 'literal', undefined].includes(enumOptions.type)}>
+      <Code name={typeName} export={!namesMerge} type={['asConst', 'literal', undefined].includes(enumOptions.type)}>
         {typeNode}
       </Code>
-    </>
+    </Origin>
   )
 }
