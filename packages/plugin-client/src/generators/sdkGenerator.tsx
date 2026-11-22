@@ -94,7 +94,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
       const clientPath = path.resolve(root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(root, '.kubb/standardSchema.ts')
 
-      const renderClassFile = (className: string, file: FileTarget, ops: Array<OperationData>) => {
+      const renderClassFile = ({ name: className, file, operations: ops }: Pick<Controller, 'name' | 'file' | 'operations'>) => {
         const typeImports = code.join(ops.flatMap((op) => op.typeNames)).imports
         const schemaImports = validatorEnabled ? code.join(ops.flatMap((op) => op.schemaNames)).imports : []
         const resultOps = ops.filter((op) => !getStream(op.node)?.shape)
@@ -167,12 +167,12 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
 
       const files =
         sdk.mode === 'flat'
-          ? renderClassFile(
-              resolver.className(sdk.name ?? 'sdk'),
-              namedFile({ name: sdk.name ?? 'sdk' }),
-              controllers.flatMap((controller) => controller.operations),
-            )
-          : [...controllers.map(({ name, file, operations: ops }) => renderClassFile(name, file, ops)), sdk.name && renderFacadeFile(sdk.name)]
+          ? renderClassFile({
+              name: resolver.className(sdk.name ?? 'sdk'),
+              file: namedFile({ name: sdk.name ?? 'sdk' }),
+              operations: controllers.flatMap((controller) => controller.operations),
+            })
+          : [...controllers.map(renderClassFile), sdk.name && renderFacadeFile(sdk.name)]
 
       return (
         <>
