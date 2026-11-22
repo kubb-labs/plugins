@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { matchesInfinite } from '@internals/tanstack-query'
-import { code, defineGenerator, from, type RefName } from '@kubb/kit'
+import { code, defineGenerator, type RefName } from '@kubb/kit'
 import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
 import { classifyOperation, resolveOperationOverrides } from '@internals/tanstack-query'
@@ -31,7 +31,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       path: resolvedFile.path.replace(/[^/\\]+\.ts$/, `${name}.ts`),
     }
 
-    const own = from(ctx.plugin.name)
+    const own = ctx.from()
     const optionsNames: Array<RefName> = []
     const hookOptions: Record<string, string> = {}
 

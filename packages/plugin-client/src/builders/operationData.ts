@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { getResponseHeadersTypeNames, type OperationTypeNames, type OperationTypeSource } from '@internals/client'
-import { from, type Generator, operationKey, type RefName } from '@kubb/kit'
+import { type Generator, operationKey, type RefName } from '@kubb/kit'
 import type { ContractClientFactory } from '../types.ts'
 import { getOperationSecurity, isAuthRequired, type SecurityRequirement } from './security.ts'
 import { buildValidatorHooks, type ValidatorHooks } from './validator.ts'
@@ -41,8 +41,8 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
 
   const validatorHooks = buildValidatorHooks({ node, validator, schemaResolver })
   const headerTypeNames = getResponseHeadersTypeNames({ node, types })
-  const typeSource = from('types')
-  const schemas = schemaResolver && schemaPlugin?.options ? from(schemaResolver.pluginName) : null
+  const typeSource = ctx.from('types')
+  const schemas = schemaResolver && schemaPlugin?.options ? ctx.from(schemaResolver.pluginName) : null
 
   return {
     node,

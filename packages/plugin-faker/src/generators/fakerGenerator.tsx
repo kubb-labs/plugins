@@ -2,7 +2,7 @@ import { ast } from '@internals/ast'
 import { getPerContentTypeName, resolveContentTypeVariants, toResponseContent } from '@internals/shared'
 import { jsDocEscape } from '@internals/utils'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
-import { defineGenerator, from } from '@kubb/kit'
+import { defineGenerator } from '@kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
 import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
@@ -43,7 +43,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const schemaName = node.name
     const isEnumSchema = !!ast.schema.narrow(node, ast.schema.types.enum)
     const schemaTypeName = enumTypeName({ resolver: tsResolver, name: schemaName, enumOptions: pluginTs.options?.enum, isEnum: isEnumSchema })
-    const types = from(pluginTsName)
+    const types = ctx.from(pluginTsName)
     const meta = {
       name: resolver.name(schemaName),
       file: ctx.file(node),
@@ -171,7 +171,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ...(hasResponseNameCollision ? [] : [responseName]),
     ])
 
-    const types = from(pluginTsName)
+    const types = ctx.from(pluginTsName)
     const meta = {
       file: ctx.file(node),
       typeOf: (typeName: string) => types.import(node, typeName),

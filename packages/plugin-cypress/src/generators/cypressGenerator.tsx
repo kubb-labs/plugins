@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { resolveOperationTypeNames } from '@internals/shared'
-import { code, defineGenerator, from, operationKey } from '@kubb/kit'
+import { code, defineGenerator, operationKey } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
@@ -23,7 +23,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const tsResolver = ctx.getResolver(pluginTsName)
 
-    const types = from(pluginTsName)
+    const types = ctx.from(pluginTsName)
     const { imports } = code.join(
       [tsResolver.response.options(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })].map((typeName) =>
         types.import(node, typeName),

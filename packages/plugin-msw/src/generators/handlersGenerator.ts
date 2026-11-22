@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { casing, code, defineGenerator, from } from '@kubb/kit'
+import { casing, code, defineGenerator } from '@kubb/kit'
 import type { PluginMsw } from '../types'
 
 /**
@@ -20,7 +20,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
 
     const handlerNames = nodes.map((node) => resolver.handler.name(node))
 
-    const own = from(ctx.plugin.name)
+    const own = ctx.from()
     const imports = code
       .join(nodes.map((node, index) => own.import(node, handlerNames[index]!)))
       .imports.map((imp) => ast.factory.createImport({ name: imp.name, path: imp.path, root: file.path }))

@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import { getResponseHeadersTypeNames, resolveOperationTypes } from '@internals/client'
 import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
-import { code, Diagnostics, from, type GeneratorContext, type Group, type Output, useKubb } from '@kubb/kit'
+import { code, Diagnostics, type GeneratorContext, type Group, type Output, useKubb } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
 import { type HookFileVariant, hookFileName } from '../resolver.ts'
@@ -63,7 +63,7 @@ export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFil
   const headerTypeNames = returnType === 'data' || !contractOp.typedHeaders ? [] : getResponseHeadersTypeNames({ node, types: tsResolver })
 
   const file = resolver.file({ ...operationFileEntry(node, hookFileName({ resolver, node, variant })), root, output, group: group ?? undefined })
-  const typeSource = from('types')
+  const typeSource = ctx.from('types')
   const importedTypeNames = [
     tsResolver.response.options(node),
     tsResolver.response.responses(node),

@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { getEnumNames } from '@internals/shared'
-import { code, defineGenerator, from } from '@kubb/kit'
+import { code, defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -29,11 +29,11 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     }
 
     if (parser === 'faker') ctx.requirePlugin(pluginFakerName)
-    const faker = parser === 'faker' ? from(pluginFakerName).resolver.response.response(node) : null
+    const faker = parser === 'faker' ? ctx.from(pluginFakerName).resolver.response.response(node) : null
 
     const pluginTs = ctx.requirePlugin(pluginTsName)
     const tsResolver = ctx.getResolver(pluginTsName)
-    const typeRefs = from(pluginTsName).resolver
+    const typeRefs = ctx.from(pluginTsName).resolver
     const responseType = typeRefs.response.response(node)
 
     const successResponses = ast.http.responses.filterSuccess(node)

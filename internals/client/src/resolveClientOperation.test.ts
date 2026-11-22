@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
-import { createResolver, withContext } from '@kubb/kit'
+import { createResolver, from, withContext } from '@kubb/kit'
 import type { Memo, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import { resolveClientOperation } from './resolveClientOperation.ts'
@@ -25,21 +25,20 @@ function createContext(pluginOptions: Record<string, unknown> | undefined, resol
     if (pluginOptions === undefined) throw new Error(`Plugin "${name}" not found`)
     return { options: pluginOptions }
   }
-  return {
+  const ctx = {
+    root: '/root',
+    memo: createTestMemo(),
+    schemas: [],
+    config: {},
+    meta: {},
+    plugin: { name: 'plugin-react-query' },
+    resolver: createResolver({ pluginName: 'plugin-react-query' }),
+    options: { output: { path: '.' } },
     getResolver,
-    ctx: {
-      root: '/root',
-      memo: createTestMemo(),
-      schemas: [],
-      config: {},
-      meta: {},
-      plugin: { name: 'plugin-react-query' },
-      resolver: createResolver({ pluginName: 'plugin-react-query' }),
-      options: { output: { path: '.' } },
-      getResolver,
-      requirePlugin,
-    },
+    requirePlugin,
+    from: (source: string) => withContext(ctx as never, () => from(source)),
   }
+  return { getResolver, ctx }
 }
 
 const run = (ctx: object, node: ast.OperationNode, pluginName = 'plugin-axios') => withContext(ctx as never, () => resolveClientOperation(node, pluginName))
