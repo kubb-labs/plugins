@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
+import { hookFileName } from '@internals/tanstack-query'
 import { defineGenerator } from '@kubb/kit'
 import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
@@ -33,9 +34,8 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
     let basePath = outputDir
     const firstNode = nodes[0]
     if (firstNode) {
-      const hookName = resolver.query.name(firstNode)
       const hookFile = resolver.file({
-        name: hookName,
+        name: hookFileName({ resolver, node: firstNode }),
         extname: '.ts',
         tag: firstNode.tags[0] ?? 'default',
         path: firstNode.path,

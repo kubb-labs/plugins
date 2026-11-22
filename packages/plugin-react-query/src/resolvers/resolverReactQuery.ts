@@ -1,7 +1,18 @@
 import { resolveOperationName } from '@internals/shared'
-import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
+import { createMutationResolver, createQueryResolver, type HookFileVariant } from '@internals/tanstack-query'
 import { createResolver, operationKey } from '@kubb/kit'
 import type { PluginReactQuery } from '../types.ts'
+
+/**
+ * The file variant of each hook namespace. Each hook has its own file, named by `hookFileName` with this variant.
+ */
+export const hookFileVariants = {
+  query: '',
+  suspenseQuery: 'Suspense',
+  infiniteQuery: 'Infinite',
+  suspenseInfiniteQuery: 'SuspenseInfinite',
+  mutation: 'mutation',
+} as const satisfies Record<string, HookFileVariant>
 
 /**
  * Default resolver used by `@kubb/plugin-react-query`. Decides the names and

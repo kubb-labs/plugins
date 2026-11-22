@@ -100,6 +100,7 @@ describe('valibotGenerator schema', () => {
 
   test('a schema with a Date field also gets an input variant that encodes', async () => {
     const { driver, context } = setup('inputVariant', { inferred: true })
+    driver.inputNode = ast.factory.createInput({ schemas: [staySchema] })
     const node = createSchema({
       type: 'object',
       primitive: 'object',

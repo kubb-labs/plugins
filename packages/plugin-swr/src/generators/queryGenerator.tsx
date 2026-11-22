@@ -16,8 +16,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver, root } = ctx
-    const { output, query, mutation, client, group } = ctx.options
+    const { query, mutation, client } = ctx.options
 
     const { isQuery } = classifyOperation(node, { query, mutation })
 
@@ -26,15 +25,15 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     const importPath = query ? query.importPath : 'swr'
 
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, ctx, node, root, output })
+    const contractOp = resolveClientOperation({ node, pluginName: client.pluginName })
     if (!contractOp) return null
 
-    const queryName = resolver.query.name(node)
-    const queryOptionsName = resolver.query.optionsName(node)
-    const queryKeyName = resolver.query.keyName(node)
-    const queryKeyTypeName = resolver.query.keyTypeName(node)
+    const queryName = ctx.resolver.query.name(node)
+    const queryOptionsName = ctx.resolver.query.optionsName(node)
+    const queryKeyName = ctx.resolver.query.keyName(node)
+    const queryKeyTypeName = ctx.resolver.query.keyTypeName(node)
 
-    const hook = resolveHookFile(node, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName, returnType: ctx.options.returnType })
+    const hook = resolveHookFile(node, { contractOp, keyTypeName: queryKeyTypeName, returnType: ctx.options.returnType })
     const { tsResolver } = hook
 
     return (

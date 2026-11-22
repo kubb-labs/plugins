@@ -7,7 +7,7 @@ import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { PutEventOptionsSchemaType, PutEventResponsesSchemaType } from '../zod/putEventSchema'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema'
-import { putEventResponseSchema, putEventStatus409Schema, putEventBodySchema, putEventPathSchema, putEventQuerySchema, putEventHeadersSchema } from '../zod/putEventSchema'
+import { putEventBodySchema, putEventHeadersSchema, putEventPathSchema, putEventQuerySchema, putEventResponseSchema, putEventStatus409Schema } from '../zod/putEventSchema'
 
 /**
  * `PUT /events/{day}`

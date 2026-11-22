@@ -50,7 +50,6 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   name: 'valibot',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { resolver, root } = ctx
     const { output, inferred, typeGuards, importPath, group } = ctx.options
 
     if (!node.name) {
@@ -61,22 +60,14 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     const printerOptions = ctx.printer.options
     // Rendered twice: the schema decodes, and its `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions })
+    const valibot = ctx.from().resolver
     const inputImports = hasDirectionalNode
-      ? collectDirectionalRefNames({ node, printerOptions }).map((schemaName) => ({
-          name: [resolver.schema.inputName(schemaName)],
-          path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-        }))
+      ? collectDirectionalRefNames({ node, printerOptions }).flatMap((schemaName) => valibot.schema.inputName(schemaName).import ?? [])
       : []
-    const imports = [
-      ...new Map(
-        [...resolver.imports({ node, root, output, group: group ?? undefined, checks: true }), ...inputImports].map(
-          (imp) => [`${Array.isArray(imp.name) ? imp.name.join(',') : imp.name}|${imp.path}`, imp] as const,
-        ),
-      ).values(),
-    ]
-    const inputName = resolver.schema.inputName(node.name)
+    const imports = [...ctx.resolver.imports({ node, root: ctx.root, output, group: group ?? undefined, checks: true }), ...inputImports]
+    const inputName = ctx.resolver.schema.inputName(node.name)
     const meta = {
-      name: resolver.name(node.name),
+      name: ctx.resolver.name(node.name),
       file: ctx.file(node),
     } as const
 
@@ -91,10 +82,10 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
           name={meta.name}
           node={node}
           printer={ctx.printer.with({ direction: 'decode' })}
-          inferTypeName={inferred ? resolver.schema.typeName(node.name) : null}
+          inferTypeName={inferred ? ctx.resolver.schema.typeName(node.name) : null}
           typeGuards={typeGuards}
-          isName={resolver.schema.isName(node.name)}
-          assertName={resolver.schema.assertName(node.name)}
+          isName={ctx.resolver.schema.isName(node.name)}
+          assertName={ctx.resolver.schema.assertName(node.name)}
           cyclic={cyclicSchemas.has(node.name)}
           comments={schemaComments(node)}
         />
@@ -103,11 +94,11 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
             name={inputName}
             node={node}
             printer={ctx.printer.with({ direction: 'encode' })}
-            inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
+            inferTypeName={inferred ? ctx.resolver.schema.inputTypeName(node.name) : null}
             inferKind="InferInput"
             typeGuards={typeGuards}
-            isName={resolver.schema.isName(inputName)}
-            assertName={resolver.schema.assertName(inputName)}
+            isName={ctx.resolver.schema.isName(inputName)}
+            assertName={ctx.resolver.schema.assertName(inputName)}
             cyclic={cyclicSchemas.has(node.name)}
             comments={schemaComments(node)}
           />
@@ -117,7 +108,6 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver, root } = ctx
     const { output, inferred, importPath, group } = ctx.options
 
     const meta = {
@@ -158,13 +148,13 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       }
 
       const inputRefNames = direction === 'encode' ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
-      const imports = resolver.imports({
+      const imports = ctx.resolver.imports({
         node: schema,
-        root,
+        root: ctx.root,
         output,
         group: group ?? undefined,
         checks: true,
-        name: (schemaName) => (inputRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
+        name: (schemaName) => (inputRefNames?.has(schemaName) ? ctx.resolver.schema.inputName(schemaName) : ctx.resolver.name(schemaName)),
       })
 
       return (
@@ -178,7 +168,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
             name={name}
             node={schema}
             printer={ctx.printer.with({ keysToOmit, direction })}
-            inferTypeName={inferred ? resolver.schema.type(name) : null}
+            inferTypeName={inferred ? ctx.resolver.schema.type(name) : null}
             inferKind={inferKinds[direction]}
             comments={schemaComments(schema)}
           />
@@ -191,38 +181,40 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       <>{buildContentTypeEntries(entries, baseName).map((entry) => renderSchemaEntry({ ...entry, direction }))}</>
     )
     const renderResponseUnion = (responses: Array<ast.ResponseNode>, name: string, fallbackUnknown: boolean) =>
-      renderSchemaEntry({ schema: buildResponseUnionSchema({ node, responses, name, resolver, fallbackUnknown }), name })
+      renderSchemaEntry({ schema: buildResponseUnionSchema({ node, responses, name, resolver: ctx.resolver, fallbackUnknown }), name })
 
     const paramSchemas = node.parameters.map((param) =>
-      renderSchemaEntry({ schema: param.schema, name: resolver.param.name(node, param), direction: 'encode' }),
+      renderSchemaEntry({ schema: param.schema, name: ctx.resolver.param.name(node, param), direction: 'encode' }),
     )
 
     const responseSchemas = node.responses.map((res) => {
       const content = (res.content ?? []).map((entry, _, content) => toResponseContent(entry, content))
       const variants = content.filter((entry) => entry.schema)
       if (variants.length > 1) {
-        return renderContentTypeVariants(content, resolver.response.status(node, res.statusCode))
+        return renderContentTypeVariants(content, ctx.resolver.response.status(node, res.statusCode))
       }
       const primary = variants[0] ?? content[0]
       return renderSchemaEntry({
         schema: primary?.schema ?? null,
-        name: resolver.response.status(node, res.statusCode),
+        name: ctx.resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
       })
     })
 
     const responseHeaderSchemas = node.responses.map((res) =>
-      res.headers?.length ? renderSchemaEntry({ schema: buildParamsSchema(res.headers), name: resolver.response.headers(node, res.statusCode) }) : null,
+      res.headers?.length ? renderSchemaEntry({ schema: buildParamsSchema(res.headers), name: ctx.resolver.response.headers(node, res.statusCode) }) : null,
     )
 
     const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
     // The response schema covers success (2xx) bodies only.
     const successResponsesWithSchema = responsesWithSchema.filter((res) => ast.http.status.isSuccess(res))
-    const responseUnionSchema = responsesWithSchema.length > 0 ? renderResponseUnion(successResponsesWithSchema, resolver.response.response(node), true) : null
+    const responseUnionSchema =
+      responsesWithSchema.length > 0 ? renderResponseUnion(successResponsesWithSchema, ctx.resolver.response.response(node), true) : null
 
     // The error schema covers every non-2xx response, including the OpenAPI `default`.
     const errorResponsesWithSchema = responsesWithSchema.filter((res) => !ast.http.status.isSuccess(res))
-    const errorUnionSchema = errorResponsesWithSchema.length > 0 ? renderResponseUnion(errorResponsesWithSchema, resolver.response.error(node), false) : null
+    const errorUnionSchema =
+      errorResponsesWithSchema.length > 0 ? renderResponseUnion(errorResponsesWithSchema, ctx.resolver.response.error(node), false) : null
 
     const requestBodyContent = node.requestBody?.content ?? []
     const requestSchema = (() => {
@@ -232,12 +224,12 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
         if (!entry.schema) return null
         return renderSchemaEntry({
           schema: entry.schema,
-          name: resolver.response.body(node),
+          name: ctx.resolver.response.body(node),
           keysToOmit: entry.keysToOmit,
           direction: 'encode',
         })
       }
-      return renderContentTypeVariants(requestBodyContent, resolver.response.body(node), 'encode')
+      return renderContentTypeVariants(requestBodyContent, ctx.resolver.response.body(node), 'encode')
     })()
 
     // Grouped path, query, headers, and cookies schemas, one object per group.
@@ -254,8 +246,8 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       .filter(({ params }) => params.length > 0)
       .map(({ kind, params }) =>
         renderSchemaEntry({
-          schema: buildParamRefsSchema({ node, params, resolver }),
-          name: resolver.param[kind](node, params[0]!),
+          schema: buildParamRefsSchema({ node, params, resolver: ctx.resolver }),
+          name: ctx.resolver.param[kind](node, params[0]!),
           direction: 'encode',
         }),
       )
@@ -263,9 +255,9 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     // The combined options object and the per-status record back `resolver.response.options(node)` and
     // `resolver.response.responses(node)`, for callers that take their types from this plugin.
     const optionsSchema = inferred
-      ? renderSchemaEntry({ schema: buildOptionsSchema(node, resolver), name: resolver.name(`${node.operationId} Options`), direction: 'encode' })
+      ? renderSchemaEntry({ schema: buildOptionsSchema(node, ctx.resolver), name: ctx.resolver.name(`${node.operationId} Options`), direction: 'encode' })
       : null
-    const responsesSchema = inferred ? renderSchemaEntry({ schema: buildResponses(node, resolver), name: resolver.response.responses(node) }) : null
+    const responsesSchema = inferred ? renderSchemaEntry({ schema: buildResponses(node, ctx.resolver), name: ctx.resolver.response.responses(node) }) : null
 
     return (
       <File {...meta.file}>

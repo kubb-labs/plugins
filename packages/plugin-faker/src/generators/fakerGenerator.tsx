@@ -30,7 +30,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, seed, locale, typeMode } = ctx.options
     const pluginTs = ctx.requirePlugin(pluginTsName)
 
@@ -43,11 +42,11 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const schemaName = node.name
     const isEnumSchema = !!ast.schema.narrow(node, ast.schema.types.enum)
     const schemaTypeName = enumTypeName({ resolver: tsResolver, name: schemaName, enumOptions: pluginTs.options?.enum, isEnum: isEnumSchema })
+    const types = ctx.from(pluginTsName)
     const meta = {
-      name: resolver.name(schemaName),
+      name: ctx.resolver.name(schemaName),
       file: ctx.file(node),
       typeName: schemaTypeName,
-      typeFile: ctx.file(node, { plugin: pluginTsName }),
     } as const
     const canOverride = canOverrideSchema(node)
     const printerInstance = ctx.printer.with({ schemaName, typeName: meta.typeName })
@@ -56,12 +55,11 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       node,
       canOverride,
       name: meta.name,
-      typeName: meta.typeName,
+      type: types.ref(node, meta.typeName),
       filePath: meta.file.path,
-      typeFilePath: meta.typeFile.path,
     })
 
-    const imports = resolver.imports({ node, root, output, group: group ?? undefined, checks: true })
+    const imports = ctx.resolver.imports({ node, root: ctx.root, output, group: group ?? undefined, checks: true })
     const usedImports = filterUsedImports(imports, fakerText)
 
     return (
@@ -69,7 +67,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParserName(dateParser)} />}
-        {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[meta.typeName]} />}
+        {typeReference.import && <File.Import {...typeReference.import} isTypeOnly root={meta.file.path} />}
         {usedImports.map((imp) => (
           <File.Import key={[schemaName, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
         ))}
@@ -87,7 +85,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     )
   },
   operation(node, ctx) {
-    const { resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, seed, locale, typeMode } = ctx.options
     ctx.requirePlugin(pluginTsName)
 
@@ -96,10 +93,10 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
     const paramGroups = (
       [
-        { params: pathParams, name: resolver.param.path, typeName: tsResolver.param.path },
-        { params: queryParams, name: resolver.param.query, typeName: tsResolver.param.query },
-        { params: headerParams, name: resolver.param.headers, typeName: tsResolver.param.headers },
-        { params: cookieParams, name: resolver.param.cookies, typeName: tsResolver.param.cookies },
+        { params: pathParams, name: ctx.resolver.param.path, typeName: tsResolver.param.path },
+        { params: queryParams, name: ctx.resolver.param.query, typeName: tsResolver.param.query },
+        { params: headerParams, name: ctx.resolver.param.headers, typeName: tsResolver.param.headers },
+        { params: cookieParams, name: ctx.resolver.param.cookies, typeName: tsResolver.param.cookies },
       ] as const
     )
       .filter((group) => group.params.length > 0)
@@ -149,20 +146,20 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const responseUnits = node.responses.flatMap((response) =>
       expandContentUnits(
         (response.content ?? []).map((entry, _, content) => toResponseContent(entry, content)),
-        resolver.response.status(node, response.statusCode),
+        ctx.resolver.response.status(node, response.statusCode),
         tsResolver.response.status(node, response.statusCode),
         response.description,
       ),
     )
     const dataUnits = expandContentUnits(
       node.requestBody?.content ?? [],
-      resolver.response.body(node),
+      ctx.resolver.response.body(node),
       tsResolver.response.body(node),
       node.requestBody?.description,
       (schema) => ({ ...schema, description: node.requestBody?.description ?? schema.description }),
     )
-    const responseName = resolver.response.response(node)
-    const importedResponseNames = new Set(ast.http.responses.getImportedNames(node.responses).map((name) => resolver.name(name)))
+    const responseName = ctx.resolver.response.response(node)
+    const importedResponseNames = new Set(ast.http.responses.getImportedNames(node.responses).map((name) => ctx.resolver.name(name)))
     const hasResponseNameCollision = importedResponseNames.has(responseName)
     const localHelperNames = new Set([
       ...paramGroups.map((group) => group.name),
@@ -171,13 +168,15 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ...(hasResponseNameCollision ? [] : [responseName]),
     ])
 
+    const types = ctx.from(pluginTsName)
     const meta = {
       file: ctx.file(node),
-      typeFile: ctx.file(node, { plugin: tsResolver.pluginName }),
     } as const
 
     function resolveMockImports(schema: ast.SchemaNode) {
-      return resolver.imports({ node: schema, root, output, group: group ?? undefined, checks: true }).filter((entry) => entry.path !== meta.file.path)
+      return ctx.resolver
+        .imports({ node: schema, root: ctx.root, output, group: group ?? undefined, checks: true })
+        .filter((entry) => entry.path !== meta.file.path)
     }
 
     function renderEntry({ schema, name, typeName, description, keysToOmit, skipImportNames = [], factories }: RenderUnit) {
@@ -203,14 +202,13 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         node: schema,
         canOverride,
         name,
-        typeName,
+        type: types.ref(node, typeName),
         filePath: meta.file.path,
-        typeFilePath: meta.typeFile.path,
       })
 
       return (
         <>
-          {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
+          {typeReference.import && <File.Import {...typeReference.import} isTypeOnly root={meta.file.path} />}
           {imports.map((imp) => (
             <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
           ))}
@@ -234,8 +232,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       { name, typeName, description, factories }: Omit<RenderUnit, 'schema'> & { factories: Array<RenderUnit> },
       schema: ast.SchemaNode,
     ) {
-      const reference = (unit: Pick<RenderUnit, 'name' | 'typeName'>, node: ast.SchemaNode) =>
-        resolveTypeReference({ node, canOverride: true, name: unit.name, typeName: unit.typeName, filePath: meta.file.path, typeFilePath: meta.typeFile.path })
+      const reference = (unit: Pick<RenderUnit, 'name' | 'typeName'>, unitSchema: ast.SchemaNode) =>
+        resolveTypeReference({ node: unitSchema, canOverride: true, name: unit.name, type: types.ref(node, unit.typeName), filePath: meta.file.path })
       const typeReference = reference({ name, typeName }, schema)
       // An object override merges into an object factory. Any other override (an array, a scalar) is complete, so it is returned as is.
       const objectMembers = factories.flatMap((unit) => {
@@ -252,7 +250,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
       return (
         <>
-          {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
+          {typeReference.import && <File.Import {...typeReference.import} isTypeOnly root={meta.file.path} />}
           <Function
             export
             name={name}
@@ -266,7 +264,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       )
     }
 
-    const responseUnionSchema = hasResponseNameCollision ? null : buildResponseUnionSchema(node, resolver)
+    const responseUnionSchema = hasResponseNameCollision ? null : buildResponseUnionSchema(node, ctx.resolver)
     // A union of status factories, not the inline union of a single response schema.
     const statusMembers = responseUnionSchema?.type === 'union' ? (responseUnionSchema.members ?? []) : []
     const statusUnits = statusMembers.flatMap((member) => responseUnits.filter((unit) => unit.name === ast.ref.getName(member)))

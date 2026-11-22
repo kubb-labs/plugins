@@ -1,4 +1,5 @@
 import type { ast } from '@internals/ast'
+import { ensureValidVarName } from '@internals/utils'
 import { casing, operationKey } from '@kubb/kit'
 import type { Resolver } from '@kubb/kit'
 
@@ -27,6 +28,22 @@ export type QueryResolver = {
 export type MutationResolver = {
   name(this: Resolver, node: ast.OperationNode): string
   keyName(this: Resolver, node: ast.OperationNode): string
+}
+
+/**
+
+ * A hook file: one of the query variants, or the mutation hook.
+
+ */
+export type HookFileVariant = QueryVariant | 'mutation'
+
+/**
+ * A hook file's name before casing, such as `useGetPetByIdSuspense`. Built from the `operationId`, not the resolver's `name`,
+ * so a `name` override renames hooks and leaves their files alone. Two operations with the same name get `usePetList2`.
+ */
+export function hookFileName({ resolver, node, variant = '' }: { resolver: Resolver; node: ast.OperationNode; variant?: HookFileVariant }): string {
+  const name = `use${casing.capitalize(ensureValidVarName(casing.camel(node.operationId)))}${variant === 'mutation' ? '' : variant}`
+  return resolver.resolveName({ key: operationKey(node, 'hookFile', variant), name, scope: 'file' })
 }
 
 /**

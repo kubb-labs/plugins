@@ -20,30 +20,28 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     // A stream has no single JSON body to return as tool output, like the query plugins skip it.
     const stream = getStream(node)
     if (stream?.shape || stream?.hasVariant) return null
-    const { resolver, root } = ctx
-    const { output, client } = ctx.options
+    const { client } = ctx.options
 
     const types = resolveOperationTypes()
     const tsResolver = types.resolver
 
     // The registered contract client plugin owns the `<op>` the handler imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, ctx, node, root, output })
+    const contractOp = resolveClientOperation({ node, pluginName: client.pluginName })
     if (!contractOp) {
       return null
     }
 
     // The handler signature references the grouped `<Name>Options`.
-    const optionsName = tsResolver.response.options(node)
+    const options = ctx.from('types').resolver.response.options(node).import
 
     const meta = {
-      name: resolver.handler.name(node),
-      file: ctx.file(node, { suffix: false }),
-      fileTs: ctx.file(node, { plugin: tsResolver.pluginName }),
+      name: ctx.resolver.handler.name(node),
+      file: ctx.file(node),
     } as const
 
     return (
       <File {...meta.file}>
-        {meta.fileTs && optionsName && <File.Import name={[optionsName]} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
+        {options && <File.Import {...options} root={meta.file.path} isTypeOnly />}
         <File.Import name={['CallToolResult', 'ServerContext']} path={'@modelcontextprotocol/server'} isTypeOnly />
 
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />

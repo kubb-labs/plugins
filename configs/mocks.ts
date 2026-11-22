@@ -17,7 +17,7 @@ import type {
   Plugin,
   PluginType,
 } from '@kubb/kit'
-import { ast, casing, Diagnostics, file, Hookable, memo, memoryStorage, withContext } from '@kubb/kit'
+import { ast, casing, Diagnostics, file, from, Hookable, memo, memoryStorage, withContext } from '@kubb/kit'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'
@@ -175,10 +175,11 @@ type RenderGeneratorOptions<TOptions extends PluginType> = {
   printer?: PrinterFactory<TOptions>
 }
 
-// Adds `ctx.printer` and `ctx.file`, like kit's visitor does. The factory runs with `ctx` as `useKubb()`.
+// Adds `ctx.printer`, `ctx.file` and `ctx.from`, like kit's visitor does. The factory runs with `ctx` as `useKubb()`.
 function withPrinter<TOptions extends PluginType>(ctx: PrinterContext<TOptions>, opts: RenderGeneratorOptions<TOptions>): GeneratorContext<TOptions> {
   const generatorContext = { ...ctx, printer: undefined } as GeneratorContext<TOptions>
   generatorContext.file = (node, options) => withContext(generatorContext, () => file(node, options))
+  generatorContext.from = ((source) => withContext(generatorContext, () => from(source))) as GeneratorContext<TOptions>['from']
   generatorContext.printer = (opts.printer && withContext(ctx, () => opts.printer!(ctx))) as GeneratorContext<TOptions>['printer']
   return generatorContext
 }
@@ -186,6 +187,8 @@ function withPrinter<TOptions extends PluginType>(ctx: PrinterContext<TOptions>,
 function createMockedPluginContext<TOptions extends PluginType>(
   opts: RenderGeneratorOptions<TOptions>,
 ): Omit<GeneratorContext<TOptions>, 'options' | 'printer'> {
+  // A real build registers the plugin under test, so it can look itself up by name.
+  const getPlugin = (name: string) => opts.driver.getPlugin(name) ?? (name === opts.plugin.name ? opts.plugin : undefined)
   return {
     config: opts.config,
     root: resolve(opts.config.root, opts.config.output.path),
@@ -193,16 +196,16 @@ function createMockedPluginContext<TOptions extends PluginType>(
     resolver: opts.resolver,
     plugin: opts.plugin,
     driver: opts.driver,
-    getPlugin: (name: string) => opts.driver.getPlugin(name),
-    getResolver: (name: string) => opts.driver.getResolver(name),
+    getPlugin,
+    getResolver: (name: string) => opts.driver.getResolver(name) ?? (name === opts.plugin.name ? opts.resolver : undefined),
     requirePlugin: (pluginName: string) => {
-      const plugin = opts.driver.getPlugin(pluginName)
+      const plugin = getPlugin(pluginName)
       if (!plugin) throw pluginNotFoundError({ pluginName, requiredBy: opts.plugin.name })
       return plugin
     },
     meta: opts.meta ?? {},
     schemas: opts.driver.inputNode?.schemas ?? [],
-    memo: opts.driver.memo.bind(opts.driver),
+    memo: opts.driver.memo,
     addFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.add(...files),
     upsertFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.upsert(...files),
     hooks: opts.driver.hooks ?? new Hookable<KubbHooks>(),

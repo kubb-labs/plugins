@@ -5,7 +5,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponses, FindPetsByTagsQuery } from './FindPetsByTags'
+import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsResponses } from './FindPetsByTags'
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { findPetsByTags } from './clients/findPetsByTags'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'

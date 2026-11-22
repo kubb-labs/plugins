@@ -5,6 +5,7 @@
 '@kubb/plugin-valibot': patch
 ---
 
-Register each plugin's printer with `setPrinter` from `@kubb/kit`. Generators read it as `ctx.printer` and pass per-node options through `printer.with(...)`, so the printer is built once per build instead of once per schema. Generated output is unchanged.
+Build each plugin's printer once per build with kit's `setPrinter`, instead of once per schema. Generated output is unchanged.
 
-zod and valibot no longer keep a printer or a directional-node cache in the build memo: each printer gets its own cache, and the `buildMemo` printer option is gone.
+- Generators read the printer as `ctx.printer` and pass per-node options with `printer.with(...)`.
+- Remove the `buildMemo` printer option from zod and valibot. Each printer keeps its own cache.

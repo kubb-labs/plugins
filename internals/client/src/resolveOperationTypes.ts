@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
-import { Diagnostics, type GeneratorContext, type Group, type Output, useKubb } from '@kubb/kit'
+import { Diagnostics, type GeneratorContext, useKubb } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
-import type { PluginZod, ResolverZod } from '@kubb/plugin-zod'
+import type { PluginZod } from '@kubb/plugin-zod'
 
 // A type-only import: the query plugins bundle this file but do not depend on @kubb/plugin-zod.
 const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
@@ -65,53 +65,13 @@ export function getResponseHeadersTypeNames({ node, types }: { node: ast.Operati
 }
 
 /**
- * Where a generated client sources its operation types, plus the resolver and output the file
- * declaring them is resolved with.
+ * Where a generated client sources its operation types, plus the resolver of the plugin that provides them.
  */
 export type OperationTypeSource = OperationTypeNames & {
   /**
-   * `plugin-ts` shaped resolver of the plugin supplying the names, also used to resolve the file they are exported from.
+   * `plugin-ts` shaped resolver of the plugin that provides `types`.
    */
   resolver: ResolverTs
-  /**
-   * The supplying plugin's own `output`, when it configured one.
-   */
-  output: Output | undefined
-  /**
-   * The supplying plugin's own `group`, when it configured one.
-   */
-  group: Group | undefined
-}
-
-/**
- * A `plugin-ts` shaped resolver whose operation type names point at the types `pluginZod({ inferred })`
- * exports next to each schema, so code written against `plugin-ts` names picks up the zod types.
- */
-function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
-  const type = (name: string) => resolver.schema.type(name)
-
-  return {
-    ...resolver,
-    // Class methods, so a spread drops them. `file` reads private fields, and `memo` gets its own key
-    // space so these type names never share an entry with the zod names.
-    file: resolver.file.bind(resolver),
-    memo: (key: string, compute: () => unknown) => resolver.memo(`zodTypes:${key}`, compute),
-    param: {
-      name: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.name(node, p)),
-      path: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.path(node, p)),
-      query: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.query(node, p)),
-      headers: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.headers(node, p)),
-      cookies: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.cookies(node, p)),
-    },
-    response: {
-      body: (node: ast.OperationNode) => type(resolver.response.body(node)),
-      status: (node: ast.OperationNode, statusCode: ast.StatusCode) => type(resolver.response.status(node, statusCode)),
-      response: (node: ast.OperationNode) => type(resolver.response.response(node)),
-      responses: (node: ast.OperationNode) => type(resolver.response.responses(node)),
-      headers: (node: ast.OperationNode, statusCode: ast.StatusCode) => type(resolver.response.headers(node, statusCode)),
-      options: (node: ast.OperationNode) => resolver.response.options(node),
-    },
-  } as unknown as ResolverTs
 }
 
 /**
@@ -131,15 +91,7 @@ export function resolveOperationTypes(): OperationTypeSource {
   const ctx = useKubb<GeneratorContext>()
   const pluginName = ctx.plugin.name
   return ctx.memo(`operationTypes:${pluginName}`, () => {
-    const pluginTs = ctx.getPlugin(pluginTsName)
-    const pluginZod = ctx.getPlugin(pluginZodName)
-
-    if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
-      const resolver = ctx.getResolver(pluginTsName)
-      return { response: resolver.response, resolver, output: pluginTs.options?.output, group: pluginTs.options?.group ?? undefined }
-    }
-
-    if (!pluginZod?.options?.inferred) {
+    if (!ctx.getPlugin(pluginTsName) && !ctx.getPlugin(pluginZodName)?.options?.inferred) {
       throw new Diagnostics.Error({
         code: Diagnostics.code.missingDependency,
         severity: 'error',
@@ -150,8 +102,9 @@ export function resolveOperationTypes(): OperationTypeSource {
       })
     }
 
-    const resolver = toZodTypeResolver(ctx.getResolver(pluginZodName))
-    return { response: resolver.response, resolver, output: pluginZod.options.output, group: pluginZod.options.group ?? undefined }
+    // plugin-ts and `pluginZod({ inferred })` provide `types`, and kit picks the provider by priority.
+    const resolver = ctx.getResolver('types')
+    return { response: resolver.response, resolver }
   })
 }
 
@@ -159,10 +112,6 @@ declare global {
   namespace Kubb {
     interface MemoRegistry {
       operationTypes: OperationTypeSource
-      /**
-       * Nests every key the zod-backed `ResolverTs` memoizes, so it holds each of their value types.
-       */
-      zodTypes: unknown
     }
   }
 }

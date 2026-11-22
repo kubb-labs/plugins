@@ -16,8 +16,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver, root } = ctx
-    const { output, query, mutation, client, group } = ctx.options
+    const { query, mutation, client } = ctx.options
 
     const { isMutation } = classifyOperation(node, { query, mutation })
 
@@ -26,15 +25,15 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
     const importPath = mutation ? mutation.importPath : 'swr/mutation'
 
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, ctx, node, root, output })
+    const contractOp = resolveClientOperation({ node, pluginName: client.pluginName })
     if (!contractOp) return null
 
-    const mutationHookName = resolver.mutation.name(node)
-    const mutationKeyName = resolver.mutation.keyName(node)
-    const mutationKeyTypeName = resolver.mutation.keyTypeName(node)
-    const mutationArgTypeName = resolver.mutation.argTypeName(node)
+    const mutationHookName = ctx.resolver.mutation.name(node)
+    const mutationKeyName = ctx.resolver.mutation.keyName(node)
+    const mutationKeyTypeName = ctx.resolver.mutation.keyTypeName(node)
+    const mutationArgTypeName = ctx.resolver.mutation.argTypeName(node)
 
-    const hook = resolveHookFile(node, { name: mutationHookName, output, group, contractOp, returnType: ctx.options.returnType })
+    const hook = resolveHookFile(node, { variant: 'mutation', contractOp, returnType: ctx.options.returnType })
 
     return (
       <HookFile hook={hook}>

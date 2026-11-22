@@ -18,8 +18,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver, root } = ctx
-    const { output, query, mutation, client, group, hooks } = ctx.options
+    const { query, mutation, client, hooks } = ctx.options
 
     const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
 
@@ -28,15 +27,15 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
     const importPath = query ? query.importPath : '@tanstack/vue-query'
 
     // The registered contract client plugin owns the `<op>` the composable imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, ctx, node, root, output })
+    const contractOp = resolveClientOperation({ node, pluginName: client.pluginName })
     if (!contractOp) return null
 
-    const queryName = resolver.query.name(node)
-    const queryOptionsName = resolver.query.optionsName(node)
-    const queryKeyName = resolver.query.keyName(node)
-    const queryKeyTypeName = resolver.query.keyTypeName(node)
+    const queryName = ctx.resolver.query.name(node)
+    const queryOptionsName = ctx.resolver.query.optionsName(node)
+    const queryKeyName = ctx.resolver.query.keyName(node)
+    const queryKeyTypeName = ctx.resolver.query.keyTypeName(node)
 
-    const hook = resolveHookFile(node, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName, returnType: ctx.options.returnType })
+    const hook = resolveHookFile(node, { contractOp, keyTypeName: queryKeyTypeName, returnType: ctx.options.returnType })
     const { tsResolver } = hook
 
     return (

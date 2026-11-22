@@ -1,4 +1,4 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
+import { addGenerator, defineExtension, getResolver, provide, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { typeGenerator } from './generators/typeGenerator.tsx'
@@ -64,6 +64,7 @@ export const pluginTs = defineExtension<PluginTs>({
     }
 
     setResolver(userResolver ? Resolver.merge(resolverTs, ...[userResolver].flat()) : resolverTs)
+    provide('types', () => getResolver(pluginTsName))
     if (userMacros?.length) {
       setMacros(userMacros)
     }
