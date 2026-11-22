@@ -1,5 +1,6 @@
 import { ast } from '@internals/ast'
-import { casing, defineGenerator } from '@kubb/kit'
+import { namedFile } from '@internals/shared'
+import { casing, code, defineGenerator } from '@kubb/kit'
 import type { PluginMsw } from '../types'
 
 /**
@@ -11,38 +12,18 @@ import type { PluginMsw } from '../types'
 export const handlersGenerator = defineGenerator<PluginMsw>({
   name: 'plugin-msw',
   operations(nodes, ctx) {
-    const { resolver, config, root } = ctx
-    const { output, group } = ctx.options
+    const handlersName = ctx.resolver.handler.listName()
+    const createHandlersName = ctx.resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })
+    const file = namedFile({ name: handlersName })
 
-    const handlersName = resolver.handler.listName()
-    const createHandlersName = resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })
-    const file = resolver.file({ name: handlersName, extname: '.ts', root, output, group: group ?? undefined })
-
-    const handlerNames = nodes.map((node) => resolver.handler.name(node))
-
-    const imports = nodes.map((node, index) => {
-      const operationName = handlerNames[index]!
-      const operationFile = resolver.file({
-        name: resolver.name(node.operationId),
-        extname: '.ts',
-        tag: node.tags[0] ?? 'default',
-        path: node.path,
-        root,
-        output,
-        group: group ?? undefined,
-      })
-      return ast.factory.createImport({ name: [operationName], root: file.path, path: operationFile.path })
-    })
-
-    const handlers = handlerNames.map((name) => `${name}(undefined, options)`)
+    const own = ctx.from().resolver
+    const handlerRefs = nodes.map((node) => own.handler.name(node))
+    const imports = code.join(handlerRefs).imports.map((imp) => ({ ...imp, root: file.path }))
+    const handlers = handlerRefs.map((ref) => `${ref}(undefined, options)`)
 
     return [
       ast.factory.createFile({
-        baseName: file.baseName,
-        path: file.path,
-        meta: file.meta,
-        banner: resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
-        footer: resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
+        ...file,
         imports,
         sources: [
           ast.factory.createSource({

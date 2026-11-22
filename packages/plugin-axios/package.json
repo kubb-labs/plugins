@@ -89,7 +89,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.23.1",
+    "@kubb/kit": "^5.23.2",
     "@kubb/plugin-client": "workspace:^"
   },
   "devDependencies": {

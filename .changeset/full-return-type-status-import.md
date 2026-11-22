@@ -4,4 +4,4 @@
 '@kubb/plugin-swr': patch
 ---
 
-With `returnType: 'full'`, hooks no longer import the unused success status type (such as `GetPetLimitsStatus200`) when the operation declares response headers. The import broke builds that enable `noUnusedLocals`.
+With `returnType: 'full'`, hooks no longer import the unused success status type, such as `GetPetLimitsStatus200`, which broke builds with `noUnusedLocals`.

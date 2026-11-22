@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
-import { resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
-import { defineGenerator, operationKey } from '@kubb/kit'
+import { resolveOperationTypeNames } from '@internals/shared'
+import { code, defineGenerator, operationKey } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
@@ -16,38 +16,26 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { config, resolver, root } = ctx
-    const { output, baseURL, group } = ctx.options
+    const { baseURL } = ctx.options
 
-    const pluginTs = ctx.requirePlugin(pluginTsName)
-
+    const types = ctx.from(pluginTsName)
     const tsResolver = ctx.getResolver(pluginTsName)
-
-    const importedTypeNames = [tsResolver.response.options(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })]
-    const name = resolver.name(node.operationId)
+    const { imports } = code.join([
+      types.resolver.response.options(node),
+      ...resolveOperationTypeNames(node, tsResolver, { includeParams: false }).map((typeName) => types.ref(node, typeName)),
+    ])
+    const name = ctx.resolver.name(node.operationId)
 
     const meta = {
-      name: resolver.resolveName({ key: operationKey(node), name }),
-      file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
-      fileTs: resolveOperationFile({
-        ctx,
-        node,
-        resolver: tsResolver,
-        root,
-        output: pluginTs.options?.output ?? output,
-        group: pluginTs.options?.group,
-      }),
+      name: ctx.resolver.resolveName({ key: operationKey(node), name }),
+      file: ctx.file(node),
     } as const
 
     return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
-        <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
+      <File {...meta.file}>
+        {imports.map((imp) => (
+          <File.Import key={imp.path} {...imp} root={meta.file.path} isTypeOnly />
+        ))}
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>
     )

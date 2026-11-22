@@ -38,8 +38,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   },
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver, root } = ctx
-    const { output, query, infinite, client, group } = ctx.options
+    const { query, infinite, client } = ctx.options
 
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
     if (!infiniteOptions) return null
@@ -50,24 +49,22 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     const importPath = query ? query.importPath : '@tanstack/vue-query'
 
     // The registered contract client plugin owns the `<op>` the composable imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, ctx, node, root, output })
+    const contractOp = resolveClientOperation({ node, pluginName: client.pluginName })
     if (!contractOp) return null
 
-    const queryName = resolver.infiniteQuery.name(node)
-    const queryOptionsName = resolver.infiniteQuery.optionsName(node)
-    const queryKeyName = resolver.infiniteQuery.keyName(node)
-    const queryKeyTypeName = resolver.infiniteQuery.keyTypeName(node)
+    const queryName = ctx.resolver.infiniteQuery.name(node)
+    const queryOptionsName = ctx.resolver.infiniteQuery.optionsName(node)
+    const queryKeyName = ctx.resolver.infiniteQuery.keyName(node)
+    const queryKeyTypeName = ctx.resolver.infiniteQuery.keyTypeName(node)
 
-    const hook = resolveHookFile(node, ctx, {
-      name: queryName,
-      output,
-      group,
+    const hook = resolveHookFile(node, {
+      variant: 'Infinite',
       contractOp,
       returnType: ctx.options.returnType,
       keyTypeName: queryKeyTypeName,
       extraTypeNames: [
         resolvePageParamType(node, {
-          resolver: resolveOperationTypes(ctx, ctx.resolver.pluginName).resolver,
+          resolver: resolveOperationTypes().resolver,
           initialPageParam: infiniteOptions.initialPageParam,
           queryParam: infiniteOptions.queryParam,
         }).queryParamsTypeName,

@@ -75,6 +75,11 @@ export type PrinterZodOptions = {
    */
   resolver?: ResolverZod
   /**
+   * Caches the directional-node lookups of `containsDirectionalNode`. The `setPrinter` factory creates
+   * one per printer, so the cache lives as long as that printer. Without it, nothing is cached.
+   */
+  directionalCache?: WeakMap<ast.SchemaNode, ast.SchemaNode | null>
+  /**
    * Properties to exclude using `.omit({ key: true })`.
    */
   keysToOmit?: Array<string> | null
@@ -261,18 +266,9 @@ export function containsDirectionalNode({
     ast.schema.find(node, {
       predicate: (schema) => variesByDirection({ node: schema, printerOptions, mini }),
       follow: ['ref'],
-      cache: getDirectionalCache(printerOptions),
+      cache: printerOptions.directionalCache,
     }) !== undefined
   )
-}
-
-/**
- * The `find` cache for {@link containsDirectionalNode}, one per plugin per build and per option set
- * the probe reads. A `printer.nodes` override has no string key, so it searches without a cache.
- */
-function getDirectionalCache({ resolver, nodes, coercion, dateType }: PrinterZodOptions) {
-  if (!resolver || nodes) return undefined
-  return resolver.memo(`zodDirectionalNodes:${shouldCoerce(coercion, 'dates')}:${dateType}`, () => new WeakMap<ast.SchemaNode, ast.SchemaNode | null>())
 }
 
 /**

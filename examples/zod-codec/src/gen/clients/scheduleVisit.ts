@@ -8,12 +8,12 @@ import type { ScheduleVisitOptionsSchemaType, ScheduleVisitResponsesSchemaType }
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client.ts'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema.ts'
 import {
-  scheduleVisitResponseSchema,
-  scheduleVisitStatus409Schema,
   scheduleVisitBodySchema,
+  scheduleVisitHeadersSchema,
   scheduleVisitPathSchema,
   scheduleVisitQuerySchema,
-  scheduleVisitHeadersSchema,
+  scheduleVisitResponseSchema,
+  scheduleVisitStatus409Schema,
 } from '../zod/scheduleVisitSchema.ts'
 
 /**

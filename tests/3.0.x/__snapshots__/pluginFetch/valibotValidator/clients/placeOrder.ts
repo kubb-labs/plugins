@@ -6,7 +6,7 @@
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
-import { placeOrderResponseSchema, placeOrderStatus405Schema, placeOrderBodySchema } from '../valibot/placeOrderSchema'
+import { placeOrderBodySchema, placeOrderResponseSchema, placeOrderStatus405Schema } from '../valibot/placeOrderSchema'
 
 /**
  * `POST /store/order`

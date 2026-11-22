@@ -6,8 +6,8 @@ import type { PluginMsw } from '../types.ts'
  * paths for every generated MSW handler. Function names get a `Handler`
  * suffix; the aggregate export is always `handlers`.
  *
- * The top-level `name` applies the `handler` suffix, and `file` falls back to the built-in
- * `toFilePath` casing. Operation-specific naming is grouped under the `handler` namespace.
+ * The top-level `name` applies the `handler` suffix, and `file.name` names each file from the `operationId`, so a `name`
+ * override leaves the files alone. Operation-specific naming is grouped under the `handler` namespace.
  *
  * @example Resolve a handler name
  * ```ts
@@ -18,6 +18,12 @@ import type { PluginMsw } from '../types.ts'
  */
 export const resolverMsw = createResolver<PluginMsw>({
   pluginName: 'plugin-msw',
+  file: {
+    // The default handler name, not `this.name`, so a `name` override renames identifiers and leaves files alone.
+    name(node) {
+      return node.kind === 'Operation' ? casing.camel(node.operationId, { suffix: 'handler' }) : undefined
+    },
+  },
   name(name) {
     return this.memo(`name:${name}`, () => casing.camel(name, { suffix: 'handler' }))
   },

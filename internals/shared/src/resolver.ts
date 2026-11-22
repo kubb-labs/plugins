@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import { ensureValidVarName } from '@internals/utils'
-import { casing } from '@kubb/kit'
-import type { GeneratorContext, Resolver } from '@kubb/kit'
+import { casing, memo, useKubb } from '@kubb/kit'
+import type { FileTarget, GeneratorContext, Group, Output, PrinterContext, Resolver, ResolverFileParams } from '@kubb/kit'
 
 /**
  * The shared top-level `name` of the operation plugins, computed once per operation name and build.
@@ -10,20 +10,39 @@ export function resolveOperationName(this: Resolver, name: string): string {
   return this.memo(`operation:${name}`, () => ensureValidVarName(casing.camel(name)))
 }
 
-type SchemaIndexContext = Pick<GeneratorContext, 'memo' | 'schemas'>
+/** `ctx.file(node)` for a file that no single node owns, such as `handlers.ts`: path, banner and footer from the current plugin. */
+export function namedFile(entry: Pick<ResolverFileParams, 'name' | 'tag'> & { extname?: ResolverFileParams['extname'] }): FileTarget {
+  const ctx = useKubb<GeneratorContext>()
+  const { output, group } = ctx.options as { output: Output; group?: Group | null }
+  const file = ctx.resolver.file({ extname: '.ts', ...entry, root: ctx.root, output, group: group ?? undefined })
+  const fileContext = { output, config: ctx.config, file: { path: file.path, baseName: file.baseName } }
 
-/**
- * Names of the schemas in a circular reference chain, computed once per build.
- */
-export function getCircularNames(ctx: SchemaIndexContext): ReadonlySet<string> {
-  return ctx.memo('circularNames:set', () => ast.graph.getCircularNames(ctx.schemas))
+  return {
+    baseName: file.baseName,
+    path: file.path,
+    meta: file.meta,
+    banner: ctx.resolver.default.banner(ctx.meta, fileContext),
+    footer: ctx.resolver.default.footer(ctx.meta, fileContext),
+  }
 }
 
 /**
- * Names of the schemas whose type is `enum`, computed once per build.
+ * Names of the schemas in a circular reference chain, computed once per build. Reads the current context, so call it
+ * in a generator or a printer factory.
  */
-export function getEnumNames(ctx: SchemaIndexContext): ReadonlySet<string> {
-  return ctx.memo('enumNames:set', () => new Set(ctx.schemas.flatMap((schema) => (schema.type === 'enum' && schema.name ? [schema.name] : []))))
+export function getCircularNames(): ReadonlySet<string> {
+  return memo('circularNames:set', () => ast.graph.getCircularNames(useKubb<PrinterContext>().schemas))
+}
+
+/**
+ * Names of the schemas whose type is `enum`, computed once per build. Reads the current context, so call it
+ * in a generator or a printer factory.
+ */
+export function getEnumNames(): ReadonlySet<string> {
+  return memo(
+    'enumNames:set',
+    () => new Set(useKubb<PrinterContext>().schemas.flatMap((schema) => (schema.type === 'enum' && schema.name ? [schema.name] : []))),
+  )
 }
 
 declare global {

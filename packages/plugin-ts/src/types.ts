@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
 import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
-import type { PrinterTsNodes } from './printers/printerTs.ts'
+import type { PrinterTsFactory, PrinterTsNodes } from './printers/printerTs.ts'
 /**
  * The concrete resolver type for `@kubb/plugin-ts`.
  * Extends the base `Resolver` (which provides `default` naming and option helpers, the top-level
@@ -329,12 +329,18 @@ export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   printer: Options['printer']
 }
 
-export type PluginTs = PluginType<'plugin-ts', Options, ResolvedOptions, ResolverTs>
+export type PluginTs = PluginType<'plugin-ts', Options, ResolvedOptions, ResolverTs, ast.Printer<PrinterTsFactory>>
 
 declare global {
   namespace Kubb {
     interface PluginRegistry {
       'plugin-ts': PluginTs
+    }
+    interface ProvideRegistry {
+      /**
+       * Operation and schema type names, from plugin-ts or `pluginZod({ inferred })`.
+       */
+      types: ResolverTs
     }
   }
 }

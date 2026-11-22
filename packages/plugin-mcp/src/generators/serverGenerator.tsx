@@ -1,8 +1,8 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
-import { operationFileEntry, resolveOperationFile, getStream } from '@internals/shared'
+import { getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
-import { defineGenerator } from '@kubb/kit'
+import { code, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
@@ -19,17 +19,15 @@ export const serverGenerator = defineGenerator<PluginMcp>({
   name: 'operations',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { config, resolver, plugin, root } = ctx
-    const { output, group } = ctx.options
+    const { output } = ctx.options
 
-    const pluginZod = ctx.requirePlugin(pluginZodName)
-
-    const zodResolver = ctx.getResolver(pluginZodName)
+    const handlers = ctx.from().resolver
+    const schemas = ctx.from(pluginZodName).resolver
 
     const fileAt = <TName extends `${string}.${string}`>(baseName: TName) => ({
       baseName,
-      path: path.resolve(root, output.path, baseName),
-      meta: { pluginName: plugin.name },
+      path: path.resolve(ctx.root, output.path, baseName),
+      meta: { pluginName: ctx.plugin.name },
     })
     const serverFile = fileAt('server.ts')
     const startFile = fileAt('start.ts')
@@ -42,7 +40,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         [ctx.meta.title || 'server']: {
           type: 'stdio',
           command: 'npx',
-          args: ['tsx', getRelativePath(path.resolve(config.root), startFile.path)],
+          args: ['tsx', getRelativePath(path.resolve(ctx.config.root), startFile.path)],
         },
       },
     }
@@ -57,21 +55,13 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       .map((node) => {
         const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)
 
-        const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
-        const zodFile = resolveOperationFile({
-          ctx,
-          node,
-          resolver: zodResolver,
-          root,
-          output: pluginZod.options?.output ?? output,
-          group: pluginZod.options?.group ?? undefined,
-        })
-
-        const requestName = ast.http.requestBody.getSchema(node) ? zodResolver.response.body(node) : null
+        const handler = handlers.handler.name(node)
+        const request = ast.http.requestBody.getSchema(node) ? schemas.response.body(node) : null
         const successStatus = ast.http.responses.findPrimary(node)?.statusCode
-        const responseName = successStatus ? zodResolver.response.status(node, successStatus) : null
+        const response = successStatus ? schemas.response.status(node, successStatus) : null
+        const paramRefs = [...pathParams, ...queryParams, ...headerParams, ...cookieParams].map((p) => schemas.param.name(node, p))
 
-        const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.param.name(node, p) }))
+        const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: schemas.param.name(node, p).name }))
         const resolveOptional = (params: typeof pathParams) => (params.length ? resolveParams(params) : null)
 
         return {
@@ -81,38 +71,23 @@ export const serverGenerator = defineGenerator<PluginMcp>({
             description: node.description || `Make a ${node.method.toUpperCase()} request to ${node.path}`,
           },
           mcp: {
-            name: resolver.handler.name(node),
-            file: mcpFile,
+            name: handler.name,
           },
           zod: {
             pathParams: resolveParams(pathParams),
             queryParams: resolveOptional(queryParams),
             headerParams: resolveOptional(headerParams),
             cookieParams: resolveOptional(cookieParams),
-            requestName,
-            responseName,
-            file: zodFile,
+            requestName: request?.name ?? null,
+            responseName: response?.name ?? null,
           },
+          source: code.join([handler, ...paramRefs, request, response]),
         }
       })
 
-    const imports = operationsMapped.flatMap(({ mcp, zod }) => {
-      const zodNames = [
-        ...zod.pathParams.map((p) => p.schemaName),
-        ...(typeof zod.queryParams === 'string' ? [zod.queryParams] : (zod.queryParams ?? []).map((p) => p.schemaName)),
-        ...(zod.headerParams ?? []).map((p) => p.schemaName),
-        ...(zod.cookieParams ?? []).map((p) => p.schemaName),
-        zod.requestName,
-        zod.responseName,
-      ].filter((name): name is string => Boolean(name))
-
-      const uniqueNames = [...new Set(zodNames)].sort()
-
-      return [
-        <File.Import key={mcp.name} name={[mcp.name]} root={serverFile.path} path={mcp.file.path} />,
-        uniqueNames.length > 0 && <File.Import key={`zod-${mcp.name}`} name={uniqueNames} root={serverFile.path} path={zod.file.path} />,
-      ].filter(Boolean)
-    })
+    const imports = operationsMapped.flatMap(({ mcp, source }) =>
+      source.imports.map((imp) => <File.Import key={`${mcp.name}:${imp.path}`} {...imp} root={serverFile.path} />),
+    )
 
     return (
       <>
@@ -120,8 +95,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           baseName={serverFile.baseName}
           path={serverFile.path}
           meta={serverFile.meta}
-          banner={resolver.default.banner(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
-          footer={resolver.default.footer(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
+          banner={ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
+          footer={ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
         >
           <File.Import name={['McpServer']} path={'@modelcontextprotocol/server'} />
           <File.Import name={['serveStdio']} path={'@modelcontextprotocol/server/stdio'} />
@@ -135,8 +110,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           baseName={startFile.baseName}
           path={startFile.path}
           meta={startFile.meta}
-          banner={resolver.default.banner(ctx.meta, { output, config, file: { path: startFile.path, baseName: startFile.baseName } })}
-          footer={resolver.default.footer(ctx.meta, { output, config, file: { path: startFile.path, baseName: startFile.baseName } })}
+          banner={ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: startFile.path, baseName: startFile.baseName } })}
+          footer={ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: startFile.path, baseName: startFile.baseName } })}
         >
           <File.Import name={['startServer']} root={startFile.path} path={serverFile.path} />
           {/* Not indexable: barrels must not re-export this entry, importing it starts the server. */}

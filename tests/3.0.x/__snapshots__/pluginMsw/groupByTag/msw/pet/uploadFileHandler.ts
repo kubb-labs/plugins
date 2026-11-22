@@ -4,7 +4,7 @@
 */
 
 import type { MswBody } from '../../.kubb/mswBody'
-import type { UploadFileResponse, UploadFileBody } from '../../types/UploadFile'
+import type { UploadFileBody, UploadFileResponse } from '../../types/UploadFile'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 

@@ -1,6 +1,7 @@
 import { ast } from '@internals/ast'
 import { createRequire } from 'node:module'
-import { createPrinter, Diagnostics } from '@kubb/kit'
+import { getEnumNames } from '@internals/shared'
+import { createPrinter, Diagnostics, type PrinterFactory } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'
@@ -399,3 +400,20 @@ export const printerTs = createPrinter<PrinterTs>((options) => {
     },
   }
 })
+
+/**
+ * The `setPrinter` factory of `@kubb/plugin-ts`. Generators get its printer as `ctx.printer` and pass
+ * per-node options, such as `name` and `keysToOmit`, through `printer.with(...)`.
+ */
+export const createPrinterTs: PrinterFactory<PluginTs> = (ctx) => {
+  const { optionalType, arrayType, enum: enumOptions, syntaxType, printer } = ctx.options
+  return printerTs({
+    optionalType,
+    arrayType,
+    enum: enumOptions,
+    syntaxType,
+    resolver: ctx.resolver,
+    enumSchemaNames: getEnumNames(),
+    nodes: printer?.nodes,
+  })
+}

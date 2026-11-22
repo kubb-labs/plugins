@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
-import { getEnumNames, resolveOperationFile } from '@internals/shared'
-import { defineGenerator } from '@kubb/kit'
+import { getEnumNames } from '@internals/shared'
+import { code, defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -20,53 +20,26 @@ export const mswGenerator = defineGenerator<PluginMsw>({
   renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { resolver, config, root } = ctx
-    const { output, parser, baseURL, group } = ctx.options
+    const { parser, baseURL } = ctx.options
 
-    const fileName = resolver.name(node.operationId)
     const mock = {
-      name: resolver.handler.name(node),
-      file: resolver.file({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
+      name: ctx.resolver.handler.name(node),
+      file: ctx.file(node),
     }
 
-    const fakerPlugin = parser === 'faker' ? ctx.requirePlugin(pluginFakerName) : null
-    const fakerResolver = fakerPlugin ? ctx.getResolver(pluginFakerName) : null
-    const faker =
-      fakerPlugin && fakerResolver
-        ? {
-            name: fakerResolver.response.response(node),
-            file: resolveOperationFile({
-              ctx,
-              node,
-              resolver: fakerResolver,
-              root,
-              output: fakerPlugin.options?.output ?? output,
-              group: fakerPlugin.options?.group ?? undefined,
-            }),
-          }
-        : null
+    const faker = parser === 'faker' ? ctx.from(pluginFakerName).resolver.response.response(node) : null
 
     const pluginTs = ctx.requirePlugin(pluginTsName)
     const tsResolver = ctx.getResolver(pluginTsName)
-
-    const type = {
-      file: resolveOperationFile({
-        ctx,
-        node,
-        resolver: tsResolver,
-        root,
-        output: pluginTs.options?.output ?? output,
-        group: pluginTs.options?.group,
-      }),
-      responseName: tsResolver.response.response(node),
-    }
+    const typeRefs = ctx.from(pluginTsName).resolver
+    const responseType = typeRefs.response.response(node)
 
     const successResponses = ast.http.responses.filterSuccess(node)
     const referencedNames = ast.http.responses.getImportedNames(node.responses)
     const enumOptions = pluginTs.options?.enum
-    const enumNames = getEnumNames(ctx)
+    const enumNames = getEnumNames()
     const hasResponseNameCollision = referencedNames.some((name) => {
-      return enumTypeName({ resolver: tsResolver, name, enumOptions, isEnum: enumNames.has(name) }) === type.responseName
+      return enumTypeName({ resolver: tsResolver, name, enumOptions, isEnum: enumNames.has(name) }) === responseType.name
     })
     // One helper per documented status, a range such as `4xx` included. `default` has no status to mock,
     // and the Fetch `Response` constructor rejects a `1xx` status.
@@ -74,44 +47,37 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       .filter((response) => response.statusCode !== 'default' && ast.http.status.getClass(response) !== 1)
       .map((response) => {
         const isResponseType = ast.http.status.isSuccess(response) && !hasResponseNameCollision
-        return [response, isResponseType ? type.responseName : tsResolver.response.status(node, response.statusCode)] as const
+        return [response, isResponseType ? responseType : typeRefs.response.status(node, response.statusCode)] as const
       })
-    const responseTypeNames = types.map(([, typeName]) => typeName)
     const mockResponseName =
-      hasResponseNameCollision && successResponses[0] ? tsResolver.response.status(node, successResponses[0].statusCode) : type.responseName
+      hasResponseNameCollision && successResponses[0] ? tsResolver.response.status(node, successResponses[0].statusCode) : responseType.name
     const hasSuccessSchema = successResponses.some((response) => hasResponseSchema(response))
     // The handler calls the helper of the response it mocks when that helper takes the handler's own data type.
     const primaryResponse = ast.http.responses.findPrimary(node)
     const responseHelperName =
       primaryResponse &&
       hasResponseSchema(primaryResponse) &&
-      types.some(([response, typeName]) => response.statusCode === primaryResponse.statusCode && typeName === mockResponseName)
+      types.some(([response, type]) => response.statusCode === primaryResponse.statusCode && type.name === mockResponseName)
         ? `${mock.name}Response${primaryResponse.statusCode}`
         : undefined
 
-    const requestName = ast.http.requestBody.getSchema(node) ? tsResolver.response.body(node) : null
+    const request = ast.http.requestBody.getSchema(node) ? typeRefs.response.body(node) : null
+    const requestName = request?.name ?? null
+    const { imports: typeImports } = code.join([!hasResponseNameCollision && responseType, ...types.map(([, type]) => type), request])
+    const fakerImport = hasSuccessSchema ? faker?.import : null
 
     return (
-      <File
-        baseName={mock.file.baseName}
-        path={mock.file.path}
-        meta={mock.file.meta}
-        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
-        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
-      >
+      <File {...mock.file}>
         <File.Import name={['http', 'HttpResponse']} path="msw/http" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
-        {requestName && <File.Import name={['MswBody']} isTypeOnly root={mock.file.path} path={mswBodyPath(config)} />}
-        <File.Import
-          name={Array.from(new Set([...(hasResponseNameCollision ? [] : [type.responseName]), ...responseTypeNames, ...(requestName ? [requestName] : [])]))}
-          path={type.file.path}
-          root={mock.file.path}
-          isTypeOnly
-        />
-        {faker && hasSuccessSchema && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
+        {requestName && <File.Import name={['MswBody']} isTypeOnly root={mock.file.path} path={mswBodyPath(ctx.config)} />}
+        {typeImports.map((imp) => (
+          <File.Import key={imp.path} {...imp} root={mock.file.path} isTypeOnly />
+        ))}
+        {fakerImport && <File.Import {...fakerImport} root={mock.file.path} />}
 
-        {types.map(([response, typeName]) => (
-          <Response key={response.statusCode} typeName={typeName} response={response} name={mock.name} />
+        {types.map(([response, type]) => (
+          <Response key={response.statusCode} typeName={type.name} response={response} name={mock.name} />
         ))}
 
         <Mock

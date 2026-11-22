@@ -1,4 +1,3 @@
-import type { ast } from '@internals/ast'
 import { text } from '@kubb/kit'
 import { Const, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -34,7 +33,6 @@ type Props = {
     }
     mcp: {
       name: string
-      file: ast.FileNode
     }
     zod: {
       pathParams: Array<ZodParam>

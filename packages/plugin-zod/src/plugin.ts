@@ -1,8 +1,9 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from '@kubb/kit'
+import { addGenerator, defineExtension, getResolver, provide, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { zodGenerator } from './generators/zodGenerator.tsx'
+import { createPrinterZod, zodGenerator } from './generators/zodGenerator.tsx'
 import { resolverZod } from './resolvers/resolverZod.ts'
+import { toZodTypeResolver } from './resolvers/toZodTypeResolver.ts'
 import type { PluginZod } from './types.ts'
 
 /**
@@ -62,9 +63,15 @@ export const pluginZod = defineExtension<PluginZod>({
     } = options
 
     setResolver(userResolver ? Resolver.merge(resolverZod, ...[userResolver].flat()) : resolverZod)
+    const resolvedInferred = inferred === 'direction' ? 'codec' : inferred
+    // Codec types carry the domain value, so they win over plugin-ts. Plain inferred types are the fallback without plugin-ts.
+    if (resolvedInferred) {
+      provide('types', () => toZodTypeResolver(getResolver(pluginZodName)), { priority: resolvedInferred === 'codec' ? 1 : -1 })
+    }
     if (userMacros?.length) {
       setMacros(userMacros)
     }
+    setPrinter(createPrinterZod)
     addGenerator(zodGenerator)
 
     return {
@@ -76,7 +83,7 @@ export const pluginZod = defineExtension<PluginZod>({
       importPath,
       coercion,
       // `'direction'` is the deprecated name of `'codec'`.
-      inferred: inferred === 'direction' ? 'codec' : inferred,
+      inferred: resolvedInferred,
       guidType,
       regexType,
       oneOfType,

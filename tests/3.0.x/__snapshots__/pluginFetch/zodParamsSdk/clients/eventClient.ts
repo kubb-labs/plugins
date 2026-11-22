@@ -9,9 +9,9 @@ import type { ListEventsOptionsSchemaType, ListEventsResponsesSchemaType } from 
 import type { PutEventOptionsSchemaType, PutEventResponsesSchemaType } from '../zod/putEventSchema'
 import { createClient, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema'
-import { getResourceResponseSchema, getResourcePathSchema, getResourceQuerySchema, getResourceHeadersSchema } from '../zod/getResourceSchema'
-import { listEventsResponseSchema, listEventsQuerySchema } from '../zod/listEventsSchema'
-import { putEventResponseSchema, putEventStatus409Schema, putEventBodySchema, putEventPathSchema, putEventQuerySchema, putEventHeadersSchema } from '../zod/putEventSchema'
+import { getResourceHeadersSchema, getResourcePathSchema, getResourceQuerySchema, getResourceResponseSchema } from '../zod/getResourceSchema'
+import { listEventsQuerySchema, listEventsResponseSchema } from '../zod/listEventsSchema'
+import { putEventBodySchema, putEventHeadersSchema, putEventPathSchema, putEventQuerySchema, putEventResponseSchema, putEventStatus409Schema } from '../zod/putEventSchema'
 
 export class EventClient {
   readonly client: ClientInstance

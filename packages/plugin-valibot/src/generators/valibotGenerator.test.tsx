@@ -12,7 +12,7 @@ import {
 } from '#mocks'
 import { resolverValibot } from '../resolvers/resolverValibot.ts'
 import type { PluginValibot } from '../types.ts'
-import { valibotGenerator } from './valibotGenerator.tsx'
+import { createPrinterValibot, valibotGenerator } from './valibotGenerator.tsx'
 
 const { createContent, createSchema, createProperty, createOperation, createParameter, createResponse } = ast.factory
 
@@ -85,7 +85,7 @@ describe('valibotGenerator schema', () => {
   test.each(schemas)('$name', async ({ name, node, options }) => {
     const { driver, context } = setup(name, options)
 
-    await renderGeneratorSchema(valibotGenerator, node, { ...context, driver })
+    await renderGeneratorSchema(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, name)
   })
@@ -93,13 +93,14 @@ describe('valibotGenerator schema', () => {
   test('typeGuards adds an is* guard and an assert* function', async () => {
     const { driver, context } = setup('typeGuards', { typeGuards: true })
 
-    await renderGeneratorSchema(valibotGenerator, createSchema({ type: 'integer', name: 'PetId' }), { ...context, driver })
+    await renderGeneratorSchema(valibotGenerator, createSchema({ type: 'integer', name: 'PetId' }), { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'typeGuards')
   })
 
   test('a schema with a Date field also gets an input variant that encodes', async () => {
     const { driver, context } = setup('inputVariant', { inferred: true })
+    driver.inputNode = ast.factory.createInput({ schemas: [staySchema] })
     const node = createSchema({
       type: 'object',
       primitive: 'object',
@@ -110,7 +111,7 @@ describe('valibotGenerator schema', () => {
       ],
     })
 
-    await renderGeneratorSchema(valibotGenerator, node, { ...context, driver })
+    await renderGeneratorSchema(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'inputVariant')
   })
@@ -119,7 +120,7 @@ describe('valibotGenerator schema', () => {
     const { driver, context } = setup('circular', { inferred: true })
     driver.inputNode = ast.factory.createInput({ schemas: [petSchema] })
 
-    await renderGeneratorSchema(valibotGenerator, petSchema, { ...context, driver })
+    await renderGeneratorSchema(valibotGenerator, petSchema, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'circular')
   })
@@ -195,7 +196,7 @@ describe('valibotGenerator operation', () => {
       responses: [createResponse({ statusCode: '204', description: 'Created' })],
     })
 
-    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
+    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'circularBody')
   })
@@ -238,7 +239,7 @@ describe('valibotGenerator operation', () => {
       responses: [createResponse({ statusCode: '204', description: 'Created' })],
     })
 
-    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
+    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'circularAllOfBody')
   })
@@ -256,7 +257,7 @@ describe('valibotGenerator operation', () => {
       responses: [createResponse({ statusCode: '200', schema: stayRef(), description: 'Booked' })],
     })
 
-    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
+    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'codec')
   })
@@ -264,7 +265,7 @@ describe('valibotGenerator operation', () => {
   test.each(operations)('$name', async ({ name, node, options }) => {
     const { driver, context } = setup(name, options)
 
-    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver })
+    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, name)
   })

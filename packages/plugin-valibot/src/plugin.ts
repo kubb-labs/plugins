@@ -1,7 +1,7 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from '@kubb/kit'
+import { addGenerator, defineExtension, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { valibotGenerator } from './generators/valibotGenerator.tsx'
+import { createPrinterValibot, valibotGenerator } from './generators/valibotGenerator.tsx'
 import { resolverValibot } from './resolvers/resolverValibot.ts'
 import type { PluginValibot } from './types.ts'
 
@@ -57,6 +57,7 @@ export const pluginValibot = defineExtension<PluginValibot>({
     if (userMacros?.length) {
       setMacros(userMacros)
     }
+    setPrinter(createPrinterValibot)
     addGenerator(valibotGenerator)
 
     return {

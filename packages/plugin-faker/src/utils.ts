@@ -2,7 +2,7 @@ import { ast } from '@internals/ast'
 import { posix } from 'node:path'
 import { toResponseContent } from '@internals/shared'
 import { ensureValidVarName, getRelativePath } from '@internals/utils'
-import { casing } from '@kubb/kit'
+import { casing, type RefName } from '@kubb/kit'
 import type { ResolverFaker } from './types.ts'
 
 /** The identifier a `dateParser` module is imported and called under: `my-date-lib` becomes `myDateLib`. */
@@ -115,40 +115,37 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
 }
 
 /**
- * Resolves a type reference, determining if it needs an import statement or inline type reference.
- * Takes into account whether the type can be overridden and the file paths.
+ * Resolves how a faker names its type: through the type's import, or inline as `import('…').Type` when the
+ * faker has the same name as the type. Takes into account whether the type can be overridden.
  */
 export function resolveTypeReference({
   node,
   canOverride,
   name,
-  typeName,
+  type,
   filePath,
-  typeFilePath,
 }: {
   node: ast.SchemaNode
   canOverride: boolean
   name: string
-  typeName: string
+  type: RefName
   filePath: string
-  typeFilePath: string
-}): { importPath?: string; typeName: string } {
+}): { import: ast.ImportNode | null; typeName: string } {
+  const typeName = type.name
   const { usesTypeName } = resolveFakerTypeUsage(node, typeName, canOverride)
 
   if (!usesTypeName) {
-    return { typeName }
+    return { import: null, typeName }
   }
 
   if (name === typeName) {
     return {
-      typeName: `import('${getRelativePath(posix.dirname(filePath), typeFilePath)}').${typeName}`,
+      import: null,
+      typeName: type.import ? `import('${getRelativePath(posix.dirname(filePath), type.import.path)}').${typeName}` : typeName,
     }
   }
 
-  return {
-    importPath: typeFilePath,
-    typeName,
-  }
+  return { import: type.import, typeName }
 }
 
 /**
