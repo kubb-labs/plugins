@@ -215,7 +215,7 @@ describe("typeGenerator — operations: 'inline'", () => {
     ],
   })
 
-  test('marks every operation source inline, printed without enum declarations or property JSDoc', async () => {
+  test('marks the operation file inline, with bodies printed without enum declarations or property JSDoc', async () => {
     const resolver = Resolver.merge(apiResolver)
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions, operations: 'inline' }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver })
@@ -232,8 +232,12 @@ describe("typeGenerator — operations: 'inline'", () => {
     })
 
     const [file] = driver.fileManager.files
-    expect(file!.sources.length > 0 && file!.sources.every((source) => source.inline)).toBe(true)
-    expect(Object.fromEntries(file!.sources.map((source) => [source.name, source.inline?.expression]))).toMatchInlineSnapshot(`
+    expect(file!.inline).toBe(true)
+    const body = (source: ast.SourceNode) => {
+      const declaration = source.nodes?.[0]
+      return declaration && 'nodes' in declaration ? ast.node.getText(declaration.nodes) : undefined
+    }
+    expect(Object.fromEntries(file!.sources.map((source) => [source.name, body(source)]))).toMatchInlineSnapshot(`
       {
         "ApiCreatePetBody": "ApiCreatePetBodyJson",
         "ApiCreatePetBodyJson": "ApiNewPet",

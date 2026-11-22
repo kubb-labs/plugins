@@ -32,9 +32,9 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
       ?.replace(/\/\*\*[\s\S]*?\*\/\s*/g, '')
     if (!expression) return
 
-    // The file is never written. The body becomes the inline expression and keeps its imports in use.
+    // The operation file is `inline`, so it is never written and importers take this body in place of the name.
     return (
-      <TypeDeclaration export name={name} inline>
+      <TypeDeclaration export name={name}>
         {expression}
       </TypeDeclaration>
     )
