@@ -76,7 +76,7 @@
     "@kubb/ast": "^5.23.2",
     "@kubb/kit": "^5.23.2",
     "@kubb/renderer-jsx": "^5.23.2",
-    "yuku-codegen": "^0.19.0"
+    "yuku": "^0.28.1"
   },
   "devDependencies": {
     "@internals/ast": "workspace:*",
