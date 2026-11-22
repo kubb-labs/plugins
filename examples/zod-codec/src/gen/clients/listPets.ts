@@ -6,7 +6,7 @@
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client.ts'
 import type { ListPetsOptionsSchemaType, ListPetsResponsesSchemaType } from '../zod/listPetsSchema.ts'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client.ts'
-import { listPetsResponseSchema, listPetsQuerySchema } from '../zod/listPetsSchema.ts'
+import { listPetsQuerySchema, listPetsResponseSchema } from '../zod/listPetsSchema.ts'
 
 /**
  * `GET /pets`

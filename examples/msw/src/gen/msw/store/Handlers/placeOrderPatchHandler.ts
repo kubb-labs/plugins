@@ -4,7 +4,7 @@
  */
 
 import type { MswBody } from '../../../.kubb/mswBody'
-import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405, PlaceOrderPatchBody } from '../../../models/PlaceOrderPatch'
+import type { PlaceOrderPatchBody, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../../models/PlaceOrderPatch'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 
