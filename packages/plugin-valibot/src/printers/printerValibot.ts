@@ -52,11 +52,6 @@ export type PrinterValibotOptions = {
    */
   direction?: 'encode' | 'decode'
   /**
-   * The adapter's `dateType`. `'stringLocal'` drops the timestamp check, because Valibot has no
-   * check for a date-time without an offset.
-   */
-  dateType?: ast.ParserOptions['dateType']
-  /**
    * Turns a schema name from the spec into the name of its generated const.
    */
   resolver?: ResolverValibot
@@ -555,7 +550,7 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
     ...directionalNodes,
     datetime(node) {
       // `v.isoTimestamp()` needs a `Z` or an offset, so a local date-time stays an unchecked string.
-      const isLocal = node.local || this.options.dateType === 'stringLocal'
+      const isLocal = node.local
 
       return isLocal ? 'v.string()' : 'v.pipe(v.string(), v.isoTimestamp())'
     },

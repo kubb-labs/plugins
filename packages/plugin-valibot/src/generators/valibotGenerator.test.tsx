@@ -57,7 +57,7 @@ function setup(name: string, optionOverrides: Partial<PluginValibot['resolvedOpt
     driver: createMockedPluginDriver({ name }),
     context: {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       plugin: createMockedPlugin<PluginValibot>({ name: 'plugin-valibot', options, resolver }),
       options,
       resolver,

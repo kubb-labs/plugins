@@ -67,10 +67,6 @@ export type PrinterZodOptions = {
    */
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
   /**
-   * Date format in the OpenAPI spec (`'date'` or `'date-time'`).
-   */
-  dateType?: ast.ParserOptions['dateType']
-  /**
    * Transforms raw schema names into valid JavaScript identifiers.
    */
   resolver?: ResolverZod
@@ -336,8 +332,8 @@ const scalarNodes: PrinterZodNodes = {
     return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : decoded
   },
   datetime(node) {
-    const offset = node.offset || this.options.dateType === 'stringOffset'
-    const local = node.local || this.options.dateType === 'stringLocal'
+    const offset = node.offset
+    const local = node.local
 
     if (offset) return 'z.iso.datetime({ offset: true })'
     if (local) return 'z.iso.datetime({ local: true })'
