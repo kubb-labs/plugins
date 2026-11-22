@@ -24,7 +24,7 @@
 
 ### Generate MSW request handlers with Kubb
 
-`@kubb/plugin-msw` generates Mock Service Worker (MSW) request handlers with Kubb. The handlers work in both browser and Node.js environments via MSW v2.
+`@kubb/plugin-msw` generates Mock Service Worker (MSW) request handlers with Kubb. The handlers work in both browser and Node.js environments via MSW v3.
 
 ## Installation
 
@@ -39,6 +39,14 @@ npm install @kubb/plugin-msw
 ```
 
 `kubb add` installs the version the [Kubb registry](https://kubb.dev/registry) pins and adds `pluginMsw()` to your `kubb.config.ts`. Run `npx kubb init` first if you have no config.
+
+The generated handlers import from `msw/http`, which only exists in MSW 3. Install `msw` v3 in the app that uses them:
+
+```bash
+npm install msw@^3.0.0
+```
+
+With MSW 2, TypeScript fails with `TS2307: Cannot find module 'msw/http'`.
 
 ## Documentation
 
