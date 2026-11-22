@@ -27,7 +27,6 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       file: ctx.file(node),
     }
 
-    if (parser === 'faker') ctx.requirePlugin(pluginFakerName)
     const faker = parser === 'faker' ? ctx.from(pluginFakerName).resolver.response.response(node) : null
 
     const pluginTs = ctx.requirePlugin(pluginTsName)
@@ -58,13 +57,13 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const responseHelperName =
       primaryResponse &&
       hasResponseSchema(primaryResponse) &&
-      types.some(([response, typeName]) => response.statusCode === primaryResponse.statusCode && typeName.name === mockResponseName)
+      types.some(([response, type]) => response.statusCode === primaryResponse.statusCode && type.name === mockResponseName)
         ? `${mock.name}Response${primaryResponse.statusCode}`
         : undefined
 
     const request = ast.http.requestBody.getSchema(node) ? typeRefs.response.body(node) : null
     const requestName = request?.name ?? null
-    const { imports: typeImports } = code.join([...(hasResponseNameCollision ? [] : [responseType]), ...types.map(([, typeName]) => typeName), request])
+    const { imports: typeImports } = code.join([!hasResponseNameCollision && responseType, ...types.map(([, type]) => type), request])
     const fakerImport = hasSuccessSchema ? faker?.import : null
 
     return (
@@ -73,12 +72,12 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
         {requestName && <File.Import name={['MswBody']} isTypeOnly root={mock.file.path} path={mswBodyPath(ctx.config)} />}
         {typeImports.map((imp) => (
-          <File.Import key={imp.path} name={imp.name} root={mock.file.path} path={imp.path} isTypeOnly />
+          <File.Import key={imp.path} {...imp} root={mock.file.path} isTypeOnly />
         ))}
-        {fakerImport && <File.Import name={fakerImport.name} root={mock.file.path} path={fakerImport.path} />}
+        {fakerImport && <File.Import {...fakerImport} root={mock.file.path} />}
 
-        {types.map(([response, typeName]) => (
-          <Response key={response.statusCode} typeName={typeName.name} response={response} name={mock.name} />
+        {types.map(([response, type]) => (
+          <Response key={response.statusCode} typeName={type.name} response={response} name={mock.name} />
         ))}
 
         <Mock

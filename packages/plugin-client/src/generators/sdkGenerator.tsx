@@ -8,7 +8,6 @@ import type { FileTarget, Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
-import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
 import { ClientRuntime } from '../components/ClientRuntime.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
@@ -85,14 +84,13 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
 
       const types = resolveOperationTypes()
 
-      const validatorEnabled = isValidatorEnabled(validator)
       const controllers = buildControllers(nodes, ctx, types)
       const clientPath = path.resolve(ctx.root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(ctx.root, '.kubb/standardSchema.ts')
 
       const renderClassFile = ({ name: className, file, operations: ops }: Pick<Controller, 'name' | 'file' | 'operations'>) => {
         const typeImports = code.join(ops.flatMap((op) => op.typeNames)).imports
-        const schemaImports = validatorEnabled ? code.join(ops.flatMap((op) => op.schemaNames)).imports : []
+        const schemaImports = code.join(ops.flatMap((op) => op.schemaNames)).imports
         const resultOps = ops.filter((op) => !getStream(op.node)?.shape)
         const typedHeaders = (op: OperationData) => op.headerTypeNames.length > 0
         const resultName = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
@@ -129,11 +127,11 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
             {validator === 'zod' && ops.some((op) => ast.http.requestBody.getSchema(op.node) != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
             {typeImports.map((imp) => (
-              <File.Import key={imp.path} name={imp.name} root={file.path} path={imp.path} isTypeOnly />
+              <File.Import key={imp.path} {...imp} root={file.path} isTypeOnly />
             ))}
 
             {schemaImports.map((imp) => (
-              <File.Import key={imp.path} name={imp.name} root={file.path} path={imp.path} />
+              <File.Import key={imp.path} {...imp} root={file.path} />
             ))}
 
             {ops.some((op) => op.validatorHooks.headers) && <File.Import name={['toHeadersStandardSchema']} root={file.path} path={standardSchemaPath} />}

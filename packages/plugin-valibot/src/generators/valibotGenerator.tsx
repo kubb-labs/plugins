@@ -16,7 +16,6 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerValibot } from '../printers/printerValibot.ts'
 import type { PrinterValibotOptions } from '../printers/printerValibot.ts'
-import { pluginValibotName } from '../plugin.ts'
 import type { PluginValibot } from '../types.ts'
 
 type Direction = NonNullable<PrinterValibotOptions['direction']>
@@ -61,17 +60,11 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
     const printerOptions = ctx.printer.options
     // Rendered twice: the schema decodes, and its `${name}InputSchema` variant encodes.
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions })
-    const valibot = ctx.from(pluginValibotName).resolver
+    const valibot = ctx.from().resolver
     const inputImports = hasDirectionalNode
       ? collectDirectionalRefNames({ node, printerOptions }).flatMap((schemaName) => valibot.schema.inputName(schemaName).import ?? [])
       : []
-    const imports = [
-      ...new Map(
-        [...ctx.resolver.imports({ node, root: ctx.root, output, group: group ?? undefined, checks: true }), ...inputImports].map(
-          (imp) => [`${Array.isArray(imp.name) ? imp.name.join(',') : imp.name}|${imp.path}`, imp] as const,
-        ),
-      ).values(),
-    ]
+    const imports = [...ctx.resolver.imports({ node, root: ctx.root, output, group: group ?? undefined, checks: true }), ...inputImports]
     const inputName = ctx.resolver.schema.inputName(node.name)
     const meta = {
       name: ctx.resolver.name(node.name),

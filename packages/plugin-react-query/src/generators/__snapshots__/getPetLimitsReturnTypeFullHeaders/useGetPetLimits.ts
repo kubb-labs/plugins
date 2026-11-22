@@ -9,8 +9,8 @@ import type {
   GetPetLimitsOptions,
   GetPetLimitsResponses,
   GetPetLimitsStatus200Headers,
-  GetPetLimitsStatus400Headers,
   GetPetLimitsStatus400,
+  GetPetLimitsStatus400Headers,
 } from './GetPetLimits'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { getPetLimits } from './clients/getPetLimits'

@@ -9,7 +9,9 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { ClientOperation, ReturnTypeOption } from '@internals/client'
 
 type ResolveHookFileOptions = {
-  /** The hook's variant, which names its file through `hookFileName`. */
+  /**
+   * The hook's variant, which names its file through `hookFileName`.
+   */
   variant?: HookFileVariant
   contractOp: ClientOperation
   /**
@@ -27,7 +29,9 @@ type ResolvedHookFile = {
   file: FileTarget
   tsResolver: ResolverTs
   contractOp: ClientOperation
-  /** The operation type names, grouped into imports from the types plugin's file. */
+  /**
+   * The imports of the operation type names, from the `types` provider.
+   */
   typeImports: ReadonlyArray<ast.ImportNode>
   /**
    * The client's result type the hook names with `returnType: 'full'`.
@@ -37,8 +41,7 @@ type ResolvedHookFile = {
 }
 
 /**
- * Resolves what every TanStack hook file shares: its file, the operation types file and names (`@kubb/plugin-ts`, or
- * `pluginZod({ inferred: 'codec' })`), banner and footer.
+ * Resolves what every TanStack hook file shares: its file with banner and footer, and the type imports from the `types` provider.
  */
 export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFileOptions): ResolvedHookFile {
   const ctx = useKubb<GeneratorContext>()
@@ -59,26 +62,28 @@ export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFil
 
   const file = ctx.file(node, { name: hookFileName({ resolver: ctx.resolver, node, variant }) })
   const typeSource = ctx.from('types')
-  const importedTypeNames = [
-    tsResolver.response.options(node),
-    tsResolver.response.responses(node),
-    ...headerTypeNames,
-    ...extraTypeNames,
-    ...resolveOperationTypeNames(node, tsResolver, {
-      // The full result only names error statuses (in ResponseErrorConfig); success statuses are unused.
-      responseStatusNames: returnType === 'data' ? undefined : 'error',
-      // The joined response alias is unused with the full result, and the printer keeps it as a substring of the responses record name.
-      exclude: [keyTypeName, returnType !== 'data' ? tsResolver.response.response(node) : null].filter((name): name is string => Boolean(name)),
-      order: 'body-response-first',
-      includeParams: false,
-    }),
-  ].flatMap((typeName) => (typeName ? [typeSource.import(node, typeName)] : []))
+  const typeRefs = [
+    typeSource.resolver.response.options(node),
+    typeSource.resolver.response.responses(node),
+    ...[
+      ...headerTypeNames,
+      ...extraTypeNames,
+      ...resolveOperationTypeNames(node, tsResolver, {
+        // The full result only names error statuses (in ResponseErrorConfig); success statuses are unused.
+        responseStatusNames: returnType === 'data' ? undefined : 'error',
+        // The joined response alias is unused with the full result, and the printer keeps it as a substring of the responses record name.
+        exclude: [keyTypeName, returnType !== 'data' ? tsResolver.response.response(node) : null].filter((name): name is string => Boolean(name)),
+        order: 'body-response-first',
+        includeParams: false,
+      }),
+    ].flatMap((typeName) => (typeName ? [typeSource.ref(node, typeName)] : [])),
+  ]
 
   return {
     file,
     tsResolver,
     contractOp,
-    typeImports: code.join(importedTypeNames).imports,
+    typeImports: code.join(typeRefs).imports,
     resultTypeName: headerTypeNames.length ? 'RequestResultWithHeaders' : 'RequestResult',
     returnType,
   }
@@ -111,7 +116,7 @@ export function HookFile({ hook, imports, children }: HookFileProps): KubbReactN
 
       {imports}
       {typeImports.map((imp) => (
-        <File.Import key={imp.path} name={imp.name} root={file.path} path={imp.path} isTypeOnly />
+        <File.Import key={imp.path} {...imp} root={file.path} isTypeOnly />
       ))}
 
       {children}

@@ -1,7 +1,18 @@
 import { resolveOperationName } from '@internals/shared'
-import { createMutationResolver, createQueryResolver, hookFileName } from '@internals/tanstack-query'
+import { createMutationResolver, createQueryResolver, type HookFileVariant } from '@internals/tanstack-query'
 import { createResolver, operationKey } from '@kubb/kit'
-import type { PluginReactQuery, ResolverReactQuery } from '../types.ts'
+import type { PluginReactQuery } from '../types.ts'
+
+/**
+ * The file variant of each hook namespace. Each hook has its own file, named by `hookFileName` with this variant.
+ */
+export const hookFileVariants = {
+  query: '',
+  suspenseQuery: 'Suspense',
+  infiniteQuery: 'Infinite',
+  suspenseInfiniteQuery: 'SuspenseInfinite',
+  mutation: 'mutation',
+} as const satisfies Record<string, HookFileVariant>
 
 /**
  * Default resolver used by `@kubb/plugin-react-query`. Decides the names and
@@ -24,22 +35,6 @@ import type { PluginReactQuery, ResolverReactQuery } from '../types.ts'
  */
 export const resolverReactQuery = createResolver<PluginReactQuery>({
   pluginName: 'plugin-react-query',
-  file: {
-    // Each hook has its own file, so a hook's options are imported from the file of the namespace that names them.
-    name(node, exportName) {
-      if (node.kind !== 'Operation' || !exportName) return undefined
-      const resolver = this as unknown as ResolverReactQuery
-      const namespaces = [
-        [resolver.query, ''],
-        [resolver.suspenseQuery, 'Suspense'],
-        [resolver.infiniteQuery, 'Infinite'],
-        [resolver.suspenseInfiniteQuery, 'SuspenseInfinite'],
-        [resolver.mutation, 'mutation'],
-      ] as const
-      const match = namespaces.find(([ns]) => ns.name(node) === exportName || ns.optionsName(node) === exportName)
-      return match ? hookFileName({ resolver: this, node, variant: match[1] }) : undefined
-    },
-  },
   name: resolveOperationName,
   query: createQueryResolver(),
   suspenseQuery: createQueryResolver('Suspense'),

@@ -12,7 +12,9 @@ export type OperationData = {
   node: ast.HttpOperationNode
   name: string
   types: OperationTypeNames
-  /** The options, responses and headers type names, each with its import. */
+  /**
+   * The options, responses and headers type names, each with its import.
+   */
   typeNames: Array<RefName>
   /**
    * Empty unless `validator` turns a direction on.
@@ -29,8 +31,8 @@ export type OperationData = {
 }
 
 /**
- * Resolves what the function and SDK generators both print for one operation: its name, the files its types and validator
- * schemas come from, and its validator hooks, security, base URL and response headers types.
+ * Resolves what the function and SDK generators both print for one operation: its name, its type and schema names, each with
+ * its import, and its validator hooks, security, base URL and response headers types.
  */
 export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOperationNode; ctx: GeneratorContext; types: OperationTypeSource }): OperationData {
   const { validator, importPath } = ctx.options
@@ -47,8 +49,12 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
     node,
     name: ctx.resolver.resolveName({ key: operationKey(node), name: ctx.resolver.name(node.operationId) }),
     types,
-    typeNames: [types.response.options(node), types.response.responses(node), ...headerTypeNames].map((name) => typeSource.import(node, name)),
-    schemaNames: schemas ? validatorHooks.importedSchemaNames.map((name) => schemas.import(node, name)) : [],
+    typeNames: [
+      typeSource.resolver.response.options(node),
+      typeSource.resolver.response.responses(node),
+      ...headerTypeNames.map((name) => typeSource.ref(node, name)),
+    ],
+    schemaNames: schemas ? validatorHooks.importedSchemaNames.map((name) => schemas.ref(node, name)) : [],
     validatorHooks,
     headerTypeNames,
     // The fetch and axios clients write `securitySchemes` into `.kubb/client.ts`. A custom client module has none.

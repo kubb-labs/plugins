@@ -26,7 +26,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
     const importPath = mutation ? mutation.importPath : '@tanstack/vue-query'
 
     // The registered contract client plugin owns the `<op>` the composable imports and calls.
-    const contractOp = resolveClientOperation(node, client.pluginName)
+    const contractOp = resolveClientOperation({ node, pluginName: client.pluginName })
     if (!contractOp) return null
 
     const mutationHookName = ctx.resolver.mutation.name(node)

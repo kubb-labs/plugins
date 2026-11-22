@@ -5,7 +5,7 @@
  */
 
 import type { MswBody } from './.kubb/mswBody'
-import type { CreatePetsResponse, CreatePetsBody } from './CreatePets'
+import type { CreatePetsBody, CreatePetsResponse } from './CreatePets'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 

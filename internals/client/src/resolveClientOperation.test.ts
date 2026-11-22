@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
-import { createResolver, from, withContext } from '@kubb/kit'
+import { createResolver, Diagnostics, file, withContext } from '@kubb/kit'
 import type { Memo, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import { resolveClientOperation } from './resolveClientOperation.ts'
@@ -22,26 +22,27 @@ function createTestMemo(): Memo {
 function createContext(pluginOptions: Record<string, unknown> | undefined, resolver: Resolver = createResolver({ pluginName: 'plugin-axios' }) as Resolver) {
   const getResolver = vi.fn((_name: string) => resolver)
   const requirePlugin = (name: string) => {
-    if (pluginOptions === undefined) throw new Error(`Plugin "${name}" not found`)
+    if (pluginOptions === undefined)
+      throw new Diagnostics.Error({ code: Diagnostics.code.pluginNotFound, severity: 'error', message: `Plugin "${name}" not found` })
     return { options: pluginOptions }
   }
   const ctx = {
     root: '/root',
     memo: createTestMemo(),
     schemas: [],
-    config: {},
+    config: { output: { path: '.' } },
     meta: {},
     plugin: { name: 'plugin-react-query' },
     resolver: createResolver({ pluginName: 'plugin-react-query' }),
     options: { output: { path: '.' } },
     getResolver,
     requirePlugin,
-    from: (source: string) => withContext(ctx as never, () => from(source)),
+    file: (node: ast.OperationNode, options: object) => withContext(ctx as never, () => file(node, options)),
   }
   return { getResolver, ctx }
 }
 
-const run = (ctx: object, node: ast.OperationNode, pluginName = 'plugin-axios') => withContext(ctx as never, () => resolveClientOperation(node, pluginName))
+const run = (ctx: object, node: ast.OperationNode, pluginName = 'plugin-axios') => withContext(ctx as never, () => resolveClientOperation({ node, pluginName }))
 
 describe('resolveClientOperation', () => {
   const getPetById = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
@@ -50,7 +51,7 @@ describe('resolveClientOperation', () => {
   test('reports a client plugin that is not registered', () => {
     const { ctx } = createContext(undefined)
 
-    expect(() => run(ctx, getPetById)).toThrow('plugin-axios')
+    expect(() => run(ctx, getPetById)).toThrow(expect.objectContaining({ diagnostic: expect.objectContaining({ code: 'KUBB_PLUGIN_NOT_FOUND' }) }))
   })
 
   test('reuses the cached result for the same client plugin and node instead of resolving again', () => {

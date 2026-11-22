@@ -12,4 +12,4 @@
 '@kubb/plugin-vue-query': patch
 ---
 
-Resolve operation files with kit's `ctx.file(node)` and read the build context through composables, so the shared helpers no longer take `ctx`. Generated output is unchanged.
+Find operation files with kit's `ctx.file(node)` and read the build context through composables. Generated output is unchanged.

@@ -1,10 +1,10 @@
-import { addGenerator, defineExtension, getResolver, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
+import { addGenerator, defineExtension, getResolver, provide, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { typeGenerator } from './generators/typeGenerator.tsx'
 import { createPrinterTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
-import type { PluginTs, ResolverTs } from './types.ts'
+import type { PluginTs } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-ts`. Used for driver lookups and
@@ -39,7 +39,7 @@ export const pluginTsName = 'plugin-ts' satisfies PluginTs['name']
 export const pluginTs = defineExtension<PluginTs>({
   kind: 'plugin',
   meta: { name: pluginTsName, version, compatibility },
-  setup(options, ctx) {
+  setup(options) {
     const {
       output = { path: 'types', barrel: { type: 'named' } },
       group,
@@ -64,7 +64,7 @@ export const pluginTs = defineExtension<PluginTs>({
     }
 
     setResolver(userResolver ? Resolver.merge(resolverTs, ...[userResolver].flat()) : resolverTs)
-    ctx.provide('types', () => getResolver(pluginTsName) as ResolverTs)
+    provide('types', () => getResolver(pluginTsName))
     if (userMacros?.length) {
       setMacros(userMacros)
     }

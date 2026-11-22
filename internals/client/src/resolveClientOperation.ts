@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import path from 'node:path'
 import { operationKey, useKubb } from '@kubb/kit'
-import type { Exclude, GeneratorContext, Group, Include, Output, Override } from '@kubb/kit'
+import type { Exclude, GeneratorContext, Include, Override } from '@kubb/kit'
 
 /**
  * Shape of the value a generated operation function resolves to.
@@ -39,8 +39,6 @@ export type ClientOperation = {
  * The client plugin options a dependent reads, including the filters that scope them per operation.
  */
 type ClientPluginOptions = {
-  output?: Output
-  group?: Group | null
   returnType?: ReturnTypeOption
   importPath?: string
   exclude?: Array<Exclude>
@@ -67,9 +65,10 @@ function resolveImportPath(options: { importPath: string; operationFile: string 
  *
  * Call it from a generator. The result is cached in `ctx.memo` per client plugin and operation, so the query, mutation and
  * MCP generators share it. `returnType` and `importPath` come from the client plugin's options after its `override` entries,
- * and `from()` finds its file, so a dependent's call and import match the `<op>` actually emitted.
+ * and `ctx.file()` finds its file, so a dependent's call and import match the `<op>` actually emitted.
+ * Throws `KUBB_PLUGIN_NOT_FOUND` when `pluginName` is not in the config.
  */
-export function resolveClientOperation(node: ast.OperationNode, pluginName: string): ClientOperation | null {
+export function resolveClientOperation({ node, pluginName }: { node: ast.OperationNode; pluginName: string }): ClientOperation | null {
   const ctx = useKubb<GeneratorContext>()
 
   return ctx.memo(`${pluginName}:clientOperation:${node.operationId}`, () => {
@@ -80,7 +79,7 @@ export function resolveClientOperation(node: ast.OperationNode, pluginName: stri
     if (!operationOptions) return null
 
     const name = resolver.resolveName({ key: operationKey(node), name: resolver.name(node.operationId) })
-    const file = ctx.from(pluginName).import(node, name).import!
+    const file = ctx.file(node, { plugin: pluginName })
     const { importPath } = operationOptions
 
     return {

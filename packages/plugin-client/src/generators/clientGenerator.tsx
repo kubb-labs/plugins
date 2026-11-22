@@ -64,10 +64,10 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
           <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
 
           {code.join(data.typeNames).imports.map((imp) => (
-            <File.Import key={imp.path} name={imp.name} root={file.path} path={imp.path} isTypeOnly />
+            <File.Import key={imp.path} {...imp} root={file.path} isTypeOnly />
           ))}
           {code.join(data.schemaNames).imports.map((imp) => (
-            <File.Import key={imp.path} name={imp.name} root={file.path} path={imp.path} />
+            <File.Import key={imp.path} {...imp} root={file.path} />
           ))}
           {validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
 
