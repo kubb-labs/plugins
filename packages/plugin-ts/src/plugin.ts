@@ -64,7 +64,7 @@ export const pluginTs = defineExtension<PluginTs>({
     }
 
     setResolver(userResolver ? Resolver.merge(resolverTs, ...[userResolver].flat()) : resolverTs)
-    ctx.provide({ name: 'types', factory: () => getResolver(pluginTsName) as ResolverTs })
+    ctx.provide('types', () => getResolver(pluginTsName) as ResolverTs)
     if (userMacros?.length) {
       setMacros(userMacros)
     }
