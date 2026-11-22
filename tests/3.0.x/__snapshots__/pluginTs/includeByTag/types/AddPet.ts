@@ -6,33 +6,33 @@
 import type { AddPetRequest } from './AddPetRequest'
 import type { Pet } from './Pet'
 
-export type AddPetStatus200Json = Pet;
+export type AddPetStatus200Json = Pet
 
-export type AddPetStatus200Xml = string;
+export type AddPetStatus200Xml = string
 
-export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml;
+export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-export type AddPetStatus405 = unknown;
-
-/**
- * @description Create a new pet in the store
- * @type object
- */
-export type AddPetBodyJson = AddPetRequest;
+export type AddPetStatus405 = unknown
 
 /**
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetBodyXml = Pet;
+export type AddPetBodyJson = AddPetRequest
 
 /**
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetBodyFormUrlEncoded = Pet;
+export type AddPetBodyXml = Pet
 
-export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded;
+/**
+ * @description Create a new pet in the store
+ * @type object
+ */
+export type AddPetBodyFormUrlEncoded = Pet
+
+export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 
 export type AddPetOptions = {
   body: AddPetBodyJson;
@@ -58,7 +58,7 @@ export type AddPetOptions = {
   contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
-};
+}
 
 export type AddPetResponses = {
   '200': {
@@ -69,9 +69,9 @@ export type AddPetResponses = {
     data: AddPetStatus200Xml;
   };
   '405': AddPetStatus405;
-};
+}
 
 /**
  * @description Union of all possible responses
  */
-export type AddPetResponse = AddPetStatus200;
+export type AddPetResponse = AddPetStatus200

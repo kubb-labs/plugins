@@ -4,7 +4,7 @@ import { jsDocEscape } from '@internals/utils'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { defineGenerator } from '@kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
-import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, Function, jsxRenderer, Raw } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import type { PluginFaker } from '../types.ts'
 import { buildResponseUnionSchema, canOverrideSchema, dateParserName, localeToFakerImport, resolveFakerTypeUsage, resolveTypeReference } from '../utils.ts'
@@ -71,7 +71,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         {usedImports.map((imp) => (
           <File.Import key={[schemaName, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
         ))}
-        {seed !== undefined ? <File.Source name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</File.Source> : undefined}
+        {seed !== undefined ? <Raw name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</Raw> : undefined}
         <Faker
           name={meta.name}
           typeName={typeReference.typeName}
@@ -274,7 +274,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParserName(dateParser)} />}
-        {seed !== undefined ? <File.Source name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</File.Source> : undefined}
+        {seed !== undefined ? <Raw name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</Raw> : undefined}
         {paramGroups.map((group) => renderEntry(group))}
         {responseUnits.map((unit) => renderEntry(unit))}
         {dataUnits.map((unit) => renderEntry(unit))}

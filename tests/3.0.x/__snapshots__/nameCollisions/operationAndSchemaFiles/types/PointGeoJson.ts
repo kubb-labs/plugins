@@ -7,4 +7,4 @@ import type { Point } from './Point'
 
 export type PointGeoJson = {
   properties?: Point;
-};
+}

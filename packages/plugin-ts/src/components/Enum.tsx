@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import { ensureValidVarName } from '@internals/utils'
 import { casing, text } from '@kubb/kit'
-import { File } from '@kubb/renderer-jsx'
+import { Code, Origin, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
@@ -44,13 +44,13 @@ export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.
  * - A `const enum` or plain `enum` declaration (`constEnum` / `enum`)
  * - A union literal type alias (`literal`)
  *
- * The emitted `File.Source` nodes carry the resolved names so that the barrel
+ * The emitted blocks carry the resolved names so that the barrel
  * index picks up the correct export identifiers.
  */
 export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNode {
   const { enumName, typeName } = getEnumNames({ node, enum: enumOptions, resolver })
 
-  const [nameNode, typeNode] = factory.createEnumDeclaration({
+  const [nameNode, typeNode, alias] = factory.createEnumDeclaration({
     name: enumName,
     typeName,
     enums: (node.namedEnumValues?.map((v) => [text.unquote(v.name.toString()), v.value, v.description]) ??
@@ -66,21 +66,21 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
   const namesMerge = !!nameNode && enumName === typeName
 
   return (
-    <>
+    <Origin pointer={node.pointer}>
       {nameNode && (
-        <File.Source name={enumName} pointer={node.pointer} isExportable isIndexable isTypeOnly={false}>
+        <Code name={enumName} export>
           {nameNode}
-        </File.Source>
+        </Code>
       )}
-      <File.Source
-        name={typeName}
-        pointer={node.pointer}
-        isIndexable={!namesMerge}
-        isExportable={!namesMerge && enumOptions.type !== 'inlineLiteral'}
-        isTypeOnly={['asConst', 'literal', undefined].includes(enumOptions.type)}
-      >
-        {typeNode}
-      </File.Source>
-    </>
+      {alias && !namesMerge ? (
+        <Type export name={typeName}>
+          {alias}
+        </Type>
+      ) : (
+        <Code name={typeName} export={!namesMerge}>
+          {typeNode}
+        </Code>
+      )}
+    </Origin>
   )
 }

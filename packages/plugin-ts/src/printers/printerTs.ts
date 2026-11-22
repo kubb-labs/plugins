@@ -167,6 +167,37 @@ function toNodeHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial<f
 }
 
 /**
+ * Returns the parts of a named declaration: alias or interface, the type, and its JSDoc lines.
+ * `print` joins them into one declaration, and the `Type` component passes them to `<Type>`.
+ */
+export function getDeclarationParts(
+  printer: { options: PrinterTsOptions; transform: (node: ast.SchemaNode) => factory.TsNode | null },
+  node: ast.SchemaNode,
+): { syntax: 'type' | 'interface'; type: factory.TsNode; comments: Array<string | undefined> } | null {
+  const { syntaxType = 'type', description, examples, comments = [], keysToOmit } = printer.options
+
+  const transformed = printer.transform(node)
+  if (!transformed) return null
+
+  // For ref nodes, structural metadata lives on node.schema rather than the ref node itself.
+  const meta = ast.ref.mergeSchema(node)
+
+  // Wrap with Omit first, then apply nullable/optional so NonNullable inside createOmitDeclaration does not swallow them.
+  const omitted = keysToOmit?.length ? factory.createOmitDeclaration({ keys: keysToOmit, type: transformed, nonNullable: true }) : transformed
+  // A named declaration always adds `| undefined` for optional or nullish; the `?` token only applies to properties.
+  const type = factory.wrapNullableOptional(omitted, !!meta.nullable, !!(meta.nullish || meta.optional))
+
+  // An interface needs an object literal, so anything else stays a type alias.
+  const isInterface = syntaxType === 'interface' && !keysToOmit?.length && type.type === 'TSTypeLiteral'
+
+  return {
+    syntax: isInterface ? 'interface' : 'type',
+    type,
+    comments: [...comments, ...buildPropertyJSDocComments({ ...meta, description, examples: examples?.length ? examples : meta.examples })],
+  }
+}
+
+/**
  * TypeScript type printer built with `definePrinter`.
  *
  * Converts a `SchemaNode` AST node into TypeScript source:
@@ -358,45 +389,21 @@ export const printerTs = createPrinter<PrinterTs>((options) => {
       ...toNodeHandlers(options.nodes),
     },
     print(node) {
-      const { name, syntaxType = 'type', description, examples, comments = [], keysToOmit } = this.options
-
-      const transformed = this.transform(node)
-      if (!transformed) return null
-
-      // For ref nodes, structural metadata lives on node.schema rather than the ref node itself.
-      const meta = ast.ref.mergeSchema(node)
+      const { name, keysToOmit } = this.options
 
       // Without name, apply modifiers inline and return.
       if (!name) {
+        const transformed = this.transform(node)
+        if (!transformed) return null
+        const meta = ast.ref.mergeSchema(node)
         const omitted = keysToOmit?.length ? factory.createOmitDeclaration({ keys: keysToOmit, type: transformed, nonNullable: true }) : transformed
         return factory.print(factory.wrapNullableOptional(omitted, !!meta.nullable, !!(meta.nullish || meta.optional) && addsUndefined))
       }
 
-      // When keysToOmit is present, wrap with Omit first, then apply nullable/optional
-      // modifiers so they are not swallowed by NonNullable inside createOmitDeclaration.
-      const inner = (() => {
-        const omitted = keysToOmit?.length ? factory.createOmitDeclaration({ keys: keysToOmit, type: transformed, nonNullable: true }) : transformed
-        // For named type declarations (type aliases), optional/nullish always produces | undefined
-        // regardless of optionalType — the questionToken ? modifier only applies to object properties.
-        return factory.wrapNullableOptional(omitted, !!meta.nullable, !!(meta.nullish || meta.optional))
-      })()
+      const parts = getDeclarationParts(this, node)
+      if (!parts) return null
 
-      const useTypeGeneration = syntaxType === 'type' || !!keysToOmit?.length
-
-      return factory.createTypeDeclaration({
-        name,
-        isExportable: true,
-        type: inner,
-        syntax: useTypeGeneration ? 'type' : 'interface',
-        comments: [
-          ...comments,
-          ...buildPropertyJSDocComments({
-            ...meta,
-            description,
-            examples: examples?.length ? examples : meta.examples,
-          }),
-        ],
-      })
+      return factory.createTypeDeclaration({ name, isExportable: true, ...parts })
     },
   }
 })

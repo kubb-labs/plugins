@@ -5,4 +5,4 @@
 
 export type Point = {
   gridId?: string;
-};
+}

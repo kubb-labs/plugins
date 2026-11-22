@@ -65,7 +65,9 @@ describe('Code Generation', () => {
           ['#VERCEL_SKIP', '#VERCEL_SKIP'],
           ['VALID_KEY', 'VALID_KEY'],
         ],
-      }).join('\n'),
+      })
+        .slice(0, 2)
+        .join('\n'),
     )
 
     expect(output).toContain("'#VERCEL_SKIP': '#VERCEL_SKIP'")
@@ -85,7 +87,9 @@ describe('Code Generation', () => {
           ['#0099ff', '#0099ff'],
           ['#ccff9a', '#ccff9a'],
         ],
-      }).join('\n'),
+      })
+        .slice(0, 2)
+        .join('\n'),
     )
 
     expect(output).toContain("'#0099ff': '#0099ff'")
@@ -129,6 +133,7 @@ describe('Code Generation', () => {
     expect(createEnumDeclaration({ type: 'asConst', name: 'petStatus', typeName: 'PetStatusKey', enums: [['available', 'available']] })).toEqual([
       "export const petStatus = {\n  available: 'available',\n} as const;",
       'export type PetStatusKey = (typeof petStatus)[keyof typeof petStatus];',
+      '(typeof petStatus)[keyof typeof petStatus]',
     ])
   })
 })

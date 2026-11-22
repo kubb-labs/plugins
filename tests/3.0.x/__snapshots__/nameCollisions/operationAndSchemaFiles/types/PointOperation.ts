@@ -7,22 +7,22 @@ import type { PointGeoJson } from './PointGeoJson'
 
 export type PointPath = {
   id: string;
-};
+}
 
-export type PointStatus200 = PointGeoJson;
+export type PointStatus200 = PointGeoJson
 
 export type PointOptions = {
   body?: never;
   path: PointPath;
   query?: never;
   headers?: never;
-};
+}
 
 export type PointResponses = {
   '200': PointStatus200;
-};
+}
 
 /**
  * @description Union of all possible responses
  */
-export type PointResponse = PointStatus200;
+export type PointResponse = PointStatus200

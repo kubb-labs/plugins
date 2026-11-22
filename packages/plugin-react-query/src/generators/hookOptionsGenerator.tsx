@@ -1,4 +1,5 @@
 import { ast } from '@internals/ast'
+import { namedFile } from '@internals/shared'
 import { hookFileName, matchesInfinite } from '@internals/tanstack-query'
 import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
@@ -19,12 +20,12 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-hook-options',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { output, customOptions, query, mutation, suspense, infinite, group, override, hooks } = ctx.options
+    const { output, customOptions, query, mutation, suspense, infinite, override, hooks } = ctx.options
 
     if (!customOptions || !hooks) return null
 
     const name = ctx.resolver.hook.optionsName()
-    const resolvedFile = ctx.resolver.file({ name, extname: '.ts', root: ctx.root, output, group: group ?? undefined })
+    const resolvedFile = namedFile({ name })
     const hookOptionsFile = {
       ...resolvedFile,
       baseName: `${name}.ts` as const,

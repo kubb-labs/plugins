@@ -1,4 +1,4 @@
-import { File } from '@kubb/renderer-jsx'
+import { Code } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 type Member = {
@@ -28,8 +28,8 @@ export function SdkFacade({ name, members }: Props): KubbReactNode {
   const classCode = `export class ${name} {\n${body}\n}`
 
   return (
-    <File.Source name={name} isExportable isIndexable>
+    <Code name={name} export>
       {classCode}
-    </File.Source>
+    </Code>
   )
 }

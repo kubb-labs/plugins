@@ -1,6 +1,8 @@
 import { ast } from '@internals/ast'
-import { File, Type as TypeDeclaration } from '@kubb/renderer-jsx'
+import { File, Origin, Type as TypeDeclaration } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
+import * as factory from '../factory.ts'
+import { getDeclarationParts } from '../printers/printerTs.ts'
 import type { PrinterTsFactory } from '../printers/printerTs.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { isInlineConstEnum } from '../utils.ts'
@@ -30,9 +32,9 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
       ?.replace(/\/\*\*[\s\S]*?\*\/\s*/g, '')
     if (!expression) return
 
-    // The file is never written. The body becomes the inline expression and keeps its imports in use.
+    // The operation file is `inline`, so it is never written and importers take this body in place of the name.
     return (
-      <TypeDeclaration export name={name} inline>
+      <TypeDeclaration export name={name}>
         {expression}
       </TypeDeclaration>
     )
@@ -47,10 +49,10 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
     },
   })
 
-  const output = printer.print(node)
+  const parts = getDeclarationParts(printer, node)
   const printerImports = printer.drainImports()
 
-  if (!output) {
+  if (!parts) {
     return
   }
 
@@ -73,9 +75,11 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
           {printerImports.map((imp) => (
             <File.Import key={[name, imp.path, imp.name].join('-')} {...imp} />
           ))}
-          <File.Source name={name} pointer={node.pointer} isTypeOnly isExportable isIndexable>
-            {output}
-          </File.Source>
+          <Origin pointer={node.pointer}>
+            <TypeDeclaration export name={name} syntax={parts.syntax} JSDoc={{ comments: parts.comments }}>
+              {factory.print(parts.type)}
+            </TypeDeclaration>
+          </Origin>
         </>
       )}
     </>

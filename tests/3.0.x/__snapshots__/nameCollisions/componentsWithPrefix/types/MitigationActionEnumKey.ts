@@ -3,4 +3,4 @@
 * Do not edit manually.
 */
 
-export type ApiMitigationActionEnumKey = string;
+export type ApiMitigationActionEnumKey = string

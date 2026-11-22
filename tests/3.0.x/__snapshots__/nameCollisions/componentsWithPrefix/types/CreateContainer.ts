@@ -5,22 +5,22 @@
 
 import type { ApiCreateContainerBody } from './CreateContainerBody'
 
-export type ApiCreateContainerStatus200 = unknown;
+export type ApiCreateContainerStatus200 = unknown
 
-export type ApiCreateContainerBody3 = ApiCreateContainerBody | undefined;
+export type ApiCreateContainerBody3 = ApiCreateContainerBody | undefined
 
 export type ApiCreateContainerOptions = {
   body?: ApiCreateContainerBody3;
   path?: never;
   query?: never;
   headers?: never;
-};
+}
 
 export type ApiCreateContainerResponses = {
   '200': ApiCreateContainerStatus200;
-};
+}
 
 /**
  * @description Union of all possible responses
  */
-export type ApiCreateContainerResponse = ApiCreateContainerStatus200;
+export type ApiCreateContainerResponse = ApiCreateContainerStatus200

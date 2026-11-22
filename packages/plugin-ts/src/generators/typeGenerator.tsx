@@ -231,7 +231,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const responseType = buildResponseType()
 
     return (
-      <File {...meta.file}>
+      <File {...meta.file} inline={inline}>
         {paramGroupTypes}
         {responseTypes}
         {responseHeaderTypes}

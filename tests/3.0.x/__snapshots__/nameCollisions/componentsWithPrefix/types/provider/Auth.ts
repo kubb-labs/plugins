@@ -5,20 +5,20 @@
 
 import type { ApiProviderAuthError } from '../ProviderAuthError'
 
-export type ApiProviderAuthStatus400 = ApiProviderAuthError;
+export type ApiProviderAuthStatus400 = ApiProviderAuthError
 
 export type ApiProviderAuthOptions = {
   body?: never;
   path?: never;
   query?: never;
   headers?: never;
-};
+}
 
 export type ApiProviderAuthResponses = {
   '400': ApiProviderAuthStatus400;
-};
+}
 
 /**
  * @description Union of all possible responses
  */
-export type ApiProviderAuthResponse = ApiProviderAuthStatus400;
+export type ApiProviderAuthResponse = ApiProviderAuthStatus400

@@ -5,20 +5,20 @@
 
 import type { Pet } from './Pet'
 
-export type PetListStatus2002 = Pet;
+export type PetListStatus2002 = Pet
 
 export type PetListOptions2 = {
   body?: never;
   path?: never;
   query?: never;
   headers?: never;
-};
+}
 
 export type PetListResponses2 = {
   '200': PetListStatus2002;
-};
+}
 
 /**
  * @description Union of all possible responses
  */
-export type PetListResponse2 = PetListStatus2002;
+export type PetListResponse2 = PetListStatus2002

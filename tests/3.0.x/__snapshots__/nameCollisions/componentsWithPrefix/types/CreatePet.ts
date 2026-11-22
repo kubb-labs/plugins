@@ -3,24 +3,24 @@
 * Do not edit manually.
 */
 
-export type ApiCreatePetStatus200 = unknown;
+export type ApiCreatePetStatus200 = unknown
 
 export type ApiCreatePetBody2 = {
   name?: string;
-} | undefined;
+} | undefined
 
 export type ApiCreatePetOptions = {
   body?: ApiCreatePetBody2;
   path?: never;
   query?: never;
   headers?: never;
-};
+}
 
 export type ApiCreatePetResponses = {
   '200': ApiCreatePetStatus200;
-};
+}
 
 /**
  * @description Union of all possible responses
  */
-export type ApiCreatePetResponse = ApiCreatePetStatus200;
+export type ApiCreatePetResponse = ApiCreatePetStatus200

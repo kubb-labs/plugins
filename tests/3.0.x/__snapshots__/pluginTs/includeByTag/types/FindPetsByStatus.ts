@@ -13,22 +13,22 @@ export type FindPetsByStatusQuery = {
    * @default available
    */
   status?: FindPetsByStatusStatusKey;
-};
+}
 
-export type FindPetsByStatusStatus200Json = Pet[];
+export type FindPetsByStatusStatus200Json = Pet[]
 
-export type FindPetsByStatusStatus200Xml = string;
+export type FindPetsByStatusStatus200Xml = string
 
-export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml;
+export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
-export type FindPetsByStatusStatus400 = unknown;
+export type FindPetsByStatusStatus400 = unknown
 
 export type FindPetsByStatusOptions = {
   body?: never;
   path?: never;
   query?: FindPetsByStatusQuery;
   headers?: never;
-};
+}
 
 export type FindPetsByStatusResponses = {
   '200': {
@@ -39,9 +39,9 @@ export type FindPetsByStatusResponses = {
     data: FindPetsByStatusStatus200Xml;
   };
   '400': FindPetsByStatusStatus400;
-};
+}
 
 /**
  * @description Union of all possible responses
  */
-export type FindPetsByStatusResponse = FindPetsByStatusStatus200;
+export type FindPetsByStatusResponse = FindPetsByStatusStatus200
