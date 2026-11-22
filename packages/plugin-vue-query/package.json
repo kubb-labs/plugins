@@ -89,10 +89,10 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/ast": "0.0.0-canary-20261121174658",
-    "@kubb/kit": "0.0.0-canary-20261121174658",
+    "@kubb/ast": "0.0.0-canary-20261122150949",
+    "@kubb/kit": "0.0.0-canary-20261122150949",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/renderer-jsx": "0.0.0-canary-20261121174658"
+    "@kubb/renderer-jsx": "0.0.0-canary-20261122150949"
   },
   "devDependencies": {
     "@internals/ast": "workspace:*",

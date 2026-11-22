@@ -89,7 +89,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "0.0.0-canary-20261121174658",
+    "@kubb/kit": "0.0.0-canary-20261122150949",
     "@kubb/plugin-client": "workspace:^"
   },
   "devDependencies": {
