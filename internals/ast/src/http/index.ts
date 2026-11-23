@@ -1,4 +1,5 @@
 import { ast, type HttpOperationNode, type InputServer, type ParameterNode } from '@kubb/ast'
+import { memo } from '@kubb/kit'
 
 export const isOperation = ast.http.isOperation
 export * as requestBody from './requestBody.ts'
@@ -11,12 +12,6 @@ export function getBaseURL(server: InputServer | undefined): string | undefined 
   return URL.canParse(server.url) ? server.url : undefined
 }
 
-/** Computes once per key; generators visit the same node many times. */
-function cached<TKey extends object, TValue>(store: WeakMap<TKey, TValue>, key: TKey, compute: () => TValue): TValue {
-  if (!store.has(key)) store.set(key, compute())
-  return store.get(key)!
-}
-
 type ParameterGroups = Record<'path' | 'query' | 'header' | 'cookie', Array<ParameterNode>>
 
 // Every plugin's generator visits the same node, so the groups are built once per node.
@@ -24,7 +19,7 @@ const parametersByNode = new WeakMap<Pick<HttpOperationNode, 'parameters'>, Para
 
 /** The operation's parameters by location, with a `querystring` parameter in `query`. A repeated name keeps its first parameter. */
 export function groupParameters(node: Pick<HttpOperationNode, 'parameters'>): ParameterGroups {
-  return cached(parametersByNode, node, () => {
+  return memo(parametersByNode, node, () => {
     const group = (...locations: Array<ParameterNode['in']>) => {
       const seen = new Set<string>()
       return locations.flatMap((location) =>
@@ -59,7 +54,7 @@ const requestGroupsByNode = new WeakMap<Pick<HttpOperationNode, 'parameters' | '
 
 /** Which request groups are present, which hold a required member, and the body's media types. Built once per operation. */
 export function getRequestGroups(node: Pick<HttpOperationNode, 'parameters' | 'requestBody'>): RequestGroups {
-  return cached(requestGroupsByNode, node, () => {
+  return memo(requestGroupsByNode, node, () => {
     const { path, query, header, cookie } = groupParameters(node)
     const content = node.requestBody?.content ?? []
     const body = Boolean(content[0]?.schema)

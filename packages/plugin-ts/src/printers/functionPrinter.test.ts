@@ -21,6 +21,11 @@ describe('renderType', () => {
     expect(renderType(createIndexedAccessType({ target: 'GetPetPathParams', key: 'petId' }))).toBe("GetPetPathParams['petId']")
   })
 
+  it('quotes keys that are not identifiers and escapes quotes in them', () => {
+    expect(renderType(createIndexedAccessType({ target: 'Params', key: "it's" }))).toBe("Params['it\\'s']")
+    expect(renderType(createTypeLiteral({ members: [{ name: 'content-type', type: 'string', optional: false }] }))).toBe("{ 'content-type': string }")
+  })
+
   it('renders a type literal with optional members', () => {
     const type = createTypeLiteral({
       members: [

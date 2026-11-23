@@ -3,6 +3,8 @@
  */
 const PARAM_RANK = { required: 0, optional: 1, withDefault: 2, rest: 3 } as const
 
+import { objectKey } from '@internals/utils'
+import { text } from '@kubb/kit'
 import { isIndexedAccessType, isTypeLiteral } from './functionParams.ts'
 import type { FunctionParameterNode, FunctionParametersNode, ObjectBindingPatternNode, TypeExpression } from './functionParams.ts'
 
@@ -21,21 +23,13 @@ export function renderType(type: TypeExpression, transformType?: (type: string) 
   return transformType ? transformType(rendered) : rendered
 }
 
-/**
- * Renders an object-type key, quoting it as a string literal when it is not a valid
- * identifier so `{ 'content-type': string }` stays valid TypeScript.
- */
-function renderKey(name: string): string {
-  return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name) ? name : JSON.stringify(name)
-}
-
 function renderMembers(members: Array<{ key: string; type: string; optional?: boolean }>): string {
-  return `{ ${members.map((member) => `${renderKey(member.key)}${member.optional ? '?' : ''}: ${member.type}`).join('; ')} }`
+  return `{ ${members.map((member) => `${objectKey(member.key)}${member.optional ? '?' : ''}: ${member.type}`).join('; ')} }`
 }
 
 function renderTypeExpression(type: TypeExpression): string {
   if (typeof type === 'string') return type
-  if (isIndexedAccessType(type)) return `${type.target}['${type.key}']`
+  if (isIndexedAccessType(type)) return `${type.target}[${text.quote(type.key)}]`
 
   return renderMembers(type.members.map((member) => ({ key: member.name, type: renderTypeExpression(member.type), optional: member.optional })))
 }

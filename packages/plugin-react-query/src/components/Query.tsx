@@ -1,6 +1,7 @@
 import type { ast } from '@internals/ast'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
+import { text } from '@kubb/kit'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildClientOptionType, buildOperationComments } from '@internals/shared'
@@ -137,7 +138,7 @@ export function Query({
       {`
        const { query: queryConfig = {}, client: config = {} } = options ?? {}
        const { client: queryClient, ...resolvedOptions } = queryConfig${resolvedParams ? `\n       const resolvedParams = ${resolvedParams}` : ''}
-       const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyArgs})${customOptions ? `\n       const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
+       const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyArgs})${customOptions ? `\n       const customOptions = ${customOptions.name}({ hookName: ${text.quote(name)}, operationId: ${text.quote(node.operationId)} })` : ''}
 
        const queryResult = ${hookName}({
         ...${queryOptionsName}(${queryOptionsArgs}),${customOptions ? '\n        ...customOptions,' : ''}

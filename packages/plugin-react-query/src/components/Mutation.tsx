@@ -1,6 +1,7 @@
 import type { ast } from '@internals/ast'
 import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
+import { text } from '@kubb/kit'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildResponseTypes, resolveMutationRequestType } from '@internals/tanstack-query'
@@ -60,7 +61,7 @@ export function Mutation({ name, mutationOptionsName, node, tsResolver, mutation
         const { client: queryClient, ...mutationOptions } = mutation;
         const mutationKey = mutationOptions.mutationKey ?? ${mutationKeyName}()
 
-        const baseOptions = ${mutationOptionsName}(${mutationOptionsParamsCall}) as UseMutationOptions<${generics}>${customOptions ? `\n        const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' }) as UseMutationOptions<${generics}>` : ''}
+        const baseOptions = ${mutationOptionsName}(${mutationOptionsParamsCall}) as UseMutationOptions<${generics}>${customOptions ? `\n        const customOptions = ${customOptions.name}({ hookName: ${text.quote(name)}, operationId: ${text.quote(node.operationId)} }) as UseMutationOptions<${generics}>` : ''}
 
         return useMutation<${generics}>({
           ...baseOptions,${customOptions ? '\n          ...customOptions,' : ''}

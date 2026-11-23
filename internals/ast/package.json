@@ -47,7 +47,8 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/ast": "catalog:"
+    "@kubb/ast": "catalog:",
+    "@kubb/kit": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:"

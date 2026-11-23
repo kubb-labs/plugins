@@ -72,7 +72,7 @@ export function ClientRuntime({
   ])
 
   const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
-  const mediaTypes = [...forms.map(({ contentType, name }) => `'${contentType}': ${name}`), streams ? '...streamMediaTypes' : null].filter(Boolean)
+  const mediaTypes = [...forms.map(({ contentType, name }) => `${text.quote(contentType)}: ${name}`), streams ? '...streamMediaTypes' : null].filter(Boolean)
   const config = [
     baseURLExpression ? `baseURL: ${baseURLExpression}` : null,
     mediaTypes.length ? `mediaTypes: { ${mediaTypes.join(', ')} }` : null,
