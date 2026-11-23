@@ -9,6 +9,7 @@ Pass these options to `pluginAxios()`. Shared options link to [Shared plugin opt
 | [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                    | `{ path: 'clients', barrel: { type: 'named' } }` |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                | None                                             |
 | [`baseURL`](#baseurl)                                                     | Base URL the client starts with.                            | None                                             |
+| [`importPath`](#importpath)                                               | Module the operations import the client from.               | `.kubb/client.ts`                                |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | Throw on a non-2xx response unless a call says otherwise.   | `true`                                           |
 | [`validator`](#validator)                                                 | Validate requests and responses with Zod or Valibot.        | `false`                                          |
 | [`auth`](#auth)                                                           | How generated functions take `auth`.                        | None                                             |
@@ -42,6 +43,28 @@ pluginAxios({ baseURL: '${process.env.API_URL}' })
 
 > [!NOTE]
 > The spec's top-level `servers` URL is never used. See [Set the base URL](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/configure-requests#set-the-base-url).
+
+### importPath
+
+Import specifier of a module the generated operations import the client runtime from, written exactly as given. Kubb still writes the full `.kubb/` runtime, including the `config.ts` the spec needs, so your module can re-export it and replace only some parts, such as a pre-configured `client` or narrower types.
+
+|          |          |
+| -------- | -------- |
+| Type     | `string` |
+| Required | `false`  |
+
+The specifier must resolve from each generated file, so use a relative path, a package name, or an alias:
+
+```typescript
+pluginAxios({ importPath: '../../client' }) // from src/gen/clients/ to src/client.ts
+```
+
+```typescript
+// src/client.ts
+export * from './gen/.kubb/client.ts'
+```
+
+The module must export every helper and type the generated files import. Results from a custom module get no typed response headers.
 
 ### throwOnErrorDefault
 

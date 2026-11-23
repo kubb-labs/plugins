@@ -578,6 +578,39 @@ export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse>
 }
 
 /**
+ * A call config without `client`, so it does not lead back to `ClientInstance`.
+ */
+type ClientLikeConfig<TRequest, TResponse> = Omit<RequestConfig<unknown, TRequest, TResponse>, 'client'>
+
+/**
+ * The part of a client that code wrapping a generated client needs: calling it, its config, its interceptors, and new clients from it.
+ * Every generated client is assignable to it, also one from another `.kubb/` folder or from the package types.
+ * `ClientInstance` is not, because TypeScript cannot relate its generic call and `stream` signatures across two copies of this file.
+ *
+ * @example
+ * ```ts
+ * export function createConfiguredClient(generated: ClientLike, config: ClientConfig): ClientLike {
+ *   const configured = generated.createClient(config)
+ *   configured.interceptors.request.use((request) => request)
+ *   return configured
+ * }
+ * ```
+ */
+export type ClientLike<TRequest = NativeRequest, TResponse = NativeResponse> = {
+  (config: ClientLikeConfig<TRequest, TResponse>): Promise<unknown>
+  getConfig: () => ClientConfig<TRequest, TResponse>
+  setConfig: (config: ClientConfig<TRequest, TResponse>) => ClientConfig<TRequest, TResponse>
+  getUrl: (config: UrlConfig) => string
+  interceptors: {
+    request: InterceptorStack<ResolvedRequest, ClientLikeConfig<TRequest, TResponse>>
+    response: InterceptorStack<DecodedResponse<unknown, TRequest, TResponse>, ClientLikeConfig<TRequest, TResponse>>
+    error: InterceptorStack<ResponseError<unknown, TRequest, TResponse> | Error, ClientLikeConfig<TRequest, TResponse>, Error | void>
+  }
+  createClient: (config?: ClientConfig<TRequest, TResponse>) => ClientLike<TRequest, TResponse>
+  extend: (config?: ClientConfig<TRequest, TResponse>) => ClientLike<TRequest, TResponse>
+}
+
+/**
  * Thrown for a non-2xx response when `throwOnError` is true.
  */
 export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> extends Error {
