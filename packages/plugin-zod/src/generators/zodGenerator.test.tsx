@@ -173,8 +173,7 @@ describe('zodGenerator — Schema', () => {
     expect(schema.safeParse({ a: 1, shared: 'y' }).success).toBe(false)
   })
 
-  // `document` holds the schemas a case refers to. A ref gets an import only to a schema the document has.
-  const schemas: Array<{ name: string; node: ast.SchemaNode; options?: Partial<PluginZod['resolvedOptions']>; document?: Array<ast.SchemaNode> }> = [
+  const schemas: Array<{ name: string; node: ast.SchemaNode; options?: Partial<PluginZod['resolvedOptions']> }> = [
     { name: 'string', node: stringSchema },
     { name: 'number', node: numberSchema },
     { name: 'integer', node: integerSchema },
@@ -249,11 +248,7 @@ describe('zodGenerator — Schema', () => {
     },
     // composite schemas
     { name: 'union', node: unionSchema },
-    {
-      name: 'discriminatedUnion',
-      node: discriminatedUnionSchema,
-      document: ['CardPayment', 'WalletPayment'].map((name) => ast.factory.createSchema({ type: ast.schema.types.object, name, properties: [] })),
-    },
+    { name: 'discriminatedUnion', node: discriminatedUnionSchema },
     { name: 'intersection', node: intersectionSchema },
     // regexType: constructor emits new RegExp(...) instead of a regex literal
     { name: 'regexType constructor', node: schemaWithPattern, options: { regexType: 'constructor' } },
@@ -318,7 +313,6 @@ describe('zodGenerator — Schema', () => {
     const resolver = Resolver.merge(resolverZod)
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: props.name })
-    driver.inputNode = ast.factory.createInput({ schemas: props.document ?? [] })
 
     await renderTemplate(zodSchema, props.node, {
       config: testConfig,
@@ -1574,7 +1568,6 @@ describe('custom imports', () => {
         ],
       }),
       {},
-      ['PaymentError', 'Label', 'Tag'].map((name) => ast.factory.createSchema({ type: 'object', name, properties: [] })),
     )
 
     expect(files[0]?.imports.flatMap((imp) => ast.file.getNames(imp).map((item) => item.alias ?? item.name))).toEqual([
@@ -1582,5 +1575,22 @@ describe('custom imports', () => {
       'labelSchema',
       'paymentErrorSchema',
     ])
+  })
+
+  test('imports a ref to a schema a macro renamed, which the document only knows by its old name', async () => {
+    const pet = ast.factory.createSchema({ type: 'object', name: 'Pet', properties: [] })
+    const files = await render(
+      ast.factory.createSchema({
+        type: 'object',
+        name: 'Owner',
+        properties: [
+          ast.factory.createProperty({ name: 'pet', schema: ast.factory.createSchema({ type: 'ref', name: 'Animal', ref: '#/components/schemas/Animal' }) }),
+        ],
+      }),
+      {},
+      [pet],
+    )
+
+    expect(files[0]?.imports.flatMap((imp) => ast.file.getNames(imp).map((item) => item.alias ?? item.name))).toEqual(['z', 'animalSchema'])
   })
 })

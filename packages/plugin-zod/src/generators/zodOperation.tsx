@@ -24,8 +24,7 @@ export const zodOperation = defineTemplate<PluginZod>({
   kind: 'Operation',
   render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { compile, mini, inferred, importPath } = ctx.options
-    const zod = ctx.from().resolver
+    const { output, compile, mini, inferred, importPath, group } = ctx.options
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
 
@@ -53,9 +52,14 @@ export const zodOperation = defineTemplate<PluginZod>({
 
       const directionalRefNames = direction === 'encode' ? new Set(collectDirectionalRefNames({ node: schema, printerOptions, mini })) : null
       const schemaPrinter = ctx.printer.with({ keysToOmit, direction })
-      const imports = ast.graph
-        .getImportedNames(schema, { checks: true })
-        .flatMap((schemaName) => (directionalRefNames?.has(schemaName) ? zod.schema.inputName(schemaName) : zod.name(schemaName)).import ?? [])
+      const imports = ctx.resolver.imports({
+        node: schema,
+        root: ctx.root,
+        output,
+        group: group ?? undefined,
+        checks: true,
+        name: (schemaName) => (directionalRefNames?.has(schemaName) ? ctx.resolver.schema.inputName(schemaName) : ctx.resolver.name(schemaName)),
+      })
 
       return (
         <>

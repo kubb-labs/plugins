@@ -14,7 +14,7 @@ import type { PrinterZodOptions } from '../printers/printerZod.ts'
 export const zodSchema = defineTemplate<PluginZod>({
   kind: 'Schema',
   render(node, ctx) {
-    const { compile, mini, inferred, typeGuards, importPath } = ctx.options
+    const { output, compile, mini, inferred, typeGuards, importPath, group } = ctx.options
 
     if (!node.name) {
       return null
@@ -28,8 +28,8 @@ export const zodSchema = defineTemplate<PluginZod>({
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions, mini })
 
     const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions, mini }) : [])
+    const importEntries = ctx.resolver.imports({ node, root: ctx.root, output, group: group ?? undefined, checks: true })
     const zod = ctx.from().resolver
-    const importEntries = ast.graph.getImportedNames(node, { checks: true }).flatMap((schemaName) => zod.name(schemaName).import ?? [])
     const inputImportEntries = [...directionalRefNames].flatMap((schemaName) => zod.schema.inputName(schemaName).import ?? [])
     const imports = [...importEntries, ...inputImportEntries]
 
