@@ -5,7 +5,6 @@ import {
   formatDefault,
   getChecks,
   getObjectKind,
-  numericLiteral,
   schemaComments,
   shouldCoerce,
   withFormatRange,
