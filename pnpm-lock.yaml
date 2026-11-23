@@ -1195,9 +1195,6 @@ importers:
       '@internals/ast':
         specifier: workspace:*
         version: link:../../internals/ast
-      '@kubb/adapter-oas':
-        specifier: 'catalog:'
-        version: 0.0.0-canary-20261123140222(openapi-types@12.1.3)
 
   packages/plugin-swr:
     dependencies:

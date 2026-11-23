@@ -7,7 +7,7 @@ The Redoc plugin generates one Redoc HTML page with your OpenAPI spec embedded. 
 
 ## Setup
 
-No other plugins or packages are needed. The plugin needs the default OpenAPI adapter, `adapterOas`, and fails with `KUBB_ADAPTER_REQUIRED` for any other adapter.
+No other plugins or packages are needed. The plugin needs an adapter that produces an OpenAPI 3 or Swagger 2 document, such as the default `adapterOas`. Without one it fails with `KUBB_ADAPTER_REQUIRED`.
 
 ## Options worth knowing
 

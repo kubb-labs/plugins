@@ -1,10 +1,10 @@
-import type { AdapterOas } from '@kubb/adapter-oas'
 import { describe, expect, test } from 'vitest'
-import { getPageHTML } from './redoc.ts'
+import { getPageHTML, isOpenApiDocument } from './redoc.ts'
+import type { OpenApiDocument } from './redoc.ts'
 
 const payload = '</script><script>alert(1)</script>'
 
-function createDocument(): AdapterOas['document'] {
+function createDocument(): OpenApiDocument {
   return {
     openapi: '3.0.3',
     info: { title: 'Pet store', version: '1.0.0', description: payload },
@@ -16,7 +16,7 @@ function createDocument(): AdapterOas['document'] {
         },
       },
     },
-  } as AdapterOas['document']
+  } as OpenApiDocument
 }
 
 function getInlineData(html: string) {
@@ -46,5 +46,18 @@ describe('getPageHTML', () => {
     expect(html).toMatch(
       /<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/redoc@\d+\.\d+\.\d+\/bundles\/redoc\.standalone\.js" integrity="sha384-[A-Za-z0-9+/=]+" crossorigin="anonymous"><\/script>/,
     )
+  })
+})
+
+describe('isOpenApiDocument', () => {
+  test('accepts an OpenAPI 3 or Swagger 2 document', () => {
+    expect(isOpenApiDocument({ openapi: '3.1.0', info: { title: 'Pets' } })).toBe(true)
+    expect(isOpenApiDocument({ swagger: '2.0' })).toBe(true)
+  })
+
+  test('rejects anything else an adapter can produce', () => {
+    expect(isOpenApiDocument(null)).toBe(false)
+    expect(isOpenApiDocument('openapi: 3.1.0')).toBe(false)
+    expect(isOpenApiDocument({ asyncapi: '3.0.0' })).toBe(false)
   })
 })
