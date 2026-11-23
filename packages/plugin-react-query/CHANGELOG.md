@@ -1,5 +1,15 @@
 # @kubb/plugin-react-query
 
+## 5.13.2
+
+### Patch Changes
+
+- [#1583](https://github.com/kubb-labs/plugins/pull/1583) [`7e90893`](https://github.com/kubb-labs/plugins/commit/7e9089313953c4b4c97c49f0c2a2fac8a51c5027) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Quote values from the OpenAPI document with `text.quote` from `@kubb/kit`. A path, content type, operation ID or property name that holds a `'` no longer breaks the generated code.
+  
+  `@kubb/plugin-ts` now quotes an object-type key that is not an identifier with single quotes, the same as the other plugins: `{ 'content-type': string }` instead of `{ "content-type": string }`.
+- Updated dependencies [[`7e90893`](https://github.com/kubb-labs/plugins/commit/7e9089313953c4b4c97c49f0c2a2fac8a51c5027)]:
+  - @kubb/plugin-ts@5.7.1
+
 ## 5.13.1
 
 ### Patch Changes
