@@ -55,6 +55,7 @@ export type DecodedResponse<TData = unknown, TRequest = NativeRequest, TResponse
 export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
+export type ClientLike<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientLike<TRequest, TResponse>
 export type StreamResult<
   TResponses,
   ThrowOnError extends boolean = true,

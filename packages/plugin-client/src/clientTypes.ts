@@ -73,16 +73,7 @@ export type ClientOptions = PluginOptions<Omit<ClientResolvedOptions, 'throwOnEr
    * runtime environment reads dynamic.
    */
   baseURL?: string
-  /**
-   * Import specifier of a module the generated operations import the client runtime from, written exactly as given.
-   * Kubb still writes the `.kubb/` runtime, so the module can re-export it with its own `client` or types.
-   * It must resolve from the generated file, so use a relative path, a package name, or an alias.
-   *
-   * @example
-   * ```ts
-   * pluginFetch({ importPath: '../../client' }) // src/client.ts re-exports './gen/.kubb/client.ts'
-   * ```
-   */
+  /** Module the generated operations import the client from, used verbatim. Kubb still writes the `.kubb/` runtime. */
   importPath?: string
   /**
    * Default error behavior for generated operations and their client. Per-call `throwOnError`

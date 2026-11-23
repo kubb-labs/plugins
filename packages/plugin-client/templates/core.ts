@@ -577,25 +577,9 @@ export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse>
   extend: (config?: ClientConfig<TRequest, TResponse>) => ClientInstance<TRequest, TResponse>
 }
 
-/**
- * A call config without `client`, so it does not lead back to `ClientInstance`.
- */
 type ClientLikeConfig<TRequest, TResponse> = Omit<RequestConfig<unknown, TRequest, TResponse>, 'client'>
 
-/**
- * The part of a client that code wrapping a generated client needs: calling it, its config, its interceptors, and new clients from it.
- * Every generated client is assignable to it, also one from another `.kubb/` folder or from the package types.
- * `ClientInstance` is not, because TypeScript cannot relate its generic call and `stream` signatures across two copies of this file.
- *
- * @example
- * ```ts
- * export function createConfiguredClient(generated: ClientLike, config: ClientConfig): ClientLike {
- *   const configured = generated.createClient(config)
- *   configured.interceptors.request.use((request) => request)
- *   return configured
- * }
- * ```
- */
+/** A client type every generated client fits, also one from another `.kubb/` folder or the package types; `ClientInstance` does not relate across copies. */
 export type ClientLike<TRequest = NativeRequest, TResponse = NativeResponse> = {
   (config: ClientLikeConfig<TRequest, TResponse>): Promise<unknown>
   getConfig: () => ClientConfig<TRequest, TResponse>

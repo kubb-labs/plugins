@@ -577,6 +577,23 @@ export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse>
   extend: (config?: ClientConfig<TRequest, TResponse>) => ClientInstance<TRequest, TResponse>
 }
 
+type ClientLikeConfig<TRequest, TResponse> = Omit<RequestConfig<unknown, TRequest, TResponse>, 'client'>
+
+/** A client type every generated client fits, also one from another `.kubb/` folder or the package types; `ClientInstance` does not relate across copies. */
+export type ClientLike<TRequest = NativeRequest, TResponse = NativeResponse> = {
+  (config: ClientLikeConfig<TRequest, TResponse>): Promise<unknown>
+  getConfig: () => ClientConfig<TRequest, TResponse>
+  setConfig: (config: ClientConfig<TRequest, TResponse>) => ClientConfig<TRequest, TResponse>
+  getUrl: (config: UrlConfig) => string
+  interceptors: {
+    request: InterceptorStack<ResolvedRequest, ClientLikeConfig<TRequest, TResponse>>
+    response: InterceptorStack<DecodedResponse<unknown, TRequest, TResponse>, ClientLikeConfig<TRequest, TResponse>>
+    error: InterceptorStack<ResponseError<unknown, TRequest, TResponse> | Error, ClientLikeConfig<TRequest, TResponse>, Error | void>
+  }
+  createClient: (config?: ClientConfig<TRequest, TResponse>) => ClientLike<TRequest, TResponse>
+  extend: (config?: ClientConfig<TRequest, TResponse>) => ClientLike<TRequest, TResponse>
+}
+
 /**
  * Thrown for a non-2xx response when `throwOnError` is true.
  */
