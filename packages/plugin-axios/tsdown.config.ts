@@ -41,7 +41,7 @@ export default defineConfig([
     },
     format: 'esm',
     fixedExtension: false,
-    plugins: [sharedTemplates],
+    inputOptions: sharedTemplates,
     dts: { dtsOnly: true, tsconfig: '../../tsconfig.dts.json' },
   },
 ])
