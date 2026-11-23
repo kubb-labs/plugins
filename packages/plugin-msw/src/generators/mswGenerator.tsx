@@ -1,9 +1,9 @@
 import { ast } from '@internals/ast'
 import { getEnumNames, typeNames } from '@internals/shared'
-import { code, defineGenerator } from '@kubb/kit'
+import { code, defineTemplate } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File } from '@kubb/renderer-jsx'
 import { Mock } from '../components/Mock.tsx'
 import { Response } from '../components/Response.tsx'
 import type { PluginMsw } from '../types'
@@ -15,10 +15,9 @@ import { hasResponseSchema, mswBodyPath } from '../utils.ts'
  * from `@kubb/plugin-faker`; with `parser: 'data'` it returns a typed empty
  * payload for tests to fill in.
  */
-export const mswGenerator = defineGenerator<PluginMsw>({
-  name: 'msw',
-  renderer: jsxRenderer,
-  operation(node, ctx) {
+export const mswOperation = defineTemplate<PluginMsw>({
+  kind: 'Operation',
+  render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { parser, baseURL } = ctx.options
 

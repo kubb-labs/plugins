@@ -3,9 +3,9 @@ import path from 'node:path'
 import { getStream, namedFile, typeNames } from '@internals/shared'
 import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
 import { ensureValidVarName } from '@internals/utils'
-import { code, defineGenerator, Diagnostics } from '@kubb/kit'
-import type { FileTarget, Generator } from '@kubb/kit'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { code, defineTemplate, Diagnostics } from '@kubb/kit'
+import type { FileTarget, Template } from '@kubb/kit'
+import { File } from '@kubb/renderer-jsx'
 import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
@@ -46,7 +46,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
 }
 
 /**
- * Builds the class-based SDK generator for a client plugin (`@kubb/plugin-fetch`,
+ * Builds the class-based SDK template for a client plugin (`@kubb/plugin-fetch`,
  * `@kubb/plugin-axios`). Only registered when `sdk` is set; otherwise the plugin keeps its
  * standalone per-operation functions.
  *
@@ -59,11 +59,10 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
  * `templates` is the folder the optional runtime is copied from: `sse.ts` only for a document that streams, and each
  * form media type only for a document with a body of that type.
  */
-export function createSdkGenerator<TFactory extends ContractClientFactory>({ templates }: { templates?: string } = {}): Generator<TFactory> {
-  return defineGenerator<TFactory>({
-    name: 'sdk',
-    renderer: jsxRenderer,
-    operations(nodes, ctx) {
+export function createSdkTemplate<TFactory extends ContractClientFactory>({ templates }: { templates?: string } = {}): Template<TFactory> {
+  return defineTemplate<TFactory>({
+    kind: 'Operations',
+    render(nodes, ctx) {
       const { output, validator, returnType, throwOnErrorDefault, sdk } = ctx.options
 
       if (!sdk) return null

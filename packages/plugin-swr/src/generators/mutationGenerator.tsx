@@ -1,20 +1,19 @@
 import { ast } from '@internals/ast'
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation, HookFile, MutationKey, resolveHookFile } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/kit'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { defineTemplate } from '@kubb/kit'
+import { File } from '@kubb/renderer-jsx'
 import { Mutation } from '../components/Mutation.tsx'
 import type { PluginSwr } from '../types'
 
 /**
- * Built-in generator for `useSWRMutation` hooks. Emits one `useFooMutation` hook
+ * Built-in template for `useSWRMutation` hooks. Emits one `useFooMutation` hook
  * per POST/PUT/DELETE operation (configurable via `mutation.methods`) plus
  * the matching `fooMutationKey` helper.
  */
-export const mutationGenerator = defineGenerator<PluginSwr>({
-  name: 'swr-mutation',
-  renderer: jsxRenderer,
-  operation(node, ctx) {
+export const mutationOperation = defineTemplate<PluginSwr>({
+  kind: 'Operation',
+  render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { query, mutation, client } = ctx.options
 

@@ -4,10 +4,10 @@ import { ast } from '@internals/ast'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
 import { resolverCypress } from '../resolvers/resolverCypress.ts'
 import type { PluginCypress } from '../types.ts'
-import { cypressGenerator } from './cypressGenerator.tsx'
+import { cypressOperation } from './cypressGenerator.tsx'
 
 const defaultOptions: PluginCypress['resolvedOptions'] = {
   output: { path: '.', mode: 'directory' },
@@ -48,7 +48,7 @@ describe('cypressGenerator — baseURL', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperation(cypressGenerator, node, {
+    await renderTemplate(cypressOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -77,7 +77,7 @@ describe('cypressGenerator — numeric body', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperation(cypressGenerator, node, {
+    await renderTemplate(cypressOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -130,7 +130,7 @@ describe('cypressGenerator — cookie parameters', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperation(cypressGenerator, node, {
+    await renderTemplate(cypressOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

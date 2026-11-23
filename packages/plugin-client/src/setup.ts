@@ -1,10 +1,10 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { addGenerator, addMacro, injectFile, Resolver, setResolver, useConfig } from '@kubb/kit'
+import { addMacro, addTemplate, injectFile, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './builders/validatorOptions.ts'
-import { createClientGenerator } from './generators/clientGenerator.tsx'
-import { createSdkGenerator } from './generators/sdkGenerator.tsx'
+import { createClientTemplates } from './generators/clientGenerator.tsx'
+import { createSdkTemplate } from './generators/sdkGenerator.tsx'
 import { defaultMacros } from './macros.ts'
 import { resolverClient } from './resolver.ts'
 import type { ClientOptions, ClientResolvedOptions, ContractClientFactory, ResolverClient } from './types.ts'
@@ -48,15 +48,17 @@ export function resolveClientOptions(options: ClientOptions): ClientResolvedOpti
 }
 
 /**
- * Wires a client plugin in its `setup`: resolver, macros, client or SDK generator, and the `.kubb/` runtime with the plugin's own `client.ts`.
+ * Wires a client plugin in its `setup`: resolver, macros, client or SDK templates, and the `.kubb/` runtime with the plugin's own `client.ts`.
  */
 export function setupClient({
-  name,
   resolved,
   macros = [],
   client,
 }: {
-  name: string
+  /**
+   * @deprecated Unused. Templates carry no name.
+   */
+  name?: string
   resolved: ClientResolvedOptions
   macros?: ClientOptions['macros']
   client: string
@@ -67,7 +69,11 @@ export function setupClient({
   addMacro(...defaultMacros, ...macros)
 
   const templates = templatePath('')
-  addGenerator<ContractClientFactory>(resolved.sdk ? createSdkGenerator({ templates }) : createClientGenerator(name, { templates }))
+  for (const template of resolved.sdk
+    ? [createSdkTemplate<ContractClientFactory>({ templates })]
+    : createClientTemplates<ContractClientFactory>({ templates })) {
+    addTemplate(template)
+  }
 
   const root = path.resolve(config.root, config.output.path)
   const files = [

@@ -5,13 +5,13 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
 import { queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from '../types.ts'
-import { queryGenerator } from './queryGenerator.tsx'
+import { queryOperation } from './queryGenerator.tsx'
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
@@ -101,7 +101,7 @@ describe('queryGenerator operation', () => {
     const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
     const driver = createMultiPluginDriver(props.name, plugins)
 
-    await renderGeneratorOperation(queryGenerator, props.node, {
+    await renderTemplate(queryOperation, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -121,7 +121,7 @@ describe('queryGenerator queryKey', () => {
     const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
     const driver = createMultiPluginDriver('customQueryKey', plugins)
 
-    await renderGeneratorOperation(queryGenerator, findByTagsNode, {
+    await renderTemplate(queryOperation, findByTagsNode, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

@@ -2,20 +2,19 @@ import { ast } from '@internals/ast'
 import { requestGroupOrder } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation, HookFile, MutationKey, resolveHookFile } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/kit'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { defineTemplate } from '@kubb/kit'
+import { File } from '@kubb/renderer-jsx'
 import { Mutation } from '../components/Mutation.tsx'
 import type { PluginVueQuery } from '../types'
 
 /**
- * Built-in generator for `useMutation` composables. Emits one
+ * Built-in template for `useMutation` composables. Emits one
  * `useFooMutation` composable per POST/PUT/DELETE operation (configurable
  * via `mutation.methods`) plus the matching `fooMutationKey` helper.
  */
-export const mutationGenerator = defineGenerator<PluginVueQuery>({
-  name: 'vue-query-mutation',
-  renderer: jsxRenderer,
-  operation(node, ctx) {
+export const mutationOperation = defineTemplate<PluginVueQuery>({
+  kind: 'Operation',
+  render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { query, mutation, client, hooks } = ctx.options
 

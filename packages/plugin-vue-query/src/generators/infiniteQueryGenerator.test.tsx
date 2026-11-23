@@ -3,12 +3,12 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from '../types.ts'
-import { infiniteQueryGenerator } from './infiniteQueryGenerator.tsx'
+import { infiniteQueryOperation } from './infiniteQueryGenerator.tsx'
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
@@ -104,7 +104,7 @@ describe('infiniteQueryGenerator operation', () => {
     const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
     const driver = createMultiPluginDriver(props.name, plugins)
 
-    await renderGeneratorOperation(infiniteQueryGenerator, props.node, {
+    await renderTemplate(infiniteQueryOperation, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -127,7 +127,7 @@ describe('infiniteQueryGenerator operation with hooks disabled', () => {
     const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
     const driver = createMultiPluginDriver('hooksDisabled', plugins)
 
-    await renderGeneratorOperation(infiniteQueryGenerator, findByTagsNode, {
+    await renderTemplate(infiniteQueryOperation, findByTagsNode, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -147,7 +147,7 @@ describe('infiniteQueryGenerator queryKey', () => {
     const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
     const driver = createMultiPluginDriver('customQueryKey', plugins)
 
-    await renderGeneratorOperation(infiniteQueryGenerator, findByTagsNode, {
+    await renderTemplate(infiniteQueryOperation, findByTagsNode, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

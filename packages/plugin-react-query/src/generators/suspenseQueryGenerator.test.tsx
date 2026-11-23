@@ -3,11 +3,11 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@kubb/plugin-client'
 import { describe, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
-import { suspenseQueryGenerator } from './suspenseQueryGenerator.tsx'
+import { suspenseQueryOperation } from './suspenseQueryGenerator.tsx'
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
@@ -87,7 +87,7 @@ describe('suspenseQueryGenerator operation', () => {
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
     const driver = createMultiPluginDriver(props.name, plugins)
 
-    await renderGeneratorOperation(suspenseQueryGenerator, props.node, {
+    await renderTemplate(suspenseQueryOperation, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

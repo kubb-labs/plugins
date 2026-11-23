@@ -3,8 +3,8 @@ import { describe, expect, test } from 'vitest'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
-import { hookOptionsGenerator } from './hookOptionsGenerator.tsx'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperations, testConfig } from '#mocks'
+import { hookOptionsOperations } from './hookOptionsGenerator.tsx'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderTemplate, testConfig } from '#mocks'
 
 function createOptions(overrides: Partial<PluginReactQuery['resolvedOptions']> = {}): PluginReactQuery['resolvedOptions'] {
   return {
@@ -36,7 +36,7 @@ async function renderHookOptionsSource(options: PluginReactQuery['resolvedOption
   const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
   const driver = createMockedPluginDriver({ name: 'hookOptions', config: testConfig })
 
-  await renderGeneratorOperations(hookOptionsGenerator, operationNodes, {
+  await renderTemplate(hookOptionsOperations, operationNodes, {
     config: testConfig,
     adapter: createMockedAdapter(),
     driver,

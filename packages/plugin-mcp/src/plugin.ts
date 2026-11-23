@@ -1,11 +1,11 @@
 import { resolveContractClient } from '@internals/client'
-import { addGenerator, addMacro, defineExtension, Resolver, setResolver, useConfig } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { mcpGenerator } from './generators/mcpGenerator.tsx'
-import { serverGenerator } from './generators/serverGenerator.tsx'
+import { mcpOperation } from './generators/mcpGenerator.tsx'
+import { serverOperations } from './generators/serverGenerator.tsx'
 import { resolverMcp } from './resolvers/resolverMcp.ts'
 import type { PluginMcp, ResolverMcp } from './types.ts'
 
@@ -63,7 +63,8 @@ export const pluginMcp = defineExtension<PluginMcp>({
 
     setResolver(resolver)
     addMacro(...(userMacros ?? []))
-    addGenerator(mcpGenerator, serverGenerator)
+    addTemplate(mcpOperation)
+    addTemplate(serverOperations)
 
     return {
       output,

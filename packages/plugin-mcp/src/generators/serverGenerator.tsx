@@ -2,7 +2,7 @@ import { ast } from '@internals/ast'
 import path from 'node:path'
 import { getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
-import { code, defineGenerator } from '@kubb/kit'
+import { code, defineGenerator, defineTemplate } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer, Raw } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
@@ -15,10 +15,9 @@ import type { PluginMcp } from '../types.ts'
  * and `resolveResponseStatusName` for per-status response schemas.
  * Query and header params are composed into `z.object({ ... })` from individual schemas.
  */
-export const serverGenerator = defineGenerator<PluginMcp>({
-  name: 'operations',
-  renderer: jsxRenderer,
-  operations(nodes, ctx) {
+export const serverOperations = defineTemplate<PluginMcp>({
+  kind: 'Operations',
+  render(nodes, ctx) {
     const { output } = ctx.options
 
     const handlers = ctx.from().resolver
@@ -124,4 +123,13 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       </>
     )
   },
+})
+
+/**
+ * @deprecated Register `serverOperations` with `addTemplate`.
+ */
+export const serverGenerator = defineGenerator<PluginMcp>({
+  name: 'operations',
+  renderer: jsxRenderer,
+  operations: (nodes, ctx) => serverOperations.render(nodes, ctx),
 })

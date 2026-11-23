@@ -16,11 +16,14 @@ import type {
   Parser,
   Plugin,
   PluginType,
+  Template,
 } from '@kubb/kit'
 import { ast, casing, Diagnostics, file, from, Hookable, memo, memoryStorage, withContext } from '@kubb/kit'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'
+import { jsxRenderer } from '@kubb/renderer-jsx'
+import { isKubbElement } from '@kubb/renderer-jsx/jsx-runtime'
 import { expect, type Mock, vi } from 'vitest'
 
 // Test helpers copied from kubb's former `kubb/kit/testing` entry, so kubb ships no Vitest-backed API.
@@ -85,7 +88,6 @@ export function createMockedPluginDriver(options: { name?: string; plugin?: Mock
 export type MockedSetupContext<TFactory extends PluginType = PluginType> = KubbPluginSetupContext<TFactory> & {
   plugin: { name: string }
   memo: { get(key: string): unknown }
-  addGenerator: Mock
   setResolver: Mock
   addMacro: Mock
 }
@@ -102,7 +104,6 @@ export function createMockedSetupContext<TFactory extends PluginType = PluginTyp
     config: { root: '.', output: { path: './gen' }, plugins: registered } as unknown as Config,
     options,
     plugin: { name: 'plugin-mock', meta: { name: 'plugin-mock' } },
-    addGenerator: vi.fn(),
     setResolver: vi.fn(),
     addMacro: vi.fn(),
     setOptions: vi.fn(),
@@ -118,15 +119,10 @@ export function createMockedSetupContext<TFactory extends PluginType = PluginTyp
 }
 
 /**
- * Returns the generators a plugin registered during a mocked setup. A kit that stores them in memo
- * and a kit that calls `ctx.addGenerator` both count. Kit stores a generator as one template per
- * method, all with the generator's name, so templates count once per name.
+ * Returns the templates a plugin registered during a mocked setup, in the order it added them.
  */
-export function registeredGenerators(ctx: MockedSetupContext): Array<unknown> {
-  const stored = ctx.memo.get(`${ctx.plugin.name}:generators`) as Array<unknown> | undefined
-  const templates = (ctx.memo.get(`${ctx.plugin.name}:templates`) as Array<{ name: string }> | undefined) ?? []
-  const firstPerName = templates.filter((template, index) => templates.findIndex((other) => other.name === template.name) === index)
-  return [...ctx.addGenerator.mock.calls.flat(), ...(stored ?? []), ...firstPerName]
+export function registeredTemplates(ctx: MockedSetupContext): Array<Template> {
+  return (ctx.memo.get(`${ctx.plugin.name}:templates`) as Array<Template> | undefined) ?? []
 }
 
 /**
@@ -273,6 +269,24 @@ export async function renderGeneratorOperations<TOptions extends PluginType>(
   const ctx = withPrinter({ ...context, options: opts.options }, opts)
   const result = await withContext(ctx, () => generator.operations!.call(ctx, transformedNodes, ctx))
   await opts.driver.fileManager.dispatch({ result, renderer: generator.renderer })
+}
+
+/**
+ * Renders a template for a node, or for every operation with an `'Operations'` template, and collects its files on
+ * `opts.driver.fileManager`. JSX renders with `jsxRenderer`, like kit's visitor.
+ */
+export async function renderTemplate<TOptions extends PluginType>(
+  template: Template<TOptions>,
+  node: ast.SchemaNode | ast.OperationNode | Array<ast.OperationNode>,
+  opts: RenderGeneratorOptions<TOptions>,
+): Promise<void> {
+  const ctx = withPrinter({ ...createMockedPluginContext(opts), options: opts.options }, opts)
+  const macros = opts.plugin.macros ?? []
+  const apply = <TNode extends ast.SchemaNode | ast.OperationNode>(item: TNode): TNode => (macros.length ? ast.macro.apply(item, macros) : item)
+  const transformed = Array.isArray(node) ? node.map(apply) : apply(node)
+  const render = template.render as (node: unknown, ctx: GeneratorContext<TOptions>) => unknown
+  const result = await withContext(ctx, () => render.call(ctx, transformed, ctx))
+  await opts.driver.fileManager.dispatch({ result, renderer: isKubbElement(result) ? jsxRenderer : null })
 }
 
 async function matchFilesBase(

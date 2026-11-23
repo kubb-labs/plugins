@@ -10,8 +10,9 @@ import {
   resolveHookFile,
   resolvePageParamType,
 } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/kit'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { defineTemplate } from '@kubb/kit'
+import type { TemplateContext } from '@kubb/kit'
+import { File } from '@kubb/renderer-jsx'
 import { Query } from '../components/Query.tsx'
 import { QueryOptions } from '../components/QueryOptions.tsx'
 import { hookFileVariants } from '../resolvers/resolverReactQuery.ts'
@@ -27,33 +28,35 @@ const OBSERVER_IMPORTS: Record<Variant, Array<string>> = {
 }
 
 /**
- * Builds the generator for one `useQuery` flavor. `variant` picks the resolver namespace
+ * Builds the template for one `useQuery` flavor. `variant` picks the resolver namespace
  * (`resolver.query`, `resolver.suspenseQuery`, ...), the TanStack hook, and the options it needs.
  */
-export function createQueryGenerator({ name, variant }: { name: string; variant: Variant }) {
+export function createQueryTemplate({ variant }: { variant: Variant }) {
   const suspense = variant === 'suspenseQuery' || variant === 'suspenseInfiniteQuery'
   const infinite = variant === 'infiniteQuery' || variant === 'suspenseInfiniteQuery'
   const hookImport = `use${suspense ? 'Suspense' : ''}${infinite ? 'InfiniteQuery' : 'Query'}`
   const observerImports = OBSERVER_IMPORTS[variant]
 
-  return defineGenerator<PluginReactQuery>({
-    name,
-    renderer: jsxRenderer,
-    match(node, ctx) {
-      const operationNode = node as ast.OperationNode
-      if (!ast.http.isOperation(operationNode)) return false
-      const { query, mutation, infinite: infiniteConfig, suspense: suspenseConfig, hooks } = ctx.options
-      const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
-      if (!isQuery || isMutation) return false
-      if (suspense && !suspenseConfig) return false
-      if (variant === 'query') return true
-      if (!hooks) return false
-      if (!infinite) return true
+  // The operations this flavor writes. Every other operation returns `null`.
+  function matches(node: ast.SchemaNode | ast.OperationNode, ctx: TemplateContext<PluginReactQuery>): boolean {
+    const operationNode = node as ast.OperationNode
+    if (!ast.http.isOperation(operationNode)) return false
+    const { query, mutation, infinite: infiniteConfig, suspense: suspenseConfig, hooks } = ctx.options
+    const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
+    if (!isQuery || isMutation) return false
+    if (suspense && !suspenseConfig) return false
+    if (variant === 'query') return true
+    if (!hooks) return false
+    if (!infinite) return true
 
-      const infiniteOptions = infiniteConfig && typeof infiniteConfig === 'object' ? infiniteConfig : null
-      return !!infiniteOptions && matchesInfinite(operationNode, infiniteOptions)
-    },
-    operation(node, ctx) {
+    const infiniteOptions = infiniteConfig && typeof infiniteConfig === 'object' ? infiniteConfig : null
+    return !!infiniteOptions && matchesInfinite(operationNode, infiniteOptions)
+  }
+
+  return defineTemplate<PluginReactQuery>({
+    kind: 'Operation',
+    render(node, ctx) {
+      if (!matches(node, ctx)) return null
       if (!ast.http.isOperation(node)) return null
       const { query, infinite: infiniteConfig, client, customOptions, hooks } = ctx.options
 

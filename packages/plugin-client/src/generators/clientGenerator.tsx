@@ -2,9 +2,9 @@ import { ast } from '@internals/ast'
 import path from 'node:path'
 import { resolveOperationTypes, resultTypeName } from '@internals/client'
 import { getStream, typeNames } from '@internals/shared'
-import { code, defineGenerator } from '@kubb/kit'
-import type { Generator } from '@kubb/kit'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { code, defineTemplate } from '@kubb/kit'
+import type { Template } from '@kubb/kit'
+import { File } from '@kubb/renderer-jsx'
 import { resolveOperationData } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { Operation } from '../components/Operation.tsx'
@@ -12,78 +12,87 @@ import { ClientRuntime } from '../components/ClientRuntime.tsx'
 import type { ContractClientFactory } from '../types.ts'
 
 /**
- * Builds the per-operation client generator shared by the client plugins. `templates` is the folder the optional runtime, such as `sse.ts`, is copied from.
+ * Builds the client templates shared by the client plugins: one file per operation and the runtime the files import. `templates` is the folder the optional runtime, such as `sse.ts`, is copied from.
  */
-export function createClientGenerator<TFactory extends ContractClientFactory>(name: string, { templates }: { templates?: string } = {}): Generator<TFactory> {
-  return defineGenerator<TFactory>({
-    name,
-    renderer: jsxRenderer,
-    operations(nodes, ctx) {
-      return <ClientRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
-    },
-    operation(node, ctx) {
-      if (!ast.http.isOperation(node)) return null
+export function createClientTemplates<TFactory extends ContractClientFactory>({ templates }: { templates?: string } = {}): [
+  runtime: Template<TFactory>,
+  operation: Template<TFactory>,
+] {
+  return [
+    defineTemplate<TFactory>({
+      kind: 'Operations',
+      render(nodes, ctx) {
+        return (
+          <ClientRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
+        )
+      },
+    }),
+    defineTemplate<TFactory>({
+      kind: 'Operation',
+      render(node, ctx) {
+        if (!ast.http.isOperation(node)) return null
 
-      const { returnType, throwOnErrorDefault, importPath } = ctx.options
+        const { returnType, throwOnErrorDefault, importPath } = ctx.options
 
-      const resolvedTypes = resolveOperationTypes()
-      // A custom client module keeps the two-argument `RequestResult` it documents, so its results get no typed headers.
-      const types = importPath === undefined ? resolvedTypes : { ...resolvedTypes, response: { ...resolvedTypes.response, headers: undefined } }
+        const resolvedTypes = resolveOperationTypes()
+        // A custom client module keeps the two-argument `RequestResult` it documents, so its results get no typed headers.
+        const types = importPath === undefined ? resolvedTypes : { ...resolvedTypes, response: { ...resolvedTypes.response, headers: undefined } }
 
-      const data = resolveOperationData({ node, ctx, types })
-      const { validatorHooks, headerTypeNames } = data
-      const file = ctx.file(node)
+        const data = resolveOperationData({ node, ctx, types })
+        const { validatorHooks, headerTypeNames } = data
+        const file = ctx.file(node)
 
-      // A custom client module is emitted verbatim, so `importPath` is used exactly as configured.
-      // The default `.kubb/client.ts` is a file path and is made relative to the operation file.
-      const clientPath = importPath ?? path.resolve(ctx.root, '.kubb/client.ts')
-      const clientRoot = importPath === undefined ? file.path : undefined
-      // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
-      // alongside its other runtime helpers.
-      const standardSchemaPath = importPath ?? path.resolve(ctx.root, '.kubb/standardSchema.ts')
-      const stream = getStream(node)?.shape ?? null
+        // A custom client module is emitted verbatim, so `importPath` is used exactly as configured.
+        // The default `.kubb/client.ts` is a file path and is made relative to the operation file.
+        const clientPath = importPath ?? path.resolve(ctx.root, '.kubb/client.ts')
+        const clientRoot = importPath === undefined ? file.path : undefined
+        // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
+        // alongside its other runtime helpers.
+        const standardSchemaPath = importPath ?? path.resolve(ctx.root, '.kubb/standardSchema.ts')
+        const stream = getStream(node)?.shape ?? null
 
-      const clientValueImports = [
-        ...{
-          plain: ['client'],
-          data: ['client', 'unwrapResult', 'resolveThrowOnError'],
-          full: ['client', 'withUnwrap', 'resolveThrowOnError'],
-        }[returnType],
-        ...(importPath === undefined && data.security ? ['securitySchemes'] : []),
-      ]
+        const clientValueImports = [
+          ...{
+            plain: ['client'],
+            data: ['client', 'unwrapResult', 'resolveThrowOnError'],
+            full: ['client', 'withUnwrap', 'resolveThrowOnError'],
+          }[returnType],
+          ...(importPath === undefined && data.security ? ['securitySchemes'] : []),
+        ]
 
-      const clientTypeImports = stream
-        ? buildEventStreamImports({ node, types, returnType })
-        : { plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType].map(
-            (name) => (name.endsWith('Result') ? resultTypeName(name, headerTypeNames.length > 0) : name),
-          )
+        const clientTypeImports = stream
+          ? buildEventStreamImports({ node, types, returnType })
+          : { plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType].map(
+              (name) => (name.endsWith('Result') ? resultTypeName(name, headerTypeNames.length > 0) : name),
+            )
 
-      return (
-        <File {...file}>
-          <File.Import names={clientValueImports.map((name) => ({ name }))} root={clientRoot} path={clientPath} />
-          <File.Import names={clientTypeImports.map((name) => ({ name, space: 'type' as const }))} root={clientRoot} path={clientPath} />
+        return (
+          <File {...file}>
+            <File.Import names={clientValueImports.map((name) => ({ name }))} root={clientRoot} path={clientPath} />
+            <File.Import names={clientTypeImports.map((name) => ({ name, space: 'type' as const }))} root={clientRoot} path={clientPath} />
 
-          {code.join(data.typeNames).imports.map((imp) => (
-            <File.Import key={imp.path} names={typeNames(imp)} path={imp.path} root={file.path} />
-          ))}
-          {code.join(data.schemaNames).imports.map((imp) => (
-            <File.Import key={imp.path} names={ast.file.getNames(imp)} path={imp.path} root={file.path} />
-          ))}
-          {validatorHooks.headers && <File.Import names={[{ name: 'toHeadersStandardSchema' }]} root={clientRoot} path={standardSchemaPath} />}
+            {code.join(data.typeNames).imports.map((imp) => (
+              <File.Import key={imp.path} names={typeNames(imp)} path={imp.path} root={file.path} />
+            ))}
+            {code.join(data.schemaNames).imports.map((imp) => (
+              <File.Import key={imp.path} names={ast.file.getNames(imp)} path={imp.path} root={file.path} />
+            ))}
+            {validatorHooks.headers && <File.Import names={[{ name: 'toHeadersStandardSchema' }]} root={clientRoot} path={standardSchemaPath} />}
 
-          <Operation
-            name={data.name}
-            node={node}
-            types={types}
-            validatorHooks={validatorHooks}
-            returnType={returnType}
-            throwOnErrorDefault={throwOnErrorDefault}
-            security={data.security}
-            authRequired={data.authRequired}
-            baseURL={data.baseURL}
-          />
-        </File>
-      )
-    },
-  })
+            <Operation
+              name={data.name}
+              node={node}
+              types={types}
+              validatorHooks={validatorHooks}
+              returnType={returnType}
+              throwOnErrorDefault={throwOnErrorDefault}
+              security={data.security}
+              authRequired={data.authRequired}
+              baseURL={data.baseURL}
+            />
+          </File>
+        )
+      },
+    }),
+  ]
 }

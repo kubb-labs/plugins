@@ -10,33 +10,36 @@ import {
   resolveHookFile,
   resolvePageParamType,
 } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/kit'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { defineTemplate } from '@kubb/kit'
+import type { TemplateContext } from '@kubb/kit'
+import { File } from '@kubb/renderer-jsx'
 import { Query } from '../components/Query.tsx'
 import { maybeRefOrGetter } from '../utils.ts'
 import type { PluginVueQuery } from '../types'
 
+// The operations this template writes. Every other operation returns `null`.
+function matchesInfiniteQuery(node: ast.SchemaNode | ast.OperationNode, ctx: TemplateContext<PluginVueQuery>): boolean {
+  const operationNode = node as ast.OperationNode
+  if (!ast.http.isOperation(operationNode)) return false
+  const { query, mutation, infinite, hooks } = ctx.options
+
+  const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
+  const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
+  if (!isQuery || isMutation || !infiniteOptions || !hooks) return false
+
+  return matchesInfinite(operationNode, infiniteOptions)
+}
+
 /**
- * Built-in generator for `useInfiniteQuery` composables. Enabled when
+ * Built-in template for `useInfiniteQuery` composables. Enabled when
  * `pluginVueQuery({ infinite: { ... }, hooks: true })`. Emits one
  * `useFooInfiniteQuery` composable per query operation, wiring the
  * configured cursor path into TanStack Query's cursor-based pagination.
  */
-export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
-  name: 'vue-query-infinite',
-  renderer: jsxRenderer,
-  match(node, ctx) {
-    const operationNode = node as ast.OperationNode
-    if (!ast.http.isOperation(operationNode)) return false
-    const { query, mutation, infinite, hooks } = ctx.options
-
-    const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
-    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
-    if (!isQuery || isMutation || !infiniteOptions || !hooks) return false
-
-    return matchesInfinite(operationNode, infiniteOptions)
-  },
-  operation(node, ctx) {
+export const infiniteQueryOperation = defineTemplate<PluginVueQuery>({
+  kind: 'Operation',
+  render(node, ctx) {
+    if (!matchesInfiniteQuery(node, ctx)) return null
     if (!ast.http.isOperation(node)) return null
     const { query, infinite, client } = ctx.options
 

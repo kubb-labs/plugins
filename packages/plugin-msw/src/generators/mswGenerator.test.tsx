@@ -13,10 +13,10 @@ import * as msw from 'msw'
 import { Resolver } from '@kubb/kit'
 import { mswBodyTemplate } from '../utils.ts'
 import { describe, expect, onTestFinished, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderTemplate, testConfig } from '#mocks'
 import { resolverMsw } from '../resolvers/resolverMsw.ts'
 import type { PluginMsw } from '../types.ts'
-import { mswGenerator } from './mswGenerator.tsx'
+import { mswOperation } from './mswGenerator.tsx'
 
 const defaultOptions: PluginMsw['resolvedOptions'] = {
   output: { path: '.', mode: 'directory' },
@@ -186,7 +186,7 @@ async function renderOperation(props: RenderProps) {
     return undefined
   }) as typeof driver.getResolver
 
-  await renderGeneratorOperation(mswGenerator, props.node, {
+  await renderTemplate(mswOperation, props.node, {
     config: testConfig,
     adapter: createMockedAdapter(),
     driver,

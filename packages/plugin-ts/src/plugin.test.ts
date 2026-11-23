@@ -1,5 +1,5 @@
 import { kubbContext } from '@kubb/kit'
-import { createMockedSetupContext, registeredGenerators } from '#mocks'
+import { createMockedSetupContext, registeredTemplates } from '#mocks'
 import { describe, expect, test } from 'vitest'
 import { pluginTs } from './plugin.ts'
 import type { Options, PluginTs } from './types.ts'
@@ -16,6 +16,6 @@ describe('pluginTs setup', () => {
     const { run, ctx } = setup({})
 
     expect(run()).toMatchObject({ output: { path: 'types' }, enum: { type: 'asConst' }, syntaxType: 'type', arrayType: 'array', optionalType: 'questionToken' })
-    expect(registeredGenerators(ctx)).toHaveLength(1)
+    expect(registeredTemplates(ctx)).toHaveLength(2)
   })
 })

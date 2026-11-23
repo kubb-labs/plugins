@@ -1,8 +1,8 @@
-import { addGenerator, addMacro, defineExtension, Resolver, setResolver } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, Resolver, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { cypressGenerator } from './generators/cypressGenerator.tsx'
+import { cypressOperation } from './generators/cypressGenerator.tsx'
 import { resolverCypress } from './resolvers/resolverCypress.ts'
 import type { PluginCypress, ResolverCypress } from './types.ts'
 
@@ -55,7 +55,7 @@ export const pluginCypress = defineExtension<PluginCypress>({
 
     setResolver(resolver)
     addMacro(...(userMacros ?? []))
-    addGenerator(cypressGenerator)
+    addTemplate(cypressOperation)
 
     return {
       output,

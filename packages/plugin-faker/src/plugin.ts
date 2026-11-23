@@ -1,8 +1,8 @@
-import { addGenerator, addMacro, defineExtension, Resolver, setPrinter, setResolver } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, Resolver, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { fakerGenerator } from './generators/fakerGenerator.tsx'
+import { fakerOperation, fakerSchema } from './generators/fakerGenerator.tsx'
 import { createPrinterFaker } from './printers/printerFaker.ts'
 import { resolverFaker } from './resolvers/resolverFaker.ts'
 import type { PluginFaker } from './types.ts'
@@ -61,7 +61,8 @@ export const pluginFaker = defineExtension<PluginFaker>({
     setResolver(userResolver ? Resolver.merge(resolverFaker, ...[userResolver].flat()) : resolverFaker)
     addMacro(...(userMacros ?? []))
     setPrinter(createPrinterFaker)
-    addGenerator(fakerGenerator)
+    addTemplate(fakerSchema)
+    addTemplate(fakerOperation)
 
     return {
       output,

@@ -2,7 +2,7 @@ import { ast } from '@internals/ast'
 import { getPerContentTypeName, resolveContentTypeVariants, toResponseContent, typeNames } from '@internals/shared'
 import { jsDocEscape } from '@internals/utils'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
-import { defineGenerator } from '@kubb/kit'
+import { defineGenerator, defineTemplate } from '@kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
 import { File, Function, jsxRenderer, Raw } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
@@ -21,15 +21,14 @@ type RenderUnit = {
 }
 
 /**
- * Built-in generator for `@kubb/plugin-faker`. Emits one `createX` factory
+ * Built-in template for `@kubb/plugin-faker`. Emits one `createX` factory
  * per schema in the spec plus per-operation request/response factories. Each
  * factory returns a value matching the corresponding TypeScript type from
  * `@kubb/plugin-ts`.
  */
-export const fakerGenerator = defineGenerator<PluginFaker>({
-  name: 'faker',
-  renderer: jsxRenderer,
-  schema(node, ctx) {
+export const fakerSchema = defineTemplate<PluginFaker>({
+  kind: 'Schema',
+  render(node, ctx) {
     const { output, group, dateParser, regexGenerator, seed, locale, typeMode } = ctx.options
     const pluginTs = ctx.requirePlugin(pluginTsName)
 
@@ -89,7 +88,11 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       </File>
     )
   },
-  operation(node, ctx) {
+})
+
+export const fakerOperation = defineTemplate<PluginFaker>({
+  kind: 'Operation',
+  render(node, ctx) {
     const { output, group, dateParser, regexGenerator, seed, locale, typeMode } = ctx.options
     ctx.requirePlugin(pluginTsName)
 
@@ -298,4 +301,14 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       </File>
     )
   },
+})
+
+/**
+ * @deprecated Register `fakerSchema` and `fakerOperation` with `addTemplate`.
+ */
+export const fakerGenerator = defineGenerator<PluginFaker>({
+  name: 'faker',
+  renderer: jsxRenderer,
+  schema: (node, ctx) => fakerSchema.render(node, ctx),
+  operation: (node, ctx) => fakerOperation.render(node, ctx),
 })

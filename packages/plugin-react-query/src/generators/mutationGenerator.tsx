@@ -1,27 +1,30 @@
 import { ast } from '@internals/ast'
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation, HookFile, MutationKey, resolveHookFile } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/kit'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { defineTemplate } from '@kubb/kit'
+import type { TemplateContext } from '@kubb/kit'
+import { File } from '@kubb/renderer-jsx'
 import { Mutation } from '../components/Mutation.tsx'
 import { MutationOptions } from '../components/MutationOptions.tsx'
 import type { PluginReactQuery } from '../types'
 
+// The operations this template writes. Every other operation returns `null`.
+function matchesMutation(node: ast.SchemaNode | ast.OperationNode, ctx: TemplateContext<PluginReactQuery>): boolean {
+  const operationNode = node as ast.OperationNode
+  if (!ast.http.isOperation(operationNode)) return false
+  const { query, mutation } = ctx.options
+  return classifyOperation(operationNode, { query, mutation }).isMutation
+}
+
 /**
- * Built-in generator for `useMutation` hooks. Emits one `useFooMutation` hook
+ * Built-in template for `useMutation` hooks. Emits one `useFooMutation` hook
  * per POST/PUT/DELETE operation (configurable via `mutation.methods`) plus
  * the matching `fooMutationKey` / `fooMutationOptions` helpers.
  */
-export const mutationGenerator = defineGenerator<PluginReactQuery>({
-  name: 'react-query-mutation',
-  renderer: jsxRenderer,
-  match(node, ctx) {
-    const operationNode = node as ast.OperationNode
-    if (!ast.http.isOperation(operationNode)) return false
-    const { query, mutation } = ctx.options
-    return classifyOperation(operationNode, { query, mutation }).isMutation
-  },
-  operation(node, ctx) {
+export const mutationOperation = defineTemplate<PluginReactQuery>({
+  kind: 'Operation',
+  render(node, ctx) {
+    if (!matchesMutation(node, ctx)) return null
     if (!ast.http.isOperation(node)) return null
     const { mutation, client, customOptions, hooks } = ctx.options
 

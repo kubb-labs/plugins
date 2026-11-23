@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
 import { getStream, typeNames } from '@internals/shared'
-import { defineGenerator } from '@kubb/kit'
+import { defineGenerator, defineTemplate } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'
@@ -12,10 +12,9 @@ import type { PluginMcp } from '../types.ts'
  * headers, body }` config and forwards it to the registered client plugin's
  * (`@kubb/plugin-axios` / `@kubb/plugin-fetch`) `<op>` function.
  */
-export const mcpGenerator = defineGenerator<PluginMcp>({
-  name: 'mcp',
-  renderer: jsxRenderer,
-  operation(node, ctx) {
+export const mcpOperation = defineTemplate<PluginMcp>({
+  kind: 'Operation',
+  render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     // A stream has no single JSON body to return as tool output, like the query plugins skip it.
     const stream = getStream(node)
@@ -56,4 +55,13 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
       </File>
     )
   },
+})
+
+/**
+ * @deprecated Register `mcpOperation` with `addTemplate`.
+ */
+export const mcpGenerator = defineGenerator<PluginMcp>({
+  name: 'mcp',
+  renderer: jsxRenderer,
+  operation: (node, ctx) => mcpOperation.render(node, ctx),
 })

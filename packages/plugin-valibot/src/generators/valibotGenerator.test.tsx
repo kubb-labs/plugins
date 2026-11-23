@@ -1,18 +1,10 @@
 import { ast } from '@internals/ast'
 import { Resolver } from '@kubb/kit'
 import { describe, test } from 'vitest'
-import {
-  createMockedAdapter,
-  createMockedPlugin,
-  createMockedPluginDriver,
-  matchFiles,
-  renderGeneratorOperation,
-  renderGeneratorSchema,
-  testConfig,
-} from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
 import { resolverValibot } from '../resolvers/resolverValibot.ts'
 import type { PluginValibot } from '../types.ts'
-import { createPrinterValibot, valibotGenerator } from './valibotGenerator.tsx'
+import { createPrinterValibot, valibotOperation, valibotSchema } from './valibotGenerator.tsx'
 
 const { createContent, createSchema, createProperty, createOperation, createParameter, createResponse } = ast.factory
 
@@ -85,7 +77,7 @@ describe('valibotGenerator schema', () => {
   test.each(schemas)('$name', async ({ name, node, options }) => {
     const { driver, context } = setup(name, options)
 
-    await renderGeneratorSchema(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
+    await renderTemplate(valibotSchema, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, name)
   })
@@ -93,7 +85,7 @@ describe('valibotGenerator schema', () => {
   test('typeGuards adds an is* guard and an assert* function', async () => {
     const { driver, context } = setup('typeGuards', { typeGuards: true })
 
-    await renderGeneratorSchema(valibotGenerator, createSchema({ type: 'integer', name: 'PetId' }), { ...context, driver, printer: createPrinterValibot })
+    await renderTemplate(valibotSchema, createSchema({ type: 'integer', name: 'PetId' }), { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'typeGuards')
   })
@@ -111,7 +103,7 @@ describe('valibotGenerator schema', () => {
       ],
     })
 
-    await renderGeneratorSchema(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
+    await renderTemplate(valibotSchema, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'inputVariant')
   })
@@ -120,7 +112,7 @@ describe('valibotGenerator schema', () => {
     const { driver, context } = setup('circular', { inferred: true })
     driver.inputNode = ast.factory.createInput({ schemas: [petSchema] })
 
-    await renderGeneratorSchema(valibotGenerator, petSchema, { ...context, driver, printer: createPrinterValibot })
+    await renderTemplate(valibotSchema, petSchema, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'circular')
   })
@@ -196,7 +188,7 @@ describe('valibotGenerator operation', () => {
       responses: [createResponse({ statusCode: '204', description: 'Created' })],
     })
 
-    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
+    await renderTemplate(valibotOperation, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'circularBody')
   })
@@ -239,7 +231,7 @@ describe('valibotGenerator operation', () => {
       responses: [createResponse({ statusCode: '204', description: 'Created' })],
     })
 
-    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
+    await renderTemplate(valibotOperation, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'circularAllOfBody')
   })
@@ -257,7 +249,7 @@ describe('valibotGenerator operation', () => {
       responses: [createResponse({ statusCode: '200', schema: stayRef(), description: 'Booked' })],
     })
 
-    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
+    await renderTemplate(valibotOperation, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, 'codec')
   })
@@ -265,7 +257,7 @@ describe('valibotGenerator operation', () => {
   test.each(operations)('$name', async ({ name, node, options }) => {
     const { driver, context } = setup(name, options)
 
-    await renderGeneratorOperation(valibotGenerator, node, { ...context, driver, printer: createPrinterValibot })
+    await renderTemplate(valibotOperation, node, { ...context, driver, printer: createPrinterValibot })
 
     await matchFiles(driver.fileManager.files, name)
   })

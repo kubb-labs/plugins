@@ -1,21 +1,20 @@
 import { ast } from '@internals/ast'
 import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, toResponseContent, typeNames } from '@internals/shared'
-import { defineGenerator } from '@kubb/kit'
+import { defineGenerator, defineTemplate } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import type { PluginTs } from '../types'
 import { buildParams, buildResponseComments, enumTypeName, getExampleValues, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
 
 /**
- * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
+ * Built-in template for `@kubb/plugin-ts`. Emits one TypeScript file per
  * schema in the spec plus per-operation request, response, and parameter
  * types. Drop-replace with a custom `Generator<PluginTs>` to change how
  * TypeScript output is produced.
  */
-export const typeGenerator = defineGenerator<PluginTs>({
-  name: 'typescript',
-  renderer: jsxRenderer,
-  schema(node, ctx) {
+export const typeSchema = defineTemplate<PluginTs>({
+  kind: 'Schema',
+  render(node, ctx) {
     const { enum: enumOptions, output, group } = ctx.options
     const { resolver, root } = ctx
 
@@ -51,7 +50,11 @@ export const typeGenerator = defineGenerator<PluginTs>({
       </File>
     )
   },
-  operation(node, ctx) {
+})
+
+export const typeOperation = defineTemplate<PluginTs>({
+  kind: 'Operation',
+  render(node, ctx) {
     const { enum: enumOptions, group, output, operations } = ctx.options
     const { resolver, root } = ctx
     const inline = operations === 'inline'
@@ -242,4 +245,14 @@ export const typeGenerator = defineGenerator<PluginTs>({
       </File>
     )
   },
+})
+
+/**
+ * @deprecated Register `typeSchema` and `typeOperation` with `addTemplate`.
+ */
+export const typeGenerator = defineGenerator<PluginTs>({
+  name: 'typescript',
+  renderer: jsxRenderer,
+  schema: (node, ctx) => typeSchema.render(node, ctx),
+  operation: (node, ctx) => typeOperation.render(node, ctx),
 })

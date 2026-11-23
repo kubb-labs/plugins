@@ -5,24 +5,14 @@ import { createRequire } from 'node:module'
 import path from 'node:path'
 import { promisify } from 'node:util'
 import { parserTs } from '@kubb/parser-ts'
-import { type PluginTs, resolverTs, typeGenerator } from '@kubb/plugin-ts'
+import { type PluginTs, resolverTs, typeSchema, typeOperation } from '@kubb/plugin-ts'
 import { describe, expect, onTestFinished, test } from 'vitest'
-import {
-  createMockedAdapter,
-  createMockedPlugin,
-  createMockedPluginDriver,
-  format,
-  matchFiles,
-  rawSources,
-  renderGeneratorOperation,
-  renderGeneratorSchema,
-  testConfig,
-} from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, format, matchFiles, rawSources, renderTemplate, testConfig } from '#mocks'
 import { createPrinterTs } from '../../../plugin-ts/src/printers/printerTs.ts'
 import { createPrinterFaker } from '../printers/printerFaker.ts'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import { fakerGenerator } from './fakerGenerator.tsx'
+import { fakerOperation, fakerSchema } from './fakerGenerator.tsx'
 
 const categorySchema = ast.factory.createSchema({
   type: 'object',
@@ -338,7 +328,7 @@ describe('fakerGenerator — schema', () => {
     const driver = createMockedPluginDriver({ name: 'allOfCycle', plugin: tsPlugin })
     driver.inputNode = ast.factory.createInput({ schemas })
     for (const node of schemas) {
-      await renderGeneratorSchema(typeGenerator, node, {
+      await renderTemplate(typeSchema, node, {
         config: testConfig,
         adapter: createMockedAdapter(),
         driver,
@@ -347,7 +337,7 @@ describe('fakerGenerator — schema', () => {
         resolver: resolverTs,
         printer: createPrinterTs,
       })
-      await renderGeneratorSchema(fakerGenerator, node, {
+      await renderTemplate(fakerSchema, node, {
         config: testConfig,
         adapter: createMockedAdapter(),
         driver,
@@ -431,7 +421,7 @@ const custom: true = child.custom`,
       ],
     })
 
-    await renderGeneratorSchema(fakerGenerator, node, {
+    await renderTemplate(fakerSchema, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -452,7 +442,7 @@ const custom: true = child.custom`,
       plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorSchema(fakerGenerator, emojiSchema, {
+    await renderTemplate(fakerSchema, emojiSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -482,8 +472,8 @@ const custom: true = child.custom`,
       plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorSchema(
-      fakerGenerator,
+    await renderTemplate(
+      fakerSchema,
       { ...petSchema, description: 'A pet' },
       {
         config: testConfig,
@@ -569,7 +559,7 @@ describe('fakerGenerator — operation', () => {
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options, resolver: resolverFaker })
     const driver = createMockedPluginDriver({ name: 'binaryReadonly', plugin: tsPlugin })
     for (const node of [pdf, payload]) {
-      await renderGeneratorSchema(typeGenerator, node, {
+      await renderTemplate(typeSchema, node, {
         config: testConfig,
         adapter: createMockedAdapter(),
         driver,
@@ -578,7 +568,7 @@ describe('fakerGenerator — operation', () => {
         resolver: resolverTs,
         printer: createPrinterTs,
       })
-      await renderGeneratorSchema(fakerGenerator, node, {
+      await renderTemplate(fakerSchema, node, {
         config: testConfig,
         adapter: createMockedAdapter(),
         driver,
@@ -589,7 +579,7 @@ describe('fakerGenerator — operation', () => {
       })
     }
     for (const node of operations) {
-      await renderGeneratorOperation(typeGenerator, node, {
+      await renderTemplate(typeOperation, node, {
         config: testConfig,
         adapter: createMockedAdapter(),
         driver,
@@ -598,7 +588,7 @@ describe('fakerGenerator — operation', () => {
         resolver: resolverTs,
         printer: createPrinterTs,
       })
-      await renderGeneratorOperation(fakerGenerator, node, {
+      await renderTemplate(fakerOperation, node, {
         config: testConfig,
         adapter: createMockedAdapter(),
         driver,
@@ -912,7 +902,7 @@ body.id
 
     driver.inputNode = ast.factory.createInput({ schemas: [apiErrorSchema, petListSchema, categorySchema, errorSchema, petSchema, treeNodeSchema] })
 
-    await renderGeneratorOperation(fakerGenerator, node, {
+    await renderTemplate(fakerOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -947,7 +937,7 @@ body.id
       ],
     })
 
-    await renderGeneratorOperation(fakerGenerator, node, {
+    await renderTemplate(fakerOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -983,9 +973,9 @@ describe('fakerGenerator — custom imports', () => {
     })
     const context = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverFaker, printer: createPrinterFaker }
 
-    await renderGeneratorSchema(fakerGenerator, ast.factory.createSchema({ type: 'date', representation: 'string', name: 'CreatedAt' }), context)
-    await renderGeneratorOperation(
-      fakerGenerator,
+    await renderTemplate(fakerSchema, ast.factory.createSchema({ type: 'date', representation: 'string', name: 'CreatedAt' }), context)
+    await renderTemplate(
+      fakerOperation,
       ast.factory.createOperation({
         operationId: 'getClock',
         method: 'GET',
@@ -1018,9 +1008,9 @@ describe('fakerGenerator — custom imports', () => {
     })
     const context = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverFaker, printer: createPrinterFaker }
 
-    await renderGeneratorSchema(fakerGenerator, ast.factory.createSchema({ type: 'string', name: 'Name' }), context)
-    await renderGeneratorOperation(
-      fakerGenerator,
+    await renderTemplate(fakerSchema, ast.factory.createSchema({ type: 'string', name: 'Name' }), context)
+    await renderTemplate(
+      fakerOperation,
       ast.factory.createOperation({
         operationId: 'getName',
         method: 'GET',
@@ -1067,7 +1057,7 @@ describe('fakerGenerator — custom imports', () => {
       plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorSchema(fakerGenerator, schema, {
+    await renderTemplate(fakerSchema, schema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

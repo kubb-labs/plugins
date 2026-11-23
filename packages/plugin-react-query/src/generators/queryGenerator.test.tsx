@@ -6,16 +6,16 @@ import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@kubb/plugin-client'
 import type { ClientResolvedOptions } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, rawSources, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, rawSources, renderTemplate, testConfig } from '#mocks'
 import { hookFileName, mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { Resolver } from '@kubb/kit'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
-import { queryGenerator } from './queryGenerator.tsx'
-import { infiniteQueryGenerator } from './infiniteQueryGenerator.tsx'
-import { suspenseQueryGenerator } from './suspenseQueryGenerator.tsx'
-import { suspenseInfiniteQueryGenerator } from './suspenseInfiniteQueryGenerator.tsx'
+import { queryOperation } from './queryGenerator.tsx'
+import { infiniteQueryOperation } from './infiniteQueryGenerator.tsx'
+import { suspenseQueryOperation } from './suspenseQueryGenerator.tsx'
+import { suspenseInfiniteQueryOperation } from './suspenseInfiniteQueryGenerator.tsx'
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
@@ -212,7 +212,7 @@ describe('queryGenerator operation', () => {
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
     const driver = createMultiPluginDriver(props.name, plugins)
 
-    await renderGeneratorOperation(queryGenerator, props.node, {
+    await renderTemplate(queryOperation, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -237,7 +237,7 @@ describe('queryGenerator returnType', () => {
     const driver = createMultiPluginDriver('returnTypeConflict', { 'plugin-ts': mockedTsPlugin, 'plugin-axios': mockedDataAxiosPlugin })
 
     await expect(
-      renderGeneratorOperation(queryGenerator, getPetByIdNode, {
+      renderTemplate(queryOperation, getPetByIdNode, {
         config: testConfig,
         adapter: createMockedAdapter(),
         driver,
@@ -250,40 +250,42 @@ describe('queryGenerator returnType', () => {
 })
 
 describe('queryGenerator queryKey', () => {
-  test.each([queryGenerator, infiniteQueryGenerator, suspenseQueryGenerator, suspenseInfiniteQueryGenerator])(
-    'forwards headers to a custom key with $name',
-    async (generator) => {
-      const options: PluginReactQuery['resolvedOptions'] = {
-        ...defaultOptions,
-        suspense: {},
-        infinite: { queryParam: 'page', initialPageParam: 0 },
-        queryKey: (props) => [...queryKeyTransformer(props), '...(headers ? [headers] : [])'],
-      }
-      const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
-      const driver = createMultiPluginDriver('headerKey', plugins)
+  test.each([
+    ['react-query', queryOperation],
+    ['react-infinite-query', infiniteQueryOperation],
+    ['react-suspense-query', suspenseQueryOperation],
+    ['react-suspense-infinite-query', suspenseInfiniteQueryOperation],
+  ])('forwards headers to a custom key with %s', async (_name, template) => {
+    const options: PluginReactQuery['resolvedOptions'] = {
+      ...defaultOptions,
+      suspense: {},
+      infinite: { queryParam: 'page', initialPageParam: 0 },
+      queryKey: (props) => [...queryKeyTransformer(props), '...(headers ? [headers] : [])'],
+    }
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMultiPluginDriver('headerKey', plugins)
 
-      const node = ast.factory.createOperation({
-        ...headersOnlyNode,
-        parameters: [
-          ...headersOnlyNode.parameters,
-          ast.factory.createParameter({ name: 'page', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
-        ],
-      })
-      await renderGeneratorOperation(generator, node, {
-        config: testConfig,
-        adapter: createMockedAdapter(),
-        driver,
-        plugin,
-        options,
-        resolver: resolverReactQuery,
-      })
+    const node = ast.factory.createOperation({
+      ...headersOnlyNode,
+      parameters: [
+        ...headersOnlyNode.parameters,
+        ast.factory.createParameter({ name: 'page', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+      ],
+    })
+    await renderTemplate(template, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverReactQuery,
+    })
 
-      const source = rawSources(driver.fileManager.files).join('\n')
-      expect(source).toContain('headers?:')
-      expect(source).toContain('...(headers ? [headers] : [])')
-      expect(source).toMatch(/const queryKey = \w+\({ query, headers }\)/)
-    },
-  )
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('headers?:')
+    expect(source).toContain('...(headers ? [headers] : [])')
+    expect(source).toMatch(/const queryKey = \w+\({ query, headers }\)/)
+  })
 
   test('passes the query variant to a custom queryKey', async () => {
     const queryKey = vi.fn<Transformer>(queryKeyTransformer)
@@ -291,7 +293,7 @@ describe('queryGenerator queryKey', () => {
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
     const driver = createMultiPluginDriver('customQueryKey', plugins)
 
-    await renderGeneratorOperation(queryGenerator, findByTagsNode, {
+    await renderTemplate(queryOperation, findByTagsNode, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -312,7 +314,7 @@ describe('queryGenerator queryKey', () => {
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
     const driver = createMultiPluginDriver('wrappedQueryKey', plugins)
 
-    await renderGeneratorOperation(queryGenerator, findByTagsNode, {
+    await renderTemplate(queryOperation, findByTagsNode, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

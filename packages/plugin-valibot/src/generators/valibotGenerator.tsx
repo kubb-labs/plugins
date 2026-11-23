@@ -10,7 +10,7 @@ import {
   schemaComments,
   toResponseContent,
 } from '@internals/shared'
-import { defineGenerator, type PrinterFactory } from '@kubb/kit'
+import { defineGenerator, defineTemplate, type PrinterFactory } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerValibot } from '../printers/printerValibot.ts'
@@ -41,13 +41,12 @@ export const createPrinterValibot: PrinterFactory<PluginValibot> = (ctx) => {
 const inferKinds = { encode: 'InferInput', decode: 'InferOutput' } as const
 
 /**
- * Built-in generator for `@kubb/plugin-valibot`. Emits one Valibot schema per schema in the spec,
+ * Built-in template for `@kubb/plugin-valibot`. Emits one Valibot schema per schema in the spec,
  * plus the parameter, request, and response schemas of each operation.
  */
-export const valibotGenerator = defineGenerator<PluginValibot>({
-  name: 'valibot',
-  renderer: jsxRenderer,
-  schema(node, ctx) {
+export const valibotSchema = defineTemplate<PluginValibot>({
+  kind: 'Schema',
+  render(node, ctx) {
     const { output, inferred, typeGuards, importPath, group } = ctx.options
 
     if (!node.name) {
@@ -109,7 +108,11 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       </File>
     )
   },
-  operation(node, ctx) {
+})
+
+export const valibotOperation = defineTemplate<PluginValibot>({
+  kind: 'Operation',
+  render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { output, inferred, importPath, group } = ctx.options
 
@@ -282,4 +285,14 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
       </File>
     )
   },
+})
+
+/**
+ * @deprecated Register `valibotSchema` and `valibotOperation` with `addTemplate`.
+ */
+export const valibotGenerator = defineGenerator<PluginValibot>({
+  name: 'valibot',
+  renderer: jsxRenderer,
+  schema: (node, ctx) => valibotSchema.render(node, ctx),
+  operation: (node, ctx) => valibotOperation.render(node, ctx),
 })

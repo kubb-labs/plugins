@@ -1,8 +1,8 @@
 import { ast } from '@internals/ast'
 import { namedFile } from '@internals/shared'
 import { hookFileName, matchesInfinite } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/kit'
-import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
+import { defineTemplate } from '@kubb/kit'
+import { File, Type } from '@kubb/renderer-jsx'
 import { hookFileVariants } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types'
 import { classifyOperation, resolveOperationOverrides } from '@internals/tanstack-query'
@@ -16,10 +16,9 @@ type MutationOption = PluginReactQuery['resolvedOptions']['mutation']
  * every hook keyed by name so user-supplied options stay in sync with the
  * generated hooks at compile time.
  */
-export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
-  name: 'react-query-hook-options',
-  renderer: jsxRenderer,
-  operations(nodes, ctx) {
+export const hookOptionsOperations = defineTemplate<PluginReactQuery>({
+  kind: 'Operations',
+  render(nodes, ctx) {
     const { output, customOptions, query, mutation, suspense, infinite, override, hooks } = ctx.options
 
     if (!customOptions || !hooks) return null

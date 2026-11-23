@@ -1,22 +1,21 @@
 import { ast } from '@internals/ast'
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation, HookFile, QueryKey, resolveHookFile } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/kit'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { defineTemplate } from '@kubb/kit'
+import { File } from '@kubb/renderer-jsx'
 import { Query } from '../components/Query.tsx'
 import { QueryOptions } from '../components/QueryOptions.tsx'
 import { maybeRefOrGetter } from '../utils.ts'
 import type { PluginVueQuery } from '../types'
 
 /**
- * Built-in generator for `useQuery` composables. Emits one `useFooQuery`
+ * Built-in template for `useQuery` composables. Emits one `useFooQuery`
  * composable per GET and QUERY operation (configurable via `query.methods`) plus the
  * matching `fooQueryKey` / `fooQueryOptions` helpers.
  */
-export const queryGenerator = defineGenerator<PluginVueQuery>({
-  name: 'vue-query',
-  renderer: jsxRenderer,
-  operation(node, ctx) {
+export const queryOperation = defineTemplate<PluginVueQuery>({
+  kind: 'Operation',
+  render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { query, mutation, client, hooks } = ctx.options
 

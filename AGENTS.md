@@ -37,7 +37,7 @@ The full folder structure, repository setup, and commands live in
 Each plugin in the `packages/` directory follows a consistent structure:
 
 - `src/components/` - JSX-renderer components
-- `src/generators/` - Generator implementations
+- `src/generators/` - Templates (`defineTemplate`) that write the plugin's files
 - `src/*.test.ts` - Tests
 - `docs/` - kubb.dev pages (overview, options, guides)
 - `kubb-extension.json` - Registry metadata

@@ -6,18 +6,10 @@ import { resolverClient } from '@kubb/plugin-client'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import {
-  createMockedAdapter,
-  createMockedPlugin,
-  createMultiPluginDriver,
-  matchFiles,
-  rawSources,
-  renderGeneratorOperation,
-  testConfig as baseConfig,
-} from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, rawSources, renderTemplate, testConfig as baseConfig } from '#mocks'
 import { resolverMcp } from '../resolvers/resolverMcp.ts'
 import type { PluginMcp } from '../types.ts'
-import { mcpGenerator } from './mcpGenerator.tsx'
+import { mcpOperation } from './mcpGenerator.tsx'
 
 // A string input makes the generated banner carry a `Source:` line, which the snapshots pin.
 const testConfig: Config = { ...baseConfig, input: '' }
@@ -65,7 +57,7 @@ describe("mcpGenerator — the client plugin's returnType", () => {
     const driver = driverFor('getPets', axiosPlugin)
     const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
 
-    await renderGeneratorOperation(mcpGenerator, operation, {
+    await renderTemplate(mcpOperation, operation, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -111,7 +103,7 @@ describe('mcpGenerator — cookie parameters', () => {
     const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
     const driver = driverFor(name)
 
-    await renderGeneratorOperation(mcpGenerator, node, {
+    await renderTemplate(mcpOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -141,7 +133,7 @@ describe('mcpGenerator — stream operations', () => {
     const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
     const driver = driverFor('streamEvents')
 
-    await renderGeneratorOperation(mcpGenerator, node, {
+    await renderTemplate(mcpOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

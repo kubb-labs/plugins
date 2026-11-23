@@ -3,12 +3,12 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
-import { suspenseInfiniteQueryGenerator } from './suspenseInfiniteQueryGenerator.tsx'
+import { suspenseInfiniteQueryOperation } from './suspenseInfiniteQueryGenerator.tsx'
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
@@ -99,7 +99,7 @@ describe('suspenseInfiniteQueryGenerator operation', () => {
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
     const driver = createMultiPluginDriver(props.name, plugins)
 
-    await renderGeneratorOperation(suspenseInfiniteQueryGenerator, props.node, {
+    await renderTemplate(suspenseInfiniteQueryOperation, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -119,7 +119,7 @@ describe('suspenseInfiniteQueryGenerator queryKey', () => {
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
     const driver = createMultiPluginDriver('customQueryKey', plugins)
 
-    await renderGeneratorOperation(suspenseInfiniteQueryGenerator, findByTagsNode, {
+    await renderTemplate(suspenseInfiniteQueryOperation, findByTagsNode, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

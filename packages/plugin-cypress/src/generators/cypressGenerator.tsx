@@ -1,20 +1,19 @@
 import { ast } from '@internals/ast'
 import { resolveOperationTypeNames, typeNames } from '@internals/shared'
-import { code, defineGenerator, operationKey } from '@kubb/kit'
+import { code, defineGenerator, defineTemplate, operationKey } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
 import type { PluginCypress } from '../types.ts'
 
 /**
- * Built-in generator for `@kubb/plugin-cypress`. Emits one typed
+ * Built-in template for `@kubb/plugin-cypress`. Emits one typed
  * `cy.request()` wrapper per OpenAPI operation, ready to call inside Cypress
  * test specs and custom commands.
  */
-export const cypressGenerator = defineGenerator<PluginCypress>({
-  name: 'cypress',
-  renderer: jsxRenderer,
-  operation(node, ctx) {
+export const cypressOperation = defineTemplate<PluginCypress>({
+  kind: 'Operation',
+  render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { baseURL } = ctx.options
 
@@ -40,4 +39,13 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
       </File>
     )
   },
+})
+
+/**
+ * @deprecated Register `cypressOperation` with `addTemplate`.
+ */
+export const cypressGenerator = defineGenerator<PluginCypress>({
+  name: 'cypress',
+  renderer: jsxRenderer,
+  operation: (node, ctx) => cypressOperation.render(node, ctx),
 })

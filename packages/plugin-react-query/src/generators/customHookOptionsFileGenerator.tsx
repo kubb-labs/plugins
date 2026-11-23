@@ -3,8 +3,8 @@ import path from 'node:path'
 
 import { namedFile } from '@internals/shared'
 import { hookFileName } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/kit'
-import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
+import { defineTemplate } from '@kubb/kit'
+import { File, Function } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
 
 /**
@@ -13,10 +13,9 @@ import type { PluginReactQuery } from '../types'
  * only created when it does not already exist, so user edits persist across
  * regeneration, and only when `importPath` resolves inside the plugin's output folder.
  */
-export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>({
-  name: 'react-query-custom-hook-options-file',
-  renderer: jsxRenderer,
-  operations(nodes, ctx) {
+export const customHookOptionsFileOperations = defineTemplate<PluginReactQuery>({
+  kind: 'Operations',
+  render(nodes, ctx) {
     const { resolver, root } = ctx
     const { output, customOptions, query, hooks } = ctx.options
 

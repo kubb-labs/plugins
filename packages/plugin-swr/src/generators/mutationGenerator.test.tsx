@@ -3,12 +3,12 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, renderTemplate, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverSwr } from '../resolvers/resolverSwr.ts'
 import type { PluginSwr } from '../types.ts'
-import { mutationGenerator } from './mutationGenerator.tsx'
+import { mutationOperation } from './mutationGenerator.tsx'
 
 const defaultOptions: PluginSwr['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
@@ -69,7 +69,7 @@ describe('mutationGenerator mutationKey', () => {
     const plugin = createMockedPlugin<PluginSwr>({ name: 'plugin-swr', options, resolver: resolverSwr })
     const driver = createMultiPluginDriver('customMutationKey', plugins)
 
-    await renderGeneratorOperation(mutationGenerator, updatePetWithFormNode, {
+    await renderTemplate(mutationOperation, updatePetWithFormNode, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

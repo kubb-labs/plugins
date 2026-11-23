@@ -1,3 +1,3 @@
-export { infiniteQueryGenerator } from './infiniteQueryGenerator.tsx'
-export { mutationGenerator } from './mutationGenerator.tsx'
-export { queryGenerator } from './queryGenerator.tsx'
+export { infiniteQueryOperation } from './infiniteQueryGenerator.tsx'
+export { mutationOperation } from './mutationGenerator.tsx'
+export { queryOperation } from './queryGenerator.tsx'

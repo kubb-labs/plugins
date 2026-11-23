@@ -1,17 +1,17 @@
 import { ast } from '@internals/ast'
 import { namedFile } from '@internals/shared'
-import { casing, code, defineGenerator } from '@kubb/kit'
+import { casing, code, defineTemplate } from '@kubb/kit'
 import type { PluginMsw } from '../types'
 
 /**
- * Aggregate generator enabled by `pluginMsw({ handlers: true })`. Emits a
+ * Aggregate template enabled by `pluginMsw({ handlers: true })`. Emits a
  * `handlers.ts` file that re-exports every generated handler in operation
  * order, ready to spread into `setupServer(...handlers)` or
  * `setupWorker(...handlers)`.
  */
-export const handlersGenerator = defineGenerator<PluginMsw>({
-  name: 'plugin-msw',
-  operations(nodes, ctx) {
+export const handlersOperations = defineTemplate<PluginMsw>({
+  kind: 'Operations',
+  render(nodes, ctx) {
     const handlersName = ctx.resolver.handler.listName()
     const createHandlersName = ctx.resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })
     const file = namedFile({ name: handlersName })

@@ -3,20 +3,11 @@ import path from 'node:path'
 import type { Group } from '@kubb/kit'
 import { casing, Resolver } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import {
-  createMockedAdapter,
-  createMockedPlugin,
-  createMockedPluginDriver,
-  matchFiles,
-  rawSources,
-  renderGeneratorOperation,
-  renderGeneratorSchema,
-  testConfig,
-} from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderTemplate, testConfig } from '#mocks'
 import { createPrinterTs } from '../printers/printerTs.ts'
 import { resolverTs } from '../resolvers/resolverTs.ts'
 import type { PluginTs } from '../types.ts'
-import { typeGenerator } from './typeGenerator.tsx'
+import { typeSchema, typeOperation } from './typeGenerator.tsx'
 
 const defaultOptions: PluginTs['resolvedOptions'] = {
   enum: { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
@@ -104,7 +95,7 @@ describe('typeGenerator — response alias', () => {
     const driver = createMockedPluginDriver({ name: 'response alias' })
     const node = ast.factory.createOperation({ operationId: 'providers.list', method: 'GET', path: '/v1/providers', responses })
 
-    await renderGeneratorOperation(typeGenerator, node, {
+    await renderTemplate(typeOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -156,7 +147,7 @@ describe('typeGenerator — custom resolver', () => {
     })
     const adapter = createMockedAdapter()
 
-    await renderGeneratorOperation(typeGenerator, node, {
+    await renderTemplate(typeOperation, node, {
       config: testConfig,
       adapter,
       driver,
@@ -221,7 +212,7 @@ describe("typeGenerator — operations: 'inline'", () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver })
     const driver = createMockedPluginDriver({ name: 'operations inline' })
 
-    await renderGeneratorOperation(typeGenerator, node, {
+    await renderTemplate(typeOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -554,7 +545,7 @@ describe('typeGenerator — Operation', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: props.name })
 
-    await renderGeneratorOperation(typeGenerator, props.node, {
+    await renderTemplate(typeOperation, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -608,7 +599,7 @@ describe('typeGenerator — Operation — group', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
 
-    await renderGeneratorOperation(typeGenerator, node, {
+    await renderTemplate(typeOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -645,7 +636,7 @@ describe('typeGenerator — Operation — group', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'getConfig', config: testConfig })
 
-    await renderGeneratorOperation(typeGenerator, noTagNode, {
+    await renderTemplate(typeOperation, noTagNode, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -708,7 +699,7 @@ describe('typeGenerator — Operation — output.mode', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'getPet', config: testConfig })
 
-    await renderGeneratorOperation(typeGenerator, operation, {
+    await renderTemplate(typeOperation, operation, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -731,7 +722,7 @@ describe('typeGenerator — Operation — output.mode', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
 
-    await renderGeneratorOperation(typeGenerator, node, {
+    await renderTemplate(typeOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -752,7 +743,7 @@ describe('typeGenerator — Operation — output.mode', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
 
-    await renderGeneratorOperation(typeGenerator, node, {
+    await renderTemplate(typeOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -774,7 +765,7 @@ describe('typeGenerator — params casing', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'paramsCasing camelcase' })
 
-    await renderGeneratorOperation(typeGenerator, operationWithSnakeCaseParams, {
+    await renderTemplate(typeOperation, operationWithSnakeCaseParams, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -807,7 +798,7 @@ describe('typeGenerator — params casing', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'paramsCasing distinct names' })
 
-    await renderGeneratorOperation(typeGenerator, operationWithCasingVariantParams, {
+    await renderTemplate(typeOperation, operationWithCasingVariantParams, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -840,7 +831,7 @@ describe('typeGenerator — params casing', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'paramsCasing duplicate names' })
 
-    await renderGeneratorOperation(typeGenerator, operationWithDuplicateParamName, {
+    await renderTemplate(typeOperation, operationWithDuplicateParamName, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -864,7 +855,7 @@ describe('typeGenerator — enumType', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: `enumType ${enumType}` })
 
-    await renderGeneratorSchema(typeGenerator, enumSchema, {
+    await renderTemplate(typeSchema, enumSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -895,7 +886,7 @@ describe('typeGenerator — const (single-value enum)', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: `const ${enumType}` })
 
-    await renderGeneratorSchema(typeGenerator, constSchema, {
+    await renderTemplate(typeSchema, constSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -924,7 +915,7 @@ describe('typeGenerator — enumType — empty string value', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: `emptyStringEnum ${enumType}` })
 
-    await renderGeneratorSchema(typeGenerator, emptyStringEnumSchema, {
+    await renderTemplate(typeSchema, emptyStringEnumSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -955,7 +946,7 @@ describe('typeGenerator — enumType — dotted name', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: `enumNames.Type — ${enumType}` })
 
-    await renderGeneratorSchema(typeGenerator, dottedEnumSchema, {
+    await renderTemplate(typeSchema, dottedEnumSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -979,7 +970,7 @@ describe('typeGenerator — enumKeyCasing', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: `enumKeyCasing ${enumKeyCasing}` })
 
-    await renderGeneratorSchema(typeGenerator, multiWordEnumSchema, {
+    await renderTemplate(typeSchema, multiWordEnumSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -999,7 +990,7 @@ describe('typeGenerator — enumTypeSuffix', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'enumTypeSuffix Key' })
 
-    await renderGeneratorSchema(typeGenerator, enumSchema, {
+    await renderTemplate(typeSchema, enumSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1017,7 +1008,7 @@ describe('typeGenerator — enumTypeSuffix', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'enumTypeSuffix Value' })
 
-    await renderGeneratorSchema(typeGenerator, enumSchema, {
+    await renderTemplate(typeSchema, enumSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1035,7 +1026,7 @@ describe('typeGenerator — enumTypeSuffix', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'enumTypeSuffix empty' })
 
-    await renderGeneratorSchema(typeGenerator, enumSchema, {
+    await renderTemplate(typeSchema, enumSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1056,7 +1047,7 @@ describe('typeGenerator — enumConstCasing', () => {
     const driver = createMockedPluginDriver({ name: `digit-leading enum ${constCasing}` })
     const schema = ast.factory.createSchema({ type: 'enum', name: '1-10', primitive: 'string', enumValues: ['1-10', '11-20'] })
 
-    await renderGeneratorSchema(typeGenerator, schema, {
+    await renderTemplate(typeSchema, schema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1079,7 +1070,7 @@ describe('typeGenerator — enumConstCasing', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'enumConstCasing pascalCase' })
 
-    await renderGeneratorSchema(typeGenerator, enumSchema, {
+    await renderTemplate(typeSchema, enumSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1100,7 +1091,7 @@ describe('typeGenerator — enumConstCasing', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'enumConstCasing merged name' })
 
-    await renderGeneratorSchema(typeGenerator, enumSchema, {
+    await renderTemplate(typeSchema, enumSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1120,7 +1111,7 @@ describe('typeGenerator — syntaxType', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'syntaxType type' })
 
-    await renderGeneratorSchema(typeGenerator, objectSchema, {
+    await renderTemplate(typeSchema, objectSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1138,7 +1129,7 @@ describe('typeGenerator — syntaxType', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'syntaxType interface' })
 
-    await renderGeneratorSchema(typeGenerator, objectSchema, {
+    await renderTemplate(typeSchema, objectSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1162,7 +1153,7 @@ describe('typeGenerator — optionalType', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: `optionalType ${optionalType}` })
 
-    await renderGeneratorSchema(typeGenerator, objectSchema, {
+    await renderTemplate(typeSchema, objectSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1184,7 +1175,7 @@ describe('typeGenerator — arrayType', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: `arrayType ${arrayType}` })
 
-    await renderGeneratorSchema(typeGenerator, objectSchema, {
+    await renderTemplate(typeSchema, objectSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1212,7 +1203,7 @@ describe('typeGenerator — transformers', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs, macros: [removeOptionalProperties] })
     const driver = createMockedPluginDriver({ name: 'transformers removeOptionalProperties' })
 
-    await renderGeneratorSchema(typeGenerator, objectSchema, {
+    await renderTemplate(typeSchema, objectSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1246,7 +1237,7 @@ describe('typeGenerator — transformers', () => {
       ],
     })
 
-    await renderGeneratorSchema(typeGenerator, schemaWithInteger, {
+    await renderTemplate(typeSchema, schemaWithInteger, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1276,7 +1267,7 @@ describe('typeGenerator — custom imports', () => {
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'customImports' })
 
-    await renderGeneratorSchema(typeGenerator, ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' }), {
+    await renderTemplate(typeSchema, ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' }), {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

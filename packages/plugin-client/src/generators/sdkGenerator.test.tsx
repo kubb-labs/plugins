@@ -4,10 +4,10 @@ import { Diagnostics, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperations } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderTemplate } from '#mocks'
 import { resolverClient } from '../resolver.ts'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
-import { createSdkGenerator } from './sdkGenerator.tsx'
+import { createSdkTemplate } from './sdkGenerator.tsx'
 
 type PluginFetch = PluginType<'plugin-fetch', ClientOptions, ClientResolvedOptions, ResolverClient>
 
@@ -141,7 +141,7 @@ describe('sdkGenerator operations', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperations(createSdkGenerator<PluginFetch>(), 'nodes' in props ? props.nodes : operationNodes, {
+    await renderTemplate(createSdkTemplate<PluginFetch>(), 'nodes' in props ? props.nodes : operationNodes, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -168,7 +168,7 @@ describe('sdkGenerator operations invalid options', () => {
     })
 
     await expect(
-      renderGeneratorOperations(createSdkGenerator<PluginFetch>(), operationNodes, {
+      renderTemplate(createSdkTemplate<PluginFetch>(), operationNodes, {
         config: testConfig,
         adapter: createMockedAdapter(),
         driver,

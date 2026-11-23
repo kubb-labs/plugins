@@ -6,10 +6,10 @@ import type { PluginZod } from '@kubb/plugin-zod'
 import { resolverZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderGeneratorOperations, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderTemplate, testConfig } from '#mocks'
 import { resolverMcp } from '../resolvers/resolverMcp.ts'
 import type { PluginMcp } from '../types.ts'
-import { serverGenerator } from './serverGenerator.tsx'
+import { serverOperations } from './serverGenerator.tsx'
 
 const defaultOptions: PluginMcp['resolvedOptions'] = {
   output: { path: '.', mode: 'directory' },
@@ -113,7 +113,7 @@ async function renderServer(nodes: Array<ast.OperationNode>) {
     return mockedTsPlugin.resolver
   }) as typeof driver.getResolver
 
-  await renderGeneratorOperations(serverGenerator, nodes, {
+  await renderTemplate(serverOperations, nodes, {
     config: testConfig,
     adapter: createMockedAdapter(),
     driver,

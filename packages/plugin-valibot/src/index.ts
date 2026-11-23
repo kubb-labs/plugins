@@ -1,4 +1,4 @@
-export { valibotGenerator } from './generators/valibotGenerator.tsx'
+export { valibotGenerator, valibotOperation, valibotSchema } from './generators/valibotGenerator.tsx'
 export { default, pluginValibot, pluginValibotName } from './plugin.ts'
 export type { PrinterValibotFactory, PrinterValibotNodes, PrinterValibotOptions } from './printers/printerValibot.ts'
 export { printerValibot } from './printers/printerValibot.ts'

@@ -4,27 +4,19 @@ import { memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import {
-  createMockedAdapter,
-  createMockedPlugin,
-  createMockedPluginDriver,
-  matchFiles,
-  rawSources,
-  renderGeneratorOperation,
-  renderGeneratorOperations,
-} from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderTemplate } from '#mocks'
 import { resolverClient } from '../resolver.ts'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
-import { createClientGenerator } from './clientGenerator.tsx'
+import { createClientTemplates } from './clientGenerator.tsx'
 
 type PluginFetch = PluginType<'plugin-fetch', ClientOptions, ClientResolvedOptions, ResolverClient>
 
-const clientGenerator = createClientGenerator<PluginFetch>('fetch')
+const [, clientOperation] = createClientTemplates<PluginFetch>()
 
 type PluginClient = PluginType<'plugin-client', ClientOptions, ClientResolvedOptions & { importPath: string }, ResolverClient>
 
 // What `@kubb/plugin-client` registers: a user-owned client module, imported exactly as configured.
-const customClientGenerator = createClientGenerator<PluginClient>('client')
+const [, customClientOperation] = createClientTemplates<PluginClient>()
 
 const testConfig: Config = {
   root: '.',
@@ -332,7 +324,7 @@ describe('clientGenerator operation', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperation(clientGenerator, props.node, {
+    await renderTemplate(clientOperation, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: 'meta' in props ? props.meta : undefined,
@@ -355,7 +347,7 @@ describe('clientGenerator with a custom client module', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperation(customClientGenerator, getPetByIdNode, {
+    await renderTemplate(customClientOperation, getPetByIdNode, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -374,7 +366,7 @@ describe('clientGenerator with a custom client module', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperation(customClientGenerator, getPetByIdNode, {
+    await renderTemplate(customClientOperation, getPetByIdNode, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -392,7 +384,7 @@ describe('clientGenerator without an operation type source', () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
 
     await expect(
-      renderGeneratorOperation(clientGenerator, getPetByIdNode, {
+      renderTemplate(clientOperation, getPetByIdNode, {
         config: testConfig,
         adapter: createMockedAdapter(),
         driver: createMockedPluginDriver({ name: 'missingOperationTypes' }),
@@ -411,7 +403,7 @@ describe('clientGenerator without an operation type source', () => {
 })
 
 describe('clientGenerator runtime files', () => {
-  const sseGenerator = createClientGenerator<PluginFetch>('fetch', { templates: '/templates' })
+  const [clientRuntime] = createClientTemplates<PluginFetch>({ templates: '/templates' })
   // The files copied into `.kubb/`, the generated `config.ts`, and the footer of `client.ts`.
   const readRuntime = (files: Array<ast.FileNode>) => {
     const runtime = files.filter((file) => file.path.includes('.kubb/'))
@@ -440,7 +432,7 @@ describe('clientGenerator runtime files', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperations(sseGenerator, nodes, {
+    await renderTemplate(clientRuntime, nodes, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -471,7 +463,7 @@ describe('clientGenerator runtime files', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperations(sseGenerator, [getPetByIdNode], {
+    await renderTemplate(clientRuntime, [getPetByIdNode], {
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
@@ -500,7 +492,7 @@ describe('clientGenerator runtime files', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperations(sseGenerator, [getPetByIdNode, uploadFileNode], {
+    await renderTemplate(clientRuntime, [getPetByIdNode, uploadFileNode], {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -532,7 +524,7 @@ describe('clientGenerator runtime files', () => {
       responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
     })
 
-    await renderGeneratorOperations(sseGenerator, [getPetByIdNode, node], {
+    await renderTemplate(clientRuntime, [getPetByIdNode, node], {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

@@ -9,20 +9,13 @@ import { Resolver } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import * as z from 'zod'
 import * as zMini from 'zod/mini'
-import {
-  createMockedAdapter,
-  createMockedPlugin,
-  createMockedPluginDriver,
-  matchFiles,
-  rawSources,
-  renderGeneratorOperation,
-  renderGeneratorSchema,
-  testConfig,
-} from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderTemplate, testConfig } from '#mocks'
 import type { PrinterZodNodes } from '../printers/printerZod.ts'
 import { resolverZod } from '../resolvers/resolverZod.ts'
 import type { PluginZod } from '../types.ts'
-import { createPrinterZod, zodGenerator } from './zodGenerator.tsx'
+import { createPrinterZod } from './zodGenerator.tsx'
+import { zodOperation } from './zodOperation.tsx'
+import { zodSchema } from './zodSchema.tsx'
 
 const temporalNodes: PrinterZodNodes = {
   time() {
@@ -161,7 +154,7 @@ describe('zodGenerator — Schema', () => {
     const resolver = Resolver.merge(resolverZod)
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'oneOfSiblings' })
-    await renderGeneratorSchema(zodGenerator, root.schemas[0]!, {
+    await renderTemplate(zodSchema, root.schemas[0]!, {
       config: testConfig,
       adapter,
       driver,
@@ -327,7 +320,7 @@ describe('zodGenerator — Schema', () => {
     const driver = createMockedPluginDriver({ name: props.name })
     driver.inputNode = ast.factory.createInput({ schemas: props.document ?? [] })
 
-    await renderGeneratorSchema(zodGenerator, props.node, {
+    await renderTemplate(zodSchema, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -346,7 +339,7 @@ describe('zodGenerator — Schema', () => {
     const driver = createMockedPluginDriver({ name: 'catCycle' })
     driver.inputNode = ast.factory.createInput({ schemas: [petPolySchema, catCycleSchema] })
 
-    await renderGeneratorSchema(zodGenerator, catCycleSchema, {
+    await renderTemplate(zodSchema, catCycleSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -381,7 +374,7 @@ describe('zodGenerator — Schema', () => {
     const driver = createMockedPluginDriver({ name: 'selfRefCycle' })
     driver.inputNode = ast.factory.createInput({ schemas: [errorDetailsSchema] })
 
-    await renderGeneratorSchema(zodGenerator, errorDetailsSchema, {
+    await renderTemplate(zodSchema, errorDetailsSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -419,7 +412,7 @@ describe('zodGenerator — Schema', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver })
     const driver = createMockedPluginDriver({ name: 'nullableRecursive' })
     driver.inputNode = ast.factory.createInput({ schemas: [node] })
-    await renderGeneratorSchema(zodGenerator, node, {
+    await renderTemplate(zodSchema, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -832,7 +825,7 @@ describe('zodGenerator — Operation', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: props.name })
 
-    await renderGeneratorOperation(zodGenerator, props.node, {
+    await renderTemplate(zodOperation, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -861,7 +854,7 @@ describe('zodGenerator — transformers', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver, macros: [removeOptionalProperties] })
     const driver = createMockedPluginDriver({ name: 'transformers removeOptionalProperties' })
 
-    await renderGeneratorSchema(zodGenerator, objectSchema, {
+    await renderTemplate(zodSchema, objectSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -897,7 +890,7 @@ describe('zodGenerator — transformers', () => {
       ],
     })
 
-    await renderGeneratorSchema(zodGenerator, schemaWithInteger, {
+    await renderTemplate(zodSchema, schemaWithInteger, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -947,7 +940,7 @@ describe('zodGenerator — inferred aliases', () => {
     const resolver = Resolver.merge(resolverZod)
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: `alias-${node.name}` })
-    await renderGeneratorSchema(zodGenerator, node, {
+    await renderTemplate(zodSchema, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -963,7 +956,7 @@ describe('zodGenerator — inferred aliases', () => {
     const resolver = Resolver.merge(resolverZod)
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: `alias-${node.operationId}` })
-    await renderGeneratorOperation(zodGenerator, node, {
+    await renderTemplate(zodOperation, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1088,7 +1081,7 @@ describe('zodGenerator — Type Guards', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'typeguards-true' })
 
-    await renderGeneratorSchema(zodGenerator, testSchema, {
+    await renderTemplate(zodSchema, testSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1112,7 +1105,7 @@ describe('zodGenerator — Type Guards', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'typeguards-is-only' })
 
-    await renderGeneratorSchema(zodGenerator, testSchema, {
+    await renderTemplate(zodSchema, testSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1134,7 +1127,7 @@ describe('zodGenerator — Type Guards', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'typeguards-assert-only' })
 
-    await renderGeneratorSchema(zodGenerator, testSchema, {
+    await renderTemplate(zodSchema, testSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1156,7 +1149,7 @@ describe('zodGenerator — Type Guards', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'typeguards-inferred' })
 
-    await renderGeneratorSchema(zodGenerator, testSchema, {
+    await renderTemplate(zodSchema, testSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1179,7 +1172,7 @@ describe('zodGenerator — Type Guards', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'typeguards-mini' })
 
-    await renderGeneratorSchema(zodGenerator, testSchema, {
+    await renderTemplate(zodSchema, testSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1205,7 +1198,7 @@ describe('zodGenerator — Compile Option', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileSchema' })
 
-    await renderGeneratorSchema(zodGenerator, objectSchema, {
+    await renderTemplate(zodSchema, objectSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1225,7 +1218,7 @@ describe('zodGenerator — Compile Option', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileMiniSchema' })
 
-    await renderGeneratorSchema(zodGenerator, objectSchema, {
+    await renderTemplate(zodSchema, objectSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1274,7 +1267,7 @@ describe('zodGenerator — Compile Option', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileOperation' })
 
-    await renderGeneratorOperation(zodGenerator, operationWithRefAndInline, {
+    await renderTemplate(zodOperation, operationWithRefAndInline, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1303,7 +1296,7 @@ describe('zodGenerator — Compile Option', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileStrictSchema' })
 
-    await renderGeneratorSchema(zodGenerator, objectSchema, {
+    await renderTemplate(zodSchema, objectSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1341,7 +1334,7 @@ describe('zodGenerator — Compile Option', () => {
     const driver = createMockedPluginDriver({ name: 'compileStrictCyclic' })
     driver.inputNode = ast.factory.createInput({ schemas: [cyclicNodeSchema] })
 
-    await renderGeneratorSchema(zodGenerator, cyclicNodeSchema, {
+    await renderTemplate(zodSchema, cyclicNodeSchema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1389,7 +1382,7 @@ describe('zodGenerator — Compile Option', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileStrictCoerced' })
 
-    await renderGeneratorOperation(zodGenerator, operation, {
+    await renderTemplate(zodOperation, operation, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1446,7 +1439,7 @@ describe('zodGenerator — Compile Option', () => {
     const driver = createMockedPluginDriver({ name: 'compileStrictReachesCycle' })
     driver.inputNode = ast.factory.createInput({ schemas: [treeNode, forest] })
 
-    await renderGeneratorOperation(zodGenerator, operation, {
+    await renderTemplate(zodOperation, operation, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1482,7 +1475,7 @@ describe('zodGenerator — Compile Option', () => {
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileStrictUnsupported' })
 
-    await renderGeneratorSchema(zodGenerator, schema, {
+    await renderTemplate(zodSchema, schema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -1511,7 +1504,7 @@ describe('custom imports', () => {
     const driver = createMockedPluginDriver({ name: 'customImports' })
     driver.inputNode = ast.factory.createInput({ schemas: document })
 
-    await renderGeneratorSchema(zodGenerator, schema, {
+    await renderTemplate(zodSchema, schema, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
