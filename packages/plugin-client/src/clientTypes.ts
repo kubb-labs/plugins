@@ -73,8 +73,6 @@ export type ClientOptions = PluginOptions<Omit<ClientResolvedOptions, 'throwOnEr
    * runtime environment reads dynamic.
    */
   baseURL?: string
-  /** Module the generated operations import the client from, used verbatim. Kubb still writes the `.kubb/` runtime. */
-  importPath?: string
   /**
    * Default error behavior for generated operations and their client. Per-call `throwOnError`
    * takes precedence.
