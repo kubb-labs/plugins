@@ -16,20 +16,22 @@ function createPlugin(): Rolldown.Plugin {
         if (shared) return { id: `@kubb/plugin-client/templates/${shared[1]}.ts`, external: true }
         if (!importer) return null
 
-        const isDts = importer.endsWith('.d.ts')
         const fromShared = importer.startsWith(clientTemplates)
 
         if (!fromShared && source === './core.ts') {
-          client = importer.replace(/\.d\.ts$|\.ts$/, '')
-          const core = path.join(clientTemplates, 'core.ts')
-          if (!isDts) return core
-          await this.load({ id: core })
+          client = importer
+          await this.load({ id: path.join(clientTemplates, 'core.ts') })
           return { id: path.join(clientTemplates, 'core.d.ts') }
         }
-        if (fromShared && source === './client.ts' && client) return `${client}${isDts ? '.d.ts' : '.ts'}`
+        if (fromShared && source === './client.ts') return client
 
         return null
       },
+    },
+    buildEnd() {
+      if (![...this.getModuleIds()].includes(path.join(clientTemplates, 'core.d.ts'))) {
+        this.error("shared-templates did not bundle plugin-client's `core.d.ts`, so the template types would use the stand-in `NativeOptions`.")
+      }
     },
   }
 }
