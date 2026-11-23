@@ -80,11 +80,7 @@
     "@kubb/kit": "catalog:"
   },
   "devDependencies": {
-    "@internals/ast": "workspace:*",
-    "@kubb/adapter-oas": "catalog:"
-  },
-  "peerDependencies": {
-    "@kubb/adapter-oas": "catalog:"
+    "@internals/ast": "workspace:*"
   },
   "engines": {
     "node": ">=22.22"

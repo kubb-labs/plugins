@@ -39,7 +39,7 @@ export const pluginKy = defineExtension<PluginKy>({
   dependencies: clientDependencies,
   setup(options) {
     const resolved = resolveClientOptions(options)
-    setupClient({ name: 'ky', resolved, macros: options.macros, client: fileURLToPath(new URL('../templates/client.ts', import.meta.url)) })
+    setupClient({ resolved, macros: options.macros, client: fileURLToPath(new URL('../templates/client.ts', import.meta.url)) })
     return resolved
   },
 })

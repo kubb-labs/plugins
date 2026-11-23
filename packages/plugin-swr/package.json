@@ -85,10 +85,10 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/ast": "^5.23.5",
-    "@kubb/kit": "^5.23.5",
+    "@kubb/ast": "^5.24.0",
+    "@kubb/kit": "^5.24.0",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/renderer-jsx": "^5.23.5"
+    "@kubb/renderer-jsx": "^5.24.0"
   },
   "devDependencies": {
     "@internals/ast": "workspace:*",

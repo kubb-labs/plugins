@@ -1,9 +1,11 @@
-import { addGenerator, defineExtension, getResolver, provide, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, getResolver, provide, Resolver, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { createPrinterZod, zodGenerator } from './generators/zodGenerator.tsx'
+import { createPrinterZod } from './printers/createPrinterZod.ts'
 import { resolverZod } from './resolvers/resolverZod.ts'
 import { toZodTypeResolver } from './resolvers/toZodTypeResolver.ts'
+import { zodOperation } from './templates/zodOperation.tsx'
+import { zodSchema } from './templates/zodSchema.tsx'
 import type { PluginZod } from './types.ts'
 
 /**
@@ -68,11 +70,10 @@ export const pluginZod = defineExtension<PluginZod>({
     if (resolvedInferred) {
       provide('types', () => toZodTypeResolver(getResolver(pluginZodName)), { priority: resolvedInferred === 'codec' ? 1 : -1 })
     }
-    if (userMacros?.length) {
-      setMacros(userMacros)
-    }
+    addMacro(...(userMacros ?? []))
     setPrinter(createPrinterZod)
-    addGenerator(zodGenerator)
+    addTemplate(zodSchema)
+    addTemplate(zodOperation)
 
     return {
       output,

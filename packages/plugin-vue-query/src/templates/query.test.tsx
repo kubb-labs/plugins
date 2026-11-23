@@ -1,0 +1,135 @@
+/** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
+
+import { ast } from '@internals/ast'
+import type { PluginTs } from '@kubb/plugin-ts'
+import { resolverTs } from '@kubb/plugin-ts'
+import { resolverClient } from '@kubb/plugin-client'
+import { describe, expect, test, vi } from 'vitest'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
+import { mutationKeyTransformer } from '@internals/tanstack-query'
+import { queryKeyTransformer } from '@internals/tanstack-query'
+import type { Transformer } from '@internals/tanstack-query'
+import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
+import type { PluginVueQuery } from '../types.ts'
+import { queryOperation } from './query.tsx'
+
+const defaultOptions: PluginVueQuery['resolvedOptions'] = {
+  client: { kind: 'contract', pluginName: 'plugin-axios' },
+  queryKey: queryKeyTransformer,
+  mutationKey: mutationKeyTransformer,
+  query: {
+    importPath: '@tanstack/react-query',
+    methods: ['GET'],
+  },
+  mutation: {
+    methods: ['POST'],
+    importPath: '@tanstack/react-query',
+  },
+  infinite: false,
+  output: { path: '.', mode: 'directory' },
+  group: null,
+  exclude: [],
+  include: undefined,
+  override: [],
+  hooks: true,
+  resolver: resolverVueQuery,
+}
+
+const mockedTsPlugin = createMockedPlugin<PluginTs>({
+  name: 'plugin-ts',
+  options: { output: { path: '.', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
+  resolver: resolverTs,
+})
+
+const mockedAxiosPlugin = createMockedPlugin({
+  name: 'plugin-axios',
+  options: { output: { path: './clients', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
+  resolver: resolverClient,
+})
+
+const plugins = { 'plugin-ts': mockedTsPlugin, 'plugin-axios': mockedAxiosPlugin }
+
+const findByTagsNode = ast.factory.createOperation({
+  operationId: 'findPetsByTags',
+  method: 'GET',
+  path: '/pet/findByTags',
+  tags: ['pet'],
+  parameters: [
+    ast.factory.createParameter({
+      name: 'tags',
+      in: 'query',
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+      required: true,
+    }),
+    ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+  ],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
+})
+
+describe('queryGenerator operation', () => {
+  const testData = [
+    { name: 'findByTags', node: findByTagsNode, options: {} },
+    {
+      name: 'headersInQueryKey',
+      node: ast.factory.createOperation({
+        ...findByTagsNode,
+        parameters: [
+          ...findByTagsNode.parameters,
+          ast.factory.createParameter({ name: 'X-Locale', in: 'header', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+      }),
+      options: { queryKey: (props) => [...queryKeyTransformer(props), '...(headers ? [headers] : [])'] },
+    },
+  ] as const satisfies Array<{
+    name: string
+    node: ast.OperationNode
+    options: Partial<PluginVueQuery['resolvedOptions']>
+    baseURL?: string
+  }>
+
+  test.each(testData)('$name', async (props) => {
+    const options: PluginVueQuery['resolvedOptions'] = {
+      ...defaultOptions,
+      ...props.options,
+    }
+    const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
+    const driver = createMultiPluginDriver(props.name, plugins)
+
+    await renderTemplate(queryOperation, props.node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverVueQuery,
+    })
+
+    await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('queryGenerator queryKey', () => {
+  test('passes the query variant to a custom queryKey', async () => {
+    const queryKey = vi.fn<Transformer>(queryKeyTransformer)
+    const options: PluginVueQuery['resolvedOptions'] = { ...defaultOptions, queryKey }
+    const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
+    const driver = createMultiPluginDriver('customQueryKey', plugins)
+
+    await renderTemplate(queryOperation, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverVueQuery,
+    })
+
+    expect(queryKey.mock.calls.map(([props]) => props.variant)).toEqual(['query'])
+  })
+})

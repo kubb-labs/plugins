@@ -1,10 +1,10 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { resolveContractClient } from '@internals/client'
 import { mutationKeyTransformer, queryKeyTransformer, resolveMutationConfig, resolveQueryConfig } from '@internals/tanstack-query'
-import { mutationGenerator, queryGenerator } from './generators'
+import { mutationOperation, queryOperation } from './templates'
 import { resolverSwr } from './resolvers/resolverSwr.ts'
 import type { PluginSwr, ResolverSwr } from './types.ts'
 
@@ -59,11 +59,10 @@ export const pluginSwr = defineExtension<PluginSwr>({
     const resolver = userResolver ? Resolver.merge<ResolverSwr>(resolverSwr, ...[userResolver].flat()) : resolverSwr
 
     setResolver(resolver)
-    if (userMacros?.length) {
-      setMacros(userMacros)
-    }
+    addMacro(...(userMacros ?? []))
 
-    addGenerator(queryGenerator, mutationGenerator)
+    addTemplate(queryOperation)
+    addTemplate(mutationOperation)
 
     return {
       output,

@@ -1,16 +1,6 @@
 import { ast } from '@internals/ast'
 import { describe, expect, test } from 'vitest'
-import {
-  defaultLiteral,
-  formatDefault,
-  getChecks,
-  getObjectKind,
-  numericLiteral,
-  schemaComments,
-  shouldCoerce,
-  withFormatRange,
-  isComposedObject,
-} from './schema.ts'
+import { defaultLiteral, formatDefault, getChecks, getObjectKind, schemaComments, shouldCoerce, withFormatRange, isComposedObject } from './schema.ts'
 
 describe('formatDefault', () => {
   test('object value keeps its contents', () => {

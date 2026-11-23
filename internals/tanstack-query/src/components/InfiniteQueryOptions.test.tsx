@@ -1,10 +1,10 @@
 import { ast } from '@internals/ast'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
-import { defineGenerator } from '@kubb/kit'
+import { File } from '@kubb/renderer-jsx'
+import { defineTemplate } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rawSources, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rawSources, renderTemplate, testConfig } from '#mocks'
 import { definePageParam } from '../utils.ts'
 import { InfiniteQueryOptions } from './InfiniteQueryOptions.tsx'
 
@@ -48,11 +48,10 @@ const tsPlugin = createMockedPlugin<PluginTs>({
   resolver: resolverTs,
 })
 
-const generator = (params: PageParams) =>
-  defineGenerator<PluginTs>({
-    name: 'infinite-query-options-test',
-    renderer: jsxRenderer,
-    operation(node) {
+const template = (params: PageParams) =>
+  defineTemplate<PluginTs>({
+    kind: 'Operation',
+    render(node) {
       return (
         <File baseName="options.ts" path="/options.ts">
           <InfiniteQueryOptions
@@ -74,7 +73,7 @@ const generator = (params: PageParams) =>
 async function render(params: PageParams) {
   const driver = createMockedPluginDriver({ name: 'pageParamCombos' })
 
-  await renderGeneratorOperation(generator(params), findByTagsNode, {
+  await renderTemplate(template(params), findByTagsNode, {
     config: testConfig,
     adapter: createMockedAdapter(),
     driver,

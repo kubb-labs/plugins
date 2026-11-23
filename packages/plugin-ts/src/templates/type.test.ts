@@ -1,0 +1,1282 @@
+import { ast } from '@internals/ast'
+import path from 'node:path'
+import type { Group } from '@kubb/kit'
+import { casing, Resolver } from '@kubb/kit'
+import { describe, expect, test } from 'vitest'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderTemplate, testConfig } from '#mocks'
+import { createPrinterTs } from '../printers/printerTs.ts'
+import { resolverTs } from '../resolvers/resolverTs.ts'
+import type { PluginTs } from '../types.ts'
+import { typeSchema, typeOperation } from './type.tsx'
+
+const defaultOptions: PluginTs['resolvedOptions'] = {
+  enum: { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
+  optionalType: 'questionToken',
+  arrayType: 'array',
+  syntaxType: 'type',
+  operations: 'export',
+  output: { path: '.', mode: 'directory' },
+  exclude: [],
+  include: undefined,
+  override: [],
+  group: null,
+  printer: undefined,
+}
+
+const enumSchema = ast.factory.createSchema({
+  type: 'enum',
+  name: 'petStatus',
+  primitive: 'string',
+  enumValues: ['available', 'pending', 'sold'],
+})
+
+const multiWordEnumSchema = ast.factory.createSchema({
+  type: 'enum',
+  name: 'orderStatus',
+  primitive: 'string',
+  enumValues: ['in_progress', 'awaiting_payment', 'fully_shipped'],
+})
+
+const objectSchema = ast.factory.createSchema({
+  type: 'object',
+  name: 'Pet',
+  properties: [
+    ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+    ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+    ast.factory.createProperty({ name: 'description', schema: ast.factory.createSchema({ type: 'string', optional: true }) }),
+    ast.factory.createProperty({ name: 'tags', schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }) }),
+  ],
+})
+
+const operationWithSnakeCaseParams: ast.OperationNode = ast.factory.createOperation({
+  operationId: 'updatePet',
+  method: 'POST',
+  path: '/pets/{pet_id}',
+  tags: ['pets'],
+  parameters: [
+    ast.factory.createParameter({ name: 'pet_id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+    ast.factory.createParameter({ name: 'include_deleted', in: 'query', schema: ast.factory.createSchema({ type: 'boolean' }) }),
+    ast.factory.createParameter({ name: 'request_source', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+  ],
+  requestBody: {
+    content: [
+      ast.factory.createContent({
+        contentType: 'application/json',
+        schema: ast.factory.createSchema({
+          type: 'object',
+          properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+        }),
+      }),
+    ],
+  },
+  responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Success' })],
+})
+
+const apiResolver = Resolver.merge(resolverTs, {
+  name(name: string) {
+    return `Api${resolverTs.name(name)}`
+  },
+})
+
+describe('typeGenerator — response alias', () => {
+  test.each([
+    { name: 'no responses', responses: [], expected: 'unknown' },
+    { name: 'a default response without a schema', responses: [ast.factory.createResponse({ statusCode: 'default' })], expected: 'unknown' },
+    { name: 'a 204 response without a schema', responses: [ast.factory.createResponse({ statusCode: '204' })], expected: 'unknown' },
+    { name: 'an error response without a schema', responses: [ast.factory.createResponse({ statusCode: '400' })], expected: 'unknown' },
+    {
+      name: 'a default response with a schema',
+      responses: [ast.factory.createResponse({ statusCode: 'default', schema: ast.factory.createSchema({ type: 'string' }) })],
+      expected: 'ProvidersListStatusDefault',
+    },
+  ])('exports the response alias for $name', async ({ responses, expected }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'response alias' })
+    const node = ast.factory.createOperation({ operationId: 'providers.list', method: 'GET', path: '/v1/providers', responses })
+
+    await renderTemplate(typeOperation, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+
+    expect(source).toContain(`export type ProvidersListResponse = ${expected}`)
+    for (const response of responses.filter((res) => !res.content?.some((entry) => entry.schema))) {
+      expect(source).toContain(`export type ${resolverTs.response.status(node, response.statusCode)} = unknown`)
+    }
+  })
+})
+
+describe('typeGenerator — custom resolver', () => {
+  test('uses name consistently for imported schema refs', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: apiResolver })
+    const driver = createMockedPluginDriver({ name: 'custom resolver' })
+    const node = ast.factory.createOperation({
+      operationId: 'createPet',
+      method: 'POST',
+      path: '/pets',
+      tags: ['pets'],
+      requestBody: {
+        content: [
+          ast.factory.createContent({
+            contentType: 'application/json',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'NewPet', ref: '#/components/schemas/NewPet' }),
+          }),
+        ],
+      },
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '201',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          description: 'Created',
+        }),
+        ast.factory.createResponse({
+          statusCode: '400',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'ErrorResponse', ref: '#/components/schemas/ErrorResponse' }),
+          description: 'Bad request',
+        }),
+      ],
+    })
+    const adapter = createMockedAdapter()
+
+    await renderTemplate(typeOperation, node, {
+      config: testConfig,
+      adapter,
+      driver,
+      plugin,
+      options,
+      resolver: apiResolver,
+      printer: createPrinterTs,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+
+    expect(source).toContain('export type ApiCreatePetStatus201 = ApiPet')
+    expect(source).toContain('export type ApiCreatePetStatus400 = ApiErrorResponse')
+    expect(source).toContain('export type ApiCreatePetBody = ApiNewPet')
+    expect(source).toContain("import type { ApiPet } from './Pet'")
+    expect(source).toContain("import type { ApiErrorResponse } from './ErrorResponse'")
+    expect(source).toContain("import type { ApiNewPet } from './NewPet'")
+  })
+})
+
+describe("typeGenerator — operations: 'inline'", () => {
+  // The adapter resolves each `$ref` target onto `schema`; a documented target must still be referenced by name.
+  const ref = (name: string, schema: ast.SchemaNode = { ...objectSchema, name, description: `A ${name}` }, extra: Partial<ast.SchemaNode> = {}) =>
+    ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}`, schema, ...extra } as ast.SchemaNode)
+  const node = ast.factory.createOperation({
+    operationId: 'createPet',
+    method: 'POST',
+    path: '/pets/{petId}',
+    tags: ['pets'],
+    parameters: [
+      ast.factory.createParameter({ name: 'petId', in: 'path', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+      ast.factory.createParameter({
+        name: 'status',
+        in: 'query',
+        schema: ast.factory.createSchema({ type: 'enum', name: 'createPetStatus', primitive: 'string', enumValues: ['a', 'b'] }),
+      }),
+    ],
+    requestBody: {
+      content: [
+        ast.factory.createContent({ contentType: 'application/json', schema: ref('NewPet') }),
+        ast.factory.createContent({ contentType: 'application/xml', schema: ref('NewPet') }),
+      ],
+    },
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '201',
+        content: [
+          ast.factory.createContent({ contentType: 'application/json', schema: ref('Pet') }),
+          ast.factory.createContent({ contentType: 'application/xml; charset=utf-8', schema: ref('Pet') }),
+        ],
+        description: 'Created',
+      }),
+      ast.factory.createResponse({ statusCode: '404', schema: ast.factory.createSchema({ type: 'unknown' }), description: 'Not found' }),
+      ast.factory.createResponse({ statusCode: '409', schema: ref('PetStatus', enumSchema), description: 'Conflict' }),
+      ast.factory.createResponse({ statusCode: '410', schema: ref('Pet', undefined, { nullable: true }), description: 'Gone' }),
+    ],
+  })
+
+  test('marks the operation file inline, with bodies printed without enum declarations or property JSDoc', async () => {
+    const resolver = Resolver.merge(apiResolver)
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, operations: 'inline' }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver })
+    const driver = createMockedPluginDriver({ name: 'operations inline' })
+
+    await renderTemplate(typeOperation, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver,
+      printer: createPrinterTs,
+    })
+
+    const [file] = driver.fileManager.files
+    expect(file!.inline).toBe(true)
+    const body = (source: ast.SourceNode) => {
+      const declaration = source.nodes?.[0]
+      return declaration && 'nodes' in declaration ? ast.node.getText(declaration.nodes) : undefined
+    }
+    expect(Object.fromEntries(file!.sources.map((source) => [source.name, body(source)]))).toMatchInlineSnapshot(`
+      {
+        "ApiCreatePetBody": "ApiCreatePetBodyJson",
+        "ApiCreatePetBodyJson": "ApiNewPet",
+        "ApiCreatePetBodyXml": "ApiNewPet",
+        "ApiCreatePetOptions": "{
+        body?: ApiCreatePetBodyJson;
+        path: ApiCreatePetPath;
+        query?: ApiCreatePetQuery;
+        headers?: never;
+        contentType?: 'application/json' | {
+          request: 'application/json';
+        };
+      } | {
+        body?: ApiCreatePetBodyXml;
+        path: ApiCreatePetPath;
+        query?: ApiCreatePetQuery;
+        headers?: never;
+        contentType: 'application/xml' | {
+          request: 'application/xml';
+        };
+      }",
+        "ApiCreatePetPath": "{
+        petId: string;
+      }",
+        "ApiCreatePetQuery": "{
+        status?: 'a' | 'b';
+      }",
+        "ApiCreatePetResponse": "ApiCreatePetStatus201",
+        "ApiCreatePetResponses": "{
+        '201': {
+          contentType: 'application/json';
+          data: ApiCreatePetStatus201Json;
+        } | {
+          contentType: 'application/xml';
+          data: ApiCreatePetStatus201Xml;
+        };
+        '404': ApiCreatePetStatus404;
+        '409': ApiCreatePetStatus409;
+        '410': ApiCreatePetStatus410;
+      }",
+        "ApiCreatePetStatus201": "ApiCreatePetStatus201Json | ApiCreatePetStatus201Xml",
+        "ApiCreatePetStatus201Json": "ApiPet",
+        "ApiCreatePetStatus201Xml": "string",
+        "ApiCreatePetStatus404": "unknown",
+        "ApiCreatePetStatus409": "ApiPetStatus",
+        "ApiCreatePetStatus410": "ApiPet | null",
+      }
+    `)
+  })
+})
+
+describe('typeGenerator — Operation', () => {
+  const operations = [
+    {
+      name: 'findPetsByStatus — GET with query param enum',
+      node: ast.factory.createOperation({
+        operationId: 'findPetsByStatus',
+        method: 'GET',
+        path: '/pet/findByStatus',
+        tags: ['pet'],
+        parameters: [
+          ast.factory.createParameter({
+            name: 'status',
+            in: 'query',
+            schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['available', 'pending', 'sold'] }),
+          }),
+        ],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+            description: 'Successful operation',
+          }),
+        ],
+      }),
+    },
+    {
+      name: 'deletePet — DELETE with no response body',
+      node: ast.factory.createOperation({
+        operationId: 'deletePet',
+        method: 'DELETE',
+        path: '/pets/{petId}',
+        tags: ['pets'],
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+        responses: [ast.factory.createResponse({ statusCode: '204', description: 'No content', schema: ast.factory.createSchema({ type: 'void' }) })],
+      }),
+    },
+    {
+      name: 'findArtifacts — GET with multiple query params',
+      node: ast.factory.createOperation({
+        operationId: 'findArtifacts',
+        method: 'GET',
+        path: '/artifacts',
+        tags: ['artifacts'],
+        parameters: [
+          ast.factory.createParameter({ name: 'page', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+          ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+          ast.factory.createParameter({ name: 'sort', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+        responses: [
+          ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Results' }),
+        ],
+      }),
+    },
+    {
+      name: 'noTagsOperation — GET with no tags',
+      node: ast.factory.createOperation({
+        operationId: 'get_enterprise_configurations_id_v2025.0',
+        method: 'GET',
+        path: '/enterprise_configurations/:enterprise_id',
+        tags: [],
+        parameters: [ast.factory.createParameter({ name: 'enterprise_id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+            description: 'Enterprise config',
+          }),
+        ],
+      }),
+    },
+    {
+      // Regression for kubb-labs/plugins#132: an inline response that is an array of objects with a
+      // nested enum property must stay an array of objects, not collapse into an array of the enum.
+      name: 'getPreferencesUnits — GET with inline array-of-object response containing a nested enum',
+      node: ast.factory.createOperation({
+        operationId: 'getPreferencesUnits',
+        method: 'GET',
+        path: '/preferences/units/',
+        tags: ['Preferences'],
+        parameters: [],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'OK',
+            schema: ast.factory.createSchema({
+              type: 'array',
+              name: 'GetPreferencesUnitsStatus200',
+              items: [
+                ast.factory.createSchema({
+                  type: 'object',
+                  name: 'GetPreferencesUnitsStatus200',
+                  primitive: 'object',
+                  properties: [
+                    ast.factory.createProperty({
+                      name: 'id',
+                      required: true,
+                      schema: ast.factory.createSchema({ type: 'number', primitive: 'number', name: 'GetPreferencesUnitsStatus200Id' }),
+                    }),
+                    ast.factory.createProperty({
+                      name: 'type',
+                      required: true,
+                      schema: ast.factory.createSchema({
+                        type: 'enum',
+                        primitive: 'string',
+                        name: 'GetPreferencesUnitsStatus200TypeEnum',
+                        enumValues: ['area', 'density', 'length'],
+                      }),
+                    }),
+                    ast.factory.createProperty({
+                      name: 'value',
+                      required: true,
+                      schema: ast.factory.createSchema({ type: 'string', primitive: 'string', name: 'GetPreferencesUnitsStatus200Value' }),
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          }),
+        ],
+      }),
+    },
+    {
+      // Regression for kubb-labs/kubb#3475: with `enumType: 'asConst'`, an array whose items
+      // are an object containing a nested enum property must keep its object shape, not
+      // collapse into an array of the (first) nested enum.
+      name: 'arrayOfObjectWithNestedEnum — regression for kubb-labs/kubb#3475',
+      node: ast.factory.createOperation({
+        operationId: 'getArrayOfObject',
+        method: 'GET',
+        path: '/array-of-object',
+        tags: ['regression'],
+        parameters: [],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'OK',
+            schema: ast.factory.createSchema({
+              type: 'array',
+              name: 'ArrayOfObject',
+              items: [
+                ast.factory.createSchema({
+                  type: 'object',
+                  name: 'ArrayOfObject',
+                  primitive: 'object',
+                  properties: [
+                    ast.factory.createProperty({
+                      name: 'id',
+                      required: true,
+                      schema: ast.factory.createSchema({ type: 'integer', primitive: 'number', name: 'ArrayOfObjectId' }),
+                    }),
+                    ast.factory.createProperty({
+                      name: 'status',
+                      required: true,
+                      schema: ast.factory.createSchema({
+                        type: 'enum',
+                        primitive: 'string',
+                        name: 'ArrayOfObjectStatusEnum',
+                        enumValues: ['active', 'inactive'],
+                      }),
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          }),
+        ],
+      }),
+    },
+    {
+      name: 'multiContentType — POST with json and form-data request body',
+      node: ast.factory.createOperation({
+        operationId: 'uploadFile',
+        method: 'POST',
+        path: '/pet/{petId}/uploadImage',
+        tags: ['pet'],
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+        requestBody: {
+          content: [
+            ast.factory.createContent({
+              contentType: 'application/json',
+              schema: ast.factory.createSchema({
+                type: 'object',
+                properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+              }),
+            }),
+            ast.factory.createContent({
+              contentType: 'multipart/form-data',
+              schema: ast.factory.createSchema({
+                type: 'object',
+                properties: [ast.factory.createProperty({ name: 'file', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+              }),
+            }),
+          ],
+        },
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+            description: 'Successful operation',
+          }),
+        ],
+      }),
+    },
+    {
+      name: 'multiContentType — GET with json and xml response body',
+      node: ast.factory.createOperation({
+        operationId: 'getPetById',
+        method: 'GET',
+        path: '/pet/{petId}',
+        tags: ['pet'],
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'Successful operation',
+            schema: ast.factory.createSchema({
+              type: 'object',
+              properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+            }),
+            content: [
+              ast.factory.createContent({
+                contentType: 'application/json',
+                schema: ast.factory.createSchema({
+                  type: 'object',
+                  properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+                }),
+              }),
+              ast.factory.createContent({
+                contentType: 'application/xml',
+                schema: ast.factory.createSchema({
+                  type: 'object',
+                  properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+                }),
+              }),
+            ],
+          }),
+        ],
+      }),
+    },
+    {
+      name: 'getCookies — GET with cookie params',
+      node: ast.factory.createOperation({
+        operationId: 'getCookies',
+        method: 'GET',
+        path: '/cookies',
+        tags: ['cookies'],
+        parameters: [
+          ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+          ast.factory.createParameter({ name: 'theme', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+            description: 'The cookies the request sent',
+          }),
+        ],
+      }),
+    },
+  ] as const satisfies Array<{ name: string; node: ast.OperationNode }>
+
+  test.each(operations)('$name', async (props) => {
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: props.name })
+
+    await renderTemplate(typeOperation, props.node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('typeGenerator — Operation — group', () => {
+  const node = ast.factory.createOperation({
+    operationId: 'listPets',
+    method: 'GET',
+    path: '/pets',
+    tags: ['pets'],
+    parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        description: 'A paged array of pets',
+      }),
+      ast.factory.createResponse({
+        statusCode: 'default',
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        description: 'Unexpected error',
+      }),
+    ],
+  })
+
+  test.each([
+    {
+      group: {
+        type: 'tag',
+        name: (ctx: { group: string }) => `${casing.camel(ctx.group)}Controller`,
+      } satisfies Group,
+      expectedBaseName: 'ListPets.ts',
+      expectedDir: 'petsController',
+    },
+    { group: null, expectedBaseName: 'ListPets.ts', expectedDir: undefined },
+  ] satisfies Array<{
+    group: Group | null
+    expectedBaseName: string
+    expectedDir: string | undefined
+  }>)('group=$group.type — file path is computed correctly', async ({ group, expectedBaseName, expectedDir }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, group }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
+
+    await renderTemplate(typeOperation, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    const file = driver.fileManager.files.find((f: ast.FileNode) => f.baseName === expectedBaseName)
+    expect(file).toBeDefined()
+    const root = path.resolve(testConfig.root, testConfig.output.path, options.output.path)
+    const expectedPath = expectedDir ? path.resolve(root, expectedDir, expectedBaseName) : path.resolve(root, expectedBaseName)
+    expect(file!.path).toBe(expectedPath)
+  })
+
+  test('group=tag with empty tags falls back to default', async () => {
+    const noTagNode = ast.factory.createOperation({
+      operationId: 'getConfig',
+      method: 'GET',
+      path: '/config',
+      tags: [],
+      responses: [
+        ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Config' }),
+      ],
+    })
+    const options: PluginTs['resolvedOptions'] = {
+      ...defaultOptions,
+      group: {
+        type: 'tag',
+        name: (ctx: { group: string }) => `${casing.camel(ctx.group)}Controller`,
+      },
+    }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'getConfig', config: testConfig })
+
+    await renderTemplate(typeOperation, noTagNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    const file = driver.fileManager.files.find((f: ast.FileNode) => f.baseName === 'GetConfig.ts')
+    expect(file).toBeDefined()
+    const root = path.resolve(testConfig.root, testConfig.output.path, options.output.path)
+    expect(file!.path).toBe(path.resolve(root, 'defaultController', 'GetConfig.ts'))
+  })
+})
+
+describe('typeGenerator — Operation — output.mode', () => {
+  const node = ast.factory.createOperation({
+    operationId: 'listPets',
+    method: 'GET',
+    path: '/pets',
+    tags: ['pets'],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        description: 'A paged array of pets',
+      }),
+    ],
+  })
+
+  test('links parameter and response types to the spec entry they come from', async () => {
+    const operation = ast.factory.createOperation({
+      operationId: 'getPet',
+      method: 'GET',
+      path: '/pets/{id}',
+      pointer: '#/paths/~1pets~1{id}/get',
+      parameters: [
+        ast.factory.createParameter({
+          name: 'id',
+          in: 'path',
+          required: true,
+          pointer: '#/paths/~1pets~1{id}/get/parameters/0',
+          schema: ast.factory.createSchema({ type: 'string', pointer: '#/paths/~1pets~1{id}/get/parameters/0/schema' }),
+        }),
+      ],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          pointer: '#/paths/~1pets~1{id}/get/responses/200',
+          content: [
+            ast.factory.createContent({
+              contentType: 'application/json',
+              schema: ast.factory.createSchema({ type: 'string', pointer: '#/paths/~1pets~1{id}/get/responses/200/content/application~1json/schema' }),
+            }),
+          ],
+        }),
+      ],
+    })
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'getPet', config: testConfig })
+
+    await renderTemplate(typeOperation, operation, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    const pointers = Object.fromEntries(driver.fileManager.files.flatMap((file) => file.sources.map((source) => [source.name, source.pointer])))
+    // Types built from the whole operation, such as `GetPetResponses`, get the operation's pointer from the build.
+    expect(pointers).toMatchObject({
+      GetPetPath: '#/paths/~1pets~1{id}/get/parameters',
+      GetPetStatus200: '#/paths/~1pets~1{id}/get/responses/200',
+    })
+  })
+
+  test("mode 'file' writes the operation into the single output file", async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, output: { path: 'types.ts', mode: 'file' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
+
+    await renderTemplate(typeOperation, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    const file = driver.fileManager.files.at(0)
+    expect(file).toBeDefined()
+    expect(file!.path).toBe(path.resolve(testConfig.root, testConfig.output.path, 'types.ts'))
+    expect(file!.baseName).toBe('types.ts')
+  })
+
+  test("mode 'directory' with group places a tagged operation in a per-tag subdirectory", async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, output: { path: 'types', mode: 'directory' }, group: { type: 'tag' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
+
+    await renderTemplate(typeOperation, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    const root = path.resolve(testConfig.root, testConfig.output.path, options.output.path)
+    const file = driver.fileManager.files.find((f: ast.FileNode) => path.dirname(f.path) === path.resolve(root, 'pets'))
+    expect(file).toBeDefined()
+  })
+})
+
+describe('typeGenerator — params casing', () => {
+  test('snake_case params keep the exact OpenAPI spec name', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'paramsCasing camelcase' })
+
+    await renderTemplate(typeOperation, operationWithSnakeCaseParams, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'paramsCasing camelcase')
+  })
+
+  test('query params with distinct spec names, including casing variants, all render as separate properties', async () => {
+    const operationWithCasingVariantParams: ast.OperationNode = ast.factory.createOperation({
+      operationId: 'listUploads',
+      method: 'GET',
+      path: '/uploads',
+      tags: ['uploads'],
+      parameters: [
+        ast.factory.createParameter({ name: 'max-uploads', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+        ast.factory.createParameter({ name: 'prefix', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'MaxUploads', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+      ],
+      responses: [
+        ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Success' }),
+      ],
+    })
+
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'paramsCasing distinct names' })
+
+    await renderTemplate(typeOperation, operationWithCasingVariantParams, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'paramsCasing distinct names')
+  })
+
+  test('query params sharing the exact same name are de-duplicated, keeping the first', async () => {
+    const operationWithDuplicateParamName: ast.OperationNode = ast.factory.createOperation({
+      operationId: 'listUploads',
+      method: 'GET',
+      path: '/uploads',
+      tags: ['uploads'],
+      parameters: [
+        ast.factory.createParameter({ name: 'max-uploads', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+        ast.factory.createParameter({ name: 'prefix', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'max-uploads', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+      ],
+      responses: [
+        ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Success' }),
+      ],
+    })
+
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'paramsCasing duplicate names' })
+
+    await renderTemplate(typeOperation, operationWithDuplicateParamName, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'paramsCasing duplicate names')
+  })
+})
+
+describe('typeGenerator — enumType', () => {
+  const enumTypes = ['asConst', 'enum', 'constEnum', 'literal', 'inlineLiteral'] as const satisfies Array<
+    NonNullable<PluginTs['resolvedOptions']['enum']['type']>
+  >
+
+  test.each(enumTypes.map((t) => ({ enumType: t })))('enumType $enumType', async ({ enumType }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `enumType ${enumType}` })
+
+    await renderTemplate(typeSchema, enumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, `enumType ${enumType}`)
+  })
+})
+
+describe('typeGenerator — const (single-value enum)', () => {
+  // OAS 3.1 `const` is parsed into a single-value enum node. It must render as a bare literal
+  // type with no runtime enum declaration, regardless of the configured enum.type.
+  const constSchema = ast.factory.createSchema({
+    type: 'enum',
+    name: 'Status',
+    primitive: 'string',
+    enumValues: ['active'],
+  })
+
+  const enumTypes = ['asConst', 'enum', 'constEnum', 'literal', 'inlineLiteral'] as const
+
+  test.each(enumTypes.map((t) => ({ enumType: t })))('enumType $enumType — const renders a literal type without a runtime enum', async ({ enumType }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `const ${enumType}` })
+
+    await renderTemplate(typeSchema, constSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, `const ${enumType}`)
+  })
+})
+
+describe('typeGenerator — enumType — empty string value', () => {
+  const emptyStringEnumSchema = ast.factory.createSchema({
+    type: 'enum',
+    name: 'proxyHostALPN',
+    primitive: 'string',
+    enumValues: ['', 'h3', 'h2', 'http/1.1'],
+  })
+
+  const enumTypes = ['asConst', 'literal', 'inlineLiteral'] as const
+
+  test.each(enumTypes.map((t) => ({ enumType: t })))('enumType $enumType — empty string value is preserved', async ({ enumType }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `emptyStringEnum ${enumType}` })
+
+    await renderTemplate(typeSchema, emptyStringEnumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, `emptyStringEnum ${enumType}`)
+  })
+})
+
+describe('typeGenerator — enumType — dotted name', () => {
+  const dottedEnumSchema = ast.factory.createSchema({
+    type: 'enum',
+    name: 'enumNames.Type',
+    primitive: 'string',
+    enumValues: ['available', 'pending', 'sold'],
+  })
+
+  const dottedDefaultOptions: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, typeSuffix: 'EnumKey' } }
+
+  const enumTypes = ['asConst', 'constEnum', 'enum', 'literal', 'inlineLiteral'] as const
+
+  test.each(enumTypes.map((et) => ({ enumType: et })))('enumType=$enumType — top-level enum with dotted name', async ({ enumType }) => {
+    const options: PluginTs['resolvedOptions'] = { ...dottedDefaultOptions, enum: { ...dottedDefaultOptions.enum, type: enumType } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `enumNames.Type — ${enumType}` })
+
+    await renderTemplate(typeSchema, dottedEnumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, `enumNames.Type — ${enumType}`)
+  })
+})
+
+describe('typeGenerator — enumKeyCasing', () => {
+  const casingVariants = ['screamingSnakeCase', 'snakeCase', 'pascalCase', 'camelCase', 'none'] as const satisfies Array<
+    NonNullable<PluginTs['resolvedOptions']['enum']['keyCasing']>
+  >
+
+  test.each(casingVariants.map((c) => ({ enumKeyCasing: c })))('enumKeyCasing $enumKeyCasing', async ({ enumKeyCasing }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', keyCasing: enumKeyCasing } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `enumKeyCasing ${enumKeyCasing}` })
+
+    await renderTemplate(typeSchema, multiWordEnumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, `enumKeyCasing ${enumKeyCasing}`)
+  })
+})
+
+describe('typeGenerator — enumTypeSuffix', () => {
+  test('enumTypeSuffix Key (default)', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', typeSuffix: 'Key' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'enumTypeSuffix Key' })
+
+    await renderTemplate(typeSchema, enumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'enumTypeSuffix Key')
+  })
+
+  test('enumTypeSuffix Value', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', typeSuffix: 'Value' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'enumTypeSuffix Value' })
+
+    await renderTemplate(typeSchema, enumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'enumTypeSuffix Value')
+  })
+
+  test('enumTypeSuffix empty string', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', typeSuffix: '' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'enumTypeSuffix empty' })
+
+    await renderTemplate(typeSchema, enumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'enumTypeSuffix empty')
+  })
+})
+
+describe('typeGenerator — enumConstCasing', () => {
+  test.each(['camelCase', 'pascalCase'] as const)('exports valid enum identifiers for digit-leading names with %s', async (constCasing) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, constCasing } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `digit-leading enum ${constCasing}` })
+    const schema = ast.factory.createSchema({ type: 'enum', name: '1-10', primitive: 'string', enumValues: ['1-10', '11-20'] })
+
+    await renderTemplate(typeSchema, schema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+
+    expect(source).toContain('export const _110 =')
+    expect(source).toContain('export type _110Key = (typeof _110)[keyof typeof _110]')
+    const exports = driver.fileManager.files?.flatMap((file) => file.sources.filter((source) => source.export).map((source) => source.name))
+    expect(exports).toStrictEqual(['_110', '_110Key'])
+  })
+
+  test('constCasing pascalCase keeps the Key-suffixed type', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', constCasing: 'pascalCase' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'enumConstCasing pascalCase' })
+
+    await renderTemplate(typeSchema, enumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'enumConstCasing pascalCase')
+  })
+
+  test('constCasing pascalCase with empty typeSuffix merges the const and type under one name', async () => {
+    const options: PluginTs['resolvedOptions'] = {
+      ...defaultOptions,
+      enum: { ...defaultOptions.enum, type: 'asConst', constCasing: 'pascalCase', typeSuffix: '' },
+    }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'enumConstCasing merged name' })
+
+    await renderTemplate(typeSchema, enumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'enumConstCasing merged name')
+  })
+})
+
+describe('typeGenerator — syntaxType', () => {
+  test('syntaxType type (default)', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, syntaxType: 'type' }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'syntaxType type' })
+
+    await renderTemplate(typeSchema, objectSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'syntaxType type')
+  })
+
+  test('syntaxType interface', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, syntaxType: 'interface' }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'syntaxType interface' })
+
+    await renderTemplate(typeSchema, objectSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'syntaxType interface')
+  })
+})
+
+describe('typeGenerator — optionalType', () => {
+  const optionalTypes = ['questionToken', 'undefined', 'questionTokenAndUndefined'] as const satisfies Array<
+    NonNullable<PluginTs['resolvedOptions']['optionalType']>
+  >
+
+  test.each(optionalTypes.map((t) => ({ optionalType: t })))('optionalType $optionalType', async ({ optionalType }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, optionalType }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `optionalType ${optionalType}` })
+
+    await renderTemplate(typeSchema, objectSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, `optionalType ${optionalType}`)
+  })
+})
+
+describe('typeGenerator — arrayType', () => {
+  const arrayTypes = ['array', 'generic'] as const satisfies Array<NonNullable<PluginTs['resolvedOptions']['arrayType']>>
+
+  test.each(arrayTypes.map((t) => ({ arrayType: t })))('arrayType $arrayType', async ({ arrayType }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, arrayType }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `arrayType ${arrayType}` })
+
+    await renderTemplate(typeSchema, objectSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, `arrayType ${arrayType}`)
+  })
+})
+
+describe('typeGenerator — transformers', () => {
+  test('schema transformer — removes optional properties from object', async () => {
+    const removeOptionalProperties: ast.Macro = {
+      name: 'remove-optional-properties',
+      schema(node) {
+        if ('properties' in node) {
+          return { ...node, properties: node.properties.filter((p) => p.required) }
+        }
+        return node
+      },
+    }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs, macros: [removeOptionalProperties] })
+    const driver = createMockedPluginDriver({ name: 'transformers removeOptionalProperties' })
+
+    await renderTemplate(typeSchema, objectSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'transformers removeOptionalProperties')
+  })
+
+  test('schema transformer — maps integer type to string', async () => {
+    const integerToString: ast.Macro = {
+      name: 'integer-to-string',
+      schema(node) {
+        if (node.type === 'integer') return { ...node, type: 'string' }
+        return node
+      },
+    }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs, macros: [integerToString] })
+    const driver = createMockedPluginDriver({ name: 'transformers integerToString' })
+
+    const schemaWithInteger = ast.factory.createSchema({
+      type: 'object',
+      name: 'Order',
+      properties: [
+        ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) }),
+        ast.factory.createProperty({ name: 'quantity', schema: ast.factory.createSchema({ type: 'integer', optional: true }) }),
+        ast.factory.createProperty({ name: 'status', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+      ],
+    })
+
+    await renderTemplate(typeSchema, schemaWithInteger, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'transformers integerToString')
+  })
+})
+
+describe('typeGenerator — custom imports', () => {
+  test('`this.import` in a printer.nodes handler adds the import to the file', async () => {
+    const options: PluginTs['resolvedOptions'] = {
+      ...defaultOptions,
+      printer: {
+        nodes: {
+          bigint() {
+            this.import(ast.factory.createImport({ names: [{ name: 'Int64', space: 'type' }], path: 'my-int64' }))
+            return 'Int64'
+          },
+        },
+      },
+    }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'customImports' })
+
+    await renderTemplate(typeSchema, ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' }), {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    expect(driver.fileManager.files[0]?.imports.map((imp) => imp.path)).toContain('my-int64')
+  })
+})

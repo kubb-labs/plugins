@@ -4,7 +4,7 @@ import { resolveTypeReference } from './utils.ts'
 
 describe('resolveTypeReference', () => {
   const node = ast.factory.createSchema({ type: 'object', name: 'Pet', properties: [] })
-  const typeImport = ast.factory.createImport({ name: ['Pet'], path: '/gen/types/Pet.ts' })
+  const typeImport = ast.factory.createImport({ names: [{ name: 'Pet' }], path: '/gen/types/Pet.ts' })
 
   it('names a type that shares the faker name inline through its import path', () => {
     const type = { name: 'Pet', import: typeImport, toString: () => 'Pet' }

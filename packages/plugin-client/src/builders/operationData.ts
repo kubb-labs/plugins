@@ -60,8 +60,6 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
     // The fetch and axios clients write `securitySchemes` into `.kubb/client.ts`. A custom client module has none.
     security: getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth, hoist: importPath === undefined }),
     authRequired: ctx.options.auth.mode === 'required' && isAuthRequired({ auth: node.auth, schemes: ctx.meta.auth }),
-    baseURL: ast.http.getBaseURL(
-      ast.server.get({ servers: node.servers, index: (ctx.adapter.options as { server?: { index?: number } } | undefined)?.server?.index }),
-    ),
+    baseURL: ast.http.getBaseURL(ast.server.get({ servers: node.servers, index: ctx.meta.serverIndex })),
   }
 }

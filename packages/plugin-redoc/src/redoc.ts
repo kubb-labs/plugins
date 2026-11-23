@@ -1,4 +1,16 @@
-import type { AdapterOas } from '@kubb/adapter-oas'
+/**
+ * The part of an OpenAPI or Swagger document the page reads. The rest is embedded as it is.
+ */
+export type OpenApiDocument = { openapi?: string; swagger?: string; info?: { title?: string } }
+
+/**
+ * Whether an adapter's document is an OpenAPI 3 or Swagger 2 document, the only kind Redoc renders.
+ */
+export function isOpenApiDocument(document: unknown): document is OpenApiDocument {
+  if (!document || typeof document !== 'object') return false
+  const { openapi, swagger } = document as OpenApiDocument
+  return typeof openapi === 'string' || typeof swagger === 'string'
+}
 
 const htmlEscapes: Record<string, string> = {
   '&': '&amp;',
@@ -48,8 +60,8 @@ const redocBundle = {
  * embeds the spec inline and pulls Redoc's bundle from a CDN at runtime, so
  * the generated file works without further build steps.
  */
-export function getPageHTML(api: AdapterOas['document']) {
-  const pageTitle = escapeHtml(api.info.title || 'ReDoc documentation')
+export function getPageHTML(api: OpenApiDocument) {
+  const pageTitle = escapeHtml(api.info?.title || 'ReDoc documentation')
   const googleFont = `<link href='https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700' rel='stylesheet' />`
   const redocHTML = `
      <script src="${redocBundle.src}" integrity="${redocBundle.integrity}" crossorigin="anonymous"></script>

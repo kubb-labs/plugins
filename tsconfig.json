@@ -35,5 +35,5 @@
     }
   },
   "include": ["./package.json", "./tsdown.config.ts", "./vitest.config.ts", "./src/**/*", "tests"],
-  "exclude": ["node_modules", "dist", "tmp", "coverage", "**/__snapshots__/**", "**/templates/**", "**/.kubb/**"]
+  "exclude": ["node_modules", "dist", "tmp", "coverage", "**/__snapshots__/**", "packages/*/templates/**", "**/.kubb/**"]
 }

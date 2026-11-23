@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
-import { casing, createResolver, resolverCasedFile } from '@kubb/kit'
-import type { Group, Memo, Output, PluginType, Resolver } from '@kubb/kit'
-import { describe, expect, test, vi } from 'vitest'
+import { createResolver } from '@kubb/kit'
+import type { PluginType, Resolver } from '@kubb/kit'
+import { describe, expect, test } from 'vitest'
 import {
   buildContentTypeEntries,
   buildOperationComments,
@@ -387,13 +387,13 @@ describe('toResponseContent', () => {
 })
 
 describe('schema builders for an operation', () => {
-  const { createOperation, createParameter, createResponse, createSchema } = ast.factory
+  const { createContent, createOperation, createParameter, createResponse, createSchema } = ast.factory
   const string = createSchema({ type: 'string' })
   const names = {
     name: (name: string) => `${name}Schema`,
     response: { status: (_node: ast.OperationNode, statusCode: ast.StatusCode) => `Status${statusCode}` },
   }
-  const response = (statusCode: ast.StatusCode) => createResponse({ statusCode, content: [{ contentType: 'application/json', schema: string }] })
+  const response = (statusCode: ast.StatusCode) => createResponse({ statusCode, content: [createContent({ contentType: 'application/json', schema: string })] })
   const node = createOperation({ operationId: 'getPet', method: 'GET', path: '/pets', parameters: [], responses: [] })
 
   test('buildParamRefsSchema points every key at the const of its parameter', () => {

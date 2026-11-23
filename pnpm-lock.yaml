@@ -174,26 +174,26 @@ settings:
 catalogs:
   default:
     '@kubb/adapter-oas':
-      specifier: ^5.23.5
-      version: 5.23.5
+      specifier: ^5.24.0
+      version: 5.24.0
     '@kubb/ast':
-      specifier: ^5.23.5
-      version: 5.23.5
+      specifier: ^5.24.0
+      version: 5.24.0
     '@kubb/core':
-      specifier: ^5.23.5
-      version: 5.23.5
+      specifier: ^5.24.0
+      version: 5.24.0
     '@kubb/kit':
-      specifier: ^5.23.5
-      version: 5.23.5
+      specifier: ^5.24.0
+      version: 5.24.0
     '@kubb/parser-ts':
-      specifier: ^5.23.5
-      version: 5.23.5
+      specifier: ^5.24.0
+      version: 5.24.0
     '@kubb/plugin-barrel':
-      specifier: ^5.23.5
-      version: 5.23.5
+      specifier: ^5.24.0
+      version: 5.24.0
     '@kubb/renderer-jsx':
-      specifier: ^5.23.5
-      version: 5.23.5
+      specifier: ^5.24.0
+      version: 5.24.0
     '@types/node':
       specifier: 22.20.5
       version: 22.20.5
@@ -207,8 +207,8 @@ catalogs:
       specifier: ^5.1.1
       version: 5.1.1
     kubb:
-      specifier: ^5.23.5
-      version: 5.23.5
+      specifier: ^5.24.0
+      version: 5.24.0
     oxfmt:
       specifier: ^0.79.0
       version: 0.79.0
@@ -240,19 +240,19 @@ importers:
         version: 3.0.3
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-barrel':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0
       '@kubb/plugin-cypress':
         specifier: workspace:*
         version: link:packages/plugin-cypress
@@ -262,6 +262,9 @@ importers:
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:packages/plugin-zod
+      '@kubb/renderer-jsx':
+        specifier: 'catalog:'
+        version: 5.24.0(@kubb/ast@5.24.0)
       '@types/node':
         specifier: 'catalog:'
         version: 22.20.5
@@ -276,7 +279,7 @@ importers:
         version: 1.4.5
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       oxfmt:
         specifier: 'catalog:'
         version: 0.79.0(svelte@5.59.1)
@@ -376,13 +379,13 @@ importers:
     devDependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -391,7 +394,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -403,7 +406,7 @@ importers:
         version: 1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -413,7 +416,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -422,7 +425,7 @@ importers:
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -432,7 +435,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-cypress':
         specifier: workspace:*
         version: link:../../packages/plugin-cypress
@@ -441,7 +444,7 @@ importers:
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -460,7 +463,7 @@ importers:
         version: 10.6.0
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-faker':
         specifier: workspace:*
         version: link:../../packages/plugin-faker
@@ -472,7 +475,7 @@ importers:
         version: 1.11.23
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -485,7 +488,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -494,7 +497,7 @@ importers:
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -504,7 +507,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-ky':
         specifier: workspace:*
         version: link:../../packages/plugin-ky
@@ -513,7 +516,7 @@ importers:
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       ky:
         specifier: ^2.2.0
         version: 2.2.0
@@ -526,10 +529,10 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -550,7 +553,7 @@ importers:
         version: 1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -566,7 +569,7 @@ importers:
         version: 10.6.0
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-faker':
         specifier: workspace:*
         version: link:../../packages/plugin-faker
@@ -581,7 +584,7 @@ importers:
         version: 0.11.0(msw@3.0.7(@types/node@22.20.5)(supports-color@8.1.1)(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)))
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       msw:
         specifier: ^3.0.7
         version: 3.0.7(@types/node@22.20.5)(supports-color@8.1.1)(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
@@ -597,7 +600,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -612,7 +615,7 @@ importers:
         version: 5.108.2(@types/react@19.3.0)(react@19.3.1)
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -628,7 +631,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -637,7 +640,7 @@ importers:
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -647,10 +650,10 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -674,7 +677,7 @@ importers:
         version: 1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -689,7 +692,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -701,7 +704,7 @@ importers:
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -720,7 +723,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -729,7 +732,7 @@ importers:
         version: 1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -739,13 +742,13 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-valibot':
         specifier: workspace:*
         version: link:../../packages/plugin-valibot
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -757,7 +760,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -772,7 +775,7 @@ importers:
         version: 5.108.2(vue@3.5.45(typescript@7.0.2))
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       vue:
         specifier: ^3.5.45
         version: 3.5.45(typescript@7.0.2)
@@ -785,7 +788,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -797,7 +800,7 @@ importers:
         version: 1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -812,10 +815,10 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -824,7 +827,7 @@ importers:
         version: link:../../packages/plugin-zod
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -840,7 +843,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -856,10 +859,10 @@ importers:
         version: link:../shared
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -881,14 +884,11 @@ importers:
         version: link:../utils
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
     devDependencies:
-      '@kubb/adapter-oas':
-        specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
       '@types/node':
         specifier: 'catalog:'
         version: 22.20.5
@@ -909,16 +909,16 @@ importers:
         version: link:../utils
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -928,7 +928,7 @@ importers:
     dependencies:
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -937,8 +937,8 @@ importers:
   packages/plugin-axios:
     dependencies:
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-client':
         specifier: workspace:^
         version: link:../plugin-client
@@ -953,17 +953,17 @@ importers:
   packages/plugin-client:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -990,17 +990,17 @@ importers:
   packages/plugin-cypress:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1018,17 +1018,17 @@ importers:
   packages/plugin-faker:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@faker-js/faker':
         specifier: ^10.6.0
@@ -1046,8 +1046,8 @@ importers:
   packages/plugin-fetch:
     dependencies:
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-client':
         specifier: workspace:^
         version: link:../plugin-client
@@ -1059,8 +1059,8 @@ importers:
   packages/plugin-ky:
     dependencies:
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-client':
         specifier: workspace:^
         version: link:../plugin-client
@@ -1075,11 +1075,11 @@ importers:
   packages/plugin-mcp:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
@@ -1087,8 +1087,8 @@ importers:
         specifier: workspace:^
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1115,11 +1115,11 @@ importers:
   packages/plugin-msw:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-faker':
         specifier: workspace:^
         version: link:../plugin-faker
@@ -1127,8 +1127,8 @@ importers:
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1146,17 +1146,17 @@ importers:
   packages/plugin-react-query:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1184,32 +1184,29 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
         version: link:../../internals/ast
-      '@kubb/adapter-oas':
-        specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
 
   packages/plugin-swr:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1236,14 +1233,14 @@ importers:
   packages/plugin-ts:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
       '@typescript/typescript6':
         specifier: ^6.0.2
         version: 6.0.2
@@ -1262,7 +1259,7 @@ importers:
         version: link:../../internals/utils
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -1270,14 +1267,14 @@ importers:
   packages/plugin-valibot:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1295,17 +1292,17 @@ importers:
   packages/plugin-vue-query:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1335,14 +1332,14 @@ importers:
   packages/plugin-zod:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/renderer-jsx':
-        specifier: ^5.23.5
-        version: 5.23.5
+        specifier: ^5.24.0
+        version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1367,13 +1364,13 @@ importers:
         version: link:../../internals/utils
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -1421,7 +1418,7 @@ importers:
         version: link:../../packages/plugin-zod
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -1443,10 +1440,10 @@ importers:
         version: 10.6.0
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -1482,7 +1479,7 @@ importers:
         version: 16.3.0
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       msw:
         specifier: ^3.0.7
         version: 3.0.7(@types/node@22.20.5)(supports-color@8.1.1)(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
@@ -1510,10 +1507,10 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)
+        version: 5.24.0(openapi-types@12.1.3)
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.23.5
+        version: 5.24.0
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -1528,7 +1525,7 @@ importers:
         version: link:../../packages/plugin-zod
       kubb:
         specifier: 'catalog:'
-        version: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -1742,22 +1739,22 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kubb/adapter-oas@5.23.5':
-    resolution: {integrity: sha512-5zhO3so0JJOi5/6xzDrPnEzbw5aClairBrhRDLQyqe/nqXGz5xLhT9QN0Gl/N7RUWLcVzzFhZOQfRWpAzFqUuA==}
+  '@kubb/adapter-oas@5.24.0':
+    resolution: {integrity: sha512-3UL0F1lH+ie2UHxmiPNp0opG9w+88UF7RNNkbolzNYHdJ7BsvZK9SXRK0QSGmAfzrhdKk6Xc/+khO3jHduKq3Q==}
     engines: {node: '>=22.22'}
 
-  '@kubb/ast@5.23.5':
-    resolution: {integrity: sha512-rWjpNK8qTvcB7UMyTJ5N+ttF3Ex70RX2qI9Rfqu+Y9RVwBE/DOu9UtYO2G7ef2L1hPcWCdEsawPPXx9OFN92+A==}
+  '@kubb/ast@5.24.0':
+    resolution: {integrity: sha512-GcriOaTWVInYM7ELgQHXhgX0sj5TFvX3/oibxf8pfk2fWyiApQMISmVV8e74W8qEHpk/3fMSXqECENgIZ0Xyiw==}
     engines: {node: '>=22.22'}
 
-  '@kubb/cli@5.23.5':
-    resolution: {integrity: sha512-lp5xhgyaEdGVB9hkyOR5Lnu26kTeKEI6bFNVwupyvxCuoKTJ2vDi/BQbkuaO1ZqiwKHNdmol7pYZ/DTVchUaaA==}
+  '@kubb/cli@5.24.0':
+    resolution: {integrity: sha512-B/jStuYBezn5TGbYvi67t6xpAz65VX93YocNEAKpn5MBZRXSNi41GXjUJ/PLQ1KqtZ1oOoMsQvO9XhYrlbqJ0Q==}
     engines: {node: '>=22.22'}
     hasBin: true
     peerDependencies:
-      '@kubb/adapter-oas': 5.23.5
-      '@kubb/mcp': 5.23.5
-      '@kubb/studio': 5.23.5
+      '@kubb/adapter-oas': 5.24.0
+      '@kubb/mcp': 5.24.0
+      '@kubb/studio': 5.24.0
     peerDependenciesMeta:
       '@kubb/adapter-oas':
         optional: true
@@ -1766,39 +1763,47 @@ packages:
       '@kubb/studio':
         optional: true
 
-  '@kubb/core@5.23.5':
-    resolution: {integrity: sha512-M9dFuzbFMYbDeJdaUbN1eVGUqz4T2sGA7rhgwERAs+IF7nXmk5rY1JXsXBLI0o0qSYtIGAPHF7RCLGTnciiReQ==}
+  '@kubb/core@5.24.0':
+    resolution: {integrity: sha512-H2ayTROt+K6T55qPt8C4OtPMCZ8dKSTflSFy87kmFlsMQrtXfovukW6ZXr9xXXW5PVkX8+J9we7dBRhxuVIXSg==}
     engines: {node: '>=22.22'}
 
-  '@kubb/kit@5.23.5':
-    resolution: {integrity: sha512-ICGXOxxMRncQay63xBZKI801YUcSZ+7RSpKYVFf9wix8X1IEm9Ys4wtsUqa+cl7VDDHlW9wMfWbX0U3ocOUvNg==}
+  '@kubb/kit@5.24.0':
+    resolution: {integrity: sha512-DGpKmnZV28fdpgk9qFEwpbPue+gcnKpyoO3r6iDqhBJ8bKN2uBXQe2KgOJxjsh3DBWxjjVE27KxSNXeB6cEZqw==}
     engines: {node: '>=22.22'}
+    peerDependencies:
+      '@kubb/ast': ^5.24.0
+      '@kubb/core': ^5.24.0
 
-  '@kubb/mcp@5.23.5':
-    resolution: {integrity: sha512-ebf8SGzIwsyL9F1kPOHawfI3itHHbRumYCutN6pq3qJV21TB5hS8AmGyTJbIW96nnc58yjs0ay0E7H9ESTSFjA==}
+  '@kubb/mcp@5.24.0':
+    resolution: {integrity: sha512-PluGdj5xBwKc/D0pISHBoE8PUTladEhQgZn/D4UwW3rdwUYleYMTOFoN2XMaijG3TjFv9sDoTrlSKu1BiEmXmw==}
     engines: {node: '>=22.22'}
     hasBin: true
     peerDependencies:
-      '@kubb/renderer-jsx': 5.23.5
+      '@kubb/renderer-jsx': 5.24.0
 
-  '@kubb/parser-md@5.23.5':
-    resolution: {integrity: sha512-r3DTJfolGA6aoilc6EGxFzHImCo5I6pFmJlucZBOhbrc0GpBFzhX8K9620jh+hAjche8f3uJOWToqxQZTY8a4w==}
+  '@kubb/parser-md@5.24.0':
+    resolution: {integrity: sha512-0no/Ei6SgOUxD7GlznN01Q//oT2vThCvhglebBLKaZPVMR1chZgzJy32+C4w/fCYhaVr+olE5CvDHL6tDPzZPQ==}
     engines: {node: '>=22.22'}
 
-  '@kubb/parser-ts@5.23.5':
-    resolution: {integrity: sha512-IdYpByWQFKsm64hC91KyW+QOjkXrky/LzXrulhg6OyduApQy4DnIahHzbDwqgPCutGDwHSwG1oiPdP450wbrqw==}
+  '@kubb/parser-ts@5.24.0':
+    resolution: {integrity: sha512-FdlgYsMetzuYv0leCeH2i9G8GWpLnWb3YV42vxPmD+BbT5YOaN+mUhNlGB1qtMGq5St6L0z4DU2aFfgQzzQfkA==}
+    engines: {node: '>=22.22'}
+    peerDependencies:
+      '@kubb/ast': ^5.24.0
+      '@kubb/core': ^5.24.0
+
+  '@kubb/plugin-barrel@5.24.0':
+    resolution: {integrity: sha512-H/gLmw4Xh4kjsGlfjThEZiFDllXAk/mj1UwT6e23JlAxusrjQj9SESl3DV4OXGsjHzFOT1a+o2tyz/fLfce8iQ==}
     engines: {node: '>=22.22'}
 
-  '@kubb/plugin-barrel@5.23.5':
-    resolution: {integrity: sha512-8Zt03l5FA4vJ+ufSewQTZsgsxEHu1IHNkdEhg80dQ0MEBa0aTm2KpgZTlHjZFOrWuFB+pWv00vKAFAx2/NiBqw==}
+  '@kubb/renderer-jsx@5.24.0':
+    resolution: {integrity: sha512-upOvQXGVdDlv8pXGTFUyQf3YisQxcjmu173wntQyhn4qllzydbjvH3ggdE0Aw4Gv0bg/dRudmeFyaLOYtwlthw==}
     engines: {node: '>=22.22'}
+    peerDependencies:
+      '@kubb/ast': ^5.24.0
 
-  '@kubb/renderer-jsx@5.23.5':
-    resolution: {integrity: sha512-cCZS7cqZsba+yidcARsGRQi8P5VaNTLbO12GxNfRGb2B8kr0TY+VHS2sMqCDk083+l20La18QjoPB6z2Ec+TNw==}
-    engines: {node: '>=22.22'}
-
-  '@kubb/studio@5.23.5':
-    resolution: {integrity: sha512-jXx/IgtNA+OWXX3uc/uqKvHmBnJup1DNCSfklrkaJGCscbgmabUdKi44HxRSqUS25CgRklNmMTPahUvO4/wMxA==}
+  '@kubb/studio@5.24.0':
+    resolution: {integrity: sha512-FpAbwcV/iGcKZJLx2dqSO2BK4uzSoWvEjfWmNS/2U9fo7qR22fgOviILH5DV5ImYqXKJ0zYsEIGzCkaUmLCtew==}
     engines: {node: '>=22.22'}
     peerDependencies:
       tsdown: ^0.23.1
@@ -3434,8 +3439,8 @@ packages:
   jsprim@2.0.2:
     resolution: {integrity: sha512-gqXddjPqQ6G40VdnI6T6yObEC+pDNvyP95wdQhkWkg7crHH3km5qP1FsOXEkzEQwnz6gz5qGTn1c2Y52wP3OyQ==}
 
-  kubb@5.23.5:
-    resolution: {integrity: sha512-Vvjg5xP5cfP3HAAuWwLapPp8GCvOlD9G3NjpLvONz9gVirHhSAMnYcB8rZE3rUaGh8nnb/2K1W8lX1gTZeCnyg==}
+  kubb@5.24.0:
+    resolution: {integrity: sha512-1nICYDsvzDkp5ZoBTISiqvBv2nmFxIek2FgP5ttiRhlImV/Ue28ixQbfD7gr9c9SpVJCnf/HyNekGPDvVh0faA==}
     engines: {node: '>=22.22'}
     hasBin: true
 
@@ -4106,8 +4111,8 @@ packages:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
 
-  unplugin-kubb@5.23.5:
-    resolution: {integrity: sha512-G8uO5Bg0OLiJyGzev7eW3oz1tQzrCc8z8Eo3de1nhwgjqvKwjcaHPVfhR9R+FMn1wD4zXk3nPpLeKwd7+Rh1zw==}
+  unplugin-kubb@5.24.0:
+    resolution: {integrity: sha512-9mJfcfDdXLQ72f2y4v0fIQVddUtk4D2Rejqs+x0nfC2w2H9sQ6x/8EMTHEI52iGCst4832CanGDYfDNmxMq4Kw==}
     engines: {node: '>=22.22'}
     peerDependencies:
       '@farmfe/core': ^1.7.0 || ^2.0.0
@@ -4659,10 +4664,11 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@kubb/adapter-oas@5.23.5(openapi-types@12.1.3)':
+  '@kubb/adapter-oas@5.24.0(openapi-types@12.1.3)':
     dependencies:
-      '@kubb/core': 5.23.5
-      '@kubb/kit': 5.23.5
+      '@kubb/ast': 5.24.0
+      '@kubb/core': 5.24.0
+      '@kubb/kit': 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@readme/openapi-parser': 10.0.0(openapi-types@12.1.3)
       '@scalar/openapi-upgrader': 0.5.1
       api-ref-bundler: 0.5.1
@@ -4671,13 +4677,13 @@ snapshots:
     transitivePeerDependencies:
       - openapi-types
 
-  '@kubb/ast@5.23.5': {}
+  '@kubb/ast@5.24.0': {}
 
-  '@kubb/cli@5.23.5(@kubb/adapter-oas@5.23.5(openapi-types@12.1.3))(@kubb/mcp@5.23.5(@kubb/renderer-jsx@5.23.5)(openapi-types@12.1.3)(typescript@7.0.2))(@kubb/studio@5.23.5(tsdown@0.23.7(typescript@7.0.2)))':
+  '@kubb/cli@5.24.0(@kubb/adapter-oas@5.24.0(openapi-types@12.1.3))(@kubb/mcp@5.24.0(@kubb/renderer-jsx@5.24.0(@kubb/ast@5.24.0))(openapi-types@12.1.3)(typescript@7.0.2))(@kubb/studio@5.24.0(tsdown@0.23.7(typescript@7.0.2)))':
     dependencies:
       '@clack/prompts': 1.9.0
       '@gunshi/plugin-dryrun': 0.37.3
-      '@kubb/core': 5.23.5
+      '@kubb/core': 5.24.0
       '@napi-rs/keyring': 2.1.2
       chokidar: 6.0.0
       gunshi: 0.37.3
@@ -4687,29 +4693,29 @@ snapshots:
       verkit: 0.5.0
       yuku: 0.28.1
     optionalDependencies:
-      '@kubb/adapter-oas': 5.23.5(openapi-types@12.1.3)
-      '@kubb/mcp': 5.23.5(@kubb/renderer-jsx@5.23.5)(openapi-types@12.1.3)(typescript@7.0.2)
-      '@kubb/studio': 5.23.5(tsdown@0.23.7(typescript@7.0.2))
+      '@kubb/adapter-oas': 5.24.0(openapi-types@12.1.3)
+      '@kubb/mcp': 5.24.0(@kubb/renderer-jsx@5.24.0(@kubb/ast@5.24.0))(openapi-types@12.1.3)(typescript@7.0.2)
+      '@kubb/studio': 5.24.0(tsdown@0.23.7(typescript@7.0.2))
     transitivePeerDependencies:
       - '@yuku-toolchain/wasm'
 
-  '@kubb/core@5.23.5':
+  '@kubb/core@5.24.0':
     dependencies:
-      '@kubb/ast': 5.23.5
+      '@kubb/ast': 5.24.0
       tinyexec: 1.3.1
       verkit: 0.5.0
 
-  '@kubb/kit@5.23.5':
+  '@kubb/kit@5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)':
     dependencies:
-      '@kubb/ast': 5.23.5
-      '@kubb/core': 5.23.5
-      '@kubb/renderer-jsx': 5.23.5
+      '@kubb/ast': 5.24.0
+      '@kubb/core': 5.24.0
+      '@kubb/renderer-jsx': 5.24.0(@kubb/ast@5.24.0)
 
-  '@kubb/mcp@5.23.5(@kubb/renderer-jsx@5.23.5)(openapi-types@12.1.3)(typescript@7.0.2)':
+  '@kubb/mcp@5.24.0(@kubb/renderer-jsx@5.24.0(@kubb/ast@5.24.0))(openapi-types@12.1.3)(typescript@7.0.2)':
     dependencies:
-      '@kubb/adapter-oas': 5.23.5(openapi-types@12.1.3)
-      '@kubb/core': 5.23.5
-      '@kubb/renderer-jsx': 5.23.5
+      '@kubb/adapter-oas': 5.24.0(openapi-types@12.1.3)
+      '@kubb/core': 5.24.0
+      '@kubb/renderer-jsx': 5.24.0(@kubb/ast@5.24.0)
       '@tmcp/adapter-valibot': 0.1.7(tmcp@1.20.1(typescript@7.0.2))(valibot@1.5.0(typescript@7.0.2))
       '@tmcp/transport-stdio': 0.5.2(tmcp@1.20.1(typescript@7.0.2))
       jiti: 2.7.0
@@ -4719,33 +4725,35 @@ snapshots:
       - openapi-types
       - typescript
 
-  '@kubb/parser-md@5.23.5':
+  '@kubb/parser-md@5.24.0':
     dependencies:
-      '@kubb/ast': 5.23.5
-      '@kubb/core': 5.23.5
+      '@kubb/ast': 5.24.0
+      '@kubb/core': 5.24.0
       yaml: 2.9.1
 
-  '@kubb/parser-ts@5.23.5':
+  '@kubb/parser-ts@5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)':
     dependencies:
-      '@kubb/ast': 5.23.5
-      '@kubb/core': 5.23.5
+      '@kubb/ast': 5.24.0
+      '@kubb/core': 5.24.0
       yuku: 0.28.1
     transitivePeerDependencies:
       - '@yuku-toolchain/wasm'
 
-  '@kubb/plugin-barrel@5.23.5':
+  '@kubb/plugin-barrel@5.24.0':
     dependencies:
-      '@kubb/kit': 5.23.5
+      '@kubb/ast': 5.24.0
+      '@kubb/core': 5.24.0
+      '@kubb/kit': 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
 
-  '@kubb/renderer-jsx@5.23.5':
+  '@kubb/renderer-jsx@5.24.0(@kubb/ast@5.24.0)':
     dependencies:
-      '@kubb/ast': 5.23.5
+      '@kubb/ast': 5.24.0
       yaml: 2.9.1
 
-  '@kubb/studio@5.23.5(tsdown@0.23.7(typescript@7.0.2))':
+  '@kubb/studio@5.24.0(tsdown@0.23.7(typescript@7.0.2))':
     dependencies:
-      '@kubb/ast': 5.23.5
-      '@kubb/core': 5.23.5
+      '@kubb/ast': 5.24.0
+      '@kubb/core': 5.24.0
       capnweb: 0.12.0
       diff: 9.0.0
       ofetch: 1.5.1
@@ -6005,19 +6013,20 @@ snapshots:
       json-schema: 0.4.0
       verror: 1.10.0
 
-  kubb@5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
+  kubb@5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
-      '@kubb/adapter-oas': 5.23.5(openapi-types@12.1.3)
-      '@kubb/cli': 5.23.5(@kubb/adapter-oas@5.23.5(openapi-types@12.1.3))(@kubb/mcp@5.23.5(@kubb/renderer-jsx@5.23.5)(openapi-types@12.1.3)(typescript@7.0.2))(@kubb/studio@5.23.5(tsdown@0.23.7(typescript@7.0.2)))
-      '@kubb/core': 5.23.5
-      '@kubb/kit': 5.23.5
-      '@kubb/mcp': 5.23.5(@kubb/renderer-jsx@5.23.5)(openapi-types@12.1.3)(typescript@7.0.2)
-      '@kubb/parser-md': 5.23.5
-      '@kubb/parser-ts': 5.23.5
-      '@kubb/plugin-barrel': 5.23.5
-      '@kubb/renderer-jsx': 5.23.5
-      '@kubb/studio': 5.23.5(tsdown@0.23.7(typescript@7.0.2))
-      unplugin-kubb: 5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+      '@kubb/adapter-oas': 5.24.0(openapi-types@12.1.3)
+      '@kubb/ast': 5.24.0
+      '@kubb/cli': 5.24.0(@kubb/adapter-oas@5.24.0(openapi-types@12.1.3))(@kubb/mcp@5.24.0(@kubb/renderer-jsx@5.24.0(@kubb/ast@5.24.0))(openapi-types@12.1.3)(typescript@7.0.2))(@kubb/studio@5.24.0(tsdown@0.23.7(typescript@7.0.2)))
+      '@kubb/core': 5.24.0
+      '@kubb/kit': 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
+      '@kubb/mcp': 5.24.0(@kubb/renderer-jsx@5.24.0(@kubb/ast@5.24.0))(openapi-types@12.1.3)(typescript@7.0.2)
+      '@kubb/parser-md': 5.24.0
+      '@kubb/parser-ts': 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
+      '@kubb/plugin-barrel': 5.24.0
+      '@kubb/renderer-jsx': 5.24.0(@kubb/ast@5.24.0)
+      '@kubb/studio': 5.24.0(tsdown@0.23.7(typescript@7.0.2))
+      unplugin-kubb: 5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     transitivePeerDependencies:
       - '@farmfe/core'
       - '@nuxt/kit'
@@ -6036,19 +6045,20 @@ snapshots:
       - vite
       - webpack
 
-  kubb@5.23.5(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
+  kubb@5.24.0(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
-      '@kubb/adapter-oas': 5.23.5(openapi-types@12.1.3)
-      '@kubb/cli': 5.23.5(@kubb/adapter-oas@5.23.5(openapi-types@12.1.3))(@kubb/mcp@5.23.5(@kubb/renderer-jsx@5.23.5)(openapi-types@12.1.3)(typescript@7.0.2))(@kubb/studio@5.23.5(tsdown@0.23.7(typescript@7.0.2)))
-      '@kubb/core': 5.23.5
-      '@kubb/kit': 5.23.5
-      '@kubb/mcp': 5.23.5(@kubb/renderer-jsx@5.23.5)(openapi-types@12.1.3)(typescript@7.0.2)
-      '@kubb/parser-md': 5.23.5
-      '@kubb/parser-ts': 5.23.5
-      '@kubb/plugin-barrel': 5.23.5
-      '@kubb/renderer-jsx': 5.23.5
-      '@kubb/studio': 5.23.5(tsdown@0.23.7(typescript@7.0.2))
-      unplugin-kubb: 5.23.5(openapi-types@12.1.3)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
+      '@kubb/adapter-oas': 5.24.0(openapi-types@12.1.3)
+      '@kubb/ast': 5.24.0
+      '@kubb/cli': 5.24.0(@kubb/adapter-oas@5.24.0(openapi-types@12.1.3))(@kubb/mcp@5.24.0(@kubb/renderer-jsx@5.24.0(@kubb/ast@5.24.0))(openapi-types@12.1.3)(typescript@7.0.2))(@kubb/studio@5.24.0(tsdown@0.23.7(typescript@7.0.2)))
+      '@kubb/core': 5.24.0
+      '@kubb/kit': 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
+      '@kubb/mcp': 5.24.0(@kubb/renderer-jsx@5.24.0(@kubb/ast@5.24.0))(openapi-types@12.1.3)(typescript@7.0.2)
+      '@kubb/parser-md': 5.24.0
+      '@kubb/parser-ts': 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
+      '@kubb/plugin-barrel': 5.24.0
+      '@kubb/renderer-jsx': 5.24.0(@kubb/ast@5.24.0)
+      '@kubb/studio': 5.24.0(tsdown@0.23.7(typescript@7.0.2))
+      unplugin-kubb: 5.24.0(openapi-types@12.1.3)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     transitivePeerDependencies:
       - '@farmfe/core'
       - '@nuxt/kit'
@@ -6750,13 +6760,14 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unplugin-kubb@5.23.5(openapi-types@12.1.3)(rolldown@1.2.18)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
+  unplugin-kubb@5.24.0(openapi-types@12.1.3)(rolldown@1.2.18)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
-      '@kubb/adapter-oas': 5.23.5(openapi-types@12.1.3)
-      '@kubb/core': 5.23.5
-      '@kubb/parser-md': 5.23.5
-      '@kubb/parser-ts': 5.23.5
-      '@kubb/plugin-barrel': 5.23.5
+      '@kubb/adapter-oas': 5.24.0(openapi-types@12.1.3)
+      '@kubb/ast': 5.24.0
+      '@kubb/core': 5.24.0
+      '@kubb/parser-md': 5.24.0
+      '@kubb/parser-ts': 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
+      '@kubb/plugin-barrel': 5.24.0
       jiti: 2.7.0
       unplugin: 3.7.0(rolldown@1.2.18)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       yuku: 0.28.1
@@ -6771,13 +6782,14 @@ snapshots:
       - openapi-types
       - unloader
 
-  unplugin-kubb@5.23.5(openapi-types@12.1.3)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
+  unplugin-kubb@5.24.0(openapi-types@12.1.3)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
-      '@kubb/adapter-oas': 5.23.5(openapi-types@12.1.3)
-      '@kubb/core': 5.23.5
-      '@kubb/parser-md': 5.23.5
-      '@kubb/parser-ts': 5.23.5
-      '@kubb/plugin-barrel': 5.23.5
+      '@kubb/adapter-oas': 5.24.0(openapi-types@12.1.3)
+      '@kubb/ast': 5.24.0
+      '@kubb/core': 5.24.0
+      '@kubb/parser-md': 5.24.0
+      '@kubb/parser-ts': 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
+      '@kubb/plugin-barrel': 5.24.0
       jiti: 2.7.0
       unplugin: 3.7.0(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       yuku: 0.28.1

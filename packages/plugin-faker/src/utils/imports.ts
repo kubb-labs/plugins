@@ -1,33 +1,17 @@
-import type { ast } from '@internals/ast'
-
-export type ImportName = string | { propertyName: string; name?: string }
-
-export type ImportEntry = {
-  name: string | Array<ImportName>
-  names?: Array<ast.ModuleName> | null
-  path: string
-}
+import { ast } from '@internals/ast'
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-function getImportNames(entry: ImportEntry): Array<string> {
-  return (Array.isArray(entry.name) ? entry.name : [entry.name])
-    .map((name) => {
-      if (typeof name === 'string') {
-        return name
-      }
-
-      return name.name ?? name.propertyName
-    })
-    .filter((name): name is string => Boolean(name))
+function getImportNames(entry: ast.ImportNode): Array<string> {
+  return ast.file.getNames(entry).map((item) => item.alias ?? item.name)
 }
 
 /**
  * Keeps the imports whose names `text` calls, as `name(` or `name<`, minus `skipImportNames`.
  */
-export function filterUsedImports<TEntry extends ImportEntry>(imports: Array<TEntry>, text: string, skipImportNames: Array<string> = []): Array<TEntry> {
+export function filterUsedImports(imports: Array<ast.ImportNode>, text: string, skipImportNames: Array<string> = []): Array<ast.ImportNode> {
   const skip = new Set(skipImportNames)
   // One scan of `text` instead of a new RegExp per import name. Generated helpers can use explicit
   // type arguments, such as `createPet<object>()`.
@@ -46,30 +30,25 @@ export function filterUsedImports<TEntry extends ImportEntry>(imports: Array<TEn
   })
 }
 
-export function aliasConflictingImports<TEntry extends ImportEntry>(
-  imports: Array<TEntry>,
+export function aliasConflictingImports(
+  imports: Array<ast.ImportNode>,
   reservedNames: Iterable<string>,
-): { imports: Array<TEntry>; aliases: Map<string, string> } {
+): { imports: Array<ast.ImportNode>; aliases: Map<string, string> } {
   const reservedNameSet = new Set(reservedNames)
   const aliases = new Map<string, string>()
 
   const aliasedImports = imports.map((entry) => {
-    const names = Array.isArray(entry.name) ? entry.name : [entry.name]
-    const aliasedNames = names.map((item): ImportName => {
-      if (typeof item !== 'string' || !reservedNameSet.has(item)) {
-        return item
-      }
+    const names = ast.file.getNames(entry)
+    if (!names.some((item) => !item.alias && reservedNameSet.has(item.name))) return entry
 
-      const alias = `${item}Schema`
-      aliases.set(item, alias)
-
-      return { propertyName: item, name: alias }
+    const aliasedNames = names.map((item) => {
+      if (item.alias || !reservedNameSet.has(item.name)) return item
+      const alias = `${item.name}Schema`
+      aliases.set(item.name, alias)
+      return { ...item, alias }
     })
 
-    if (!aliasedNames.some((item) => typeof item === 'object' && item.name)) return entry
-    // An entry with `names` is read from `names`, so the alias goes there too.
-    const moduleNames = entry.names?.map((item) => (!item.alias && aliases.has(item.name) ? { ...item, alias: aliases.get(item.name) } : item))
-    return Object.assign({}, entry, { name: aliasedNames }, moduleNames ? { names: moduleNames } : {})
+    return ast.factory.createImport({ names: aliasedNames, path: entry.path, root: entry.root })
   })
 
   return {

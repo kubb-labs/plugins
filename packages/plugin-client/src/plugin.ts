@@ -1,7 +1,7 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, Resolver, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { createClientGenerator } from './generators/clientGenerator.tsx'
+import { createClientTemplates } from './templates/client.tsx'
 import { defaultMacros } from './macros.ts'
 import { resolverClient } from './resolver.ts'
 import { clientDependencies } from './setup.ts'
@@ -44,8 +44,10 @@ export const pluginClient = defineExtension<PluginClient>({
     const resolver = userResolver ? Resolver.merge<ResolverClient>(resolverClient, ...[userResolver].flat()) : resolverClient
 
     setResolver(resolver)
-    setMacros([...defaultMacros, ...(options.macros ?? [])])
-    addGenerator(createClientGenerator<PluginClient>('client'))
+    addMacro(...defaultMacros, ...(options.macros ?? []))
+    for (const template of createClientTemplates<PluginClient>()) {
+      addTemplate(template)
+    }
 
     return {
       output,

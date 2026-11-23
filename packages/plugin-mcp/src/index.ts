@@ -1,8 +1,8 @@
 export { McpHandler } from './components/McpHandler.tsx'
 export { Server } from './components/Server.tsx'
 
-export { mcpGenerator } from './generators/mcpGenerator.tsx'
-export { serverGenerator } from './generators/serverGenerator.tsx'
+export { mcpOperation } from './templates/mcp.tsx'
+export { serverOperations } from './templates/server.tsx'
 
 export { default, pluginMcp, pluginMcpName } from './plugin.ts'
 

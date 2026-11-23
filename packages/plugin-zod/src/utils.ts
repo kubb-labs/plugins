@@ -363,3 +363,12 @@ export function printWithOmit(
 
   return modify(base, meta)
 }
+
+/**
+ * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
+ * input and a response (decode) schema from its output; `true` keeps `z.infer` for both.
+ */
+export function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction: 'encode' | 'decode'): 'infer' | 'input' | 'output' {
+  if (inferred !== 'codec') return 'infer'
+  return direction === 'encode' ? 'input' : 'output'
+}

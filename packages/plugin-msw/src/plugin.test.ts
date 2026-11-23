@@ -1,6 +1,6 @@
 import { createKubb } from '@kubb/core'
 import { defineExtension, kubbContext } from '@kubb/kit'
-import { createMockedSetupContext, registeredGenerators } from '#mocks'
+import { createMockedSetupContext, registeredTemplates } from '#mocks'
 import { describe, expect, test } from 'vitest'
 import { pluginMsw } from './plugin.ts'
 import type { Options, PluginMsw } from './types.ts'
@@ -12,13 +12,13 @@ function setupKubb(options: Options, pluginNames: Array<string>) {
 }
 
 describe('pluginMsw setup', () => {
-  test.each([{ handlers: true, generators: 2 }])('registers $generators generator(s) when handlers is $handlers', ({ handlers, generators }) => {
+  test.each([{ handlers: true, templates: 2 }])('registers $templates templates when handlers is $handlers', ({ handlers, templates }) => {
     const plugin = pluginMsw({ handlers })
     const ctx = createMockedSetupContext<PluginMsw>()
 
     kubbContext.run(ctx, () => plugin.setup?.(plugin.options ?? {}, ctx))
 
-    expect(registeredGenerators(ctx)).toHaveLength(generators)
+    expect(registeredTemplates(ctx)).toHaveLength(templates)
   })
 
   test("parser: 'faker' fails with KUBB_MISSING_DEPENDENCY when plugin-faker is not registered", async () => {

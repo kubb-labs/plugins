@@ -1,10 +1,10 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { mutationKeyTransformer, queryKeyTransformer, resolveInfiniteConfig, resolveMutationConfig, resolveQueryConfig } from '@internals/tanstack-query'
 import { resolveContractClient } from '@internals/client'
-import { infiniteQueryGenerator, mutationGenerator, queryGenerator } from './generators'
+import { infiniteQueryOperation, mutationOperation, queryOperation } from './templates'
 import { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery, ResolverVueQuery } from './types.ts'
 
@@ -64,11 +64,11 @@ export const pluginVueQuery = defineExtension<PluginVueQuery>({
     const resolver = userResolver ? Resolver.merge<ResolverVueQuery>(resolverVueQuery, ...[userResolver].flat()) : resolverVueQuery
 
     setResolver(resolver)
-    if (userMacros?.length) {
-      setMacros(userMacros)
-    }
+    addMacro(...(userMacros ?? []))
 
-    addGenerator(queryGenerator, infiniteQueryGenerator, mutationGenerator)
+    addTemplate(queryOperation)
+    addTemplate(infiniteQueryOperation)
+    addTemplate(mutationOperation)
 
     return {
       output,

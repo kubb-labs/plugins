@@ -1,18 +1,18 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { resolveContractClient } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { mutationKeyTransformer, queryKeyTransformer, resolveInfiniteConfig, resolveMutationConfig, resolveQueryConfig } from '@internals/tanstack-query'
 import {
-  customHookOptionsFileGenerator,
-  hookOptionsGenerator,
-  infiniteQueryGenerator,
-  mutationGenerator,
-  queryGenerator,
-  suspenseInfiniteQueryGenerator,
-  suspenseQueryGenerator,
-} from './generators'
+  customHookOptionsFileOperations,
+  hookOptionsOperations,
+  infiniteQueryOperation,
+  mutationOperation,
+  queryOperation,
+  suspenseInfiniteQueryOperation,
+  suspenseQueryOperation,
+} from './templates'
 import { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery, ResolverReactQuery } from './types.ts'
 
@@ -75,19 +75,15 @@ export const pluginReactQuery = defineExtension<PluginReactQuery>({
     const resolver = userResolver ? Resolver.merge<ResolverReactQuery>(resolverReactQuery, ...[userResolver].flat()) : resolverReactQuery
 
     setResolver(resolver)
-    if (userMacros?.length) {
-      setMacros(userMacros)
-    }
+    addMacro(...(userMacros ?? []))
 
-    addGenerator(
-      queryGenerator,
-      suspenseQueryGenerator,
-      infiniteQueryGenerator,
-      suspenseInfiniteQueryGenerator,
-      mutationGenerator,
-      hookOptionsGenerator,
-      customHookOptionsFileGenerator,
-    )
+    addTemplate(queryOperation)
+    addTemplate(suspenseQueryOperation)
+    addTemplate(infiniteQueryOperation)
+    addTemplate(suspenseInfiniteQueryOperation)
+    addTemplate(mutationOperation)
+    addTemplate(hookOptionsOperations)
+    addTemplate(customHookOptionsFileOperations)
 
     return {
       output,
