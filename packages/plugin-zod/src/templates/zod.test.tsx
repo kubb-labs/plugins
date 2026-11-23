@@ -1036,6 +1036,23 @@ describe('zodGenerator — inferred aliases', () => {
     expect(source).toMatch(/export const bookSlotStatus200Schema = [^\n]*\n\s*startsAt: z\.iso\.time\(\)\.transform/)
   })
 
+  test('imports the encode variant of a ref the document does not know by name, as a macro rename leaves it', async () => {
+    const booking = ast.factory.createSchema({
+      type: ast.schema.types.object,
+      name: 'Booking',
+      properties: [
+        ast.factory.createProperty({
+          name: 'slot',
+          required: true,
+          schema: ast.factory.createSchema({ type: ast.schema.types.ref, name: 'Slot', ref: '#/components/schemas/Slot', schema: slotSchema }),
+        }),
+      ],
+    })
+    const source = await renderSchema(booking, resolveOptions('codec'))
+    expect(source).toContain('slot: slotInputSchema')
+    expect(source).toContain("import { slotInputSchema, slotSchema } from './slotSchema'")
+  })
+
   test('mini: true without a printer override emits no encode variant', async () => {
     const source = await renderSchema(slotSchema, { ...defaultOptions, inferred: 'codec', mini: true, importPath: 'zod/mini' })
     expect(source).not.toContain('slotInputSchema')

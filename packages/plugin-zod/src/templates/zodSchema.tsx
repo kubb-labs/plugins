@@ -28,9 +28,14 @@ export const zodSchema = defineTemplate<PluginZod>({
     const hasDirectionalNode = containsDirectionalNode({ node, printerOptions, mini })
 
     const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions, mini }) : [])
-    const importEntries = ctx.resolver.imports({ node, root: ctx.root, output, group: group ?? undefined, checks: true })
-    const zod = ctx.from().resolver
-    const inputImportEntries = [...directionalRefNames].flatMap((schemaName) => zod.schema.inputName(schemaName).import ?? [])
+    const importOptions = { node, root: ctx.root, output, group: group ?? undefined, checks: true }
+    const importEntries = ctx.resolver.imports(importOptions)
+    const inputNames = new Set([...directionalRefNames].map((schemaName) => ctx.resolver.schema.inputName(schemaName)))
+    const inputImportEntries = inputNames.size
+      ? ctx.resolver
+          .imports({ ...importOptions, name: (schemaName) => ctx.resolver.schema.inputName(schemaName) })
+          .filter((imp) => ast.file.getNames(imp).some((item) => inputNames.has(item.name)))
+      : []
     const imports = [...importEntries, ...inputImportEntries]
 
     const meta = {
