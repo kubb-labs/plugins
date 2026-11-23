@@ -1,4 +1,6 @@
-import { addMacro, addTemplate, defineExtension, Resolver, setResolver } from '@kubb/kit'
+import { createRequire } from 'node:module'
+import path from 'node:path'
+import { addMacro, addTemplate, defineExtension, Diagnostics, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { createClientTemplates } from './templates/client.tsx'
@@ -13,9 +15,29 @@ import type { PluginClient, ResolvedOptions, ResolverClient } from './types.ts'
 export const pluginClientName = 'plugin-client' satisfies PluginClient['name']
 
 /**
+ * Resolves the `client.ts` template of the transport package from the project, so plugin-client needs no dependency on it.
+ */
+function resolveRuntime(runtime: NonNullable<PluginClient['options']['runtime']>): string {
+  const packageName = `@kubb/plugin-${runtime}`
+  const require = createRequire(path.resolve(useConfig().root, 'package.json'))
+  try {
+    return require.resolve(`${packageName}/templates/client.ts`)
+  } catch {
+    throw new Diagnostics.Error({
+      code: Diagnostics.code.missingDependency,
+      severity: 'error',
+      message: `Plugin "${pluginClientName}" has \`runtime: '${runtime}'\` but cannot find "${packageName}".`,
+      help: `Install "${packageName}", which ships the ${runtime} runtime.`,
+      location: { kind: 'config' },
+      plugin: pluginClientName,
+    })
+  }
+}
+
+/**
  * Generates typed operations that call a client module owned by your application.
  * The module at `importPath` must export the runtime helpers and types used by generated operations.
- * Kubb writes no transport runtime unless `runtime` points at a transport's `client.ts` template.
+ * Kubb writes no transport runtime unless `runtime` names a transport.
  *
  * @example
  * ```ts
@@ -59,7 +81,7 @@ export const pluginClient = defineExtension<PluginClient>({
     }
 
     if (options.runtime) {
-      setupClient({ resolved, macros: options.macros, client: options.runtime })
+      setupClient({ resolved, macros: options.macros, client: resolveRuntime(options.runtime) })
       return resolved
     }
 
