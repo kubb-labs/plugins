@@ -1,5 +1,23 @@
 # @kubb/plugin-ts
 
+## 5.7.0
+
+### Minor Changes
+
+- [#1573](https://github.com/kubb-labs/plugins/pull/1573) [`2c716b6`](https://github.com/kubb-labs/plugins/commit/2c716b65b093cc7187133e33fb34885040c94d5f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Write files with kit templates instead of generators, and stop using deprecated kit APIs. Generated output does not change.
+  
+  - Each plugin registers its templates with `addTemplate`. The exported ones are `typeSchema` and `typeOperation` (plugin-ts), `fakerSchema` and `fakerOperation`, `valibotSchema` and `valibotOperation`, `cypressOperation`, and `mcpOperation` and `serverOperations` (plugin-mcp). Another plugin can register them or call their `render`.
+  - `typeGenerator`, `fakerGenerator`, `valibotGenerator`, `cypressGenerator`, `mcpGenerator` and `serverGenerator` are removed. Register the templates above with `addTemplate` instead.
+  - `setupClient` no longer takes `name`.
+  - The user's `macros` option goes to `addMacro` instead of the deprecated `setMacros`.
+  - Each plugin keeps its templates in `src/templates/`.
+
+### Patch Changes
+
+- [#1561](https://github.com/kubb-labs/plugins/pull/1561) [`bb317df`](https://github.com/kubb-labs/plugins/commit/bb317dff2871609ff9717fc1dd9dda17670800a8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Write each module's imports as one `File.Import` with `names`, in place of the deprecated `name`, `isTypeOnly` and `isNameSpace`. The generated code is unchanged.
+
+- [#1578](https://github.com/kubb-labs/plugins/pull/1578) [`f69034b`](https://github.com/kubb-labs/plugins/commit/f69034b24cab26d72cbe0c992fac53db35ca0107) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Print a nullable union with a `null` member as `Foo | null` instead of `Foo | (null | null)`. This covers OpenAPI 3.1 `oneOf` or `anyOf` with `{ type: 'null' }`, and OpenAPI 3.0 `nullable: true` with `allOf`.
+
 ## 5.6.1
 
 ### Patch Changes
