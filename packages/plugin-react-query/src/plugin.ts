@@ -12,7 +12,7 @@ import {
   queryOperation,
   suspenseInfiniteQueryOperation,
   suspenseQueryOperation,
-} from './generators'
+} from './templates'
 import { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery, ResolverReactQuery } from './types.ts'
 

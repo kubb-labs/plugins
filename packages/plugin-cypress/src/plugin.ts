@@ -2,7 +2,7 @@ import { addMacro, addTemplate, defineExtension, Resolver, setResolver } from '@
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { cypressOperation } from './generators/cypressGenerator.tsx'
+import { cypressOperation } from './templates/cypress.tsx'
 import { resolverCypress } from './resolvers/resolverCypress.ts'
 import type { PluginCypress, ResolverCypress } from './types.ts'
 

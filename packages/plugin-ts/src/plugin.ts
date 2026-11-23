@@ -1,7 +1,7 @@
 import { addMacro, addTemplate, defineExtension, getResolver, provide, Resolver, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { typeOperation, typeSchema } from './generators/typeGenerator.tsx'
+import { typeOperation, typeSchema } from './templates/type.tsx'
 import { createPrinterTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
 import type { PluginTs } from './types.ts'

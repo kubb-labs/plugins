@@ -1,11 +1,11 @@
 import { addMacro, addTemplate, defineExtension, getResolver, provide, Resolver, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { createPrinterZod } from './generators/zodGenerator.tsx'
+import { createPrinterZod } from './printers/createPrinterZod.ts'
 import { resolverZod } from './resolvers/resolverZod.ts'
 import { toZodTypeResolver } from './resolvers/toZodTypeResolver.ts'
-import { zodOperation } from './generators/zodOperation.tsx'
-import { zodSchema } from './generators/zodSchema.tsx'
+import { zodOperation } from './templates/zodOperation.tsx'
+import { zodSchema } from './templates/zodSchema.tsx'
 import type { PluginZod } from './types.ts'
 
 /**

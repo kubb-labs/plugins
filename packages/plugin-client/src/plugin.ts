@@ -1,7 +1,7 @@
 import { addMacro, addTemplate, defineExtension, Resolver, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { createClientTemplates } from './generators/clientGenerator.tsx'
+import { createClientTemplates } from './templates/client.tsx'
 import { defaultMacros } from './macros.ts'
 import { resolverClient } from './resolver.ts'
 import { clientDependencies } from './setup.ts'

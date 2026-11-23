@@ -1,5 +1,5 @@
 export { Request } from './components/Request.tsx'
-export { cypressGenerator, cypressOperation } from './generators/cypressGenerator.tsx'
+export { cypressOperation } from './templates/cypress.tsx'
 export { default, pluginCypress, pluginCypressName } from './plugin.ts'
 export { resolverCypress } from './resolvers/resolverCypress.ts'
 export type { PluginCypress, ResolverCypress } from './types.ts'

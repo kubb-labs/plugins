@@ -2,7 +2,7 @@ import { addMacro, addTemplate, defineExtension, Resolver, setPrinter, setResolv
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { fakerOperation, fakerSchema } from './generators/fakerGenerator.tsx'
+import { fakerOperation, fakerSchema } from './templates/faker.tsx'
 import { createPrinterFaker } from './printers/printerFaker.ts'
 import { resolverFaker } from './resolvers/resolverFaker.ts'
 import type { PluginFaker } from './types.ts'

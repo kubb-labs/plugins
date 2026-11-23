@@ -4,7 +4,7 @@ import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { mutationKeyTransformer, queryKeyTransformer, resolveInfiniteConfig, resolveMutationConfig, resolveQueryConfig } from '@internals/tanstack-query'
 import { resolveContractClient } from '@internals/client'
-import { infiniteQueryOperation, mutationOperation, queryOperation } from './generators'
+import { infiniteQueryOperation, mutationOperation, queryOperation } from './templates'
 import { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery, ResolverVueQuery } from './types.ts'
 

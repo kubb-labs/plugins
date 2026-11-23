@@ -1,5 +1,5 @@
 export { Faker } from './components/Faker.tsx'
-export { fakerGenerator, fakerOperation, fakerSchema } from './generators/fakerGenerator.tsx'
+export { fakerOperation, fakerSchema } from './templates/faker.tsx'
 export { default, pluginFaker, pluginFakerName } from './plugin.ts'
 export type { PrinterFakerFactory, PrinterFakerNodes, PrinterFakerOptions } from './printers/printerFaker.ts'
 export { printerFaker } from './printers/printerFaker.ts'
