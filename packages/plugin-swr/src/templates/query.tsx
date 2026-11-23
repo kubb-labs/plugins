@@ -12,7 +12,7 @@ import type { PluginSwr } from '../types'
  * matching `fooQueryKey` helper and `fooQueryOptions` factory.
  */
 export const queryOperation = defineTemplate<PluginSwr>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { query, mutation, client } = ctx.options

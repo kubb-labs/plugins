@@ -27,7 +27,7 @@ const inferKinds = { encode: 'InferInput', decode: 'InferOutput' } as const
  * plus the parameter, request, and response schemas of each operation.
  */
 export const valibotSchema = defineTemplate<PluginValibot>({
-  kind: 'Schema',
+  kind: ast.node.kinds.schema,
   render(node, ctx) {
     const { output, inferred, typeGuards, importPath, group } = ctx.options
 
@@ -88,7 +88,7 @@ export const valibotSchema = defineTemplate<PluginValibot>({
 })
 
 export const valibotOperation = defineTemplate<PluginValibot>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { output, inferred, importPath, group } = ctx.options

@@ -27,7 +27,7 @@ type RenderUnit = {
  * `@kubb/plugin-ts`.
  */
 export const fakerSchema = defineTemplate<PluginFaker>({
-  kind: 'Schema',
+  kind: ast.node.kinds.schema,
   render(node, ctx) {
     const { output, group, dateParser, regexGenerator, seed, locale, typeMode } = ctx.options
     const pluginTs = ctx.requirePlugin(pluginTsName)
@@ -89,7 +89,7 @@ export const fakerSchema = defineTemplate<PluginFaker>({
 })
 
 export const fakerOperation = defineTemplate<PluginFaker>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     const { output, group, dateParser, regexGenerator, seed, locale, typeMode } = ctx.options
     ctx.requirePlugin(pluginTsName)

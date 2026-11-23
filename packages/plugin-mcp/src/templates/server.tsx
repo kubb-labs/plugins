@@ -16,7 +16,7 @@ import type { PluginMcp } from '../types.ts'
  * Query and header params are composed into `z.object({ ... })` from individual schemas.
  */
 export const serverOperations = defineTemplate<PluginMcp>({
-  kind: 'Operations',
+  kind: ast.node.kinds.operations,
   render({ operations: nodes }, ctx) {
     const { output } = ctx.options
 

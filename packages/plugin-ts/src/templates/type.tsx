@@ -13,7 +13,7 @@ import { buildParams, buildResponseComments, enumTypeName, getExampleValues, isI
  * TypeScript output is produced.
  */
 export const typeSchema = defineTemplate<PluginTs>({
-  kind: 'Schema',
+  kind: ast.node.kinds.schema,
   render(node, ctx) {
     const { enum: enumOptions, output, group } = ctx.options
     const { resolver, root } = ctx
@@ -53,7 +53,7 @@ export const typeSchema = defineTemplate<PluginTs>({
 })
 
 export const typeOperation = defineTemplate<PluginTs>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     const { enum: enumOptions, group, output, operations } = ctx.options
     const { resolver, root } = ctx

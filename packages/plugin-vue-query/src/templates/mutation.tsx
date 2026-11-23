@@ -13,7 +13,7 @@ import type { PluginVueQuery } from '../types'
  * via `mutation.methods`) plus the matching `fooMutationKey` helper.
  */
 export const mutationOperation = defineTemplate<PluginVueQuery>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { query, mutation, client, hooks } = ctx.options

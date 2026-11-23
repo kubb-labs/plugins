@@ -12,7 +12,7 @@ import type { PluginCypress } from '../types.ts'
  * test specs and custom commands.
  */
 export const cypressOperation = defineTemplate<PluginCypress>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { baseURL } = ctx.options

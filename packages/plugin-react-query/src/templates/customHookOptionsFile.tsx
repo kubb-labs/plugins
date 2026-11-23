@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
+import { ast } from '@internals/ast'
 import { namedFile } from '@internals/shared'
 import { hookFileName } from '@internals/tanstack-query'
 import { defineTemplate } from '@kubb/kit'
@@ -14,7 +15,7 @@ import type { PluginReactQuery } from '../types'
  * regeneration, and only when `importPath` resolves inside the plugin's output folder.
  */
 export const customHookOptionsFileOperations = defineTemplate<PluginReactQuery>({
-  kind: 'Operations',
+  kind: ast.node.kinds.operations,
   render({ operations: nodes }, ctx) {
     const { resolver, root } = ctx
     const { output, customOptions, query, hooks } = ctx.options

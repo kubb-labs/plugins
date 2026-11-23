@@ -16,7 +16,7 @@ import { hasResponseSchema, mswBodyPath } from '../utils.ts'
  * payload for tests to fill in.
  */
 export const mswOperation = defineTemplate<PluginMsw>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { parser, baseURL } = ctx.options

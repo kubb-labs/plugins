@@ -13,7 +13,7 @@ import type { PluginMcp } from '../types.ts'
  * (`@kubb/plugin-axios` / `@kubb/plugin-fetch`) `<op>` function.
  */
 export const mcpOperation = defineTemplate<PluginMcp>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     // A stream has no single JSON body to return as tool output, like the query plugins skip it.

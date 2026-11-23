@@ -53,7 +53,7 @@ export function createQueryTemplate({ variant }: { variant: Variant }) {
   }
 
   return defineTemplate<PluginReactQuery>({
-    kind: 'Operation',
+    kind: ast.node.kinds.operation,
     render(node, ctx) {
       if (!matches(node, ctx)) return null
       if (!ast.http.isOperation(node)) return null

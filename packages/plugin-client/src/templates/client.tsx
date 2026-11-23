@@ -20,7 +20,7 @@ export function createClientTemplates<TFactory extends ContractClientFactory>({ 
 ] {
   return [
     defineTemplate<TFactory>({
-      kind: 'Operations',
+      kind: ast.node.kinds.operations,
       render({ operations: nodes }, ctx) {
         return (
           <ClientRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
@@ -28,7 +28,7 @@ export function createClientTemplates<TFactory extends ContractClientFactory>({ 
       },
     }),
     defineTemplate<TFactory>({
-      kind: 'Operation',
+      kind: ast.node.kinds.operation,
       render(node, ctx) {
         if (!ast.http.isOperation(node)) return null
 

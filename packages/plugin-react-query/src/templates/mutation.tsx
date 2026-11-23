@@ -21,7 +21,7 @@ function matchesMutation(node: ast.OperationNode, ctx: TemplateContext<PluginRea
  * the matching `fooMutationKey` / `fooMutationOptions` helpers.
  */
 export const mutationOperation = defineTemplate<PluginReactQuery>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!matchesMutation(node, ctx)) return null
     if (!ast.http.isOperation(node)) return null

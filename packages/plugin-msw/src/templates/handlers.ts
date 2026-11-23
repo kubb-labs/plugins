@@ -10,7 +10,7 @@ import type { PluginMsw } from '../types'
  * `setupWorker(...handlers)`.
  */
 export const handlersOperations = defineTemplate<PluginMsw>({
-  kind: 'Operations',
+  kind: ast.node.kinds.operations,
   render({ operations: nodes }, ctx) {
     const handlersName = ctx.resolver.handler.listName()
     const createHandlersName = ctx.resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })

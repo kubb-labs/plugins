@@ -14,7 +14,7 @@ import type { PluginVueQuery } from '../types'
  * matching `fooQueryKey` / `fooQueryOptions` helpers.
  */
 export const queryOperation = defineTemplate<PluginVueQuery>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { query, mutation, client, hooks } = ctx.options

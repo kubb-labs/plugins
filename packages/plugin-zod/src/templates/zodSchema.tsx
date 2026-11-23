@@ -12,7 +12,7 @@ import type { PrinterZodOptions } from '../printers/printerZod.ts'
  * Writes one file per schema: the Zod schema, plus an `Input` variant when encoding differs from decoding.
  */
 export const zodSchema = defineTemplate<PluginZod>({
-  kind: 'Schema',
+  kind: ast.node.kinds.schema,
   render(node, ctx) {
     const { output, compile, mini, inferred, typeGuards, importPath, group } = ctx.options
 

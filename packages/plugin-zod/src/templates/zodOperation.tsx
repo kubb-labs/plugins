@@ -21,7 +21,7 @@ import type { PrinterZodOptions } from '../printers/printerZod.ts'
  * Writes one file per operation with the schemas of its parameters, request body and responses.
  */
 export const zodOperation = defineTemplate<PluginZod>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
     const { output, compile, mini, inferred, importPath, group } = ctx.options

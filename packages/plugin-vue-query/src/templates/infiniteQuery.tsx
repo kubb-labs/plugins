@@ -36,7 +36,7 @@ function matchesInfiniteQuery(node: ast.OperationNode, ctx: TemplateContext<Plug
  * configured cursor path into TanStack Query's cursor-based pagination.
  */
 export const infiniteQueryOperation = defineTemplate<PluginVueQuery>({
-  kind: 'Operation',
+  kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!matchesInfiniteQuery(node, ctx)) return null
     if (!ast.http.isOperation(node)) return null
