@@ -1,4 +1,6 @@
 export { zodGenerator } from './generators/zodGenerator.tsx'
+export { zodOperation } from './generators/zodOperation.tsx'
+export { zodSchema } from './generators/zodSchema.tsx'
 
 export { default, pluginZod, pluginZodName } from './plugin.ts'
 export type { PrinterZodFactory, PrinterZodNodes, PrinterZodOptions } from './printers/printerZod.ts'

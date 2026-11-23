@@ -121,11 +121,13 @@ export function createMockedSetupContext<TFactory extends PluginType = PluginTyp
 
 /**
  * Returns the generators a plugin registered during a mocked setup. A kit that stores them in memo
- * and a kit that calls `ctx.addGenerator` both count.
+ * and a kit that calls `ctx.addGenerator` both count. Kit stores a generator as one template per
+ * method, all with the generator's name, so templates count once per name.
  */
 export function registeredGenerators(ctx: MockedSetupContext): Array<unknown> {
   const stored = ctx.memo.get(`${ctx.plugin.name}:generators`) as Array<unknown> | undefined
-  return [...ctx.addGenerator.mock.calls.flat(), ...(stored ?? [])]
+  const templates = (ctx.memo.get(`${ctx.plugin.name}:templates`) as Array<{ name: string }> | undefined) ?? []
+  return [...ctx.addGenerator.mock.calls.flat(), ...(stored ?? []), ...new Set(templates.map((template) => template.name))]
 }
 
 /**

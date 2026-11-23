@@ -180,7 +180,8 @@ describe('zodGenerator — Schema', () => {
     expect(schema.safeParse({ a: 1, shared: 'y' }).success).toBe(false)
   })
 
-  const schemas: Array<{ name: string; node: ast.SchemaNode; options?: Partial<PluginZod['resolvedOptions']> }> = [
+  // `document` holds the schemas a case refers to. A ref gets an import only to a schema the document has.
+  const schemas: Array<{ name: string; node: ast.SchemaNode; options?: Partial<PluginZod['resolvedOptions']>; document?: Array<ast.SchemaNode> }> = [
     { name: 'string', node: stringSchema },
     { name: 'number', node: numberSchema },
     { name: 'integer', node: integerSchema },
@@ -255,7 +256,11 @@ describe('zodGenerator — Schema', () => {
     },
     // composite schemas
     { name: 'union', node: unionSchema },
-    { name: 'discriminatedUnion', node: discriminatedUnionSchema },
+    {
+      name: 'discriminatedUnion',
+      node: discriminatedUnionSchema,
+      document: ['CardPayment', 'WalletPayment'].map((name) => ast.factory.createSchema({ type: ast.schema.types.object, name, properties: [] })),
+    },
     { name: 'intersection', node: intersectionSchema },
     // regexType: constructor emits new RegExp(...) instead of a regex literal
     { name: 'regexType constructor', node: schemaWithPattern, options: { regexType: 'constructor' } },
@@ -320,6 +325,7 @@ describe('zodGenerator — Schema', () => {
     const resolver = Resolver.merge(resolverZod)
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: props.name })
+    driver.inputNode = ast.factory.createInput({ schemas: props.document ?? [] })
 
     await renderGeneratorSchema(zodGenerator, props.node, {
       config: testConfig,
@@ -1498,11 +1504,12 @@ describe('custom imports', () => {
   const codecImport = ast.factory.createImport({ name: ['myCodec'], path: 'my-codec/zod' })
   const bigintSchema = ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' })
 
-  async function render(schema: ast.SchemaNode, options: Partial<PluginZod['resolvedOptions']>) {
+  async function render(schema: ast.SchemaNode, options: Partial<PluginZod['resolvedOptions']>, document: Array<ast.SchemaNode> = []) {
     const resolved: PluginZod['resolvedOptions'] = { ...defaultOptions, ...options }
     const resolver = Resolver.merge(resolverZod)
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: resolved, resolver })
     const driver = createMockedPluginDriver({ name: 'customImports' })
+    driver.inputNode = ast.factory.createInput({ schemas: document })
 
     await renderGeneratorSchema(zodGenerator, schema, {
       config: testConfig,
@@ -1574,6 +1581,7 @@ describe('custom imports', () => {
         ],
       }),
       {},
+      ['PaymentError', 'Label', 'Tag'].map((name) => ast.factory.createSchema({ type: 'object', name, properties: [] })),
     )
 
     expect(files[0]?.imports.flatMap((imp) => imp.name)).toEqual(['z', 'labelSchema', 'paymentErrorSchema'])
