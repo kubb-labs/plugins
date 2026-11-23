@@ -889,9 +889,6 @@ importers:
         specifier: 'catalog:'
         version: 0.0.0-canary-20261123140222
     devDependencies:
-      '@kubb/adapter-oas':
-        specifier: 'catalog:'
-        version: 0.0.0-canary-20261123140222(openapi-types@12.1.3)
       '@types/node':
         specifier: 'catalog:'
         version: 22.20.5
