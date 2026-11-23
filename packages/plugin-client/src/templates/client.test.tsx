@@ -309,6 +309,13 @@ describe('clientGenerator operation', () => {
       node: { ...streamEventsNode, servers: [{ url: 'https://echo.websocket.org' }] },
       options: {},
     },
+    // `meta.serverIndex` picks the path server at the same position as the configured `server.index`.
+    {
+      name: 'streamEventsWithPathServerIndex',
+      node: { ...streamEventsNode, servers: [{ url: 'https://echo.websocket.org' }, { url: 'https://eu.echo.websocket.org' }] },
+      options: {},
+      meta: { serverIndex: 1 },
+    },
   ] as const satisfies Array<{
     name: string
     node: ast.OperationNode
