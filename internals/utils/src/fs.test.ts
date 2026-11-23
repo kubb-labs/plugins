@@ -2,7 +2,6 @@ import { describe, expect, test } from 'vitest'
 import { getRelativePath } from './fs.ts'
 
 describe('getRelativePath', () => {
-
   test('returns correct relative path for Windows-style paths', () => {
     const winMocks = 'C:\\Users\\user\\project\\mocks'
     const winFolder = 'C:\\Users\\user\\project\\mocks\\folder'
