@@ -13,7 +13,6 @@
   "internals/tanstack-query/src/components/keys.test.ts": "Pins the empty query and mutation keys for an operation without a path, and that cookies stay out of a query key; no generator snapshot reaches either.",
   "internals/tanstack-query/src/utils.test.ts": "Branchy classification and page-param warning: ref chains, allOf, json priority, QUERY method, and cookie-only operations without key params.",
   "internals/utils/src/codegen.test.ts": "Pins the buildJSDoc fallback and buildList custom brackets, which no generator output reaches.",
-  "internals/utils/src/filePath.test.ts": "Pins the path-traversal guard for leading dots and version-number dots; nothing else tests it.",
   "internals/utils/src/fs.test.ts": "The Windows backslash branch of getRelativePath cannot be hit by snapshots on Linux CI.",
   "internals/utils/src/reserved.test.ts": "Pins isValidVarName accepting valid identifiers such as a leading $, which no snapshot input reaches.",
   "internals/utils/src/strings.test.ts": "Branchy regex builder: u-flag detection, identity-escape dropping, inline flags, executed against real patterns.",
