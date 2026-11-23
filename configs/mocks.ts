@@ -127,7 +127,8 @@ export function createMockedSetupContext<TFactory extends PluginType = PluginTyp
 export function registeredGenerators(ctx: MockedSetupContext): Array<unknown> {
   const stored = ctx.memo.get(`${ctx.plugin.name}:generators`) as Array<unknown> | undefined
   const templates = (ctx.memo.get(`${ctx.plugin.name}:templates`) as Array<{ name: string }> | undefined) ?? []
-  return [...ctx.addGenerator.mock.calls.flat(), ...(stored ?? []), ...new Set(templates.map((template) => template.name))]
+  const firstPerName = templates.filter((template, index) => templates.findIndex((other) => other.name === template.name) === index)
+  return [...ctx.addGenerator.mock.calls.flat(), ...(stored ?? []), ...firstPerName]
 }
 
 /**
