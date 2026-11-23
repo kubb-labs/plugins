@@ -64,10 +64,37 @@ pluginKy({ importPath: '../../client' }) // from src/gen/clients/ to src/client.
 export * from './gen/.kubb/client.ts'
 ```
 
-The module must export everything `.kubb/client.ts` exports, so start from `export *` and override from there.
+The module must export everything `.kubb/client.ts` exports, so start from `export *` and override from there. This binding sets up the client once, narrows `throwOnError` to `true`, and uses its own error type:
 
-- Overriding `client` changes the default client of the generated functions. SDK classes call `createClient`, so pass your config to the class instead.
-- A narrowed `Options` or `RequestConfig` must keep the same type parameters, such as `ThrowOnError extends boolean`. Narrow fields like `throwOnError` or `client` instead of the parameters.
+```typescript
+// src/client.ts
+import { createClient as createKubbClient } from './gen/.kubb/client.ts'
+import type { DataShape, NativeRequest, NativeResponse, Options as KubbOptions } from './gen/.kubb/client.ts'
+
+export * from './gen/.kubb/client.ts'
+
+export class MyHttpError<TError = unknown> extends Error {
+  constructor(readonly data: TError) {
+    super('Request failed')
+  }
+}
+
+export const client = createKubbClient({ baseURL: 'https://api.example.com' })
+client.interceptors.error.use((error) => new MyHttpError(error))
+
+// SDK classes call `createClient`, so start every new client from the configured one.
+export const createClient: typeof createKubbClient = (config) => client.extend(config)
+
+export type Options<TData extends DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = Omit<
+  KubbOptions<TData, ThrowOnError, TRequest, TResponse>,
+  'throwOnError'
+> & { throwOnError?: ThrowOnError & true }
+
+export type ResponseErrorConfig<TError = unknown> = MyHttpError<TError>
+```
+
+- Keep the type parameters of `Options`. Write the narrowed field as `ThrowOnError & true`: a plain `throwOnError?: true` does not compile in the generated functions.
+- `ResponseErrorConfig` and `RequestConfig` reach the query hooks only. The generated functions take their result type from the runtime, and the error interceptor converts an error only when the call throws.
 
 To write the whole client yourself, with no `.kubb/` runtime, use [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client).
 
