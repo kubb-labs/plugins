@@ -4,6 +4,7 @@
 '@kubb/plugin-react-query': patch
 '@kubb/plugin-vue-query': patch
 '@kubb/plugin-swr': patch
+'@kubb/plugin-faker': patch
 ---
 
 Quote values from the OpenAPI document with `text.quote` from `@kubb/kit`. A path, content type, operation ID or property name that holds a `'` no longer breaks the generated code.

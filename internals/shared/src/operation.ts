@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
-import type { Resolver } from '@kubb/kit'
+import { casing, type Resolver } from '@kubb/kit'
 
 export type ContentTypeInfo = {
   contentTypes: string[]
@@ -163,7 +163,7 @@ function getContentTypeSuffix(contentType: string): string {
   const subtype = baseType.split('/').pop() ?? baseType
   const parts = subtype.split(/[^a-zA-Z0-9]+/).filter(Boolean)
   if (parts.length === 0) return 'Unknown'
-  return parts.map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('')
+  return parts.map(casing.capitalize).join('')
 }
 
 /**

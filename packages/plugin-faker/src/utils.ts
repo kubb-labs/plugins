@@ -2,7 +2,7 @@ import { ast } from '@internals/ast'
 import { posix } from 'node:path'
 import { toResponseContent } from '@internals/shared'
 import { ensureValidVarName, getRelativePath } from '@internals/utils'
-import { casing, type RefName } from '@kubb/kit'
+import { casing, text, type RefName } from '@kubb/kit'
 import type { ResolverFaker } from './types.ts'
 
 /** The identifier a `dateParser` module is imported and called under: `my-date-lib` becomes `myDateLib`. */
@@ -141,7 +141,7 @@ export function resolveTypeReference({
   if (name === typeName) {
     return {
       import: null,
-      typeName: type.import ? `import('${getRelativePath(posix.dirname(filePath), type.import.path)}').${typeName}` : typeName,
+      typeName: type.import ? `import(${text.quote(getRelativePath(posix.dirname(filePath), type.import.path))}).${typeName}` : typeName,
     }
   }
 
