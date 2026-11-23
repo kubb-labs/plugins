@@ -20,7 +20,7 @@ import type { PluginValibot } from '../types.ts'
 type Direction = NonNullable<PrinterValibotOptions['direction']>
 
 /**
- * The `setPrinter` factory of `@kubb/plugin-valibot`. Generators pass `direction` and `keysToOmit`
+ * The `setPrinter` factory of `@kubb/plugin-valibot`. Templates pass `direction` and `keysToOmit`
  * per node through `printer.with(...)`.
  */
 export const createPrinterValibot: PrinterFactory<PluginValibot> = (ctx) => {

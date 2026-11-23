@@ -11,7 +11,7 @@ import type { PluginZod } from '../types'
 
 /**
  * The `setPrinter` factory of `@kubb/plugin-zod`: `printerZod`, or `printerZodMini` with `mini: true`.
- * Generators pass `direction` and `keysToOmit` per node through `printer.with(...)`.
+ * Templates pass `direction` and `keysToOmit` per node through `printer.with(...)`.
  */
 export const createPrinterZod: PrinterFactory<PluginZod> = (ctx) => {
   const { coercion, guidType, regexType, oneOfType, mini, printer } = ctx.options

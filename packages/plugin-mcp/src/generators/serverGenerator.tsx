@@ -9,7 +9,7 @@ import { Server } from '../components/Server.tsx'
 import type { PluginMcp } from '../types.ts'
 
 /**
- * Default v5 server generator for `@kubb/plugin-mcp`.
+ * Default v5 server template for `@kubb/plugin-mcp`.
  *
  * Uses individual zod schemas for each param (e.g. `createPetsPathUuidSchema`, `createPetsQueryOffsetSchema`)
  * and `resolveResponseStatusName` for per-status response schemas.
@@ -44,7 +44,7 @@ export const serverOperations = defineTemplate<PluginMcp>({
       },
     }
 
-    // `mcpGenerator` emits no handler for a stream operation, so it gets no tool either.
+    // `mcpOperation` emits no handler for a stream operation, so it gets no tool either.
     const operationsMapped = nodes
       .filter(ast.http.isOperation)
       .filter((node) => {

@@ -38,11 +38,10 @@ export function createQueryTemplate({ variant }: { variant: Variant }) {
   const observerImports = OBSERVER_IMPORTS[variant]
 
   // The operations this flavor writes. Every other operation returns `null`.
-  function matches(node: ast.SchemaNode | ast.OperationNode, ctx: TemplateContext<PluginReactQuery>): boolean {
-    const operationNode = node as ast.OperationNode
-    if (!ast.http.isOperation(operationNode)) return false
+  function matches(node: ast.OperationNode, ctx: TemplateContext<PluginReactQuery>): boolean {
+    if (!ast.http.isOperation(node)) return false
     const { query, mutation, infinite: infiniteConfig, suspense: suspenseConfig, hooks } = ctx.options
-    const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
+    const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
     if (!isQuery || isMutation) return false
     if (suspense && !suspenseConfig) return false
     if (variant === 'query') return true
@@ -50,7 +49,7 @@ export function createQueryTemplate({ variant }: { variant: Variant }) {
     if (!infinite) return true
 
     const infiniteOptions = infiniteConfig && typeof infiniteConfig === 'object' ? infiniteConfig : null
-    return !!infiniteOptions && matchesInfinite(operationNode, infiniteOptions)
+    return !!infiniteOptions && matchesInfinite(node, infiniteOptions)
   }
 
   return defineTemplate<PluginReactQuery>({
@@ -63,7 +62,7 @@ export function createQueryTemplate({ variant }: { variant: Variant }) {
       const infiniteOptions = infinite && infiniteConfig && typeof infiniteConfig === 'object' ? infiniteConfig : null
       if (infinite && !infiniteOptions) return null
 
-      // The suspense infinite generator skips the warning: the infinite one already emits it for this operation.
+      // The suspense infinite template skips the warning: the infinite one already emits it for this operation.
       if (variant === 'infiniteQuery' && infiniteOptions) {
         const pageParamsWarning = getDefaultPageParamsWarning(node, infiniteOptions)
         if (pageParamsWarning) ctx.warn(pageParamsWarning)

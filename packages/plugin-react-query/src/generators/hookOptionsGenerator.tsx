@@ -42,7 +42,7 @@ export const hookOptionsOperations = defineTemplate<PluginReactQuery>({
       const nodeInfinite = 'infinite' in opOverrides ? opOverrides.infinite : infinite
       const nodeInfiniteOptions = nodeInfinite && typeof nodeInfinite === 'object' ? nodeInfinite : null
 
-      // A per-operation `query: false` skips the query hooks, matching the generators that emit them.
+      // A per-operation `query: false` skips the query hooks, matching the templates that emit them.
       const { isQuery, isMutation } = classifyOperation(node, { query: nodeQuery, mutation: nodeMutation })
       const isSuspense = !!suspense
       const isInfinite = isQuery && !!nodeInfiniteOptions && matchesInfinite(node, nodeInfiniteOptions)

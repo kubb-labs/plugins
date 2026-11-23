@@ -9,11 +9,10 @@ import { MutationOptions } from '../components/MutationOptions.tsx'
 import type { PluginReactQuery } from '../types'
 
 // The operations this template writes. Every other operation returns `null`.
-function matchesMutation(node: ast.SchemaNode | ast.OperationNode, ctx: TemplateContext<PluginReactQuery>): boolean {
-  const operationNode = node as ast.OperationNode
-  if (!ast.http.isOperation(operationNode)) return false
+function matchesMutation(node: ast.OperationNode, ctx: TemplateContext<PluginReactQuery>): boolean {
+  if (!ast.http.isOperation(node)) return false
   const { query, mutation } = ctx.options
-  return classifyOperation(operationNode, { query, mutation }).isMutation
+  return classifyOperation(node, { query, mutation }).isMutation
 }
 
 /**

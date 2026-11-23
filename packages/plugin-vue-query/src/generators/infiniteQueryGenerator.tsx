@@ -18,16 +18,15 @@ import { maybeRefOrGetter } from '../utils.ts'
 import type { PluginVueQuery } from '../types'
 
 // The operations this template writes. Every other operation returns `null`.
-function matchesInfiniteQuery(node: ast.SchemaNode | ast.OperationNode, ctx: TemplateContext<PluginVueQuery>): boolean {
-  const operationNode = node as ast.OperationNode
-  if (!ast.http.isOperation(operationNode)) return false
+function matchesInfiniteQuery(node: ast.OperationNode, ctx: TemplateContext<PluginVueQuery>): boolean {
+  if (!ast.http.isOperation(node)) return false
   const { query, mutation, infinite, hooks } = ctx.options
 
-  const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
+  const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
   const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
   if (!isQuery || isMutation || !infiniteOptions || !hooks) return false
 
-  return matchesInfinite(operationNode, infiniteOptions)
+  return matchesInfinite(node, infiniteOptions)
 }
 
 /**

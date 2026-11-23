@@ -5,7 +5,6 @@ import type {
   Adapter,
   AdapterFactoryOptions,
   Config,
-  Generator,
   GeneratorContext,
   PrinterContext,
   PrinterFactory,
@@ -38,7 +37,7 @@ function memoOn(store: Map<string, unknown>): Memo {
 }
 
 /**
- * A plugin for generator tests. It carries the `resolver` and `macros` the render helpers read,
+ * A plugin for template tests. It carries the `resolver` and `macros` the render helpers read,
  * whatever fields the installed `NormalizedPlugin` has.
  */
 export type MockedPlugin<TOptions extends PluginType = PluginType> = NormalizedPlugin<TOptions> & {
@@ -47,7 +46,7 @@ export type MockedPlugin<TOptions extends PluginType = PluginType> = NormalizedP
 }
 
 /**
- * A driver for generator tests, with a `getResolver` the test can replace.
+ * A driver for template tests, with a `getResolver` the test can replace.
  */
 export type MockedPluginDriver = KubbDriver & { getResolver: (pluginName: string) => unknown }
 
@@ -66,7 +65,7 @@ function pluginNotFoundError({ pluginName, requiredBy }: { pluginName: string; r
 }
 
 /**
- * Creates a driver for generator tests. `getPlugin` and `getResolver` return `options.plugin` and
+ * Creates a driver for template tests. `getPlugin` and `getResolver` return `options.plugin` and
  * its resolver for any name, and files land in a real file manager.
  */
 export function createMockedPluginDriver(options: { name?: string; plugin?: MockedPlugin; config?: Config } = {}): MockedPluginDriver {
@@ -160,7 +159,7 @@ export function createMockedPlugin<TOptions extends PluginType = PluginType>(par
   } as unknown as MockedPlugin<TOptions>
 }
 
-type RenderGeneratorOptions<TOptions extends PluginType> = {
+type RenderTemplateOptions<TOptions extends PluginType> = {
   config: Config
   adapter: Adapter
   meta?: ast.InputMeta
@@ -168,12 +167,12 @@ type RenderGeneratorOptions<TOptions extends PluginType> = {
   plugin: MockedPlugin<TOptions>
   options: TOptions['resolvedOptions']
   resolver: TOptions['resolver']
-  /** The plugin's `setPrinter` factory. The generator reads its result as `ctx.printer`. */
+  /** The plugin's `setPrinter` factory. The template reads its result as `ctx.printer`. */
   printer?: PrinterFactory<TOptions>
 }
 
 // Adds `ctx.printer`, `ctx.file` and `ctx.from`, like kit's visitor does. The factory runs with `ctx` as `useKubb()`.
-function withPrinter<TOptions extends PluginType>(ctx: PrinterContext<TOptions>, opts: RenderGeneratorOptions<TOptions>): GeneratorContext<TOptions> {
+function withPrinter<TOptions extends PluginType>(ctx: PrinterContext<TOptions>, opts: RenderTemplateOptions<TOptions>): GeneratorContext<TOptions> {
   const generatorContext = { ...ctx, printer: undefined } as GeneratorContext<TOptions>
   generatorContext.file = (node, options) => withContext(generatorContext, () => file(node, options))
   generatorContext.from = ((source) => withContext(generatorContext, () => from(source))) as GeneratorContext<TOptions>['from']
@@ -182,7 +181,7 @@ function withPrinter<TOptions extends PluginType>(ctx: PrinterContext<TOptions>,
 }
 
 function createMockedPluginContext<TOptions extends PluginType>(
-  opts: RenderGeneratorOptions<TOptions>,
+  opts: RenderTemplateOptions<TOptions>,
 ): Omit<GeneratorContext<TOptions>, 'options' | 'printer'> {
   // A real build registers the plugin under test, so it can look itself up by name.
   const getPlugin = (name: string) => opts.driver.getPlugin(name) ?? (name === opts.plugin.name ? opts.plugin : undefined)
@@ -212,65 +211,6 @@ function createMockedPluginContext<TOptions extends PluginType>(
   } as unknown as Omit<GeneratorContext<TOptions>, 'options' | 'printer'>
 }
 
-async function renderNode<TOptions extends PluginType, TNode extends ast.SchemaNode | ast.OperationNode>({
-  generator,
-  node,
-  opts,
-  generate,
-}: {
-  generator: Generator<TOptions>
-  node: TNode
-  opts: RenderGeneratorOptions<TOptions>
-  generate: (node: TNode, ctx: GeneratorContext<TOptions>) => ReturnType<NonNullable<Generator<TOptions>['schema']>>
-}): Promise<void> {
-  const ctx = withPrinter({ ...createMockedPluginContext(opts), options: opts.options }, opts)
-  const transformedNode = opts.plugin.macros?.length ? ast.macro.apply(node, opts.plugin.macros) : node
-  // Generator methods run with `ctx` as `this` and `useKubb()`, like kit's visitor.
-  const matches = generator.match ? await withContext(ctx, () => generator.match!.call(ctx, transformedNode, ctx)) : true
-  if (!matches) return
-  await opts.driver.fileManager.dispatch({ result: await withContext(ctx, () => generate(transformedNode, ctx)), renderer: generator.renderer })
-}
-
-/**
- * Renders a generator's `schema` method and collects its files on `opts.driver.fileManager`.
- */
-export async function renderGeneratorSchema<TOptions extends PluginType>(
-  generator: Generator<TOptions>,
-  node: ast.SchemaNode,
-  opts: RenderGeneratorOptions<TOptions>,
-): Promise<void> {
-  if (!generator.schema) return
-  await renderNode({ generator, node, opts, generate: (transformedNode, ctx) => generator.schema!.call(ctx, transformedNode, ctx) })
-}
-
-/**
- * Renders a generator's `operation` method and collects its files on `opts.driver.fileManager`.
- */
-export async function renderGeneratorOperation<TOptions extends PluginType>(
-  generator: Generator<TOptions>,
-  node: ast.OperationNode,
-  opts: RenderGeneratorOptions<TOptions>,
-): Promise<void> {
-  if (!generator.operation) return
-  await renderNode({ generator, node, opts, generate: (transformedNode, ctx) => generator.operation!.call(ctx, transformedNode, ctx) })
-}
-
-/**
- * Renders a generator's `operations` method and collects its files on `opts.driver.fileManager`.
- */
-export async function renderGeneratorOperations<TOptions extends PluginType>(
-  generator: Generator<TOptions>,
-  nodes: Array<ast.OperationNode>,
-  opts: RenderGeneratorOptions<TOptions>,
-): Promise<void> {
-  if (!generator.operations) return
-  const context = createMockedPluginContext(opts)
-  const transformedNodes = opts.plugin.macros?.length ? nodes.map((node) => ast.macro.apply(node, opts.plugin.macros!)) : nodes
-  const ctx = withPrinter({ ...context, options: opts.options }, opts)
-  const result = await withContext(ctx, () => generator.operations!.call(ctx, transformedNodes, ctx))
-  await opts.driver.fileManager.dispatch({ result, renderer: generator.renderer })
-}
-
 /**
  * Renders a template for a node, or for every operation with an `'Operations'` template, and collects its files on
  * `opts.driver.fileManager`. JSX renders with `jsxRenderer`, like kit's visitor.
@@ -278,7 +218,7 @@ export async function renderGeneratorOperations<TOptions extends PluginType>(
 export async function renderTemplate<TOptions extends PluginType>(
   template: Template<TOptions>,
   node: ast.SchemaNode | ast.OperationNode | Array<ast.OperationNode>,
-  opts: RenderGeneratorOptions<TOptions>,
+  opts: RenderTemplateOptions<TOptions>,
 ): Promise<void> {
   const ctx = withPrinter({ ...createMockedPluginContext(opts), options: opts.options }, opts)
   const macros = opts.plugin.macros ?? []
@@ -340,7 +280,7 @@ const parsers = new Map<`.${string}`, any>([['.ts', parserTs()]])
 
 /**
  * Renders the driver's `.ts` files to their raw, unformatted source. Snapshots run through
- * prettier (see {@link format}), which silently repairs whitespace, so guarding the generator's
+ * prettier (see {@link format}), which silently repairs whitespace, so guarding the template's
  * own output means inspecting this raw text instead.
  */
 export function rawSources(files: Array<ast.FileNode> | undefined): Array<string> {
@@ -348,8 +288,8 @@ export function rawSources(files: Array<ast.FileNode> | undefined): Array<string
 }
 
 /**
- * Guards the raw (pre-prettier) output every generator emits. Prettier repairs whitespace before
- * snapshotting, so without this check a generator could regress to double blank lines or a blank
+ * Guards the raw (pre-prettier) output every template emits. Prettier repairs whitespace before
+ * snapshotting, so without this check a template could regress to double blank lines or a blank
  * line straight after an opening bracket and no snapshot would notice.
  */
 function assertCleanRawOutput(files: Array<ast.FileNode> | undefined): void {

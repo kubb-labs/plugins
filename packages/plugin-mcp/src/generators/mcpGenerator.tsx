@@ -7,7 +7,7 @@ import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'
 
 /**
- * Built-in operation generator for `@kubb/plugin-mcp`. Emits one MCP tool
+ * Built-in operation template for `@kubb/plugin-mcp`. Emits one MCP tool
  * handler per OpenAPI operation. The handler takes the grouped `{ path, query,
  * headers, body }` config and forwards it to the registered client plugin's
  * (`@kubb/plugin-axios` / `@kubb/plugin-fetch`) `<op>` function.

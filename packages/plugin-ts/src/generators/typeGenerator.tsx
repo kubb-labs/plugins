@@ -9,7 +9,7 @@ import { buildParams, buildResponseComments, enumTypeName, getExampleValues, isI
 /**
  * Built-in template for `@kubb/plugin-ts`. Emits one TypeScript file per
  * schema in the spec plus per-operation request, response, and parameter
- * types. Drop-replace with a custom `Generator<PluginTs>` to change how
+ * types. Register your own `Template<PluginTs>` with `addTemplate` to change how
  * TypeScript output is produced.
  */
 export const typeSchema = defineTemplate<PluginTs>({

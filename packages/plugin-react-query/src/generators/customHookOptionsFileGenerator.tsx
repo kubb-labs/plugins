@@ -56,7 +56,7 @@ export const customHookOptionsFileOperations = defineTemplate<PluginReactQuery>(
 
     if (fs.existsSync(file.path)) return null
 
-    // Same path `hookOptionsGenerator` writes the type to, so the import resolves without a root barrel.
+    // Same path `hookOptionsOperations` writes the type to, so the import resolves without a root barrel.
     const hookOptionsPath = namedFile({ name: hookOptionsName }).path.replace(/[^/\\]+\.ts$/, `${hookOptionsName}.ts`)
 
     return (
