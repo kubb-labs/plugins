@@ -7,6 +7,7 @@ import { findPetsByTags } from '../../axios/petService/findPetsByTags'
 
 export const findPetsByTagsInfiniteQueryKey = ({
   query,
+  headers,
 }: Omit<
   {
     body?: never
@@ -21,7 +22,20 @@ export const findPetsByTagsInfiniteQueryKey = ({
     }
   },
   'headers'
-> = {}) => [{ url: '/pet/findByTags', infinite: true }, ...(query ? [query] : [])] as const
+> & {
+  headers?: {
+    body?: never
+    path?: never
+    query?: {
+      tags?: Array<string>
+      page?: string
+      pageSize?: number
+    }
+    headers: {
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+    }
+  }['headers']
+} = {}) => [{ url: '/pet/findByTags', infinite: true }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
 
@@ -43,7 +57,7 @@ export function findPetsByTagsInfiniteQueryOptions(
   },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
-  const queryKey = findPetsByTagsInfiniteQueryKey({ query })
+  const queryKey = findPetsByTagsInfiniteQueryKey({ query, headers })
   return infiniteQueryOptions<
     Array<Pet> | string,
     ResponseErrorConfig<unknown>,

@@ -329,18 +329,12 @@ describe('printerZod', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'datetime' }))).toBe('z.iso.datetime()')
     })
 
-    test('datetime with dateType stringOffset option', () => {
-      const p = printerZod({ dateType: 'stringOffset' })
-      expect(p.print(ast.factory.createSchema({ type: 'datetime' }))).toBe('z.iso.datetime({ offset: true })')
-    })
-
-    test('datetime with dateType stringLocal option', () => {
-      const p = printerZod({ dateType: 'stringLocal' })
-      expect(p.print(ast.factory.createSchema({ type: 'datetime' }))).toBe('z.iso.datetime({ local: true })')
-    })
-
-    test('datetime with node.offset takes precedence', () => {
+    test('datetime with node.offset', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'datetime', offset: true }))).toBe('z.iso.datetime({ offset: true })')
+    })
+
+    test('datetime with node.local', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'datetime', local: true }))).toBe('z.iso.datetime({ local: true })')
     })
 
     test('time (ISO string)', () => {

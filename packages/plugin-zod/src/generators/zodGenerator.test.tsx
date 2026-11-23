@@ -323,7 +323,7 @@ describe('zodGenerator — Schema', () => {
 
     await renderGeneratorSchema(zodGenerator, props.node, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -342,9 +342,7 @@ describe('zodGenerator — Schema', () => {
 
     await renderGeneratorSchema(zodGenerator, catCycleSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({
-        resolvedOptions: { dateType: 'string' },
-      }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options: defaultOptions,
@@ -379,7 +377,7 @@ describe('zodGenerator — Schema', () => {
 
     await renderGeneratorSchema(zodGenerator, errorDetailsSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -417,7 +415,7 @@ describe('zodGenerator — Schema', () => {
     driver.inputNode = ast.factory.createInput({ schemas: [node] })
     await renderGeneratorSchema(zodGenerator, node, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options: defaultOptions,
@@ -830,7 +828,7 @@ describe('zodGenerator — Operation', () => {
 
     await renderGeneratorOperation(zodGenerator, props.node, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -859,7 +857,7 @@ describe('zodGenerator — transformers', () => {
 
     await renderGeneratorSchema(zodGenerator, objectSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options: defaultOptions,
@@ -895,7 +893,7 @@ describe('zodGenerator — transformers', () => {
 
     await renderGeneratorSchema(zodGenerator, schemaWithInteger, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options: defaultOptions,
@@ -945,7 +943,7 @@ describe('zodGenerator — inferred aliases', () => {
     const driver = createMockedPluginDriver({ name: `alias-${node.name}` })
     await renderGeneratorSchema(zodGenerator, node, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -961,7 +959,7 @@ describe('zodGenerator — inferred aliases', () => {
     const driver = createMockedPluginDriver({ name: `alias-${node.operationId}` })
     await renderGeneratorOperation(zodGenerator, node, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1086,7 +1084,7 @@ describe('zodGenerator — Type Guards', () => {
 
     await renderGeneratorSchema(zodGenerator, testSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1110,7 +1108,7 @@ describe('zodGenerator — Type Guards', () => {
 
     await renderGeneratorSchema(zodGenerator, testSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1132,7 +1130,7 @@ describe('zodGenerator — Type Guards', () => {
 
     await renderGeneratorSchema(zodGenerator, testSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1154,7 +1152,7 @@ describe('zodGenerator — Type Guards', () => {
 
     await renderGeneratorSchema(zodGenerator, testSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1177,7 +1175,7 @@ describe('zodGenerator — Type Guards', () => {
 
     await renderGeneratorSchema(zodGenerator, testSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1203,7 +1201,7 @@ describe('zodGenerator — Compile Option', () => {
 
     await renderGeneratorSchema(zodGenerator, objectSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1223,7 +1221,7 @@ describe('zodGenerator — Compile Option', () => {
 
     await renderGeneratorSchema(zodGenerator, objectSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1272,7 +1270,7 @@ describe('zodGenerator — Compile Option', () => {
 
     await renderGeneratorOperation(zodGenerator, operationWithRefAndInline, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1301,7 +1299,7 @@ describe('zodGenerator — Compile Option', () => {
 
     await renderGeneratorSchema(zodGenerator, objectSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1339,7 +1337,7 @@ describe('zodGenerator — Compile Option', () => {
 
     await renderGeneratorSchema(zodGenerator, cyclicNodeSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1387,7 +1385,7 @@ describe('zodGenerator — Compile Option', () => {
 
     await renderGeneratorOperation(zodGenerator, operation, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1444,7 +1442,7 @@ describe('zodGenerator — Compile Option', () => {
 
     await renderGeneratorOperation(zodGenerator, operation, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1480,7 +1478,7 @@ describe('zodGenerator — Compile Option', () => {
 
     await renderGeneratorSchema(zodGenerator, schema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,
@@ -1508,7 +1506,7 @@ describe('custom imports', () => {
 
     await renderGeneratorSchema(zodGenerator, schema, {
       config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options: resolved,

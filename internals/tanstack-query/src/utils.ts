@@ -29,8 +29,7 @@ export function maybeValueOrGetter(type: string): string {
 /**
  * Builds the grouped `{ path, query, body, headers, cookies }` parameter that mirrors the client
  * function signature. Only the groups the operation carries are emitted, typed from the
- * operation's `Options`. `keys` narrows the emitted groups, used by the query key which
- * never carries `headers`.
+ * operation's `Options`. `keys` narrows the emitted groups.
  *
  * By default the whole group is typed as the single `Options` reference. When
  * `memberTypeWrapper` is set, each group is emitted as its own member typed from the matching
@@ -43,11 +42,15 @@ export function buildGroupedRequestParam(
     resolver: ResolverTs
     keys?: ReadonlyArray<RequestGroupKey>
     memberTypeWrapper?: (type: string) => string
+    /**
+     * Keeps headers optional for query key helpers, including operations with required headers.
+     */
+    optionalHeaders?: boolean
     /** Binds the variables whole, so destructuring does not drop the chosen media type. */
     withContentType?: boolean
   },
 ): FunctionParameterNode | null {
-  const { resolver, keys = requestGroupOrder, memberTypeWrapper, withContentType = false } = options
+  const { resolver, keys = requestGroupOrder, memberTypeWrapper, optionalHeaders = false, withContentType = false } = options
   const groups = ast.http.getRequestGroups(node)
   const names = keys.filter((key) => groups[key])
 
@@ -59,7 +62,7 @@ export function buildGroupedRequestParam(
     path: groups.required.path,
     query: groups.required.query,
     body: groups.body,
-    headers: groups.required.headers,
+    headers: !optionalHeaders && groups.required.headers,
     cookies: false,
   }
 
@@ -67,7 +70,7 @@ export function buildGroupedRequestParam(
   // query key narrows `keys`, so optionality is computed over the emitted groups, not all of them.
   const isOptional = names.every((name) => !requiredByGroup[name])
 
-  // Drop the groups this binding never destructures (the query key omits `headers`), so a group
+  // Drop the groups this binding never destructures, so a group
   // that is required elsewhere does not leak into a binding that does not carry it.
   const optionsName = resolver.response.options(node)
   if (withContentType && groups.hasContentTypeChoice) {
@@ -75,8 +78,11 @@ export function buildGroupedRequestParam(
   }
 
   // `cookies` is on the options type only when the operation has cookie parameters, so it is omitted only then.
-  const omittedKeys = requestGroupOrder.filter((key) => !keys.includes(key) && (key !== 'cookies' || groups.cookies))
+  const omittedKeys = requestGroupOrder.filter(
+    (key) => (!keys.includes(key) || (optionalHeaders && key === 'headers' && !groups.headers)) && (key !== 'cookies' || groups.cookies),
+  )
   const optionsType = omittedKeys.length > 0 ? `Omit<${optionsName}, ${omittedKeys.map((key) => `'${key}'`).join(' | ')}>` : optionsName
+  const paramType = optionalHeaders && names.includes('headers') ? `Omit<${optionsType}, 'headers'> & { headers?: ${optionsType}['headers'] }` : optionsType
 
   if (memberTypeWrapper) {
     const members = names.map((name) => ({
@@ -95,7 +101,7 @@ export function buildGroupedRequestParam(
 
   return createFunctionParameter({
     name: createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
-    type: optionsType,
+    type: paramType,
     optional: false,
     ...(isOptional ? { default: '{}' } : {}),
   })
@@ -437,12 +443,10 @@ export function resolveOperationOverrides<TOptions>(node: ast.OperationNode, ove
 }
 
 /**
- * The request groups a query key is built from, matching `buildQueryKeyParams`. Headers are
- * deliberately absent: they do not identify a cache entry, so the key factory takes no parameter
- * for an operation that only carries headers. Cookies are left out too: they often hold a session token, and a query key
- * is stored in SSR payloads, persisted caches, and devtools.
+ * The request groups available to a query key transformer. Headers are available for custom keys
+ * but excluded from the default key. Cookies stay excluded.
  */
-export const queryKeyGroupOrder = ['path', 'query', 'body'] as const
+export const queryKeyGroupOrder = ['path', 'query', 'body', 'headers'] as const
 
 /**
  * Whether the generated query key factory declares a parameter, so a call site passes an argument
@@ -454,16 +458,15 @@ export function hasQueryKeyParams(node: ast.OperationNode): boolean {
 }
 
 /**
- * Build QueryKey params as the grouped `{ path, query, body }` object (NO headers, NO cookies, NO config),
- * typed from the operation's `Options` minus `url`. The query key transformer reads the
- * grouped `path`/`query`/`body` bindings.
+ * Builds query key bindings for path, query, body, and optional headers. Custom transformers
+ * can reference `headers` in returned code without changing the default key.
  */
 export function buildQueryKeyParams(
   node: ast.OperationNode,
   options: { resolver: PluginTs['resolver']; memberTypeWrapper?: (type: string) => string },
 ): FunctionParametersNode {
   const { resolver, memberTypeWrapper } = options
-  const groupedParam = buildGroupedRequestParam(node, { resolver, keys: queryKeyGroupOrder, memberTypeWrapper })
+  const groupedParam = buildGroupedRequestParam(node, { resolver, keys: queryKeyGroupOrder, memberTypeWrapper, optionalHeaders: true })
 
   return createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
 }

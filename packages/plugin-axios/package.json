@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-axios",
-  "version": "6.4.0",
+  "version": "6.4.1",
   "description": "Generate a slim, type-safe HTTP client with Kubb based on axios.",
   "keywords": [
     "api-client",
@@ -89,7 +89,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "0.0.0-canary-20261122210551",
+    "@kubb/kit": "^5.23.3",
     "@kubb/plugin-client": "workspace:^"
   },
   "devDependencies": {

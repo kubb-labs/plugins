@@ -6,13 +6,16 @@ import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@kubb/plugin-client'
 import type { ClientResolvedOptions } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, rawSources, renderGeneratorOperation, testConfig } from '#mocks'
 import { hookFileName, mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { Resolver } from '@kubb/kit'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { queryGenerator } from './queryGenerator.tsx'
+import { infiniteQueryGenerator } from './infiniteQueryGenerator.tsx'
+import { suspenseQueryGenerator } from './suspenseQueryGenerator.tsx'
+import { suspenseInfiniteQueryGenerator } from './suspenseInfiniteQueryGenerator.tsx'
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
@@ -147,8 +150,6 @@ const createUsersWithListInputNode = ast.factory.createOperation({
   ],
 })
 
-// Headers do not identify a cache entry, so the key factory takes no parameter here and the hook
-// must not pass one.
 const headersOnlyNode = ast.factory.createOperation({
   operationId: 'retrieveMyProfile',
   method: 'GET',
@@ -196,6 +197,11 @@ describe('queryGenerator operation', () => {
       options: { query: { importPath: '@tanstack/react-query', methods: ['post'] } },
     },
     { name: 'headersOnly', node: headersOnlyNode, options: {} },
+    {
+      name: 'headersInQueryKey',
+      node: headersOnlyNode,
+      options: { queryKey: (props) => [...queryKeyTransformer(props), '...(headers ? [headers] : [])'] },
+    },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']>; baseURL?: string }>
 
   test.each(testData)('$name', async (props) => {
@@ -244,6 +250,41 @@ describe('queryGenerator returnType', () => {
 })
 
 describe('queryGenerator queryKey', () => {
+  test.each([queryGenerator, infiniteQueryGenerator, suspenseQueryGenerator, suspenseInfiniteQueryGenerator])(
+    'forwards headers to a custom key with $name',
+    async (generator) => {
+      const options: PluginReactQuery['resolvedOptions'] = {
+        ...defaultOptions,
+        suspense: {},
+        infinite: { queryParam: 'page', initialPageParam: 0 },
+        queryKey: (props) => [...queryKeyTransformer(props), '...(headers ? [headers] : [])'],
+      }
+      const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+      const driver = createMultiPluginDriver('headerKey', plugins)
+
+      const node = ast.factory.createOperation({
+        ...headersOnlyNode,
+        parameters: [
+          ...headersOnlyNode.parameters,
+          ast.factory.createParameter({ name: 'page', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+        ],
+      })
+      await renderGeneratorOperation(generator, node, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin,
+        options,
+        resolver: resolverReactQuery,
+      })
+
+      const source = rawSources(driver.fileManager.files).join('\n')
+      expect(source).toContain('headers?:')
+      expect(source).toContain('...(headers ? [headers] : [])')
+      expect(source).toMatch(/const queryKey = \w+\({ query, headers }\)/)
+    },
+  )
+
   test('passes the query variant to a custom queryKey', async () => {
     const queryKey = vi.fn<Transformer>(queryKeyTransformer)
     const options: PluginReactQuery['resolvedOptions'] = { ...defaultOptions, queryKey }

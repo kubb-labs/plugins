@@ -1,5 +1,20 @@
 # @kubb/plugin-axios
 
+## 6.4.1
+
+### Patch Changes
+
+- [#1549](https://github.com/kubb-labs/plugins/pull/1549) [`1cdfb5c`](https://github.com/kubb-labs/plugins/commit/1cdfb5cea7a71928cbb1102a35f82b4cc0efe308) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Plugins find their files with kit's `ctx.file` and import each other's names with `from`, `provide` and `code`, instead of looking up each other's paths.
+  
+  - A resolver `name` override renames TanStack hooks (react-query, vue-query, swr) and msw handlers, but no longer their files. Those files are named from the `operationId`.
+  - Named imports list their names in alphabetical order.
+  - A query or MCP plugin without its client plugin in the config reports `KUBB_PLUGIN_NOT_FOUND`.
+  - Operation types come from plugin-ts, or from `pluginZod({ inferred })`, in the same order as before: codec types first, then plugin-ts, then plain inferred types.
+
+- [#1560](https://github.com/kubb-labs/plugins/pull/1560) [`8567cc1`](https://github.com/kubb-labs/plugins/commit/8567cc1216e12c74acca48a4d72ebd69d26cc432) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb `^5.23.3`, which adds `Code`, `Raw`, `Origin`, `<File inline>` and `ctx.getFile`. These plugins use them.
+- Updated dependencies [[`1cdfb5c`](https://github.com/kubb-labs/plugins/commit/1cdfb5cea7a71928cbb1102a35f82b4cc0efe308), [`8567cc1`](https://github.com/kubb-labs/plugins/commit/8567cc1216e12c74acca48a4d72ebd69d26cc432), [`1cdfb5c`](https://github.com/kubb-labs/plugins/commit/1cdfb5cea7a71928cbb1102a35f82b4cc0efe308)]:
+  - @kubb/plugin-client@6.4.1
+
 ## 6.4.0
 
 ### Minor Changes

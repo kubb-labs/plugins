@@ -23,7 +23,6 @@ export {
   toResponseContent,
 } from './operation.ts'
 export type { ResponseStream } from './operation.ts'
-export { getOasAdapter } from './adapter.ts'
 export { getCircularNames, getEnumNames, namedFile, resolveOperationName } from './resolver.ts'
 export {
   defaultLiteral,

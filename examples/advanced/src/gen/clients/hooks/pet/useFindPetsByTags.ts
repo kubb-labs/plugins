@@ -7,6 +7,7 @@ import { findPetsByTags } from '../../axios/petService/findPetsByTags'
 
 export const findPetsByTagsQueryKey = ({
   query,
+  headers,
 }: Omit<
   {
     body?: never
@@ -21,7 +22,20 @@ export const findPetsByTagsQueryKey = ({
     }
   },
   'headers'
-> = {}) => [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
+> & {
+  headers?: {
+    body?: never
+    path?: never
+    query?: {
+      tags?: Array<string>
+      page?: string
+      pageSize?: number
+    }
+    headers: {
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+    }
+  }['headers']
+} = {}) => [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
@@ -43,7 +57,7 @@ export function findPetsByTagsQueryOptions(
   },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
-  const queryKey = findPetsByTagsQueryKey({ query })
+  const queryKey = findPetsByTagsQueryKey({ query, headers })
   return queryOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, Array<Pet> | string, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {

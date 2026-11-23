@@ -10,7 +10,8 @@ import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from
 import { retrieveMyProfile } from './clients/retrieveMyProfile'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const retrieveMyProfileQueryKey = () => [{ url: '/user/me' }] as const
+export const retrieveMyProfileQueryKey = ({ headers }: Omit<RetrieveMyProfileOptions, 'headers'> & { headers?: RetrieveMyProfileOptions['headers'] } = {}) =>
+  [{ url: '/user/me' }] as const
 
 type RetrieveMyProfileQueryKey = ReturnType<typeof retrieveMyProfileQueryKey>
 
@@ -18,7 +19,7 @@ export function retrieveMyProfileQueryOptions(
   { headers }: RetrieveMyProfileOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
-  const queryKey = retrieveMyProfileQueryKey()
+  const queryKey = retrieveMyProfileQueryKey({ headers })
   return queryOptions<RetrieveMyProfileStatus200, ResponseErrorConfig<Error>, RetrieveMyProfileStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
@@ -44,7 +45,7 @@ export function useRetrieveMyProfile<
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const resolvedParams = { headers: typeof headers === 'function' ? headers() : headers }
-  const queryKey = resolvedOptions?.queryKey ?? retrieveMyProfileQueryKey()
+  const queryKey = resolvedOptions?.queryKey ?? retrieveMyProfileQueryKey(resolvedParams)
 
   const queryResult = useQuery(
     {
