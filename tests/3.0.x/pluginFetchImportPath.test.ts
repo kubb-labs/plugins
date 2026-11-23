@@ -22,7 +22,7 @@ const tscFlags =
  * Generates `train-travel.yaml`, which has security schemes and response headers, with `importPath` pointing at a
  * binding that only re-exports the `.kubb/` runtime, then typechecks every generated client against it.
  */
-async function generate(name: string, options: NonNullable<Parameters<typeof pluginFetch>[0]>) {
+async function generate(name: string, sdk: NonNullable<Parameters<typeof pluginFetch>[0]>['sdk']) {
   const output = path.join(await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-fetch-import-path-${name}-`)), 'gen')
   const { diagnostics } = await createKubb(
     {
@@ -35,7 +35,7 @@ async function generate(name: string, options: NonNullable<Parameters<typeof plu
       storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFetch({ output: { path: './clients', barrel: false }, importPath: '../api/client', ...options }),
+        pluginFetch({ output: { path: './clients', barrel: false }, importPath: '../api/client', sdk }),
       ],
     } as Config,
     { hooks: new Hookable<KubbHooks>() },
@@ -53,10 +53,10 @@ async function generate(name: string, options: NonNullable<Parameters<typeof plu
 
 describe('plugin-fetch importPath 3.0.x', () => {
   test.each([
-    { name: 'functions', options: {} },
-    { name: 'sdk', options: { sdk: {} } },
-  ])('$name: imports from importPath, keeps securitySchemes and typed headers, and writes the .kubb/ runtime', async ({ name, options }) => {
-    const { diagnostics, clients, runtime, typecheck, cleanup } = await generate(name, options)
+    { name: 'functions', sdk: undefined },
+    { name: 'sdk', sdk: {} },
+  ])('$name: imports from importPath, keeps securitySchemes and typed headers, and writes the .kubb/ runtime', async ({ name, sdk }) => {
+    const { diagnostics, clients, runtime, typecheck, cleanup } = await generate(name, sdk)
 
     try {
       expect(Diagnostics.hasError(diagnostics)).toBe(false)
