@@ -15,7 +15,9 @@ const __dirname = path.dirname(__filename)
 
 const version = '3.0.x'
 
-async function generate(name: string, validator: NonNullable<Parameters<typeof pluginClient>[0]>['validator']) {
+type ClientOptions = NonNullable<Parameters<typeof pluginClient>[0]>
+
+async function generate(name: string, validator: ClientOptions['validator'], runtime?: ClientOptions['runtime']) {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), `kubb-test-client-${name}-`))
   const output = path.join(tmpDir, 'gen')
   const { files, diagnostics } = await createKubb(
@@ -29,16 +31,18 @@ async function generate(name: string, validator: NonNullable<Parameters<typeof p
       storage: fsStorage(),
       plugins: [
         pluginZod({ inferred: 'codec', output: { path: './zod', barrel: false } }),
-        pluginClient({ importPath: '../api/client', output: { path: './clients', barrel: false }, validator }),
+        pluginClient({ importPath: '../api/client', output: { path: './clients', barrel: false }, validator, runtime }),
       ],
     } as Config,
     { hooks: new Hookable<KubbHooks>() },
   ).safeBuild()
 
   const putEvent = await fs.readFile(path.join(output, 'clients/putEvent.ts'), 'utf-8')
+  const runtimeClient = await fs.readFile(path.join(output, '.kubb/client.ts'), 'utf-8').catch(() => undefined)
+  const runtimeConfig = await fs.readFile(path.join(output, '.kubb/config.ts'), 'utf-8').catch(() => undefined)
   await fs.rm(tmpDir, { recursive: true, force: true })
 
-  return { files, diagnostics, putEvent }
+  return { files, diagnostics, putEvent, runtimeClient, runtimeConfig }
 }
 
 describe(`plugin-client ${version}`, () => {
@@ -54,5 +58,16 @@ describe(`plugin-client ${version}`, () => {
     expect(putEvent).toMatch(/import \{[^}]*\btoHeadersStandardSchema\b[^}]*\} from '\.\.\/api\/client'/)
     expect(putEvent).not.toContain('.kubb')
     expect(files.some((file) => file.path.split(path.sep).includes('.kubb'))).toBe(false)
+  })
+
+  test('runtime writes the .kubb/ runtime with the given client.ts, while operations still import from importPath', async () => {
+    const fetchClient = fileURLToPath(new URL('../../packages/plugin-fetch/templates/client.ts', import.meta.url))
+    const { diagnostics, putEvent, runtimeClient, runtimeConfig } = await generate('runtime', false, fetchClient)
+
+    expect(Diagnostics.hasError(diagnostics)).toBe(false)
+    expect(putEvent).toMatch(/from '\.\.\/api\/client'/)
+    expect(putEvent).not.toContain('.kubb')
+    expect(runtimeClient).toContain('globalThis.fetch')
+    expect(runtimeConfig).toContain('export const defaultConfig')
   })
 })

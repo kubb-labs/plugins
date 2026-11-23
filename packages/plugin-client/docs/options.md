@@ -7,6 +7,7 @@ Pass these options to `pluginClient()`. Shared options link to [Shared plugin op
 | Option                                                                    | Purpose                                                                             | Default                                          |
 | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------ |
 | [`importPath`](#importpath)                                               | Import specifier of your client module.                                             | Required                                         |
+| [`runtime`](#runtime)                                                     | Also write the `.kubb/` runtime with a transport's `client.ts`.                     | None                                             |
 | [`returnType`](#returntype)                                               | What a generated function resolves to.                                              | `'plain'`                                        |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | `throwOnError` value each call passes to your client.                               | `true`                                           |
 | [`validator`](#validator)                                                 | Zod or Valibot schemas to pass to your client.                                      | `false`                                          |
@@ -37,6 +38,31 @@ pluginClient({ importPath: '@my-org/api-client' }) // a package
 ```
 
 Without `group`, files sit one folder higher, so use `../../client`. [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client) lists the exports the module needs.
+
+### runtime
+
+Path to a transport's `client.ts` template. When set, Kubb also writes the `.kubb/` runtime, including the `config.ts` with the media types and serializers your spec needs. The generated operations still import from `importPath`, so your module can re-export the runtime and replace only some parts, such as a pre-configured `client`.
+
+|          |          |
+| -------- | -------- |
+| Type     | `string` |
+| Required | `false`  |
+
+```typescript
+import { fileURLToPath } from 'node:url'
+
+pluginClient({
+  importPath: '../../client', // from src/gen/clients/ to src/client.ts
+  runtime: fileURLToPath(import.meta.resolve('@kubb/plugin-fetch/templates/client.ts')),
+})
+```
+
+```typescript
+// src/client.ts
+export * from './gen/.kubb/client.ts'
+```
+
+Use the template of `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-ky`, and install that package.
 
 ### returnType
 

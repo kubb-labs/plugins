@@ -48,6 +48,8 @@ export type Options = DistributiveOmit<ClientOptions, 'sdk' | 'returnType' | 'ba
    * ```
    */
   importPath: string
+  /** Path to a transport's `client.ts` template, such as `@kubb/plugin-fetch/templates/client.ts`. When set, Kubb also writes the `.kubb/` runtime with it. */
+  runtime?: string
 }
 
 /**

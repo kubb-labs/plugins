@@ -4,8 +4,8 @@ import { version } from '../package.json'
 import { createClientTemplates } from './templates/client.tsx'
 import { defaultMacros } from './macros.ts'
 import { resolverClient } from './resolver.ts'
-import { clientDependencies } from './setup.ts'
-import type { PluginClient, ResolverClient } from './types.ts'
+import { clientDependencies, setupClient } from './setup.ts'
+import type { PluginClient, ResolvedOptions, ResolverClient } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-client`.
@@ -15,7 +15,7 @@ export const pluginClientName = 'plugin-client' satisfies PluginClient['name']
 /**
  * Generates typed operations that call a client module owned by your application.
  * The module at `importPath` must export the runtime helpers and types used by generated operations.
- * Kubb does not copy or inject a transport implementation.
+ * Kubb writes no transport runtime unless `runtime` points at a transport's `client.ts` template.
  *
  * @example
  * ```ts
@@ -42,14 +42,7 @@ export const pluginClient = defineExtension<PluginClient>({
     } = options
 
     const resolver = userResolver ? Resolver.merge<ResolverClient>(resolverClient, ...[userResolver].flat()) : resolverClient
-
-    setResolver(resolver)
-    addMacro(...defaultMacros, ...(options.macros ?? []))
-    for (const template of createClientTemplates<PluginClient>()) {
-      addTemplate(template)
-    }
-
-    return {
+    const resolved: ResolvedOptions = {
       output,
       exclude,
       include,
@@ -64,6 +57,19 @@ export const pluginClient = defineExtension<PluginClient>({
       sdk: undefined,
       resolver,
     }
+
+    if (options.runtime) {
+      setupClient({ resolved, macros: options.macros, client: options.runtime })
+      return resolved
+    }
+
+    setResolver(resolver)
+    addMacro(...defaultMacros, ...(options.macros ?? []))
+    for (const template of createClientTemplates<PluginClient>()) {
+      addTemplate(template)
+    }
+
+    return resolved
   },
 })
 
