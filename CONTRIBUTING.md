@@ -67,7 +67,7 @@ plugins/
 └── assets/                  # Static assets
 ```
 
-Most plugins under `packages/` follow the same shape: `src/plugin.ts` defines the plugin, `src/generators/` holds the generation logic, `src/components/` holds JSX-renderer components, and `src/*.test.ts` holds the tests. A few are leaner, like the client plugins (`plugin-axios`, `plugin-fetch`, `plugin-ky`) that build on `@kubb/plugin-client`, and `plugin-redoc`, which is a single `redoc.tsx` with no `generators/` or `components/`.
+Most plugins under `packages/` follow the same shape: `src/plugin.ts` defines the plugin, `src/templates/` holds the templates that write each file (`defineTemplate` from `@kubb/kit`), `src/components/` holds JSX-renderer components, and `src/*.test.ts` holds the tests. A few are leaner, like the client plugins (`plugin-axios`, `plugin-fetch`, `plugin-ky`) that build on `@kubb/plugin-client`, and `plugin-redoc`, which is a single `redoc.ts` with no `templates/` or `components/`.
 
 ## Tech stack
 
@@ -145,7 +145,7 @@ packages/plugin-<name>/
 │   ├── index.ts        # Public API
 │   ├── plugin.ts       # Plugin definition
 │   ├── components/     # JSX components
-│   ├── generators/     # Code generation logic
+│   ├── templates/      # Templates that write the files
 │   └── *.test.ts(x)    # Unit tests
 ├── docs/               # kubb.dev pages: overview.md, options.md, guides/
 ├── kubb-extension.json # Registry metadata

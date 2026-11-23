@@ -1,5 +1,5 @@
 import type { ast } from '@internals/ast'
-import { Url } from '@kubb/kit'
+import { text, Url } from '@kubb/kit'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -29,7 +29,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
  */
 export const mutationKeyTransformer: Transformer = ({ node }) => {
   if (!node.path) return []
-  return [`{ url: '${Url.toPath(node.path)}' }`]
+  return [`{ url: ${text.quote(Url.toPath(node.path))} }`]
 }
 
 export function MutationKey({ name, node, transformer, typeName }: Props): KubbReactNode {

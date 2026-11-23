@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
-import type { Resolver } from '@kubb/kit'
+import { casing, type Resolver } from '@kubb/kit'
 
 export type ContentTypeInfo = {
   contentTypes: string[]
@@ -163,7 +163,7 @@ function getContentTypeSuffix(contentType: string): string {
   const subtype = baseType.split('/').pop() ?? baseType
   const parts = subtype.split(/[^a-zA-Z0-9]+/).filter(Boolean)
   if (parts.length === 0) return 'Unknown'
-  return parts.map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('')
+  return parts.map(casing.capitalize).join('')
 }
 
 /**
@@ -543,26 +543,6 @@ export function resolveOperationTypeNames(
 
     return names.filter((name): name is string => Boolean(name) && !exclude.has(name as string))
   })
-}
-
-export function resolveResponseTypes(node: ast.OperationNode, resolver: ResponseNameResolver): Array<[statusCode: number | 'default', typeName: string]> {
-  const types: Array<[number | 'default', string]> = []
-
-  for (const response of node.responses) {
-    if (response.statusCode === 'default') {
-      types.push(['default', resolver.response.response(node)])
-      continue
-    }
-
-    const code = Number(response.statusCode)
-    if (Number.isNaN(code)) {
-      continue
-    }
-
-    types.push([code, ast.http.status.isSuccess(code) ? resolver.response.response(node) : resolver.response.status(node, response.statusCode)])
-  }
-
-  return types
 }
 
 /**

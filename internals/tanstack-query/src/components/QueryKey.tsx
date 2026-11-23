@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { Url } from '@kubb/kit'
+import { text, Url } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Function, Type } from '@kubb/renderer-jsx'
@@ -46,7 +46,7 @@ export const queryKeyTransformer: Transformer = ({ node, variant }) => {
   // while preserving TanStack Query partial matching for base URL invalidation.
   const isInfinite = variant === 'infiniteQuery' || variant === 'suspenseInfiniteQuery'
 
-  const urlFields = [`url: '${Url.toPath(node.path)}'`]
+  const urlFields = [`url: ${text.quote(Url.toPath(node.path))}`]
   if (path.length > 0) urlFields.push('params: path')
   if (isInfinite) urlFields.push('infinite: true')
 

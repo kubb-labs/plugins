@@ -844,6 +844,9 @@ importers:
       '@kubb/ast':
         specifier: 'catalog:'
         version: 5.24.0
+      '@kubb/kit':
+        specifier: 'catalog:'
+        version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

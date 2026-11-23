@@ -18,7 +18,6 @@ export {
   resolveContentTypeVariants,
   resolveErrorNames,
   resolveOperationTypeNames,
-  resolveResponseTypes,
   resolveSuccessNames,
   toResponseContent,
 } from './operation.ts'

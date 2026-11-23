@@ -13,7 +13,6 @@ import {
   getStream,
   resolveErrorNames,
   resolveOperationTypeNames,
-  resolveResponseTypes,
   resolveStatusCodeNames,
   resolveSuccessNames,
   toResponseContent,
@@ -230,14 +229,6 @@ describe('response status helpers', () => {
     expect(resolveErrorNames(node, resolver)).toStrictEqual(['Status400'])
     expect(resolveSuccessNames(node, resolver)).toStrictEqual(['Status201'])
     expect(resolveStatusCodeNames(node, resolver)).toStrictEqual(['Status201', 'Status400', 'Statusdefault'])
-  })
-
-  test('resolves response types', () => {
-    expect(resolveResponseTypes(node, resolver)).toStrictEqual([
-      [201, 'createPetResponse'],
-      [400, 'Status400'],
-      ['default', 'createPetResponse'],
-    ])
   })
 })
 
