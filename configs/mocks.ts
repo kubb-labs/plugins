@@ -125,7 +125,10 @@ export function createMockedSetupContext<TFactory extends PluginType = PluginTyp
  */
 export function registeredGenerators(ctx: MockedSetupContext): Array<unknown> {
   const stored = ctx.memo.get(`${ctx.plugin.name}:generators`) as Array<unknown> | undefined
-  return [...ctx.addGenerator.mock.calls.flat(), ...(stored ?? [])]
+  // Kit 5.23.5 stores one template per generator handler, each named after its generator.
+  const templates = ctx.memo.get(`${ctx.plugin.name}:templates`) as Array<{ name: string }> | undefined
+  const fromTemplates = [...new Set(templates?.map((template) => template.name))]
+  return [...ctx.addGenerator.mock.calls.flat(), ...(stored ?? []), ...fromTemplates]
 }
 
 /**

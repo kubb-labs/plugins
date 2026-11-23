@@ -64,12 +64,15 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     return (
       <File {...meta.file}>
-        <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
-        {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
-        {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParserName(dateParser)} />}
-        {typeReference.import && <File.Import {...typeReference.import} isTypeOnly root={meta.file.path} />}
-        {usedImports.map((imp) => (
-          <File.Import key={[schemaName, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+        <File.Import
+          names={[locale ? { name: localeToFakerImport(locale), alias: 'faker', space: 'value' } : { name: 'faker', space: 'value' }]}
+          path="@faker-js/faker"
+        />
+        {regexGenerator === 'randexp' && <File.Import names={[{ name: 'default', alias: 'RandExp', space: 'value' }]} path={'randexp'} />}
+        {dateParser !== 'faker' && <File.Import names={[{ name: 'default', alias: dateParserName(dateParser), space: 'value' }]} path={dateParser} />}
+        {typeReference.import && <File.Import names={ast.imports.asType(typeReference.import)} root={meta.file.path} path={typeReference.import.path} />}
+        {usedImports.map((imp, index) => (
+          <File.Import key={index} names={ast.file.getNames(imp)} root={meta.file.path} path={imp.path} />
         ))}
         {seed !== undefined ? <Raw name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</Raw> : undefined}
         <Faker
@@ -208,9 +211,9 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
       return (
         <>
-          {typeReference.import && <File.Import {...typeReference.import} isTypeOnly root={meta.file.path} />}
-          {imports.map((imp) => (
-            <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+          {typeReference.import && <File.Import names={ast.imports.asType(typeReference.import)} root={meta.file.path} path={typeReference.import.path} />}
+          {imports.map((imp, index) => (
+            <File.Import key={index} names={ast.file.getNames(imp)} root={meta.file.path} path={imp.path} />
           ))}
           <Faker
             name={name}
@@ -250,7 +253,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
       return (
         <>
-          {typeReference.import && <File.Import {...typeReference.import} isTypeOnly root={meta.file.path} />}
+          {typeReference.import && <File.Import names={ast.imports.asType(typeReference.import)} root={meta.file.path} path={typeReference.import.path} />}
           <Function
             export
             name={name}
@@ -271,9 +274,12 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     return (
       <File {...meta.file}>
-        <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
-        {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
-        {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParserName(dateParser)} />}
+        <File.Import
+          names={[locale ? { name: localeToFakerImport(locale), alias: 'faker', space: 'value' } : { name: 'faker', space: 'value' }]}
+          path="@faker-js/faker"
+        />
+        {regexGenerator === 'randexp' && <File.Import names={[{ name: 'default', alias: 'RandExp', space: 'value' }]} path={'randexp'} />}
+        {dateParser !== 'faker' && <File.Import names={[{ name: 'default', alias: dateParserName(dateParser), space: 'value' }]} path={dateParser} />}
         {seed !== undefined ? <Raw name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</Raw> : undefined}
         {paramGroups.map((group) => renderEntry(group))}
         {responseUnits.map((unit) => renderEntry(unit))}

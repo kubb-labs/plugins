@@ -41,8 +41,13 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
 
         {mutation && (
           <>
-            <File.Import name={'useSWRMutation'} path={importPath} />
-            <File.Import name={['SWRMutationConfiguration']} path={importPath} isTypeOnly />
+            <File.Import
+              names={[
+                { name: 'default', alias: 'useSWRMutation', space: 'value' },
+                { name: 'SWRMutationConfiguration', space: 'type' },
+              ]}
+              path={importPath}
+            />
             <Mutation
               name={mutationHookName}
               clientName={contractOp.name}

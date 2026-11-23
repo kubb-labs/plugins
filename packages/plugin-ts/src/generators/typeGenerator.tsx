@@ -45,7 +45,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     return (
       <File {...meta.file}>
         {imports.map((imp) => (
-          <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
+          <File.Import key={[node.name, imp.path].join('-')} names={ast.imports.asType(imp)} root={meta.file.path} path={imp.path} />
         ))}
         <Type name={meta.name} node={node} enum={enumOptions} resolver={resolver} printer={schemaPrinter} />
       </File>
@@ -89,7 +89,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       return (
         <>
           {imports.map((imp) => (
-            <File.Import key={[name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
+            <File.Import key={[name, imp.path].join('-')} names={ast.imports.asType(imp)} root={meta.file.path} path={imp.path} />
           ))}
           <Type name={name} node={schema} enum={enumOptions} resolver={resolver} printer={schemaPrinter} inline={inline} />
         </>

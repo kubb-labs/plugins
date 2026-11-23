@@ -60,16 +60,22 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
       return (
         <File {...file}>
-          <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
-          <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
+          <File.Import
+            names={[
+              ...clientValueImports.map((name) => ({ name, space: 'value' as const })),
+              ...clientTypeImports.map((name) => ({ name, space: 'type' as const })),
+            ]}
+            root={clientRoot}
+            path={clientPath}
+          />
 
           {code.join(data.typeNames).imports.map((imp) => (
-            <File.Import key={imp.path} {...imp} root={file.path} isTypeOnly />
+            <File.Import key={imp.path} names={ast.imports.asType(imp)} root={file.path} path={imp.path} />
           ))}
           {code.join(data.schemaNames).imports.map((imp) => (
-            <File.Import key={imp.path} {...imp} root={file.path} />
+            <File.Import key={imp.path} names={ast.file.getNames(imp)} root={file.path} path={imp.path} />
           ))}
-          {validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
+          {validatorHooks.headers && <File.Import names={[{ name: 'toHeadersStandardSchema', space: 'value' }]} root={clientRoot} path={standardSchemaPath} />}
 
           <Operation
             name={data.name}
