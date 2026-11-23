@@ -54,3 +54,8 @@ declare global {
     }
   }
 }
+
+/** The names `imp` brings in, each imported as a type. */
+export function typeNames(imp: ast.ImportNode): Array<ast.ModuleName> {
+  return ast.file.getNames(imp).map((item) => ({ ...item, space: 'type' }))
+}

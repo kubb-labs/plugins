@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
-import { getStream } from '@internals/shared'
+import { getStream, typeNames } from '@internals/shared'
 import { defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
@@ -41,10 +41,16 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     return (
       <File {...meta.file}>
-        {options && <File.Import {...options} root={meta.file.path} isTypeOnly />}
-        <File.Import name={['CallToolResult', 'ServerContext']} path={'@modelcontextprotocol/server'} isTypeOnly />
+        {options && <File.Import names={typeNames(options)} path={options.path} root={meta.file.path} />}
+        <File.Import
+          names={[
+            { name: 'CallToolResult', space: 'type' },
+            { name: 'ServerContext', space: 'type' },
+          ]}
+          path={'@modelcontextprotocol/server'}
+        />
 
-        <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
+        <File.Import names={[{ name: contractOp.name }]} root={meta.file.path} path={contractOp.path} />
 
         <McpHandler name={meta.name} clientName={contractOp.name} node={node} resolver={tsResolver} returnType={contractOp.returnType} />
       </File>

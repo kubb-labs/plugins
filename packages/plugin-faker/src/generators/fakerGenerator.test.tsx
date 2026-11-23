@@ -1055,7 +1055,7 @@ describe('fakerGenerator — custom imports', () => {
       printer: {
         nodes: {
           bigint() {
-            this.import(ast.factory.createImport({ name: ['fakeInt64'], path: 'my-int64/faker' }))
+            this.import(ast.factory.createImport({ names: [{ name: 'fakeInt64' }], path: 'my-int64/faker' }))
             return 'fakeInt64()'
           },
         },

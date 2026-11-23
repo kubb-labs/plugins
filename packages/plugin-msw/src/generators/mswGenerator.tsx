@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { getEnumNames } from '@internals/shared'
+import { getEnumNames, typeNames } from '@internals/shared'
 import { code, defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -68,13 +68,13 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     return (
       <File {...mock.file}>
-        <File.Import name={['http', 'HttpResponse']} path="msw/http" />
-        <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
-        {requestName && <File.Import name={['MswBody']} isTypeOnly root={mock.file.path} path={mswBodyPath(ctx.config)} />}
+        <File.Import names={[{ name: 'http' }, { name: 'HttpResponse' }]} path="msw/http" />
+        <File.Import names={[{ name: 'HttpResponseResolver', space: 'type' }]} path="msw/http" />
+        {requestName && <File.Import names={[{ name: 'MswBody', space: 'type' }]} root={mock.file.path} path={mswBodyPath(ctx.config)} />}
         {typeImports.map((imp) => (
-          <File.Import key={imp.path} {...imp} root={mock.file.path} isTypeOnly />
+          <File.Import key={imp.path} names={typeNames(imp)} path={imp.path} root={mock.file.path} />
         ))}
-        {fakerImport && <File.Import {...fakerImport} root={mock.file.path} />}
+        {fakerImport && <File.Import names={ast.file.getNames(fakerImport)} path={fakerImport.path} root={mock.file.path} />}
 
         {types.map(([response, type]) => (
           <Response key={response.statusCode} typeName={type.name} response={response} name={mock.name} />

@@ -33,6 +33,7 @@ export type {
   JSDocNode,
   JsxNode,
   Macro,
+  ModuleName,
   Node,
   NodeKind,
   NotSchemaNode,

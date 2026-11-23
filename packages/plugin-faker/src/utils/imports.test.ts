@@ -1,47 +1,38 @@
+import { ast } from '@internals/ast'
 import { describe, expect, test } from 'vitest'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from './imports.ts'
-import type { ImportEntry } from './imports.ts'
+
+const imp = (names: Array<ast.ModuleName>, path: string) => ast.factory.createImport({ names, path })
+const createPet = imp([{ name: 'createPet' }], './pet.ts')
 
 describe('import utilities', () => {
   test('filters imports used as function calls', () => {
-    const imports: Array<ImportEntry> = [
-      { name: 'createPet', path: './pet.ts' },
-      { name: 'unused', path: './unused.ts' },
-      { name: [{ propertyName: 'createUser', name: 'makeUser' }], path: './user.ts' },
-    ]
+    const makeUser = imp([{ name: 'createUser', alias: 'makeUser' }], './user.ts')
+    const imports = [createPet, imp([{ name: 'unused' }], './unused.ts'), makeUser]
 
-    expect(filterUsedImports(imports, 'createPet(data); makeUser<object>(); const value = unused')).toStrictEqual([
-      { name: 'createPet', path: './pet.ts' },
-      { name: [{ propertyName: 'createUser', name: 'makeUser' }], path: './user.ts' },
-    ])
+    expect(filterUsedImports(imports, 'createPet(data); makeUser<object>(); const value = unused')).toStrictEqual([createPet, makeUser])
   })
 
   test('ignores names that only appear inside a longer call', () => {
-    expect(filterUsedImports([{ name: 'createPet', path: './pet.ts' }], 'createPetList(data); x.createPet (1)')).toStrictEqual([
-      { name: 'createPet', path: './pet.ts' },
-    ])
-    expect(filterUsedImports([{ name: 'createPet', path: './pet.ts' }], 'createPetList(data); recreatePet()')).toStrictEqual([])
+    expect(filterUsedImports([createPet], 'createPetList(data); x.createPet (1)')).toStrictEqual([createPet])
+    expect(filterUsedImports([createPet], 'createPetList(data); recreatePet()')).toStrictEqual([])
   })
 
   test('keeps no imports when the text calls nothing', () => {
-    expect(filterUsedImports([{ name: 'createPet', path: './pet.ts' }], 'undefined')).toStrictEqual([])
+    expect(filterUsedImports([createPet], 'undefined')).toStrictEqual([])
   })
 
   test('skips selected import names', () => {
-    expect(filterUsedImports([{ name: 'createPet', path: './pet.ts' }], 'createPet(data)', ['createPet'])).toStrictEqual([])
+    expect(filterUsedImports([createPet], 'createPet(data)', ['createPet'])).toStrictEqual([])
   })
 
   test('aliases conflicting string imports', () => {
-    const importEntries: Array<ImportEntry> = [
-      { name: ['createPet', 'createUser'], path: './api.ts' },
-      { name: [{ propertyName: 'createStore', name: 'storeFactory' }], path: './store.ts' },
-    ]
+    const store = imp([{ name: 'createStore', alias: 'storeFactory' }], './store.ts')
+    const { imports, aliases } = aliasConflictingImports([imp([{ name: 'createPet' }, { name: 'createUser' }], './api.ts'), store], ['createPet'])
 
-    const { imports, aliases } = aliasConflictingImports(importEntries, ['createPet'])
-
-    expect(imports).toStrictEqual([
-      { name: [{ propertyName: 'createPet', name: 'createPetSchema' }, 'createUser'], path: './api.ts' },
-      { name: [{ propertyName: 'createStore', name: 'storeFactory' }], path: './store.ts' },
+    expect(imports.map((entry) => ast.file.getNames(entry))).toStrictEqual([
+      [{ name: 'createPet', alias: 'createPetSchema' }, { name: 'createUser' }],
+      ast.file.getNames(store),
     ])
     expect(aliases).toStrictEqual(new Map([['createPet', 'createPetSchema']]))
   })

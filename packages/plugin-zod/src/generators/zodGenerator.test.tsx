@@ -1501,7 +1501,7 @@ describe('zodGenerator — Compile Option', () => {
 })
 
 describe('custom imports', () => {
-  const codecImport = ast.factory.createImport({ name: ['myCodec'], path: 'my-codec/zod' })
+  const codecImport = ast.factory.createImport({ names: [{ name: 'myCodec' }], path: 'my-codec/zod' })
   const bigintSchema = ast.factory.createSchema({ type: ast.schema.types.bigint, name: 'Counter' })
 
   async function render(schema: ast.SchemaNode, options: Partial<PluginZod['resolvedOptions']>, document: Array<ast.SchemaNode> = []) {
@@ -1584,6 +1584,10 @@ describe('custom imports', () => {
       ['PaymentError', 'Label', 'Tag'].map((name) => ast.factory.createSchema({ type: 'object', name, properties: [] })),
     )
 
-    expect(files[0]?.imports.flatMap((imp) => imp.name)).toEqual(['z', 'labelSchema', 'paymentErrorSchema'])
+    expect(files[0]?.imports.flatMap((imp) => ast.file.getNames(imp).map((item) => item.alias ?? item.name))).toEqual([
+      'z',
+      'labelSchema',
+      'paymentErrorSchema',
+    ])
   })
 })

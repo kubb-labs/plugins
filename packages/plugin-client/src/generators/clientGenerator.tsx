@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
 import { resolveOperationTypes, resultTypeName } from '@internals/client'
-import { getStream } from '@internals/shared'
+import { getStream, typeNames } from '@internals/shared'
 import { code, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -60,16 +60,16 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
       return (
         <File {...file}>
-          <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
-          <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
+          <File.Import names={clientValueImports.map((name) => ({ name }))} root={clientRoot} path={clientPath} />
+          <File.Import names={clientTypeImports.map((name) => ({ name, space: 'type' as const }))} root={clientRoot} path={clientPath} />
 
           {code.join(data.typeNames).imports.map((imp) => (
-            <File.Import key={imp.path} {...imp} root={file.path} isTypeOnly />
+            <File.Import key={imp.path} names={typeNames(imp)} path={imp.path} root={file.path} />
           ))}
           {code.join(data.schemaNames).imports.map((imp) => (
-            <File.Import key={imp.path} {...imp} root={file.path} />
+            <File.Import key={imp.path} names={ast.file.getNames(imp)} path={imp.path} root={file.path} />
           ))}
-          {validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
+          {validatorHooks.headers && <File.Import names={[{ name: 'toHeadersStandardSchema' }]} root={clientRoot} path={standardSchemaPath} />}
 
           <Operation
             name={data.name}

@@ -1267,7 +1267,7 @@ describe('typeGenerator — custom imports', () => {
       printer: {
         nodes: {
           bigint() {
-            this.import(ast.factory.createImport({ name: ['Int64'], path: 'my-int64', isTypeOnly: true }))
+            this.import(ast.factory.createImport({ names: [{ name: 'Int64', space: 'type' }], path: 'my-int64' }))
             return 'Int64'
           },
         },

@@ -63,7 +63,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         const hookName = ns.name(node)
         // Each hook's options live in that hook's own file.
         const { path } = ctx.file(node, { plugin: ctx.plugin.name, name: hookFileName({ resolver: ctx.resolver, node, variant: hookFileVariants[namespace] }) })
-        optionsImports.push(ast.factory.createImport({ name: [optionsName], path }))
+        optionsImports.push(ast.factory.createImport({ names: [{ name: optionsName }], path }))
         hookOptions[hookName] = `Partial<ReturnType<typeof ${optionsName}>>`
       }
     }
@@ -77,7 +77,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         footer={ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
       >
         {optionsImports.map((imp) => (
-          <File.Import key={imp.path} {...imp} root={hookOptionsFile.path} />
+          <File.Import key={imp.path} names={ast.file.getNames(imp)} path={imp.path} root={hookOptionsFile.path} />
         ))}
         <Type export name={name}>
           {`{ ${Object.keys(hookOptions)

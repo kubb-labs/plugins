@@ -1,6 +1,6 @@
-import type { ast } from '@internals/ast'
+import { ast } from '@internals/ast'
 import { getResponseHeadersTypeNames, resolveOperationTypes } from '@internals/client'
-import { resolveOperationTypeNames } from '@internals/shared'
+import { resolveOperationTypeNames, typeNames } from '@internals/shared'
 import { code, Diagnostics, type FileTarget, type GeneratorContext, useKubb } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
@@ -102,17 +102,20 @@ export function HookFile({ hook, imports, children }: HookFileProps): KubbReactN
 
   return (
     <File {...file}>
-      <File.Import name={[contractOp.name]} root={file.path} path={contractOp.path} />
+      <File.Import names={[{ name: contractOp.name }]} root={file.path} path={contractOp.path} />
       <File.Import
-        name={['RequestConfig', 'ResponseErrorConfig', resultTypeName]}
+        names={[
+          { name: 'RequestConfig', space: 'type' },
+          { name: 'ResponseErrorConfig', space: 'type' },
+          { name: resultTypeName, space: 'type' },
+        ]}
         root={contractOp.clientPathIsFile ? file.path : undefined}
         path={contractOp.clientPath}
-        isTypeOnly
       />
 
       {imports}
       {typeImports.map((imp) => (
-        <File.Import key={imp.path} {...imp} root={file.path} isTypeOnly />
+        <File.Import key={imp.path} names={typeNames(imp)} path={imp.path} root={file.path} />
       ))}
 
       {children}

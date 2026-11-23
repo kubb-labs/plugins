@@ -101,9 +101,8 @@ describe('customHookOptionsFileGenerator operations', () => {
 
     expect(files.at(0)?.imports).toContainEqual(
       expect.objectContaining({
-        name: ['HookOptions'],
+        names: [{ name: 'HookOptions', space: 'type' }],
         path: path.resolve(testConfig.root, testConfig.output.path, 'hooks', 'HookOptions.ts'),
-        isTypeOnly: true,
       }),
     )
   })

@@ -43,8 +43,8 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
         hook={hook}
         imports={
           <>
-            <File.Import name={['toValue']} path="vue" />
-            <File.Import name={['MaybeRefOrGetter']} path="vue" isTypeOnly />
+            <File.Import names={[{ name: 'toValue' }]} path="vue" />
+            <File.Import names={[{ name: 'MaybeRefOrGetter', space: 'type' }]} path="vue" />
           </>
         }
       >
@@ -59,7 +59,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
           exportType
         />
 
-        <File.Import name={['queryOptions']} path={importPath} />
+        <File.Import names={[{ name: 'queryOptions' }]} path={importPath} />
 
         <QueryOptions
           name={queryOptionsName}
@@ -74,8 +74,16 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
 
         {query && hooks && (
           <>
-            <File.Import name={['useQuery']} path={importPath} />
-            <File.Import name={['QueryKey', 'QueryClient', 'UseQueryOptions', 'UseQueryReturnType']} path={importPath} isTypeOnly />
+            <File.Import names={[{ name: 'useQuery' }]} path={importPath} />
+            <File.Import
+              names={[
+                { name: 'QueryKey', space: 'type' },
+                { name: 'QueryClient', space: 'type' },
+                { name: 'UseQueryOptions', space: 'type' },
+                { name: 'UseQueryReturnType', space: 'type' },
+              ]}
+              path={importPath}
+            />
             <Query
               name={queryName}
               queryOptionsName={queryOptionsName}

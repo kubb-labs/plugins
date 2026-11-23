@@ -19,7 +19,16 @@ type Props = {
 
 export function Faker({ node, description, name, typeName, printer, canOverride, typeMode = 'inferred', keysToOmit }: Props): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
-  const imports = printer.drainImports().map((imp) => <File.Import key={[name, imp.path, imp.name].join('-')} {...imp} />)
+  const imports = printer
+    .drainImports()
+    .map((imp) => (
+      <File.Import
+        key={[name, imp.path, ...ast.file.getNames(imp).map((item) => item.name)].join('-')}
+        names={ast.file.getNames(imp)}
+        path={imp.path}
+        root={imp.root}
+      />
+    ))
 
   const isArray = node.type === 'array'
   const isObject = !!ast.schema.narrow(node, ast.schema.types.object) || (node.type === ast.schema.types.intersection && isObjectSchema(node))
