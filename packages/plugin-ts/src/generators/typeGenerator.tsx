@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, toResponseContent, typeNames } from '@internals/shared'
+import { buildOptionsSchema, buildResponses, getEnumNames, resolveContentTypeVariants, toResponseContent } from '@internals/shared'
 import { defineGenerator, defineTemplate } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -44,7 +44,7 @@ export const typeSchema = defineTemplate<PluginTs>({
     return (
       <File {...meta.file}>
         {imports.map((imp) => (
-          <File.Import key={[node.name, imp.path].join('-')} names={typeNames(imp)} root={meta.file.path} path={imp.path} />
+          <File.Import key={[node.name, imp.path].join('-')} names={ast.imports.asType(imp)} root={meta.file.path} path={imp.path} />
         ))}
         <Type name={meta.name} node={node} enum={enumOptions} resolver={resolver} printer={schemaPrinter} />
       </File>
@@ -92,7 +92,7 @@ export const typeOperation = defineTemplate<PluginTs>({
       return (
         <>
           {imports.map((imp) => (
-            <File.Import key={[name, imp.path].join('-')} names={typeNames(imp)} root={meta.file.path} path={imp.path} />
+            <File.Import key={[name, imp.path].join('-')} names={ast.imports.asType(imp)} root={meta.file.path} path={imp.path} />
           ))}
           <Type name={name} node={schema} enum={enumOptions} resolver={resolver} printer={schemaPrinter} inline={inline} />
         </>

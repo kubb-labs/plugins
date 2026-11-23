@@ -40,8 +40,13 @@ export const mutationOperation = defineTemplate<PluginSwr>({
 
         {mutation && (
           <>
-            <File.Import names={[{ name: 'default', alias: 'useSWRMutation' }]} path={importPath} />
-            <File.Import names={[{ name: 'SWRMutationConfiguration', space: 'type' }]} path={importPath} />
+            <File.Import
+              names={[
+                { name: 'default', alias: 'useSWRMutation', space: 'value' },
+                { name: 'SWRMutationConfiguration', space: 'type' },
+              ]}
+              path={importPath}
+            />
             <Mutation
               name={mutationHookName}
               clientName={contractOp.name}

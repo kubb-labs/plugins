@@ -42,8 +42,10 @@ export const mutationOperation = defineTemplate<PluginVueQuery>({
         hook={hook}
         imports={
           <>
-            {hasRequestGroups && <File.Import names={[{ name: 'toValue' }]} path="vue" />}
-            <File.Import names={[{ name: 'MaybeRefOrGetter', space: 'type' }]} path="vue" />
+            <File.Import
+              names={[...(hasRequestGroups ? [{ name: 'toValue', space: 'value' as const }] : []), { name: 'MaybeRefOrGetter', space: 'type' }]}
+              path="vue"
+            />
           </>
         }
       >
@@ -51,9 +53,9 @@ export const mutationOperation = defineTemplate<PluginVueQuery>({
 
         {mutation && hooks && (
           <>
-            <File.Import names={[{ name: 'useMutation' }]} path={importPath} />
             <File.Import
               names={[
+                { name: 'useMutation', space: 'value' },
                 { name: 'MutationObserverOptions', space: 'type' },
                 { name: 'QueryClient', space: 'type' },
               ]}

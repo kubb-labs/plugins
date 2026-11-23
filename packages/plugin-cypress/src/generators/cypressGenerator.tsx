@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { resolveOperationTypeNames, typeNames } from '@internals/shared'
+import { resolveOperationTypeNames } from '@internals/shared'
 import { code, defineGenerator, defineTemplate, operationKey } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -33,7 +33,7 @@ export const cypressOperation = defineTemplate<PluginCypress>({
     return (
       <File {...meta.file}>
         {imports.map((imp) => (
-          <File.Import key={imp.path} names={typeNames(imp)} path={imp.path} root={meta.file.path} />
+          <File.Import key={imp.path} names={ast.imports.asType(imp)} root={meta.file.path} path={imp.path} />
         ))}
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>

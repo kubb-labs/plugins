@@ -70,14 +70,9 @@ export const valibotSchema = defineTemplate<PluginValibot>({
 
     return (
       <File {...meta.file}>
-        <File.Import names={[{ name: '*', alias: 'v' }]} path={importPath} />
+        <File.Import names={[{ name: '*', alias: 'v', space: 'value' }]} path={importPath} />
         {imports.map((imp) => (
-          <File.Import
-            key={[node.name, imp.path, ...ast.file.getNames(imp).map((item) => item.name)].join('-')}
-            names={ast.file.getNames(imp)}
-            root={meta.file.path}
-            path={imp.path}
-          />
+          <File.Import key={[node.name, imp.path].join('-')} names={ast.file.getNames(imp)} root={meta.file.path} path={imp.path} />
         ))}
 
         <Valibot
@@ -166,12 +161,7 @@ export const valibotOperation = defineTemplate<PluginValibot>({
       return (
         <>
           {imports.map((imp) => (
-            <File.Import
-              key={[name, imp.path, ...ast.file.getNames(imp).map((item) => item.name)].join('-')}
-              names={ast.file.getNames(imp)}
-              root={meta.file.path}
-              path={imp.path}
-            />
+            <File.Import key={[name, imp.path].join('-')} names={ast.file.getNames(imp)} root={meta.file.path} path={imp.path} />
           ))}
           {/* A circular component schema carries the `v.GenericSchema` annotation at its own definition.
               Annotating the operation schema too would erase its inferred type to `unknown`. */}
@@ -272,7 +262,7 @@ export const valibotOperation = defineTemplate<PluginValibot>({
 
     return (
       <File {...meta.file}>
-        <File.Import names={[{ name: '*', alias: 'v' }]} path={importPath} />
+        <File.Import names={[{ name: '*', alias: 'v', space: 'value' }]} path={importPath} />
         {paramSchemas}
         {responseSchemas}
         {responseHeaderSchemas}

@@ -73,12 +73,7 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
       {shouldExportType && (
         <>
           {printerImports.map((imp) => (
-            <File.Import
-              key={[name, imp.path, ...ast.file.getNames(imp).map((item) => item.name)].join('-')}
-              names={ast.file.getNames(imp)}
-              path={imp.path}
-              root={imp.root}
-            />
+            <File.Import key={[name, imp.path].join('-')} names={ast.file.getNames(imp)} path={imp.path} root={imp.root} />
           ))}
           <Origin pointer={node.pointer}>
             <TypeDeclaration export name={name} syntax={parts.syntax} JSDoc={{ comments: parts.comments }}>

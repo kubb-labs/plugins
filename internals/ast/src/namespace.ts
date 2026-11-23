@@ -25,6 +25,7 @@ export type {
   HttpMethod,
   HttpOperationNode,
   ImportNode,
+  ModuleName,
   InputMeta,
   InputNode,
   InputServer,
@@ -33,7 +34,6 @@ export type {
   JSDocNode,
   JsxNode,
   Macro,
-  ModuleName,
   Node,
   NodeKind,
   NotSchemaNode,
@@ -59,6 +59,7 @@ export type {
   SchemaNodeByType,
   SchemaType,
   SourceNode,
+  Space,
   StatusCode,
   StringSchemaNode,
   TextNode,
@@ -75,6 +76,7 @@ export type { DateOnlyTypeValue, DateTimeTypeValue, DateTypeOptions, ParserOptio
 export * as auth from './auth.ts'
 export * as graph from './graph.ts'
 export * as http from './http/index.ts'
+export * as imports from './imports.ts'
 export * as mediaType from './mediaType.ts'
 export * as schema from './schema.ts'
 export * as server from './server.ts'

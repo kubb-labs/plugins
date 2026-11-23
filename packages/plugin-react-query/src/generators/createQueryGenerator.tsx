@@ -94,7 +94,7 @@ export function createQueryTemplate({ variant }: { variant: Variant }) {
       })
 
       return (
-        <HookFile hook={hook} imports={customOptions && <File.Import names={[{ name: customOptions.name }]} path={customOptions.importPath} />}>
+        <HookFile hook={hook} imports={customOptions && <File.Import names={[{ name: customOptions.name, space: 'value' }]} path={customOptions.importPath} />}>
           <QueryKey
             name={queryKeyName}
             typeName={queryKeyTypeName}
@@ -106,8 +106,13 @@ export function createQueryTemplate({ variant }: { variant: Variant }) {
 
           {infiniteOptions ? (
             <>
-              <File.Import names={[{ name: 'InfiniteData', space: 'type' }]} path={importPath} />
-              <File.Import names={[{ name: 'infiniteQueryOptions' }]} path={importPath} />
+              <File.Import
+                names={[
+                  { name: 'infiniteQueryOptions', space: 'value' },
+                  { name: 'InfiniteData', space: 'type' },
+                ]}
+                path={importPath}
+              />
               <InfiniteQueryOptions
                 name={queryOptionsName}
                 clientName={contractOp.name}
@@ -129,7 +134,7 @@ export function createQueryTemplate({ variant }: { variant: Variant }) {
             </>
           ) : (
             <>
-              <File.Import names={[{ name: 'queryOptions' }]} path={importPath} />
+              <File.Import names={[{ name: 'queryOptions', space: 'value' }]} path={importPath} />
               <QueryOptions
                 name={queryOptionsName}
                 clientName={contractOp.name}
@@ -145,12 +150,10 @@ export function createQueryTemplate({ variant }: { variant: Variant }) {
 
           {(variant !== 'query' || (query && hooks)) && (
             <>
-              <File.Import names={[{ name: hookImport }]} path={importPath} />
               <File.Import
                 names={[
-                  { name: 'QueryKey', space: 'type' },
-                  { name: 'QueryClient', space: 'type' },
-                  ...observerImports.map((name) => ({ name, space: 'type' as const })),
+                  { name: hookImport, space: 'value' },
+                  ...['QueryKey', 'QueryClient', ...observerImports].map((name) => ({ name, space: 'type' as const })),
                 ]}
                 path={importPath}
               />

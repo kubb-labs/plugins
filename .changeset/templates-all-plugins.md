@@ -19,5 +19,4 @@ Write files with kit templates instead of generators, and stop using deprecated 
 - Each plugin registers its templates with `addTemplate`. The exported ones are `typeSchema` and `typeOperation` (plugin-ts), `fakerSchema` and `fakerOperation`, `valibotSchema` and `valibotOperation`, `cypressOperation`, and `mcpOperation` and `serverOperations` (plugin-mcp). Another plugin can register them or call their `render`.
 - `typeGenerator`, `fakerGenerator`, `valibotGenerator`, `cypressGenerator`, `mcpGenerator` and `serverGenerator` are deprecated. They still work and run the templates.
 - The user's `macros` option goes to `addMacro` instead of the deprecated `setMacros`.
-- Imports are built with `names` instead of the deprecated `name` and `isTypeOnly`.
 - `setupClient` no longer reads `name`, which is now optional and deprecated.

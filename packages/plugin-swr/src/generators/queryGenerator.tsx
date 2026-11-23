@@ -51,8 +51,13 @@ export const queryOperation = defineTemplate<PluginSwr>({
 
         {query && (
           <>
-            <File.Import names={[{ name: 'default', alias: 'useSWR' }]} path={importPath} />
-            <File.Import names={[{ name: 'SWRConfiguration', space: 'type' }]} path={importPath} />
+            <File.Import
+              names={[
+                { name: 'default', alias: 'useSWR', space: 'value' },
+                { name: 'SWRConfiguration', space: 'type' },
+              ]}
+              path={importPath}
+            />
             <Query
               name={queryName}
               queryOptionsName={queryOptionsName}

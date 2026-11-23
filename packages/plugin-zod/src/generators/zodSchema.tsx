@@ -45,14 +45,9 @@ export const zodSchema = defineTemplate<PluginZod>({
 
     return (
       <File {...meta.file}>
-        <File.Import names={[isZodImport ? { name: '*', alias: 'z' } : { name: 'z' }]} path={importPath} />
+        <File.Import names={[isZodImport ? { name: '*', alias: 'z', space: 'value' } : { name: 'z', space: 'value' }]} path={importPath} />
         {imports.map((imp) => (
-          <File.Import
-            key={[node.name, imp.path, ...ast.file.getNames(imp).map((item) => item.name)].join('-')}
-            names={ast.file.getNames(imp)}
-            root={meta.file.path}
-            path={imp.path}
-          />
+          <File.Import key={[node.name, imp.path].join('-')} names={ast.file.getNames(imp)} root={meta.file.path} path={imp.path} />
         ))}
 
         <Zod

@@ -89,7 +89,7 @@ export function ClientRuntime({
       ))}
       <File baseName="config.ts" path={configPath}>
         {imports.map(({ file, name }) => (
-          <File.Import key={name} names={[{ name: name }]} root={configPath} path={runtimePath(file)} />
+          <File.Import key={name} names={[{ name, space: 'value' }]} root={configPath} path={runtimePath(file)} />
         ))}
         <File.Import names={[{ name: 'ClientConfig', space: 'type' }]} root={configPath} path={runtimePath('core')} />
         <Code name="defaultConfig">

@@ -85,7 +85,7 @@ export const serverOperations = defineTemplate<PluginMcp>({
       })
 
     const imports = operationsMapped.flatMap(({ mcp, source }) =>
-      source.imports.map((imp) => <File.Import key={`${mcp.name}:${imp.path}`} names={ast.file.getNames(imp)} path={imp.path} root={serverFile.path} />),
+      source.imports.map((imp) => <File.Import key={`${mcp.name}:${imp.path}`} names={ast.file.getNames(imp)} root={serverFile.path} path={imp.path} />),
     )
 
     return (
@@ -97,9 +97,9 @@ export const serverOperations = defineTemplate<PluginMcp>({
           banner={ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
           footer={ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
         >
-          <File.Import names={[{ name: 'McpServer' }]} path={'@modelcontextprotocol/server'} />
-          <File.Import names={[{ name: 'serveStdio' }]} path={'@modelcontextprotocol/server/stdio'} />
-          <File.Import names={[{ name: 'z' }]} path={'zod'} />
+          <File.Import names={[{ name: 'McpServer', space: 'value' }]} path={'@modelcontextprotocol/server'} />
+          <File.Import names={[{ name: 'serveStdio', space: 'value' }]} path={'@modelcontextprotocol/server/stdio'} />
+          <File.Import names={[{ name: 'z', space: 'value' }]} path={'zod'} />
 
           {imports}
           <Server serverName={ctx.meta.title ?? 'server'} serverVersion={ctx.meta.version ?? '0.0.0'} operations={operationsMapped} />
@@ -112,7 +112,7 @@ export const serverOperations = defineTemplate<PluginMcp>({
           banner={ctx.resolver.default.banner(ctx.meta, { output, config: ctx.config, file: { path: startFile.path, baseName: startFile.baseName } })}
           footer={ctx.resolver.default.footer(ctx.meta, { output, config: ctx.config, file: { path: startFile.path, baseName: startFile.baseName } })}
         >
-          <File.Import names={[{ name: 'startServer' }]} root={startFile.path} path={serverFile.path} />
+          <File.Import names={[{ name: 'startServer', space: 'value' }]} root={startFile.path} path={serverFile.path} />
           {/* `Raw`, so barrels never re-export this entry: importing it starts the server. */}
           <Raw name="start">{'void startServer()'}</Raw>
         </File>

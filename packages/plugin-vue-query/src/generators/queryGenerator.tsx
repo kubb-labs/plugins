@@ -42,8 +42,13 @@ export const queryOperation = defineTemplate<PluginVueQuery>({
         hook={hook}
         imports={
           <>
-            <File.Import names={[{ name: 'toValue' }]} path="vue" />
-            <File.Import names={[{ name: 'MaybeRefOrGetter', space: 'type' }]} path="vue" />
+            <File.Import
+              names={[
+                { name: 'toValue', space: 'value' },
+                { name: 'MaybeRefOrGetter', space: 'type' },
+              ]}
+              path="vue"
+            />
           </>
         }
       >
@@ -58,7 +63,7 @@ export const queryOperation = defineTemplate<PluginVueQuery>({
           exportType
         />
 
-        <File.Import names={[{ name: 'queryOptions' }]} path={importPath} />
+        <File.Import names={[{ name: 'queryOptions', space: 'value' }]} path={importPath} />
 
         <QueryOptions
           name={queryOptionsName}
@@ -73,9 +78,9 @@ export const queryOperation = defineTemplate<PluginVueQuery>({
 
         {query && hooks && (
           <>
-            <File.Import names={[{ name: 'useQuery' }]} path={importPath} />
             <File.Import
               names={[
+                { name: 'useQuery', space: 'value' },
                 { name: 'QueryKey', space: 'type' },
                 { name: 'QueryClient', space: 'type' },
                 { name: 'UseQueryOptions', space: 'type' },

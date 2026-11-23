@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
-import { getStream, namedFile, typeNames } from '@internals/shared'
+import { getStream, namedFile } from '@internals/shared'
 import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
 import { ensureValidVarName } from '@internals/utils'
 import { code, defineTemplate, Diagnostics } from '@kubb/kit'
@@ -98,26 +98,25 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
           <File key={file.path} {...file}>
             <File.Import
               names={[
-                { name: 'createClient' },
-                { name: returnType === 'data' ? 'unwrapResult' : 'withUnwrap' },
-                { name: 'resolveThrowOnError' },
-                ...(ctx.options.importPath === undefined && ops.some((op) => op.security) ? ['securitySchemes'] : []).map((name) => ({ name })),
+                ...[
+                  'createClient',
+                  returnType === 'data' ? 'unwrapResult' : 'withUnwrap',
+                  'resolveThrowOnError',
+                  ...(ctx.options.importPath === undefined && ops.some((op) => op.security) ? ['securitySchemes'] : []),
+                ].map((name) => ({ name, space: 'value' as const })),
+                ...Array.from(
+                  new Set([
+                    'ClientConfig',
+                    'ClientInstance',
+                    'Options',
+                    ...(returnType === 'data' ? [] : ['Unwrappable']),
+                    ...(resultOps.some((op) => !typedHeaders(op)) ? [resultName] : []),
+                    ...(resultOps.some(typedHeaders) ? [resultTypeName(resultName, true)] : []),
+                    ...ops.filter((op) => getStream(op.node)?.shape).flatMap((op) => buildEventStreamImports({ node: op.node, types: op.types, returnType })),
+                  ]),
+                  (name) => ({ name, space: 'type' as const }),
+                ),
               ]}
-              root={file.path}
-              path={clientPath}
-            />
-            <File.Import
-              names={Array.from(
-                new Set([
-                  'ClientConfig',
-                  'ClientInstance',
-                  'Options',
-                  ...(returnType === 'data' ? [] : ['Unwrappable']),
-                  ...(resultOps.some((op) => !typedHeaders(op)) ? [resultName] : []),
-                  ...(resultOps.some(typedHeaders) ? [resultTypeName(resultName, true)] : []),
-                  ...ops.filter((op) => getStream(op.node)?.shape).flatMap((op) => buildEventStreamImports({ node: op.node, types: op.types, returnType })),
-                ]),
-              ).map((name) => ({ name, space: 'type' as const }))}
               root={file.path}
               path={clientPath}
             />
@@ -127,15 +126,15 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
             )}
 
             {typeImports.map((imp) => (
-              <File.Import key={imp.path} names={typeNames(imp)} path={imp.path} root={file.path} />
+              <File.Import key={imp.path} names={ast.imports.asType(imp)} root={file.path} path={imp.path} />
             ))}
 
             {schemaImports.map((imp) => (
-              <File.Import key={imp.path} names={ast.file.getNames(imp)} path={imp.path} root={file.path} />
+              <File.Import key={imp.path} names={ast.file.getNames(imp)} root={file.path} path={imp.path} />
             ))}
 
             {ops.some((op) => op.validatorHooks.headers) && (
-              <File.Import names={[{ name: 'toHeadersStandardSchema' }]} root={file.path} path={standardSchemaPath} />
+              <File.Import names={[{ name: 'toHeadersStandardSchema', space: 'value' }]} root={file.path} path={standardSchemaPath} />
             )}
 
             <SdkClient name={className} operations={ops} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
@@ -151,9 +150,9 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
 
         return (
           <File key={sdkFile.path} {...sdkFile}>
-            <File.Import names={[{ name: 'createClient' }]} root={sdkFile.path} path={clientPath} />
             <File.Import
               names={[
+                { name: 'createClient', space: 'value' },
                 { name: 'ClientConfig', space: 'type' },
                 { name: 'ClientInstance', space: 'type' },
               ]}
@@ -161,7 +160,7 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
               path={clientPath}
             />
             {controllers.map(({ name, file }) => (
-              <File.Import key={name} names={[{ name: name }]} root={sdkFile.path} path={file.path} />
+              <File.Import key={name} names={[{ name, space: 'value' }]} root={sdkFile.path} path={file.path} />
             ))}
             <SdkFacade name={ctx.resolver.className(name)} members={members} />
           </File>

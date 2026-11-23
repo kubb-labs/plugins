@@ -42,10 +42,10 @@ export const mutationOperation = defineTemplate<PluginReactQuery>({
     const { tsResolver } = hook
 
     return (
-      <HookFile hook={hook} imports={customOptions && <File.Import names={[{ name: customOptions.name }]} path={customOptions.importPath} />}>
+      <HookFile hook={hook} imports={customOptions && <File.Import names={[{ name: customOptions.name, space: 'value' }]} path={customOptions.importPath} />}>
         <MutationKey name={mutationKeyName} node={node} transformer={ctx.options.mutationKey} />
 
-        <File.Import names={[{ name: 'mutationOptions' }]} path={importPath} />
+        <File.Import names={[{ name: 'mutationOptions', space: 'value' }]} path={importPath} />
 
         <MutationOptions
           name={mutationOptionsName}
@@ -60,9 +60,9 @@ export const mutationOperation = defineTemplate<PluginReactQuery>({
 
         {mutation && hooks && (
           <>
-            <File.Import names={[{ name: 'useMutation' }]} path={importPath} />
             <File.Import
               names={[
+                { name: 'useMutation', space: 'value' },
                 { name: 'UseMutationOptions', space: 'type' },
                 { name: 'UseMutationResult', space: 'type' },
                 { name: 'QueryClient', space: 'type' },

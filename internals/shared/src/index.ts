@@ -23,7 +23,7 @@ export {
   toResponseContent,
 } from './operation.ts'
 export type { ResponseStream } from './operation.ts'
-export { getCircularNames, getEnumNames, namedFile, resolveOperationName, typeNames } from './resolver.ts'
+export { getCircularNames, getEnumNames, namedFile, resolveOperationName } from './resolver.ts'
 export {
   defaultLiteral,
   formatDefault,

@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
 import { resolveOperationTypes, resultTypeName } from '@internals/client'
-import { getStream, typeNames } from '@internals/shared'
+import { getStream } from '@internals/shared'
 import { code, defineTemplate } from '@kubb/kit'
 import type { Template } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
@@ -68,16 +68,24 @@ export function createClientTemplates<TFactory extends ContractClientFactory>({ 
 
         return (
           <File {...file}>
-            <File.Import names={clientValueImports.map((name) => ({ name }))} root={clientRoot} path={clientPath} />
-            <File.Import names={clientTypeImports.map((name) => ({ name, space: 'type' as const }))} root={clientRoot} path={clientPath} />
+            <File.Import
+              names={[
+                ...clientValueImports.map((name) => ({ name, space: 'value' as const })),
+                ...clientTypeImports.map((name) => ({ name, space: 'type' as const })),
+              ]}
+              root={clientRoot}
+              path={clientPath}
+            />
 
             {code.join(data.typeNames).imports.map((imp) => (
-              <File.Import key={imp.path} names={typeNames(imp)} path={imp.path} root={file.path} />
+              <File.Import key={imp.path} names={ast.imports.asType(imp)} root={file.path} path={imp.path} />
             ))}
             {code.join(data.schemaNames).imports.map((imp) => (
-              <File.Import key={imp.path} names={ast.file.getNames(imp)} path={imp.path} root={file.path} />
+              <File.Import key={imp.path} names={ast.file.getNames(imp)} root={file.path} path={imp.path} />
             ))}
-            {validatorHooks.headers && <File.Import names={[{ name: 'toHeadersStandardSchema' }]} root={clientRoot} path={standardSchemaPath} />}
+            {validatorHooks.headers && (
+              <File.Import names={[{ name: 'toHeadersStandardSchema', space: 'value' }]} root={clientRoot} path={standardSchemaPath} />
+            )}
 
             <Operation
               name={data.name}

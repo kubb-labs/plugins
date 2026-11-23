@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { getEnumNames, typeNames } from '@internals/shared'
+import { getEnumNames } from '@internals/shared'
 import { code, defineTemplate } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -67,13 +67,19 @@ export const mswOperation = defineTemplate<PluginMsw>({
 
     return (
       <File {...mock.file}>
-        <File.Import names={[{ name: 'http' }, { name: 'HttpResponse' }]} path="msw/http" />
-        <File.Import names={[{ name: 'HttpResponseResolver', space: 'type' }]} path="msw/http" />
+        <File.Import
+          names={[
+            { name: 'http', space: 'value' },
+            { name: 'HttpResponse', space: 'value' },
+            { name: 'HttpResponseResolver', space: 'type' },
+          ]}
+          path="msw/http"
+        />
         {requestName && <File.Import names={[{ name: 'MswBody', space: 'type' }]} root={mock.file.path} path={mswBodyPath(ctx.config)} />}
         {typeImports.map((imp) => (
-          <File.Import key={imp.path} names={typeNames(imp)} path={imp.path} root={mock.file.path} />
+          <File.Import key={imp.path} names={ast.imports.asType(imp)} root={mock.file.path} path={imp.path} />
         ))}
-        {fakerImport && <File.Import names={ast.file.getNames(fakerImport)} path={fakerImport.path} root={mock.file.path} />}
+        {fakerImport && <File.Import names={ast.file.getNames(fakerImport)} root={mock.file.path} path={fakerImport.path} />}
 
         {types.map(([response, type]) => (
           <Response key={response.statusCode} typeName={type.name} response={response} name={mock.name} />

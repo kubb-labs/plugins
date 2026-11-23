@@ -60,12 +60,7 @@ export const zodOperation = defineTemplate<PluginZod>({
       return (
         <>
           {imports.map((imp) => (
-            <File.Import
-              key={[name, imp.path, ...ast.file.getNames(imp).map((item) => item.name)].join('-')}
-              names={ast.file.getNames(imp)}
-              root={meta.file.path}
-              path={imp.path}
-            />
+            <File.Import key={[name, imp.path].join('-')} names={ast.file.getNames(imp)} root={meta.file.path} path={imp.path} />
           ))}
           {/* Operation schemas reference (and import) the component schemas, which carry the
               `z.ZodType` annotation at their own definition when cyclic. Annotating the operation
@@ -188,7 +183,7 @@ export const zodOperation = defineTemplate<PluginZod>({
 
     return (
       <File {...meta.file}>
-        <File.Import names={[isZodImport ? { name: '*', alias: 'z' } : { name: 'z' }]} path={importPath} />
+        <File.Import names={[isZodImport ? { name: '*', alias: 'z', space: 'value' } : { name: 'z', space: 'value' }]} path={importPath} />
         {paramSchemas}
         {responseSchemas}
         {responseHeaderSchemas}

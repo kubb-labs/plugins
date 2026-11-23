@@ -61,8 +61,13 @@ export const customHookOptionsFileOperations = defineTemplate<PluginReactQuery>(
 
     return (
       <File baseName={file.baseName} path={file.path}>
-        <File.Import names={[{ name: 'QueryClient', space: 'type' }]} path={reactQueryImportPath} />
-        <File.Import names={[{ name: 'useQueryClient' }]} path={reactQueryImportPath} />
+        <File.Import
+          names={[
+            { name: 'useQueryClient', space: 'value' },
+            { name: 'QueryClient', space: 'type' },
+          ]}
+          path={reactQueryImportPath}
+        />
         <File.Import names={[{ name: hookOptionsName, space: 'type' }]} root={file.path} path={hookOptionsPath} />
         <Function name={customHookOptionsName} params="{ queryClient }: { queryClient: QueryClient }" returnType={`Partial<${hookOptionsName}>`}>
           {`return {

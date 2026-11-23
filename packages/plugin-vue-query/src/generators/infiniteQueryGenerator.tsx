@@ -80,8 +80,13 @@ export const infiniteQueryOperation = defineTemplate<PluginVueQuery>({
         hook={hook}
         imports={
           <>
-            <File.Import names={[{ name: 'toValue' }]} path="vue" />
-            <File.Import names={[{ name: 'MaybeRefOrGetter', space: 'type' }]} path="vue" />
+            <File.Import
+              names={[
+                { name: 'toValue', space: 'value' },
+                { name: 'MaybeRefOrGetter', space: 'type' },
+              ]}
+              path="vue"
+            />
           </>
         }
       >
@@ -96,8 +101,13 @@ export const infiniteQueryOperation = defineTemplate<PluginVueQuery>({
           exportType
         />
 
-        <File.Import names={[{ name: 'InfiniteData', space: 'type' }]} path={importPath} />
-        <File.Import names={[{ name: 'infiniteQueryOptions' }]} path={importPath} />
+        <File.Import
+          names={[
+            { name: 'infiniteQueryOptions', space: 'value' },
+            { name: 'InfiniteData', space: 'type' },
+          ]}
+          path={importPath}
+        />
 
         <InfiniteQueryOptions
           name={queryOptionsName}
@@ -121,9 +131,9 @@ export const infiniteQueryOperation = defineTemplate<PluginVueQuery>({
           unwrapName={(name) => `toValue(${name})`}
         />
 
-        <File.Import names={[{ name: 'useInfiniteQuery' }]} path={importPath} />
         <File.Import
           names={[
+            { name: 'useInfiniteQuery', space: 'value' },
             { name: 'QueryKey', space: 'type' },
             { name: 'QueryClient', space: 'type' },
             { name: 'UseInfiniteQueryOptions', space: 'type' },
