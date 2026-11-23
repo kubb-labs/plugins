@@ -183,7 +183,7 @@ export const zodOperation = defineTemplate<PluginZod>({
 
     return (
       <File {...meta.file}>
-        <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
+        <File.Import names={[isZodImport ? { name: '*', alias: 'z' } : { name: 'z' }]} path={importPath} />
         {paramSchemas}
         {responseSchemas}
         {responseHeaderSchemas}

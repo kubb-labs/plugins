@@ -71,7 +71,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
 
     return (
       <File {...meta.file}>
-        <File.Import name="v" path={importPath} isNameSpace />
+        <File.Import names={[{ name: '*', alias: 'v' }]} path={importPath} />
         {imports.map((imp) => (
           <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
         ))}
@@ -259,7 +259,7 @@ export const valibotGenerator = defineGenerator<PluginValibot>({
 
     return (
       <File {...meta.file}>
-        <File.Import name="v" path={importPath} isNameSpace />
+        <File.Import names={[{ name: '*', alias: 'v' }]} path={importPath} />
         {paramSchemas}
         {responseSchemas}
         {responseHeaderSchemas}
