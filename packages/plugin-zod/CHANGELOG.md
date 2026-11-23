@@ -1,5 +1,22 @@
 # @kubb/plugin-zod
 
+## 5.12.0
+
+### Minor Changes
+
+- [#1573](https://github.com/kubb-labs/plugins/pull/1573) [`2c716b6`](https://github.com/kubb-labs/plugins/commit/2c716b65b093cc7187133e33fb34885040c94d5f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Write zod files with kit templates. `zodSchema` writes the file for each schema and `zodOperation` the file for each operation. Both are exported, so another plugin can register them with `addTemplate` or call their `render`.
+  
+  - `zodGenerator` is removed. Register `zodSchema` and `zodOperation` with `addTemplate` instead.
+  - `createPrinterZod` moved to `src/printers/createPrinterZod.ts`.
+  - The user's `macros` option now goes to `addMacro`, which replaces the deprecated `setMacros`.
+  - Generated output does not change.
+
+### Patch Changes
+
+- [#1561](https://github.com/kubb-labs/plugins/pull/1561) [`bb317df`](https://github.com/kubb-labs/plugins/commit/bb317dff2871609ff9717fc1dd9dda17670800a8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Write each module's imports as one `File.Import` with `names`, in place of the deprecated `name`, `isTypeOnly` and `isNameSpace`. The generated code is unchanged.
+
+- [#1573](https://github.com/kubb-labs/plugins/pull/1573) [`2c716b6`](https://github.com/kubb-labs/plugins/commit/2c716b65b093cc7187133e33fb34885040c94d5f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Import a schema's `Input` variant when a macro renamed that schema. A schema with a read-only, write-only or codec field gets an `...InputSchema` variant. A schema that refers to it now imports that variant, even when the document only knows the schema by its old name.
+
 ## 5.11.2
 
 ### Patch Changes

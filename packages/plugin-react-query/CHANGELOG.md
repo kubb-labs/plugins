@@ -1,5 +1,23 @@
 # @kubb/plugin-react-query
 
+## 5.13.1
+
+### Patch Changes
+
+- [#1561](https://github.com/kubb-labs/plugins/pull/1561) [`bb317df`](https://github.com/kubb-labs/plugins/commit/bb317dff2871609ff9717fc1dd9dda17670800a8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Write each module's imports as one `File.Import` with `names`, in place of the deprecated `name`, `isTypeOnly` and `isNameSpace`. The generated code is unchanged.
+
+- [#1573](https://github.com/kubb-labs/plugins/pull/1573) [`2c716b6`](https://github.com/kubb-labs/plugins/commit/2c716b65b093cc7187133e33fb34885040c94d5f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Write files with kit templates instead of generators, and stop using deprecated kit APIs. Generated output does not change.
+  
+  - Each plugin registers its templates with `addTemplate`. The exported ones are `typeSchema` and `typeOperation` (plugin-ts), `fakerSchema` and `fakerOperation`, `valibotSchema` and `valibotOperation`, `cypressOperation`, and `mcpOperation` and `serverOperations` (plugin-mcp). Another plugin can register them or call their `render`.
+  - `typeGenerator`, `fakerGenerator`, `valibotGenerator`, `cypressGenerator`, `mcpGenerator` and `serverGenerator` are removed. Register the templates above with `addTemplate` instead.
+  - `setupClient` no longer takes `name`.
+  - The user's `macros` option goes to `addMacro` instead of the deprecated `setMacros`.
+  - Each plugin keeps its templates in `src/templates/`.
+
+- [#1582](https://github.com/kubb-labs/plugins/pull/1582) [`f12f161`](https://github.com/kubb-labs/plugins/commit/f12f1611f249b32ca278cfa37d3fc891396d167b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `importPath` to `pluginFetch`, `pluginAxios`, and `pluginKy`. The generated operations, SDK classes, and query hooks import the client from that module, and Kubb still writes the full `.kubb/` runtime, including `config.ts`. The module re-exports `.kubb/client.ts` and overrides what it needs, such as a pre-configured `client`. Typed response headers and `securitySchemes` stay, also in the query hooks, and the headers validator helper still comes from `.kubb/standardSchema.ts`.
+- Updated dependencies [[`bb317df`](https://github.com/kubb-labs/plugins/commit/bb317dff2871609ff9717fc1dd9dda17670800a8), [`2c716b6`](https://github.com/kubb-labs/plugins/commit/2c716b65b093cc7187133e33fb34885040c94d5f), [`f69034b`](https://github.com/kubb-labs/plugins/commit/f69034b24cab26d72cbe0c992fac53db35ca0107)]:
+  - @kubb/plugin-ts@5.7.0
+
 ## 5.13.0
 
 ### Minor Changes

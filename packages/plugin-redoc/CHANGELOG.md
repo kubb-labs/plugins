@@ -1,5 +1,11 @@
 # @kubb/plugin-redoc
 
+## 5.2.7
+
+### Patch Changes
+
+- [#1573](https://github.com/kubb-labs/plugins/pull/1573) [`2c716b6`](https://github.com/kubb-labs/plugins/commit/2c716b65b093cc7187133e33fb34885040c94d5f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read the OpenAPI document from any adapter, instead of only `adapterOas`. The plugin checks that the adapter's document is an OpenAPI 3 or Swagger 2 document and still fails with `KUBB_ADAPTER_REQUIRED` when it isn't. `@kubb/adapter-oas` is no longer a peer dependency.
+
 ## 5.2.6
 
 ### Patch Changes
