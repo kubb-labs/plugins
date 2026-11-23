@@ -30,15 +30,18 @@ export const handlersOperations = defineTemplate<PluginMsw>({
             name: createHandlersName,
             export: true,
             nodes: [
-              ast.factory.createText(`export function ${createHandlersName}(options?: { baseURL?: string }) {
-  return [${handlers.join(', ')}] as const
-}`),
+              ast.factory.createFunction({
+                name: createHandlersName,
+                export: true,
+                params: 'options?: { baseURL?: string }',
+                nodes: [ast.factory.createText(`return [${handlers.join(', ')}] as const`)],
+              }),
             ],
           }),
           ast.factory.createSource({
             name: handlersName,
             export: true,
-            nodes: [ast.factory.createText(`export const ${handlersName} = ${createHandlersName}()`)],
+            nodes: [ast.factory.createConst({ name: handlersName, export: true, nodes: [ast.factory.createText(`${createHandlersName}()`)] })],
           }),
         ],
       }),
