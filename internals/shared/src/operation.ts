@@ -545,26 +545,6 @@ export function resolveOperationTypeNames(
   })
 }
 
-export function resolveResponseTypes(node: ast.OperationNode, resolver: ResponseNameResolver): Array<[statusCode: number | 'default', typeName: string]> {
-  const types: Array<[number | 'default', string]> = []
-
-  for (const response of node.responses) {
-    if (response.statusCode === 'default') {
-      types.push(['default', resolver.response.response(node)])
-      continue
-    }
-
-    const code = Number(response.statusCode)
-    if (Number.isNaN(code)) {
-      continue
-    }
-
-    types.push([code, ast.http.status.isSuccess(code) ? resolver.response.response(node) : resolver.response.status(node, response.statusCode)])
-  }
-
-  return types
-}
-
 /**
  * One object schema for a list of parameters or response headers, with each schema inline.
  */
