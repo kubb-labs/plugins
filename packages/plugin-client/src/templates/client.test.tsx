@@ -11,7 +11,7 @@ import { createClientTemplates } from './client.tsx'
 
 type PluginFetch = PluginType<'plugin-fetch', ClientOptions, ClientResolvedOptions, ResolverClient>
 
-const [, clientOperation] = createClientTemplates<PluginFetch>()
+const [, clientOperation] = createClientTemplates<PluginFetch>({ templates: '/templates' })
 
 type PluginClient = PluginType<'plugin-client', ClientOptions, ClientResolvedOptions & { importPath: string }, ResolverClient>
 

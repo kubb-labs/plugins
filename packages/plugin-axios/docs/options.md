@@ -9,6 +9,7 @@ Pass these options to `pluginAxios()`. Shared options link to [Shared plugin opt
 | [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written.                                    | `{ path: 'clients', barrel: { type: 'named' } }` |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path.                                | None                                             |
 | [`baseURL`](#baseurl)                                                     | Base URL the client starts with.                            | None                                             |
+| [`importPath`](#importpath)                                               | Module the operations import the client from.               | `.kubb/client.ts`                                |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | Throw on a non-2xx response unless a call says otherwise.   | `true`                                           |
 | [`validator`](#validator)                                                 | Validate requests and responses with Zod or Valibot.        | `false`                                          |
 | [`auth`](#auth)                                                           | How generated functions take `auth`.                        | None                                             |
@@ -42,6 +43,60 @@ pluginAxios({ baseURL: '${process.env.API_URL}' })
 
 > [!NOTE]
 > The spec's top-level `servers` URL is never used. See [Set the base URL](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/configure-requests#set-the-base-url).
+
+### importPath
+
+Module the generated operations import the client from, written exactly as given. Kubb still writes the full `.kubb/` runtime, including the `config.ts` your spec needs. Your module re-exports it and replaces only what you need, such as a pre-configured `client`.
+
+|          |          |
+| -------- | -------- |
+| Type     | `string` |
+| Required | `false`  |
+
+The specifier must resolve from each generated file, so use a relative path, a package name, or an alias:
+
+```typescript
+pluginAxios({ importPath: '../../client' }) // from src/gen/clients/ to src/client.ts
+```
+
+```typescript
+// src/client.ts
+export * from './gen/.kubb/client.ts'
+```
+
+The module must export everything `.kubb/client.ts` exports, so start from `export *` and override from there. This binding sets up the client once, narrows `throwOnError` to `true`, and uses its own error type:
+
+```typescript
+// src/client.ts
+import { createClient as createKubbClient } from './gen/.kubb/client.ts'
+import type { DataShape, NativeRequest, NativeResponse, Options as KubbOptions } from './gen/.kubb/client.ts'
+
+export * from './gen/.kubb/client.ts'
+
+export class MyHttpError<TError = unknown> extends Error {
+  constructor(readonly data: TError) {
+    super('Request failed')
+  }
+}
+
+export const client = createKubbClient({ baseURL: 'https://api.example.com' })
+client.interceptors.error.use((error) => new MyHttpError(error))
+
+// SDK classes call `createClient`, so start every new client from the configured one.
+export const createClient: typeof createKubbClient = (config) => client.extend(config)
+
+export type Options<TData extends DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = Omit<
+  KubbOptions<TData, ThrowOnError, TRequest, TResponse>,
+  'throwOnError'
+> & { throwOnError?: ThrowOnError & true }
+
+export type ResponseErrorConfig<TError = unknown> = MyHttpError<TError>
+```
+
+- Keep the type parameters of `Options`. Write the narrowed field as `ThrowOnError & true`: a plain `throwOnError?: true` does not compile in the generated functions.
+- `ResponseErrorConfig` and `RequestConfig` reach the query hooks only. The generated functions take their result type from the runtime, and the error interceptor converts an error only when the call throws.
+
+To write the whole client yourself, with no `.kubb/` runtime, use [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client).
 
 ### throwOnErrorDefault
 

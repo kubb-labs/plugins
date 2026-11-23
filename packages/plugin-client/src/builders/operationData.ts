@@ -34,8 +34,18 @@ export type OperationData = {
  * Resolves what the function and SDK generators both print for one operation: its name, its type and schema names, each with
  * its import, and its validator hooks, security, base URL and response headers types.
  */
-export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOperationNode; ctx: GeneratorContext; types: OperationTypeSource }): OperationData {
-  const { validator, importPath } = ctx.options
+export function resolveOperationData({
+  node,
+  ctx,
+  types,
+  custom = false,
+}: {
+  node: ast.HttpOperationNode
+  ctx: GeneratorContext
+  types: OperationTypeSource
+  custom?: boolean
+}): OperationData {
+  const { validator } = ctx.options
   const library = resolveValidatorLibrary(validator)
   const schemaPlugin = library === 'valibot' ? ctx.getPlugin(pluginValibotName) : library === 'zod' ? ctx.getPlugin(pluginZodName) : null
   const schemaResolver = !schemaPlugin ? null : library === 'valibot' ? ctx.getResolver(pluginValibotName) : ctx.getResolver(pluginZodName)
@@ -57,8 +67,8 @@ export function resolveOperationData({ node, ctx, types }: { node: ast.HttpOpera
     schemaNames: schemas ? validatorHooks.importedSchemaNames.map((name) => schemas.ref(node, name)) : [],
     validatorHooks,
     headerTypeNames,
-    // The fetch and axios clients write `securitySchemes` into `.kubb/client.ts`. A custom client module has none.
-    security: getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth, hoist: importPath === undefined }),
+    // The fetch, axios, and ky runtimes write `securitySchemes` into `.kubb/client.ts`. A custom client module has none.
+    security: getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth, hoist: !custom }),
     authRequired: ctx.options.auth.mode === 'required' && isAuthRequired({ auth: node.auth, schemes: ctx.meta.auth }),
     baseURL: ast.http.getBaseURL(ast.server.get({ servers: node.servers, index: ctx.meta.serverIndex })),
   }

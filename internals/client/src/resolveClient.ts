@@ -22,7 +22,7 @@ import { Diagnostics } from '@kubb/kit'
 const pluginFetchName = 'plugin-fetch'
 const pluginAxiosName = 'plugin-axios'
 const pluginKyName = 'plugin-ky'
-const pluginClientName = 'plugin-client'
+export const pluginClientName = 'plugin-client'
 
 /**
  * The client selector accepted by a consumer's `client` option. Each calls a registered contract
