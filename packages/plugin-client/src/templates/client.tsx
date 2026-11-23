@@ -48,9 +48,9 @@ export function createClientTemplates<TFactory extends ContractClientFactory>({ 
         // The default `.kubb/client.ts` is a file path and is made relative to the operation file.
         const clientPath = importPath ?? path.resolve(ctx.root, '.kubb/client.ts')
         const clientRoot = importPath === undefined ? file.path : undefined
-        // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
-        // alongside its other runtime helpers.
-        const standardSchemaPath = importPath ?? path.resolve(ctx.root, '.kubb/standardSchema.ts')
+        // The headers validator helper ships in `.kubb/standardSchema.ts`; only a custom client module exports it itself.
+        const standardSchemaPath = custom && importPath ? importPath : path.resolve(ctx.root, '.kubb/standardSchema.ts')
+        const standardSchemaRoot = custom && importPath ? undefined : file.path
         const stream = getStream(node)?.shape ?? null
 
         const clientValueImports = [
@@ -86,7 +86,7 @@ export function createClientTemplates<TFactory extends ContractClientFactory>({ 
               <File.Import key={imp.path} names={ast.file.getNames(imp)} root={file.path} path={imp.path} />
             ))}
             {validatorHooks.headers && (
-              <File.Import names={[{ name: 'toHeadersStandardSchema', space: 'value' }]} root={clientRoot} path={standardSchemaPath} />
+              <File.Import names={[{ name: 'toHeadersStandardSchema', space: 'value' }]} root={standardSchemaRoot} path={standardSchemaPath} />
             )}
 
             <Operation

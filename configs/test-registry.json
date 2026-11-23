@@ -87,7 +87,7 @@
   "tests/3.0.x/pluginClient.test.ts": "Golden path: custom client importPath with params validator and no .kubb runtime; unique.",
   "tests/3.0.x/pluginFaker.test.ts": "Golden path: faker options plus type-checked override and typeMode behavior; unique.",
   "tests/3.0.x/pluginFetch.test.ts": "Golden path: sdk modes, zod typing, .ts specifiers run in Node, baseURL, barrel regression.",
-  "tests/3.0.x/pluginFetchImportPath.test.ts": "Golden path: pluginFetch importPath in function and SDK mode keeps securitySchemes and typed headers, writes .kubb/, and typechecks against a re-exporting binding; unique.",
+  "tests/3.0.x/pluginFetchImportPath.test.ts": "Golden path: importPath on pluginFetch, pluginAxios and pluginKy, in function and SDK mode, with the headers validator and React Query hooks; typechecks the output against a binding that only re-exports .kubb/; unique.",
   "tests/3.0.x/pluginKy.test.ts": "Golden path: sdk name and flat mode forwarding, baseURL forms, and the PetClient barrel-name regression, on the Ky client template.",
   "tests/3.0.x/pluginMcp.test.ts": "Golden path: only snapshot of the MCP server, tools, and .mcp.json output.",
   "tests/3.0.x/pluginMsw.test.ts": "Golden path: data and faker parsers, handlers, baseURL, a method-changing macro keeping plugin-ts and plugin-faker names; only plugin-msw coverage.",

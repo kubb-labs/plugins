@@ -87,7 +87,8 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
       // `importPath` is written verbatim; the bundled runtime is made relative to each file.
       const { importPath } = ctx.options
       const clientPath = importPath ?? path.resolve(ctx.root, '.kubb/client.ts')
-      const standardSchemaPath = importPath ?? path.resolve(ctx.root, '.kubb/standardSchema.ts')
+      // `.kubb/client.ts` does not re-export the headers validator helper, so it always comes from the runtime.
+      const standardSchemaPath = path.resolve(ctx.root, '.kubb/standardSchema.ts')
       const importRoot = (file: string) => (importPath === undefined ? file : undefined)
 
       const renderClassFile = ({ name: className, file, operations: ops }: Pick<Controller, 'name' | 'file' | 'operations'>) => {
@@ -137,7 +138,7 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
             ))}
 
             {ops.some((op) => op.validatorHooks.headers) && (
-              <File.Import names={[{ name: 'toHeadersStandardSchema', space: 'value' }]} root={importRoot(file.path)} path={standardSchemaPath} />
+              <File.Import names={[{ name: 'toHeadersStandardSchema', space: 'value' }]} root={file.path} path={standardSchemaPath} />
             )}
 
             <SdkClient name={className} operations={ops} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />

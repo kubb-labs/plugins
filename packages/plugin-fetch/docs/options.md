@@ -64,7 +64,12 @@ pluginFetch({ importPath: '../../client' }) // from src/gen/clients/ to src/clie
 export * from './gen/.kubb/client.ts'
 ```
 
-The module must export everything `.kubb/client.ts` exports, so start from `export *` and override from there. To write the whole client yourself, with no `.kubb/` runtime, use [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client).
+The module must export everything `.kubb/client.ts` exports, so start from `export *` and override from there.
+
+- Overriding `client` changes the default client of the generated functions. SDK classes call `createClient`, so pass your config to the class instead.
+- A narrowed `Options` or `RequestConfig` must keep the same type parameters, such as `ThrowOnError extends boolean`. Narrow fields like `throwOnError` or `client` instead of the parameters.
+
+To write the whole client yourself, with no `.kubb/` runtime, use [`@kubb/plugin-client`](https://kubb.dev/extensions/kubb-labs/plugin-client).
 
 ### throwOnErrorDefault
 

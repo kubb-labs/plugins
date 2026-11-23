@@ -2,6 +2,7 @@ import type { ast } from '@internals/ast'
 import path from 'node:path'
 import { operationKey, useKubb } from '@kubb/kit'
 import type { Exclude, GeneratorContext, Include, Override } from '@kubb/kit'
+import { pluginClientName } from './resolveClient.ts'
 
 /**
  * Shape of the value a generated operation function resolves to.
@@ -88,7 +89,8 @@ export function resolveClientOperation({ node, pluginName }: { node: ast.Operati
       clientPath: importPath === undefined ? path.resolve(ctx.root, '.kubb/client.ts') : resolveImportPath({ importPath, operationFile: file.path }),
       clientPathIsFile: importPath === undefined || isRelativeImport(importPath),
       returnType: operationOptions.returnType ?? 'full',
-      typedHeaders: importPath === undefined,
+      // Only a custom `@kubb/plugin-client` module lacks the typed-headers result; the transports re-export the runtime.
+      typedHeaders: importPath === undefined || pluginName !== pluginClientName,
     }
   })
 }
