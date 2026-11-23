@@ -69,6 +69,15 @@ describe('printerTs', () => {
     expect(await formatTS(printer.transform(literalOrString))).toContain('(string & {}) | null')
   })
 
+  it('prints a nullable null member once', async () => {
+    const union = ast.factory.createSchema({
+      type: 'union',
+      members: [ast.factory.createSchema({ type: 'ref', name: 'Foo' }), ast.factory.createSchema({ type: 'null', nullable: true })],
+    })
+
+    expect(await formatTS(printer.transform(union))).toBe('Foo | null')
+  })
+
   describe('date / time', () => {
     it('date with representation=date returns Date', async () => {
       const result = printer.transform(ast.factory.createSchema({ type: 'date', representation: 'date' }))

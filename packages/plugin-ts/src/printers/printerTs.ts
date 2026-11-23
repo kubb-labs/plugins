@@ -133,9 +133,10 @@ type PrinterTs = PrinterTsFactory
 type HandlerContext = { transform: (node: ast.SchemaNode) => factory.TsNode | null }
 
 // Adds the `| null` of an OpenAPI 3.0 `nullable: true` set on an array item or union member itself.
+// A `null` member already prints `null`, so it gets no second one.
 function printNullable(node: ast.SchemaNode, print: (node: ast.SchemaNode) => factory.TsNode | null | undefined): factory.TsNode | null | undefined {
   const type = print(node)
-  return type && node.nullable ? factory.createUnionDeclaration({ nodes: [type, factory.keywordTypeNodes.null] }) : type
+  return type && node.nullable && node.type !== 'null' ? factory.createUnionDeclaration({ nodes: [type, factory.keywordTypeNodes.null] }) : type
 }
 
 /**
