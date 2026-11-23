@@ -88,7 +88,6 @@ export type MockedSetupContext<TFactory extends PluginType = PluginType> = KubbP
   addGenerator: Mock
   setResolver: Mock
   addMacro: Mock
-  setMacros: Mock
 }
 
 /**
@@ -106,7 +105,6 @@ export function createMockedSetupContext<TFactory extends PluginType = PluginTyp
     addGenerator: vi.fn(),
     setResolver: vi.fn(),
     addMacro: vi.fn(),
-    setMacros: vi.fn(),
     setOptions: vi.fn(),
     injectFile: vi.fn(),
     requirePlugin: vi.fn((pluginName: string) => {

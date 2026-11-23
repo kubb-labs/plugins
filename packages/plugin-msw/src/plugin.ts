@@ -1,4 +1,4 @@
-import { addGenerator, defineExtension, injectFile, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
+import { addGenerator, addMacro, defineExtension, injectFile, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginFakerName } from '@kubb/plugin-faker'
@@ -62,9 +62,7 @@ export const pluginMsw = defineExtension<PluginMsw>({
     const resolver = userResolver ? Resolver.merge<ResolverMsw>(resolverMsw, ...[userResolver].flat()) : resolverMsw
 
     setResolver(resolver)
-    if (userMacros?.length) {
-      setMacros(userMacros)
-    }
+    addMacro(...(userMacros ?? []))
 
     addGenerator(mswGenerator)
     injectFile({ baseName: 'mswBody.ts', path: mswBodyPath(useConfig()), copy: mswBodyTemplate })

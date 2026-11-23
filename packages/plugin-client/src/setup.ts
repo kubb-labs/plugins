@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { addGenerator, injectFile, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
+import { addGenerator, addMacro, injectFile, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './builders/validatorOptions.ts'
 import { createClientGenerator } from './generators/clientGenerator.tsx'
@@ -64,7 +64,7 @@ export function setupClient({
   const config = useConfig()
 
   setResolver(resolved.resolver)
-  setMacros([...defaultMacros, ...macros])
+  addMacro(...defaultMacros, ...macros)
 
   const templates = templatePath('')
   addGenerator<ContractClientFactory>(resolved.sdk ? createSdkGenerator({ templates }) : createClientGenerator(name, { templates }))

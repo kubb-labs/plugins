@@ -1,4 +1,4 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setPrinter, setResolver } from '@kubb/kit'
+import { addGenerator, addMacro, defineExtension, Resolver, setPrinter, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -59,9 +59,7 @@ export const pluginFaker = defineExtension<PluginFaker>({
     } = options
 
     setResolver(userResolver ? Resolver.merge(resolverFaker, ...[userResolver].flat()) : resolverFaker)
-    if (userMacros?.length) {
-      setMacros(userMacros)
-    }
+    addMacro(...(userMacros ?? []))
     setPrinter(createPrinterFaker)
     addGenerator(fakerGenerator)
 

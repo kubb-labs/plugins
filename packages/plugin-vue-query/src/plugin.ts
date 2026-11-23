@@ -1,4 +1,4 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
+import { addGenerator, addMacro, defineExtension, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -64,9 +64,7 @@ export const pluginVueQuery = defineExtension<PluginVueQuery>({
     const resolver = userResolver ? Resolver.merge<ResolverVueQuery>(resolverVueQuery, ...[userResolver].flat()) : resolverVueQuery
 
     setResolver(resolver)
-    if (userMacros?.length) {
-      setMacros(userMacros)
-    }
+    addMacro(...(userMacros ?? []))
 
     addGenerator(queryGenerator, infiniteQueryGenerator, mutationGenerator)
 

@@ -1,4 +1,4 @@
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
+import { addGenerator, addMacro, defineExtension, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -59,9 +59,7 @@ export const pluginSwr = defineExtension<PluginSwr>({
     const resolver = userResolver ? Resolver.merge<ResolverSwr>(resolverSwr, ...[userResolver].flat()) : resolverSwr
 
     setResolver(resolver)
-    if (userMacros?.length) {
-      setMacros(userMacros)
-    }
+    addMacro(...(userMacros ?? []))
 
     addGenerator(queryGenerator, mutationGenerator)
 
