@@ -84,8 +84,11 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
       const types = resolveOperationTypes()
 
       const controllers = buildControllers(nodes, ctx, types)
-      const clientPath = path.resolve(ctx.root, '.kubb/client.ts')
-      const standardSchemaPath = path.resolve(ctx.root, '.kubb/standardSchema.ts')
+      // `importPath` is written verbatim; the bundled runtime is made relative to each file.
+      const { importPath } = ctx.options
+      const clientPath = importPath ?? path.resolve(ctx.root, '.kubb/client.ts')
+      const standardSchemaPath = importPath ?? path.resolve(ctx.root, '.kubb/standardSchema.ts')
+      const importRoot = (file: string) => (importPath === undefined ? file : undefined)
 
       const renderClassFile = ({ name: className, file, operations: ops }: Pick<Controller, 'name' | 'file' | 'operations'>) => {
         const typeImports = code.join(ops.flatMap((op) => op.typeNames)).imports
@@ -102,7 +105,7 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
                   'createClient',
                   returnType === 'data' ? 'unwrapResult' : 'withUnwrap',
                   'resolveThrowOnError',
-                  ...(ctx.options.importPath === undefined && ops.some((op) => op.security) ? ['securitySchemes'] : []),
+                  ...(ops.some((op) => op.security) ? ['securitySchemes'] : []),
                 ].map((name) => ({ name, space: 'value' as const })),
                 ...Array.from(
                   new Set([
@@ -117,7 +120,7 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
                   (name) => ({ name, space: 'type' as const }),
                 ),
               ]}
-              root={file.path}
+              root={importRoot(file.path)}
               path={clientPath}
             />
 
@@ -134,7 +137,7 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
             ))}
 
             {ops.some((op) => op.validatorHooks.headers) && (
-              <File.Import names={[{ name: 'toHeadersStandardSchema', space: 'value' }]} root={file.path} path={standardSchemaPath} />
+              <File.Import names={[{ name: 'toHeadersStandardSchema', space: 'value' }]} root={importRoot(file.path)} path={standardSchemaPath} />
             )}
 
             <SdkClient name={className} operations={ops} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
@@ -156,7 +159,7 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
                 { name: 'ClientConfig', space: 'type' },
                 { name: 'ClientInstance', space: 'type' },
               ]}
-              root={sdkFile.path}
+              root={importRoot(sdkFile.path)}
               path={clientPath}
             />
             {controllers.map(({ name, file }) => (

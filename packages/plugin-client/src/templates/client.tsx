@@ -13,6 +13,7 @@ import type { ContractClientFactory } from '../types.ts'
 
 /**
  * Builds the client templates shared by the client plugins: one file per operation and the runtime the files import. `templates` is the folder the optional runtime, such as `sse.ts`, is copied from.
+ * Without `templates`, as in `@kubb/plugin-client`, the module at `importPath` is a custom client that exports no `securitySchemes` or typed headers.
  */
 export function createClientTemplates<TFactory extends ContractClientFactory>({ templates }: { templates?: string } = {}): [
   runtime: Template<TFactory>,
@@ -33,12 +34,13 @@ export function createClientTemplates<TFactory extends ContractClientFactory>({ 
         if (!ast.http.isOperation(node)) return null
 
         const { returnType, throwOnErrorDefault, importPath } = ctx.options
+        const custom = templates === undefined
 
         const resolvedTypes = resolveOperationTypes()
         // A custom client module keeps the two-argument `RequestResult` it documents, so its results get no typed headers.
-        const types = importPath === undefined ? resolvedTypes : { ...resolvedTypes, response: { ...resolvedTypes.response, headers: undefined } }
+        const types = custom ? { ...resolvedTypes, response: { ...resolvedTypes.response, headers: undefined } } : resolvedTypes
 
-        const data = resolveOperationData({ node, ctx, types })
+        const data = resolveOperationData({ node, ctx, types, custom })
         const { validatorHooks, headerTypeNames } = data
         const file = ctx.file(node)
 
@@ -57,7 +59,7 @@ export function createClientTemplates<TFactory extends ContractClientFactory>({ 
             data: ['client', 'unwrapResult', 'resolveThrowOnError'],
             full: ['client', 'withUnwrap', 'resolveThrowOnError'],
           }[returnType],
-          ...(importPath === undefined && data.security ? ['securitySchemes'] : []),
+          ...(!custom && data.security ? ['securitySchemes'] : []),
         ]
 
         const clientTypeImports = stream

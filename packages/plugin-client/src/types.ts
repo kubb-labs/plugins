@@ -48,8 +48,6 @@ export type Options = DistributiveOmit<ClientOptions, 'sdk' | 'returnType' | 'ba
    * ```
    */
   importPath: string
-  /** Transport whose runtime Kubb also writes into `.kubb/`. Install its package, such as `@kubb/plugin-fetch`. */
-  runtime?: 'fetch' | 'axios' | 'ky'
 }
 
 /**

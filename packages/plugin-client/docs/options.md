@@ -7,7 +7,6 @@ Pass these options to `pluginClient()`. Shared options link to [Shared plugin op
 | Option                                                                    | Purpose                                                                             | Default                                          |
 | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------ |
 | [`importPath`](#importpath)                                               | Import specifier of your client module.                                             | Required                                         |
-| [`runtime`](#runtime)                                                     | Also write the `.kubb/` runtime of `'fetch'`, `'axios'`, or `'ky'`.                 | None                                             |
 | [`returnType`](#returntype)                                               | What a generated function resolves to.                                              | `'plain'`                                        |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | `throwOnError` value each call passes to your client.                               | `true`                                           |
 | [`validator`](#validator)                                                 | Zod or Valibot schemas to pass to your client.                                      | `false`                                          |
@@ -38,26 +37,6 @@ pluginClient({ importPath: '@my-org/api-client' }) // a package
 ```
 
 Without `group`, files sit one folder higher, so use `../../client`. [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client) lists the exports the module needs.
-
-### runtime
-
-Transport whose runtime Kubb also writes into `.kubb/`, including the `config.ts` with the media types and serializers your spec needs. The generated operations still import from `importPath`, so your module can re-export the runtime and replace only some parts, such as a pre-configured `client`.
-
-|          |                              |
-| -------- | ---------------------------- |
-| Type     | `'fetch' \| 'axios' \| 'ky'` |
-| Required | `false`                      |
-
-Install the matching package: `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-ky`.
-
-```typescript
-pluginClient({ importPath: '../../client', runtime: 'fetch' }) // from src/gen/clients/ to src/client.ts
-```
-
-```typescript
-// src/client.ts
-export * from './gen/.kubb/client.ts'
-```
 
 ### returnType
 
