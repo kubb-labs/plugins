@@ -213,7 +213,8 @@ function createMockedPluginContext<TOptions extends PluginType>(
 
 /**
  * Renders a template for a node, or for every operation with an `'Operations'` template, and collects its files on
- * `opts.driver.fileManager`. JSX renders with `jsxRenderer`, like kit's visitor.
+ * `opts.driver.fileManager`. The operations reach `render` as one `OperationsNode`, and JSX renders with `jsxRenderer`,
+ * like kit's visitor.
  */
 export async function renderTemplate<TOptions extends PluginType>(
   template: Template<TOptions>,
@@ -223,7 +224,7 @@ export async function renderTemplate<TOptions extends PluginType>(
   const ctx = withPrinter({ ...createMockedPluginContext(opts), options: opts.options }, opts)
   const macros = opts.plugin.macros ?? []
   const apply = <TNode extends ast.SchemaNode | ast.OperationNode>(item: TNode): TNode => (macros.length ? ast.macro.apply(item, macros) : item)
-  const transformed = Array.isArray(node) ? node.map(apply) : apply(node)
+  const transformed = Array.isArray(node) ? ast.factory.createOperations({ operations: node.map(apply) }) : apply(node)
   const render = template.render as (node: unknown, ctx: GeneratorContext<TOptions>) => unknown
   const result = await withContext(ctx, () => render.call(ctx, transformed, ctx))
   await opts.driver.fileManager.dispatch({ result, renderer: isKubbElement(result) ? jsxRenderer : null })

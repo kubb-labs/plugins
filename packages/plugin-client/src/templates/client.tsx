@@ -21,7 +21,7 @@ export function createClientTemplates<TFactory extends ContractClientFactory>({ 
   return [
     defineTemplate<TFactory>({
       kind: 'Operations',
-      render(nodes, ctx) {
+      render({ operations: nodes }, ctx) {
         return (
           <ClientRuntime nodes={nodes} root={ctx.root} templates={templates} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} auth={ctx.meta.auth} />
         )

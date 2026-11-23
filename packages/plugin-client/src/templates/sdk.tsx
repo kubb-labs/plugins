@@ -62,7 +62,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
 export function createSdkTemplate<TFactory extends ContractClientFactory>({ templates }: { templates?: string } = {}): Template<TFactory> {
   return defineTemplate<TFactory>({
     kind: 'Operations',
-    render(nodes, ctx) {
+    render({ operations: nodes }, ctx) {
       const { output, validator, returnType, throwOnErrorDefault, sdk } = ctx.options
 
       if (!sdk) return null

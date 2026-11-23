@@ -17,7 +17,7 @@ import type { PluginMcp } from '../types.ts'
  */
 export const serverOperations = defineTemplate<PluginMcp>({
   kind: 'Operations',
-  render(nodes, ctx) {
+  render({ operations: nodes }, ctx) {
     const { output } = ctx.options
 
     const handlers = ctx.from().resolver

@@ -18,7 +18,7 @@ type MutationOption = PluginReactQuery['resolvedOptions']['mutation']
  */
 export const hookOptionsOperations = defineTemplate<PluginReactQuery>({
   kind: 'Operations',
-  render(nodes, ctx) {
+  render({ operations: nodes }, ctx) {
     const { output, customOptions, query, mutation, suspense, infinite, override, hooks } = ctx.options
 
     if (!customOptions || !hooks) return null

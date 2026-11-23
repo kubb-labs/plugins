@@ -11,7 +11,7 @@ import type { PluginMsw } from '../types'
  */
 export const handlersOperations = defineTemplate<PluginMsw>({
   kind: 'Operations',
-  render(nodes, ctx) {
+  render({ operations: nodes }, ctx) {
     const handlersName = ctx.resolver.handler.listName()
     const createHandlersName = ctx.resolver.resolveName({ key: ['handlers', 'create'], name: casing.camel(handlersName, { prefix: 'create' }) })
     const file = namedFile({ name: handlersName })

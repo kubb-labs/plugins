@@ -15,7 +15,7 @@ import type { PluginReactQuery } from '../types'
  */
 export const customHookOptionsFileOperations = defineTemplate<PluginReactQuery>({
   kind: 'Operations',
-  render(nodes, ctx) {
+  render({ operations: nodes }, ctx) {
     const { resolver, root } = ctx
     const { output, customOptions, query, hooks } = ctx.options
 
