@@ -19,6 +19,18 @@ export type ResolverMcp = Resolver & {
      */
     name(node: ast.OperationNode): string
   }
+  /**
+   * Naming for the MCP tools that `server.ts` registers.
+   */
+  tool: {
+    /**
+     * Resolves the tool name for an operation: the `operationId` with only `[a-zA-Z0-9_-]`, at most 64 characters, unique within the build.
+     *
+     * @example Resolving tool names
+     * `resolver.tool.name(operationNode) // -> 'pets_list_v2'`
+     */
+    name(node: ast.OperationNode): string
+  }
 }
 
 /**

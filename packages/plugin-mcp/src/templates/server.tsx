@@ -3,33 +3,11 @@ import path from 'node:path'
 import { resolveClientOperation } from '@internals/client'
 import { getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
-import { code, defineTemplate, memo, operationKey } from '@kubb/kit'
+import { code, defineTemplate } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, Raw } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
 import type { PluginMcp } from '../types.ts'
-
-const toolNameLimit = 64
-
-/**
- * Turns the `operationId` into a tool name MCP clients accept: only `[a-zA-Z0-9_-]`, at most 64 characters, unique within the build.
- */
-function toToolName(node: ast.OperationNode): string {
-  return memo(`plugin-mcp:toolName:${operationKey(node).join(':')}`, () => {
-    const used = memo('plugin-mcp:toolNames', () => new Set<string>())
-    const base = node.operationId.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, toolNameLimit)
-    let name = base
-    let count = 1
-    while (used.has(name)) {
-      count += 1
-      const suffix = `_${count}`
-      name = `${base.slice(0, toolNameLimit - suffix.length)}${suffix}`
-    }
-    used.add(name)
-
-    return name
-  })
-}
 
 /**
  * Default v5 server template for `@kubb/plugin-mcp`.
@@ -88,7 +66,7 @@ export const serverOperations = defineTemplate<PluginMcp>({
 
         return {
           tool: {
-            name: toToolName(node),
+            name: ctx.resolver.tool.name(node),
             title: node.summary || undefined,
             description: node.description || `Make a ${node.method.toUpperCase()} request to ${node.path}`,
           },

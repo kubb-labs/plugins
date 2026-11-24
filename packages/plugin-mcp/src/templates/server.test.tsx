@@ -84,21 +84,14 @@ describe('serverGenerator — client plugin filter', () => {
 })
 
 describe('serverGenerator — tool names', () => {
-  const operation = (operationId: string, index: number) => ast.factory.createOperation({ operationId, method: 'GET', path: `/ping/${index}`, responses: [] })
-  const toolNames = async (...operationIds: Array<string>) => {
-    const source = rawSources((await renderServer(operationIds.map(operation))).fileManager.files).join('\n')
-
-    return [...source.matchAll(/registerTool\("([^"]+)"/g)].map((match) => match[1])
-  }
-
-  test('replaces characters MCP clients reject and cuts the name at 64 characters', async () => {
-    expect(await toolNames('pets.list/v2', 'a'.repeat(70))).toEqual(['pets_list_v2', 'a'.repeat(64)])
-  })
-
-  test('keeps names unique after the rewrite', async () => {
+  test('replaces characters MCP clients reject, cuts the name at 64 characters and keeps names unique', async () => {
     const long = 'a'.repeat(64)
+    const operationIds = ['pets.list/v2', 'pets.list', 'pets/list', 'pets_list_2', `${long}b`, `${long}c`]
+    const nodes = operationIds.map((operationId, index) => ast.factory.createOperation({ operationId, method: 'GET', path: `/tools/${index}`, responses: [] }))
+    const source = rawSources((await renderServer(nodes)).fileManager.files).join('\n')
 
-    expect(await toolNames('pets.list', 'pets/list', 'pets_list_2', `${long}b`, `${long}c`)).toEqual([
+    expect([...source.matchAll(/registerTool\("([^"]+)"/g)].map((match) => match[1])).toEqual([
+      'pets_list_v2',
       'pets_list',
       'pets_list_2',
       'pets_list_2_2',
