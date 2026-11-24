@@ -65,5 +65,9 @@ declare global {
     interface PluginRegistry {
       'plugin-mcp': PluginMcp
     }
+    interface MemoRegistry {
+      'plugin-mcp:toolName': string
+      'plugin-mcp:toolNames': Set<string>
+    }
   }
 }

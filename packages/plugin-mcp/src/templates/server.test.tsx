@@ -84,7 +84,7 @@ describe('serverGenerator — client plugin filter', () => {
 })
 
 describe('serverGenerator — tool names', () => {
-  const operation = (operationId: string) => ast.factory.createOperation({ operationId, method: 'GET', path: '/ping', responses: [] })
+  const operation = (operationId: string, index: number) => ast.factory.createOperation({ operationId, method: 'GET', path: `/ping/${index}`, responses: [] })
   const toolNames = async (...operationIds: Array<string>) => {
     const source = rawSources((await renderServer(operationIds.map(operation))).fileManager.files).join('\n')
 

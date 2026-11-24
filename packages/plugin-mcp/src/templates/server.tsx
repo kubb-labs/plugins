@@ -3,7 +3,7 @@ import path from 'node:path'
 import { resolveClientOperation } from '@internals/client'
 import { getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
-import { code, defineTemplate } from '@kubb/kit'
+import { code, defineTemplate, memo, operationKey } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, Raw } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
@@ -12,20 +12,23 @@ import type { PluginMcp } from '../types.ts'
 const toolNameLimit = 64
 
 /**
- * Turns an `operationId` into a tool name MCP clients accept: only `[a-zA-Z0-9_-]`, at most 64 characters, unique within `used`.
+ * Turns the `operationId` into a tool name MCP clients accept: only `[a-zA-Z0-9_-]`, at most 64 characters, unique within the build.
  */
-function toToolName(operationId: string, used: Set<string>): string {
-  const base = operationId.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, toolNameLimit)
-  let name = base
-  let count = 1
-  while (used.has(name)) {
-    count += 1
-    const suffix = `_${count}`
-    name = `${base.slice(0, toolNameLimit - suffix.length)}${suffix}`
-  }
-  used.add(name)
+function toToolName(node: ast.OperationNode): string {
+  return memo(`plugin-mcp:toolName:${operationKey(node).join(':')}`, () => {
+    const used = memo('plugin-mcp:toolNames', () => new Set<string>())
+    const base = node.operationId.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, toolNameLimit)
+    let name = base
+    let count = 1
+    while (used.has(name)) {
+      count += 1
+      const suffix = `_${count}`
+      name = `${base.slice(0, toolNameLimit - suffix.length)}${suffix}`
+    }
+    used.add(name)
 
-  return name
+    return name
+  })
 }
 
 /**
@@ -64,8 +67,6 @@ export const serverOperations = defineTemplate<PluginMcp>({
       },
     }
 
-    const toolNames = new Set<string>()
-
     // `mcpOperation` emits no handler for a stream operation, or for one the client plugin leaves out, so neither gets a tool.
     const operationsMapped = nodes
       .filter(ast.http.isOperation)
@@ -87,7 +88,7 @@ export const serverOperations = defineTemplate<PluginMcp>({
 
         return {
           tool: {
-            name: toToolName(node.operationId, toolNames),
+            name: toToolName(node),
             title: node.summary || undefined,
             description: node.description || `Make a ${node.method.toUpperCase()} request to ${node.path}`,
           },
