@@ -16,7 +16,7 @@ import {
   resolvePageParamType,
 } from '../utils.ts'
 
-type Props = {
+export type InfiniteQueryOptionsProps = {
   name: string
   clientName: string
   queryKeyName: string
@@ -70,7 +70,7 @@ export function InfiniteQueryOptions({
   clientReturnType,
   returnType,
   typedHeaders,
-}: Props): KubbReactNode {
+}: InfiniteQueryOptionsProps): KubbReactNode {
   const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
   const dataSuffix = returnType === 'data' ? '' : '.data'
 

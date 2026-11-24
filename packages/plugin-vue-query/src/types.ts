@@ -75,7 +75,7 @@ export type ResolverVueQuery = Resolver & {
  * @note String values are inlined verbatim into generated code. Wrap literal
  * strings in `JSON.stringify(...)`.
  */
-type QueryKey = Transformer
+export type QueryKey = Transformer
 
 /**
  * Builds the `mutationKey` used by each generated mutation composable.
@@ -83,7 +83,7 @@ type QueryKey = Transformer
  * @note String values are inlined verbatim into generated code. Wrap literal
  * strings in `JSON.stringify(...)`.
  */
-type MutationKey = Transformer
+export type MutationKey = Transformer
 
 /**
  * Where the generated composables are written and how they are exported, plus the optional

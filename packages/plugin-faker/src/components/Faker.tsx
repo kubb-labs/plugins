@@ -6,7 +6,7 @@ import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import { isObjectSchema, resolveFakerTypeUsage } from '../utils.ts'
 
-type Props = {
+export type FakerProps = {
   name: string
   typeName: string
   node: ast.SchemaNode
@@ -17,7 +17,7 @@ type Props = {
   keysToOmit?: Array<string> | null
 }
 
-export function Faker({ node, description, name, typeName, printer, canOverride, typeMode = 'inferred', keysToOmit }: Props): KubbReactNode {
+export function Faker({ node, description, name, typeName, printer, canOverride, typeMode = 'inferred', keysToOmit }: FakerProps): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
   const imports = printer.drainImports().map((imp, index) => <File.Import key={index} names={ast.file.getNames(imp)} path={imp.path} root={imp.root} />)
 

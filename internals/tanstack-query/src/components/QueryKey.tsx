@@ -7,7 +7,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { KeyVariant, Transformer } from '../types.ts'
 import { buildQueryKeyParams } from '../utils.ts'
 
-type Props = {
+export type QueryKeyProps = {
   name: string
   typeName: string
   node: ast.OperationNode
@@ -58,7 +58,7 @@ export const queryKeyTransformer: Transformer = ({ node, variant }) => {
   return result
 }
 
-export function QueryKey({ name, node, tsResolver, typeName, transformer, variant = 'query', memberTypeWrapper, exportType }: Props): KubbReactNode {
+export function QueryKey({ name, node, tsResolver, typeName, transformer, variant = 'query', memberTypeWrapper, exportType }: QueryKeyProps): KubbReactNode {
   const paramsNode = buildQueryKeyParams(node, { resolver: tsResolver, memberTypeWrapper })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = (transformer ?? queryKeyTransformer)({ node, casing: 'camelcase', variant })

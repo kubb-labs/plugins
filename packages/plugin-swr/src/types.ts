@@ -84,14 +84,14 @@ export type ResolverSwr = Resolver & {
 /**
  * Customize the queryKey.
  */
-type QueryKey = Transformer
+export type QueryKey = Transformer
 
 /**
  * Customize the mutationKey.
  */
-type MutationKey = Transformer
+export type MutationKey = Transformer
 
-type Query = {
+export type Query = {
   /**
    * HTTP methods to use for queries.
    *
@@ -108,7 +108,7 @@ type Query = {
   importPath?: string
 }
 
-type Mutation = {
+export type Mutation = {
   /**
    * HTTP methods to use for mutations.
    *

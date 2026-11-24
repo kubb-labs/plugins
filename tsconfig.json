@@ -5,7 +5,7 @@
     "rootDir": ".",
     "types": ["node"],
     "paths": {
-      "#mocks": ["./configs/mocks.ts"],
+      "#mocks": ["./configs/test/mocks.ts"],
       "@internals/ast": ["./internals/ast/src/index.ts"],
       "@internals/shared": ["./internals/shared/src/index.ts"],
       "@internals/shared/types": ["./internals/shared/src/types.ts"],

@@ -27,7 +27,7 @@ export type SecurityRequirement = OperationAuth | Array<OperationAuth>
 /**
  * A scheme of one operation. `ref` names its entry in `securitySchemes`, which the call then points at.
  */
-type OperationAuth = Auth & { ref?: string }
+export type OperationAuth = Auth & { ref?: string }
 
 // The order the keys of an inline scheme are printed in.
 const inlineAuthKeys = ['type', 'scheme', 'name', 'in', 'scopes', 'flows', 'metadataUrl', 'url'] as const

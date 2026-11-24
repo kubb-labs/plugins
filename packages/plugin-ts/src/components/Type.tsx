@@ -8,7 +8,7 @@ import type { PluginTs, ResolverTs } from '../types.ts'
 import { isInlineConstEnum } from '../utils.ts'
 import { Enum, resolveEnumNames } from './Enum.tsx'
 
-type Props = {
+export type TypeProps = {
   name: string
   node: ast.SchemaNode
   /** The plugin's `ctx.printer`, with per-node options from `printer.with(...)`. */
@@ -21,7 +21,7 @@ type Props = {
   inline?: boolean
 }
 
-export function Type({ name, node, printer, enum: enumOptions, resolver, inline }: Props): KubbReactNode {
+export function Type({ name, node, printer, enum: enumOptions, resolver, inline }: TypeProps): KubbReactNode {
   if (inline) {
     // An inline type has no file to declare its enums in, so they print as literal unions.
     const withoutEnums = ast.node.transform(node, { schema: (n) => (n.type === ast.schema.types.enum && n.name ? { ...n, name: undefined } : undefined) })

@@ -71,10 +71,9 @@ function serializeUrl({
     // A base URL that ends in `/` would give `//` before a path that starts with one.
     .reduce<string>((url, part) => (part ? url + (url.endsWith('/') && part.startsWith('/') ? part.slice(1) : part) : url), '')
     .replace(/\{([^{}]+)\}/g, (_, key: string) => {
-      const value = pathParams[key]
+      const segment = requireSerializer(serializers, 'path')({ name: key, value: pathParams[key], options: styles?.path?.[key] })
       // An empty segment would call another endpoint, such as `/pets/` for `/pets/{petId}`.
-      if (value === undefined || value === null) throw new TypeError(`Missing path parameter ${key}.`)
-      const segment = requireSerializer(serializers, 'path')({ name: key, value, options: styles?.path?.[key] })
+      if (segment === '') throw new TypeError(`Missing path parameter ${key}.`)
       // A URL parser resolves a dot segment against the path, also when it is percent-encoded.
       if (segment === '.' || segment === '..') throw new TypeError(`Path parameter ${key} cannot be a dot segment.`)
       return segment
