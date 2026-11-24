@@ -5,7 +5,7 @@ import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { Transformer } from '../types.ts'
 
-type Props = {
+export type MutationKeyProps = {
   name: string
   node: ast.OperationNode
   transformer: Transformer | null | undefined
@@ -32,7 +32,7 @@ export const mutationKeyTransformer: Transformer = ({ node }) => {
   return [`{ url: ${text.quote(Url.toPath(node.path))} }`]
 }
 
-export function MutationKey({ name, node, transformer, typeName }: Props): KubbReactNode {
+export function MutationKey({ name, node, transformer, typeName }: MutationKeyProps): KubbReactNode {
   const paramsNode = createFunctionParameters({ params: [] })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   // Mutations always use 'mutation' as they do not have suspense or infinite variants.

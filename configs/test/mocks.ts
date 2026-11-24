@@ -160,7 +160,7 @@ export function createMockedPlugin<TOptions extends PluginType = PluginType>(par
   } as unknown as MockedPlugin<TOptions>
 }
 
-type RenderTemplateOptions<TOptions extends PluginType> = {
+export type RenderTemplateOptions<TOptions extends PluginType> = {
   config: Config
   adapter: Adapter
   meta?: ast.InputMeta

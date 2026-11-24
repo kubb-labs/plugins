@@ -40,7 +40,7 @@ export function resolveInlineEnumNames({
  * with a `typeSuffix` uses its suffixed key alias (e.g. `StatusKey`); every other schema uses its
  * plain resolved name.
  */
-type EnumTypeNameProps = {
+export type EnumTypeNameProps = {
   resolver: ResolverTs
   name: string
   enumOptions: { type?: string; typeSuffix?: string } | undefined
@@ -154,7 +154,7 @@ export function buildResponseComments(response: ast.ResponseNode): Array<string>
   return [...(response.summary ? [`@summary ${jsDocEscape(response.summary)}`] : []), ...links]
 }
 
-type BuildParamsSchemaOptions = {
+export type BuildParamsSchemaOptions = {
   params: Array<ast.ParameterNode>
   /**
    * Adds each serialized example to `examples` as a `<caption>Serialized</caption>` JSDoc line.

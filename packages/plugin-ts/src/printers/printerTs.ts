@@ -53,7 +53,7 @@ export function loadParserTs(load = () => requireModule('@kubb/parser-ts') as ty
 export type PrinterTsNodes = ast.PrinterPartial<string | DeprecatedTsNode, PrinterTsOptions>
 
 /** @deprecated A TypeScript compiler node returned by an override. Return a string; removed in the next major. */
-type DeprecatedTsNode = { readonly kind: number }
+export type DeprecatedTsNode = { readonly kind: number }
 
 export type PrinterTsOptions = {
   /**
@@ -128,7 +128,7 @@ export type PrinterTsOptions = {
  */
 export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTsOptions, factory.TsNode, string>
 
-type PrinterTs = PrinterTsFactory
+export type PrinterTs = PrinterTsFactory
 
 type HandlerContext = { transform: (node: ast.SchemaNode) => factory.TsNode | null; base: (node: ast.SchemaNode) => factory.TsNode | null }
 

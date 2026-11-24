@@ -1,6 +1,6 @@
 import { ast, type ContentNode, type SchemaNode } from '@kubb/ast'
 
-type MediaTypeInput = string | { contentType: string }
+export type MediaTypeInput = string | { contentType: string }
 
 const streamMediaTypes = new Set(['application/jsonl', 'application/x-ndjson', 'application/json-seq', 'text/event-stream'])
 
@@ -13,7 +13,7 @@ export function isStream(mediaType: MediaTypeInput): boolean {
   return streamMediaTypes.has(baseType) || (baseType.startsWith('application/') && baseType.endsWith('+json-seq'))
 }
 
-type ContentEntry = { contentType: string; schema?: Pick<SchemaNode, 'type'> | null; stream?: ContentNode['stream'] }
+export type ContentEntry = { contentType: string; schema?: Pick<SchemaNode, 'type'> | null; stream?: ContentNode['stream'] }
 
 const formKinds: Record<string, 'form' | 'urlencoded'> = { 'multipart/form-data': 'form', 'application/x-www-form-urlencoded': 'urlencoded' }
 

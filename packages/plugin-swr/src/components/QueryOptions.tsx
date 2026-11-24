@@ -6,7 +6,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildQueryOptionsParams, buildClientCall } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
 
-type Props = {
+export type QueryOptionsProps = {
   name: string
   clientName: string
   node: ast.OperationNode
@@ -15,7 +15,7 @@ type Props = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function QueryOptions({ name, clientName, node, tsResolver, clientReturnType, returnType }: Props): KubbReactNode {
+export function QueryOptions({ name, clientName, node, tsResolver, clientReturnType, returnType }: QueryOptionsProps): KubbReactNode {
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const fetcherBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false }), { clientReturnType, returnType })

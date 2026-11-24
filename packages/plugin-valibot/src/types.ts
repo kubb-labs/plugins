@@ -164,7 +164,7 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
-type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
+export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   importPath: NonNullable<Options['importPath']>
   inferred: NonNullable<Options['inferred']>
   regexType: NonNullable<Options['regexType']>

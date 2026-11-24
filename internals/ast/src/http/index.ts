@@ -12,7 +12,7 @@ export function getBaseURL(server: InputServer | undefined): string | undefined 
   return URL.canParse(server.url) ? server.url : undefined
 }
 
-type ParameterGroups = Record<'path' | 'query' | 'header' | 'cookie', Array<ParameterNode>>
+export type ParameterGroups = Record<'path' | 'query' | 'header' | 'cookie', Array<ParameterNode>>
 
 // Every plugin's generator visits the same node, so the groups are built once per node.
 const parametersByNode = new WeakMap<Pick<HttpOperationNode, 'parameters'>, ParameterGroups>()

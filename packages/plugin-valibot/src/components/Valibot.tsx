@@ -4,7 +4,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterValibotFactory } from '../printers/printerValibot.ts'
 import type { PluginValibot } from '../types.ts'
 
-type Props = {
+export type ValibotProps = {
   name: string
   node: ast.SchemaNode
   /**
@@ -47,7 +47,7 @@ export function Valibot({
   assertName,
   cyclic,
   comments = [],
-}: Props): KubbReactNode {
+}: ValibotProps): KubbReactNode {
   // `v.is` and `v.assert` narrow to the value the schema accepts, before any conversion.
   const guardType = `v.InferInput<typeof ${name}>`
   const shouldGenerateIs = isName && (typeof typeGuards === 'object' ? (typeGuards.is ?? true) : Boolean(typeGuards))

@@ -4,13 +4,11 @@ import { casing, text } from '@kubb/kit'
 import { Code, Origin, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import * as factory from '../factory.ts'
-import type { PluginTs, ResolverTs } from '../types.ts'
+import type { ResolvedEnumOptions, ResolverTs } from '../types.ts'
 
-type EnumOptions = PluginTs['resolvedOptions']['enum']
-
-type Props = {
+export type EnumProps = {
   node: ast.EnumSchemaNode
-  enum: EnumOptions
+  enum: ResolvedEnumOptions
   resolver: ResolverTs
   key?: string | number | null
 }
@@ -25,7 +23,7 @@ type Props = {
  * When `constCasing` is `'pascalCase'` and `typeSuffix` is empty, the const and the type
  * resolve to the same name, which TypeScript merges into a single value+type declaration.
  */
-export function resolveEnumNames({ node, enum: enumOptions, resolver }: { node: ast.EnumSchemaNode; enum: EnumOptions; resolver: ResolverTs }): {
+export function resolveEnumNames({ node, enum: enumOptions, resolver }: { node: ast.EnumSchemaNode; enum: ResolvedEnumOptions; resolver: ResolverTs }): {
   enumName: string
   typeName: string
 } {
@@ -47,7 +45,7 @@ export function resolveEnumNames({ node, enum: enumOptions, resolver }: { node: 
  * The emitted blocks carry the resolved names so that the barrel
  * index picks up the correct export identifiers.
  */
-export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNode {
+export function Enum({ node, enum: enumOptions, resolver }: EnumProps): KubbReactNode {
   const { enumName, typeName } = resolveEnumNames({ node, enum: enumOptions, resolver })
 
   const [nameNode, typeNode, alias] = factory.createEnumDeclaration({
