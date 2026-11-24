@@ -91,14 +91,17 @@ describe('event stream runtime', () => {
 
       // The only form body in petStore is urlencoded.
       expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual([
+        'auth.ts',
         'client.ts',
         'config.ts',
         'core.ts',
         'mediaTypes',
         'mediaTypes.ts',
+        'retry.ts',
         'serializers',
         'serializers.ts',
         'standardSchema.ts',
+        'types.ts',
       ])
       expect(await fs.readdir(path.join(output, '.kubb/mediaTypes'))).toStrictEqual(['urlencoded.ts'])
       expect(await fs.readFile(path.join(output, '.kubb', 'config.ts'), 'utf8')).not.toContain('streamMediaTypes')

@@ -150,6 +150,6 @@ describe('cypressGenerator — cookie parameters', () => {
     expect(pattern).toBeDefined()
     // The generated code is a template literal in `Request.tsx`, so its backslashes are doubled there.
     expect(read('../components/Request.tsx').replaceAll('\\\\', '\\')).toContain(pattern)
-    expect(read('../../../plugin-client/templates/core.ts')).toContain(pattern)
+    expect(read('../../../plugin-client/templates/auth.ts')).toContain(pattern)
   })
 })
