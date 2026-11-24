@@ -896,6 +896,21 @@ describe('printerZod', () => {
       expect(schema.safeParse({ type: 'c' }).success).toBe(false)
     })
 
+    test('rejects every value when allOf members share no enum value', () => {
+      const object = (enumValues: Array<string>) =>
+        ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [ast.factory.createProperty({ name: 'type', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues }) })],
+        })
+      const node = ast.factory.createSchema({ type: 'intersection', members: [object(['a']), object(['b'])] })
+      const schema = new Function('z', `return ${printer.print(node)}`)(z) as z.ZodType
+
+      expect(printer.print(node)).toContain('type: z.never()')
+      expect(schema.safeParse({ type: 'a' }).success).toBe(false)
+      expect(schema.safeParse({ type: 'b' }).success).toBe(false)
+    })
+
     test('ref with string min and max constraints', () => {
       const node = ast.factory.createSchema({
         type: 'intersection',
