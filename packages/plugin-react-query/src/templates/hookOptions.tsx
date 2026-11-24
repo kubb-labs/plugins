@@ -34,7 +34,6 @@ export const hookOptionsOperations = defineTemplate<PluginReactQuery>({
 
     for (const node of nodes) {
       if (!ast.http.isOperation(node)) continue
-      // The hook templates emit nothing for an operation the client plugin leaves out.
       if (!resolveClientOperation({ node, pluginName: client.pluginName })) continue
       // The options the per-operation templates get: this plugin's `override`, `include` and `exclude` applied.
       const operationOptions = ctx.resolver.default.options(node, { options: ctx.options, exclude, include, override })
