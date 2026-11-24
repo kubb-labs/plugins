@@ -8,7 +8,7 @@ import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
 import type { ReturnTypeOption } from '../types.ts'
 
-type Props = {
+export type OperationProps = {
   /**
    * The generated function name.
    */
@@ -47,7 +47,17 @@ type Props = {
  * type, signature, and call config are built with the AST factory, and only the jsx-renderer emits
  * the source.
  */
-export function Operation({ name, node, types, validatorHooks, returnType, throwOnErrorDefault, security, authRequired, baseURL }: Props): KubbReactNode {
+export function Operation({
+  name,
+  node,
+  types,
+  validatorHooks,
+  returnType,
+  throwOnErrorDefault,
+  security,
+  authRequired,
+  baseURL,
+}: OperationProps): KubbReactNode {
   if (!ast.http.isOperation(node)) return null
 
   const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault })

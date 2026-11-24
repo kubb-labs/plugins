@@ -8,7 +8,7 @@ import type { Exclude, Group, Include, Output, Override, PluginType, Resolver, R
  */
 export type ValidatorLibrary = 'zod' | 'valibot'
 
-type ValidatorSlots<TLibrary extends ValidatorLibrary> = { request?: TLibrary; params?: TLibrary; response?: TLibrary }
+export type ValidatorSlots<TLibrary extends ValidatorLibrary> = { request?: TLibrary; params?: TLibrary; response?: TLibrary }
 
 /**
  * Validator applied to the request and response using schemas from `@kubb/plugin-zod` or `@kubb/plugin-valibot`.

@@ -18,6 +18,8 @@
     // Copied into the user's project, where the generated code imports them.
     { "file": "packages/*/templates/**", "exports": ["*"] }
   ],
+  // A type that only its own file uses stays exported, so the signatures that use it can be named.
+  "ignoreExportsUsedInFile": { "type": true },
   "workspaces": {
     "settings": {
       // Only the generated code imports these, and it is ignored above or not committed.

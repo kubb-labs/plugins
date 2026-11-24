@@ -1,6 +1,6 @@
 import type { ResponseNode, StatusCode } from '@kubb/ast'
 
-type StatusInput = StatusCode | number | (string & {}) | Pick<ResponseNode, 'statusCode'>
+export type StatusInput = StatusCode | number | (string & {}) | Pick<ResponseNode, 'statusCode'>
 
 const classByRange = new Map([
   ['1xx', 1],

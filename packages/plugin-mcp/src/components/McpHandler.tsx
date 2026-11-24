@@ -4,7 +4,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
-type Props = {
+export type McpHandlerProps = {
   /**
    * Name of the handler function.
    */
@@ -27,7 +27,7 @@ type Props = {
   returnType?: 'full' | 'data' | 'plain'
 }
 
-export function McpHandler({ name, clientName, node, resolver, returnType = 'full' }: Props): KubbReactNode {
+export function McpHandler({ name, clientName, node, resolver, returnType = 'full' }: McpHandlerProps): KubbReactNode {
   const { signature, names: callArgs } = buildRequestParamsSignature(node, resolver, { isConfigurable: false })
   const paramsSignature = [signature, 'ctx: ServerContext'].filter(Boolean).join(', ')
 
