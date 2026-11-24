@@ -156,9 +156,7 @@ export function throwsOnStrictCompile({
   }
 }
 
-/**
- * The `refine` callback of a `not` schema: the value must fail the schema `not` holds. Zod has no negation schema.
- */
+// The `refine` callback of a `not` schema: the value must fail the schema it holds.
 function notCheck(ctx: { transform: (node: ast.SchemaNode) => string | null | undefined }, node: ast.SchemaNode): string | null {
   const [member] = ast.schema.narrow(node, ast.schema.types.not)?.members ?? []
   const schema = member ? ctx.transform(member) : null
