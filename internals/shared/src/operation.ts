@@ -631,3 +631,100 @@ export function buildResponseUnionSchema({
 
   return members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
 }
+
+type OperationSchemaEntry = { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null; direction?: 'encode' | 'decode' }
+
+type OperationSchemaResolver = OperationTypeNameResolver &
+  ResponseStatusNameResolver & {
+    name(name: string): string
+    param: { name(node: ast.OperationNode, param: ast.ParameterNode): string }
+    response: {
+      headers(node: ast.OperationNode, statusCode: ast.StatusCode): string
+      error(node: ast.OperationNode): string
+      responses(node: ast.OperationNode): string
+    }
+  }
+
+/**
+ * The schemas a validator plugin writes into the file of an operation, in file order: every parameter, every response
+ * and its headers, the success and error unions, the request body, and the parameter groups. `inferred` adds the
+ * options object and the per-status record, for callers that take their types from the plugin.
+ * A request-direction entry has `direction: 'encode'`. An entry without a schema is one the caller skips.
+ */
+export function buildOperationSchemaEntries({
+  node,
+  resolver,
+  inferred,
+}: {
+  node: ast.HttpOperationNode
+  resolver: OperationSchemaResolver
+  inferred: boolean
+}): Array<OperationSchemaEntry> {
+  const encode = (entry: OperationSchemaEntry): OperationSchemaEntry => ({ ...entry, direction: 'encode' })
+  const responseUnion = (responses: Array<ast.ResponseNode>, name: string, fallbackUnknown: boolean): OperationSchemaEntry => ({
+    schema: buildResponseUnionSchema({ node, responses, name, resolver, fallbackUnknown }),
+    name,
+  })
+
+  const parameters = node.parameters.map((param) => encode({ schema: param.schema, name: resolver.param.name(node, param) }))
+
+  const responses = node.responses.flatMap((res): Array<OperationSchemaEntry> => {
+    const content = (res.content ?? []).map((entry, _, entries) => toResponseContent(entry, entries))
+    const variants = content.filter((entry) => entry.schema)
+    const name = resolver.response.status(node, res.statusCode)
+    // Several content types for one name: one schema per content type, then the union of them.
+    if (variants.length > 1) return buildContentTypeEntries(content, name)
+    const primary = variants[0] ?? content[0]
+    return [{ schema: primary?.schema ?? null, name, keysToOmit: primary?.keysToOmit }]
+  })
+
+  const responseHeaders = node.responses
+    .filter((res) => res.headers?.length)
+    .map((res) => ({ schema: buildParamsSchema(res.headers ?? []), name: resolver.response.headers(node, res.statusCode) }))
+
+  // The response schema covers the success (2xx) bodies, and the error schema every other response, including `default`.
+  const withSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
+  const success = withSchema.filter((res) => ast.http.status.isSuccess(res))
+  const errors = withSchema.filter((res) => !ast.http.status.isSuccess(res))
+  const unions = [
+    ...(withSchema.length > 0 ? [responseUnion(success, resolver.response.response(node), true)] : []),
+    ...(errors.length > 0 ? [responseUnion(errors, resolver.response.error(node), false)] : []),
+  ]
+
+  const bodyContent = node.requestBody?.content ?? []
+  const describe = (schema: ast.SchemaNode): ast.SchemaNode => ({ ...schema, description: node.requestBody?.description ?? schema.description })
+  const [onlyBody] = bodyContent
+  const body =
+    bodyContent.length > 1
+      ? buildContentTypeEntries(bodyContent, resolver.response.body(node), describe)
+      : onlyBody?.schema
+        ? [{ schema: describe(onlyBody.schema), name: resolver.response.body(node), keysToOmit: onlyBody.keysToOmit }]
+        : []
+
+  const { path, query, header, cookie } = ast.http.groupParameters(node)
+  const groups = (
+    [
+      { kind: 'path', params: path },
+      { kind: 'query', params: query },
+      { kind: 'headers', params: header },
+      { kind: 'cookies', params: cookie },
+    ] as const
+  )
+    .filter(({ params }) => params.length > 0)
+    .map(({ kind, params }) => ({ schema: buildParamRefsSchema({ node, params, resolver }), name: resolver.param[kind](node, params[0]!) }))
+
+  return [
+    ...parameters,
+    ...responses,
+    ...responseHeaders,
+    ...unions,
+    ...body.map(encode),
+    ...groups.map(encode),
+    ...(inferred
+      ? [
+          encode({ schema: buildOptionsSchema(node, resolver), name: resolver.name(`${node.operationId} Options`) }),
+          { schema: buildResponses(node, resolver), name: resolver.response.responses(node) },
+        ]
+      : []),
+  ]
+}

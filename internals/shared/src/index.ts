@@ -9,6 +9,7 @@ export {
   buildRequestParamsSignature,
   castToClientOptions,
   buildResponses,
+  buildOperationSchemaEntries,
   buildResponseUnionSchema,
   getContentTypeInfo,
   getPerContentTypeName,
