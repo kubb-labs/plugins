@@ -34,7 +34,6 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
     `TQueryData = ${TData}`,
     `TQueryKey extends QueryKey = ${queryKeyTypeName}`,
   ]
-  // `UseInfiniteQueryOptions` takes `<TQueryFnData, TError, TData, TQueryKey, TPageParam>`, unlike `UseQueryOptions`.
   const pageParamType = infinite
     ? resolvePageParamType(node, { resolver: tsResolver, initialPageParam: infinite.initialPageParam, queryParam: infinite.queryParam }).pageParamType
     : null
