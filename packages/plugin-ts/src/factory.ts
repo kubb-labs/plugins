@@ -509,16 +509,16 @@ export function buildIndexSignatures(
   printNode: (node: ast.SchemaNode) => TsNode | null | undefined,
 ): Array<TsNode> {
   const valueTypes: Array<TsNode> = []
+  const printValue = (schema: ast.SchemaNode) => wrapNullableOptional(printNode(schema) ?? keywordTypeNodes.unknown, !!schema.nullable, false)
 
   if (node.additionalProperties && node.additionalProperties !== true) {
-    valueTypes.push(printNode(node.additionalProperties) ?? keywordTypeNodes.unknown)
+    valueTypes.push(printValue(node.additionalProperties))
   } else if (node.additionalProperties === true) {
     valueTypes.push(keywordTypeNodes.unknown)
   }
 
   for (const schema of Object.values(node.patternProperties ?? {})) {
-    const patternType = printNode(schema) ?? keywordTypeNodes.unknown
-    valueTypes.push(schema.nullable ? createUnionDeclaration({ nodes: [patternType, keywordTypeNodes.null] }) : patternType)
+    valueTypes.push(printValue(schema))
   }
 
   if (valueTypes.length === 0) return []

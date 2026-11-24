@@ -581,6 +581,40 @@ describe('printerTs', () => {
 }`)
     })
 
+    it('additionalProperties with nullable primitive adds | null to index type', async () => {
+      const result = printer.transform(
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [],
+          additionalProperties: ast.factory.createSchema({ type: 'integer', nullable: true }),
+        }),
+      )
+
+      expect(await formatTS(result)).toBe(`{
+  [key: string]: number | null
+}`)
+    })
+
+    it('additionalProperties with nullable object adds | null to index type', async () => {
+      const result = printer.transform(
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [],
+          additionalProperties: ast.factory.createSchema({
+            type: 'object',
+            nullable: true,
+            properties: [ast.factory.createProperty({ name: 'label', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+          }),
+        }),
+      )
+
+      expect(await formatTS(result)).toBe(`{
+  [key: string]: {
+    label: string
+  } | null
+}`)
+    })
+
     it('patternProperties adds index signature', async () => {
       const result = printer.transform(
         ast.factory.createSchema({
