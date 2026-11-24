@@ -65,5 +65,8 @@ type ResolverMcpPatch = {
   handler?: {
     name?(node: OperationNode): string  // → 'showPetByIdHandler'
   }
+  tool?: {
+    name?(node: OperationNode): string  // → 'showPetById'
+  }
 }
 ```

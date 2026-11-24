@@ -74,11 +74,13 @@ The server name comes from `info.title` in your spec. The `args` path is relativ
 
 | Tool field  | Comes from                                                                                                                        |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Name        | The `operationId`                                                                                                                 |
+| Name        | The `operationId`, with each character outside `a-z`, `A-Z`, `0-9`, `_` and `-` replaced by `_`, cut at 64 characters             |
 | Title       | The operation `summary`                                                                                                           |
 | Description | The operation `description`, or one built from the method and path: `Make a GET request to /pets/{petId}`                         |
 | Input       | The Zod schemas of the parameters and the request body                                                                            |
 | Output      | The success body, as `{ data: body }` structured content and as the JSON text of `body`. A success with no body gives empty text. |
+
+MCP clients reject other tool names, so `pets.list/v2` becomes `pets_list_v2`. When two operations end up with the same name, the later one gets a `_2` suffix, then `_3`.
 
 Each handler forwards the MCP cancellation signal to the client and throws for a non-2xx response, which the assistant sees as a tool error. Operations that stream their response get no tool.
 
