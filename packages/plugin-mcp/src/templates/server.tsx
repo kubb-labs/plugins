@@ -66,7 +66,7 @@ export const serverOperations = defineTemplate<PluginMcp>({
 
         return {
           tool: {
-            name: node.operationId,
+            name: ctx.resolver.tool.name(node),
             title: node.summary || undefined,
             description: node.description || `Make a ${node.method.toUpperCase()} request to ${node.path}`,
           },

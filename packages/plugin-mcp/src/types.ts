@@ -4,7 +4,7 @@ import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/typ
 import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
 /**
- * Resolver for MCP that provides naming methods for handler functions.
+ * Resolver for MCP that provides naming methods for handler functions and tools.
  */
 export type ResolverMcp = Resolver & {
   /**
@@ -16,6 +16,18 @@ export type ResolverMcp = Resolver & {
      *
      * @example Resolving handler function names
      * `resolver.handler.name(operationNode) // -> 'showPetByIdHandler'`
+     */
+    name(node: ast.OperationNode): string
+  }
+  /**
+   * Naming for the MCP tools that `server.ts` registers.
+   */
+  tool: {
+    /**
+     * Resolves the tool name for an operation: the `operationId` with only `[a-zA-Z0-9_-]`, at most 64 characters, unique within the build.
+     *
+     * @example Resolving tool names
+     * `resolver.tool.name(operationNode) // -> 'pets_list_v2'`
      */
     name(node: ast.OperationNode): string
   }
@@ -64,6 +76,9 @@ declare global {
   namespace Kubb {
     interface PluginRegistry {
       'plugin-mcp': PluginMcp
+    }
+    interface MemoRegistry {
+      'plugin-mcp:toolNames': Map<string, string>
     }
   }
 }

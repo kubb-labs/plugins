@@ -83,6 +83,24 @@ describe('serverGenerator — client plugin filter', () => {
   })
 })
 
+describe('serverGenerator — tool names', () => {
+  test('replaces characters MCP clients reject, cuts the name at 64 characters and keeps names unique', async () => {
+    const long = 'a'.repeat(64)
+    const operationIds = ['pets.list/v2', 'pets.list', 'pets/list', 'pets_list_2', `${long}b`, `${long}c`]
+    const nodes = operationIds.map((operationId, index) => ast.factory.createOperation({ operationId, method: 'GET', path: `/tools/${index}`, responses: [] }))
+    const source = rawSources((await renderServer(nodes)).fileManager.files).join('\n')
+
+    expect([...source.matchAll(/registerTool\("([^"]+)"/g)].map((match) => match[1])).toEqual([
+      'pets_list_v2',
+      'pets_list',
+      'pets_list_2',
+      'pets_list_2_2',
+      long,
+      `${'a'.repeat(62)}_2`,
+    ])
+  })
+})
+
 describe('serverGenerator — tool schemas', () => {
   test('lists a tool whose schema holds a bigint or a Blob', async () => {
     const source = rawSources(
