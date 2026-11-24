@@ -9,6 +9,23 @@ import { File, Raw } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
 import type { PluginMcp } from '../types.ts'
 
+const toolNameLimit = 64
+
+/**
+ * Turns an `operationId` into a tool name MCP clients accept: only `[a-zA-Z0-9_-]`, at most 64 characters, unique within `used`.
+ */
+function toToolName(operationId: string, used: Set<string>): string {
+  const base = operationId.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, toolNameLimit)
+  let name = base
+  for (let count = 2; used.has(name); count++) {
+    const suffix = `_${count}`
+    name = `${base.slice(0, toolNameLimit - suffix.length)}${suffix}`
+  }
+  used.add(name)
+
+  return name
+}
+
 /**
  * Default v5 server template for `@kubb/plugin-mcp`.
  *
@@ -45,6 +62,8 @@ export const serverOperations = defineTemplate<PluginMcp>({
       },
     }
 
+    const toolNames = new Set<string>()
+
     // `mcpOperation` emits no handler for a stream operation, or for one the client plugin leaves out, so neither gets a tool.
     const operationsMapped = nodes
       .filter(ast.http.isOperation)
@@ -66,7 +85,7 @@ export const serverOperations = defineTemplate<PluginMcp>({
 
         return {
           tool: {
-            name: node.operationId,
+            name: toToolName(node.operationId, toolNames),
             title: node.summary || undefined,
             description: node.description || `Make a ${node.method.toUpperCase()} request to ${node.path}`,
           },

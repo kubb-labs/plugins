@@ -44,7 +44,7 @@ export function getServer() {
     version: '1',
   })
 
-  server.registerTool("pet.list", {
+  server.registerTool("pet_list", {
     description: "Make a GET request to /pets/first",
     outputSchema: toolSchema(z.object({ data: petListStatus200Schema })),
   }, async (ctx) => {
@@ -58,7 +58,7 @@ export function getServer() {
     return petListHandler2(ctx)
   })
 
-  server.registerTool("pet.create", {
+  server.registerTool("pet_create", {
     description: "Make a POST request to /pets/create-first",
     outputSchema: toolSchema(z.object({ data: petCreateStatus200Schema })),
   }, async (ctx) => {
