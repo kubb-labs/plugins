@@ -214,7 +214,7 @@ describe('retry', () => {
     }
     const client = createClientCore({ defaultTransport: async () => ok(), mediaTypes: streamMediaTypes, retry: { limit: 2, delay: () => 0 } })
     let calls = 0
-    const auth = vi.fn(() => `token-${++calls}`)
+    const auth = () => `token-${++calls}`
 
     await client({ url: '/pets', auth, security: [{ type: 'http', scheme: 'bearer' }], transport: record([busy(), ok()]) })
     expect(requests.map((request) => request.headers['Authorization'])).toEqual(['Bearer token-1', 'Bearer token-2'])
