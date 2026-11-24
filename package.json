@@ -50,7 +50,7 @@
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "bun-types": "^1.4.5",
-    "fallow": "^3.46.0",
+    "fallow": "3.46.0",
     "kubb": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",

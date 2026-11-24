@@ -269,7 +269,7 @@ importers:
         specifier: ^1.4.5
         version: 1.4.5
       fallow:
-        specifier: ^3.46.0
+        specifier: 3.46.0
         version: 3.46.0
       kubb:
         specifier: 'catalog:'
