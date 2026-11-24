@@ -7,7 +7,7 @@ import { Mutation } from '../components/Mutation.tsx'
 import type { PluginSwr } from '../types'
 
 /**
- * Built-in template for `useSWRMutation` hooks. Emits one `useFooMutation` hook
+ * Built-in template for `useSWRMutation` hooks. Emits one `useFoo` hook
  * per POST/PUT/DELETE operation (configurable via `mutation.methods`) plus
  * the matching `fooMutationKey` helper.
  */

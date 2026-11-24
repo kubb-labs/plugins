@@ -17,18 +17,18 @@ The full folder structure, repository setup, and commands live in
 
 ## Repository setup
 
-| Aspect | Choice |
-| --- | --- |
-| Monorepo | pnpm workspaces + Turborepo |
-| Module system | ESM-only (`type: "module"`) |
-| Node version | 22 |
-| Package manager | pnpm 11+ |
-| Linter | oxlint |
-| Formatter | oxfmt |
-| Bundler | tsdown |
-| Tests | Vitest |
-| Versioning | Changesets |
-| CI/CD | GitHub Actions |
+| Aspect          | Choice                                                  |
+| --------------- | ------------------------------------------------------- |
+| Monorepo        | pnpm workspaces + Turborepo                             |
+| Module system   | ESM source (`type: "module"`), published as ESM and CJS |
+| Node version    | 22                                                      |
+| Package manager | pnpm 11+                                                |
+| Linter          | oxlint                                                  |
+| Formatter       | oxfmt                                                   |
+| Bundler         | tsdown                                                  |
+| Tests           | Vitest                                                  |
+| Versioning      | Changesets                                              |
+| CI/CD           | GitHub Actions                                          |
 
 ## Plugin ecosystem
 
@@ -38,7 +38,9 @@ Each plugin in the `packages/` directory follows a consistent structure:
 
 - `src/components/` - JSX-renderer components
 - `src/templates/` - Templates (`defineTemplate`) that write the plugin's files
-- `src/*.test.ts` - Tests
+- `src/printers/` - Schema printers, in the plugins that print schemas
+- `src/resolvers/` - The resolver that names files and exports
+- `*.test.ts` and `*.test.tsx` next to the file they test
 - `docs/` - kubb.dev pages (overview, options, guides)
 - `kubb-extension.json` - Registry metadata
 - `package.json` - Plugin metadata
@@ -48,6 +50,8 @@ Each plugin in the `packages/` directory follows a consistent structure:
 The `internals/` directory provides shared utilities:
 
 - `ast` holds the `ast` namespace plugins import (`import { ast } from '@internals/ast'`): all of `@kubb/ast`, plus helpers only plugins need
+- `shared` holds the operation, schema and resolver builders several plugins use
+- `client` holds the helpers that let the query and MCP plugins find the registered client plugin
 - `tanstack-query` holds shared TanStack Query utilities
 - `utils` holds general utility functions
 
@@ -74,7 +78,7 @@ Each plugin ships its docs in `packages/<name>/docs/`. The registry reads the fo
 
 ## How agents read this repo
 
-`AGENTS.md` is the canonical instruction file. Local skills live in `.agents/skills/` (open
+`AGENTS.md` is the canonical instruction file. Local skills live in `.claude/skills/` (open
 `SKILL.md` format, cross-provider). Shared skills, convention rules, `/create-pr`,
 `/create-changeset`, `/create-branch`, `/create-issue`, the `code-reviewer` subagent, and the
 `house` output style come from the `agents` plugin

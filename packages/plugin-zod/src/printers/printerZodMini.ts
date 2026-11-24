@@ -57,7 +57,7 @@ function buildZodMiniObjectShape(ctx: Parameters<typeof buildObjectShape>[0], no
 }
 
 /**
- * Zod v4 Mini printer built with `definePrinter`.
+ * Zod v4 Mini printer built with `createPrinter`.
  *
  * Converts a `SchemaNode` AST into a Zod v4 code string using the functional API
  * (`z.optional(z.string())`) for improved tree-shaking. See {@link printerZod} for the chainable API.

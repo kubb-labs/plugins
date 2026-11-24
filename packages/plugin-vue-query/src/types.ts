@@ -120,8 +120,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
    */
   queryKey?: QueryKey
   /**
-   * Configures query composables. Set to `false` to skip composable generation
-   * and emit only `queryOptions(...)` helpers.
+   * Configures query composables. Set to `false` to skip the query output.
    */
   query?: Partial<Query> | false
   /**

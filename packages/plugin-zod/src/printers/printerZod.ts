@@ -333,7 +333,7 @@ const scalarNodes: PrinterZodNodes = {
 }
 
 /**
- * Zod v4 printer built with `definePrinter`.
+ * Zod v4 printer built with `createPrinter`.
  *
  * Converts a `SchemaNode` AST into a Zod v4 code string using the chainable API
  * (`.optional()`, `.nullable()`, `.omit()`, etc.). For improved tree-shaking, see {@link printerZodMini}.
