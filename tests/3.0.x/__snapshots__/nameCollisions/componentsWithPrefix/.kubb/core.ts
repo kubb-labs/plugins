@@ -783,7 +783,8 @@ function placeToken({ scheme, token, headers, query }: { scheme: Auth; token: st
   }
   if (scheme.in === 'cookie') {
     // Outside the RFC 6265 cookie-octets, such as a `;`, the token would start another cookie. The message leaves the token out.
-    if (!/^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/.test(token)) throw new TypeError(`The ${name} API key has characters a cookie cannot carry, escape it first.`)
+    if (!/^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/.test(token))
+      throw new TypeError(`The ${name} API key has characters a cookie cannot carry, escape it first.`)
     appendCookie(headers, `${name}=${token}`)
     return
   }
