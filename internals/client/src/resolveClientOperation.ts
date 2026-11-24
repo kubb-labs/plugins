@@ -50,7 +50,22 @@ type ClientPluginOptions = {
 }
 
 // Names the hook and MCP handler bodies bind around the client call, which would shadow an operation of the same name.
-const consumerBindings = new Set(['path', 'query', 'body', 'headers', 'cookies', 'config', 'signal', 'variables', 'options', 'ctx', 'res', 'pageParam'])
+const consumerBindings = new Set([
+  'path',
+  'query',
+  'body',
+  'headers',
+  'cookies',
+  'config',
+  'signal',
+  'variables',
+  'options',
+  'ctx',
+  'res',
+  'pageParam',
+  'queryKey',
+  'mutationKey',
+])
 
 function isRelativeImport(importPath: string): boolean {
   return importPath.startsWith('.')
