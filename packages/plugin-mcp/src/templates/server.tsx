@@ -17,7 +17,9 @@ const toolNameLimit = 64
 function toToolName(operationId: string, used: Set<string>): string {
   const base = operationId.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, toolNameLimit)
   let name = base
-  for (let count = 2; used.has(name); count++) {
+  let count = 1
+  while (used.has(name)) {
+    count += 1
     const suffix = `_${count}`
     name = `${base.slice(0, toolNameLimit - suffix.length)}${suffix}`
   }
