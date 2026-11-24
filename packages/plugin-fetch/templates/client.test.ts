@@ -1,8 +1,9 @@
 import { describe, expect, test, vi } from 'vitest'
 import { createClient, createClientCore, defaultTransport } from './client.ts'
+import type { Transport } from './client.ts'
 
 test('passes createClient credentials to the transport', async () => {
-  const transport = vi.fn(async () => new Response('{}', { headers: { 'Content-Type': 'application/json' } }))
+  const transport = vi.fn<Transport>(async () => new Response('{}', { headers: { 'Content-Type': 'application/json' } }))
   const client = createClient({ transport, credentials: 'include' })
   await client({ method: 'GET', url: '/pet' })
   expect(transport.mock.calls[0]?.[0]?.credentials).toBe('include')

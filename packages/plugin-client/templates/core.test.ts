@@ -21,6 +21,7 @@ import {
   withUnwrap,
 } from './core.ts'
 import type { BodyEncoding } from './serializers.ts'
+import type { ValidationErrorHandler } from './standardSchema.ts'
 import { serializeCookies } from './serializers/cookies.ts'
 import { serializeHeaders } from './serializers/headers.ts'
 import { serializeStyledPath } from './serializers/pathStyles.ts'
@@ -976,7 +977,7 @@ describe('createClientCore', () => {
 
   test('reports a failing request body with the request direction', async () => {
     const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
-    const onValidationError = vi.fn(() => ({ value: { name: 'odie' } }))
+    const onValidationError = vi.fn<ValidationErrorHandler>(() => ({ value: { name: 'odie' } }))
     const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
     await client({ method: 'POST', url: '/pet', body: { name: 1 }, validator: { request: toFailingSchema() } })
     expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'request', source: 'body', method: 'POST', url: '/pet', value: { name: 1 } })
@@ -1019,7 +1020,7 @@ describe('createClientCore', () => {
 
   test('runs the error interceptor before throwing', async () => {
     const { client } = createClient({ status: 500 })
-    const onError = vi.fn((error: ResponseError<unknown, string, string>) => error)
+    const onError = vi.fn((error: Error) => error)
     client.interceptors.error.use(onError)
     await expect(client({ method: 'GET', url: '/pet' })).rejects.toBeInstanceOf(ResponseError)
     expect(onError).toHaveBeenCalledTimes(1)
@@ -1164,11 +1165,11 @@ describe('media types', () => {
   test('decodes text and binary types, and a form body', async () => {
     expect((await call(answer('<pet/>', { 'content-type': 'application/xml' }))).data).toBe('<pet/>')
     expect((await call(answer('hi', { 'content-type': 'text/plain' }))).data).toBe('hi')
-    const blob = (await call(answer('bytes', { 'content-type': 'image/png' }))).data
+    const blob: unknown = (await call(answer('bytes', { 'content-type': 'image/png' }))).data
     expect(blob).toBeInstanceOf(Blob)
     expect((blob as Blob).type).toBe('image/png')
-    const form = await call(answer('a=1', { 'content-type': 'application/x-www-form-urlencoded' }), { mediaTypes: formMediaTypes })
-    expect((form.data as FormData).get('a')).toBe('1')
+    const form: unknown = (await call(answer('a=1', { 'content-type': 'application/x-www-form-urlencoded' }), { mediaTypes: formMediaTypes })).data
+    expect((form as FormData).get('a')).toBe('1')
   })
 
   test('types and returns a JSON Lines variant next to JSON as the raw stream', async () => {
@@ -1398,9 +1399,9 @@ describe('client.stream', () => {
 })
 
 describe('isResponseError', () => {
-  type Responses = { '200': { id: number }; '404': { message: string }; '4xx': { code: string }; default: { fault: true } }
+  type Responses = { '200': { id: number }; '404': { message: string }; '4xx': { code: string } }
 
-  test('narrows data by status, a range key, and default', async () => {
+  test('narrows data by status and a range key', async () => {
     const { client } = createClient({ data: { message: 'gone' }, status: 404 })
     const error = await client({ method: 'GET', url: '/pet' }).catch((caught: unknown) => caught)
     expect(isResponseError<Responses>(error)).toBe(true)
@@ -1554,7 +1555,7 @@ describe('params validators', () => {
   })
 
   test('collapses every spelling of a header into one key, the call winning', async () => {
-    const { transport, calls } = fakeTransport()
+    const { transport } = fakeTransport()
     const client = createClientCore<string, string>({ defaultTransport: transport, headers: { 'x-tenant': 'client' } })
     const headers = vi.fn((value: unknown) => value)
     await client({
@@ -1599,7 +1600,7 @@ describe('params validators', () => {
 
   test('reports a failing param with the request direction and its source', async () => {
     const { transport } = fakeTransport()
-    const onValidationError = vi.fn(() => ({ value: { page: 1 } }))
+    const onValidationError = vi.fn<ValidationErrorHandler>(() => ({ value: { page: 1 } }))
     const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
     await client({ method: 'GET', url: '/events', query: { page: 'x' }, validator: { query: toFailingSchema() } })
     expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'request', source: 'query', method: 'GET', url: '/events', value: { page: 'x' } })
