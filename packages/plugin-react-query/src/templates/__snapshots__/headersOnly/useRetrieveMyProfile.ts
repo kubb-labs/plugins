@@ -7,6 +7,7 @@
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { RetrieveMyProfileOptions, RetrieveMyProfileStatus200 } from './RetrieveMyProfile'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
+import { withQueryKey } from './.kubb/withQueryKey'
 import { retrieveMyProfile } from './clients/retrieveMyProfile'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
@@ -56,7 +57,5 @@ export function useRetrieveMyProfile<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }

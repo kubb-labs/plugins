@@ -7,6 +7,7 @@
 import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
 import type { GetPetByIdOptions, GetPetByIdResponses, GetPetByIdStatus400 } from './GetPetById'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
+import { withQueryKey } from './.kubb/withQueryKey'
 import { getPetById } from './clients/getPetById'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
@@ -62,7 +63,5 @@ export function useGetPetById<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400>> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }

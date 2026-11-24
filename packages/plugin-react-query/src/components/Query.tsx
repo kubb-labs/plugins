@@ -146,9 +146,7 @@ export function Query({
         queryKey,
        } as unknown as ${castType}, queryClient) as ${resultType}
 
-       queryResult.queryKey = queryKey as TQueryKey
-
-       return queryResult
+       return withQueryKey(queryResult, queryKey as TQueryKey)
        `}
     </Function>
   )

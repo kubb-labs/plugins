@@ -3,6 +3,7 @@ import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
 import type { Pet } from '../../../models/ts/Pet'
 import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
+import { withQueryKey } from '../../../.kubb/withQueryKey'
 import { findPetsByTags } from '../../axios/petService/findPetsByTags'
 
 export const findPetsByTagsInfiniteQueryKey = ({
@@ -173,7 +174,5 @@ export function useFindPetsByTagsInfinite<
     queryClient,
   ) as UseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }

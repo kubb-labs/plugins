@@ -7,6 +7,7 @@
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { InfiniteData, QueryKey, QueryClient, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult } from '@tanstack/react-query'
+import { withQueryKey } from './.kubb/withQueryKey'
 import { findPetsByTags } from './clients/findPetsByTags'
 import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
@@ -67,7 +68,5 @@ export function useFindPetsByTagsSuspenseInfinite<
     queryClient,
   ) as UseSuspenseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }

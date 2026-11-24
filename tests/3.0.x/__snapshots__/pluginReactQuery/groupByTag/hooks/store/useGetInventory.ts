@@ -6,6 +6,7 @@
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { GetInventoryStatus200 } from '../../types/GetInventory'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
+import { withQueryKey } from '../../.kubb/withQueryKey'
 import { getInventory } from '../../clients/getInventory'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
@@ -42,7 +43,5 @@ export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetI
    queryKey,
   } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }

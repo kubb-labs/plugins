@@ -6,6 +6,7 @@
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
 import type { PointOptions, PointStatus200 } from '../types/PointOperation'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
+import { withQueryKey } from '../.kubb/withQueryKey'
 import { point } from '../clients/point'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
@@ -41,7 +42,5 @@ export function usePoint<TData = PointStatus200, TQueryData = PointStatus200, TQ
    queryKey,
   } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }

@@ -17,6 +17,7 @@ import { Query } from '../components/Query.tsx'
 import { QueryOptions } from '../components/QueryOptions.tsx'
 import { hookFileVariants } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types'
+import { withQueryKeyPath } from '../withQueryKey.ts'
 
 type Variant = 'query' | 'suspenseQuery' | 'infiniteQuery' | 'suspenseInfiniteQuery'
 
@@ -156,6 +157,7 @@ export function createQueryTemplate({ variant }: { variant: Variant }) {
                 ]}
                 path={importPath}
               />
+              <File.Import names={[{ name: 'withQueryKey', space: 'value' }]} root={hook.file.path} path={withQueryKeyPath(ctx.config)} />
               <Query
                 name={queryName}
                 queryOptionsName={queryOptionsName}

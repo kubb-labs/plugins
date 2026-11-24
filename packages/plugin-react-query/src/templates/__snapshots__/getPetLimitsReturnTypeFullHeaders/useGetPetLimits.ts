@@ -13,6 +13,7 @@ import type {
   GetPetLimitsStatus400Headers,
 } from './GetPetLimits'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
+import { withQueryKey } from './.kubb/withQueryKey'
 import { getPetLimits } from './clients/getPetLimits'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
@@ -74,7 +75,5 @@ export function useGetPetLimits<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<GetPetLimitsStatus400>> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }

@@ -7,6 +7,7 @@
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
+import { withQueryKey } from './.kubb/withQueryKey'
 import { findPetsByTags } from './clients/findPetsByTags'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
@@ -52,7 +53,5 @@ export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQuer
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }
