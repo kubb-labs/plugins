@@ -206,7 +206,7 @@ export function getDeclarationParts(
 }
 
 /**
- * TypeScript type printer built with `definePrinter`.
+ * TypeScript type printer built with `createPrinter`.
  *
  * Converts a `SchemaNode` AST node into TypeScript source:
  * - **`printer.print(node)`** — when `options.name` is set, returns a full

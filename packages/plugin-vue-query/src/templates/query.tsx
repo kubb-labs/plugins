@@ -9,7 +9,7 @@ import { maybeRefOrGetter } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types'
 
 /**
- * Built-in template for `useQuery` composables. Emits one `useFooQuery`
+ * Built-in template for `useQuery` composables. Emits one `useFoo`
  * composable per GET and QUERY operation (configurable via `query.methods`) plus the
  * matching `fooQueryKey` / `fooQueryOptions` helpers.
  */

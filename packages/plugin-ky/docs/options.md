@@ -11,7 +11,7 @@ Pass these options to `pluginKy()`. Shared options link to [Shared plugin option
 | [`baseURL`](#baseurl)                                                     | Base URL the client starts with.                            | None                                             |
 | [`importPath`](#importpath)                                               | Module the operations import the client from.               | `.kubb/client.ts`                                |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | Throw on a non-2xx response unless a call says otherwise.   | `true`                                           |
-| [`validator`](#validator)                                                 | Validate requests and responses with Zod.                   | `false`                                          |
+| [`validator`](#validator)                                                 | Validate requests and responses with Zod or Valibot.        | `false`                                          |
 | [`auth`](#auth)                                                           | How generated functions take `auth`.                        | None                                             |
 | [`auth.mode`](#auth)                                                      | Optional `auth`, or required when a token is needed.        | `'optional'`                                     |
 | [`returnType`](#returntype)                                               | What a call resolves to.                                    | `'full'`                                         |
@@ -116,13 +116,13 @@ if (result.error !== undefined) console.error(result.status, result.error)
 
 ### validator
 
-Checks requests and responses against the schemas of `@kubb/plugin-zod`, so add `pluginZod()` too. A value that fails its schema throws a `ValidationError`.
+Checks requests and responses against the schemas of `@kubb/plugin-zod` or `@kubb/plugin-valibot`. Add `pluginZod()` for `'zod'` or `pluginValibot()` for `'valibot'`. A value that fails its schema throws a `ValidationError`.
 
-|          |                                                                           |
-| -------- | ------------------------------------------------------------------------- |
-| Type     | `false \| 'zod' \| { request?: 'zod'; params?: 'zod'; response?: 'zod' }` |
-| Required | `false`                                                                   |
-| Default  | `false`                                                                   |
+|          |                                                                   |
+| -------- | ----------------------------------------------------------------- |
+| Type     | `false \| 'zod' \| 'valibot' \| { request?; params?; response? }` |
+| Required | `false`                                                           |
+| Default  | `false`                                                           |
 
 ::field-group
 
@@ -134,8 +134,12 @@ Default value. No validation. The response is cast to the generated type.
 Validates the success body, and an error body against the schema of its status.
 :::
 
-:::field{name="{ request?: 'zod', params?: 'zod', response?: 'zod' }"}
-Opts in per part. `request` checks the body and `params` the path, query, header, and cookie params before the send. `response` works as `'zod'`.
+:::field{name="'valibot'"}
+Works as `'zod'`, with the schemas of `@kubb/plugin-valibot`.
+:::
+
+:::field{name="{ request?, params?, response? }"}
+Opts in per part, with `'zod'` or `'valibot'` as the value. Use one library for every part. `request` checks the body and `params` the path, query, header, and cookie params before the send. `response` works as `'zod'`.
 :::
 
 ::

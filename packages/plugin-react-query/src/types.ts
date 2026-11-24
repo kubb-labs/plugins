@@ -230,8 +230,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
    */
   queryKey?: QueryKey
   /**
-   * Configures query hooks. Set to `false` to skip generating hooks entirely
-   * and emit only `queryOptions(...)` helpers.
+   * Configures query hooks. Set to `false` to skip the query output.
    */
   query?: Partial<Query> | false
   /**

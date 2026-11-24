@@ -42,6 +42,7 @@ Kubb spans a few repositories. Knowing where code lives saves time:
 plugins/
 ├── packages/                # The plugins themselves
 │   ├── plugin-ts/           # TypeScript types and interfaces
+│   ├── plugin-client/       # Typed operations for a client you own, and the runtime the client plugins share
 │   ├── plugin-axios/        # Type-safe HTTP client based on axios
 │   ├── plugin-fetch/        # Type-safe HTTP client based on the Fetch API
 │   ├── plugin-ky/           # Type-safe HTTP client based on Ky
@@ -56,8 +57,9 @@ plugins/
 │   ├── plugin-redoc/        # ReDoc documentation
 │   └── plugin-mcp/          # MCP integration
 ├── internals/               # Shared, non-published helpers
+│   ├── ast/                 # The `ast` namespace: `@kubb/ast` plus helpers only plugins need
 │   ├── client/              # Client selection helpers for the query and MCP plugins
-│   ├── shared/              # Shared AST helpers used across packages
+│   ├── shared/              # Operation, schema and resolver builders used across packages
 │   ├── tanstack-query/      # Shared TanStack Query utilities
 │   └── utils/               # General utilities
 ├── examples/                # A runnable project per plugin
@@ -67,21 +69,21 @@ plugins/
 └── assets/                  # Static assets
 ```
 
-Most plugins under `packages/` follow the same shape: `src/plugin.ts` defines the plugin, `src/templates/` holds the templates that write each file (`defineTemplate` from `@kubb/kit`), `src/components/` holds JSX-renderer components, and `src/*.test.ts` holds the tests. A few are leaner, like the client plugins (`plugin-axios`, `plugin-fetch`, `plugin-ky`) that build on `@kubb/plugin-client`, and `plugin-redoc`, which is a single `redoc.ts` with no `templates/` or `components/`.
+Most plugins under `packages/` follow the same shape: `src/plugin.ts` defines the plugin, `src/templates/` holds the templates that write each file (`defineTemplate` from `@kubb/kit`), `src/components/` holds JSX-renderer components, and each test sits next to the file it tests. A few are leaner, like the client plugins (`plugin-axios`, `plugin-fetch`, `plugin-ky`) that build on `@kubb/plugin-client`, and `plugin-redoc`, which is a single `redoc.ts` with no `templates/` or `components/`.
 
 ## Tech stack
 
-| Tool | Purpose |
-|------|---------|
-| [TypeScript](https://www.typescriptlang.org/) | Language (strict, ESM only) |
-| [pnpm](https://pnpm.io/) | Package manager with workspaces |
-| [Turborepo](https://turbo.build/) | Monorepo task runner |
-| [tsdown](https://github.com/sxzz/tsdown) | Bundler |
-| [Vitest](https://vitest.dev/) | Testing |
-| [oxlint](https://oxc.rs/docs/guide/usage/linter.html) | Linter |
-| [oxfmt](https://github.com/oxc-project/oxfmt) | Formatter |
-| [Changesets](https://github.com/changesets/changesets) | Versioning |
-| [GitHub Actions](https://github.com/features/actions) | CI/CD |
+| Tool                                                   | Purpose                                                 |
+| ------------------------------------------------------ | ------------------------------------------------------- |
+| [TypeScript](https://www.typescriptlang.org/)          | Language (strict, ESM source, published as ESM and CJS) |
+| [pnpm](https://pnpm.io/)                               | Package manager with workspaces                         |
+| [Turborepo](https://turbo.build/)                      | Monorepo task runner                                    |
+| [tsdown](https://github.com/sxzz/tsdown)               | Bundler                                                 |
+| [Vitest](https://vitest.dev/)                          | Testing                                                 |
+| [oxlint](https://oxc.rs/docs/guide/usage/linter.html)  | Linter                                                  |
+| [oxfmt](https://github.com/oxc-project/oxfmt)          | Formatter                                               |
+| [Changesets](https://github.com/changesets/changesets) | Versioning                                              |
+| [GitHub Actions](https://github.com/features/actions)  | CI/CD                                                   |
 
 ## Commands
 
