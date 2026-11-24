@@ -272,8 +272,6 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       unknown: () => 'undefined',
       void: () => 'undefined',
       never: () => 'undefined',
-      // A fake value cannot be made from what a schema forbids, so `not` adds nothing.
-      not: () => null,
       boolean: () => 'faker.datatype.boolean()',
       null: () => 'null',
       string(node) {

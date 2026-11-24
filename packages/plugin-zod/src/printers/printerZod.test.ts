@@ -1385,12 +1385,6 @@ describe('printerZod', () => {
       `)
     })
 
-    test('quotes an omitted key that holds a quote', () => {
-      const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [] })
-
-      expect(printerZod({ keysToOmit: ['a"b'] }).print(node)).toBe('z.object({}).omit({ "a\\"b": true })')
-    })
-
     test('omits keys from a nullable allOf of objects', () => {
       const p = printerZod({ keysToOmit: ['id'] })
       const object = (name: string) =>

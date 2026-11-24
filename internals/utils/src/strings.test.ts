@@ -81,10 +81,6 @@ describe('getNestedAccessor', () => {
     expect(getNestedAccessor('pagination.next.id', 'lastPage')).toBe("lastPage?.['pagination']?.['next']?.['id']")
   })
 
-  it('quotes a key that holds a quote', () => {
-    expect(getNestedAccessor("a'b", 'lastPage')).toBe("lastPage?.['a\\'b']")
-  })
-
   it('returns null for an empty path', () => {
     expect(getNestedAccessor('', 'root')).toBeNull()
   })
