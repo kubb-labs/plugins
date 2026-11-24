@@ -399,14 +399,10 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       }
 
       const schemas = [firstBase]
-      const actions: Array<string> = []
-      for (const member of rest) {
-        // A `not` beside other keywords narrows the schema it sits on, so it checks that schema's value.
-        if (member.type === ast.schema.types.not) {
-          const check = notCheck(this, member)
-          if (check) actions.push(check)
-          continue
-        }
+      // A `not` beside other keywords narrows the schema it sits on, so it checks that schema's value.
+      const isNot = (member: ast.SchemaNode) => member.type === ast.schema.types.not
+      const actions: Array<string | null> = rest.filter(isNot).map((member) => notCheck(this, member))
+      for (const member of rest.filter((member) => !isNot(member))) {
         const constraints = memberActions({ member, base, regexType: this.options.regexType })
         const transformed = constraints.length ? null : this.transform(member)
         actions.push(...constraints)
