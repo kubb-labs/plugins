@@ -25,9 +25,9 @@ export type ReturnTypeOption = 'full' | 'data' | 'plain'
  * make it relative to the importing file.
  */
 export type ClientOperation = {
-  /** The local name a consumer calls. Differs from the exported `importName` only when a consumer binding would shadow it. */
+  /** The local name a consumer calls. `moduleName` imports it, under an alias when a consumer binding would shadow the export. */
   name: string
-  importName: string
+  moduleName: ast.ModuleName
   path: string
   clientPath: string
   clientPathIsFile: boolean
@@ -50,7 +50,22 @@ type ClientPluginOptions = {
 }
 
 // Names the hook and MCP handler bodies bind around the client call, which would shadow an operation of the same name.
-const consumerBindings = new Set(['path', 'query', 'body', 'headers', 'cookies', 'config', 'signal', 'variables', 'options', 'ctx', 'res', 'pageParam'])
+const consumerBindings = new Set([
+  'path',
+  'query',
+  'body',
+  'headers',
+  'cookies',
+  'config',
+  'signal',
+  'variables',
+  'options',
+  'ctx',
+  'res',
+  'pageParam',
+  'queryKey',
+  'mutationKey',
+])
 
 function isRelativeImport(importPath: string): boolean {
   return importPath.startsWith('.')
@@ -85,12 +100,13 @@ export function resolveClientOperation({ node, pluginName }: { node: ast.Operati
     if (!operationOptions) return null
 
     const importName = resolver.resolveName({ key: operationKey(node), name: resolver.name(node.operationId) })
+    const name = consumerBindings.has(importName) ? `${importName}Request` : importName
     const file = ctx.file(node, { plugin: pluginName })
     const { importPath } = operationOptions
 
     return {
-      name: consumerBindings.has(importName) ? `${importName}Request` : importName,
-      importName,
+      name,
+      moduleName: { name: importName, alias: name === importName ? undefined : name, space: 'value' as const },
       path: file.path,
       clientPath: importPath === undefined ? path.resolve(ctx.root, '.kubb/client.ts') : resolveImportPath({ importPath, operationFile: file.path }),
       clientPathIsFile: importPath === undefined || isRelativeImport(importPath),
