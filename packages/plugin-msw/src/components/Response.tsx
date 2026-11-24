@@ -3,13 +3,13 @@ import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { responseReturn } from '../utils.ts'
 
-type Props = {
+export type ResponseProps = {
   typeName: string
   name: string
   response: ast.ResponseNode
 }
 
-export function Response({ name, typeName, response }: Props): KubbReactNode {
+export function Response({ name, typeName, response }: ResponseProps): KubbReactNode {
   // Optional, since a handler passes on the `data` it got, which may be left out.
   const params = `data?: ${typeName}`
 

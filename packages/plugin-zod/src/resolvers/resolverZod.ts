@@ -1,6 +1,5 @@
 import { ensureValidVarName } from '@internals/utils'
 import { casing, createResolver, operationKey, resolverCasedFile, resolverOperationParams, resolverOperationResponse } from '@kubb/kit'
-import { pluginZodName } from '../plugin.ts'
 import type { PluginZod } from '../types.ts'
 
 /**
@@ -26,10 +25,10 @@ export const resolverZod = createResolver<PluginZod>({
   ...resolverCasedFile((part) => casing.camel(part, { suffix: 'schema' })),
   schema: {
     typeName(name) {
-      return this.memo(`${pluginZodName}:typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
+      return this.memo(`plugin-zod:typeName:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'schema type' })))
     },
     type(name) {
-      return this.memo(`${pluginZodName}:type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
+      return this.memo(`plugin-zod:type:${name}`, () => ensureValidVarName(casing.pascal(name, { suffix: 'type' })))
     },
     inputName(name) {
       return this.name(`${name} input`)

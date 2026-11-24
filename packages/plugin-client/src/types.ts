@@ -8,7 +8,7 @@ export type { ReturnTypeOption } from '@internals/client'
 /**
  * Omits keys from every member of a union, where the built-in `Omit` would collapse the union into one shape.
  */
-type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
+export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
 
 /**
  * Options for `pluginClient`. It takes the shared client options, without the ones this plugin does not use,

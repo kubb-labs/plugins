@@ -16,7 +16,7 @@ import {
 import type { HookResultProps, Infinite } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 
-type Props = {
+export type QueryProps = {
   name: string
   queryOptionsName: string
   queryKeyName: string
@@ -45,7 +45,7 @@ const OBSERVER_OPTIONS_NAMES = {
   plain: { suspense: 'UseSuspenseQueryOptions', standard: 'QueryObserverOptions' },
 }
 
-type HookTypesProps = Pick<Props, 'node' | 'suspense' | 'queryKeyTypeName' | 'infinite'> & {
+type HookTypesProps = Pick<QueryProps, 'node' | 'suspense' | 'queryKeyTypeName' | 'infinite'> & {
   tsResolver: ResolverTs
   TData: string
   TError: string
@@ -90,7 +90,7 @@ export function Query({
   infinite,
   returnType,
   typedHeaders,
-}: Props): KubbReactNode {
+}: QueryProps): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const prefix = suspense ? 'UseSuspense' : 'Use'

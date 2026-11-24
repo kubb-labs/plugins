@@ -8,7 +8,7 @@ import type { HookResultProps } from '@internals/tanstack-query'
 import { buildClientOptionType, getComments } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
-type Props = {
+export type QueryProps = {
   name: string
   queryOptionsName: string
   queryKeyName: string
@@ -24,7 +24,17 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, infinite, returnType, typedHeaders }: Props): KubbReactNode {
+export function Query({
+  name,
+  queryKeyTypeName,
+  queryOptionsName,
+  queryKeyName,
+  node,
+  tsResolver,
+  infinite,
+  returnType,
+  typedHeaders,
+}: QueryProps): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
   const optionsName = infinite ? 'UseInfiniteQueryOptions' : 'UseQueryOptions'
   const hookName = infinite ? 'useInfiniteQuery' : 'useQuery'
