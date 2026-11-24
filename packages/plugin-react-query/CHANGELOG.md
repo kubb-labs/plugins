@@ -1,5 +1,11 @@
 # @kubb/plugin-react-query
 
+## 5.13.4
+
+### Patch Changes
+
+- [#1610](https://github.com/kubb-labs/plugins/pull/1610) [`af746a6`](https://github.com/kubb-labs/plugins/commit/af746a69dc6e04c4db113ded58da8f81e7e8406c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Stop generated query hooks from writing `queryKey` onto the TanStack Query result, which could loop until React threw `Maximum update depth exceeded` on `@tanstack/react-query` 5.107 and later.
+
 ## 5.13.3
 
 ### Patch Changes
