@@ -1,5 +1,35 @@
 # @kubb/plugin-react-query
 
+## 5.13.3
+
+### Patch Changes
+
+- [#1591](https://github.com/kubb-labs/plugins/pull/1591) [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Leave out an operation that the client plugin excludes. The MCP `server.ts` registered a handler, and the react-query `HookOptions` type listed a hook, for an operation whose file was never written, so the output did not compile.
+
+- [#1606](https://github.com/kubb-labs/plugins/pull/1606) [`c817344`](https://github.com/kubb-labs/plugins/commit/c81734467bbe122f17ff642a8639c8d5aa1a4f61) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix generated code that did not compile for some real-world specs.
+  
+  - An operation named after a local binding, such as `query` or `body`, no longer shadows its own client function in a hook or an MCP handler. The client is imported under an alias, such as `import { query as queryRequest }`.
+  - A Cypress request keeps a `{placeholder}` in the URL as written when the spec declares no path parameter for it. Before, it read a key that does not exist on `path`.
+  - An `allOf` Zod schema keeps only the enum values every member allows, like the TypeScript type. Before, a discriminator mapping key missing from the member's own enum made the Zod schema wider than the type.
+
+- [#1591](https://github.com/kubb-labs/plugins/pull/1591) [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Escape text from the OpenAPI document before it reaches generated code.
+  
+  - A description or summary with `*/` no longer closes the JSDoc block of an SDK class method, and a line that starts with `@` no longer becomes a JSDoc tag.
+  - A path with a backtick, a backslash or `$` stays text in the MSW handler URL and the Cypress request URL.
+  - A property name with a quote is quoted in the `.omit()` mask of a zod schema.
+  - A parameter `style`, a response status key and the `nextParam`, `cursorParam` and `queryParam` keys are quoted. An `explode` or `allowReserved` that is not a boolean is left out.
+  - A faker enum whose values are objects lists them as JSON, not as `[object Object]`.
+  - A faker import that is renamed after a name collision only renames its calls, so a property key of the same name stays.
+
+- [#1594](https://github.com/kubb-labs/plugins/pull/1594) [`473e23b`](https://github.com/kubb-labs/plugins/commit/473e23ba2b3368069f38010a0df6db77ac18b3f3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Two generators now share code with their siblings, which fixes two small differences.
+  
+  - `@kubb/plugin-valibot` uses the `description` of a request body for its schema comment, as `@kubb/plugin-zod` does.
+  - The `HookOptions` type of `@kubb/plugin-react-query` reads `override`, `include` and `exclude` the same way the hook files do. An `override` on `method` matched only the exact case there.
+
+- [#1593](https://github.com/kubb-labs/plugins/pull/1593) [`9b5b769`](https://github.com/kubb-labs/plugins/commit/9b5b769f2a4f24ada778737ed5322cc8433412ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove stale package metadata: `typesVersions` entries for files that are not built, a `files` entry for a folder that does not exist, and unused dependencies. `@kubb/*` dependencies now read their range from the workspace catalog. The published range is unchanged.
+- Updated dependencies [[`9b5b769`](https://github.com/kubb-labs/plugins/commit/9b5b769f2a4f24ada778737ed5322cc8433412ac), [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc)]:
+  - @kubb/plugin-ts@5.7.3
+
 ## 5.13.2
 
 ### Patch Changes

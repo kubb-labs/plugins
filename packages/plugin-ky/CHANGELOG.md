@@ -1,5 +1,27 @@
 # @kubb/plugin-ky
 
+## 0.5.0
+
+### Minor Changes
+
+- [#1591](https://github.com/kubb-labs/plugins/pull/1591) [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - The generated client throws a `TypeError` for a path parameter it cannot send safely. Regenerate to get the new `.kubb/core.ts`.
+  
+  - A missing path parameter throws `Missing path parameter petId.` Before, `/pets/{petId}` was sent as `/pets/`, which is another endpoint.
+  - A path parameter of `.` or `..` throws, because a URL parser resolves it against the path.
+  - An API key sent as a cookie throws when it holds a character a cookie cannot carry, such as `;`, which would start another cookie.
+  - A JSON Lines record that is not valid JSON throws a `ValidationError`, like every other JSON body. It was a `SyntaxError`.
+  - `onValidationError` gets the URL template for a response failure, as it does for a request failure. The resolved URL could carry an API key in its query.
+
+### Patch Changes
+
+- [#1604](https://github.com/kubb-labs/plugins/pull/1604) [`0810d30`](https://github.com/kubb-labs/plugins/commit/0810d30ac91f276516e057db0c4c07ded38ff692) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix two client runtime types that rejected code the runtime accepts. The client config `headers` now takes a `Headers` instance, and a request or response interceptor may return nothing to keep the value. Regenerate to get the new types.
+
+- [#1594](https://github.com/kubb-labs/plugins/pull/1594) [`473e23b`](https://github.com/kubb-labs/plugins/commit/473e23ba2b3368069f38010a0df6db77ac18b3f3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Split the generated `.kubb/core.ts` into `core.ts`, `types.ts`, `auth.ts` and `retry.ts`. `.kubb/client.ts` exports the same names as before, so imports from it keep working. Regenerate to get the new files.
+
+- [#1593](https://github.com/kubb-labs/plugins/pull/1593) [`9b5b769`](https://github.com/kubb-labs/plugins/commit/9b5b769f2a4f24ada778737ed5322cc8433412ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove stale package metadata: `typesVersions` entries for files that are not built, a `files` entry for a folder that does not exist, and unused dependencies. `@kubb/*` dependencies now read their range from the workspace catalog. The published range is unchanged.
+- Updated dependencies [[`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc), [`0810d30`](https://github.com/kubb-labs/plugins/commit/0810d30ac91f276516e057db0c4c07ded38ff692), [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc), [`473e23b`](https://github.com/kubb-labs/plugins/commit/473e23ba2b3368069f38010a0df6db77ac18b3f3), [`9b5b769`](https://github.com/kubb-labs/plugins/commit/9b5b769f2a4f24ada778737ed5322cc8433412ac)]:
+  - @kubb/plugin-client@6.6.0
+
 ## 0.4.0
 
 ### Minor Changes

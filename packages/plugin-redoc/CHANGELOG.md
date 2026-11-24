@@ -1,5 +1,13 @@
 # @kubb/plugin-redoc
 
+## 5.2.8
+
+### Patch Changes
+
+- [#1591](https://github.com/kubb-labs/plugins/pull/1591) [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Start the page with `<!DOCTYPE html>`, so browsers do not render it in quirks mode, and name the file after `output.path`.
+
+- [#1593](https://github.com/kubb-labs/plugins/pull/1593) [`9b5b769`](https://github.com/kubb-labs/plugins/commit/9b5b769f2a4f24ada778737ed5322cc8433412ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove stale package metadata: `typesVersions` entries for files that are not built, a `files` entry for a folder that does not exist, and unused dependencies. `@kubb/*` dependencies now read their range from the workspace catalog. The published range is unchanged.
+
 ## 5.2.7
 
 ### Patch Changes

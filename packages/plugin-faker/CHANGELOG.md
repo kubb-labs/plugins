@@ -1,5 +1,24 @@
 # @kubb/plugin-faker
 
+## 5.6.2
+
+### Patch Changes
+
+- [#1591](https://github.com/kubb-labs/plugins/pull/1591) [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Escape text from the OpenAPI document before it reaches generated code.
+  
+  - A description or summary with `*/` no longer closes the JSDoc block of an SDK class method, and a line that starts with `@` no longer becomes a JSDoc tag.
+  - A path with a backtick, a backslash or `$` stays text in the MSW handler URL and the Cypress request URL.
+  - A property name with a quote is quoted in the `.omit()` mask of a zod schema.
+  - A parameter `style`, a response status key and the `nextParam`, `cursorParam` and `queryParam` keys are quoted. An `explode` or `allowReserved` that is not a boolean is left out.
+  - A faker enum whose values are objects lists them as JSON, not as `[object Object]`.
+  - A faker import that is renamed after a name collision only renames its calls, so a property key of the same name stays.
+
+- [#1591](https://github.com/kubb-labs/plugins/pull/1591) [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Report a `pattern` that JavaScript cannot compile as a `KUBB_INVALID_SPEC` diagnostic that names the pattern. It was a bare `SyntaxError`. A `never` schema now prints `undefined`.
+
+- [#1593](https://github.com/kubb-labs/plugins/pull/1593) [`9b5b769`](https://github.com/kubb-labs/plugins/commit/9b5b769f2a4f24ada778737ed5322cc8433412ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove stale package metadata: `typesVersions` entries for files that are not built, a `files` entry for a folder that does not exist, and unused dependencies. `@kubb/*` dependencies now read their range from the workspace catalog. The published range is unchanged.
+- Updated dependencies [[`9b5b769`](https://github.com/kubb-labs/plugins/commit/9b5b769f2a4f24ada778737ed5322cc8433412ac), [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc)]:
+  - @kubb/plugin-ts@5.7.3
+
 ## 5.6.1
 
 ### Patch Changes
