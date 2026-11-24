@@ -72,6 +72,17 @@ describe('serverGenerator — Operations', () => {
   })
 })
 
+describe('serverGenerator — client plugin filter', () => {
+  test('registers no tool for an operation the client plugin excludes', async () => {
+    const operation = (operationId: string) => ast.factory.createOperation({ operationId, method: 'GET', path: `/${operationId}`, responses: [] })
+    const driver = await renderServer([operation('ping'), operation('pong')], { exclude: [{ type: 'operationId', pattern: 'pong' }] })
+    const source = rawSources(driver.fileManager.files).join('\n')
+
+    expect(source).toContain('pingHandler')
+    expect(source).not.toContain('pongHandler')
+  })
+})
+
 describe('serverGenerator — tool schemas', () => {
   test('lists a tool whose schema holds a bigint or a Blob', async () => {
     const source = rawSources(
@@ -93,7 +104,7 @@ describe('serverGenerator — tool schemas', () => {
   })
 })
 
-async function renderServer(nodes: Array<ast.OperationNode>) {
+async function renderServer(nodes: Array<ast.OperationNode>, clientOptions: Record<string, unknown> = {}) {
   const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
   const driver = createMockedPluginDriver({
     name: 'showPetById',
@@ -104,6 +115,7 @@ async function renderServer(nodes: Array<ast.OperationNode>) {
   driver.getPlugin = ((pluginName: string) => {
     if (pluginName === 'plugin-zod') return mockedZodPlugin
     if (pluginName === 'plugin-mcp') return plugin
+    if (pluginName === 'plugin-axios') return { ...mockedTsPlugin, options: { ...mockedTsPlugin.options, ...clientOptions } }
     return originalGetPlugin(pluginName)
   }) as typeof driver.getPlugin
 

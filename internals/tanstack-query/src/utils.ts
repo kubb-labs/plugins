@@ -1,4 +1,5 @@
 import { ast } from '@internals/ast'
+import { text } from '@kubb/kit'
 import { getResponseContentTypeInfo, resolveErrorNames, resolveSuccessNames, buildClientOptionType, requestGroupOrder, getStream } from '@internals/shared'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
@@ -264,7 +265,7 @@ export function resolvePageParamType(node: ast.OperationNode, { resolver, initia
   const individualName = firstQueryParam ? resolver.param.name(node, firstQueryParam) : null
   const queryParamsTypeName = groupName !== individualName ? groupName : null
 
-  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
+  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}[${text.quote(queryParam)}]` : null
 
   if (!queryParamType) {
     return { queryParamsTypeName, pageParamType: resolveFallbackPageParamType(initialPageParam) }

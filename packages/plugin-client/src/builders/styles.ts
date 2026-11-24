@@ -22,10 +22,10 @@ function toKey(name: string): string {
  */
 function serializeParameter(parameter: ast.ParameterNode): string | null {
   const parts = [
-    (parameter.in === 'path' || parameter.in === 'query') && parameter.style && `style: '${parameter.style}'`,
+    (parameter.in === 'path' || parameter.in === 'query') && parameter.style && `style: ${text.quote(parameter.style)}`,
     parameter.in === 'cookie' && parameter.style === 'cookie' && `style: 'cookie'`,
-    parameter.explode !== undefined && `explode: ${parameter.explode}`,
-    parameter.in === 'query' && parameter.allowReserved !== undefined && `allowReserved: ${parameter.allowReserved}`,
+    typeof parameter.explode === 'boolean' && `explode: ${parameter.explode}`,
+    parameter.in === 'query' && typeof parameter.allowReserved === 'boolean' && `allowReserved: ${parameter.allowReserved}`,
     parameter.in !== 'path' && parameter.contentType && `contentType: ${text.quote(parameter.contentType)}`,
     parameter.in === 'querystring' && 'querystring: true',
   ].filter(Boolean)
@@ -49,8 +49,8 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
   return Object.entries(content?.length === 1 ? (content[0]?.encoding ?? {}) : {}).map(([property, { contentType, style, explode, allowReserved }]) => {
     const parts = [
       style && `style: ${JSON.stringify(style)}`,
-      explode !== undefined && `explode: ${explode}`,
-      allowReserved !== undefined && `allowReserved: ${allowReserved}`,
+      typeof explode === 'boolean' && `explode: ${explode}`,
+      typeof allowReserved === 'boolean' && `allowReserved: ${allowReserved}`,
       contentType && `contentType: ${JSON.stringify(contentType)}`,
     ].filter(Boolean)
     return `${isValidVarName(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`

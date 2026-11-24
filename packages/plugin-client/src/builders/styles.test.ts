@@ -16,6 +16,20 @@ function createOperation(parameters: Array<Parameters<typeof ast.factory.createP
 const stringSchema = () => ast.factory.createSchema({ type: 'string' })
 
 describe('buildStyles', () => {
+  test('drops an explode or allowReserved that is not a boolean, and quotes the style', () => {
+    const node = createOperation([
+      {
+        name: 'tags',
+        in: 'query',
+        schema: stringSchema(),
+        style: "form', x: evil(), y: '",
+        explode: 'true }, x: evil(), y: {',
+        allowReserved: 'evil()',
+      } as never,
+    ])
+    expect(buildStyles({ node })).toBe("{ query: { tags: { style: 'form\\', x: evil(), y: \\'' } } }")
+  })
+
   test('keeps the spec name for header and cookie parameters, quoted when not a bare identifier', () => {
     const node = createOperation([
       { name: 'X-Ids', in: 'header', schema: stringSchema(), style: 'simple', explode: true },

@@ -156,6 +156,15 @@ export function throwsOnStrictCompile({
   }
 }
 
+/**
+ * The `refine` callback of a `not` schema: the value must fail the schema `not` holds. Zod has no negation schema.
+ */
+function notCheck(ctx: { transform: (node: ast.SchemaNode) => string | null | undefined }, node: ast.SchemaNode): string | null {
+  const [member] = ast.schema.narrow(node, ast.schema.types.not)?.members ?? []
+  const schema = member ? ctx.transform(member) : null
+  return schema ? `(value) => !${schema}.safeParse(value).success, { message: "Value must not match the schema" }` : null
+}
+
 // `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
 // Prints as a plain object schema, which a discriminated union can take as a member.
 function printsAsObject(node: ast.SchemaNode, circularSchemas?: ReadonlySet<string>): boolean {
@@ -425,6 +434,11 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       }
 
       return rest.reduce((acc, member) => {
+        // A `not` beside other keywords narrows the schema it sits on, so it refines that schema.
+        if (member.type === ast.schema.types.not) {
+          const check = notCheck(this, member)
+          return check ? dialect.refine(acc, check) : acc
+        }
         const constraint = getMemberConstraint({ member, regexType: this.options.regexType, lengths: dialect.lengths, numbers: dialect.numbers })
         const numeric = ast.schema.narrow(member, 'number') ?? ast.schema.narrow(member, 'integer')
         // A bigint base can be a pipe, which has no `.min()`, and its bounds are bigints. The member's bounds run as a bigint schema after it.
@@ -434,6 +448,10 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         const transformed = transform(member)
         return transformed ? dialect.intersection(acc, transformed) : acc
       }, firstBase)
+    },
+    not(node) {
+      const check = notCheck(this, node)
+      return check ? dialect.refine('z.unknown()', check) : null
     },
   }
 }

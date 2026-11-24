@@ -18,6 +18,12 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker, dateParser }).print(node)).toBe(expected)
   })
 
+  test('lists the object values of an enum as JSON', () => {
+    const node = ast.factory.createSchema({ type: 'enum', enumValues: [{ a: 1 }, { a: 2 }] as never })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('faker.helpers.arrayElement([{"a":1}, {"a":2}])')
+  })
+
   test('calls a dateParser with a scoped module name by its import name', () => {
     const node = ast.factory.createSchema({ type: 'date', representation: 'string' })
 

@@ -1,4 +1,5 @@
 import { ast } from '@internals/ast'
+import { resolveClientOperation } from '@internals/client'
 import { namedFile } from '@internals/shared'
 import { hookFileName, matchesInfinite } from '@internals/tanstack-query'
 import { defineTemplate } from '@kubb/kit'
@@ -19,7 +20,7 @@ type MutationOption = PluginReactQuery['resolvedOptions']['mutation']
 export const hookOptionsOperations = defineTemplate<PluginReactQuery>({
   kind: ast.node.kinds.operations,
   render({ operations: nodes }, ctx) {
-    const { output, customOptions, query, mutation, suspense, infinite, override, hooks } = ctx.options
+    const { output, customOptions, query, mutation, suspense, infinite, override, hooks, client } = ctx.options
 
     if (!customOptions || !hooks) return null
 
@@ -36,6 +37,8 @@ export const hookOptionsOperations = defineTemplate<PluginReactQuery>({
 
     for (const node of nodes) {
       if (!ast.http.isOperation(node)) continue
+      // The hook templates emit nothing for an operation the client plugin leaves out.
+      if (!resolveClientOperation({ node, pluginName: client.pluginName })) continue
       const opOverrides = resolveOperationOverrides(node, override)
       const nodeQuery: QueryOption = 'query' in opOverrides ? (opOverrides.query as QueryOption) : query
       const nodeMutation: MutationOption = 'mutation' in opOverrides ? (opOverrides.mutation as MutationOption) : mutation

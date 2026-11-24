@@ -232,8 +232,8 @@ describe('parseJsonLines', () => {
     expect(await collect(parseJsonLines({ stream, terminator: '[DONE]' }))).toStrictEqual([{ n: 1 }, { n: 2 }])
   })
 
-  test('throws a SyntaxError for a line that is not JSON', async () => {
-    await expect(collect(parseJsonLines({ stream: streamOf(['{"n":1}\nnot json\n']) }))).rejects.toThrow(SyntaxError)
+  test('throws a ValidationError for a line that is not JSON, like every other JSON body', async () => {
+    await expect(collect(parseJsonLines({ stream: streamOf(['{"n":1}\nnot json\n']) }))).rejects.toThrow(ValidationError)
   })
 
   test.each([

@@ -26,6 +26,11 @@ export function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
       headers: (node: ast.OperationNode, statusCode: ast.StatusCode) => type(resolver.response.headers(node, statusCode)),
       options: (node: ast.OperationNode) => resolver.response.options(node),
     },
+    // An inferred enum has one type and no separate key type, whatever the suffix.
+    enum: {
+      keyName: (node: { name?: string | null }) => type(resolver.name(node.name ?? '')),
+    },
+    // `Resolver` is a class with private fields, which an object literal cannot satisfy.
   } as unknown as ResolverTs
 }
 

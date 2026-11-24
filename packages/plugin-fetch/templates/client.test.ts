@@ -1923,6 +1923,16 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, query: { status: ['a', 'b'] } })).toBe('/pet/7?status=a&status=b')
   })
 
+  test('throws for a missing path param, which would call another endpoint', () => {
+    const { client } = createClient()
+    expect(() => client.getUrl({ url: '/pet/{petId}', path: {} })).toThrow('Missing path parameter petId.')
+  })
+
+  test.each(['.', '..'])('throws for the dot segment %s, which a URL parser resolves against the path', (petId) => {
+    const { client } = createClient()
+    expect(() => client.getUrl({ url: '/pet/{petId}', path: { petId } })).toThrow('Path parameter petId cannot be a dot segment.')
+  })
+
   test('prefixes the configured baseURL', () => {
     const { client } = createClient()
     client.setConfig({ baseURL: 'https://example.com' })
@@ -2073,6 +2083,11 @@ describe('resolveAuth', () => {
     const headers: Record<string, string> = {}
     await resolveAuth({ security: [{ type: 'apiKey', name: 'sid', in: 'cookie' }], auth: () => 'secret', headers, query: {} })
     expect(headers.Cookie).toBe('sid=secret')
+  })
+
+  test('rejects an api key that would start another cookie, without naming the token', async () => {
+    const resolve = resolveAuth({ security: [{ type: 'apiKey', name: 'sid', in: 'cookie' }], auth: () => 'secret; admin=1', headers: {}, query: {} })
+    await expect(resolve).rejects.toThrow('The sid API key has characters a cookie cannot carry, escape it first.')
   })
 
   test('accepts a static token without a callback', async () => {

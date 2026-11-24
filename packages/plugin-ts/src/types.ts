@@ -104,7 +104,7 @@ export type ResolverTs = Resolver & {
   enum: {
     /**
      * Resolves the TypeScript type alias name for an enum schema's key variant.
-     * Appends `enumTypeSuffix` (default `'key'`) after applying the default naming convention.
+     * Appends `enumTypeSuffix` (default `'Key'`) after applying the default naming convention.
      *
      * @example Enum key names with different suffixes
      * ```ts

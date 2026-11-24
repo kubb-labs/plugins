@@ -130,7 +130,7 @@ export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTs
 
 type PrinterTs = PrinterTsFactory
 
-type HandlerContext = { transform: (node: ast.SchemaNode) => factory.TsNode | null }
+type HandlerContext = { transform: (node: ast.SchemaNode) => factory.TsNode | null; base: (node: ast.SchemaNode) => factory.TsNode | null }
 
 // Adds the `| null` of an OpenAPI 3.0 `nullable: true` set on an array item or union member itself.
 // A `null` member already prints `null`, so it gets no second one.
@@ -152,7 +152,14 @@ function toNodeHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial<f
           const output = this.transform(child)
           return output ? factory.print(output) : null
         }
-        const result = (handler as (this: unknown, node: ast.SchemaNode) => string | DeprecatedTsNode | null | undefined).call({ ...this, transform }, node)
+        const base = (child: ast.SchemaNode) => {
+          const output = this.base(child)
+          return output ? factory.print(output) : null
+        }
+        const result = (handler as (this: unknown, node: ast.SchemaNode) => string | DeprecatedTsNode | null | undefined).call(
+          { ...this, transform, base },
+          node,
+        )
         if (result === null || result === undefined) return result
         return factory.createRaw(
           typeof result === 'string'
@@ -232,6 +239,8 @@ export const printerTs = createPrinter<PrinterTs>((options) => {
       unknown: () => factory.keywordTypeNodes.unknown,
       void: () => factory.keywordTypeNodes.void,
       never: () => factory.keywordTypeNodes.never,
+      // TypeScript has no negated type, so `not` adds nothing to the type.
+      not: () => null,
       boolean: () => factory.keywordTypeNodes.boolean,
       null: () => factory.keywordTypeNodes.null,
       blob: () => factory.createTypeReferenceNode('Blob'),
@@ -387,8 +396,9 @@ export const printerTs = createPrinter<PrinterTs>((options) => {
 
         return factory.createTypeLiteralNode(allElements)
       },
-      ...toNodeHandlers(options.nodes),
     },
+    // Passed as `overrides`, not spread into `nodes`, so `this.base(node)` reaches the handler it replaces.
+    overrides: toNodeHandlers(options.nodes),
     print(node) {
       const { name, keysToOmit } = this.options
 

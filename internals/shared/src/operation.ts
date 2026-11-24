@@ -315,8 +315,8 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
   // The request line leads: free text after a block tag would belong to that tag.
   const comments = [
     getOperationRequestLine(node),
-    node.description && `@description ${node.description}`,
-    node.summary && `@summary ${node.summary}`,
+    node.description && `@description ${jsDocEscape(node.description)}`,
+    node.summary && `@summary ${jsDocEscape(node.summary)}`,
     node.deprecated && '@deprecated',
     node.externalDocs && `@see ${jsDocEscape([node.externalDocs.url, node.externalDocs.description].filter(Boolean).join(' '))}`,
   ]

@@ -115,6 +115,13 @@ function pipe(base: string, actions: Array<string | false | null | undefined>): 
   return list.length ? `v.pipe(${[base, ...list].join(', ')})` : base
 }
 
+// The `v.check` action of a `not` schema: the value must fail the schema `not` holds. Valibot has no negation schema.
+function notCheck(ctx: { transform: (node: ast.SchemaNode) => string | null | undefined }, node: ast.SchemaNode): string | null {
+  const [member] = ast.schema.narrow(node, ast.schema.types.not)?.members ?? []
+  const schema = member ? ctx.transform(member) : null
+  return schema ? `v.check((value) => !v.is(${schema}, value), "Value must not match the schema")` : null
+}
+
 function lengthActions({ min, max, pattern }: LengthConstraints, regexType: PrinterValibotOptions['regexType']): Array<string> {
   return [
     min !== undefined && `v.minLength(${min})`,
@@ -674,6 +681,12 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       const schemas = [firstBase]
       const actions: Array<string> = []
       for (const member of rest) {
+        // A `not` beside other keywords narrows the schema it sits on, so it checks that schema's value.
+        if (member.type === ast.schema.types.not) {
+          const check = notCheck(this, member)
+          if (check) actions.push(check)
+          continue
+        }
         const constraints = memberActions({ member, base, regexType: this.options.regexType })
         const transformed = constraints.length ? null : this.transform(member)
         actions.push(...constraints)
@@ -681,6 +694,10 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
       }
 
       return pipe(schemas.length > 1 ? `v.intersect(${buildList(schemas)})` : firstBase, actions)
+    },
+    not(node) {
+      const check = notCheck(this, node)
+      return check ? pipe(UNKNOWN, [check]) : null
     },
   }
 

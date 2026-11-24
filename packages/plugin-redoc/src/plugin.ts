@@ -54,12 +54,15 @@ export const pluginRedoc = defineExtension<PluginRedoc>({
 
     const pageHTML = getPageHTML(document)
 
+    const filePath = path.resolve(config.root, config.output.path, output.path || './docs.html')
+    const baseName = path.basename(filePath) as `${string}.${string}`
+
     injectFile({
-      baseName: 'docs.html',
-      path: path.resolve(config.root, config.output.path, output.path || './docs.html'),
+      baseName,
+      path: filePath,
       sources: [
         ast.factory.createSource({
-          name: 'docs.html',
+          name: baseName,
           nodes: [ast.factory.createText(pageHTML)],
         }),
       ],

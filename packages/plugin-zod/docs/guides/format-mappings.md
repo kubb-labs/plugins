@@ -40,11 +40,11 @@ With [`integerType: 'number'`](https://kubb.dev/extensions/kubb-labs/adapter-oas
 
 ## Dates and times
 
-| OpenAPI type and format       | Zod                | Zod Mini       | Notes              |
-| :---------------------------- | :----------------- | :------------- | :----------------- |
-| `string`, `format: date`      | `z.iso.date()`     | `z.iso.date()` | ISO 8601 date      |
-| `string`, `format: date-time` | `z.iso.datetime()` | `z.string()`   | ISO 8601 date-time |
-| `string`, `format: time`      | `z.iso.time()`     | `z.iso.time()` | ISO 8601 time      |
+| OpenAPI type and format       | Zod                | Zod Mini           | Notes              |
+| :---------------------------- | :----------------- | :----------------- | :----------------- |
+| `string`, `format: date`      | `z.iso.date()`     | `z.iso.date()`     | ISO 8601 date      |
+| `string`, `format: date-time` | `z.iso.datetime()` | `z.iso.datetime()` | ISO 8601 date-time |
+| `string`, `format: time`      | `z.iso.time()`     | `z.iso.time()`     | ISO 8601 time      |
 
 These rows apply to the adapter's default `dateType: 'string'`.
 

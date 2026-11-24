@@ -74,7 +74,8 @@ export function getPageHTML(api: OpenApiDocument) {
  </script>
     `
 
-  return `<html>
+  return `<!DOCTYPE html>
+<html>
 
   <head>
     <meta charset='utf8' />

@@ -189,6 +189,12 @@ describe('buildOperationComments', () => {
     expect(buildOperationComments(node)).toStrictEqual(['`GET /pets/{petId}`', '@description Show pet', '@summary Show', '@deprecated'])
   })
 
+  test('keeps a line of the description or summary from starting a tag', () => {
+    const node = ast.factory.createOperation({ operationId: 'showPet', method: 'GET', path: '/pets', description: 'Show\n@deprecated', summary: '@internal' })
+
+    expect(buildOperationComments(node)).toStrictEqual(['`GET /pets`', '@description Show\n\\@deprecated', '@summary \\@internal'])
+  })
+
   test('links the external docs with @see', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPet',

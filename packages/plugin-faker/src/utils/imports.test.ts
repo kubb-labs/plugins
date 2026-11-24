@@ -38,6 +38,8 @@ describe('import utilities', () => {
   })
 
   test('rewrites aliased import references', () => {
-    expect(rewriteAliasedImports('return createPet(data)', new Map([['createPet', 'createPetSchema']]))).toBe('return createPetSchema(data)')
+    expect(rewriteAliasedImports('return { createPet: createPet(data) }', new Map([['createPet', 'createPetSchema']]))).toBe(
+      'return { createPet: createPetSchema(data) }',
+    )
   })
 })

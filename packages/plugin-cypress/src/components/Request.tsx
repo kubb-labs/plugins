@@ -1,5 +1,6 @@
 import { ast } from '@internals/ast'
 import { buildRequestParamsSignature } from '@internals/shared'
+import { templatePathEscape } from '@internals/utils'
 
 import { text, Url } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -30,7 +31,7 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const returnType = `Cypress.Chainable<${responseType}>`
 
   // Bracket-access the path object with the raw OpenAPI param names, matching the generated `path` type's keys.
-  const urlTemplate = Url.toGroupedTemplateString(node.path, { prefix: baseURL })
+  const urlTemplate = Url.toGroupedTemplateString(templatePathEscape(node.path), { prefix: baseURL })
 
   // `cy.request` has no cookie option, so the cookie group goes out as a `Cookie` header. An array joins with commas, a Date
   // is ISO 8601, and an object is JSON.
