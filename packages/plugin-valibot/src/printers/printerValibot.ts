@@ -1,5 +1,7 @@
 import { ast } from '@internals/ast'
 import {
+  collectDirectionalRefNames as collectDirectionalRefs,
+  containsDirectionalNode as containsDirectional,
   getChecks,
   getObjectKind,
   isComposedObject,
@@ -7,9 +9,9 @@ import {
   preserveRequiredProperties,
   shouldCoerce,
   strictOneOfNode,
+  variesByDirection as probeDirection,
   withFormatRange,
 } from '@internals/shared'
-import * as shared from '@internals/shared'
 import { buildList, buildObject } from '@internals/utils'
 import { createPrinter, text } from '@kubb/kit'
 import {
@@ -130,21 +132,21 @@ const directionalNodes: PrinterValibotNodes = {
 
 // Whether the handler of a node, a `printer.nodes` override or else the built-in, prints differently per direction.
 const varies = (printerOptions: PrinterValibotOptions) => (node: ast.SchemaNode) =>
-  shared.variesByDirection({ node, handler: printerOptions.nodes?.[node.type] ?? directionalNodes[node.type], options: printerOptions })
+  probeDirection({ node, handler: printerOptions.nodes?.[node.type] ?? directionalNodes[node.type], options: printerOptions })
 
 /**
  * Whether the schema contains a node that prints differently per direction, so it decodes on
  * responses and encodes on requests. Follows a `$ref` through its resolved schema.
  */
 export function containsDirectionalNode({ node, printerOptions }: { node: ast.SchemaNode | undefined; printerOptions: PrinterValibotOptions }): boolean {
-  return shared.containsDirectionalNode({ node, varies: varies(printerOptions), cache: printerOptions.directionalCache })
+  return containsDirectional({ node, varies: varies(printerOptions), cache: printerOptions.directionalCache })
 }
 
 /**
  * Names of the `$ref` schemas a request schema reads from their `${name}InputSchema` variant.
  */
 export function collectDirectionalRefNames({ node, printerOptions }: { node: ast.SchemaNode; printerOptions: PrinterValibotOptions }): Array<string> {
-  return shared.collectDirectionalRefNames({ node, contains: (ref) => containsDirectionalNode({ node: ref, printerOptions }) })
+  return collectDirectionalRefs({ node, contains: (ref) => containsDirectionalNode({ node: ref, printerOptions }) })
 }
 
 /**

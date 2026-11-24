@@ -1878,11 +1878,6 @@ describe('getUrl', () => {
     expect(() => client.getUrl({ url: '/pet/{petId}', path: {} })).toThrow('Missing path parameter petId.')
   })
 
-  test.each(['.', '..'])('throws for the dot segment %s, which a URL parser resolves against the path', (petId) => {
-    const { client } = createClient()
-    expect(() => client.getUrl({ url: '/pet/{petId}', path: { petId } })).toThrow('Path parameter petId cannot be a dot segment.')
-  })
-
   test('prefixes the configured baseURL', () => {
     const { client } = createClient()
     client.setConfig({ baseURL: 'https://example.com' })

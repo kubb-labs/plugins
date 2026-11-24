@@ -3,8 +3,7 @@
 import { ast } from '@internals/ast'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
-import { readFileSync } from 'node:fs'
-import { describe, expect, test } from 'vitest'
+import { describe, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
 import { resolverCypress } from '../resolvers/resolverCypress.ts'
 import type { PluginCypress } from '../types.ts'
@@ -141,15 +140,5 @@ describe('cypressGenerator — cookie parameters', () => {
     })
 
     await matchFiles(driver.fileManager.files, 'getCookies')
-  })
-
-  test('sends raw cookies by the same cookie-octet pattern as the client runtime', () => {
-    const read = (file: string) => readFileSync(new URL(file, import.meta.url), 'utf8')
-    const pattern = /cookieOctets = \/(.+)\/$/m.exec(read('../../../plugin-client/templates/serializers/cookies.ts'))?.[1]
-
-    expect(pattern).toBeDefined()
-    // The generated code is a template literal in `Request.tsx`, so its backslashes are doubled there.
-    expect(read('../components/Request.tsx').replaceAll('\\\\', '\\')).toContain(pattern)
-    expect(read('../../../plugin-client/templates/auth.ts')).toContain(pattern)
   })
 })

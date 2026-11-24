@@ -239,8 +239,6 @@ export const printerTs = createPrinter<PrinterTs>((options) => {
       unknown: () => factory.keywordTypeNodes.unknown,
       void: () => factory.keywordTypeNodes.void,
       never: () => factory.keywordTypeNodes.never,
-      // TypeScript has no negated type, so `not` adds nothing to the type.
-      not: () => null,
       boolean: () => factory.keywordTypeNodes.boolean,
       null: () => factory.keywordTypeNodes.null,
       blob: () => factory.createTypeReferenceNode('Blob'),
