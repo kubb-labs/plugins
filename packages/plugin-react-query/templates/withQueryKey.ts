@@ -13,7 +13,7 @@ export function withQueryKey<T extends object, K>(query: T, queryKey: K): T & { 
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
-      get: () => (query as Record<string, unknown>)[key],
+      get: () => Reflect.get(query, key),
     })
   }
 
