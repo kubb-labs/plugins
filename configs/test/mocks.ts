@@ -270,11 +270,7 @@ const formatOptions: Options = {
 
 export async function format(source?: string): Promise<string> {
   if (!source) return ''
-  try {
-    return prettierFormat(source, formatOptions)
-  } catch {
-    return source
-  }
+  return prettierFormat(source, formatOptions)
 }
 
 const parsers = new Map<`.${string}`, any>([['.ts', parserTs()]])

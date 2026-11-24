@@ -19,9 +19,7 @@ on:
   schedule:
     - cron: '17 6 * * 1,4'
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,6 +30,10 @@ jobs:
     name: Generate Studio snapshot
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # The Kubb action pushes a branch, opens a pull request and comments on it.
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

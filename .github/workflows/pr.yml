@@ -156,7 +156,7 @@ jobs:
       - *build
 
       - name: Publish preview packages
-        run: pnpx pkg-pr-new publish --pnpm --owner=stijnvanhulle --repo=https://github.com/kubb-labs/plugins.git './packages/*' --template './examples/*'
+        run: pnpm exec pkg-pr-new publish --pnpm --owner=stijnvanhulle --repo=https://github.com/kubb-labs/plugins.git './packages/*' --template './examples/*'
 
   dependency-diff:
     name: Dependency Diff
@@ -202,7 +202,10 @@ jobs:
     name: Update generated examples
     timeout-minutes: 20
     runs-on: ubuntu-latest
-    if: github.actor != 'github-actions[bot]' && needs.changes.outputs.packages == 'true'
+    # A fork's token cannot open the pull request, so the job has nothing to do there.
+    if: >-
+      github.actor != 'github-actions[bot]' && needs.changes.outputs.packages == 'true' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     needs: [build, changes]
     permissions:
       contents: write
@@ -216,7 +219,6 @@ jobs:
         run: pnpm run generate
 
       - name: Create Pull Request with generated files
-        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8
         with:
           base: ${{ github.head_ref || github.ref_name }}

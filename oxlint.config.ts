@@ -61,11 +61,16 @@ export default defineConfig({
       // Test fixtures build partial or intentionally-invalid mock objects (`{ ... } as GeneratorContext`,
       // `undefined as any`) that a type annotation or `satisfies` cannot express, so assertions and
       // `any` are intentional there. The source rules stay strict.
-      files: ['**/*.test.ts', '**/*.test.tsx'],
+      files: ['**/*.test.ts', '**/*.test.tsx', 'configs/test/mocks.ts'],
       rules: {
         'typescript/consistent-type-assertions': 'off',
         'typescript/no-explicit-any': 'off',
       },
+    },
+    {
+      // The test helpers run without a build, where the workspace package `@internals/ast` has no entry to resolve.
+      files: ['configs/test/mocks.ts'],
+      rules: { 'no-restricted-imports': 'off' },
     },
   ],
 })

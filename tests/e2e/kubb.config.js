@@ -3,9 +3,12 @@ import { parserTs, parserTsx } from '@kubb/parser-ts'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginFaker } from '@kubb/plugin-faker'
+import { pluginMcp } from '@kubb/plugin-mcp'
 import { pluginMsw } from '@kubb/plugin-msw'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
+import { pluginSwr } from '@kubb/plugin-swr'
 import { pluginTs } from '@kubb/plugin-ts'
+import { pluginVueQuery } from '@kubb/plugin-vue-query'
 import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb/config'
 
@@ -120,6 +123,27 @@ const baseConfig = {
     pluginReactQuery({
       output: {
         path: './clients/hooks',
+        mode: 'directory',
+      },
+      group: { type: 'tag' },
+    }),
+    pluginVueQuery({
+      output: {
+        path: './clients/vue',
+        mode: 'directory',
+      },
+      group: { type: 'tag' },
+    }),
+    pluginSwr({
+      output: {
+        path: './clients/swr',
+        mode: 'directory',
+      },
+      group: { type: 'tag' },
+    }),
+    pluginMcp({
+      output: {
+        path: './mcp',
         mode: 'directory',
       },
       group: { type: 'tag' },

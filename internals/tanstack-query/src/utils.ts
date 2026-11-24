@@ -333,6 +333,7 @@ export function classifyOperation(node: ast.HttpOperationNode, { query, mutation
  * it must be self-contained and cannot reference local closures or external variables from
  * the config file.
  */
+// oxlint-disable-next-line typescript/no-explicit-any -- same defaults as `PageParamFn`
 export function definePageParam<TPage = any, TParam = any>(fn: PageParamFn<TPage, TParam>): string {
   return fn.toString()
 }

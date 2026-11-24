@@ -76,7 +76,7 @@ export const isResponseError = core.isResponseError as <TResponses = unknown, TR
 export const defaultTransport = async (request: core.ResolvedRequest): Promise<TransportResult> => {
   const nativeRequest = new Request(request.url, toRequestInit(request))
   // `Request` drops the non-standard `next` field, so Next.js reads it from the init.
-  const nextInit: NativeOptions | undefined = request.options?.next ? { next: request.options.next } : undefined
+  const nextInit: NativeOptions | undefined = request.options?.next ? { next: request.options.next as Record<string, unknown> } : undefined
   const response = await globalThis.fetch(nativeRequest, nextInit)
 
   return { webResponse: response, request: nativeRequest, response }

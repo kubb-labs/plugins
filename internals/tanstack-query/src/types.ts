@@ -128,6 +128,8 @@ export type Infinite = {
   getPreviousPageParam?: string | PageParamFn | null
 }
 
+// The `any` defaults let a config pass `(lastPage) => lastPage.next` without type arguments. `unknown` would reject that.
+// oxlint-disable-next-line typescript/no-explicit-any
 export type PageParamFn<TPage = any, TParam = any> = (
   page: TPage,
   allPages: Array<TPage>,
