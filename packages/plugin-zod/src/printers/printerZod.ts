@@ -2,8 +2,14 @@ import { ast } from '@internals/ast'
 import { lazyGetter, objectKey } from '@internals/utils'
 import { createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { defaultLiteral, hasInputChecks, shouldCoerce } from '@internals/shared'
-import * as shared from '@internals/shared'
+import {
+  collectDirectionalRefNames as collectDirectionalRefs,
+  containsDirectionalNode as containsDirectional,
+  defaultLiteral,
+  hasInputChecks,
+  shouldCoerce,
+  variesByDirection as probeDirection,
+} from '@internals/shared'
 import { applyModifiers, buildObjectShape, lengthConstraints, numberConstraints, patternKeySchema, printWithOmit } from '../utils.ts'
 import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
@@ -227,7 +233,7 @@ const varies =
   ({ printerOptions, mini }: { printerOptions: PrinterZodOptions; mini?: boolean }) =>
   (node: ast.SchemaNode) =>
     !CONTAINER_TYPES.has(node.type) &&
-    shared.variesByDirection({ node, handler: printerOptions.nodes?.[node.type] ?? (mini ? undefined : scalarNodes[node.type]), options: printerOptions })
+    probeDirection({ node, handler: printerOptions.nodes?.[node.type] ?? (mini ? undefined : scalarNodes[node.type]), options: printerOptions })
 
 /**
  * Whether the schema transitively contains a node that prints differently per direction, so it
@@ -245,7 +251,7 @@ export function containsDirectionalNode({
 }): boolean {
   if (mini && !printerOptions.nodes) return false
 
-  return shared.containsDirectionalNode({ node, varies: varies({ printerOptions, mini }), cache: printerOptions.directionalCache })
+  return containsDirectional({ node, varies: varies({ printerOptions, mini }), cache: printerOptions.directionalCache })
 }
 
 /**
@@ -260,7 +266,7 @@ export function collectDirectionalRefNames({
   printerOptions: PrinterZodOptions
   mini?: boolean
 }): Array<string> {
-  return shared.collectDirectionalRefNames({ node, contains: (ref) => containsDirectionalNode({ node: ref, printerOptions, mini }) })
+  return collectDirectionalRefs({ node, contains: (ref) => containsDirectionalNode({ node: ref, printerOptions, mini }) })
 }
 
 /**
