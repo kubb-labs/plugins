@@ -18,7 +18,7 @@ function headerEntries(headers: object): Array<[string, unknown]> {
   return headers instanceof Headers ? [...headers] : Object.entries(headers)
 }
 
-function serializeHeaders(headers: HeadersInit | undefined): Record<string, string> {
+function serializeHeaders(headers: HeadersInit | Headers | undefined): Record<string, string> {
   if (!headers) return {}
   const entries = headerEntries(headers)
   const result: Record<string, string> = {}
@@ -168,7 +168,7 @@ function isEmpty(response: Response, method: string): boolean {
   return [204, 205, 304].includes(response.status) || method === 'HEAD' || !response.body || response.headers.get('Content-Length') === '0'
 }
 
-function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes; serializer?: Serializers }>(config: T, next: T): T {
+function mergeConfig<T extends { headers?: HeadersInit | Headers; mediaTypes?: MediaTypes; serializer?: Serializers }>(config: T, next: T): T {
   return {
     ...config,
     ...next,
