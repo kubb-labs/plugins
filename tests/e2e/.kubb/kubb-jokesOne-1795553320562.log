@@ -1,0 +1,37 @@
+# jokesOne — 2026-11-24T20:48:40.562Z
+
+## Summary
+
+✓ Generation complete with warnings  1.43s
+
+  150 files generated
+  Plugins  11 passed
+  Issues   2 warnings
+  Output   ./gen/jokesOne
+
+Plugin timings
+  plugin-barrel       64ms
+  plugin-faker        64ms
+  plugin-msw          64ms
+  plugin-axios        64ms
+  plugin-zod          64ms
+  plugin-mcp          64ms
+  plugin-cypress      64ms
+  plugin-swr          64ms
+  plugin-vue-query    64ms
+  plugin-react-query  64ms
+  plugin-ts           51ms
+
+## Problems
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "string" to a specific type, so 19 schemas fall back to the base type.
+  at: #/paths/~1jod/get/parameters/0/schema
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "string" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "boolean" to a specific type, so it falls back to the base type.
+  at: #/paths/~1joke~1search/get/parameters/5/schema
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "boolean" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

@@ -1,0 +1,759 @@
+# plaid — 2026-11-24T20:50:03.271Z
+
+## Summary
+
+✓ Generation complete with warnings  13.78s
+
+  11224 files generated
+  Plugins  11 passed
+  Issues   1 warning
+  Output   ./gen/plaid
+
+Plugin timings
+  plugin-barrel       2.65s
+  plugin-faker        2.65s
+  plugin-msw          2.65s
+  plugin-axios        2.65s
+  plugin-mcp          2.65s
+  plugin-cypress      2.65s
+  plugin-zod          2.65s
+  plugin-swr          2.65s
+  plugin-vue-query    2.65s
+  plugin-react-query  2.65s
+  plugin-ts           2.35s
+
+## Problems
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionsGetRequestOptions/properties/include_personal_finance_category_beta
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionsGetRequestOptions/properties/include_personal_finance_category
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionsGetRequestOptions/properties/include_logo_and_counterparty_beta
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionBase/properties/category
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionBase/properties/category_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionBase/properties/name
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionBase/properties/transaction_type
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Transaction/allOf/1/properties/name
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionStream/properties/category
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionStream/properties/category_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionStream/properties/is_user_modified
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionStream/properties/last_user_modified_datetime
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionsRecurringGetRequestOptions/properties/include_personal_finance_category
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionsSyncRequestOptions/properties/include_personal_finance_category
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransactionsSyncRequestOptions/properties/include_logo_and_counterparty_beta
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ProductStatus/properties/status
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/SandboxPublicTokenCreateRequestOptionsTransactions/properties/start_date
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/SandboxPublicTokenCreateRequestOptionsTransactions/properties/end_date
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Security/properties/sedol
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/InvestmentTransaction/properties/cancel_transaction_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ProcessorTransactionsGetRequestOptions/properties/include_personal_finance_category_beta
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ProcessorTransactionsGetRequestOptions/properties/include_personal_finance_category
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ProcessorTransactionsGetRequestOptions/properties/include_logo_and_counterparty_beta
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PSLFStatus
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkSessionCraDocumentUploadResult
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaymentInitiationConsentScope
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ExternalPaymentInitiationConsentOptions
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaymentInitiationConsentCreateRequest/properties/scopes
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaymentInitiationConsent/properties/scopes
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaymentInitiationConsentPaymentExecuteRequest/properties/scope
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenCreateRequestUser/properties/phone_number_verified_time
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenCreateRequestUser/properties/email_address_verified_time
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenCreateRequestUser/properties/ssn
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenEUConfig
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenCreateRequestIncomeVerificationBankIncome/properties/enable_multiple_items
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenCreateRequestIncomeVerification/properties/income_verification_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenCreateRequestBaseReport
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsBaseFicoScore/properties/reason_code_1
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsBaseFicoScore/properties/reason_code_2
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsBaseFicoScore/properties/reason_code_3
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsBaseFicoScore/properties/reason_code_4
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenCreateRequestAuth/properties/database_match_enabled
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenCreateRequestAuth/properties/database_insights_enabled
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenCreateRequestAuth/properties/flow_type
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkTokenCreateRequestDepositSwitch
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkSessionSuccessMetadataAccount/properties/class_type
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkSessionSuccess
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkSessionExitDeprecated
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkSessionResults/properties/cra_document_upload_results
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/BeaconUserStatusUpdatedWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/BeaconReportCreatedWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/BeaconReportUpdatedWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/BeaconReportSyndicationCreatedWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/BeaconDuplicateDetectedWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/SecurityOverride/properties/sedol
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/IncomeBreakdown
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaystubOverridePayPeriodDetails/properties/pay_day
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaystubOverride/properties/income_breakdown
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/BankTransfersEventsUpdateWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferGetRequest/properties/originator_client_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferFailure/properties/ach_return_code
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferAuthorizationGuaranteeDecision
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferAuthorizationGuaranteeDecisionRationale
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferRefundFailure/properties/ach_return_code
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferCreditFundsSource
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Transfer/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Transfer/properties/guarantee_decision
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Transfer/properties/expected_settlement_date
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Transfer/properties/credit_funds_source
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/RecurringTransfer/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferCreateIdempotencyKey
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferUserInRequestDeprecated
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferAuthorizationProposedTransfer/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferAuthorizationProposedTransfer/properties/credit_funds_source
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferAuthorizationCreateRequest/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferAuthorizationCreateRequest/properties/with_guarantee
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferAuthorizationCreateRequest/properties/beacon_session_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferAuthorizationCreateRequest/properties/credit_funds_source
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferCreateRequest/properties/type
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferCreateRequest/properties/network
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferCreateRequest/properties/ach_class
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferCreateRequest/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferCreateRequest/properties/iso_currency_code
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferRecurringCreateRequest/properties/funding_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferRecurringCreateRequest/properties/iso_currency_code
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferAuthorizationPaymentRisk
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferAuthorization/properties/guarantee_decision
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferConfigurationGetResponse/properties/max_single_transfer_amount
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferConfigurationGetResponse/properties/max_monthly_amount
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferMetricsGetResponse/properties/monthly_transfer_volume
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferListRequest/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferCancelRequest/properties/originator_client_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferEventListRequest/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferEvent/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferBalanceGetRequest/properties/originator_client_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferIntentCreateRequest/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferIntentCreate/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TransferIntentGet/properties/origination_account_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/IncomeVerificationPrecheckRequest/properties/transactions_access_token
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/IncomeVerificationPaystubsGetRequest/properties/income_verification_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Pay
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Total
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Deductions/properties/subtotals
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Deductions/properties/totals
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Earnings/properties/subtotals
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Earnings/properties/totals
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaystubAddress/properties/line1
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaystubAddress/properties/line2
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaystubAddress/properties/state_code
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TaxpayerID/properties/last_4_digits
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/EmploymentDetails
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PayPeriodDetails/properties/pay_day
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaystubDetails
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PaystubYTDDetails
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Paystub/properties/income_breakdown
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/IncomeVerificationDocumentsDownloadRequest/properties/income_verification_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/IncomeVerificationTaxformsGetRequest/properties/income_verification_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CreditBankIncomeHistoricalSummary/properties/total_amount
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CreditBankIncomeHistoricalSummary/properties/iso_currency_code
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CreditBankIncomeHistoricalSummary/properties/unofficial_currency_code
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CreditBankIncomeSummary/properties/total_amount
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CreditBankIncomeSummary/properties/iso_currency_code
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CreditBankIncomeSummary/properties/unofficial_currency_code
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/RiskReason
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Enrichments/properties/legacy_category_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Enrichments/properties/legacy_category
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PartnerEndCustomerSecrets/properties/development
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CashFlowUpdatesInsightsWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CashFlowUpdatesNSFWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CashFlowUpdatesNewIncomeStreamWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CashFlowUpdatesExpectedDepositMissedWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CashFlowUpdatesLowBalanceWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CashFlowUpdatesLargeDepositWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CashFlowUpdatesNewLoanPaymentWebhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LinkSessionFinishedWebhook/properties/public_token
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/AssetReportCreateRequestOptions/properties/include_fast_report
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/AssetReportCreateRequestOptions/properties/products
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/AssetReportTransaction/properties/name
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TotalMonthlyIncomeInsights/properties/baseline_amount
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/IncomeSourcesCounts/properties/baseline_count
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ForecastedMonthlyIncome/properties/baseline_amount
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/HistoricalAnnualIncome/properties/baseline_amount
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LoanPaymentsCounts/properties/baseline_count
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LoanPaymentsMerchantCounts/properties/baseline_count
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ConsumerDispute/properties/consumer_dispute_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/BaseReportTransaction/properties/name
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/BaseReportAccountInsights
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/BeaconUserIDNullable
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/DeprecatedClientUserID
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraCheckReportIncomeInsightsGetOptions
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraBankIncomeTransaction/properties/name
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraCheckReportCreateBaseReportOptions/properties/client_report_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsUltraFicoScore/properties/reason_code_1
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsUltraFicoScore/properties/reason_code_2
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsUltraFicoScore/properties/reason_code_3
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsUltraFicoScore/properties/reason_code_4
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsUltraFicoScore/properties/positive_reason_code_1
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsUltraFicoScore/properties/positive_reason_code_2
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsUltraFicoScore/properties/positive_reason_code_3
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraPartnerInsightsUltraFicoScore/properties/positive_reason_code_4
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PrismInsights/properties/version
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PrismCashScore/properties/version
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PrismFirstDetect/properties/version
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraCheckReportPartnerInsightsGetPartnerInsights
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/PrismVersionsDeprecated
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraCheckReportPartnerInsightsGetOptions
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraCheckReportCashflowInsightsGetOptions
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraCheckReportLendScoreGetOptions
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraCheckReportNetworkInsightsGetOptions
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraCheckReportVerificationGetEmploymentRefreshOptions
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraCheckReportVerificationPdfGetRequest/properties/report_requested
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CraReportGetBaseReportTransaction/properties/name
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ItemImportRequestUserAuth/properties/auth_token
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ItemImportRequestOptions
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ItemImportRequestOptions/properties/webhook
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/SignalEvaluateRequest/properties/user_present
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/SignalEvaluateRequest/properties/risk_profile_key
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CustomerInitiatedRiskTier
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/BankInitiatedRiskTier
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/RiskProfile
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/Ruleset/properties/outcome
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ProtectClientSessionStartData
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "cognito_id" to a specific type, so it falls back to the base type.
+  at: #/components/schemas/BusinessVerificationID
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "cognito_id" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

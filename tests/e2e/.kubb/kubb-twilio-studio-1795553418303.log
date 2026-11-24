@@ -1,0 +1,37 @@
+# twilio-studio — 2026-11-24T20:50:18.303Z
+
+## Summary
+
+✓ Generation complete with warnings  1.72s
+
+  243 files generated
+  Plugins  11 passed
+  Issues   2 warnings
+  Output   ./gen/twilio-studio
+
+Plugin timings
+  plugin-barrel       98ms
+  plugin-faker        98ms
+  plugin-msw          98ms
+  plugin-mcp          98ms
+  plugin-axios        98ms
+  plugin-zod          98ms
+  plugin-cypress      98ms
+  plugin-swr          98ms
+  plugin-vue-query    98ms
+  plugin-react-query  98ms
+  plugin-ts           86ms
+
+## Problems
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "uri-map" to a specific type, so 3 schemas fall back to the base type.
+  at: #/components/schemas/studio.v2.flow.execution/properties/links
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "uri-map" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "phone-number" to a specific type, so 2 schemas fall back to the base type.
+  at: #/paths/~1v2~1Flows~1{FlowSid}~1Executions/post/requestBody/content/application~1x-www-form-urlencoded/schema/properties/To
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "phone-number" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

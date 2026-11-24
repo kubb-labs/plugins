@@ -1,0 +1,51 @@
+# aws-s3 — 2026-11-24T20:51:14.058Z
+
+## Summary
+
+✓ Generation complete with warnings  3.98s
+
+  2717 files generated
+  Plugins  11 passed
+  Issues   1 warning
+  Output   ./gen/aws-s3
+
+Plugin timings
+  plugin-msw          606ms
+  plugin-barrel       606ms
+  plugin-faker        606ms
+  plugin-mcp          606ms
+  plugin-axios        606ms
+  plugin-zod          606ms
+  plugin-cypress      606ms
+  plugin-swr          606ms
+  plugin-vue-query    606ms
+  plugin-react-query  606ms
+  plugin-ts           514ms
+
+## Problems
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/LifecycleRule/properties/Prefix
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/TopicConfigurationDeprecated/properties/Event
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/QueueConfigurationDeprecated/properties/Event
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CloudFunctionConfiguration/properties/Event
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ReplicationRule/properties/Prefix
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "password" to a specific type, so 24 schemas fall back to the base type.
+  at: #/components/schemas/SSEKMSKeyId
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "password" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

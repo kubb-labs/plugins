@@ -1,0 +1,22 @@
+# box — 2026-11-24T20:48:48.535Z
+
+## Summary
+
+✓ Generation complete  2.12s
+
+  615 files generated
+  Plugins  11 passed
+  Output   ./gen/box
+
+Plugin timings
+  plugin-msw          216ms
+  plugin-barrel       216ms
+  plugin-axios        216ms
+  plugin-faker        216ms
+  plugin-zod          216ms
+  plugin-mcp          216ms
+  plugin-swr          216ms
+  plugin-cypress      216ms
+  plugin-vue-query    216ms
+  plugin-react-query  216ms
+  plugin-ts           193ms

@@ -1,0 +1,87 @@
+# asana — 2026-11-24T20:49:41.816Z
+
+## Summary
+
+✓ Generation complete with warnings  7.63s
+
+  3638 files generated
+  Plugins  11 passed
+  Issues   1 warning
+  Output   ./gen/asana
+
+Plugin timings
+  plugin-msw          1.59s
+  plugin-barrel       1.59s
+  plugin-faker        1.59s
+  plugin-mcp          1.59s
+  plugin-axios        1.59s
+  plugin-zod          1.59s
+  plugin-swr          1.59s
+  plugin-cypress      1.59s
+  plugin-vue-query    1.59s
+  plugin-react-query  1.59s
+  plugin-ts           1.40s
+
+## Problems
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/GoalMembershipBase/properties/role
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/GoalMembershipBase/properties/goal/allOf/1
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/GoalMembershipCompact/allOf/1/properties/is_commenter
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/GoalMembershipCompact/allOf/1/properties/is_editor
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ProjectBase/allOf/1/properties/public
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ProjectRequest/allOf/1/properties/team
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ProjectUpdateRequest/allOf/1/properties/team
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ProjectTemplateInstantiateProjectRequest/properties/public
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/WorkspaceMembershipResponse/allOf/1/properties/vacation_dates
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/WorkspaceMembershipResponse/allOf/1/properties/vacation_dates/properties/start_on
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/WorkspaceMembershipResponse/allOf/1/properties/vacation_dates/properties/end_on
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/GoalMembershipResponse/allOf/1/properties/user/allOf/1
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/GoalMembershipResponse/allOf/1/properties/workspace/allOf/1
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CreateMembershipRequest/allOf/1/properties/role
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "id" to a specific type, so 2 schemas fall back to the base type.
+  at: #/paths/~1workspaces~1{workspace_gid}~1ai_studio~1runs/parameters/3/schema
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "id" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

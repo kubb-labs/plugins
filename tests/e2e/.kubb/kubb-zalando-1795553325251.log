@@ -1,0 +1,22 @@
+# zalando — 2026-11-24T20:48:45.250Z
+
+## Summary
+
+✓ Generation complete  1.67s
+
+  303 files generated
+  Plugins  11 passed
+  Output   ./gen/zalando
+
+Plugin timings
+  plugin-barrel       120ms
+  plugin-faker        120ms
+  plugin-msw          120ms
+  plugin-axios        120ms
+  plugin-zod          120ms
+  plugin-mcp          120ms
+  plugin-cypress      120ms
+  plugin-swr          120ms
+  plugin-vue-query    120ms
+  plugin-react-query  120ms
+  plugin-ts           108ms

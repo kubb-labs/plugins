@@ -1,0 +1,22 @@
+# callback-example — 2026-11-24T20:50:43.835Z
+
+## Summary
+
+✓ Generation complete  1.09s
+
+  25 files generated
+  Plugins  11 passed
+  Output   ./gen/callback-example
+
+Plugin timings
+  plugin-barrel       4ms
+  plugin-faker        4ms
+  plugin-msw          4ms
+  plugin-mcp          4ms
+  plugin-axios        4ms
+  plugin-cypress      4ms
+  plugin-zod          4ms
+  plugin-swr          4ms
+  plugin-vue-query    4ms
+  plugin-react-query  4ms
+  plugin-ts           3ms

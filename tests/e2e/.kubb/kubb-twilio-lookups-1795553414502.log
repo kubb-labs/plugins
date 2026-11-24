@@ -1,0 +1,37 @@
+# twilio-lookups — 2026-11-24T20:50:14.502Z
+
+## Summary
+
+✓ Generation complete with warnings  1.64s
+
+  190 files generated
+  Plugins  11 passed
+  Issues   2 warnings
+  Output   ./gen/twilio-lookups
+
+Plugin timings
+  plugin-barrel       59ms
+  plugin-msw          59ms
+  plugin-axios        59ms
+  plugin-faker        59ms
+  plugin-mcp          59ms
+  plugin-cypress      59ms
+  plugin-zod          59ms
+  plugin-swr          59ms
+  plugin-vue-query    59ms
+  plugin-react-query  59ms
+  plugin-ts           53ms
+
+## Problems
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "phone-number" to a specific type, so it falls back to the base type.
+  at: #/components/schemas/LookupResponse/properties/phone_number
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "phone-number" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "iso-country-code" to a specific type, so it falls back to the base type.
+  at: #/paths/~1v2~1PhoneNumbers~1{PhoneNumber}/get/parameters/10/schema
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "iso-country-code" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

@@ -1,0 +1,56 @@
+# Figma — 2026-11-24T20:48:16.548Z
+
+## Summary
+
+✓ Generation complete  4.44s
+
+  1514 files generated
+  Plugins  11 passed
+  Output   ./gen/Figma
+
+Plugin timings
+  plugin-barrel       621ms
+  plugin-msw          621ms
+  plugin-axios        621ms
+  plugin-faker        621ms
+  plugin-mcp          621ms
+  plugin-zod          621ms
+  plugin-cypress      621ms
+  plugin-swr          621ms
+  plugin-vue-query    621ms
+  plugin-react-query  621ms
+  plugin-ts           559ms
+
+## Problems
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/IsLayerTrait/properties/isFixed
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/HasMaskTrait/properties/isMaskOutline
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/HasFramePropertiesTrait/properties/background
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/HasFramePropertiesTrait/properties/backgroundColor
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/CanvasNode/allOf/0/properties/prototypeStartNodeID
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/FrameInfo/properties/containingStateGroup
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/WebhookV2/properties/team_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/paths/~1v2~1webhooks/post/requestBody/content/application~1json/schema/properties/team_id
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated

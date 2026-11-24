@@ -1,0 +1,22 @@
+# google-calendar — 2026-11-24T20:50:55.687Z
+
+## Summary
+
+✓ Generation complete  2.09s
+
+  493 files generated
+  Plugins  11 passed
+  Output   ./gen/google-calendar
+
+Plugin timings
+  plugin-barrel       184ms
+  plugin-faker        184ms
+  plugin-msw          184ms
+  plugin-mcp          184ms
+  plugin-axios        184ms
+  plugin-react-query  184ms
+  plugin-zod          184ms
+  plugin-swr          184ms
+  plugin-cypress      184ms
+  plugin-vue-query    184ms
+  plugin-ts           168ms

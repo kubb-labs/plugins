@@ -1,0 +1,22 @@
+# api-with-examples — 2026-11-24T20:50:41.214Z
+
+## Summary
+
+✓ Generation complete  1.29s
+
+  35 files generated
+  Plugins  11 passed
+  Output   ./gen/api-with-examples
+
+Plugin timings
+  plugin-barrel       7ms
+  plugin-faker        7ms
+  plugin-msw          7ms
+  plugin-axios        7ms
+  plugin-zod          7ms
+  plugin-mcp          7ms
+  plugin-cypress      7ms
+  plugin-swr          7ms
+  plugin-vue-query    7ms
+  plugin-react-query  7ms
+  plugin-ts           5ms

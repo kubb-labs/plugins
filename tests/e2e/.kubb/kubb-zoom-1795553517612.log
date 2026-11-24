@@ -1,0 +1,37 @@
+# zoom — 2026-11-24T20:51:57.612Z
+
+## Summary
+
+✓ Generation complete with warnings  10.61s
+
+  4160 files generated
+  Plugins  11 passed
+  Issues   2 warnings
+  Output   ./gen/zoom
+
+Plugin timings
+  plugin-barrel       1.83s
+  plugin-faker        1.83s
+  plugin-msw          1.83s
+  plugin-axios        1.83s
+  plugin-zod          1.83s
+  plugin-mcp          1.83s
+  plugin-cypress      1.83s
+  plugin-swr          1.83s
+  plugin-vue-query    1.83s
+  plugin-react-query  1.83s
+  plugin-ts           1.66s
+
+## Problems
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "string" to a specific type, so 11 schemas fall back to the base type.
+  at: #/components/schemas/MeetingRegistrantList/allOf/1/properties/registrants/items/allOf/2/properties/join_url
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "string" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "password" to a specific type, so 2 schemas fall back to the base type.
+  at: #/paths/~1users/post/requestBody/content/application~1json/schema/properties/user_info/properties/password
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "password" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

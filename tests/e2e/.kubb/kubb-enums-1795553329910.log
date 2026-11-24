@@ -1,0 +1,22 @@
+# enums — 2026-11-24T20:48:49.910Z
+
+## Summary
+
+✓ Generation complete  1.37s
+
+  177 files generated
+  Plugins  11 passed
+  Output   ./gen/enums
+
+Plugin timings
+  plugin-msw          63ms
+  plugin-barrel       63ms
+  plugin-faker        63ms
+  plugin-mcp          63ms
+  plugin-axios        63ms
+  plugin-cypress      63ms
+  plugin-zod          63ms
+  plugin-swr          63ms
+  plugin-vue-query    63ms
+  plugin-react-query  63ms
+  plugin-ts           58ms

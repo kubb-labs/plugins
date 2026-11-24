@@ -1,0 +1,22 @@
+# readme.io — 2026-11-24T20:48:42.183Z
+
+## Summary
+
+✓ Generation complete  1.62s
+
+  339 files generated
+  Plugins  11 passed
+  Output   ./gen/readme.io
+
+Plugin timings
+  plugin-barrel       98ms
+  plugin-faker        98ms
+  plugin-msw          98ms
+  plugin-axios        98ms
+  plugin-zod          98ms
+  plugin-mcp          98ms
+  plugin-cypress      98ms
+  plugin-vue-query    98ms
+  plugin-swr          98ms
+  plugin-react-query  98ms
+  plugin-ts           88ms

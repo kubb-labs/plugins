@@ -1,0 +1,22 @@
+# oai-petstore — 2026-11-24T20:50:38.581Z
+
+## Summary
+
+✓ Generation complete  1.46s
+
+  54 files generated
+  Plugins  11 passed
+  Output   ./gen/oai-petstore
+
+Plugin timings
+  plugin-barrel       13ms
+  plugin-msw          13ms
+  plugin-axios        13ms
+  plugin-faker        13ms
+  plugin-mcp          13ms
+  plugin-zod          13ms
+  plugin-cypress      13ms
+  plugin-swr          13ms
+  plugin-vue-query    13ms
+  plugin-react-query  13ms
+  plugin-ts           11ms

@@ -1,0 +1,22 @@
+# discriminator — 2026-11-24T20:48:20.906Z
+
+## Summary
+
+✓ Generation complete  812ms
+
+  102 files generated
+  Plugins  11 passed
+  Output   ./gen/discriminator
+
+Plugin timings
+  plugin-barrel       14ms
+  plugin-faker        14ms
+  plugin-msw          14ms
+  plugin-axios        14ms
+  plugin-zod          14ms
+  plugin-mcp          14ms
+  plugin-cypress      14ms
+  plugin-swr          14ms
+  plugin-vue-query    14ms
+  plugin-react-query  14ms
+  plugin-ts           12ms

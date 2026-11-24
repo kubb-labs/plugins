@@ -1,0 +1,37 @@
+# discord — 2026-11-24T20:50:32.059Z
+
+## Summary
+
+✓ Generation complete with warnings  7.59s
+
+  4144 files generated
+  Plugins  11 passed
+  Issues   2 warnings
+  Output   ./gen/discord
+
+Plugin timings
+  plugin-barrel       1.31s
+  plugin-faker        1.31s
+  plugin-msw          1.31s
+  plugin-axios        1.31s
+  plugin-zod          1.31s
+  plugin-mcp          1.31s
+  plugin-cypress      1.31s
+  plugin-swr          1.31s
+  plugin-vue-query    1.31s
+  plugin-react-query  1.31s
+  plugin-ts           1.15s
+
+## Problems
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "snowflake" to a specific type, so it falls back to the base type.
+  at: #/components/schemas/SnowflakeType
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "snowflake" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "nonce" to a specific type, so 5 schemas fall back to the base type.
+  at: #/components/schemas/BasicMessageResponse/properties/nonce/oneOf/1
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "nonce" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

@@ -1,0 +1,31 @@
+# twilio-conversations — 2026-11-24T20:50:21.485Z
+
+## Summary
+
+✓ Generation complete with warnings  3.18s
+
+  1261 files generated
+  Plugins  11 passed
+  Issues   1 warning
+  Output   ./gen/twilio-conversations
+
+Plugin timings
+  plugin-msw          424ms
+  plugin-barrel       424ms
+  plugin-faker        424ms
+  plugin-mcp          424ms
+  plugin-axios        424ms
+  plugin-zod          424ms
+  plugin-cypress      424ms
+  plugin-vue-query    424ms
+  plugin-swr          424ms
+  plugin-react-query  424ms
+  plugin-ts           353ms
+
+## Problems
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "uri-map" to a specific type, so 15 schemas fall back to the base type.
+  at: #/components/schemas/conversations.v1.configuration/properties/links
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "uri-map" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

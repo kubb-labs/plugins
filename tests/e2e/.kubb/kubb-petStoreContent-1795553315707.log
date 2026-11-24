@@ -1,0 +1,22 @@
+# petStoreContent — 2026-11-24T20:48:35.707Z
+
+## Summary
+
+✓ Generation complete  1.63s
+
+  244 files generated
+  Plugins  11 passed
+  Output   ./gen/petStoreContent
+
+Plugin timings
+  plugin-barrel       94ms
+  plugin-msw          94ms
+  plugin-faker        94ms
+  plugin-axios        94ms
+  plugin-mcp          94ms
+  plugin-zod          94ms
+  plugin-cypress      94ms
+  plugin-swr          94ms
+  plugin-vue-query    94ms
+  plugin-react-query  94ms
+  plugin-ts           83ms

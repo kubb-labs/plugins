@@ -1,0 +1,22 @@
+# notion — 2026-11-24T20:50:53.597Z
+
+## Summary
+
+✓ Generation complete  1.86s
+
+  148 files generated
+  Plugins  11 passed
+  Output   ./gen/notion
+
+Plugin timings
+  plugin-barrel       147ms
+  plugin-faker        147ms
+  plugin-msw          147ms
+  plugin-axios        147ms
+  plugin-zod          147ms
+  plugin-mcp          147ms
+  plugin-cypress      146ms
+  plugin-swr          146ms
+  plugin-vue-query    146ms
+  plugin-react-query  146ms
+  plugin-ts           134ms

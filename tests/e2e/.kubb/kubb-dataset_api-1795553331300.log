@@ -1,0 +1,22 @@
+# dataset_api — 2026-11-24T20:48:51.300Z
+
+## Summary
+
+✓ Generation complete  1.39s
+
+  60 files generated
+  Plugins  11 passed
+  Output   ./gen/dataset_api
+
+Plugin timings
+  plugin-msw          13ms
+  plugin-barrel       13ms
+  plugin-axios        13ms
+  plugin-faker        13ms
+  plugin-zod          13ms
+  plugin-mcp          13ms
+  plugin-cypress      13ms
+  plugin-vue-query    13ms
+  plugin-swr          13ms
+  plugin-react-query  13ms
+  plugin-ts           12ms

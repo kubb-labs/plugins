@@ -1,0 +1,31 @@
+# train-travel — 2026-11-24T20:48:12.099Z
+
+## Summary
+
+✓ Generation complete with warnings  1.94s
+
+  118 files generated
+  Plugins  11 passed
+  Issues   1 warning
+  Output   ./gen/train-travel
+
+Plugin timings
+  plugin-barrel       193ms
+  plugin-msw          193ms
+  plugin-faker        193ms
+  plugin-axios        193ms
+  plugin-mcp          192ms
+  plugin-zod          192ms
+  plugin-cypress      192ms
+  plugin-swr          192ms
+  plugin-vue-query    192ms
+  plugin-react-query  192ms
+  plugin-ts           179ms
+
+## Problems
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "iso-country-code" to a specific type, so 2 schemas fall back to the base type.
+  at: #/components/schemas/Station/properties/country_code
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "iso-country-code" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

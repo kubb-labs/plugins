@@ -1,0 +1,85 @@
+# twilio-api — 2026-11-24T20:50:08.113Z
+
+## Summary
+
+✓ Generation complete with warnings  4.84s
+
+  2437 files generated
+  Plugins  11 passed
+  Issues   10 warnings
+  Output   ./gen/twilio-api
+
+Plugin timings
+  plugin-barrel       781ms
+  plugin-msw          781ms
+  plugin-axios        781ms
+  plugin-faker        781ms
+  plugin-mcp          781ms
+  plugin-zod          781ms
+  plugin-cypress      781ms
+  plugin-swr          781ms
+  plugin-vue-query    781ms
+  plugin-react-query  781ms
+  plugin-ts           702ms
+
+## Problems
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "date-time-rfc-2822" to a specific type, so 110 schemas fall back to the base type.
+  at: #/components/schemas/api.v2010.account/properties/date_created
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "date-time-rfc-2822" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "uri-map" to a specific type, so 21 schemas fall back to the base type.
+  at: #/components/schemas/api.v2010.account/properties/subresource_uris
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "uri-map" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "iso-country-code" to a specific type, so 19 schemas fall back to the base type.
+  at: #/components/schemas/api.v2010.account.address/properties/iso_country
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "iso-country-code" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "http-method" to a specific type, so 112 schemas fall back to the base type.
+  at: #/components/schemas/api.v2010.account.application/properties/sms_fallback_method
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "http-method" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "phone-number" to a specific type, so 48 schemas fall back to the base type.
+  at: #/components/schemas/api.v2010.account.available_phone_number_country.available_phone_number_local/properties/friendly_name
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "phone-number" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "phone-number-capabilities" to a specific type, so 11 schemas fall back to the base type.
+  at: #/components/schemas/api.v2010.account.available_phone_number_country.available_phone_number_local/properties/capabilities
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "phone-number-capabilities" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "currency" to a specific type, so 15 schemas fall back to the base type.
+  at: #/components/schemas/api.v2010.account.call/properties/price_unit
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "currency" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "ice-server" to a specific type, so it falls back to the base type.
+  at: #/components/schemas/api.v2010.account.token/properties/ice_servers/items
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "ice-server" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "endpoint" to a specific type, so 4 schemas fall back to the base type.
+  at: #/paths/~12010-04-01~1Accounts~1{AccountSid}~1Calls.json/post/requestBody/content/application~1x-www-form-urlencoded/schema/properties/To
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "endpoint" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "twiml" to a specific type, so 2 schemas fall back to the base type.
+  at: #/paths/~12010-04-01~1Accounts~1{AccountSid}~1Calls.json/post/requestBody/content/application~1x-www-form-urlencoded/schema/properties/Twiml
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "twiml" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

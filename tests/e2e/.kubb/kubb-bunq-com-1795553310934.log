@@ -1,0 +1,22 @@
+# bunq.com — 2026-11-24T20:48:30.933Z
+
+## Summary
+
+✓ Generation complete  10.03s
+
+  6080 files generated
+  Plugins  11 passed
+  Output   ./gen/bunq.com
+
+Plugin timings
+  plugin-barrel       2.25s
+  plugin-msw          2.25s
+  plugin-axios        2.25s
+  plugin-faker        2.25s
+  plugin-mcp          2.25s
+  plugin-zod          2.25s
+  plugin-cypress      2.25s
+  plugin-swr          2.25s
+  plugin-vue-query    2.25s
+  plugin-react-query  2.25s
+  plugin-ts           2.01s

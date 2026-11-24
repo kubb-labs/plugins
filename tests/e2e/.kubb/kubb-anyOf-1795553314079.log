@@ -1,0 +1,22 @@
+# anyOf — 2026-11-24T20:48:34.079Z
+
+## Summary
+
+✓ Generation complete  1.08s
+
+  43 files generated
+  Plugins  11 passed
+  Output   ./gen/anyOf
+
+Plugin timings
+  plugin-msw          9ms
+  plugin-barrel       9ms
+  plugin-axios        9ms
+  plugin-faker        9ms
+  plugin-mcp          9ms
+  plugin-cypress      9ms
+  plugin-zod          9ms
+  plugin-swr          9ms
+  plugin-vue-query    9ms
+  plugin-react-query  9ms
+  plugin-ts           8ms

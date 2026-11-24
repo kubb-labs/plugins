@@ -1,0 +1,22 @@
+# swagger-petstore — 2026-11-24T20:50:47.325Z
+
+## Summary
+
+✓ Generation complete  1.48s
+
+  228 files generated
+  Plugins  11 passed
+  Output   ./gen/swagger-petstore
+
+Plugin timings
+  plugin-barrel       89ms
+  plugin-faker        89ms
+  plugin-msw          89ms
+  plugin-axios        89ms
+  plugin-zod          89ms
+  plugin-mcp          89ms
+  plugin-cypress      89ms
+  plugin-swr          89ms
+  plugin-vue-query    89ms
+  plugin-react-query  89ms
+  plugin-ts           78ms

@@ -1,0 +1,35 @@
+# aws-ec2 — 2026-11-24T20:51:46.998Z
+
+## Summary
+
+✓ Generation complete with warnings  30.03s
+
+  20968 files generated
+  Plugins  11 passed
+  Issues   1 warning
+  Output   ./gen/aws-ec2
+
+Plugin timings
+  plugin-barrel       6.83s
+  plugin-msw          6.83s
+  plugin-faker        6.83s
+  plugin-axios        6.83s
+  plugin-mcp          6.83s
+  plugin-zod          6.83s
+  plugin-swr          6.83s
+  plugin-cypress      6.83s
+  plugin-vue-query    6.83s
+  plugin-react-query  6.83s
+  plugin-ts           5.89s
+
+## Problems
+
+info KUBB_DEPRECATED: This schema is marked as deprecated.
+  at: #/components/schemas/ClientVpnEndpoint/properties/AssociatedTargetNetworks/allOf/1
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-deprecated
+
+warning KUBB_UNSUPPORTED_FORMAT: Kubb does not map the format "password" to a specific type, so 11 schemas fall back to the base type.
+  at: #/components/schemas/ClientSecretType
+  why: A schema uses a `format` Kubb does not map to a specific type, so it falls back to the base type.
+  fix: Use a format Kubb supports, or handle "password" with a custom parser or plugin.
+  docs: https://kubb.dev/docs/5.x/reference/diagnostics#kubb-unsupported-format

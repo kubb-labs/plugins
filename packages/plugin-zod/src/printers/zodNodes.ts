@@ -169,7 +169,7 @@ function narrowEnums(object: ast.ObjectSchemaNode | null, earlier: ReadonlyArray
   if (!object) return object
   const properties = object.properties.map((property) => {
     const node = ast.schema.narrow(property.schema, ast.schema.types.enum)
-    if (!node) return property
+    if (!node || ast.schema.getLiterals(node).length === 0) return property
     const allowed = earlier
       .flatMap((member) => ast.schema.findProperties({ node: member, propertyName: property.name }))
       .map(({ schema }) => ast.schema.getLiterals(ast.ref.mergeSchema(schema)))
@@ -177,8 +177,8 @@ function narrowEnums(object: ast.ObjectSchemaNode | null, earlier: ReadonlyArray
     const isAllowed = (value: string | number | boolean | null) => allowed.every((values) => values.includes(value))
     const enumValues = node.enumValues?.filter(isAllowed)
     const namedEnumValues = node.namedEnumValues?.filter(({ value }) => isAllowed(value))
-    // No shared value means the spec contradicts itself, so the member is printed as declared.
-    if (!(namedEnumValues ?? enumValues)?.length) return property
+    // No shared value means no value satisfies every member, like `never` in the TypeScript intersection.
+    if (!(namedEnumValues ?? enumValues)?.length) return { ...property, schema: ast.factory.createSchema({ type: 'never' }) }
     return { ...property, schema: { ...node, enumValues, namedEnumValues } }
   })
   return { ...object, properties }

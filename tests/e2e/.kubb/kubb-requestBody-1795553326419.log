@@ -1,0 +1,22 @@
+# requestBody — 2026-11-24T20:48:46.418Z
+
+## Summary
+
+✓ Generation complete  1.17s
+
+  31 files generated
+  Plugins  11 passed
+  Output   ./gen/requestBody
+
+Plugin timings
+  plugin-barrel       6ms
+  plugin-msw          6ms
+  plugin-axios        6ms
+  plugin-faker        6ms
+  plugin-mcp          6ms
+  plugin-zod          6ms
+  plugin-swr          6ms
+  plugin-cypress      6ms
+  plugin-vue-query    6ms
+  plugin-react-query  6ms
+  plugin-ts           5ms

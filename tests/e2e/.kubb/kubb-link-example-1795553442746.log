@@ -1,0 +1,22 @@
+# link-example — 2026-11-24T20:50:42.746Z
+
+## Summary
+
+✓ Generation complete  1.53s
+
+  84 files generated
+  Plugins  11 passed
+  Output   ./gen/link-example
+
+Plugin timings
+  plugin-msw          19ms
+  plugin-barrel       19ms
+  plugin-faker        19ms
+  plugin-mcp          19ms
+  plugin-axios        19ms
+  plugin-cypress      19ms
+  plugin-zod          19ms
+  plugin-swr          19ms
+  plugin-vue-query    19ms
+  plugin-react-query  19ms
+  plugin-ts           16ms

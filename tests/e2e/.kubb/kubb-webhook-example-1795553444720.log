@@ -1,0 +1,22 @@
+# webhook-example — 2026-11-24T20:50:44.720Z
+
+## Summary
+
+✓ Generation complete  883ms
+
+  18 files generated
+  Plugins  11 passed
+  Output   ./gen/webhook-example
+
+Plugin timings
+  plugin-barrel       1ms
+  plugin-faker        1ms
+  plugin-msw          1ms
+  plugin-mcp          1ms
+  plugin-axios        1ms
+  plugin-zod          1ms
+  plugin-swr          1ms
+  plugin-cypress      1ms
+  plugin-vue-query    1ms
+  plugin-react-query  1ms
+  plugin-ts           1ms
