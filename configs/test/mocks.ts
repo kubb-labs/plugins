@@ -17,8 +17,7 @@ import type {
   PluginType,
   Template,
 } from '@kubb/kit'
-import { ast } from '@internals/ast'
-import { casing, Diagnostics, file, from, Hookable, memo, memoryStorage, withContext } from '@kubb/kit'
+import { ast, casing, Diagnostics, file, from, Hookable, memo, memoryStorage, withContext } from '@kubb/kit'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'

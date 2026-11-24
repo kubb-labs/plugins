@@ -67,5 +67,10 @@ export default defineConfig({
         'typescript/no-explicit-any': 'off',
       },
     },
+    {
+      // The test helpers run without a build, where the workspace package `@internals/ast` has no entry to resolve.
+      files: ['configs/test/mocks.ts'],
+      rules: { 'no-restricted-imports': 'off' },
+    },
   ],
 })
