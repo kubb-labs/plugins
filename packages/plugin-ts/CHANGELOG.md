@@ -1,5 +1,11 @@
 # @kubb/plugin-ts
 
+## 5.7.2
+
+### Patch Changes
+
+- [#1586](https://github.com/kubb-labs/plugins/pull/1586) [`2bf2727`](https://github.com/kubb-labs/plugins/commit/2bf272702edceb51b20328420648f7cc5bcfa0c9) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `| null` to index signatures when an `additionalProperties` value schema is nullable, such as `type: ['integer', 'null']`. Before, `{ [key: string]: number }` rejected valid `null` values.
+
 ## 5.7.1
 
 ### Patch Changes
