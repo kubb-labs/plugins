@@ -107,15 +107,7 @@ export function jsDocEscape(input: unknown): string {
   return `${input}`.replace(/^(\s*)@/gm, '$1\\@')
 }
 
-/**
- * Escapes the literal segments of an OpenAPI path for use inside a template literal, so a backslash,
- * backtick or `$` from the spec stays text. `{param}` placeholders are left as they are.
- *
- * @example
- * ```ts
- * templatePathEscape('/a`b/{id}') // '/a\\`b/{id}'
- * ```
- */
+// Escapes the literal segments of an OpenAPI path for a template literal, and keeps the `{param}` placeholders.
 export function templatePathEscape(path: string): string {
   return path
     .split(/(\{[^}]+\})/)
