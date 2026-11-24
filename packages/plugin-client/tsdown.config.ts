@@ -1,8 +1,8 @@
 import { defineConfig } from 'tsdown'
-import { pluginBuilds } from '../../configs/tsdown.ts'
+import { packageBuilds } from '../../configs/tsdown.ts'
 
 export default defineConfig([
-  ...pluginBuilds(),
+  ...packageBuilds(),
   {
     // Declarations for the raw templates so consumers can import their types without `allowImportingTsExtensions`.
     entry: {
