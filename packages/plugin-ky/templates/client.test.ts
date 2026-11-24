@@ -82,7 +82,7 @@ describe('defaultTransport', () => {
 
   test('passes Ky options from the call, such as timeout and hooks', async () => {
     const seen: Array<string> = []
-    await client({ method: 'GET', url: '/hooked', options: { hooks: { beforeRequest: [({ request }) => void seen.push(request.url)] } } })
+    await client({ method: 'GET', url: '/hooked', options: { hooks: { beforeRequest: [({ request }: { request: Request }) => void seen.push(request.url)] } } })
 
     expect(seen).toEqual([`${baseURL}/hooked`])
     await expect(client({ method: 'GET', url: '/slow', options: { timeout: 50, retry: 0 } })).rejects.toMatchObject({ name: 'TimeoutError' })

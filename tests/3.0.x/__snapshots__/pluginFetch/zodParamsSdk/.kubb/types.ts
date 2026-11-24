@@ -403,7 +403,7 @@ export type StreamOptions<TData extends DataShape, ThrowOnError extends boolean 
  */
 export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = {
   baseURL?: string
-  headers?: HeadersInit
+  headers?: HeadersInit | Headers
   credentials?: RequestCredentials
   options?: NativeOptions
   throwOnError?: boolean
@@ -482,8 +482,18 @@ export type InterceptorStack<T, TContext = never, TResult = T> = {
 }
 
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = {
-  request: InterceptorStack<ResolvedRequest, RequestConfig<unknown, TRequest, TResponse>>
-  response: InterceptorStack<DecodedResponse<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
+  /**
+   * Sees the resolved request before it is sent. Return a request to replace it, or nothing to keep it.
+   */
+  request: InterceptorStack<ResolvedRequest, RequestConfig<unknown, TRequest, TResponse>, ResolvedRequest | void>
+  /**
+   * Sees the decoded response. Return a response to replace it, or nothing to keep it.
+   */
+  response: InterceptorStack<
+    DecodedResponse<unknown, TRequest, TResponse>,
+    RequestConfig<unknown, TRequest, TResponse>,
+    DecodedResponse<unknown, TRequest, TResponse> | void
+  >
   /**
    * Sees a failed call: a `ResponseError`, a network error, an abort, or a validation error. Return another error to throw it instead.
    * An error thrown while a stream is read, after its response arrived, reaches the loop that reads it and not this stack.
@@ -629,7 +639,8 @@ type ErrorStatus<TResponses> = Exclude<keyof TResponses, SuccessStatusCode>
 
 /**
  * The `ResponseError` an operation throws. Checking `status` narrows `data` to that status's body, and `headers.get` to
- * the header names in `THeaders`, the same record `RequestResult` takes.
+ * the header names in `THeaders`, the same record `RequestResult` takes. A `default` response matches every status, so its
+ * body stays in `data` after a `status` check.
  */
 export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown> = [ErrorStatus<TResponses>] extends [never]
   ? ResponseError<unknown, TRequest, TResponse>

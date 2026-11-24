@@ -4,7 +4,7 @@ import axios from 'axios'
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
 import { createAxiosTransport, createClient } from './client.ts'
-import type { RetryContext } from './client.ts'
+import type { Retry, RetryContext } from './client.ts'
 
 type Hit = { method?: string; headers: http.IncomingHttpHeaders; body: string }
 type Step = (res: http.ServerResponse) => void
@@ -150,7 +150,7 @@ describe('retry of an event stream through the axios transport', () => {
   const one = { data: 'one', event: 'message', id: '1' }
   const two = { data: 'two', event: 'message', id: '2' }
   const cut = () => events('id: 1\ndata: one\n\nid: 2\ndata: tw', true)
-  const streaming = (retry?: Parameters<typeof createClient>[0]['retry']) => createClient({ baseURL, mediaTypes: streamMediaTypes, retry })
+  const streaming = (retry?: Retry) => createClient({ baseURL, mediaTypes: streamMediaTypes, retry })
 
   test('reopens a stream the server cuts, from the last complete event ID', async () => {
     const { url, hits } = plan(cut(), events('id: 2\ndata: two\n\n'))

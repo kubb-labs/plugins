@@ -13,7 +13,7 @@ Every generated function sends through the shared `client` from `.kubb/client.ts
 | A child client    | `client.extend({ ... })`    | Copies the shared config and runs the parent's interceptors first.                      |
 | One call          | The same key on the call    | Wins over the client for that call.                                                     |
 
-The client takes `baseURL`, `headers`, `auth`, `credentials`, `options`, `transport`, `serializer`, `mediaTypes`, `validate`, `onValidationError`, and `retry`:
+The client takes `baseURL`, `headers`, `auth`, `credentials`, `options`, `transport`, `serializer`, `mediaTypes`, `validate`, `onValidationError`, and `retry`. `headers` is a record, an array of pairs, or a `Headers` instance:
 
 ```typescript
 import { client, createClient } from './gen/.kubb/client'
@@ -77,8 +77,8 @@ For a credential that no security scheme describes, such as a request signature,
 
 | Stack      | Runs                                                                         | Gets              | Returns                                        |
 | ---------- | ---------------------------------------------------------------------------- | ----------------- | ---------------------------------------------- |
-| `request`  | After the URL, body, and auth are built, before the send.                    | `ResolvedRequest` | The request.                                   |
-| `response` | After the body is decoded, before the status check and validator.            | `DecodedResponse` | The result.                                    |
+| `request`  | After the URL, body, and auth are built, before the send.                    | `ResolvedRequest` | The request, or nothing to keep it.            |
+| `response` | After the body is decoded, before the status check and validator.            | `DecodedResponse` | The result, or nothing to keep it.             |
 | `error`    | When a call fails: `ResponseError`, network error, abort, `ValidationError`. | The error         | Another error to throw, or nothing to keep it. |
 
 ::code-group

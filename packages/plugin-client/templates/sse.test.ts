@@ -261,7 +261,8 @@ describe('streamMediaTypes', () => {
       status = 200,
       client = {},
       ...config
-    }: Omit<RequestConfig, 'method' | 'url'> & EventStreamOptions & { contentType?: string; status?: number; client?: ClientConfig<unknown, unknown> } = {},
+    }: Omit<RequestConfig, 'method' | 'url' | 'client'> &
+      EventStreamOptions & { contentType?: string; status?: number; client?: ClientConfig<unknown, unknown> } = {},
   ) {
     const response = new Response(body, { status, headers: { 'content-type': contentType } })
     const instance = createClientCore<unknown, unknown>({ defaultTransport: async () => response, mediaTypes: streamMediaTypes, ...client })

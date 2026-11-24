@@ -109,7 +109,10 @@ describe('createAxiosTransport', () => {
 
   test('maps credentials onto the request the fetch adapter sends, over withCredentials in the defaults or the options', async () => {
     const sent: Array<RequestCredentials> = []
-    const fetch = async (input: Request) => (sent.push(input.credentials), new Response('{}', { headers: { 'content-type': 'application/json' } }))
+    const fetch = async (input: RequestInfo | URL) => (
+      sent.push(new Request(input).credentials),
+      new Response('{}', { headers: { 'content-type': 'application/json' } })
+    )
     const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch }, withCredentials: true })) })
     const url = 'https://petstore.dev/pet'
 
@@ -122,7 +125,10 @@ describe('createAxiosTransport', () => {
 
   test('passes credentials as is when an adapter list resolves to fetch', async () => {
     const sent: Array<RequestCredentials> = []
-    const fetch = async (input: Request) => (sent.push(input.credentials), new Response('{}', { headers: { 'content-type': 'application/json' } }))
+    const fetch = async (input: RequestInfo | URL) => (
+      sent.push(new Request(input).credentials),
+      new Response('{}', { headers: { 'content-type': 'application/json' } })
+    )
     const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: ['fetch', 'xhr'], env: { fetch } })) })
 
     await client({ method: 'GET', url: 'https://petstore.dev/pet', credentials: 'same-origin' })
@@ -152,7 +158,7 @@ describe('createAxiosTransport', () => {
 
   test('sends no Content-Type on a call without a body, where axios would label a patch as a form', async () => {
     const sent: Array<string | null> = []
-    const fetch = async (input: Request) => (sent.push(input.headers.get('content-type')), new Response(null, { status: 204 }))
+    const fetch = async (input: RequestInfo | URL) => (sent.push(new Request(input).headers.get('content-type')), new Response(null, { status: 204 }))
     const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
 
     await client({ method: 'PATCH', url: 'https://petstore.dev/pet/1' })
@@ -191,8 +197,8 @@ describe('createAxiosTransport', () => {
       '/json': ['{"id":1}', 'application/json'],
       '/number': ['123', 'text/plain'],
     }
-    const fetch = async (input: Request) => {
-      const [body, type] = bodies[new URL(input.url).pathname]!
+    const fetch = async (input: RequestInfo | URL) => {
+      const [body, type] = bodies[new URL(new Request(input).url).pathname]!
       return new Response(body, { headers: { 'content-type': type } })
     }
     const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
