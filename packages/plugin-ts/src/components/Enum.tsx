@@ -23,7 +23,7 @@ export type EnumProps = {
  * When `constCasing` is `'pascalCase'` and `typeSuffix` is empty, the const and the type
  * resolve to the same name, which TypeScript merges into a single value+type declaration.
  */
-export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.EnumSchemaNode; enum: ResolvedEnumOptions; resolver: ResolverTs }): {
+export function resolveEnumNames({ node, enum: enumOptions, resolver }: { node: ast.EnumSchemaNode; enum: ResolvedEnumOptions; resolver: ResolverTs }): {
   enumName: string
   typeName: string
 } {
@@ -46,7 +46,7 @@ export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.
  * index picks up the correct export identifiers.
  */
 export function Enum({ node, enum: enumOptions, resolver }: EnumProps): KubbReactNode {
-  const { enumName, typeName } = getEnumNames({ node, enum: enumOptions, resolver })
+  const { enumName, typeName } = resolveEnumNames({ node, enum: enumOptions, resolver })
 
   const [nameNode, typeNode, alias] = factory.createEnumDeclaration({
     name: enumName,

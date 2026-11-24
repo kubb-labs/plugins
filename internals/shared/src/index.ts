@@ -1,3 +1,5 @@
+export { createSchemaResolver } from './schemaResolver.ts'
+export { collectDirectionalRefNames, containsDirectionalNode, variesByDirection } from './direction.ts'
 export {
   buildClientOptionType,
   buildContentTypeEntries,
@@ -9,6 +11,7 @@ export {
   buildRequestParamsSignature,
   castToClientOptions,
   buildResponses,
+  buildOperationSchemaEntries,
   buildResponseUnionSchema,
   getContentTypeInfo,
   getPerContentTypeName,

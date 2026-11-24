@@ -408,42 +408,6 @@ export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: I
   return `${node.operationId}: the default infinite page params expect an array response and never end for this one. Set \`infinite.getNextPageParam\` (or \`nextParam\`) to read the next page from the response.`
 }
 
-export type OverrideFilter = { type: string; pattern: string | RegExp } | { type: 'extension'; key: `x-${string}`; value?: unknown }
-
-export type OverrideEntry<TOptions> = OverrideFilter & {
-  options?: Partial<TOptions>
-}
-
-function matchesPattern(node: ast.OperationNode, ov: OverrideFilter): boolean {
-  if ('key' in ov) {
-    const extensions = node.extensions
-    if (!extensions || !(ov.key in extensions)) return false
-    return ov.value === undefined || extensions[ov.key] === ov.value
-  }
-  const { type, pattern } = ov
-  const matches = (value: string) => (typeof pattern === 'string' ? value === pattern : pattern.test(value))
-  if (type === 'operationId') return matches(node.operationId)
-  if (type === 'tag') return node.tags.some((t) => matches(t))
-  if (type === 'path') return node.path !== undefined && matches(node.path)
-  if (type === 'method') return node.method !== undefined && matches(node.method)
-  return false
-}
-
-/**
- * Resolves per-operation overrides (first matching override wins).
- *
- * @example
- * ```ts
- * const opts = resolveOperationOverrides(node, override)
- * const queryOpts = 'query' in opts ? opts.query : defaultQuery
- * ```
- */
-export function resolveOperationOverrides<TOptions>(node: ast.OperationNode, override?: ReadonlyArray<OverrideEntry<TOptions>>): Partial<TOptions> {
-  if (!override) return {}
-  const match = override.find((ov) => matchesPattern(node, ov))
-  return match?.options ?? {}
-}
-
 /**
  * The request groups available to a query key transformer. Headers are available for custom keys
  * but excluded from the default key. Cookies stay excluded.

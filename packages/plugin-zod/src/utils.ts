@@ -306,9 +306,10 @@ export function buildObjectShape(
   const isCyclic = (schema: ast.SchemaNode): boolean =>
     ctx.options.cyclicSchemas != null && ast.graph.containsCircular(schema, { circularSchemas: ctx.options.cyclicSchemas })
 
-  const transformed = objectNode.properties.map(({ schema }) => {
+  const cyclic = objectNode.properties.map(({ schema }) => isCyclic(schema))
+  const transformed = objectNode.properties.map(({ schema }, index) => {
     // A getter defers evaluation, so clear cyclicSchemas to skip z.lazy() on nested refs.
-    const hasSelfRef = isCyclic(schema)
+    const hasSelfRef = cyclic[index]
     const savedCyclicSchemas = ctx.options.cyclicSchemas
     if (hasSelfRef) ctx.options.cyclicSchemas = undefined
     const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
@@ -318,7 +319,7 @@ export function buildObjectShape(
   const entries = objectNode.properties.map((property, index) => {
     const { name, schema } = property
     const value = transformed[index]!
-    return renderProperty({ name, value, schema, required: property.required, meta: ast.ref.mergeSchema(schema), cyclic: isCyclic(schema) })
+    return renderProperty({ name, value, schema, required: property.required, meta: ast.ref.mergeSchema(schema), cyclic: cyclic[index]! })
   })
 
   return buildObject(entries)

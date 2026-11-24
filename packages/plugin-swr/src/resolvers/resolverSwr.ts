@@ -5,7 +5,7 @@ import type { PluginSwr } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-swr`. Decides the names and file paths for every generated
- * SWR hook (`useFoo`, `useFooMutation`) and its companion helpers (`fooQueryKey`, `fooQueryOptions`,
+ * SWR hook (`useFoo`) and its companion helpers (`fooQueryKey`, `fooQueryOptions`,
  * `fooMutationKey`).
  *
  * Functions use safe camelCase identifiers; hooks get the `use` prefix.
