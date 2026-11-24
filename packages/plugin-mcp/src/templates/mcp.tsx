@@ -49,11 +49,7 @@ export const mcpOperation = defineTemplate<PluginMcp>({
           path={'@modelcontextprotocol/server'}
         />
 
-        <File.Import
-          names={[{ name: contractOp.importName, alias: contractOp.name === contractOp.importName ? undefined : contractOp.name, space: 'value' }]}
-          root={meta.file.path}
-          path={contractOp.path}
-        />
+        <File.Import names={[contractOp.moduleName]} root={meta.file.path} path={contractOp.path} />
 
         <McpHandler name={meta.name} clientName={contractOp.name} node={node} resolver={tsResolver} returnType={contractOp.returnType} />
       </File>

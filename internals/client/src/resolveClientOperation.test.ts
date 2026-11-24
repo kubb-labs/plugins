@@ -67,8 +67,8 @@ describe('resolveClientOperation', () => {
     const { ctx } = createContext({ output: { path: '.', mode: 'directory' } })
     const query = ast.factory.createOperation({ operationId: 'query', method: 'POST', path: '/query' })
 
-    expect(run(ctx, query)).toMatchObject({ name: 'queryRequest', importName: 'query' })
-    expect(run(ctx, getPetById)).toMatchObject({ name: 'getPetById', importName: 'getPetById' })
+    expect(run(ctx, query)).toMatchObject({ name: 'queryRequest', moduleName: { name: 'query', alias: 'queryRequest' } })
+    expect(run(ctx, getPetById)).toMatchObject({ name: 'getPetById', moduleName: { name: 'getPetById', alias: undefined } })
   })
 
   describe("scoped by the client plugin's per-operation options", () => {

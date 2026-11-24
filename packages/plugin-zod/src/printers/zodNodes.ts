@@ -174,7 +174,7 @@ function narrowEnums(object: ast.ObjectSchemaNode | null, earlier: ReadonlyArray
       .flatMap((member) => ast.schema.findProperties({ node: member, propertyName: property.name }))
       .map(({ schema }) => ast.schema.getLiterals(ast.ref.mergeSchema(schema)))
       .filter((values) => values.length > 0)
-    const isAllowed = (value: unknown) => allowed.every((values) => values.includes(value as never))
+    const isAllowed = (value: string | number | boolean | null) => allowed.every((values) => values.includes(value))
     const enumValues = node.enumValues?.filter(isAllowed)
     const namedEnumValues = node.namedEnumValues?.filter(({ value }) => isAllowed(value))
     // No shared value means the spec contradicts itself, so the member is printed as declared.
