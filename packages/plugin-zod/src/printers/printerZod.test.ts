@@ -883,6 +883,19 @@ describe('printerZod', () => {
       expect(schema.safeParse({ type: 'cat' }).success).toBe(false)
     })
 
+    test('keeps only the enum values every allOf member allows when extending', () => {
+      const typeProperty = (enumValues: Array<string>) =>
+        ast.factory.createProperty({ name: 'type', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues }) })
+      const object = (enumValues: Array<string>) => ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [typeProperty(enumValues)] })
+      // A discriminator mapping can list a key the member's own enum does not have.
+      const node = ast.factory.createSchema({ type: 'intersection', members: [object(['a', 'b']), object(['a', 'c'])] })
+
+      const schema = new Function('z', `return ${printer.print(node)}`)(z) as z.ZodType
+
+      expect(schema.safeParse({ type: 'a' }).success).toBe(true)
+      expect(schema.safeParse({ type: 'c' }).success).toBe(false)
+    })
+
     test('ref with string min and max constraints', () => {
       const node = ast.factory.createSchema({
         type: 'intersection',

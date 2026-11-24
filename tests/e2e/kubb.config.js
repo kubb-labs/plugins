@@ -215,7 +215,7 @@ export default defineConfig(() => {
       output: {
         ...baseConfig.output,
         path: `./gen/${name}`,
-        // Strict-typecheck the generated models + zod so output that does not compile fails the
+        // Strict-typecheck every generated folder so output that does not compile fails the
         // run. Kubb runs these commands without a shell (no globbing, no `cp` on Windows), so copy the
         // shared strict config into the spec's output with Node and point `tsc -p` at it — `include`
         // globs resolve from there.
