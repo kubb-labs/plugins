@@ -3,7 +3,6 @@
 * Do not edit manually.
 */
 
-import type { PetCreateResponse2 } from '../types/PetCreate'
 import type { PetCreateResponse } from '../types/pet/Create'
 import { http, HttpResponse } from 'msw/http'
 
@@ -21,22 +20,5 @@ export function petCreateHandler(data?: PetCreateResponse | ((info: Parameters<P
       if(typeof data === 'function') return data(info)
 
       return petCreateHandlerResponse200(data)
-    })
-}
-
-export function petCreateHandler2Response200(data?: PetCreateResponse2) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-  })
-}
-
-export function petCreateHandler2(data?: PetCreateResponse2 | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
-  return http.post(`${options?.baseURL ?? ''}/pets/create-second`, function handler(info) {
-      if(typeof data === 'function') return data(info)
-
-      return petCreateHandler2Response200(data)
     })
 }

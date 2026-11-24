@@ -4,29 +4,29 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { PetCreateStatus2002 } from '../types/PetCreate'
+import type { PetCreate2Status200 } from '../types/PetCreate2'
 import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { petCreate2 } from '../clients/petCreate'
+import { petCreate2 } from '../clients/petCreate2'
 
-export const petCreateMutationKey2 = () => [{ url: '/pets/create-second' }] as const
+export const petCreate2MutationKey = () => [{ url: '/pets/create-second' }] as const
 
-export type PetCreateMutationKey2 = ReturnType<typeof petCreateMutationKey2>
+export type PetCreate2MutationKey = ReturnType<typeof petCreate2MutationKey>
 
-export type PetCreateMutationArg2 = never
+export type PetCreate2MutationArg = never
 
 /**
  * `POST /pets/create-second`
  */
 export function usePetCreate2(options: {
-  mutation?: SWRMutationConfiguration<PetCreateStatus2002, ResponseErrorConfig<Error>, PetCreateMutationKey2 | null, PetCreateMutationArg2> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<PetCreate2Status200, ResponseErrorConfig<Error>, PetCreate2MutationKey | null, PetCreate2MutationArg> & { throwOnError?: boolean },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
-  const mutationKey = petCreateMutationKey2()
+  const mutationKey = petCreate2MutationKey()
 
-  return useSWRMutation<PetCreateStatus2002, ResponseErrorConfig<Error>, PetCreateMutationKey2 | null, PetCreateMutationArg2>(
+  return useSWRMutation<PetCreate2Status200, ResponseErrorConfig<Error>, PetCreate2MutationKey | null, PetCreate2MutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url) => {
       return (await petCreate2({ ...config, throwOnError: true })).data

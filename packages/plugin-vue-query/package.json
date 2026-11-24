@@ -90,8 +90,8 @@
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@kubb/plugin-client": "workspace:*",
-    "@tanstack/vue-query": "^5.108.1",
-    "vue": "^3.5.45"
+    "@tanstack/vue-query": "^5.108.2",
+    "vue": "^3.5.46"
   },
   "peerDependencies": {
     "@tanstack/vue-query": "^5.41.0",

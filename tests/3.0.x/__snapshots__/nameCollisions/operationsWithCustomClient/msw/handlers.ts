@@ -3,11 +3,13 @@
 * Do not edit manually.
 */
 
-import { petCreateHandler, petCreateHandler2 } from './petCreateHandler'
-import { petListHandler, petListHandler2 } from './petListHandler'
+import { petCreate2Handler } from './petCreate2Handler'
+import { petCreateHandler } from './petCreateHandler'
+import { petList2Handler } from './petList2Handler'
+import { petListHandler } from './petListHandler'
 
 export function createHandlers(options?: { baseURL?: string }) {
-  return [petListHandler(undefined, options), petListHandler2(undefined, options), petCreateHandler(undefined, options), petCreateHandler2(undefined, options)] as const
+  return [petListHandler(undefined, options), petList2Handler(undefined, options), petCreateHandler(undefined, options), petCreate2Handler(undefined, options)] as const
 }
 
 export const handlers = createHandlers()

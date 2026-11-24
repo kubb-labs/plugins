@@ -5,6 +5,6 @@
 
 import { petSchema } from './petSchema'
 
-export const petListStatus200Schema2 = petSchema
+export const petList2Status200Schema = petSchema
 
-export const petListResponseSchema2 = petListStatus200Schema2
+export const petList2ResponseSchema = petList2Status200Schema

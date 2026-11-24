@@ -4,12 +4,12 @@
 */
 
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
-import { petList2 } from '../clients/petList'
+import { petList2 } from '../clients/petList2'
 
 /**
  * `GET /pets/second`
  */
-export async function petListHandler2(ctx: ServerContext): Promise<CallToolResult> {
+export async function petList2Handler(ctx: ServerContext): Promise<CallToolResult> {
   const res = await petList2({ signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {
