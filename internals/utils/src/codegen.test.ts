@@ -6,6 +6,10 @@ describe('buildJSDoc', () => {
     expect(buildJSDoc([])).toBe('  ')
     expect(buildJSDoc([], { fallback: '' })).toBe('')
   })
+
+  it('keeps a comment line from closing the block', () => {
+    expect(buildJSDoc(['hi */ evil(); /*'])).toBe('/**\n   * hi * / evil(); /*\n   */\n  ')
+  })
 })
 
 describe('buildList', () => {

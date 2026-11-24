@@ -1,4 +1,5 @@
 import { ast } from '@internals/ast'
+import { templatePathEscape } from '@internals/utils'
 import { text } from '@kubb/kit'
 import { Url } from '@kubb/kit'
 import { Function } from '@kubb/renderer-jsx'
@@ -24,7 +25,7 @@ export function Mock({ baseURL = '', name, fakerName, responseName, typeName, re
   const methodGuard = method === 'all' ? `if (info.request.method !== ${text.quote(node.method)}) return\n\n    ` : ''
   const successResponse = ast.http.responses.findPrimary(node)
   const statusCode = successResponse ? ast.http.status.toCode(successResponse) : 200
-  const url = Url.toPath(node.path)
+  const url = Url.toPath(templatePathEscape(node.path))
 
   const responseHasSchema = hasResponseSchema(successResponse)
   const dataType = responseHasSchema ? typeName : 'string | number | boolean | null | object'

@@ -58,5 +58,6 @@ export function aliasConflictingImports(
 }
 
 export function rewriteAliasedImports(text: string, aliases: ReadonlyMap<string, string>): string {
-  return Array.from(aliases).reduce((acc, [name, alias]) => acc.replace(new RegExp(`\\b${escapeRegExp(name)}\\b`, 'g'), alias), text)
+  // shortcut: a string literal that holds `name(` is still rewritten; alias in the ref handler if that shows up.
+  return Array.from(aliases).reduce((acc, [name, alias]) => acc.replace(new RegExp(`(?<![.\\w])${escapeRegExp(name)}(?=\\s*[<(])`, 'g'), alias), text)
 }

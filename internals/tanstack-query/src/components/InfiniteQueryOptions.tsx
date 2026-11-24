@@ -1,5 +1,6 @@
 import type { ast } from '@internals/ast'
 import { getNestedAccessor } from '@internals/utils'
+import { text } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { Function } from '@kubb/renderer-jsx'
@@ -96,7 +97,7 @@ export function InfiniteQueryOptions({
   const getNextPageParamExpr = (() => {
     if (serializedGetNextPageParam) return `getNextPageParam: ${serializedGetNextPageParam}`
     if (nextParam) return `getNextPageParam: (lastPage) => ${getNestedAccessor(nextParam, `lastPage${dataSuffix}`)}`
-    if (cursorParam) return `getNextPageParam: (lastPage) => lastPage${dataSuffix}['${cursorParam}']`
+    if (cursorParam) return `getNextPageParam: (lastPage) => lastPage${dataSuffix}[${text.quote(cursorParam)}]`
     return `getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage${dataSuffix}) && lastPage${dataSuffix}.length === 0 ? undefined : lastPageParam + 1`
   })()
 
@@ -110,7 +111,7 @@ export function InfiniteQueryOptions({
   const getPreviousPageParamExpr = (() => {
     if (serializedGetPreviousPageParam) return `getPreviousPageParam: ${serializedGetPreviousPageParam}`
     if (previousParam) return `getPreviousPageParam: (firstPage) => ${getNestedAccessor(previousParam, `firstPage${dataSuffix}`)}`
-    if (cursorParam) return `getPreviousPageParam: (firstPage) => firstPage${dataSuffix}['${cursorParam}']`
+    if (cursorParam) return `getPreviousPageParam: (firstPage) => firstPage${dataSuffix}[${text.quote(cursorParam)}]`
     if (serializedGetNextPageParam || nextParam) return null
     return `getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= ${defaultPreviousThreshold} ? undefined : firstPageParam - 1`
   })()

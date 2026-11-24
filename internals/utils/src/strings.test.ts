@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getNestedAccessor, jsDocEscape, toRegExpString } from './strings.ts'
+import { getNestedAccessor, jsDocEscape, templatePathEscape, toRegExpString } from './strings.ts'
 
 describe('toRegExpString', () => {
   it('renders a RegExp constructor call', () => {
@@ -12,6 +12,10 @@ describe('toRegExpString', () => {
 
   it('renders a regex literal when func is null', () => {
     expect(toRegExpString('^(?im)foo', null)).toBe('/^foo/im')
+  })
+
+  it('reports a pattern JavaScript cannot compile as an invalid spec', () => {
+    expect(() => toRegExpString('[a-z')).toThrow('The pattern "[a-z" is not a valid JavaScript regular expression.')
   })
 
   it('strips surrounding quotes before parsing', () => {
@@ -85,5 +89,11 @@ describe('getNestedAccessor', () => {
 describe('jsDocEscape', () => {
   it('escapes an @ that starts a line and keeps the rest', () => {
     expect(jsDocEscape('intro\n  @example value\nmail me@example.com')).toBe('intro\n  \\@example value\nmail me@example.com')
+  })
+})
+
+describe('templatePathEscape', () => {
+  it('escapes what would end or interpolate a template literal, and keeps the placeholders', () => {
+    expect(templatePathEscape('/a`+x()+`b/${y}/{id}\\')).toBe('/a\\`+x()+\\`b/\\${y}/{id}\\\\')
   })
 })

@@ -96,13 +96,13 @@ export function createArrayDeclaration({ nodes, arrayType = 'array' }: { nodes: 
 }
 
 /**
- * Minimum nodes length of 2
+ * A union of `nodes`. No node gives `never`, like an enum without values, and one node is returned as it is.
  * @example Union type example
  * `string | number`
  */
 export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Array<TsNode>; withParentheses?: boolean }): TsNode {
   if (!nodes.length) {
-    return keywordTypeNodes.any
+    return keywordTypeNodes.never
   }
 
   if (nodes.length === 1) {

@@ -1,4 +1,4 @@
-import { text } from '@kubb/kit'
+import { Diagnostics, text } from '@kubb/kit'
 
 // `\p{`, `\P{` or `\u{` behind an odd number of backslashes, or a character outside the BMP: both need the `u` flag.
 const NEEDS_UNICODE = /(?<!\\)(?:\\\\)*\\[pPu]\{|[\u{10000}-\u{10FFFF}]/u
@@ -58,7 +58,20 @@ export function toRegExpString(pattern: string, func: string | null = 'RegExp'):
     .replace(/\\?\/$/, '')
     .replace(replacementTarget, '')
 
-  const { source, flags } = toRegExp(cleaned, matchedFlags)
+  const { source, flags } = (() => {
+    try {
+      return toRegExp(cleaned, matchedFlags)
+    } catch (error) {
+      // A spec `pattern` in another regex dialect would otherwise surface as a bare `SyntaxError` with no hint of its origin.
+      throw new Diagnostics.Error({
+        code: Diagnostics.code.invalidSpec,
+        severity: 'error',
+        message: `The pattern ${JSON.stringify(raw)} is not a valid JavaScript regular expression.`,
+        help: 'Rewrite the `pattern` in ECMAScript syntax. Inline flags such as `(?i)` are only read at the start, as `^(?i)`.',
+        cause: error instanceof Error ? error : undefined,
+      })
+    }
+  })()
 
   if (func === null) return `/${source}/${flags}`
 
@@ -78,7 +91,7 @@ export function toRegExpString(pattern: string, func: string | null = 'RegExp'):
 export function getNestedAccessor(param: string | Array<string>, accessor: string): string | null {
   const parts = Array.isArray(param) ? param : param.split('.')
   if (parts.length === 0 || (parts.length === 1 && parts[0] === '')) return null
-  return `${accessor}?.['${`${parts.join("']?.['")}']`}`
+  return `${accessor}${parts.map((part) => `?.[${text.quote(part)}]`).join('')}`
 }
 
 /**
@@ -92,4 +105,12 @@ export function getNestedAccessor(param: string | Array<string>, accessor: strin
  */
 export function jsDocEscape(input: unknown): string {
   return `${input}`.replace(/^(\s*)@/gm, '$1\\@')
+}
+
+// Escapes the literal segments of an OpenAPI path for a template literal, and keeps the `{param}` placeholders.
+export function templatePathEscape(path: string): string {
+  return path
+    .split(/(\{[^}]+\})/)
+    .map((part, index) => (index % 2 === 0 ? part.replace(/[\\`$]/g, '\\$&') : part))
+    .join('')
 }

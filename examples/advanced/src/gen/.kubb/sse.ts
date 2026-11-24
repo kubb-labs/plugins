@@ -1,4 +1,5 @@
 import type { EventStreamOptions, MediaType, MediaTypes, ServerSentEvent } from './client'
+import { parseJson } from './mediaTypes'
 
 // `idSeen` is set once the stream sends an `id`, even an empty one that clears the ID.
 type Cursor = { lastEventId: string; idSeen?: boolean }
@@ -146,7 +147,7 @@ export async function* parseJsonLines<TData = unknown>({
     const line = raw.split('\u001e').join('').trim()
     if (!line) continue
     if (line === terminator) return
-    yield JSON.parse(line) as TData
+    yield parseJson(line, 'application/jsonl') as TData
   }
 }
 

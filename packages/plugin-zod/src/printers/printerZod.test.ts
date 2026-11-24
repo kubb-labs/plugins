@@ -839,6 +839,26 @@ describe('printerZod', () => {
     })
   })
 
+  describe('not', () => {
+    const forbidden = ast.factory.createSchema({ type: 'not', members: [ast.factory.createSchema({ type: 'enum', enumValues: ['admin'] })] })
+
+    test('rejects a value that matches the forbidden schema', () => {
+      const schema = new Function('z', `return ${printer.print(forbidden)}`)(z)
+
+      expect(schema.safeParse('admin').success).toBe(false)
+      expect(schema.safeParse('guest').success).toBe(true)
+    })
+
+    test('narrows the schema it sits beside in an allOf', () => {
+      const node = ast.factory.createSchema({ type: 'intersection', members: [ast.factory.createSchema({ type: 'string' }), forbidden] })
+      const schema = new Function('z', `return ${printer.print(node)}`)(z)
+
+      expect(schema.safeParse('admin').success).toBe(false)
+      expect(schema.safeParse('guest').success).toBe(true)
+      expect(schema.safeParse(1).success).toBe(false)
+    })
+  })
+
   describe('intersection', () => {
     test('keeps the discriminator literal of a oneOf base over a sibling string property', () => {
       const typeProperty = (schema: ast.SchemaNode) => ast.factory.createProperty({ name: 'type', required: true, schema })

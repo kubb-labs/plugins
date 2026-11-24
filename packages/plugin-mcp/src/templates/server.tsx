@@ -1,5 +1,6 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
+import { resolveClientOperation } from '@internals/client'
 import { getStream } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { code, defineTemplate } from '@kubb/kit'
@@ -18,7 +19,7 @@ import type { PluginMcp } from '../types.ts'
 export const serverOperations = defineTemplate<PluginMcp>({
   kind: ast.node.kinds.operations,
   render({ operations: nodes }, ctx) {
-    const { output } = ctx.options
+    const { output, client } = ctx.options
 
     const handlers = ctx.from().resolver
     const schemas = ctx.from(pluginZodName).resolver
@@ -44,12 +45,12 @@ export const serverOperations = defineTemplate<PluginMcp>({
       },
     }
 
-    // `mcpOperation` emits no handler for a stream operation, so it gets no tool either.
+    // `mcpOperation` emits no handler for a stream operation, or for one the client plugin leaves out, so neither gets a tool.
     const operationsMapped = nodes
       .filter(ast.http.isOperation)
       .filter((node) => {
         const stream = getStream(node)
-        return !stream?.shape && !stream?.hasVariant
+        return !stream?.shape && !stream?.hasVariant && resolveClientOperation({ node, pluginName: client.pluginName }) !== null
       })
       .map((node) => {
         const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = ast.http.groupParameters(node)

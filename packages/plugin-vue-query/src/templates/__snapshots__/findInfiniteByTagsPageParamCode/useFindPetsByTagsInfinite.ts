@@ -49,7 +49,9 @@ export function useFindPetsByTagsInfinite<
 >(
   { query }: { query: MaybeRefOrGetter<FindPetsByTagsOptions['query']> },
   options: {
-    query?: Partial<UseInfiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TQueryData, TQueryKey, TQueryData>> & { client?: QueryClient }
+    query?: Partial<UseInfiniteQueryOptions<TQueryData, ResponseErrorConfig<Error>, TData, TQueryKey, NonNullable<FindPetsByTagsQuery['pageSize']>>> & {
+      client?: QueryClient
+    }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
@@ -63,7 +65,13 @@ export function useFindPetsByTagsInfinite<
       ...findPetsByTagsInfiniteQueryOptions({ query }, config),
       ...resolvedOptions,
       queryKey,
-    } as unknown as UseInfiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, FindPetsByTagsStatus200, TQueryKey, FindPetsByTagsStatus200>,
+    } as unknown as UseInfiniteQueryOptions<
+      FindPetsByTagsStatus200,
+      ResponseErrorConfig<Error>,
+      TData,
+      TQueryKey,
+      NonNullable<FindPetsByTagsQuery['pageSize']>
+    >,
     toValue(queryClient),
   ) as UseInfiniteQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 

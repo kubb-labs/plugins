@@ -37,6 +37,18 @@ describe('printerValibot', () => {
   const printer = printerValibot({ resolver })
   const print = (node: ast.SchemaNode) => printer.print(node)!
 
+  test('not rejects a value that matches the forbidden schema, alone and beside other keywords', () => {
+    const forbidden = createSchema({ type: 'not', members: [createSchema({ type: 'enum', enumValues: ['admin'] })] })
+    const alone = build(print(forbidden))
+    const beside = build(print(createSchema({ type: 'intersection', members: [string(), forbidden] })))
+
+    expect(v.is(alone, 'admin')).toBe(false)
+    expect(v.is(alone, 'guest')).toBe(true)
+    expect(v.is(beside, 'admin')).toBe(false)
+    expect(v.is(beside, 'guest')).toBe(true)
+    expect(v.is(beside, 1)).toBe(false)
+  })
+
   test.each([
     ['any', 'v.any()'],
     ['unknown', 'v.unknown()'],

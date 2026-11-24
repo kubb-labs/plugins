@@ -148,7 +148,7 @@ export const infiniteQueryOperation = defineTemplate<PluginVueQuery>({
           queryKeyTypeName={queryKeyTypeName}
           node={node}
           tsResolver={tsResolver}
-          infinite
+          infinite={infiniteOptions}
           returnType={hook.returnType}
           typedHeaders={hook.contractOp.typedHeaders}
         />

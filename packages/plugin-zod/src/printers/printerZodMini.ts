@@ -153,9 +153,11 @@ export const printerZodMini = createPrinter<PrinterZodMiniFactory>((options) => 
 
         return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : 'z.date()'
       },
-      datetime() {
-        // Mini mode: datetime validation via z.string() (z.iso.datetime not available in mini)
-        return 'z.string()'
+      datetime(node) {
+        if (node.offset) return 'z.iso.datetime({ offset: true })'
+        if (node.local) return 'z.iso.datetime({ local: true })'
+
+        return 'z.iso.datetime()'
       },
       time(node) {
         if (node.representation === 'string') {

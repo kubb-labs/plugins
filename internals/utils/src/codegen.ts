@@ -35,7 +35,8 @@ export function buildJSDoc(
 
   if (comments.length === 0) return fallback
 
-  return `/**\n${comments.map((c) => `${indent}${c}`).join('\n')}\n   */${suffix}`
+  // A `*/` in a comment line would close the block and turn the rest into code.
+  return `/**\n${comments.map((c) => `${indent}${c.replaceAll('*/', '* /')}`).join('\n')}\n   */${suffix}`
 }
 
 /**

@@ -346,7 +346,7 @@ export function printWithOmit(
     // A ref resolves to a wrapper variable; unwrap to the inner object before omitting.
     // Zod Mini schemas have no `.unwrap()` / `.omit()`, so walk `_zod.def.innerType` and call `z.omit()`.
     const unwrap = omitUnwrapChain(node, mini ? '._zod.def.innerType' : '.unwrap()')
-    const mask = `{ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }`
+    const mask = `{ ${keysToOmit.map((k: string) => `${JSON.stringify(k)}: true`).join(', ')} }`
     const omit = (target: string) => {
       const inner = `${target}${unwrap}`
       const hasObjectConstraints = hasInputChecks(meta)

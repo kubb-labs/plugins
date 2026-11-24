@@ -1002,6 +1002,21 @@ describe('printerTs', () => {
       expect(await formatTS(p.transform(node))).toBe('Set<string>')
     })
 
+    it('override can call this.base for the handler it replaces', async () => {
+      const p = printerTs({
+        resolver: resolverTs,
+        optionalType: 'questionToken',
+        arrayType: 'array',
+        enum: inlineLiteralEnum,
+        nodes: {
+          string(node) {
+            return `Branded<${this.base(node)}>`
+          },
+        },
+      })
+      expect(await formatTS(p.transform(ast.factory.createSchema({ type: 'string' })))).toBe('Branded<string>')
+    })
+
     it('override can read this.options', async () => {
       const p = printerTs({
         resolver: resolverTs,

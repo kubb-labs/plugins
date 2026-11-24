@@ -3,8 +3,8 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { buildHookParams, buildQueryKeyParams, buildResponseTypes, maybeRefOrGetter } from '@internals/tanstack-query'
-import type { HookResultProps } from '@internals/tanstack-query'
+import { buildHookParams, buildQueryKeyParams, buildResponseTypes, maybeRefOrGetter, resolvePageParamType } from '@internals/tanstack-query'
+import type { HookResultProps, Infinite } from '@internals/tanstack-query'
 import { buildClientOptionType, getComments } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -16,9 +16,9 @@ export type QueryProps = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   /**
-   * Emits the `useInfiniteQuery` variant of the hook instead of `useQuery`.
+   * Emits the `useInfiniteQuery` variant of the hook instead of `useQuery`. Carries the options the page param type is read from.
    */
-  infinite?: boolean
+  infinite?: Pick<Infinite, 'initialPageParam' | 'queryParam'>
 } & HookResultProps
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -44,8 +44,11 @@ export function Query({
     `TQueryData = ${TData}`,
     `TQueryKey extends QueryKey = ${queryKeyTypeName}`,
   ]
-  const optionsGenerics = infinite ? [TData, TError, 'TQueryData', 'TQueryKey', 'TQueryData'] : [TData, TError, 'TData', 'TQueryData', 'TQueryKey']
-  const castGenerics = infinite ? [TData, TError, TData, 'TQueryKey', TData] : [TData, TError, 'TData', TData, 'TQueryKey']
+  const pageParamType = infinite
+    ? resolvePageParamType(node, { resolver: tsResolver, initialPageParam: infinite.initialPageParam, queryParam: infinite.queryParam }).pageParamType
+    : null
+  const optionsGenerics = pageParamType ? ['TQueryData', TError, 'TData', 'TQueryKey', pageParamType] : [TData, TError, 'TData', 'TQueryData', 'TQueryKey']
+  const castGenerics = pageParamType ? [TData, TError, 'TData', 'TQueryKey', pageParamType] : [TData, TError, 'TData', TData, 'TQueryKey']
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver, memberTypeWrapper: maybeRefOrGetter })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''

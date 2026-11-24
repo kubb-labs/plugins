@@ -204,9 +204,12 @@ function matches(value: string, regexGenerator: 'faker' | 'randexp' = 'faker'): 
   return `faker.helpers.fromRegExp(${toRegExpString(toFakerPattern(value), null)})`
 }
 
-function parseEnumValue(value: string | number | boolean | null | undefined) {
+function parseEnumValue(value: unknown) {
   if (typeof value === 'string') {
     return text.quote(value)
+  }
+  if (typeof value === 'object' && value !== null) {
+    return JSON.stringify(value)
   }
 
   return value
@@ -268,6 +271,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       any: () => 'undefined',
       unknown: () => 'undefined',
       void: () => 'undefined',
+      never: () => 'undefined',
       boolean: () => 'faker.datatype.boolean()',
       null: () => 'null',
       string(node) {

@@ -35,7 +35,7 @@ export const resolverTs = createResolver<PluginTs>({
     },
   },
   enum: {
-    keyName(node, enumTypeSuffix = 'key') {
+    keyName(node, enumTypeSuffix = 'Key') {
       return `${this.name(node.name ?? '')}${enumTypeSuffix}`
     },
   },

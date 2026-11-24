@@ -487,7 +487,8 @@ export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> =
   request: InterceptorStack<ResolvedRequest, RequestConfig<unknown, TRequest, TResponse>>
   response: InterceptorStack<DecodedResponse<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
   /**
-   * Sees every failure: a `ResponseError`, a network error, an abort, or a validation error. Return another error to throw it instead.
+   * Sees a failed call: a `ResponseError`, a network error, an abort, or a validation error. Return another error to throw it instead.
+   * An error thrown while a stream is read, after its response arrived, reaches the loop that reads it and not this stack.
    */
   error: InterceptorStack<ResponseError<unknown, TRequest, TResponse> | Error, RequestConfig<unknown, TRequest, TResponse>, Error | void>
 }
@@ -724,7 +725,14 @@ function serializeUrl({
   const path = parts
     // A base URL that ends in `/` would give `//` before a path that starts with one.
     .reduce<string>((url, part) => (part ? url + (url.endsWith('/') && part.startsWith('/') ? part.slice(1) : part) : url), '')
-    .replace(/\{([^{}]+)\}/g, (_, key: string) => requireSerializer(serializers, 'path')({ name: key, value: pathParams[key], options: styles?.path?.[key] }))
+    .replace(/\{([^{}]+)\}/g, (_, key: string) => {
+      const segment = requireSerializer(serializers, 'path')({ name: key, value: pathParams[key], options: styles?.path?.[key] })
+      // An empty segment would call another endpoint, such as `/pets/` for `/pets/{petId}`.
+      if (segment === '') throw new TypeError(`Missing path parameter ${key}.`)
+      // A URL parser resolves a dot segment against the path, also when it is percent-encoded.
+      if (segment === '.' || segment === '..') throw new TypeError(`Path parameter ${key} cannot be a dot segment.`)
+      return segment
+    })
   // A query without values needs no serializer.
   const hasQuery = Object.values(query).some((value) => value !== undefined && value !== null)
   const search = serializers.query || hasQuery ? requireSerializer(serializers, 'query')(query, styles?.query) : ''
@@ -771,7 +779,7 @@ function placeToken({ scheme, token, headers, query }: { scheme: Auth; token: st
     return
   }
   if (scheme.in === 'cookie') {
-    appendCookie(headers, `${name}=${token}`)
+    appendCookie(headers, cookiePair(name, token))
     return
   }
   if (getHeader(headers, name) === undefined) headers[name] = token
@@ -796,6 +804,13 @@ export async function resolveAuth(params: {
     schemes.forEach((scheme, index) => placeToken({ scheme, token: tokens[index]!, headers, query }))
     return
   }
+}
+
+// Outside the RFC 6265 cookie-octets, such as a `;`, the token would start another cookie. The message leaves the token out.
+function cookiePair(name: string, token: string): string {
+  if (!/^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/.test(token))
+    throw new TypeError(`The ${name} API key has characters a cookie cannot carry, escape it first.`)
+  return `${name}=${token}`
 }
 
 function appendCookie(headers: Record<string, string>, cookie: string): void {
@@ -1240,7 +1255,8 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const validator = requestConfig.validator
     const resultSuccess = result.status >= 200 && result.status < 300
     const direction = resultSuccess ? 'response' : 'error'
-    const validationContext = { direction, source: 'body', method: resolvedRequest.method, url: resolvedRequest.url, status: result.status } as const
+    // The URL template, like a request failure gets: the resolved URL can carry an API key in its query.
+    const validationContext = { direction, source: 'body', method: resolvedRequest.method, url: requestConfig.url, status: result.status } as const
     const validatorFor = isValidationEnabled(validate, direction)
       ? resultSuccess
         ? validator?.response

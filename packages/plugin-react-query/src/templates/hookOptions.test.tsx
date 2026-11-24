@@ -4,7 +4,9 @@ import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { hookOptionsOperations } from './hookOptions.tsx'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderTemplate, testConfig } from '#mocks'
+import { resolverClient } from '@kubb/plugin-client'
+import type { ClientResolvedOptions } from '@kubb/plugin-client'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, renderTemplate, testConfig } from '#mocks'
 
 function createOptions(overrides: Partial<PluginReactQuery['resolvedOptions']> = {}): PluginReactQuery['resolvedOptions'] {
   return {
@@ -32,9 +34,14 @@ const operationNodes = [
   ast.factory.createOperation({ operationId: 'deletePet', method: 'DELETE', path: '/pet/{petId}', tags: ['pet'], responses: [] }),
 ]
 
-async function renderHookOptionsSource(options: PluginReactQuery['resolvedOptions']) {
+async function renderHookOptionsSource(options: PluginReactQuery['resolvedOptions'], clientOptions: Partial<ClientResolvedOptions> = {}) {
   const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
-  const driver = createMockedPluginDriver({ name: 'hookOptions', config: testConfig })
+  const axiosPlugin = createMockedPlugin({
+    name: 'plugin-axios',
+    options: { output: { path: './clients', mode: 'directory' }, group: null, ...clientOptions } as ClientResolvedOptions,
+    resolver: resolverClient,
+  })
+  const driver = createMultiPluginDriver('hookOptions', { 'plugin-axios': axiosPlugin })
 
   await renderTemplate(hookOptionsOperations, operationNodes, {
     config: testConfig,
@@ -58,6 +65,13 @@ describe('hookOptionsGenerator operations', () => {
 
   test('skips an operation whose override sets query: false', async () => {
     const source = await renderHookOptionsSource(createOptions({ override: [{ type: 'operationId', pattern: 'getPetById', options: { query: false } }] }))
+
+    expect(source).not.toContain('useGetPetById')
+    expect(source).toContain('"useDeletePet"')
+  })
+
+  test('skips an operation the client plugin excludes', async () => {
+    const source = await renderHookOptionsSource(createOptions(), { exclude: [{ type: 'operationId', pattern: 'getPetById' }] })
 
     expect(source).not.toContain('useGetPetById')
     expect(source).toContain('"useDeletePet"')
