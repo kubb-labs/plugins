@@ -4,7 +4,7 @@ import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/typ
 import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
 /**
- * Resolver for MCP that provides naming methods for handler functions.
+ * Resolver for MCP that provides naming methods for handler functions and tools.
  */
 export type ResolverMcp = Resolver & {
   /**
@@ -78,8 +78,7 @@ declare global {
       'plugin-mcp': PluginMcp
     }
     interface MemoRegistry {
-      'plugin-mcp:toolName': string
-      'plugin-mcp:toolNames': Set<string>
+      'plugin-mcp:toolNames': Map<string, string>
     }
   }
 }
