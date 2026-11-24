@@ -88,7 +88,7 @@ describe('serverGenerator — tool names', () => {
   const toolNames = async (...operationIds: Array<string>) => {
     const source = rawSources((await renderServer(operationIds.map(operation))).fileManager.files).join('\n')
 
-    return [...source.matchAll(/registerTool\(\s*(['"])(.*?)\1/g)].map((match) => match[2])
+    return [...source.matchAll(/registerTool\("([^"]+)"/g)].map((match) => match[1])
   }
 
   test('replaces characters MCP clients reject and cuts the name at 64 characters', async () => {
