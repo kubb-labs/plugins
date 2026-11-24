@@ -25,13 +25,8 @@ export type ReturnTypeOption = 'full' | 'data' | 'plain'
  * make it relative to the importing file.
  */
 export type ClientOperation = {
-  /**
-   * The local name a consumer calls. Differs from `importName` only when a consumer's own bindings would shadow it.
-   */
+  /** The local name a consumer calls. Differs from the exported `importName` only when a consumer binding would shadow it. */
   name: string
-  /**
-   * The name the `<op>` file exports.
-   */
   importName: string
   path: string
   clientPath: string
@@ -54,8 +49,7 @@ type ClientPluginOptions = {
   override?: Array<Override<Omit<ClientPluginOptions, 'override'>>>
 }
 
-// Names the hook and MCP handler bodies bind around the client call. An operation called `query` would be shadowed by
-// the destructured `query` group, so it is imported under an alias.
+// Names the hook and MCP handler bodies bind around the client call, which would shadow an operation of the same name.
 const consumerBindings = new Set(['path', 'query', 'body', 'headers', 'cookies', 'config', 'signal', 'variables', 'options', 'ctx', 'res', 'pageParam'])
 
 function isRelativeImport(importPath: string): boolean {
