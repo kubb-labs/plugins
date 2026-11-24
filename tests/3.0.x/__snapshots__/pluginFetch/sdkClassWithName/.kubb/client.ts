@@ -73,7 +73,7 @@ export const isResponseError = core.isResponseError as <TResponses = unknown, TR
   error: unknown,
 ) => error is ResponseErrorOf<TResponses, TRequest, TResponse, THeaders>
 
-export const defaultTransport = async (request: core.ResolvedRequest): Promise<TransportResult> => {
+export const defaultTransport = async (request: ResolvedRequest): Promise<TransportResult> => {
   const nativeRequest = new Request(request.url, toRequestInit(request))
   // `Request` drops the non-standard `next` field, so Next.js reads it from the init.
   const nextInit: NativeOptions | undefined = request.options?.next ? { next: request.options.next } : undefined

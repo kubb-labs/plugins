@@ -54,6 +54,7 @@
   "packages/plugin-react-query/src/templates/suspenseInfiniteQuery.test.tsx": "Rendered suspense infinite hooks and hooks false; tests/3.0.x has no suspense infinite config.",
   "packages/plugin-react-query/src/templates/suspenseQuery.test.tsx": "Golden path: rendered suspense query hook; the only test that pins the Suspense hook name.",
   "packages/plugin-react-query/src/index.test.ts": "Pins the default key transformer re-exports; swapping one fails only this test.",
+  "packages/plugin-redoc/src/plugin.test.ts": "Error path: the missing-adapter diagnostic a user sees when the config cannot give Redoc an OpenAPI document.",
   "packages/plugin-redoc/src/redoc.test.ts": "Security regression: a script close tag in the spec stays inside inline data; pinned Redoc bundle with integrity hash.",
   "packages/plugin-swr/src/templates/mutation.test.tsx": "Pins the mutation variant passed to a custom mutationKey; swr snapshots use default keys only.",
   "packages/plugin-swr/src/templates/query.test.tsx": "Pins the query variant passed to a custom queryKey; tests/3.0.x/pluginSwr.test.ts uses default keys.",

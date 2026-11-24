@@ -17,7 +17,8 @@ concurrency:
 jobs:
   release:
     name: Release
-    if: github.repository_owner == 'kubb-labs'
+    # `workflow_dispatch` can start from any ref, so the job only runs on a release branch.
+    if: github.repository_owner == 'kubb-labs' && contains(fromJSON('["main", "alpha", "beta", "rc"]'), github.ref_name)
     timeout-minutes: 15
     runs-on: ubuntu-latest
     # id-token: write enables npm OIDC trusted publishing — no NPM_TOKEN needed.

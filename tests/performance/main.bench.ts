@@ -44,7 +44,7 @@ describe('Plugin Generation Performance', () => {
             },
             enum: { type: 'asConst' },
           }),
-        ] as Plugin[],
+        ] as Array<Plugin>,
       })
 
       const hooks = new Hookable()
@@ -78,7 +78,7 @@ describe('Plugin Generation Performance', () => {
               mode: 'directory',
             },
           }),
-        ] as Plugin[],
+        ] as Array<Plugin>,
       })
 
       const hooks = new Hookable()
@@ -127,7 +127,7 @@ describe('Plugin Generation Performance', () => {
               barrel: false,
             },
           }),
-        ] as Plugin[],
+        ] as Array<Plugin>,
       })
 
       const hooks = new Hookable()

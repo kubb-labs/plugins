@@ -17,7 +17,8 @@ import type {
   PluginType,
   Template,
 } from '@kubb/kit'
-import { ast, casing, Diagnostics, file, from, Hookable, memo, memoryStorage, withContext } from '@kubb/kit'
+import { ast } from '@internals/ast'
+import { casing, Diagnostics, file, from, Hookable, memo, memoryStorage, withContext } from '@kubb/kit'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'
@@ -270,11 +271,8 @@ const formatOptions: Options = {
 
 export async function format(source?: string): Promise<string> {
   if (!source) return ''
-  try {
-    return prettierFormat(source, formatOptions)
-  } catch {
-    return source
-  }
+  // A source prettier cannot parse is invalid TypeScript, so it fails the test and gets no snapshot.
+  return prettierFormat(source, formatOptions)
 }
 
 const parsers = new Map<`.${string}`, any>([['.ts', parserTs()]])

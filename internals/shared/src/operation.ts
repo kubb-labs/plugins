@@ -3,7 +3,7 @@ import { jsDocEscape } from '@internals/utils'
 import { casing, type Resolver } from '@kubb/kit'
 
 export type ContentTypeInfo = {
-  contentTypes: string[]
+  contentTypes: Array<string>
   isMultipleContentTypes: boolean
   contentTypeUnion: string
   defaultContentType: string
@@ -64,7 +64,7 @@ function getOperationRequestLine(node: ast.OperationNode): string | null {
  * Derives the shared `ContentTypeInfo` shape from a list of content types, tracking whether several
  * are present and the union, default, and form-data flags the client uses to pick one.
  */
-function buildContentTypeInfo(contentTypes: string[]): ContentTypeInfo {
+function buildContentTypeInfo(contentTypes: Array<string>): ContentTypeInfo {
   const isMultipleContentTypes = contentTypes.length > 1
 
   return {
@@ -495,15 +495,15 @@ export function buildResponses(
   })
 }
 
-export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
+export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): Array<string> {
   return ast.http.responses.filterError(node).map((response) => resolver.response.status(node, response.statusCode))
 }
 
-export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
+export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): Array<string> {
   return ast.http.responses.filterSuccess(node).map((response) => resolver.response.status(node, response.statusCode))
 }
 
-export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
+export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): Array<string> {
   return node.responses.map((response) => resolver.response.status(node, response.statusCode))
 }
 
@@ -515,7 +515,7 @@ export function resolveOperationTypeNames(
   node: ast.OperationNode,
   resolver: OperationTypeNameResolver & Pick<Resolver, 'memo'>,
   options: ResolveOperationTypeNameOptions = {},
-): string[] {
+): Array<string> {
   const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   return resolver.memo(`operationTypeNames:${key}`, () => {
     const { path, query, header, cookie } = ast.http.groupParameters(node)

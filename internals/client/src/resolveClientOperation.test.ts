@@ -54,25 +54,13 @@ describe('resolveClientOperation', () => {
     expect(() => run(ctx, getPetById)).toThrow(expect.objectContaining({ diagnostic: expect.objectContaining({ code: 'KUBB_PLUGIN_NOT_FOUND' }) }))
   })
 
-  test('reuses the cached result for the same client plugin and node instead of resolving again', () => {
-    const { ctx, getResolver } = createContext({ output: { path: '.', mode: 'directory' } })
+  test('returns the same result for the same client plugin and node, and another one per client plugin', () => {
+    const { ctx } = createContext({ output: { path: '.', mode: 'directory' } })
 
     const first = run(ctx, getPetById)
-    const calls = getResolver.mock.calls.length
-    const second = run(ctx, getPetById)
 
-    expect(second).toStrictEqual(first)
-    expect(getResolver).toHaveBeenCalledTimes(calls)
-  })
-
-  test('resolves independently per client plugin name, even sharing the same memo', () => {
-    const { ctx, getResolver } = createContext({ output: { path: '.', mode: 'directory' } })
-
-    run(ctx, getPetById, 'plugin-fetch')
-    run(ctx, getPetById, 'plugin-axios')
-
-    expect(getResolver).toHaveBeenCalledWith('plugin-fetch')
-    expect(getResolver).toHaveBeenCalledWith('plugin-axios')
+    expect(run(ctx, getPetById)).toBe(first)
+    expect(run(ctx, getPetById, 'plugin-fetch')).not.toBe(first)
   })
 
   describe("scoped by the client plugin's per-operation options", () => {

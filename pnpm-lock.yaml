@@ -238,6 +238,9 @@ importers:
       '@changesets/cli':
         specifier: ^3.0.3
         version: 3.0.3
+      '@internals/ast':
+        specifier: workspace:*
+        version: link:internals/ast
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.24.0(openapi-types@12.1.3)
@@ -286,6 +289,9 @@ importers:
       oxlint:
         specifier: 'catalog:'
         version: 1.94.0
+      pkg-pr-new:
+        specifier: ^0.0.94
+        version: 0.0.94
       prettier:
         specifier: 'catalog:'
         version: 3.10.1
@@ -1456,18 +1462,30 @@ importers:
       '@kubb/plugin-faker':
         specifier: workspace:*
         version: link:../../packages/plugin-faker
+      '@kubb/plugin-mcp':
+        specifier: workspace:*
+        version: link:../../packages/plugin-mcp
       '@kubb/plugin-msw':
         specifier: workspace:*
         version: link:../../packages/plugin-msw
       '@kubb/plugin-react-query':
         specifier: workspace:*
         version: link:../../packages/plugin-react-query
+      '@kubb/plugin-swr':
+        specifier: workspace:*
+        version: link:../../packages/plugin-swr
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
+      '@kubb/plugin-vue-query':
+        specifier: workspace:*
+        version: link:../../packages/plugin-vue-query
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:../../packages/plugin-zod
+      '@modelcontextprotocol/server':
+        specifier: ^2.4.0
+        version: 2.4.0
       '@tanstack/react-query':
         specifier: ^5.108.1
         version: 5.108.2(@types/react@19.3.0)(react@19.3.1)
@@ -1495,6 +1513,9 @@ importers:
       react:
         specifier: ^19.3.1
         version: 19.3.1
+      swr:
+        specifier: ^2.5.1
+        version: 2.5.1(react@19.3.1)
       vue:
         specifier: ^3.5.45
         version: 3.5.45(typescript@7.0.2)
@@ -3713,6 +3734,10 @@ packages:
   pify@2.3.0:
     resolution: {integrity: sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==}
     engines: {node: '>=0.10.0'}
+
+  pkg-pr-new@0.0.94:
+    resolution: {integrity: sha512-+s3ZZl1Vt3wHfsIRH+chHG6/3wsu1N+Z5jitNYAPc0GGCYR8xmju34UShzTAMosi4WAYFCXvp80LZZc/fXSdpQ==}
+    hasBin: true
 
   pnpm-workspace-yaml@1.9.1:
     resolution: {integrity: sha512-Xj/T2X6DNAWbtk/9UQ0/TJRswltiHZevmcMjqoL7WrpJi67lu3qaslU4+I+zJ8wtwqmuvAE0KkB8rbv2ZdogBg==}
@@ -6321,6 +6346,8 @@ snapshots:
   picomatch@4.0.7: {}
 
   pify@2.3.0: {}
+
+  pkg-pr-new@0.0.94: {}
 
   pnpm-workspace-yaml@1.9.1:
     dependencies:
