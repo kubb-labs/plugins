@@ -1,4 +1,4 @@
-import { addMacro, addTemplate, defineExtension, Resolver, setResolver, useConfig } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, injectFile, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { resolveContractClient } from '@internals/client'
@@ -15,6 +15,7 @@ import {
 } from './templates'
 import { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery, ResolverReactQuery } from './types.ts'
+import { withQueryKeyPath, withQueryKeyTemplate } from './withQueryKey.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-react-query`. Used for driver lookups
@@ -84,6 +85,9 @@ export const pluginReactQuery = defineExtension<PluginReactQuery>({
     addTemplate(mutationOperation)
     addTemplate(hookOptionsOperations)
     addTemplate(customHookOptionsFileOperations)
+    if (hooks || override.some((entry) => entry.options.hooks === true)) {
+      injectFile({ baseName: 'withQueryKey.ts', path: withQueryKeyPath(useConfig()), copy: withQueryKeyTemplate })
+    }
 
     return {
       output,

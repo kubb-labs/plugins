@@ -5,5 +5,5 @@
     "jsxImportSource": "@kubb/renderer-jsx",
     "types": ["node", "../../globals.d.ts"]
   },
-  "include": ["src/**/*", "./package.json", "./tsdown.config.ts"]
+  "include": ["src/**/*", "templates/**/*", "./package.json", "./tsdown.config.ts"]
 }

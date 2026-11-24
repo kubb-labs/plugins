@@ -3,6 +3,7 @@ import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { Payment } from '../../../models/ts/Payment'
 import type { PaymentError } from '../../../models/ts/PaymentError'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
+import { withQueryKey } from '../../../.kubb/withQueryKey'
 import { listPayments } from '../../axios/paymentService/listPayments'
 
 export const listPaymentsQueryKey = ({
@@ -132,7 +133,5 @@ export function useListPayments<TData = Array<Payment>, TQueryData = Array<Payme
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<PaymentError>> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }

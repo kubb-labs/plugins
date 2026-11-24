@@ -2,6 +2,7 @@ import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
+import { withQueryKey } from '../../../.kubb/withQueryKey'
 import { getPetById } from '../../axios/petService/getPetById'
 
 export const getPetByIdQueryKey = ({
@@ -99,7 +100,5 @@ export function useGetPetById<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<unknown | unknown>> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }

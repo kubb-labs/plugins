@@ -65,6 +65,7 @@ const consumerBindings = new Set([
   'pageParam',
   'queryKey',
   'mutationKey',
+  'withQueryKey',
 ])
 
 function isRelativeImport(importPath: string): boolean {

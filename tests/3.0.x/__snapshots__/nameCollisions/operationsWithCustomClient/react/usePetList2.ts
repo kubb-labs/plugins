@@ -6,6 +6,7 @@
 import type { PetListStatus2002 } from '../types/PetList'
 import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
+import { withQueryKey } from '../.kubb/withQueryKey'
 import { petList2 } from '../clients/petList'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
@@ -40,7 +41,5 @@ export function usePetList2<TData = PetListStatus2002, TQueryData = PetListStatu
    queryKey,
   } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }

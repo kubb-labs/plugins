@@ -2,6 +2,7 @@ import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { Payment } from '../../../models/ts/Payment'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
+import { withQueryKey } from '../../../.kubb/withQueryKey'
 import { getPaymentById } from '../../axios/paymentService/getPaymentById'
 
 export const getPaymentByIdQueryKey = ({
@@ -87,7 +88,5 @@ export function useGetPaymentById<TData = Payment, TQueryData = Payment, TQueryK
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
+  return withQueryKey(queryResult, queryKey as TQueryKey)
 }
