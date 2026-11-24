@@ -40,7 +40,6 @@
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
-    "@internals/ast": "workspace:*",
     "@kubb/adapter-oas": "catalog:",
     "@kubb/core": "catalog:",
     "@kubb/kit": "catalog:",
