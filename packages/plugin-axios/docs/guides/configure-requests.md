@@ -183,7 +183,7 @@ The client retries a status in `statusCodes` and any error the transport throws,
 - A stream body is never retried, because it cannot be read twice.
 - A `Retry-After` header sets the wait. When it asks for more than a minute, the call is not retried.
 - An aborted `signal` stops the wait and the retries.
-- The request interceptors and the `auth` resolver run once, so every retry sends the same headers.
+- The request interceptors run once per call. An `auth` function runs again before each retry, so a retry can send a fresh token.
 
 A streaming call uses the same `retry`, see [Stop, abort, and resume](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events#stop-abort-and-resume).
 
