@@ -12,8 +12,12 @@
   "ignorePatterns": ["**/__snapshots__/**", "examples/**"],
   // The Kubb CLI loads these by path.
   "entry": ["tests/e2e/kubb*.config.js"],
-  // Each plugin is exported by name and as the default on purpose.
-  "ignoreExports": [{ "file": "packages/*/src/plugin.ts", "exports": ["default"] }],
+  "ignoreExports": [
+    // Each plugin is exported by name and as the default on purpose.
+    { "file": "packages/*/src/plugin.ts", "exports": ["default"] },
+    // Copied into the user's project, where the generated code imports them.
+    { "file": "packages/*/templates/**", "exports": ["*"] }
+  ],
   "workspaces": {
     "settings": {
       // Only the generated code imports these, and it is ignored above or not committed.
