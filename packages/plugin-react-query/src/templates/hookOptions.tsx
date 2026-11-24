@@ -6,10 +6,7 @@ import { defineTemplate } from '@kubb/kit'
 import { File, Type } from '@kubb/renderer-jsx'
 import { hookFileVariants } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types'
-import { classifyOperation, resolveOperationOverrides } from '@internals/tanstack-query'
-
-type QueryOption = PluginReactQuery['resolvedOptions']['query']
-type MutationOption = PluginReactQuery['resolvedOptions']['mutation']
+import { classifyOperation } from '@internals/tanstack-query'
 
 /**
  * Emits the `HookOptions` type used by `customOptions`. Enabled when
@@ -20,7 +17,7 @@ type MutationOption = PluginReactQuery['resolvedOptions']['mutation']
 export const hookOptionsOperations = defineTemplate<PluginReactQuery>({
   kind: ast.node.kinds.operations,
   render({ operations: nodes }, ctx) {
-    const { output, customOptions, query, mutation, suspense, infinite, override, hooks, client } = ctx.options
+    const { output, customOptions, suspense, override, include, exclude, hooks, client } = ctx.options
 
     if (!customOptions || !hooks) return null
 
@@ -39,10 +36,10 @@ export const hookOptionsOperations = defineTemplate<PluginReactQuery>({
       if (!ast.http.isOperation(node)) continue
       // The hook templates emit nothing for an operation the client plugin leaves out.
       if (!resolveClientOperation({ node, pluginName: client.pluginName })) continue
-      const opOverrides = resolveOperationOverrides(node, override)
-      const nodeQuery: QueryOption = 'query' in opOverrides ? (opOverrides.query as QueryOption) : query
-      const nodeMutation: MutationOption = 'mutation' in opOverrides ? (opOverrides.mutation as MutationOption) : mutation
-      const nodeInfinite = 'infinite' in opOverrides ? opOverrides.infinite : infinite
+      // The options the per-operation templates get: this plugin's `override`, `include` and `exclude` applied.
+      const operationOptions = ctx.resolver.default.options(node, { options: ctx.options, exclude, include, override })
+      if (!operationOptions) continue
+      const { query: nodeQuery, mutation: nodeMutation, infinite: nodeInfinite } = operationOptions
       const nodeInfiniteOptions = nodeInfinite && typeof nodeInfinite === 'object' ? nodeInfinite : null
 
       // A per-operation `query: false` skips the query hooks, matching the templates that emit them.

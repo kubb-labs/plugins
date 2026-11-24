@@ -32,7 +32,6 @@ export {
   queryKeyGroupOrder,
   resolveInfiniteConfig,
   resolveMutationConfig,
-  resolveOperationOverrides,
   resolvePageParamType,
   resolveQueryConfig,
 } from './utils.ts'
