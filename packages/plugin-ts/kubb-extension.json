@@ -280,6 +280,23 @@
       ]
     },
     {
+      "key": "operations",
+      "label": "Operations",
+      "description": "Per-operation type files, or inline types in consumers",
+      "type": "select",
+      "default": "export",
+      "choices": [
+        {
+          "label": "export",
+          "value": "export"
+        },
+        {
+          "label": "inline",
+          "value": "inline"
+        }
+      ]
+    },
+    {
       "key": "banner",
       "path": ["output", "banner"],
       "label": "Banner",

@@ -1,15 +1,7 @@
 import { describe, expect, test } from 'vitest'
-import { isValidatorEnabled, resolveParamsValidator, resolveRequestValidator, resolveResponseValidator, resolveValidatorLibrary } from './validatorOptions.ts'
+import { resolveParamsValidator, resolveRequestValidator, resolveResponseValidator, resolveValidatorLibrary } from './validatorOptions.ts'
 
 describe('validator resolvers', () => {
-  test('isValidatorEnabled tracks every form', () => {
-    expect(isValidatorEnabled(false)).toBe(false)
-    expect(isValidatorEnabled('zod')).toBe(true)
-    expect(isValidatorEnabled({ request: 'zod' })).toBe(true)
-    expect(isValidatorEnabled({ params: 'zod' })).toBe(true)
-    expect(isValidatorEnabled({})).toBe(false)
-  })
-
   test('request and params opt in independently', () => {
     expect(resolveParamsValidator({ request: 'zod' })).toBe(false)
     expect(resolveRequestValidator({ params: 'zod' })).toBe(false)

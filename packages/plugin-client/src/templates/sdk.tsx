@@ -63,7 +63,7 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
   return defineTemplate<TFactory>({
     kind: ast.node.kinds.operations,
     render({ operations: nodes }, ctx) {
-      const { output, validator, returnType, throwOnErrorDefault, sdk } = ctx.options
+      const { output, returnType, throwOnErrorDefault, sdk } = ctx.options
 
       if (!sdk) return null
 
@@ -124,10 +124,6 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
               root={importRoot(file.path)}
               path={clientPath}
             />
-
-            {validator === 'zod' && ops.some((op) => ast.http.requestBody.getSchema(op.node) != null) && (
-              <File.Import names={[{ name: 'z', space: 'type' }]} path="zod" />
-            )}
 
             {typeImports.map((imp) => (
               <File.Import key={imp.path} names={ast.imports.asType(imp)} root={file.path} path={imp.path} />

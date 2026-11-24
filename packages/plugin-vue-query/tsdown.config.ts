@@ -10,7 +10,6 @@ const shared: Partial<UserConfig> = {
   shims: true,
   deps: {
     neverBundle: [/^@kubb\//, '@types/react'],
-    // alwaysBundle: [/@internals/],
   },
   fixedExtension: false,
   outputOptions: {

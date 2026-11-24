@@ -357,9 +357,6 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
   ] as const
 
   const createOptions = (body: ast.SchemaNode, extra: Array<ast.PropertyNode> = []) =>
-    // NOTE(v5-stable): the fields were renamed from the legacy beta shape
-    // (`data`/`pathParams`/`queryParams`/`headerParams`) to `body`/`path`/`query`/`headers` so the
-    // type matches the runtime client. Drop this note once v5 leaves beta.
     ast.factory.createSchema({
       type: 'object',
       primitive: 'object',

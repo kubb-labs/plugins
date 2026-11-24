@@ -265,9 +265,6 @@ importers:
       '@vitest/ui':
         specifier: 'catalog:'
         version: 5.1.1(vitest@5.1.1)
-      bun-types:
-        specifier: ^1.4.5
-        version: 1.4.5
       fallow:
         specifier: 3.46.0
         version: 3.46.0
@@ -854,9 +851,6 @@ importers:
       '@internals/ast':
         specifier: workspace:*
         version: link:../ast
-      '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.24.0
       '@kubb/kit':
         specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
@@ -879,9 +873,6 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../utils
-      '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.24.0
       '@kubb/kit':
         specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
@@ -904,9 +895,6 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../utils
-      '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.24.0
       '@kubb/kit':
         specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
@@ -934,7 +922,7 @@ importers:
   packages/plugin-axios:
     dependencies:
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-client':
         specifier: workspace:^
@@ -950,16 +938,16 @@ importers:
   packages/plugin-client:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
@@ -987,16 +975,16 @@ importers:
   packages/plugin-cypress:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
@@ -1015,16 +1003,16 @@ importers:
   packages/plugin-faker:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@faker-js/faker':
@@ -1043,7 +1031,7 @@ importers:
   packages/plugin-fetch:
     dependencies:
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-client':
         specifier: workspace:^
@@ -1056,7 +1044,7 @@ importers:
   packages/plugin-ky:
     dependencies:
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-client':
         specifier: workspace:^
@@ -1072,10 +1060,10 @@ importers:
   packages/plugin-mcp:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
@@ -1084,7 +1072,7 @@ importers:
         specifier: workspace:^
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
@@ -1112,10 +1100,10 @@ importers:
   packages/plugin-msw:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-faker':
         specifier: workspace:^
@@ -1124,7 +1112,7 @@ importers:
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
@@ -1143,16 +1131,16 @@ importers:
   packages/plugin-react-query:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
@@ -1167,9 +1155,6 @@ importers:
       '@internals/tanstack-query':
         specifier: workspace:*
         version: link:../../internals/tanstack-query
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../plugin-client
@@ -1193,16 +1178,16 @@ importers:
   packages/plugin-swr:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
@@ -1217,9 +1202,6 @@ importers:
       '@internals/tanstack-query':
         specifier: workspace:*
         version: link:../../internals/tanstack-query
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../plugin-client
@@ -1230,13 +1212,13 @@ importers:
   packages/plugin-ts:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
       '@typescript/typescript6':
         specifier: ^6.0.2
@@ -1264,13 +1246,13 @@ importers:
   packages/plugin-valibot:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
@@ -1289,16 +1271,16 @@ importers:
   packages/plugin-vue-query:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
@@ -1313,9 +1295,6 @@ importers:
       '@internals/tanstack-query':
         specifier: workspace:*
         version: link:../../internals/tanstack-query
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../plugin-client
@@ -1329,13 +1308,13 @@ importers:
   packages/plugin-zod:
     dependencies:
       '@kubb/ast':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0
       '@kubb/kit':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)(@kubb/core@5.24.0)
       '@kubb/renderer-jsx':
-        specifier: ^5.24.0
+        specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
     devDependencies:
       '@internals/ast':
@@ -2975,9 +2954,6 @@ packages:
   buffer@5.7.1:
     resolution: {integrity: sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==}
 
-  bun-types@1.4.5:
-    resolution: {integrity: sha512-ECHn+9dhL3wv0G6u0+7dQvrnaimXiRDxxerYBmhTaLyJEEuvTPWk2Fye3XIf5Y++JIIiHKfQw4Z7V5D8KuiXbg==}
-
   cac@7.1.0:
     resolution: {integrity: sha512-LMDU/U2yA4IPIY8KT0NsNPWEYZvAMkbgyspxJ6btJaYV+WMDOHAZCmB0lsTObiHaRS1V/ztKAl7+TSkTqXyeoA==}
     engines: {node: '>=20.19.0'}
@@ -4164,9 +4140,6 @@ packages:
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
-
-  undici-types@8.12.4:
-    resolution: {integrity: sha512-GNCQH3MbVGB8OAVAoTiLH8pu4wx5Ni3DWKpnBzGj3WDsi8EwmK0aOVBooNEt+g5YL1eHPxcS9XUTouwFU6j1kQ==}
 
   undici@6.29.1:
     resolution: {integrity: sha512-EvRlUt/QqAEvXdQeRMYUfwOQsfzpDztykrG2owGEE/rBOBoYv9uF39ZzsNDh4lTFHhTr2XOZjKkYgueD12ZmGA==}
@@ -5622,11 +5595,6 @@ snapshots:
       base64-js: 1.5.1
       ieee754: 1.2.1
 
-  bun-types@1.4.5:
-    dependencies:
-      '@types/node': 22.20.5
-      undici-types: 8.12.4
-
   cac@7.1.0: {}
 
   cachedir@2.4.0: {}
@@ -6857,8 +6825,6 @@ snapshots:
       unconfig-core: 7.5.0
 
   undici-types@6.21.0: {}
-
-  undici-types@8.12.4: {}
 
   undici@6.29.1: {}
 

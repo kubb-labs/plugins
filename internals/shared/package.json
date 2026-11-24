@@ -30,9 +30,6 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {}
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -53,7 +50,6 @@
   "dependencies": {
     "@internals/ast": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@kubb/ast": "catalog:",
     "@kubb/kit": "catalog:"
   },
   "devDependencies": {

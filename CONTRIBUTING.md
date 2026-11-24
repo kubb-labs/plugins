@@ -152,7 +152,6 @@ packages/plugin-<name>/
 ├── package.json
 ├── tsconfig.json       # extends ../../tsconfig.json
 ├── tsdown.config.ts
-└── vitest.config.ts
 ```
 
 After scaffolding, add a runnable example under `examples/`, add tests in `src/`, and open a PR with a changeset.
