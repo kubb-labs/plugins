@@ -7,7 +7,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
-type Props = {
+export type RequestProps = {
   /**
    * Name of the function
    */
@@ -23,7 +23,7 @@ type Props = {
   baseURL: string | null | undefined
 }
 
-export function Request({ baseURL = '', name, resolver, node }: Props): KubbReactNode {
+export function Request({ baseURL = '', name, resolver, node }: RequestProps): KubbReactNode {
   const { signature, groups } = buildRequestParamsSignature(node, resolver, { isConfigurable: false })
   const paramsSignature = [signature, 'options: Partial<Cypress.RequestOptions> = {}'].filter(Boolean).join(', ')
 

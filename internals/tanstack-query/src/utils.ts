@@ -7,7 +7,7 @@ import { buildResponseHeadersType, buildResultTypeRef } from '@internals/client'
 import type { ReturnTypeOption } from '@internals/client'
 import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
 
-type RequestGroupKey = (typeof requestGroupOrder)[number]
+export type RequestGroupKey = (typeof requestGroupOrder)[number]
 
 /**
  * Widens a request-group member type so a generated TanStack hook accepts either the value or a
@@ -201,17 +201,17 @@ function buildResultType(node: ast.OperationNode, resolver: ResolverTs, typedHea
   return buildResultTypeRef('RequestResult', resolver.response.responses(node), headers, ['true'])
 }
 
-type ResponseTypes = {
+export type ResponseTypes = {
   TData: string
   TError: string
 }
 
-type PageParamType = {
+export type PageParamType = {
   queryParamsTypeName: string | null
   pageParamType: string
 }
 
-type ResolvePageParamTypeParams = {
+export type ResolvePageParamTypeParams = {
   resolver: ResolverTs
   initialPageParam: Infinite['initialPageParam']
   queryParam?: Infinite['queryParam']
@@ -296,12 +296,12 @@ export function resolveMutationConfig(mutation: Partial<Mutation> | false, optio
   return { importPath: options.importPath, methods: ['POST', 'PUT', 'PATCH', 'DELETE'], ...mutation }
 }
 
-type OperationClassification = {
+export type OperationClassification = {
   isQuery: boolean
   isMutation: boolean
 }
 
-type ClassifyOperationParams = {
+export type ClassifyOperationParams = {
   query: Required<Query> | false
   mutation: Required<Mutation> | false
 }
@@ -408,9 +408,9 @@ export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: I
   return `${node.operationId}: the default infinite page params expect an array response and never end for this one. Set \`infinite.getNextPageParam\` (or \`nextParam\`) to read the next page from the response.`
 }
 
-type OverrideFilter = { type: string; pattern: string | RegExp } | { type: 'extension'; key: `x-${string}`; value?: unknown }
+export type OverrideFilter = { type: string; pattern: string | RegExp } | { type: 'extension'; key: `x-${string}`; value?: unknown }
 
-type OverrideEntry<TOptions> = OverrideFilter & {
+export type OverrideEntry<TOptions> = OverrideFilter & {
   options?: Partial<TOptions>
 }
 

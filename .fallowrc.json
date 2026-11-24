@@ -1,0 +1,30 @@
+{
+  "$schema": "./node_modules/fallow/schema.json",
+  "rules": {
+    // Off by default: an exported signature that uses a type its file does not export.
+    "private-type-leaks": "warn",
+    // A pull request that adds an import cycle fails.
+    "circular-dependencies": "error"
+  },
+  // Published packages: other repositories import their exports and class members.
+  "publicPackages": ["@kubb/*"],
+  // Generated output: the example projects and the snapshot fixtures.
+  "ignorePatterns": ["**/__snapshots__/**", "examples/**"],
+  // The Kubb CLI loads these by path.
+  "entry": ["tests/e2e/kubb*.config.js"],
+  "ignoreExports": [
+    // Each plugin is exported by name and as the default on purpose.
+    { "file": "packages/*/src/plugin.ts", "exports": ["default"] },
+    // Copied into the user's project, where the generated code imports them.
+    { "file": "packages/*/templates/**", "exports": ["*"] }
+  ],
+  // A type that only its own file uses stays exported, so the signatures that use it can be named.
+  "ignoreExportsUsedInFile": { "type": true },
+  "workspaces": {
+    "settings": {
+      // Only the generated code imports these, and it is ignored above or not committed.
+      "examples/*": { "ignoreDependencies": ["*"] },
+      "tests/e2e": { "ignoreDependencies": ["*"] }
+    }
+  }
+}

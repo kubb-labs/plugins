@@ -1,12 +1,12 @@
 import { Code } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
-type Member = {
+export type Member = {
   className: string
   propName: string
 }
 
-type Props = {
+export type SdkFacadeProps = {
   name: string
   members: Array<Member>
 }
@@ -17,7 +17,7 @@ type Props = {
  * point bound to one environment. The shared client is the public `client` field, where interceptors
  * registered once apply to every tag. The per-tag clients are read-only fields built in the constructor.
  */
-export function SdkFacade({ name, members }: Props): KubbReactNode {
+export function SdkFacade({ name, members }: SdkFacadeProps): KubbReactNode {
   const fields = ['  readonly client: ClientInstance', ...members.map((member) => `  readonly ${member.propName}: ${member.className}`)]
   const assignments = [
     '    this.client = createClient(config)',

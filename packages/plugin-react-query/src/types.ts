@@ -154,7 +154,7 @@ export type ResolverReactQuery = Resolver & {
   }
 }
 
-type Suspense = object
+export type Suspense = object
 
 /**
  * Builds the `queryKey` used by each generated query hook. `variant` tells which hook the key is for,
@@ -163,7 +163,7 @@ type Suspense = object
  * @note String values are inlined verbatim into generated code. Wrap literal
  * strings in `JSON.stringify(...)`.
  */
-type QueryKey = Transformer
+export type QueryKey = Transformer
 
 /**
  * Builds the `mutationKey` used by each generated mutation hook.
@@ -171,9 +171,9 @@ type QueryKey = Transformer
  * @note String values are inlined verbatim into generated code. Wrap literal
  * strings in `JSON.stringify(...)`.
  */
-type MutationKey = Transformer
+export type MutationKey = Transformer
 
-type CustomOptions = {
+export type CustomOptions = {
   /**
    * Module specifier of your custom-options hook. Imported as a named import,
    * `import { ${name} } from '${importPath}'`.
