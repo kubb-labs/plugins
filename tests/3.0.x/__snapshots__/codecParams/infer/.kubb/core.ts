@@ -781,10 +781,7 @@ function placeToken({ scheme, token, headers, query }: { scheme: Auth; token: st
     return
   }
   if (scheme.in === 'cookie') {
-    // Outside the RFC 6265 cookie-octets, such as a `;`, the token would start another cookie. The message leaves the token out.
-    if (!/^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/.test(token))
-      throw new TypeError(`The ${name} API key has characters a cookie cannot carry, escape it first.`)
-    appendCookie(headers, `${name}=${token}`)
+    appendCookie(headers, cookiePair(name, token))
     return
   }
   if (getHeader(headers, name) === undefined) headers[name] = token
@@ -809,6 +806,13 @@ export async function resolveAuth(params: {
     schemes.forEach((scheme, index) => placeToken({ scheme, token: tokens[index]!, headers, query }))
     return
   }
+}
+
+// Outside the RFC 6265 cookie-octets, such as a `;`, the token would start another cookie. The message leaves the token out.
+function cookiePair(name: string, token: string): string {
+  if (!/^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/.test(token))
+    throw new TypeError(`The ${name} API key has characters a cookie cannot carry, escape it first.`)
+  return `${name}=${token}`
 }
 
 function appendCookie(headers: Record<string, string>, cookie: string): void {
