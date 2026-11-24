@@ -115,7 +115,6 @@ function pipe(base: string, actions: Array<string | false | null | undefined>): 
   return list.length ? `v.pipe(${[base, ...list].join(', ')})` : base
 }
 
-// The `v.check` action of a `not` schema: the value must fail the schema `not` holds. Valibot has no negation schema.
 function notCheck(ctx: { transform: (node: ast.SchemaNode) => string | null | undefined }, node: ast.SchemaNode): string | null {
   const [member] = ast.schema.narrow(node, ast.schema.types.not)?.members ?? []
   const schema = member ? ctx.transform(member) : null
