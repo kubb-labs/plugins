@@ -25,7 +25,9 @@ export type ReturnTypeOption = 'full' | 'data' | 'plain'
  * make it relative to the importing file.
  */
 export type ClientOperation = {
+  /** The local name a consumer calls. Differs from the exported `importName` only when a consumer binding would shadow it. */
   name: string
+  importName: string
   path: string
   clientPath: string
   clientPathIsFile: boolean
@@ -46,6 +48,9 @@ type ClientPluginOptions = {
   include?: Array<Include>
   override?: Array<Override<Omit<ClientPluginOptions, 'override'>>>
 }
+
+// Names the hook and MCP handler bodies bind around the client call, which would shadow an operation of the same name.
+const consumerBindings = new Set(['path', 'query', 'body', 'headers', 'cookies', 'config', 'signal', 'variables', 'options', 'ctx', 'res', 'pageParam'])
 
 function isRelativeImport(importPath: string): boolean {
   return importPath.startsWith('.')
@@ -79,12 +84,13 @@ export function resolveClientOperation({ node, pluginName }: { node: ast.Operati
     const operationOptions = resolver.default.options(node, { options: pluginOptions, exclude, include, override })
     if (!operationOptions) return null
 
-    const name = resolver.resolveName({ key: operationKey(node), name: resolver.name(node.operationId) })
+    const importName = resolver.resolveName({ key: operationKey(node), name: resolver.name(node.operationId) })
     const file = ctx.file(node, { plugin: pluginName })
     const { importPath } = operationOptions
 
     return {
-      name,
+      name: consumerBindings.has(importName) ? `${importName}Request` : importName,
+      importName,
       path: file.path,
       clientPath: importPath === undefined ? path.resolve(ctx.root, '.kubb/client.ts') : resolveImportPath({ importPath, operationFile: file.path }),
       clientPathIsFile: importPath === undefined || isRelativeImport(importPath),

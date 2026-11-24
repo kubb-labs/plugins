@@ -90,6 +90,36 @@ describe('cypressGenerator — numeric body', () => {
   })
 })
 
+describe('cypressGenerator — undeclared path placeholder', () => {
+  // The spec declares `cert_id` but the URL also names `{certificate_id}`, which has no key on `path` and stays as written.
+  test('getCertificate', async () => {
+    const node = ast.factory.createOperation({
+      operationId: 'getCertificate',
+      method: 'GET',
+      path: '/orgs/{cert_id}/certificates/{certificate_id}',
+      tags: ['certificates'],
+      parameters: [ast.factory.createParameter({ name: 'cert_id', in: 'path', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+      responses: [ast.factory.createResponse({ statusCode: '204', description: 'Found' })],
+    })
+    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress })
+    const driver = createMockedPluginDriver({
+      name: 'getCertificate',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderTemplate(cypressOperation, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverCypress,
+    })
+
+    await matchFiles(driver.fileManager.files, 'getCertificate')
+  })
+})
+
 describe('cypressGenerator — cookie parameters', () => {
   // The request takes the cookies as an optional group and sends `Cookie` only when the call passes cookies. A `style: cookie`
   // value goes out as it is, and only the arrays `tags` and `ids` get the explode code. `ids` is a `form` cookie with `explode: true`.

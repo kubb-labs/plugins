@@ -5,8 +5,11 @@
     "moduleResolution": "Bundler",
     "module": "ESNext",
     "target": "ES2021",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
     "allowImportingTsExtensions": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["cypress", "node"]
   },
-  "include": ["models/ts/**/*.ts", "zod/**/*.ts"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

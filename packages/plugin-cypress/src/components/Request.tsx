@@ -31,7 +31,13 @@ export function Request({ baseURL = '', name, resolver, node }: RequestProps): K
   const returnType = `Cypress.Chainable<${responseType}>`
 
   // Bracket-access the path object with the raw OpenAPI param names, matching the generated `path` type's keys.
-  const urlTemplate = Url.toGroupedTemplateString(templatePathEscape(node.path), { prefix: baseURL })
+  // A placeholder the spec declares no path parameter for has no key on `path`, so it stays in the URL as written.
+  const pathNames = new Set(node.parameters.filter((parameter) => parameter.in === 'path').map((parameter) => parameter.name))
+  const urlPath = templatePathEscape(node.path)
+    .split(/(\{[^}]+\})/)
+    .map((part, index) => (index % 2 === 1 && pathNames.has(part.slice(1, -1)) ? Url.toGroupedTemplateString(part).slice(1, -1) : part))
+    .join('')
+  const urlTemplate = `\`${baseURL ?? ''}${urlPath}\``
 
   // `cy.request` has no cookie option, so the cookie group goes out as a `Cookie` header. An array joins with commas, a Date
   // is ISO 8601, and an object is JSON.

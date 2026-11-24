@@ -63,6 +63,14 @@ describe('resolveClientOperation', () => {
     expect(run(ctx, getPetById, 'plugin-fetch')).not.toBe(first)
   })
 
+  test('aliases an operation whose name a consumer binding would shadow', () => {
+    const { ctx } = createContext({ output: { path: '.', mode: 'directory' } })
+    const query = ast.factory.createOperation({ operationId: 'query', method: 'POST', path: '/query' })
+
+    expect(run(ctx, query)).toMatchObject({ name: 'queryRequest', importName: 'query' })
+    expect(run(ctx, getPetById)).toMatchObject({ name: 'getPetById', importName: 'getPetById' })
+  })
+
   describe("scoped by the client plugin's per-operation options", () => {
     const resolveWith = (pluginOptions: Record<string, unknown>, node: ast.OperationNode) => run(createContext(pluginOptions).ctx, node)
 

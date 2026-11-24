@@ -163,6 +163,27 @@ function notCheck(ctx: { transform: (node: ast.SchemaNode) => string | null | un
   return schema ? `(value) => !${schema}.safeParse(value).success, { message: "Value must not match the schema" }` : null
 }
 
+// `.extend()` replaces a key, while `allOf` keeps only the values every member allows. Drops the enum values an earlier
+// member's enum for the same property rules out, such as a discriminator mapping key missing from the member's own enum.
+function narrowEnums(object: ast.ObjectSchemaNode | null, earlier: ReadonlyArray<ast.SchemaNode>): ast.ObjectSchemaNode | null {
+  if (!object) return object
+  const properties = object.properties.map((property) => {
+    const node = ast.schema.narrow(property.schema, ast.schema.types.enum)
+    if (!node) return property
+    const allowed = earlier
+      .flatMap((member) => ast.schema.findProperties({ node: member, propertyName: property.name }))
+      .map(({ schema }) => ast.schema.getLiterals(ast.ref.mergeSchema(schema)))
+      .filter((values) => values.length > 0)
+    const isAllowed = (value: unknown) => allowed.every((values) => values.includes(value as never))
+    const enumValues = node.enumValues?.filter(isAllowed)
+    const namedEnumValues = node.namedEnumValues?.filter(({ value }) => isAllowed(value))
+    // No shared value means the spec contradicts itself, so the member is printed as declared.
+    if (!(namedEnumValues ?? enumValues)?.length) return property
+    return { ...property, schema: { ...node, enumValues, namedEnumValues } }
+  })
+  return { ...object, properties }
+}
+
 // `z.discriminatedUnion` rejects a member without literal discriminator values, such as an OpenAPI 3.2 `defaultMapping`.
 // Prints as a plain object schema, which a discriminated union can take as a member.
 function printsAsObject(node: ast.SchemaNode, circularSchemas?: ReadonlySet<string>): boolean {
@@ -419,16 +440,15 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         // A discriminated `oneOf` base already pins its discriminator to a literal; a sibling
         // `type: string` extended after it would widen that literal back to any string.
         const discriminator = ast.schema.narrow(first, ast.schema.types.union)?.discriminatorPropertyName
-        return preserveRequiredProperties(members)
-          .slice(1)
-          .reduce((acc, member) => {
-            const object = ast.schema.narrow(member, ast.schema.types.object)
-            if (!discriminator || !object?.properties.some((property) => property.name === discriminator)) {
-              return dialect.extend(acc, dialect.objectShape(this, member))
-            }
-            const properties = object.properties.filter((property) => property.name !== discriminator)
-            return properties.length ? dialect.extend(acc, dialect.objectShape(this, { ...object, properties })) : acc
-          }, firstBase)
+        const composed = preserveRequiredProperties(members)
+        return composed.slice(1).reduce((acc, member, index) => {
+          const object = narrowEnums(ast.schema.narrow(member, ast.schema.types.object), composed.slice(0, index + 1))
+          if (!discriminator || !object?.properties.some((property) => property.name === discriminator)) {
+            return dialect.extend(acc, dialect.objectShape(this, object ?? member))
+          }
+          const properties = object.properties.filter((property) => property.name !== discriminator)
+          return properties.length ? dialect.extend(acc, dialect.objectShape(this, { ...object, properties })) : acc
+        }, firstBase)
       }
 
       return rest.reduce((acc, member) => {
