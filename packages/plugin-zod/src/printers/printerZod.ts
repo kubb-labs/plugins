@@ -3,6 +3,7 @@ import { lazyGetter, objectKey } from '@internals/utils'
 import { createPrinter } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { defaultLiteral, hasInputChecks, shouldCoerce } from '@internals/shared'
+import * as shared from '@internals/shared'
 import { applyModifiers, buildObjectShape, lengthConstraints, numberConstraints, patternKeySchema, printWithOmit } from '../utils.ts'
 import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
@@ -220,27 +221,13 @@ const CONTAINER_TYPES = new Set<ast.SchemaType>([
   ast.schema.types.ref,
 ])
 
-type DirectionProbeContext = { options: PrinterZodOptions; transform: () => null; base: () => null; import: () => void }
-
-/**
- * Runs the node's effective handler (a `printer.nodes` override, else the built-in) once per
- * direction and reports whether the two disagree. That difference is what makes a component
- * need an `${name}InputSchema` variant.
- */
-function variesByDirection({ node, printerOptions, mini }: { node: ast.SchemaNode; printerOptions: PrinterZodOptions; mini?: boolean }): boolean {
-  if (CONTAINER_TYPES.has(node.type)) return false
-
-  // The `zod/mini` built-ins print the same either way, so only a `printer.nodes` override can vary.
-  const handler = printerOptions.nodes?.[node.type] ?? (mini ? undefined : scalarNodes[node.type])
-  if (!handler) return false
-
-  const call = (direction: 'encode' | 'decode') => {
-    const context: DirectionProbeContext = { options: { ...printerOptions, direction }, transform: () => null, base: () => null, import: () => {} }
-    return (handler as (this: DirectionProbeContext, node: ast.SchemaNode) => string | null).call(context, node)
-  }
-
-  return call('decode') !== call('encode')
-}
+// Whether the effective handler of a node, a `printer.nodes` override or else the built-in, prints differently per direction.
+// A container reads its children and not `direction`, and the `zod/mini` built-ins print the same either way.
+const varies =
+  ({ printerOptions, mini }: { printerOptions: PrinterZodOptions; mini?: boolean }) =>
+  (node: ast.SchemaNode) =>
+    !CONTAINER_TYPES.has(node.type) &&
+    shared.variesByDirection({ node, handler: printerOptions.nodes?.[node.type] ?? (mini ? undefined : scalarNodes[node.type]), options: printerOptions })
 
 /**
  * Whether the schema transitively contains a node that prints differently per direction, so it
@@ -256,15 +243,9 @@ export function containsDirectionalNode({
   printerOptions: PrinterZodOptions
   mini?: boolean
 }): boolean {
-  if (!node || (mini && !printerOptions.nodes)) return false
+  if (mini && !printerOptions.nodes) return false
 
-  return (
-    ast.schema.find(node, {
-      predicate: (schema) => variesByDirection({ node: schema, printerOptions, mini }),
-      follow: ['ref'],
-      cache: printerOptions.directionalCache,
-    }) !== undefined
-  )
+  return shared.containsDirectionalNode({ node, varies: varies({ printerOptions, mini }), cache: printerOptions.directionalCache })
 }
 
 /**
@@ -279,10 +260,7 @@ export function collectDirectionalRefNames({
   printerOptions: PrinterZodOptions
   mini?: boolean
 }): Array<string> {
-  return ast.node.collect<string>(node, {
-    schema: (n) =>
-      n.type === ast.schema.types.ref && n.ref && containsDirectionalNode({ node: n, printerOptions, mini }) ? (ast.ref.getName(n) ?? undefined) : undefined,
-  })
+  return shared.collectDirectionalRefNames({ node, contains: (ref) => containsDirectionalNode({ node: ref, printerOptions, mini }) })
 }
 
 /**

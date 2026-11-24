@@ -1,3 +1,4 @@
+export { collectDirectionalRefNames, containsDirectionalNode, variesByDirection } from './direction.ts'
 export {
   buildClientOptionType,
   buildContentTypeEntries,
