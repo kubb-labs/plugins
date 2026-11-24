@@ -85,7 +85,7 @@ export const pluginReactQuery = defineExtension<PluginReactQuery>({
     addTemplate(mutationOperation)
     addTemplate(hookOptionsOperations)
     addTemplate(customHookOptionsFileOperations)
-    if (hooks) {
+    if (hooks || override.some((entry) => entry.options.hooks === true)) {
       injectFile({ baseName: 'withQueryKey.ts', path: withQueryKeyPath(useConfig()), copy: withQueryKeyTemplate })
     }
 
