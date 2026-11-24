@@ -271,7 +271,6 @@ const formatOptions: Options = {
 
 export async function format(source?: string): Promise<string> {
   if (!source) return ''
-  // A source prettier cannot parse is invalid TypeScript, so it fails the test and gets no snapshot.
   return prettierFormat(source, formatOptions)
 }
 
