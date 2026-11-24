@@ -11,7 +11,7 @@ import type { PluginReactQuery } from '../types.ts'
 import { buildOperationComments as getComments, buildRequestConfigType } from '@internals/shared'
 import { buildMutationConfigParamsNode } from './MutationOptions.tsx'
 
-type Props = {
+export type MutationProps = {
   name: string
   mutationOptionsName: string
   mutationKeyName: string
@@ -41,7 +41,16 @@ function buildMutationParamsNode(
   })
 }
 
-export function Mutation({ name, mutationOptionsName, node, tsResolver, mutationKeyName, customOptions, returnType, typedHeaders }: Props): KubbReactNode {
+export function Mutation({
+  name,
+  mutationOptionsName,
+  node,
+  tsResolver,
+  mutationKeyName,
+  customOptions,
+  returnType,
+  typedHeaders,
+}: MutationProps): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const TRequest = resolveMutationRequestType(node, tsResolver)

@@ -117,9 +117,9 @@ export type ResolverTs = Resolver & {
   }
 }
 
-type EnumKeyCasing = 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'
+export type EnumKeyCasing = 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'
 
-type EnumConstCasing = 'camelCase' | 'pascalCase'
+export type EnumConstCasing = 'camelCase' | 'pascalCase'
 
 /**
  * Grouped enum settings. Each `type` uses only some of the other fields.
@@ -135,7 +135,7 @@ type EnumConstCasing = 'camelCase' | 'pascalCase'
  * // export type VehicleType = (typeof VehicleType)[keyof typeof VehicleType]
  * ```
  */
-type EnumOptions =
+export type EnumOptions =
   | {
       /**
        * Emit a `const` object asserted with `as const`, paired with a `typeof` type alias.

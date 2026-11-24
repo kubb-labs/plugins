@@ -7,7 +7,7 @@ import { buildHookParams, buildQueryKeyParams, buildQueryOptionsParams, buildRes
 import type { HookResultProps } from '@internals/tanstack-query'
 import { buildClientOptionType, buildOperationComments as getComments } from '@internals/shared'
 
-type Props = {
+export type QueryProps = {
   name: string
   queryOptionsName: string
   queryKeyName: string
@@ -19,7 +19,7 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, returnType, typedHeaders }: Props): KubbReactNode {
+export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, returnType, typedHeaders }: QueryProps): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
   const generics = [TData, TError, `${queryKeyTypeName} | null`]
 

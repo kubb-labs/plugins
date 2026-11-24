@@ -8,7 +8,7 @@ import { type HookFileVariant, hookFileName } from '../resolver.ts'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { ClientOperation, ReturnTypeOption } from '@internals/client'
 
-type ResolveHookFileOptions = {
+export type ResolveHookFileOptions = {
   /** The hook's variant, which names its file through `hookFileName`. */
   variant?: HookFileVariant
   contractOp: ClientOperation
@@ -23,7 +23,7 @@ type ResolveHookFileOptions = {
   returnType?: ReturnTypeOption
 }
 
-type ResolvedHookFile = {
+export type ResolvedHookFile = {
   file: FileTarget
   tsResolver: ResolverTs
   contractOp: ClientOperation
@@ -85,7 +85,7 @@ export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFil
   }
 }
 
-type HookFileProps = {
+export type HookFileProps = {
   hook: ResolvedHookFile
   /**
    * Framework imports rendered between the client imports and the type import.

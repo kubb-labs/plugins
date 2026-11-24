@@ -45,7 +45,7 @@ export function buildSdkMethod({
   return `${jsdoc}  public ${name}${generics}(${body.paramsSignature}): ${body.returnType} {\n${methodBody}\n  }`
 }
 
-type OperationData = {
+export type SdkClientOperation = {
   node: ast.OperationNode
   name: string
   types: OperationTypeNames
@@ -54,9 +54,9 @@ type OperationData = {
   baseURL?: string
 }
 
-type Props = {
+export type SdkClientProps = {
   name: string
-  operations: Array<OperationData>
+  operations: Array<SdkClientOperation>
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
 }
@@ -68,7 +68,7 @@ type Props = {
  * client, which is how the root SDK shares one client across its tags. The client is public so callers
  * can add interceptors, and a per-call `client` option still overrides it for a one-off call.
  */
-export function SdkClient({ name, operations, returnType, throwOnErrorDefault }: Props): KubbReactNode {
+export function SdkClient({ name, operations, returnType, throwOnErrorDefault }: SdkClientProps): KubbReactNode {
   const methods = operations.map(({ node, name: methodName, types, validatorHooks, security, baseURL }) =>
     buildSdkMethod({
       node,

@@ -182,13 +182,13 @@ export function createObjectBindingPattern(props: Omit<ObjectBindingPatternNode,
 /**
  * Plain property descriptor for a destructured group built by {@link createFunctionParameter}.
  */
-type FunctionParameterProperty = {
+export type FunctionParameterProperty = {
   name: string
   type: TypeExpression
   optional?: boolean
 }
 
-type FunctionParameterInput =
+export type FunctionParameterInput =
   | { name: string | ObjectBindingPatternNode; type?: TypeExpression; optional?: boolean; default?: string; rest?: boolean }
   | { properties: Array<FunctionParameterProperty>; optional?: boolean; default?: string }
 
