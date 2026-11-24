@@ -49,7 +49,6 @@ declare global {
   namespace Kubb {
     interface MemoRegistry {
       operation: string
-      file: ast.FileNode['baseName']
       operationTypeNames: Array<string>
     }
   }

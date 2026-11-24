@@ -54,9 +54,6 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {}
-  },
   "exports": {
     ".": {
       "import": {
@@ -90,7 +87,7 @@
     "typecheck": "tsc && tsc -p tsconfig.templates.json"
   },
   "dependencies": {
-    "@kubb/kit": "^5.24.0",
+    "@kubb/kit": "catalog:",
     "@kubb/plugin-client": "workspace:^"
   },
   "devDependencies": {

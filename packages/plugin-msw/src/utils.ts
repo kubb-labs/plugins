@@ -45,7 +45,7 @@ export function resolveDefaultBaseURL(baseURL: string | null | undefined): strin
 /**
  * Gets the content type from a response, defaulting to 'application/json' if a schema exists.
  */
-export function getContentType(response: ast.ResponseNode | null | undefined): string | null {
+function getContentType(response: ast.ResponseNode | null | undefined): string | null {
   if (!hasResponseSchema(response)) {
     return null
   }

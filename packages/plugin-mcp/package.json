@@ -74,11 +74,11 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/ast": "^5.24.0",
-    "@kubb/kit": "^5.24.0",
+    "@kubb/ast": "catalog:",
+    "@kubb/kit": "catalog:",
     "@kubb/plugin-ts": "workspace:^",
     "@kubb/plugin-zod": "workspace:^",
-    "@kubb/renderer-jsx": "^5.24.0"
+    "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
     "@internals/ast": "workspace:*",

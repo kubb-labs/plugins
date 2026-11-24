@@ -72,7 +72,6 @@ export type {
   VisitorContext,
 } from '@kubb/ast'
 
-export type { DateOnlyTypeValue, DateTimeTypeValue, DateTypeOptions, ParserOptions } from './infer.ts'
 export * as auth from './auth.ts'
 export * as graph from './graph.ts'
 export * as http from './http/index.ts'

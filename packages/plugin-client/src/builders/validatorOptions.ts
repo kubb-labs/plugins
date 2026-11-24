@@ -14,13 +14,6 @@ export const pluginValibotName = 'plugin-valibot' satisfies PluginValibot['name'
 export type ValidatorResolver = ResolverZod | ResolverValibot
 
 /**
- * Returns `true` when any direction of the validator is on (used for dependency checks).
- */
-export function isValidatorEnabled(validator: ValidatorOptions | undefined): boolean {
-  return resolveValidatorLibrary(validator) !== null
-}
-
-/**
  * Returns the library the validator uses, or `null` when no direction is on.
  */
 export function resolveValidatorLibrary(validator: ValidatorOptions | undefined): ValidatorLibrary | null {

@@ -54,16 +54,6 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "components": [
-        "./dist/components.d.ts"
-      ],
-      "generators": [
-        "./dist/generators.d.ts"
-      ]
-    }
-  },
   "exports": {
     ".": {
       "import": {
@@ -89,17 +79,16 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/ast": "^5.24.0",
-    "@kubb/kit": "^5.24.0",
+    "@kubb/ast": "catalog:",
+    "@kubb/kit": "catalog:",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/renderer-jsx": "^5.24.0"
+    "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
     "@internals/ast": "workspace:*",
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
-    "@internals/utils": "workspace:*",
     "@kubb/plugin-client": "workspace:*",
     "@tanstack/vue-query": "^5.108.1",
     "vue": "^3.5.45"

@@ -33,9 +33,6 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {}
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -55,17 +52,12 @@
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@kubb/ast": "catalog:",
     "@kubb/kit": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:"
-  },
-  "peerDependencies": {
-    "@kubb/kit": "catalog:",
-    "@kubb/renderer-jsx": "catalog:"
   },
   "engines": {
     "node": ">=22.22"
