@@ -1,5 +1,17 @@
 # @kubb/plugin-ts
 
+## 5.7.3
+
+### Patch Changes
+
+- [#1593](https://github.com/kubb-labs/plugins/pull/1593) [`9b5b769`](https://github.com/kubb-labs/plugins/commit/9b5b769f2a4f24ada778737ed5322cc8433412ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove stale package metadata: `typesVersions` entries for files that are not built, a `files` entry for a folder that does not exist, and unused dependencies. `@kubb/*` dependencies now read their range from the workspace catalog. The published range is unchanged.
+
+- [#1591](https://github.com/kubb-labs/plugins/pull/1591) [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix three type printer details.
+  
+  - A `printer.nodes` override can call `this.base(node)` to get what the printer would have printed. It ran into `Maximum call stack size exceeded`.
+  - A union without members prints `never`, like an enum without values. It printed `any`.
+  - `resolver.enum.keyName(node)` without a suffix adds `Key`, the default of `enum.typeSuffix`. It added `key`.
+
 ## 5.7.2
 
 ### Patch Changes

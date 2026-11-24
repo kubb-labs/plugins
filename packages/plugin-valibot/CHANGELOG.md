@@ -1,5 +1,25 @@
 # @kubb/plugin-valibot
 
+## 0.4.0
+
+### Minor Changes
+
+- [#1591](https://github.com/kubb-labs/plugins/pull/1591) [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Validate the `not` keyword. A schema with `not` was printed without it, so the validator accepted values the document forbids.
+  
+  - `@kubb/plugin-zod` adds a `refine` that fails when the value matches the `not` schema. `zod/mini` gets the same check through `z.refine`.
+  - `@kubb/plugin-valibot` adds a `v.check` that fails when the value matches the `not` schema.
+  - `@kubb/plugin-zod` with `mini: true` prints `z.iso.datetime()` for a `date-time` string, with the `offset` and `local` flags, like the standard printer. It printed `z.string()`.
+  - A `pattern` that JavaScript cannot compile reports a `KUBB_INVALID_SPEC` diagnostic that names the pattern. It was a bare `SyntaxError`.
+
+### Patch Changes
+
+- [#1594](https://github.com/kubb-labs/plugins/pull/1594) [`473e23b`](https://github.com/kubb-labs/plugins/commit/473e23ba2b3368069f38010a0df6db77ac18b3f3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Two generators now share code with their siblings, which fixes two small differences.
+  
+  - `@kubb/plugin-valibot` uses the `description` of a request body for its schema comment, as `@kubb/plugin-zod` does.
+  - The `HookOptions` type of `@kubb/plugin-react-query` reads `override`, `include` and `exclude` the same way the hook files do. An `override` on `method` matched only the exact case there.
+
+- [#1593](https://github.com/kubb-labs/plugins/pull/1593) [`9b5b769`](https://github.com/kubb-labs/plugins/commit/9b5b769f2a4f24ada778737ed5322cc8433412ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove stale package metadata: `typesVersions` entries for files that are not built, a `files` entry for a folder that does not exist, and unused dependencies. `@kubb/*` dependencies now read their range from the workspace catalog. The published range is unchanged.
+
 ## 0.3.0
 
 ### Minor Changes

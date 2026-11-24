@@ -1,5 +1,37 @@
 # @kubb/plugin-zod
 
+## 5.13.0
+
+### Minor Changes
+
+- [#1591](https://github.com/kubb-labs/plugins/pull/1591) [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Validate the `not` keyword. A schema with `not` was printed without it, so the validator accepted values the document forbids.
+  
+  - `@kubb/plugin-zod` adds a `refine` that fails when the value matches the `not` schema. `zod/mini` gets the same check through `z.refine`.
+  - `@kubb/plugin-valibot` adds a `v.check` that fails when the value matches the `not` schema.
+  - `@kubb/plugin-zod` with `mini: true` prints `z.iso.datetime()` for a `date-time` string, with the `offset` and `local` flags, like the standard printer. It printed `z.string()`.
+  - A `pattern` that JavaScript cannot compile reports a `KUBB_INVALID_SPEC` diagnostic that names the pattern. It was a bare `SyntaxError`.
+
+### Patch Changes
+
+- [#1606](https://github.com/kubb-labs/plugins/pull/1606) [`c817344`](https://github.com/kubb-labs/plugins/commit/c81734467bbe122f17ff642a8639c8d5aa1a4f61) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix generated code that did not compile for some real-world specs.
+  
+  - An operation named after a local binding, such as `query` or `body`, no longer shadows its own client function in a hook or an MCP handler. The client is imported under an alias, such as `import { query as queryRequest }`.
+  - A Cypress request keeps a `{placeholder}` in the URL as written when the spec declares no path parameter for it. Before, it read a key that does not exist on `path`.
+  - An `allOf` Zod schema keeps only the enum values every member allows, like the TypeScript type. Before, a discriminator mapping key missing from the member's own enum made the Zod schema wider than the type.
+
+- [#1591](https://github.com/kubb-labs/plugins/pull/1591) [`7823fd3`](https://github.com/kubb-labs/plugins/commit/7823fd31ccc2092da0386b178707383f7f8d9bfc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Escape text from the OpenAPI document before it reaches generated code.
+  
+  - A description or summary with `*/` no longer closes the JSDoc block of an SDK class method, and a line that starts with `@` no longer becomes a JSDoc tag.
+  - A path with a backtick, a backslash or `$` stays text in the MSW handler URL and the Cypress request URL.
+  - A property name with a quote is quoted in the `.omit()` mask of a zod schema.
+  - A parameter `style`, a response status key and the `nextParam`, `cursorParam` and `queryParam` keys are quoted. An `explode` or `allowReserved` that is not a boolean is left out.
+  - A faker enum whose values are objects lists them as JSON, not as `[object Object]`.
+  - A faker import that is renamed after a name collision only renames its calls, so a property key of the same name stays.
+
+- [#1593](https://github.com/kubb-labs/plugins/pull/1593) [`9b5b769`](https://github.com/kubb-labs/plugins/commit/9b5b769f2a4f24ada778737ed5322cc8433412ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove stale package metadata: `typesVersions` entries for files that are not built, a `files` entry for a folder that does not exist, and unused dependencies. `@kubb/*` dependencies now read their range from the workspace catalog. The published range is unchanged.
+
+- [#1608](https://github.com/kubb-labs/plugins/pull/1608) [`4b025c5`](https://github.com/kubb-labs/plugins/commit/4b025c56dc5495d7fec2eb1f27f8127a377bbb8e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - An `allOf` Zod schema whose members share no enum value for a property now prints `z.never()` for it, like `never` in the TypeScript type. Before, it kept the later member's enum and accepted values the type rejects.
+
 ## 5.12.0
 
 ### Minor Changes
