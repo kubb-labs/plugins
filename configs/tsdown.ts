@@ -6,7 +6,7 @@ const entry = { index: 'src/index.ts' }
  * The two builds every plugin package has: the ESM JavaScript, then the CJS JavaScript with the declarations of both formats.
  * `deps` replaces the default, which keeps `@kubb/*` external and bundles `@internals/*`.
  */
-export function pluginBuilds({ deps = { neverBundle: [/^@kubb\//], alwaysBundle: [/@internals/] } }: Pick<UserConfig, 'deps'> = {}): Array<UserConfig> {
+export function packageBuilds({ deps = { neverBundle: [/^@kubb\//], alwaysBundle: [/@internals/] } }: Pick<UserConfig, 'deps'> = {}): Array<UserConfig> {
   const shared: Partial<UserConfig> = { platform: 'node', sourcemap: true, shims: true, deps, fixedExtension: false }
 
   return [
