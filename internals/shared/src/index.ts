@@ -1,3 +1,4 @@
+export { createSchemaResolver } from './schemaResolver.ts'
 export { collectDirectionalRefNames, containsDirectionalNode, variesByDirection } from './direction.ts'
 export {
   buildClientOptionType,
