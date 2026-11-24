@@ -6,7 +6,7 @@ import { getDeclarationParts } from '../printers/printerTs.ts'
 import type { PrinterTsFactory } from '../printers/printerTs.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { isInlineConstEnum } from '../utils.ts'
-import { Enum, getEnumNames } from './Enum.tsx'
+import { Enum, resolveEnumNames } from './Enum.tsx'
 
 type Props = {
   name: string
@@ -59,7 +59,7 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
   const enums = [...new Map(enumSchemaNodes.map((n) => [n.name, n])).values()].map((node) => {
     return {
       node,
-      ...getEnumNames({ node, enum: enumOptions, resolver }),
+      ...resolveEnumNames({ node, enum: enumOptions, resolver }),
     }
   })
 

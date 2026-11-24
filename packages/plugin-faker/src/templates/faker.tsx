@@ -7,7 +7,7 @@ import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
 import { File, Function, Raw } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import type { PluginFaker } from '../types.ts'
-import { buildResponseUnionSchema, canOverrideSchema, dateParserName, localeToFakerImport, resolveFakerTypeUsage, resolveTypeReference } from '../utils.ts'
+import { buildResponseMockSchema, canOverrideSchema, dateParserName, localeToFakerImport, resolveFakerTypeUsage, resolveTypeReference } from '../utils.ts'
 
 type RenderUnit = {
   schema: ast.SchemaNode | null
@@ -270,7 +270,7 @@ export const fakerOperation = defineTemplate<PluginFaker>({
       )
     }
 
-    const responseUnionSchema = hasResponseNameCollision ? null : buildResponseUnionSchema(node, ctx.resolver)
+    const responseUnionSchema = hasResponseNameCollision ? null : buildResponseMockSchema(node, ctx.resolver)
     // A union of status factories, not the inline union of a single response schema.
     const statusMembers = responseUnionSchema?.type === 'union' ? (responseUnionSchema.members ?? []) : []
     const statusUnits = statusMembers.flatMap((member) => responseUnits.filter((unit) => unit.name === ast.ref.getName(member)))

@@ -5,7 +5,7 @@ import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildQueryKeyParams, buildResponseTypes, maybeRefOrGetter, resolvePageParamType } from '@internals/tanstack-query'
 import type { HookResultProps, Infinite } from '@internals/tanstack-query'
-import { buildClientOptionType, getComments } from '../utils.ts'
+import { buildClientOptionType, buildOperationComments } from '@internals/shared'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -59,7 +59,7 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <Function name={name} export generics={generics.join(', ')} params={paramsSignature} JSDoc={{ comments: getComments(node) }}>
+    <Function name={name} export generics={generics.join(', ')} params={paramsSignature} JSDoc={{ comments: buildOperationComments(node) }}>
       {`
        const { query: queryConfig = {}, client: config = {} } = options ?? {}
        const { client: queryClient, ...resolvedOptions } = queryConfig

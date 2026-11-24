@@ -5,7 +5,7 @@ import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildClientCall, buildQueryKeyParams, buildQueryOptionsParams, buildResponseTypes } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
-import { maybeRefOrGetter } from '../utils.ts'
+import { maybeRefOrGetter } from '@internals/tanstack-query'
 
 type Props = {
   name: string

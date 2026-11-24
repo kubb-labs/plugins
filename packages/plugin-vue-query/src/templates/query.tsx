@@ -5,7 +5,7 @@ import { defineTemplate } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import { Query } from '../components/Query.tsx'
 import { QueryOptions } from '../components/QueryOptions.tsx'
-import { maybeRefOrGetter } from '../utils.ts'
+import { maybeRefOrGetter } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types'
 
 /**
