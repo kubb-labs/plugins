@@ -141,7 +141,7 @@ export function getStream(node: Pick<ast.HttpOperationNode, 'responses'>): Respo
 
 type ResponseType = 'blob' | 'text' | 'stream'
 
-type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | null; stream?: ast.ContentNode['stream'] }
+export type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | null; stream?: ast.ContentNode['stream'] }
 
 const responseTypes: Partial<Record<NonNullable<ReturnType<typeof ast.mediaType.getKind>>, ResponseType>> = {
   eventStream: 'stream',
@@ -583,7 +583,7 @@ export function buildParamRefsSchema({
   })
 }
 
-type SchemaEntry = { schema: ast.SchemaNode; name: string; keysToOmit?: Array<string> | null }
+export type SchemaEntry = { schema: ast.SchemaNode; name: string; keysToOmit?: Array<string> | null }
 
 /**
  * The schemas a name with several content types needs: one per content type, then the union of

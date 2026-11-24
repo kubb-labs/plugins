@@ -7,7 +7,7 @@ import { throwsOnStrictCompile } from '../printers/zodNodes.ts'
 
 import type { CompileOptions } from '../types.ts'
 
-type Props = {
+export type ZodProps = {
   name: string
   node: ast.SchemaNode
   /**
@@ -98,7 +98,7 @@ export function Zod({
   compile,
   siblings,
   comments = [],
-}: Props): KubbReactNode {
+}: ZodProps): KubbReactNode {
   // A cyclic object emits its self-references as deferred getters (`get prop() { … }`), so its
   // initializer never references itself directly and TypeScript infers it fine — annotating it would
   // only strip the `ZodObject` methods (`.omit()`, `.strict()`). Only non-object cyclic schemas (a

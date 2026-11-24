@@ -7,7 +7,7 @@ import { buildCallResultBody, buildQueryOptionsParams, buildClientCall } from '@
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
 import { buildQueryKeyParams, buildResponseTypes } from '@internals/tanstack-query'
 
-type Props = {
+export type QueryOptionsProps = {
   name: string
   clientName: string
   queryKeyName: string
@@ -18,7 +18,16 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName, clientReturnType, returnType, typedHeaders }: Props): KubbReactNode {
+export function QueryOptions({
+  name,
+  clientName,
+  node,
+  tsResolver,
+  queryKeyName,
+  clientReturnType,
+  returnType,
+  typedHeaders,
+}: QueryOptionsProps): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })

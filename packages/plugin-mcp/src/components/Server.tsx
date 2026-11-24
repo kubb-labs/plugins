@@ -2,7 +2,7 @@ import { text } from '@kubb/kit'
 import { Const, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
-type ZodParam = {
+export type ZodParam = {
   name: string
   schemaName: string
 }
@@ -12,7 +12,7 @@ type ZodParam = {
  */
 const zodObject = (params: Array<ZodParam>) => `z.object({ ${params.map((p) => `${JSON.stringify(p.name)}: ${p.schemaName}`).join(', ')} })`
 
-type Props = {
+export type ServerProps = {
   /**
    * Human-readable server name passed to `new McpServer({ name })`.
    */
@@ -54,7 +54,7 @@ type Props = {
   }>
 }
 
-export function Server({ serverName, serverVersion, operations }: Props): KubbReactNode {
+export function Server({ serverName, serverVersion, operations }: ServerProps): KubbReactNode {
   const registrations = operations
     .map(({ tool, mcp, zod }) => {
       // Group params into the same `{ path, query, headers, cookies, body }` shape the contract `<op>`

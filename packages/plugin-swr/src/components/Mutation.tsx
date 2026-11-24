@@ -8,7 +8,7 @@ import type { CallReturnTypeProps } from '@internals/tanstack-query'
 import type { ReturnTypeOption } from '@internals/client'
 import { buildOperationComments as getComments, buildRequestConfigType } from '@internals/shared'
 
-type Props = {
+export type MutationProps = {
   name: string
   clientName: string
   mutationKeyName: string
@@ -60,7 +60,7 @@ export function Mutation({
   clientReturnType,
   returnType,
   typedHeaders,
-}: Props): KubbReactNode {
+}: MutationProps): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })

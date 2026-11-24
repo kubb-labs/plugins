@@ -280,7 +280,7 @@ export function getMemberConstraint({
   if (member.primitive === 'array') return lengths({ ...(ast.schema.narrow(member, 'array') ?? {}), regexType }) || undefined
 }
 
-type PrinterContext = {
+export type PrinterContext = {
   transform: (node: ast.SchemaNode) => string | null
   options: { cyclicSchemas?: ReadonlySet<string>; nodes?: Partial<Record<ast.SchemaType, unknown>> }
 }
