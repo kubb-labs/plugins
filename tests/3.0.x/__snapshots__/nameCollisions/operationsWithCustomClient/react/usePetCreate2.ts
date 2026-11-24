@@ -3,17 +3,17 @@
 * Do not edit manually.
 */
 
-import type { PetCreateStatus2002 } from '../types/PetCreate'
+import type { PetCreate2Status200 } from '../types/PetCreate2'
 import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { petCreate2 } from '../clients/petCreate'
+import { petCreate2 } from '../clients/petCreate2'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
-export const petCreateMutationKey2 = () => [{ url: '/pets/create-second' }] as const
+export const petCreate2MutationKey = () => [{ url: '/pets/create-second' }] as const
 
-export function petCreateMutationOptions2<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
-  const mutationKey = petCreateMutationKey2()
-  return mutationOptions<PetCreateStatus2002, ResponseErrorConfig<Error>, undefined, TContext>({
+export function petCreate2MutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+  const mutationKey = petCreate2MutationKey()
+  return mutationOptions<PetCreate2Status200, ResponseErrorConfig<Error>, undefined, TContext>({
     mutationKey,
     mutationFn: async(_) => {
       return (await petCreate2({ ...config, throwOnError: true })).data
@@ -25,18 +25,18 @@ export function petCreateMutationOptions2<TContext = unknown>(config: Partial<Om
  * `POST /pets/create-second`
  */
 export function usePetCreate2<TContext>(options: {
-  mutation?: UseMutationOptions<PetCreateStatus2002, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<PetCreate2Status200, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
-  const mutationKey = mutationOptions.mutationKey ?? petCreateMutationKey2()
+  const mutationKey = mutationOptions.mutationKey ?? petCreate2MutationKey()
 
-  const baseOptions = petCreateMutationOptions2(config) as UseMutationOptions<PetCreateStatus2002, ResponseErrorConfig<Error>, undefined, TContext>
+  const baseOptions = petCreate2MutationOptions(config) as UseMutationOptions<PetCreate2Status200, ResponseErrorConfig<Error>, undefined, TContext>
 
-  return useMutation<PetCreateStatus2002, ResponseErrorConfig<Error>, undefined, TContext>({
+  return useMutation<PetCreate2Status200, ResponseErrorConfig<Error>, undefined, TContext>({
     ...baseOptions,
     mutationKey,
     ...mutationOptions,
-  }, queryClient) as UseMutationResult<PetCreateStatus2002, ResponseErrorConfig<Error>, undefined, TContext>
+  }, queryClient) as UseMutationResult<PetCreate2Status200, ResponseErrorConfig<Error>, undefined, TContext>
 }

@@ -4,16 +4,16 @@
 */
 
 import useSWR from 'swr'
-import type { PetListStatus2002 } from '../types/PetList'
+import type { PetList2Status200 } from '../types/PetList2'
 import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { SWRConfiguration } from 'swr'
-import { petList2 } from '../clients/petList'
+import { petList2 } from '../clients/petList2'
 
-export const petListQueryKey2 = () => [{ url: '/pets/second' }] as const
+export const petList2QueryKey = () => [{ url: '/pets/second' }] as const
 
-type PetListQueryKey2 = ReturnType<typeof petListQueryKey2>
+type PetList2QueryKey = ReturnType<typeof petList2QueryKey>
 
-export function petListQueryOptions2(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+export function petList2QueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   return {
     fetcher: async () => {
       return (await petList2({ ...config, throwOnError: true })).data
@@ -25,19 +25,19 @@ export function petListQueryOptions2(config: Partial<Omit<RequestConfig, 'path' 
  * `GET /pets/second`
  */
 export function usePetList2(options: {
-  query?: SWRConfiguration<PetListStatus2002, ResponseErrorConfig<Error>>,
+  query?: SWRConfiguration<PetList2Status200, ResponseErrorConfig<Error>>,
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {
   const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-  const queryKey = petListQueryKey2()
+  const queryKey = petList2QueryKey()
 
-  return useSWR<PetListStatus2002, ResponseErrorConfig<Error>, PetListQueryKey2 | null>(
+  return useSWR<PetList2Status200, ResponseErrorConfig<Error>, PetList2QueryKey | null>(
    shouldFetch ? queryKey : null,
    {
-     ...petListQueryOptions2(config),
+     ...petList2QueryOptions(config),
      ...(immutable ? {
          revalidateIfStale: false,
          revalidateOnFocus: false,

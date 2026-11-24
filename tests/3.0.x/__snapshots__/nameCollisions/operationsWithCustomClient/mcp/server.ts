@@ -5,12 +5,12 @@
 
 import { petCreateStatus200Schema } from '../zod/pet/createSchema'
 import { petListStatus200Schema } from '../zod/pet/listSchema'
-import { petCreateStatus200Schema2 } from '../zod/petCreateSchema'
-import { petListStatus200Schema2 } from '../zod/petListSchema'
+import { petCreate2Status200Schema } from '../zod/petCreate2Schema'
+import { petList2Status200Schema } from '../zod/petList2Schema'
 import { petCreateHandler } from './pet/create'
 import { petListHandler } from './pet/list'
-import { petCreateHandler2 } from './petCreate'
-import { petListHandler2 } from './petList'
+import { petCreate2Handler } from './petCreate2'
+import { petList2Handler } from './petList2'
 import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
@@ -51,11 +51,11 @@ export function getServer() {
     return petListHandler(ctx)
   })
 
-  server.registerTool("pet-list", {
+  server.registerTool("pet-list_2", {
     description: "Make a GET request to /pets/second",
-    outputSchema: toolSchema(z.object({ data: petListStatus200Schema2 })),
+    outputSchema: toolSchema(z.object({ data: petList2Status200Schema })),
   }, async (ctx) => {
-    return petListHandler2(ctx)
+    return petList2Handler(ctx)
   })
 
   server.registerTool("pet_create", {
@@ -65,11 +65,11 @@ export function getServer() {
     return petCreateHandler(ctx)
   })
 
-  server.registerTool("pet-create", {
+  server.registerTool("pet-create_2", {
     description: "Make a POST request to /pets/create-second",
-    outputSchema: toolSchema(z.object({ data: petCreateStatus200Schema2 })),
+    outputSchema: toolSchema(z.object({ data: petCreate2Status200Schema })),
   }, async (ctx) => {
-    return petCreateHandler2(ctx)
+    return petCreate2Handler(ctx)
   })
 
   return server
