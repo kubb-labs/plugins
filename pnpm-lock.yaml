@@ -253,15 +253,6 @@ importers:
       '@kubb/plugin-barrel':
         specifier: 'catalog:'
         version: 5.24.0
-      '@kubb/plugin-cypress':
-        specifier: workspace:*
-        version: link:packages/plugin-cypress
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:packages/plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:*
-        version: link:packages/plugin-zod
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.24.0(@kubb/ast@5.24.0)
@@ -860,9 +851,6 @@ importers:
       '@internals/ast':
         specifier: workspace:*
         version: link:../ast
-      '@internals/shared':
-        specifier: workspace:*
-        version: link:../shared
       '@kubb/ast':
         specifier: 'catalog:'
         version: 5.24.0
