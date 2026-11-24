@@ -171,7 +171,7 @@ Sets how generated functions take the `auth` option.
 ::field-group
 
 :::field{name="mode: 'optional'"}
-Default value. Every generated function takes `auth` as an optional option. Use it when `client.setConfig({ auth })` supplies the token, and with the query-hook plugins, which pass a partial config to the function.
+Default value. Every generated function takes `auth` as an optional option. Use it when `client.setConfig({ auth })` supplies the token, and with the query plugins, which pass a partial config to the function.
 :::
 
 :::field{name="mode: 'required'"}
