@@ -234,6 +234,7 @@ export type AuthToken = string | undefined
 
 /**
  * A static token, or a callback per scheme. The first requirement whose schemes all get a token is sent.
+ * A callback runs again before each retry and each reopen of an event stream, so it can return a fresh token.
  */
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 

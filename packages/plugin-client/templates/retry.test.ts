@@ -1,6 +1,8 @@
 import { describe, expect, test, vi } from 'vitest'
 import { createClientCore } from './core.ts'
 import type { ResolvedRequest } from './core.ts'
+import { serializeCookies } from './serializers/cookies.ts'
+import { serializeQuery } from './serializers/query.ts'
 import { streamMediaTypes } from './sse.ts'
 
 const busy = () => new Response('busy', { status: 503 })
@@ -202,6 +204,49 @@ describe('retry', () => {
 
     await expect(collect(await client.stream({ url: '/events', retry: { limit: 1, delay: () => 0 } }))).rejects.toThrow('terminated')
     expect(transport).toHaveBeenCalledTimes(3)
+  })
+
+  test('asks the auth callback again before a retry and a stream reopen, and a static token once', async () => {
+    const requests: Array<ResolvedRequest> = []
+    const record = (responses: Array<Response>) => async (request: ResolvedRequest) => {
+      requests.push({ ...request, headers: { ...request.headers } })
+      return responses.shift()!
+    }
+    const client = createClientCore({ defaultTransport: async () => ok(), mediaTypes: streamMediaTypes, retry: { limit: 2, delay: () => 0 } })
+    let calls = 0
+    const auth = vi.fn(() => `token-${++calls}`)
+
+    await client({ url: '/pets', auth, security: [{ type: 'http', scheme: 'bearer' }], transport: record([busy(), ok()]) })
+    expect(requests.map((request) => request.headers['Authorization'])).toEqual(['Bearer token-1', 'Bearer token-2'])
+
+    // The query and the cookie header get the new token too, next to the cookie param.
+    requests.length = 0
+    const stream = await client.stream({
+      url: '/events',
+      auth,
+      security: [
+        [
+          { type: 'apiKey', name: 'key', in: 'query' },
+          { type: 'apiKey', name: 'sid', in: 'cookie' },
+        ],
+      ],
+      cookies: { theme: 'dark' },
+      serializer: { query: serializeQuery, cookie: serializeCookies },
+      transport: record([events('id: 1\ndata: one\n\n', true), events('data: two\n\n')]),
+    })
+    await collect(stream)
+    expect(requests.map((request) => [request.url, request.headers['Cookie'], request.headers['Last-Event-ID']])).toEqual([
+      ['/events?key=token-3', 'sid=token-4; theme=dark', undefined],
+      ['/events?key=token-5', 'sid=token-6; theme=dark', '1'],
+    ])
+
+    // A header an interceptor replaced stays, and a static token is not resolved twice.
+    requests.length = 0
+    const eject = client.interceptors.request.use((request) => ({ ...request, headers: { ...request.headers, Authorization: 'Bearer mine' } }))
+    await client({ url: '/pets', auth, security: [{ type: 'http', scheme: 'bearer' }], transport: record([busy(), ok()]) })
+    client.interceptors.request.eject(eject)
+    await client({ url: '/pets', auth: 'static', security: [{ type: 'http', scheme: 'bearer' }], transport: record([busy(), ok()]) })
+    expect(requests.map((request) => request.headers['Authorization'])).toEqual(['Bearer mine', 'Bearer mine', 'Bearer static', 'Bearer static'])
   })
 
   test('starts the retry count over once a reopened stream delivers an event', async () => {

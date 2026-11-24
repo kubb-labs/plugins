@@ -191,7 +191,13 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }: {
   config: ClientConfig<TRequest, TResponse>
   requestConfig: RequestConfig<TBody, TRequest, TResponse>
-}): Promise<{ request: ResolvedRequest; mediaTypes: MediaTypes; validate: ValidateOption | undefined; responseContentType: string | undefined }> {
+}): Promise<{
+  request: ResolvedRequest
+  mediaTypes: MediaTypes
+  validate: ValidateOption | undefined
+  responseContentType: string | undefined
+  refreshAuth: ((request: ResolvedRequest) => Promise<void>) | undefined
+}> {
   const serializers = { ...config.serializer, ...requestConfig.serializer }
   const mediaTypes = { ...defaultMediaTypes, ...config.mediaTypes, ...requestConfig.mediaTypes }
   const onValidationError = requestConfig.onValidationError ?? config.onValidationError
@@ -216,28 +222,37 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   )
 
   const headerValues = validatedHeaders as HeadersInit | undefined
-  const headers = serializeHeaders(serializers.header ? serializers.header(headerValues, requestConfig.styles?.header) : headerValues)
+  const baseHeaders = serializeHeaders(serializers.header ? serializers.header(headerValues, requestConfig.styles?.header) : headerValues)
   const contentType = requestConfig.contentType
   const { request: requestContentTypeOption, response: responseContentType } = typeof contentType === 'string' ? { request: contentType } : (contentType ?? {})
-  if (responseContentType && getHeader(headers, 'accept') === undefined) {
-    headers['Accept'] = responseContentType
+  if (responseContentType && getHeader(baseHeaders, 'accept') === undefined) {
+    baseHeaders['Accept'] = responseContentType
   }
 
-  const query: Record<string, unknown> = { ...(validatedQuery as Record<string, unknown> | undefined) }
-
-  await resolveAuth({
-    security: requestConfig.security,
-    auth: requestConfig.auth ?? config.auth,
-    headers,
-    query,
-  })
-
+  const auth = requestConfig.auth ?? config.auth
   const cookies = validatedCookies as Record<string, unknown> | undefined
-  // An object with only nullish values sends nothing, so it needs no serializer.
-  if (cookies && Object.values(cookies).some((value) => value !== undefined && value !== null)) {
-    const cookie = requireSerializer(serializers, 'cookie')(cookies, requestConfig.styles?.cookie)
-    if (cookie) appendCookie(headers, cookie)
+  // The parts a token can land in: a header, the `Cookie` header it shares with the cookie params, and the query.
+  const place = async () => {
+    const headers = { ...baseHeaders }
+    const query: Record<string, unknown> = { ...(validatedQuery as Record<string, unknown> | undefined) }
+    await resolveAuth({ security: requestConfig.security, auth, headers, query })
+    // An object with only nullish values sends nothing, so it needs no serializer.
+    if (cookies && Object.values(cookies).some((value) => value !== undefined && value !== null)) {
+      const cookie = requireSerializer(serializers, 'cookie')(cookies, requestConfig.styles?.cookie)
+      if (cookie) appendCookie(headers, cookie)
+    }
+    return { headers, query }
   }
+  const toUrl = (query: Record<string, unknown>) =>
+    serializeUrl({
+      parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
+      pathParams: (validatedPath ?? {}) as Record<string, unknown>,
+      query,
+      serializers,
+      styles: requestConfig.styles,
+    })
+  const { headers, query } = await place()
+  let placed = { ...headers }
 
   const validatedBody = await runValidator({
     validator: isValidationEnabled(validate, 'request') ? requestConfig.validator?.request : undefined,
@@ -262,13 +277,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   // The transport sets the multipart boundary.
   if (body instanceof FormData) deleteHeader(headers, 'content-type')
 
-  const url = serializeUrl({
-    parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
-    pathParams: (validatedPath ?? {}) as Record<string, unknown>,
-    query,
-    serializers,
-    styles: requestConfig.styles,
-  })
+  let url = toUrl(query)
 
   const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
   const accept = getHeader(headers, 'accept')
@@ -277,6 +286,24 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     mediaTypes,
     validate,
     responseContentType,
+    // A static token cannot change between attempts, so only a callback is asked again.
+    refreshAuth:
+      typeof auth === 'function' && requestConfig.security?.length
+        ? async (request) => {
+            const next = await place()
+            const nextUrl = toUrl(next.query)
+            // A header or url an interceptor or retry hook changed is theirs, so it stays.
+            for (const key of new Set([...Object.keys(placed), ...Object.keys(next.headers)])) {
+              const value = next.headers[key]
+              if (value === placed[key] || request.headers[key] !== placed[key]) continue
+              if (value === undefined) delete request.headers[key]
+              else request.headers[key] = value
+            }
+            if (request.url === url) request.url = nextUrl
+            placed = next.headers
+            url = nextUrl
+          }
+        : undefined,
     request: {
       url,
       method: (requestConfig.method ?? 'GET').toUpperCase(),
@@ -351,7 +378,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
     const onValidationError = requestConfig.onValidationError ?? config.onValidationError
     const retry = resolveRetry(config.retry, requestConfig.retry)
-    const { request, mediaTypes, validate, responseContentType } = await resolveRequest({ config, requestConfig })
+    const { request, mediaTypes, validate, responseContentType, refreshAuth } = await resolveRequest({ config, requestConfig })
     if (streaming) {
       request.stream = true
       // `client.stream` without a response content type would otherwise ask for the default, often JSON.
@@ -395,6 +422,8 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         if (!kept) release(response)
       }
       await sleep(delay, signal)
+      // The token may have expired during the wait or a long stream.
+      await refreshAuth?.(resolvedRequest)
       return true
     }
     const connect = async (): Promise<TransportResult<TRequest, TResponse>> => {

@@ -48,6 +48,8 @@ See [Which server a call picks](#which-server-a-call-picks) and [Named servers](
 
 Set `auth` to a token, or to a sync or async function that gets each [security scheme](https://spec.openapis.org/oas/v3.1.0#security-scheme-object) of the call. It returns the token, or `undefined` to skip the scheme:
 
+The function runs again before each [retry](#retry-a-failed-call) and each reopen of an event stream, so it can return a fresh token. A static token is read once.
+
 ```typescript
 client.setConfig({
   auth: (auth) => (auth.type === 'apiKey' ? apiKey : localStorage.getItem('token') ?? undefined),
