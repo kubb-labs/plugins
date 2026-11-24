@@ -17,7 +17,7 @@ export const pluginSwrName = 'plugin-swr' satisfies PluginSwr['name']
 /**
  * Generates SWR hooks from OpenAPI operations. Read operations become `useFoo` hooks built on
  * `useSWR` and write operations become `useFoo` hooks built on `useSWRMutation`, wrapping the
- * client functions from `@kubb/plugin-axios` or `@kubb/plugin-fetch`.
+ * client functions from a client plugin: `@kubb/plugin-fetch`, `@kubb/plugin-axios`, `@kubb/plugin-ky` or `@kubb/plugin-client`.
  *
  * @example
  * ```ts

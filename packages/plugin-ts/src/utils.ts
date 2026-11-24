@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
 import { text } from '@kubb/kit'
-import { getEnumNames } from './components/Enum.tsx'
+import { resolveEnumNames } from './components/Enum.tsx'
 import type { PluginTs, ResolverTs } from './types.ts'
 
 /**
@@ -26,7 +26,7 @@ export function resolveInlineEnumNames({
         name: child.name,
         normalize: (value) => {
           // An `asConst` enum emits a value and a type alias, and the name has to be free as both.
-          const { enumName, typeName } = getEnumNames({ node: { ...child, name: value }, enum: enumOptions, resolver })
+          const { enumName, typeName } = resolveEnumNames({ node: { ...child, name: value }, enum: enumOptions, resolver })
           return enumOptions.type === 'literal' ? [typeName] : [enumName, typeName]
         },
       })

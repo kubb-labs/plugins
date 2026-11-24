@@ -9,7 +9,7 @@ import type { PluginVueQuery } from '../types'
 
 /**
  * Built-in template for `useMutation` composables. Emits one
- * `useFooMutation` composable per POST/PUT/DELETE operation (configurable
+ * `useFoo` composable per POST/PUT/DELETE operation (configurable
  * via `mutation.methods`) plus the matching `fooMutationKey` helper.
  */
 export const mutationOperation = defineTemplate<PluginVueQuery>({

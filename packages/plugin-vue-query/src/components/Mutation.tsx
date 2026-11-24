@@ -13,7 +13,7 @@ import {
 } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
 import type { ReturnTypeOption } from '@internals/client'
-import { buildRequestConfigType, getComments } from '../utils.ts'
+import { buildOperationComments, buildRequestConfigType } from '@internals/shared'
 
 export type MutationProps = {
   name: string
@@ -67,7 +67,7 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }} generics={['TContext']}>
+    <Function name={name} export params={paramsSignature} JSDoc={{ comments: buildOperationComments(node) }} generics={['TContext']}>
       {`
         const { mutation = {}, client: config = {} } = options ?? {}
         const { client: queryClient, ...mutationOptions } = mutation;

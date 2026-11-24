@@ -19,7 +19,7 @@ export type ReturnTypeOption = 'full' | 'data' | 'plain'
  * the client module path (where `RequestConfig` / `ResponseErrorConfig` come from), and the
  * registered client plugin's `returnType`.
  *
- * `clientPath` is the absolute `.kubb/client.ts` path for plugin-fetch / plugin-axios, or
+ * `clientPath` is the absolute `.kubb/client.ts` path for plugin-fetch, plugin-axios and plugin-ky, or
  * plugin-client's `importPath`: a relative one is resolved against the `<op>` file to an absolute
  * path, a package name or alias is kept verbatim. `clientPathIsFile` tells a consumer whether to
  * make it relative to the importing file.
@@ -64,8 +64,8 @@ function resolveImportPath(options: { importPath: string; operationFile: string 
 
 /**
  * Resolves the contract client `<op>` a consumer (query hook, MCP handler) imports, from the registered contract client plugin
- * (plugin-fetch, plugin-axios, or plugin-client). Returns `null` when the client plugin's `exclude` / `include` leaves this
- * operation out, since it then emits no `<op>` to import. plugin-fetch / plugin-axios inject `.kubb/client.ts` at the global
+ * (plugin-fetch, plugin-axios, plugin-ky, or plugin-client). Returns `null` when the client plugin's `exclude` / `include` leaves this
+ * operation out, since it then emits no `<op>` to import. plugin-fetch, plugin-axios and plugin-ky inject `.kubb/client.ts` at the global
  * output root, the same path consumers read `RequestConfig` / `ResponseErrorConfig` from. With plugin-client they come from
  * the user's `importPath` module instead.
  *

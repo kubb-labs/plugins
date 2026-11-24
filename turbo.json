@@ -12,6 +12,7 @@
         "templates/**/*.ts",
         "!templates/**/*.test.ts",
         "$TURBO_ROOT$/configs/sharedTemplates.ts",
+        "$TURBO_ROOT$/configs/tsdown.ts",
         "kubb-extension.json",
         "tsdown.config.ts",
         "package.json",

@@ -5,11 +5,11 @@ import { defineTemplate } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import { Query } from '../components/Query.tsx'
 import { QueryOptions } from '../components/QueryOptions.tsx'
-import { maybeRefOrGetter } from '../utils.ts'
+import { maybeRefOrGetter } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types'
 
 /**
- * Built-in template for `useQuery` composables. Emits one `useFooQuery`
+ * Built-in template for `useQuery` composables. Emits one `useFoo`
  * composable per GET and QUERY operation (configurable via `query.methods`) plus the
  * matching `fooQueryKey` / `fooQueryOptions` helpers.
  */

@@ -1,11 +1,10 @@
-import { addMacro, addTemplate, defineExtension, Resolver, setResolver } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { createClientTemplates } from './templates/client.tsx'
 import { defaultMacros } from './macros.ts'
-import { resolverClient } from './resolver.ts'
-import { clientDependencies } from './setup.ts'
-import type { PluginClient, ResolverClient } from './types.ts'
+import { clientDependencies, resolveClientOptions } from './setup.ts'
+import type { PluginClient } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-client`.
@@ -27,43 +26,16 @@ export const pluginClient = defineExtension<PluginClient>({
   meta: { name: pluginClientName, version, compatibility },
   dependencies: clientDependencies,
   setup(options) {
-    const {
-      output = { path: 'clients', barrel: { type: 'named' } },
-      exclude = [],
-      include,
-      override = [],
-      importPath,
-      throwOnErrorDefault = true,
-      validator = false,
-      auth,
-      returnType = 'plain',
-      group,
-      resolver: userResolver,
-    } = options
+    // The shared defaults, except that a client module the application owns returns the body by default.
+    const resolved = resolveClientOptions({ ...options, returnType: options.returnType ?? 'plain' })
 
-    const resolver = userResolver ? Resolver.merge<ResolverClient>(resolverClient, ...[userResolver].flat()) : resolverClient
-
-    setResolver(resolver)
+    setResolver(resolved.resolver)
     addMacro(...defaultMacros, ...(options.macros ?? []))
     for (const template of createClientTemplates<PluginClient>()) {
       addTemplate(template)
     }
 
-    return {
-      output,
-      exclude,
-      include,
-      override,
-      group: group ?? null,
-      importPath,
-      baseURL: undefined,
-      throwOnErrorDefault,
-      validator,
-      auth: { mode: auth?.mode ?? 'optional' },
-      returnType,
-      sdk: undefined,
-      resolver,
-    }
+    return { ...resolved, importPath: options.importPath }
   },
 })
 

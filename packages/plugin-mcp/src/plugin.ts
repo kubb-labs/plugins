@@ -19,7 +19,7 @@ export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
  * Generates a Model Context Protocol (MCP) server from an OpenAPI spec. Every
  * operation becomes a typed MCP tool that AI assistants (Claude Desktop, Claude
  * Code, MCP-compatible clients) can call directly. Each handler calls a contract
- * client `<op>` from a registered `@kubb/plugin-axios` or `@kubb/plugin-fetch`.
+ * client `<op>` from a registered client plugin: `@kubb/plugin-fetch`, `@kubb/plugin-axios`, `@kubb/plugin-ky` or `@kubb/plugin-client`.
  * Next to the handlers it writes `server.ts`, a `start.ts` entry that serves the
  * tools over stdio, and a `.mcp.json` that runs `start.ts` with `tsx`.
  *

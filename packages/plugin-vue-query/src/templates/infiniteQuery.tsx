@@ -14,7 +14,7 @@ import { defineTemplate } from '@kubb/kit'
 import type { TemplateContext } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import { Query } from '../components/Query.tsx'
-import { maybeRefOrGetter } from '../utils.ts'
+import { maybeRefOrGetter } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types'
 
 // The operations this template writes. Every other operation returns `null`.
@@ -32,7 +32,7 @@ function matchesInfiniteQuery(node: ast.OperationNode, ctx: TemplateContext<Plug
 /**
  * Built-in template for `useInfiniteQuery` composables. Enabled when
  * `pluginVueQuery({ infinite: { ... }, hooks: true })`. Emits one
- * `useFooInfiniteQuery` composable per query operation, wiring the
+ * `useFooInfinite` composable per query operation, wiring the
  * configured cursor path into TanStack Query's cursor-based pagination.
  */
 export const infiniteQueryOperation = defineTemplate<PluginVueQuery>({

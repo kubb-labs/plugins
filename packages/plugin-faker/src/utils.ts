@@ -79,7 +79,7 @@ function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
  * `@kubb/plugin-ts`, so the mock never is an error body. Falls back to every response when no success response has a schema.
  * Returns null if no responses are provided, or embeds single simple responses inline.
  */
-export function buildResponseUnionSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
+export function buildResponseMockSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
   const withSchema = node.responses
     .map((response) => ({ ...response, content: response.content?.map((entry, _, content) => toResponseContent(entry, content)) }))
     .filter((response) => response.content?.[0]?.schema)

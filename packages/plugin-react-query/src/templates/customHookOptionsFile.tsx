@@ -74,7 +74,7 @@ export const customHookOptionsFileOperations = defineTemplate<PluginReactQuery>(
           {`return {
               // TODO: Define custom hook options here
               // Example:
-              // useUpdatePetHook: {
+              // useUpdatePet: {
               //   onSuccess: () => {
               //     void queryClient.invalidateQueries({ queryKey: ['pet'] })
               //   }

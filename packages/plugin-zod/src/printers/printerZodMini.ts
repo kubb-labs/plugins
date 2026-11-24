@@ -1,7 +1,6 @@
 import { ast } from '@internals/ast'
 import { lazyGetter, objectKey } from '@internals/utils'
 import { createPrinter } from '@kubb/kit'
-import type { PluginZod, ResolverZod } from '../types.ts'
 import { shouldCoerce } from '@internals/shared'
 import { applyMiniModifiers, buildObjectShape, lengthChecksMini, numberChecksMini, patternKeySchemaMini, printWithOmit } from '../utils.ts'
 import { containsDirectionalNode, type PrinterZodOptions } from './printerZod.ts'
@@ -31,61 +30,13 @@ import { buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
  */
 export type PrinterZodMiniNodes = ast.PrinterPartial<string, PrinterZodMiniOptions>
 
-export type PrinterZodMiniOptions = {
-  /**
-   * Enable automatic type coercion for strings, numbers, and dates through `z.coerce.*()`.
-   */
-  coercion?: PluginZod['resolvedOptions']['coercion']
-  /**
-   * Use `z.guid()` or `z.uuid()` for UUID/GUID validation.
-   *
-   * @default 'uuid'
-   */
-  guidType?: PluginZod['resolvedOptions']['guidType']
-  /**
-   * Output form for an OpenAPI `pattern` inside `z.regex(...)`: a regex literal
-   * (`'literal'`) or the `RegExp` constructor (`'constructor'`).
-   *
-   * @default 'literal'
-   */
-  regexType?: PluginZod['resolvedOptions']['regexType']
-  /**
-   * How a non-discriminated `oneOf` is printed: `z.union` with strict members or `z.xor`.
-   *
-   * @default 'union'
-   */
-  oneOfType?: PluginZod['resolvedOptions']['oneOfType']
-  /**
-   * Transforms raw schema names into valid JavaScript identifiers.
-   */
-  resolver?: ResolverZod
-  /**
-   * Properties to exclude using `.omit({ key: true })`.
-   */
-  keysToOmit?: Array<string> | null
-  /**
-   * Schema names that form circular dependency chains.
-   * Properties referencing these emit lazy getters wrapping refs in `z.lazy(() => …)`.
-   */
-  cyclicSchemas?: ReadonlySet<string>
-  /**
-   * Which way a node converts between its wire type and its runtime type:
-   * - `'decode'` (default): wire into runtime, used by response schemas.
-   * - `'encode'`: runtime back to wire, used by request bodies and parameters.
-   *
-   * The built-in handlers ignore it. A `printer.nodes` handler returning different output per
-   * direction makes the generator emit an `${name}InputSchema` variant for that component.
-   */
-  direction?: 'encode' | 'decode'
+export type PrinterZodMiniOptions = Omit<PrinterZodOptions, 'nodes' | 'directionalCache'> & {
   /**
    * Custom handler map for node type overrides.
    */
   nodes?: PrinterZodMiniNodes
 }
 
-/**
- * Factory options for the Zod Mini printer, defining input/output types and configuration.
- */
 export type PrinterZodMiniFactory = ast.PrinterFactoryOptions<'zod-mini', PrinterZodMiniOptions, string, string>
 
 /**
@@ -106,7 +57,7 @@ function buildZodMiniObjectShape(ctx: Parameters<typeof buildObjectShape>[0], no
 }
 
 /**
- * Zod v4 Mini printer built with `definePrinter`.
+ * Zod v4 Mini printer built with `createPrinter`.
  *
  * Converts a `SchemaNode` AST into a Zod v4 code string using the functional API
  * (`z.optional(z.string())`) for improved tree-shaking. See {@link printerZod} for the chainable API.

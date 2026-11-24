@@ -16,7 +16,7 @@ function matchesMutation(node: ast.OperationNode, ctx: TemplateContext<PluginRea
 }
 
 /**
- * Built-in template for `useMutation` hooks. Emits one `useFooMutation` hook
+ * Built-in template for `useMutation` hooks. Emits one `useFoo` hook
  * per POST/PUT/DELETE operation (configurable via `mutation.methods`) plus
  * the matching `fooMutationKey` / `fooMutationOptions` helpers.
  */

@@ -69,6 +69,9 @@ export function setupClient({ resolved, macros = [], client }: { resolved: Clien
   const files = [
     ['serializers.ts', templatePath('serializers.ts')],
     ['mediaTypes.ts', templatePath('mediaTypes.ts')],
+    ['types.ts', templatePath('types.ts')],
+    ['auth.ts', templatePath('auth.ts')],
+    ['retry.ts', templatePath('retry.ts')],
     ['core.ts', templatePath('core.ts')],
     ['client.ts', client],
     ['standardSchema.ts', templatePath('standardSchema.ts')],
