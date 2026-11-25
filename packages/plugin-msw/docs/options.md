@@ -127,6 +127,8 @@ Import path, written to the handler file as it is. Use a package name or a path 
 
 ::
 
+Each encoder needs its own export name. Setup fails when two paths export the same name, or when the name is one the handler file uses: `data`, `info`, `options`, `handler`, `http`, or `HttpResponse`.
+
 ```typescript [kubb.config.ts]
 pluginMsw({
   mediaTypes: {

@@ -1,4 +1,4 @@
-import { addMacro, addTemplate, defineExtension, injectFile, Resolver, setResolver, useConfig } from '@kubb/kit'
+import { addMacro, addTemplate, defineExtension, Diagnostics, injectFile, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginFakerName } from '@kubb/plugin-faker'
@@ -59,6 +59,23 @@ export const pluginMsw = defineExtension<PluginMsw>({
       resolver: userResolver,
       macros: userMacros,
     } = options
+
+    // An encoder is called by its export name, so that name has to be free in every handler file.
+    const reserved = new Map(['data', 'info', 'options', 'handler', 'http', 'HttpResponse'].map((name) => [name, 'the generated handler']))
+    for (const { name, path } of Object.values(mediaTypes)) {
+      const taken = reserved.get(name)
+      if (taken && taken !== path) {
+        throw new Diagnostics.Error({
+          code: Diagnostics.code.invalidPluginOptions,
+          severity: 'error',
+          message: `Plugin "${pluginMswName}" cannot use the \`mediaTypes\` encoder "${name}" from "${path}", because ${taken === 'the generated handler' ? taken : `"${taken}"`} already uses that name.`,
+          help: 'Export the encoder under another name.',
+          location: { kind: 'config' },
+          plugin: pluginMswName,
+        })
+      }
+      reserved.set(name, path)
+    }
 
     const resolver = userResolver ? Resolver.merge<ResolverMsw>(resolverMsw, ...[userResolver].flat()) : resolverMsw
 
