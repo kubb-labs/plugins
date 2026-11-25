@@ -16,9 +16,6 @@ export type MockProps = {
    */
   responseName?: string
   baseURL: string | null | undefined
-  /**
-   * Name of the `mediaTypes` encoder that writes the mocked response's body.
-   */
   encoder?: string
   node: ast.HttpOperationNode
 }

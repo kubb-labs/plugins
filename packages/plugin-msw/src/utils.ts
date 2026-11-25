@@ -54,9 +54,7 @@ function getContentType(response: ast.ResponseNode | null | undefined): string |
   return getResponseContentType(response) ?? 'application/json'
 }
 
-/**
- * The `mediaTypes` encoder for the content type a mock of `response` sends, when one is registered.
- */
+/** The `mediaTypes` encoder for the content type a mock of `response` sends, when one is registered. */
 export function getEncoder(response: ast.ResponseNode | null | undefined, mediaTypes: Record<string, MediaTypeEncoder>): MediaTypeEncoder | undefined {
   const contentType = getContentType(response)
   if (!contentType) return undefined

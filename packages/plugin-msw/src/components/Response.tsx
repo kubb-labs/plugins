@@ -7,9 +7,6 @@ export type ResponseProps = {
   typeName: string
   name: string
   response: ast.ResponseNode
-  /**
-   * Name of the `mediaTypes` encoder that writes this response's body.
-   */
   encoder?: string
 }
 

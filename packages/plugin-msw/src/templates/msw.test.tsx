@@ -476,7 +476,6 @@ describe('mswGenerator mediaTypes', () => {
     ],
   })
   const mediaTypes = { 'application/vnd.acme.stream+json': { name: 'encodeStream', path: './encodeStream' } }
-  // Returns a stream, the body type a `<string>` response would reject.
   const encodeStream = `export function encodeStream(data: Array<unknown> = []) {
   const frames = [...data.map((item) => ({ type: 'data', data: item })), { type: 'done' }]
   return new Blob(frames.map((frame) => JSON.stringify(frame) + '\\n')).stream()
