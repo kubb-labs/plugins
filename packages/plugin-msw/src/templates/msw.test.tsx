@@ -27,6 +27,7 @@ const defaultOptions: PluginMsw['resolvedOptions'] = {
   include: undefined,
   override: [],
   handlers: false,
+  mediaTypes: {},
 }
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
@@ -451,6 +452,60 @@ describe('mswGenerator body encoding', () => {
     const node = eventOperation('streamExample', [{ serializedValue: 'event: ping\ndata: hi\n\n' }])
 
     expect(await getBody(node, undefined)).toBe('event: ping\ndata: hi\n\n')
+  })
+})
+
+describe('mswGenerator mediaTypes', () => {
+  const node = ast.factory.createOperation({
+    operationId: 'streamLogs',
+    method: 'GET',
+    path: '/logs',
+    tags: ['logs'],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        description: 'Log lines',
+        content: [
+          ast.factory.createContent({
+            contentType: 'application/vnd.acme.stream+json; charset=utf-8',
+            schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'object', properties: [] })] }),
+          }),
+        ],
+      }),
+      ast.factory.createResponse({ statusCode: '400', description: 'Invalid', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }),
+    ],
+  })
+  const mediaTypes = { 'application/vnd.acme.stream+json': { name: 'encodeStream', path: './encodeStream' } }
+  // Returns a stream, the body type a `<string>` response would reject.
+  const encodeStream = `export function encodeStream(data: Array<unknown> = []) {
+  const frames = [...data.map((item) => ({ type: 'data', data: item })), { type: 'done' }]
+  return new Blob(frames.map((frame) => JSON.stringify(frame) + '\\n')).stream()
+}`
+
+  test('streamLogsMediaTypesFaker', async () => {
+    const files = await renderOperation({ name: 'streamLogsMediaTypesFaker', node, options: { parser: 'faker', mediaTypes } })
+
+    await matchFiles(files, 'streamLogsMediaTypesFaker')
+  })
+
+  test('sends the encoded body for a registered media type, and JSON for the other statuses', async () => {
+    const files = await renderOperation({ name: 'streamLogsMediaTypes', node, options: { mediaTypes } })
+    const handlers = await importGenerated(rawSources(files)[0]!, { encodeStream })
+    const request = new Request('http://localhost/logs')
+    const response = await msw.getResponse([handlers.streamLogsHandler([{ id: 1 }])], request, { baseUrl: 'http://localhost' })
+
+    expect(response?.headers.get('Content-Type')).toBe('application/vnd.acme.stream+json; charset=utf-8')
+    expect(await response?.text()).toBe('{"type":"data","data":{"id":1}}\n{"type":"done"}\n')
+    // Without data, as `createHandlers()` calls it, the encoder still writes the body.
+    expect(await (await msw.getResponse([handlers.streamLogsHandler()], request, { baseUrl: 'http://localhost' }))?.text()).toBe('{"type":"done"}\n')
+    expect(await handlers.streamLogsHandlerResponse400({ code: 1 }).text()).toBe('{"code":1}')
+  })
+
+  test('leaves an operation without a registered media type unchanged', async () => {
+    const withOption = await renderOperation({ name: 'getPets', node: listPetsNode, options: { mediaTypes } })
+    const without = await renderOperation({ name: 'getPets', node: listPetsNode, options: {} })
+
+    expect(rawSources(withOption)).toStrictEqual(rawSources(without))
   })
 })
 

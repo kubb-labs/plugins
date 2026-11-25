@@ -56,12 +56,38 @@ export type Options = PluginOptions<ResolvedOptions> & {
    * @default 'data'
    */
   parser?: 'data' | 'faker'
+  /**
+   * Encoders for response bodies, keyed by media type. A response whose mocked content type matches a key sends
+   * `name(data)` as its body, and the handler file imports `name` from `path`. Other responses keep the built-in body.
+   *
+   * @example
+   * ```ts
+   * mediaTypes: { 'application/vnd.acme.stream+json': { name: 'encodeStream', path: '@acme/runtime' } }
+   * ```
+   */
+  mediaTypes?: Record<string, MediaTypeEncoder>
+}
+
+/**
+ * A function that turns the mocked `data` into a response body, and the module the handler file imports it from.
+ */
+export type MediaTypeEncoder = {
+  /**
+   * Name of the exported function. It gets the handler's `data`, which is `undefined` when a mock has none, and
+   * returns a body the `Response` constructor accepts, such as a string or a `ReadableStream`.
+   */
+  name: string
+  /**
+   * Import path, written to the handler file as it is. Use a package name or a path alias.
+   */
+  path: string
 }
 
 export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   parser: NonNullable<Options['parser']>
   baseURL: Options['baseURL'] | undefined
   handlers: boolean
+  mediaTypes: NonNullable<Options['mediaTypes']>
 }
 
 export type PluginMsw = PluginType<'plugin-msw', Options, ResolvedOptions, ResolverMsw>

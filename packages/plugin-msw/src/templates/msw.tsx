@@ -7,7 +7,7 @@ import { File } from '@kubb/renderer-jsx'
 import { Mock } from '../components/Mock.tsx'
 import { Response } from '../components/Response.tsx'
 import type { PluginMsw } from '../types'
-import { hasResponseSchema, mswBodyPath } from '../utils.ts'
+import { getEncoder, hasResponseSchema, mswBodyPath } from '../utils.ts'
 
 /**
  * Built-in operation template for `@kubb/plugin-msw`. Emits one MSW handler
@@ -19,7 +19,7 @@ export const mswOperation = defineTemplate<PluginMsw>({
   kind: ast.node.kinds.operation,
   render(node, ctx) {
     if (!ast.http.isOperation(node)) return null
-    const { parser, baseURL } = ctx.options
+    const { parser, baseURL, mediaTypes } = ctx.options
 
     const mock = {
       name: ctx.resolver.handler.name(node),
@@ -64,6 +64,8 @@ export const mswOperation = defineTemplate<PluginMsw>({
     const requestName = request?.name ?? null
     const { imports: typeImports } = code.join([!hasResponseNameCollision && responseType, ...types.map(([, type]) => type), request])
     const fakerImport = hasSuccessSchema ? faker?.import : null
+    const encoders = [primaryResponse, ...types.map(([response]) => response)].flatMap((response) => getEncoder(response, mediaTypes) ?? [])
+    const encoderImports = [...new Map(encoders.map((encoder) => [`${encoder.path}:${encoder.name}`, encoder])).values()]
 
     return (
       <File {...mock.file}>
@@ -80,9 +82,12 @@ export const mswOperation = defineTemplate<PluginMsw>({
           <File.Import key={imp.path} names={ast.imports.asType(imp)} root={mock.file.path} path={imp.path} />
         ))}
         {fakerImport && <File.Import names={ast.file.getNames(fakerImport)} root={mock.file.path} path={fakerImport.path} />}
+        {encoderImports.map((encoder) => (
+          <File.Import key={`${encoder.path}:${encoder.name}`} names={[{ name: encoder.name, space: 'value' }]} path={encoder.path} />
+        ))}
 
         {types.map(([response, type]) => (
-          <Response key={response.statusCode} typeName={type.name} response={response} name={mock.name} />
+          <Response key={response.statusCode} typeName={type.name} response={response} name={mock.name} encoder={getEncoder(response, mediaTypes)?.name} />
         ))}
 
         <Mock
@@ -91,6 +96,7 @@ export const mswOperation = defineTemplate<PluginMsw>({
           requestTypeName={requestName}
           fakerName={faker && hasSuccessSchema ? faker.name : undefined}
           responseName={responseHelperName}
+          encoder={getEncoder(primaryResponse, mediaTypes)?.name}
           node={node}
           baseURL={baseURL}
         />

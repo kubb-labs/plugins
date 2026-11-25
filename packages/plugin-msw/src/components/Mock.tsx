@@ -16,10 +16,14 @@ export type MockProps = {
    */
   responseName?: string
   baseURL: string | null | undefined
+  /**
+   * Name of the `mediaTypes` encoder that writes the mocked response's body.
+   */
+  encoder?: string
   node: ast.HttpOperationNode
 }
 
-export function Mock({ baseURL = '', name, fakerName, responseName, typeName, requestTypeName, node }: MockProps): KubbReactNode {
+export function Mock({ baseURL = '', name, fakerName, responseName, typeName, requestTypeName, encoder, node }: MockProps): KubbReactNode {
   const method = getMswMethod(node)
   // `http.all` matches every method on the path, so a handler for a method MSW has no helper for lets the others pass through.
   const methodGuard = method === 'all' ? `if (info.request.method !== ${text.quote(node.method)}) return\n\n    ` : ''
@@ -47,7 +51,8 @@ export function Mock({ baseURL = '', name, fakerName, responseName, typeName, re
   const exampleBody = example ? `data === undefined ? ${example} : data` : 'data'
   const responseBody = fakerName ? `data ?? ${fakerName}()` : exampleBody
   // A spec example is not checked against the response type, so it is not passed to the typed helper.
-  const responseStatements = responseName && !example ? `return ${responseName}(${responseBody})` : responseReturn(responseBody, statusCode, successResponse)
+  const responseStatements =
+    responseName && !example ? `return ${responseName}(${responseBody})` : responseReturn(responseBody, statusCode, successResponse, encoder)
 
   return (
     <>

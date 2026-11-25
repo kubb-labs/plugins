@@ -55,6 +55,7 @@ export const pluginMsw = defineExtension<PluginMsw>({
       handlers = false,
       parser = 'data',
       baseURL,
+      mediaTypes = {},
       resolver: userResolver,
       macros: userMacros,
     } = options
@@ -79,6 +80,7 @@ export const pluginMsw = defineExtension<PluginMsw>({
       include,
       override,
       handlers,
+      mediaTypes,
     }
   },
 })

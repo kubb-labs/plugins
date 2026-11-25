@@ -11,6 +11,7 @@ Pass these options to `pluginMsw()`. Shared options link to [Shared plugin optio
 | [`baseURL`](#baseurl)                                                     | Base URL prepended to every handler's path.                                          | None                                              |
 | [`handlers`](#handlers)                                                   | Write a `handlers.ts` that exports every handler.                                    | `false`                                           |
 | [`parser`](#parser)                                                       | Source of the response body each handler returns.                                    | `'data'`                                          |
+| [`mediaTypes`](#mediatypes)                                               | Encode the response body of a media type with your own function.                     | `{}`                                              |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                                     | None                                              |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                                          | `[]`                                              |
 | [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                                 | `[]`                                              |
@@ -103,6 +104,53 @@ Each handler file also exports one response helper per status code, such as `get
 ```typescript [test-server.ts]
 getPetHandler(() => getPetHandlerResponse404())
 ```
+
+### mediaTypes
+
+Encoders for response bodies, keyed by media type. Without one, a mock sends its data as JSON, as text, or as one Server-Sent Event. Register an encoder when your client expects another format, such as framed NDJSON.
+
+|          |                                                  |
+| -------- | ------------------------------------------------ |
+| Type     | `Record<string, { name: string; path: string }>` |
+| Required | `false`                                          |
+| Default  | `{}`                                             |
+
+::field-group
+
+:::field{name="name"}
+Name of the exported function. It gets the handler's `data` and returns a body the `Response` constructor accepts, such as a string or a `ReadableStream`. `data` is `undefined` when a mock has none.
+:::
+
+:::field{name="path"}
+Import path, written to the handler file as it is. Use a package name or a path alias.
+:::
+
+::
+
+```typescript [kubb.config.ts]
+pluginMsw({
+  mediaTypes: {
+    'application/vnd.acme.stream+json': { name: 'encodeStream', path: '@acme/runtime' },
+  },
+})
+```
+
+A response uses the encoder when the content type its mock sends matches the key. Parameters such as `charset` are ignored. The match applies to the handler and to the response helper of every status with that content type:
+
+```typescript [src/gen/handlers/streamLogsHandler.ts]
+import { encodeStream } from '@acme/runtime'
+
+export function streamLogsHandlerResponse200(data?: StreamLogsResponse) {
+  return new HttpResponse(encodeStream(data), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/vnd.acme.stream+json',
+    },
+  })
+}
+```
+
+The status, the `Content-Type` header, and the other responses stay as generated. When the spec declares a plain type such as `application/json` for the operation, set the content type with a [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros) entry and register the encoder under it.
 
 ## Resolver members
 
