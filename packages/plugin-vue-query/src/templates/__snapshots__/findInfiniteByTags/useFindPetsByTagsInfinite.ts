@@ -6,10 +6,10 @@
 
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsStatus200 } from './FindPetsByTags'
-import type { InfiniteData, QueryKey, QueryClient, UseInfiniteQueryOptions, UseInfiniteQueryReturnType } from '@tanstack/react-query'
+import type { InfiniteData, QueryKey, QueryClient, UseInfiniteQueryOptions, UseInfiniteQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { findPetsByTags } from './clients/findPetsByTags'
-import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
+import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const findPetsByTagsInfiniteQueryKey = ({ query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsOptions, 'headers'>['query']> }) =>

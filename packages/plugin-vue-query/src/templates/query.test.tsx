@@ -18,12 +18,12 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
-    importPath: '@tanstack/react-query',
+    importPath: '@tanstack/vue-query',
     methods: ['GET'],
   },
   mutation: {
     methods: ['POST'],
-    importPath: '@tanstack/react-query',
+    importPath: '@tanstack/vue-query',
   },
   infinite: false,
   output: { path: '.', mode: 'directory' },
