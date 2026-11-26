@@ -281,6 +281,7 @@
     },
     {
       "key": "operations",
+      "path": ["operations"],
       "label": "Operations",
       "description": "Per-operation type files, or inline types in consumers",
       "type": "select",
