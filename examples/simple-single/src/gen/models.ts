@@ -35,13 +35,13 @@ export const addPetRequestStatusEnum = {
 
 export type AddPetRequestStatusEnumKey = (typeof addPetRequestStatusEnum)[keyof typeof addPetRequestStatusEnum]
 
-export const findPetsByStatusStatus = {
+export const findPetsByStatusStatusEnum = {
   available: 'available',
   pending: 'pending',
   sold: 'sold',
 } as const
 
-export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof typeof findPetsByStatusStatus]
+export type FindPetsByStatusStatusEnumKey = (typeof findPetsByStatusStatusEnum)[keyof typeof findPetsByStatusStatusEnum]
 
 export type Order = {
   /**
@@ -359,7 +359,7 @@ export type FindPetsByStatusQuery = {
    * @description Status values that need to be considered for filter
    * @default available
    */
-  status?: FindPetsByStatusStatusKey
+  status?: FindPetsByStatusStatusEnumKey
 }
 
 export type FindPetsByStatusStatus200Json = Pet[]

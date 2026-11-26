@@ -34,7 +34,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
+  FindPetsByStatusStatusEnumKey,
   FindPetsByTagsOptions,
   FindPetsByTagsQuery,
   FindPetsByTagsResponse,
@@ -135,4 +135,4 @@ export { getInventory } from './cypress/storeRequests/getInventory'
 export { getOrderById } from './cypress/storeRequests/getOrderById'
 export { placeOrder } from './cypress/storeRequests/placeOrder'
 export { placeOrderPatch } from './cypress/storeRequests/placeOrderPatch'
-export { addPetRequestStatusEnum, findPetsByStatusStatus, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models'
+export { addPetRequestStatusEnum, findPetsByStatusStatusEnum, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models'

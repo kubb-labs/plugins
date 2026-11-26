@@ -23,20 +23,20 @@ export type FindPetsByTagsQuery = {
   pageSize?: string
 }
 
-export const findPetsByTagsXEXAMPLE = {
+export const findPetsByTagsXEXAMPLEEnum = {
   ONE: 'ONE',
   TWO: 'TWO',
   THREE: 'THREE',
 } as const
 
-export type FindPetsByTagsXEXAMPLEKey = (typeof findPetsByTagsXEXAMPLE)[keyof typeof findPetsByTagsXEXAMPLE]
+export type FindPetsByTagsXEXAMPLEEnumKey = (typeof findPetsByTagsXEXAMPLEEnum)[keyof typeof findPetsByTagsXEXAMPLEEnum]
 
 export type FindPetsByTagsHeaders = {
   /**
    * @description Header parameters
    * @type string
    */
-  'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+  'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
 }
 
 export type FindPetsByTagsStatus200Json = Array<Pet>

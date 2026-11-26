@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByStatusStatus } from '../FindPetsByStatusStatus'
+import type { FindPetsByStatusStatusEnum } from '../FindPetsByStatusStatusEnum'
 import type { Pet } from '../Pet'
 
 export type FindPetsByStatusQuery = {
@@ -11,7 +11,7 @@ export type FindPetsByStatusQuery = {
    * @description Status values that need to be considered for filter
    * @default available
    */
-  status?: FindPetsByStatusStatus
+  status?: FindPetsByStatusStatusEnum
 }
 
 export type FindPetsByStatusStatus200Json = Array<Pet>

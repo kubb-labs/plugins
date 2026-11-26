@@ -19,7 +19,7 @@ export type AddPetRequestStatusEnum = 'available' | 'pending' | 'sold' | 'in sto
 
 export type PaymentMethodEnum = 'card' | 'cash'
 
-export type FindPetsByStatusStatus = 'available' | 'pending' | 'sold'
+export type FindPetsByStatusStatusEnum = 'available' | 'pending' | 'sold'
 
 export type DeletePetStatus200Enum = 'TYPE1' | 'TYPE2' | 'TYPE3'
 
@@ -439,7 +439,7 @@ export type FindPetsByStatusQuery = {
    * @description Status values that need to be considered for filter
    * @default available
    */
-  status?: FindPetsByStatusStatus
+  status?: FindPetsByStatusStatusEnum
 }
 
 export type FindPetsByStatusStatus200Json = Array<Pet>

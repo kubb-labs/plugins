@@ -1,0 +1,87 @@
+{
+  "lockfileVersion": 1,
+  "inputs": {
+    "src/gen": {
+      "hash": "630b58775714e40e7980818637e2ebf8c83474c207a2dd43fe36a1cc037eb2a4",
+      "sources": ["petStore.yaml"]
+    }
+  },
+  "files": {
+    "src/gen/.kubb/auth.ts": {
+      "source": "031c690ce4313edcf90909c80fb9b6a018a9d23a8c13e0cd29ec68e57fe21b54",
+      "output": "a42d396e1ac1800ff6be459335d2dccc6b53ba72396697f3900e5320f67fb29a"
+    },
+    "src/gen/.kubb/client.ts": {
+      "source": "6e25428a26509012e7069e5167afc2e0adfd73842c77c93f4008f590b7b41c8d",
+      "output": "67b3d14dad99f3cf4de8394bc1dddad786244c91913b3d8fafb282a5e2cb6119"
+    },
+    "src/gen/.kubb/config.ts": {
+      "source": "169191c679a896e80eea72b097e8f288bc80b27551757cba97702e630553781f",
+      "output": "5d74ac8f70bbf7d8d887b54d91a16b791038cb43bc333188f6c84ac34b8db03c"
+    },
+    "src/gen/.kubb/core.ts": {
+      "source": "7695526579b6dffc60736ccf48323985e3842babfe5197983424381bfa8710d7",
+      "output": "59f4a3c88ec079a03fd8c1c5956bcfc7836a40f10b221c5e90c6f6c1bc69fa2e"
+    },
+    "src/gen/.kubb/mediaTypes.ts": {
+      "source": "6f2378df7551d926ea8107a050666660355bc2095d957197f7293d52e4d01741",
+      "output": "f8b4c9040e5ae0f86bd8e0a855412aa8e53ff0cf636823550b8b77a9e36a0f31"
+    },
+    "src/gen/.kubb/retry.ts": {
+      "source": "4243e8b1557e15728312d69b23b8e3dbc97b6614d5a4eac47eb30b49d7bae4fe",
+      "output": "329665d427046ccbc2c69253aec9d7f696ebacf2ade0f2ef79ca05f71473e537"
+    },
+    "src/gen/.kubb/serializers.ts": {
+      "source": "cadd8471b1434c93978ae30987f3115be4d78b7d33a031cea9a71305b0baf2dd",
+      "output": "5efa7d998d67f19662c72c12fdeff527231133f0cbebdea8050df3de7f1c245e"
+    },
+    "src/gen/.kubb/serializers/headers.ts": {
+      "source": "33dcaa6fc04443603f8239d52807b6f32fb0e4db77fcbf139e7b02f4d0633e82",
+      "output": "f056dadd77196a76331ef2b8c42a8d7680d9593bb87482ab9e65d91fefd2bb88"
+    },
+    "src/gen/.kubb/serializers/path.ts": {
+      "source": "3bd82872d1e16272aa8b5681b9efa5d8f076e9f5d26e7dc76242f5dcc90882c5",
+      "output": "c444a972c6479f099dfabcc779821591f4c546b77197afddb5830582d3eb9406"
+    },
+    "src/gen/.kubb/serializers/query.ts": {
+      "source": "1ad44a2128d28e4b8a7daaf610475aab63bf8d056dce97cf295d3f0f372d2d33",
+      "output": "fc8e9a4bf7bb2b8b296a4fd52e986943438a9e931519d5b4acfe1326fcc6788b"
+    },
+    "src/gen/.kubb/standardSchema.ts": {
+      "source": "54dc00c98eff1279aae087236d94e8389737176a3b655d0548ca58f90b20ddda",
+      "output": "ad30140d6ca9f564ef43d83ab2a03b797e3b1b173c403b62bd31a0b180123f95"
+    },
+    "src/gen/.kubb/types.ts": {
+      "source": "cde53fdad95adb8fbe613a663b682ce3820befe1246adf795029e5b3d2bc989f",
+      "output": "f0e018b99e2b1273435a4caa1297be8be5fb2d494d45a7f662d0e1d998b2e768"
+    },
+    "src/gen/clients/listPets.ts": {
+      "source": "6e30426807e027cac73b5ae3dcb75c475587b14e537e9d4ea87848bbf9d6e933",
+      "output": "591ff7f618aa38c745975dc0ddf0757d05bf743396ffdf02c977770bf3ea7774"
+    },
+    "src/gen/clients/scheduleVisit.ts": {
+      "source": "0ac750d2796da10968f01e04c7ffc189aa727abfde690637dfecb52bdcb4e6b0",
+      "output": "306876cec22f5768e0e5f668ce2905eeebd816f7efa07bee9af3d030fa363c87"
+    },
+    "src/gen/zod/listPetsSchema.ts": {
+      "source": "26236837f8cd5a553093e5b491e1909566f538ebda265aacd4aa5f235ac74bfa",
+      "output": "3c0c53009e329d9e3917f4f025a725cd6f5df2f643e07c6b147e6b5f1da47daf"
+    },
+    "src/gen/zod/petSchema.ts": {
+      "source": "fa571847cde94f45d13c5448acb8ef87f97d31bbfb21237308cd45a1cdc93a6d",
+      "output": "79edb47c06a07ae692620ff2cb08614a0444aeedabbdbeb700e91741d797173b"
+    },
+    "src/gen/zod/scheduleVisitSchema.ts": {
+      "source": "3b5846a2b960abc32feb69ab27a2727f07dc4d6ed5b3d89a8046f5c2cbb80189",
+      "output": "0efdbad6d2f086df34f5454103df69bf9ed768a5d3167e24694383b7d5463d64"
+    },
+    "src/gen/zod/visitRequestSchema.ts": {
+      "source": "eb5786cee08f12bb7d60207ad9b23f0604de0a744a6ddba502d5423adb03ca04",
+      "output": "fcd77b50e004705268d3b7003910ca5b7da1104fb53a96d2b91ca1d47d7fe70f"
+    },
+    "src/gen/zod/visitSchema.ts": {
+      "source": "812cefd437cc7023811036dff98569b70fd282227a289d1f334fc2cb8507066d",
+      "output": "43a91e4d9db48e59228ff205bb16a2610c7ee759ce18fb045cd0627f3cd140eb"
+    }
+  }
+}

@@ -57,7 +57,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
+  FindPetsByStatusStatusEnumKey,
 } from './models/pet/FindPetsByStatus'
 export type {
   FindPetsByTagsOptions,
@@ -263,4 +263,4 @@ export { updateUserMutationKey, useUpdateUser } from './hooks/user/useUpdateUser
 export { addPetRequestStatusEnum } from './models/AddPetRequest'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/Order'
 export { petStatusEnum } from './models/Pet'
-export { findPetsByStatusStatus } from './models/pet/FindPetsByStatus'
+export { findPetsByStatusStatusEnum } from './models/pet/FindPetsByStatus'

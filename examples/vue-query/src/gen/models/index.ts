@@ -32,7 +32,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
+  FindPetsByStatusStatusEnumKey,
 } from './pet/FindPetsByStatus'
 export type {
   FindPetsByTagsOptions,
@@ -191,4 +191,4 @@ export type {
 export { addPetRequestStatusEnum } from './AddPetRequest'
 export { orderHttpStatusEnum, orderStatusEnum } from './Order'
 export { petStatusEnum } from './Pet'
-export { findPetsByStatusStatus } from './pet/FindPetsByStatus'
+export { findPetsByStatusStatusEnum } from './pet/FindPetsByStatus'

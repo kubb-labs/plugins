@@ -1,6 +1,6 @@
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
-import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
+import type { FindPetsByTagsXEXAMPLEEnumKey } from '../../../models/ts/FindPetsByTagsXEXAMPLEEnum'
 import type { Pet } from '../../../models/ts/Pet'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { withQueryKey } from '../../../.kubb/withQueryKey'
@@ -19,7 +19,7 @@ export const findPetsByTagsQueryKey = ({
       pageSize?: number
     }
     headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
     }
   },
   'headers'
@@ -33,7 +33,7 @@ export const findPetsByTagsQueryKey = ({
       pageSize?: number
     }
     headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
     }
   }['headers']
 } = {}) => [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
@@ -53,7 +53,7 @@ export function findPetsByTagsQueryOptions(
       pageSize?: number
     }
     headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
     }
   },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
@@ -87,7 +87,7 @@ export function useFindPetsByTags<TData = Array<Pet> | string, TQueryData = Arra
             pageSize?: number
           }
           headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
           }
         }['headers']
       | (() => {
@@ -99,7 +99,7 @@ export function useFindPetsByTags<TData = Array<Pet> | string, TQueryData = Arra
             pageSize?: number
           }
           headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
           }
         }['headers'])
     query?:
@@ -112,7 +112,7 @@ export function useFindPetsByTags<TData = Array<Pet> | string, TQueryData = Arra
             pageSize?: number
           }
           headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
           }
         }['query']
       | (() => {
@@ -124,7 +124,7 @@ export function useFindPetsByTags<TData = Array<Pet> | string, TQueryData = Arra
             pageSize?: number
           }
           headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
           }
         }['query'])
   },

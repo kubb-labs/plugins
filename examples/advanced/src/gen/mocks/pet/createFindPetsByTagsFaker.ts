@@ -1,6 +1,6 @@
-import type { FindPetsByTagsXEXAMPLEKey } from '../../models/ts/FindPetsByTagsXEXAMPLE'
+import type { FindPetsByTagsXEXAMPLEEnumKey } from '../../models/ts/FindPetsByTagsXEXAMPLEEnum'
 import type { Pet } from '../../models/ts/Pet'
-import { createFindPetsByTagsXEXAMPLEFaker } from '../createFindPetsByTagsXEXAMPLEFaker'
+import { createFindPetsByTagsXEXAMPLEEnumFaker } from '../createFindPetsByTagsXEXAMPLEEnumFaker'
 import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
@@ -24,11 +24,11 @@ export function createFindPetsByTagsQueryFaker<
 
 export function createFindPetsByTagsHeadersFaker<
   TData extends Partial<{
-    'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+    'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
   }> = object,
 >(data?: TData) {
   const defaultFakeData = {
-    'X-EXAMPLE': createFindPetsByTagsXEXAMPLEFaker(),
+    'X-EXAMPLE': createFindPetsByTagsXEXAMPLEEnumFaker(),
   }
   return {
     ...defaultFakeData,

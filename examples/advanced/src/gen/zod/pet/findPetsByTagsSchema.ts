@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { findPetsByTagsXEXAMPLESchema } from '../findPetsByTagsXEXAMPLESchema'
+import { findPetsByTagsXEXAMPLEEnumSchema } from '../findPetsByTagsXEXAMPLEEnumSchema'
 import { petSchema } from '../petSchema'
 
 /**
@@ -23,7 +23,7 @@ export const findPetsByTagsQueryPageSizeSchema = z.number().optional().describe(
 
 export type FindPetsByTagsQueryPageSizeSchemaType = z.infer<typeof findPetsByTagsQueryPageSizeSchema>
 
-export const findPetsByTagsHeaderXEXAMPLESchema = findPetsByTagsXEXAMPLESchema.describe('Header parameters')
+export const findPetsByTagsHeaderXEXAMPLESchema = findPetsByTagsXEXAMPLEEnumSchema.describe('Header parameters')
 
 export type FindPetsByTagsHeaderXEXAMPLESchemaType = z.infer<typeof findPetsByTagsHeaderXEXAMPLESchema>
 

@@ -46,7 +46,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
+  FindPetsByStatusStatusEnumKey,
   FindPetsByTagsOptions,
   FindPetsByTagsQuery,
   FindPetsByTagsResponse,
@@ -171,7 +171,7 @@ export {
   uploadFileMutationKey,
   uploadFileMutationOptions,
 } from './hooks'
-export { addPetRequestStatusEnum, findPetsByStatusStatus, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models'
+export { addPetRequestStatusEnum, findPetsByStatusStatusEnum, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models'
 export {
   addPetBodySchema,
   addPetBodySchemaFormUrlEncoded,
@@ -208,7 +208,7 @@ export {
   findPetsByStatusStatus200SchemaJson,
   findPetsByStatusStatus200SchemaXml,
   findPetsByStatusStatus400Schema,
-  findPetsByStatusStatusSchema,
+  findPetsByStatusStatusEnumSchema,
   findPetsByTagsErrorSchema,
   findPetsByTagsQueryPageSchema,
   findPetsByTagsQueryPageSizeSchema,

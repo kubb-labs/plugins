@@ -4,7 +4,7 @@
  */
 
 import * as z from 'zod'
-import { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema'
+import { findPetsByTagsXEXAMPLEEnumSchema } from './findPetsByTagsXEXAMPLEEnumSchema'
 import { petSchema } from './petSchema'
 
 /**
@@ -22,7 +22,7 @@ export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to 
  */
 export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
-export const findPetsByTagsHeaderXEXAMPLESchema = findPetsByTagsXEXAMPLESchema.describe('Header parameters')
+export const findPetsByTagsHeaderXEXAMPLESchema = findPetsByTagsXEXAMPLEEnumSchema.describe('Header parameters')
 
 export const findPetsByTagsStatus200SchemaJson = z.array(petSchema)
 

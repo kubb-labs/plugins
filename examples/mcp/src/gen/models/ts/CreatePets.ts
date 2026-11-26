@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE'
+import type { CreatePetsXEXAMPLEEnumKey } from './CreatePetsXEXAMPLEEnum'
 
 export type CreatePetsPath = {
   /**
@@ -25,7 +25,7 @@ export type CreatePetsHeaders = {
   /**
    * @description Header parameters
    */
-  'X-EXAMPLE': CreatePetsXEXAMPLEKey
+  'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
 }
 
 export type CreatePetsStatus201 = unknown

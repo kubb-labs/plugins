@@ -21,7 +21,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
+  FindPetsByStatusStatusEnumKey,
 } from './FindPetsByStatus'
 export type {
   FindPetsByTagsOptions,
@@ -78,4 +78,4 @@ export type {
   UploadFileResponses,
   UploadFileStatus200,
 } from './UploadFile'
-export { findPetsByStatusStatus } from './FindPetsByStatus'
+export { findPetsByStatusStatusEnum } from './FindPetsByStatus'

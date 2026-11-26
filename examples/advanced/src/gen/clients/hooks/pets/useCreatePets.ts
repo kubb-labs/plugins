@@ -1,6 +1,5 @@
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
-import type { CreatePetsBoolParamKey } from '../../../models/ts/CreatePetsBoolParam'
-import type { CreatePetsXEXAMPLEKey } from '../../../models/ts/CreatePetsXEXAMPLE'
+import type { CreatePetsXEXAMPLEEnumKey } from '../../../models/ts/CreatePetsXEXAMPLEEnum'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { createPets } from '../../axios/petsService/createPets'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -23,11 +22,11 @@ export function createPetsMutationOptions<TContext = unknown>(
         uuid: string
       }
       query?: {
-        bool_param?: CreatePetsBoolParamKey
+        bool_param?: true
         offset?: number
       }
       headers: {
-        'X-EXAMPLE': CreatePetsXEXAMPLEKey
+        'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
       }
     },
     TContext
@@ -57,11 +56,11 @@ export function useCreatePets<TContext>(
           uuid: string
         }
         query?: {
-          bool_param?: CreatePetsBoolParamKey
+          bool_param?: true
           offset?: number
         }
         headers: {
-          'X-EXAMPLE': CreatePetsXEXAMPLEKey
+          'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
         }
       },
       TContext
@@ -85,11 +84,11 @@ export function useCreatePets<TContext>(
         uuid: string
       }
       query?: {
-        bool_param?: CreatePetsBoolParamKey
+        bool_param?: true
         offset?: number
       }
       headers: {
-        'X-EXAMPLE': CreatePetsXEXAMPLEKey
+        'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
       }
     },
     TContext
@@ -107,11 +106,11 @@ export function useCreatePets<TContext>(
         uuid: string
       }
       query?: {
-        bool_param?: CreatePetsBoolParamKey
+        bool_param?: true
         offset?: number
       }
       headers: {
-        'X-EXAMPLE': CreatePetsXEXAMPLEKey
+        'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
       }
     },
     TContext
@@ -134,11 +133,11 @@ export function useCreatePets<TContext>(
         uuid: string
       }
       query?: {
-        bool_param?: CreatePetsBoolParamKey
+        bool_param?: true
         offset?: number
       }
       headers: {
-        'X-EXAMPLE': CreatePetsXEXAMPLEKey
+        'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
       }
     },
     TContext

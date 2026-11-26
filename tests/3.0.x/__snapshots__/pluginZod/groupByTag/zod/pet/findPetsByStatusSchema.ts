@@ -4,10 +4,10 @@
 */
 
 import * as z from 'zod'
-import { findPetsByStatusStatusSchema } from '../findPetsByStatusStatusSchema'
+import { findPetsByStatusStatusEnumSchema } from '../findPetsByStatusStatusEnumSchema'
 import { petSchema } from '../petSchema'
 
-export const findPetsByStatusQueryStatusSchema = findPetsByStatusStatusSchema.optional().default('available').describe('Status values that need to be considered for filter')
+export const findPetsByStatusQueryStatusSchema = findPetsByStatusStatusEnumSchema.optional().default('available').describe('Status values that need to be considered for filter')
 
 export const findPetsByStatusStatus200SchemaJson = z.array(petSchema)
 

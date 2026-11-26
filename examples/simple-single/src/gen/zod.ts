@@ -34,7 +34,7 @@ export const addPetRequestStatusEnumSchema = z.enum(['available', 'pending', 'so
 /**
  * Status values that need to be considered for filter
  */
-export const findPetsByStatusStatusSchema = z
+export const findPetsByStatusStatusEnumSchema = z
   .enum(['available', 'pending', 'sold'])
   .default('available')
   .describe('Status values that need to be considered for filter')
@@ -171,7 +171,7 @@ export const addPetBodySchemaFormUrlEncoded = petSchema.describe('Create a new p
 
 export const addPetBodySchema = z.union([addPetBodySchemaJson, addPetBodySchemaXml, addPetBodySchemaFormUrlEncoded])
 
-export const findPetsByStatusQueryStatusSchema = findPetsByStatusStatusSchema
+export const findPetsByStatusQueryStatusSchema = findPetsByStatusStatusEnumSchema
   .optional()
   .default('available')
   .describe('Status values that need to be considered for filter')

@@ -4,13 +4,13 @@
 */
 
 import type { FindPetsByStatusQuery, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus200Json } from '../types/FindPetsByStatus'
-import { createFindPetsByStatusStatus } from './createFindPetsByStatusStatus'
+import { createFindPetsByStatusStatusEnum } from './createFindPetsByStatusStatusEnum'
 import { createPet } from './createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByStatusQuery<TData extends Partial<FindPetsByStatusQuery> = object>(data?: TData) {
   const defaultFakeData = {
-    status: createFindPetsByStatusStatus(),
+    status: createFindPetsByStatusStatusEnum(),
   }
   return {
     ...defaultFakeData,

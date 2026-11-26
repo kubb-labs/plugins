@@ -4,7 +4,7 @@
  */
 
 import * as z from 'zod'
-import { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema'
+import { createPetsXEXAMPLEEnumSchema } from './createPetsXEXAMPLEEnumSchema'
 
 /**
  * UUID
@@ -16,7 +16,7 @@ export const createPetsPathUuidSchema = z.string().describe('UUID')
  */
 export const createPetsQueryOffsetSchema = z.int().optional().describe('Offset */')
 
-export const createPetsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema.describe('Header parameters')
+export const createPetsHeaderXEXAMPLESchema = createPetsXEXAMPLEEnumSchema.describe('Header parameters')
 
 export const createPetsStatus201Schema = z.unknown()
 

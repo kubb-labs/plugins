@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusStatusKey } from './FindPetsByStatusStatus'
+import type { FindPetsByStatusStatusEnumKey } from './FindPetsByStatusStatusEnum'
 import type { Pet } from './Pet'
 
 export type FindPetsByStatusQuery = {
@@ -12,7 +12,7 @@ export type FindPetsByStatusQuery = {
    * @deprecated
    * @default available
    */
-  status?: FindPetsByStatusStatusKey;
+  status?: FindPetsByStatusStatusEnumKey;
 }
 
 export type FindPetsByStatusStatus200Json = Pet[]

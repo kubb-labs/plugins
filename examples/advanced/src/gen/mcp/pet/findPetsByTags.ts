@@ -1,4 +1,4 @@
-import type { FindPetsByTagsXEXAMPLEKey } from '../../models/ts/FindPetsByTagsXEXAMPLE'
+import type { FindPetsByTagsXEXAMPLEEnumKey } from '../../models/ts/FindPetsByTagsXEXAMPLEEnum'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { findPetsByTags } from '../../clients/axios/petService/findPetsByTags'
 
@@ -20,7 +20,7 @@ export async function findPetsByTagsHandler(
       pageSize?: number
     }
     headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
     }
   },
   ctx: ServerContext,

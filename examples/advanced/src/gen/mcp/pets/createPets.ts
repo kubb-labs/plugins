@@ -1,5 +1,4 @@
-import type { CreatePetsBoolParamKey } from '../../models/ts/CreatePetsBoolParam'
-import type { CreatePetsXEXAMPLEKey } from '../../models/ts/CreatePetsXEXAMPLE'
+import type { CreatePetsXEXAMPLEEnumKey } from '../../models/ts/CreatePetsXEXAMPLEEnum'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { createPets } from '../../clients/axios/petsService/createPets'
 
@@ -22,11 +21,11 @@ export async function createPetsHandler(
       uuid: string
     }
     query?: {
-      bool_param?: CreatePetsBoolParamKey
+      bool_param?: true
       offset?: number
     }
     headers: {
-      'X-EXAMPLE': CreatePetsXEXAMPLEKey
+      'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
     }
   },
   ctx: ServerContext,
