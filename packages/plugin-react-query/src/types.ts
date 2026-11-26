@@ -1,10 +1,10 @@
 import type { ast } from '@internals/ast'
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
-import type { Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
+import type { InfiniteConfig, MutationConfig, QueryConfig, KeyTransformer } from '@internals/tanstack-query'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
 import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
-export type { Infinite, Transformer } from '@internals/tanstack-query'
+export type { InfiniteConfig, KeyTransformer, Transformer } from '@internals/tanstack-query'
 
 /**
  * The concrete resolver type for `@kubb/plugin-react-query`.
@@ -163,7 +163,7 @@ export type Suspense = object
  * @note String values are inlined verbatim into generated code. Wrap literal
  * strings in `JSON.stringify(...)`.
  */
-export type QueryKey = Transformer
+export type QueryKeyTransformer = KeyTransformer
 
 /**
  * Builds the `mutationKey` used by each generated mutation hook.
@@ -171,7 +171,7 @@ export type QueryKey = Transformer
  * @note String values are inlined verbatim into generated code. Wrap literal
  * strings in `JSON.stringify(...)`.
  */
-export type MutationKey = Transformer
+export type MutationKeyTransformer = KeyTransformer
 
 export type CustomOptions = {
   /**
@@ -193,7 +193,7 @@ export type CustomOptions = {
  *
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginReactQueryOptions = PluginOptions<PluginReactQueryResolvedOptions> & {
   /**
    * Selects the HTTP client the generated hooks call. Every client plugin speaks the `RequestResult`
    * contract, so the hooks call a contract `<op>` that takes one grouped `options` object.
@@ -216,7 +216,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
    *
    * @default false
    */
-  infinite?: Partial<Infinite> | false
+  infinite?: Partial<InfiniteConfig> | false
   /**
    * Adds `useSuspenseQuery` hooks alongside the regular `useQuery` ones.
    * Pass an empty object (`{}`) to enable. TanStack Query v5+ only.
@@ -228,20 +228,20 @@ export type Options = PluginOptions<ResolvedOptions> & {
    * Custom `queryKey` builder. Use to add a version namespace, swap to
    * operation IDs, or shape keys to match an existing invalidation strategy.
    */
-  queryKey?: QueryKey
+  queryKey?: QueryKeyTransformer
   /**
    * Configures query hooks. Set to `false` to skip the query output.
    */
-  query?: Partial<Query> | false
+  query?: Partial<QueryConfig> | false
   /**
    * Custom `mutationKey` builder. Useful when you batch invalidations or read
    * mutation state via `useMutationState`.
    */
-  mutationKey?: MutationKey
+  mutationKey?: MutationKeyTransformer
   /**
    * Configures mutation hooks. Set to `false` to skip mutation generation.
    */
-  mutation?: Partial<Mutation> | false
+  mutation?: Partial<MutationConfig> | false
   /**
    * Wires every generated hook through a user-supplied function that returns
    * extra options (`onSuccess`, `onError`, `select`, ...). Also emits a
@@ -270,33 +270,27 @@ export type Options = PluginOptions<ResolvedOptions> & {
   macros?: Array<ast.Macro>
 }
 
-/**
- * The resolved client strategy for the generated hooks, computed once during setup. The hooks always
- * import and call a registered contract client plugin's `<op>`.
- */
-export type ResolvedClient = ResolvedContractClient
-
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
+export type PluginReactQueryResolvedOptions = ResolvedPluginOptions<PluginReactQueryResolvedOptions> & {
   /**
    * The resolved contract client the generators import and call.
    */
-  client: ResolvedClient
+  client: ResolvedContractClient
   returnType?: 'data' | 'full'
   /**
    * Resolved infinite query configuration, or `false` when infinite queries are disabled.
    */
-  infinite: NonNullable<Infinite> | false
+  infinite: NonNullable<InfiniteConfig> | false
   suspense: Suspense | false
-  queryKey: QueryKey | null
-  query: NonNullable<Required<Query>> | false
-  mutationKey: MutationKey | null
-  mutation: NonNullable<Required<Mutation>> | false
+  queryKey: QueryKeyTransformer | null
+  query: NonNullable<Required<QueryConfig>> | false
+  mutationKey: MutationKeyTransformer | null
+  mutation: NonNullable<Required<MutationConfig>> | false
   customOptions: NonNullable<Required<CustomOptions>> | null
   hooks: boolean
   resolver: ResolverReactQuery
 }
 
-export type PluginReactQuery = PluginType<'plugin-react-query', Options, ResolvedOptions, ResolverReactQuery>
+export type PluginReactQuery = PluginType<'plugin-react-query', PluginReactQueryOptions, PluginReactQueryResolvedOptions, ResolverReactQuery>
 
 declare global {
   namespace Kubb {

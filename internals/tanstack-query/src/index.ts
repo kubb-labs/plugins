@@ -11,7 +11,19 @@ export {
   type QueryVariant,
 } from './resolver.ts'
 export { QueryKey, queryKeyTransformer } from './components/QueryKey.tsx'
-export type { CallReturnTypeProps, HookResultProps, Infinite, KeyVariant, Mutation, PageParamFn, ParamsCasing, Query, Transformer } from './types.ts'
+export type {
+  CallReturnTypeProps,
+  HookResultProps,
+  InfiniteConfig,
+  KeyTransformer,
+  KeyTransformerProps,
+  KeyVariant,
+  MutationConfig,
+  PageParamFn,
+  ParamsCasing,
+  QueryConfig,
+  Transformer,
+} from './types.ts'
 export {
   buildGroupedRequestParam,
   buildHookParams,

@@ -5,6 +5,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
+import type { MockedPlugin } from '#mocks'
 import { resolverCypress } from '../resolvers/resolverCypress.ts'
 import type { PluginCypress } from '../types.ts'
 import { cypressOperation } from './cypress.tsx'
@@ -45,7 +46,7 @@ describe('cypressGenerator — baseURL', () => {
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
     const driver = createMockedPluginDriver({
       name: 'baseURL template',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(cypressOperation, node, {
@@ -74,7 +75,7 @@ describe('cypressGenerator — numeric body', () => {
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress })
     const driver = createMockedPluginDriver({
       name: 'patchCounter',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(cypressOperation, node, {
@@ -104,7 +105,7 @@ describe('cypressGenerator — undeclared path placeholder', () => {
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress })
     const driver = createMockedPluginDriver({
       name: 'getCertificate',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(cypressOperation, node, {
@@ -157,7 +158,7 @@ describe('cypressGenerator — cookie parameters', () => {
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress })
     const driver = createMockedPluginDriver({
       name: 'getCookies',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(cypressOperation, node, {

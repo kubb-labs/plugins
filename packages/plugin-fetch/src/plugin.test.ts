@@ -2,9 +2,9 @@ import { createKubb } from '@kubb/core'
 import { defineExtension } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { pluginFetch } from './plugin.ts'
-import type { Options } from './types.ts'
+import type { PluginFetchOptions } from './types.ts'
 
-function setupKubb(options: Options, pluginNames: Array<string>) {
+function setupKubb(options: PluginFetchOptions, pluginNames: Array<string>) {
   const plugins = pluginNames.map((name) => defineExtension({ kind: 'plugin', meta: { name } })())
 
   return createKubb({ input: './petStore.yaml', output: { path: './gen' }, plugins: [...plugins, pluginFetch(options)] }).setup()
@@ -26,7 +26,7 @@ describe('pluginFetch setup', () => {
 
   test("returnType: 'plain' is rejected by the Options type", () => {
     // @ts-expect-error 'plain' belongs to plugin-client, the bundled runtime does not typecheck with it
-    const options: Options = { returnType: 'plain' }
+    const options: PluginFetchOptions = { returnType: 'plain' }
 
     expect(options).toBeDefined()
   })

@@ -4,6 +4,14 @@ import { buildResponseHeadersType, buildResultTypeRef, resultTypeName, type Oper
 import type { ReturnTypeOption } from '../types.ts'
 import { buildRequestResultGenerics } from './generics.ts'
 
+export type BuildReturnStatementOptions = {
+  node: ast.OperationNode
+  types: OperationTypeNames
+  callConfig: string
+  returnType: ReturnTypeOption
+  throwOnErrorDefault: boolean
+}
+
 /**
  * Builds the return statement of a generated operation function. The client call takes the responses record and
  * `ThrowOnError` as type arguments, so its result is already the operation's `RequestResult` and needs no cast. With the
@@ -18,46 +26,21 @@ import { buildRequestResultGenerics } from './generics.ts'
  * @example
  * `return apiClient<AddPetResponses, ThrowOnError>({ method: 'POST', url: '/pet', ...config })`
  */
-export function buildReturnStatement({
-  node,
-  types,
-  callConfig,
-  returnType,
-  throwOnErrorDefault,
-}: {
-  node: ast.OperationNode
-  types: OperationTypeNames
-  callConfig: string
-  returnType: ReturnTypeOption
-  throwOnErrorDefault: boolean
-}): string {
+export function buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault }: BuildReturnStatementOptions): string {
   const call = `apiClient<${buildRequestResultGenerics({ node, types })}>(${callConfig})`
   if (returnType === 'data') return `return unwrapResult(${call}, resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault}))`
   if (returnType === 'plain') return `return ${call}`
   return `return withUnwrap(${call})`
 }
 
+export type EventStreamReturn = { returnType: string; statement: string }
+
 /**
  * Builds the return type and statement of a streamed operation, which calls `apiClient.stream`. The item type is
  * `TypedEvent<...>` when each event declares its own `event` and `data`, the success type itself for JSON Lines, and
  * otherwise the default, `ServerSentEvent` around the payload, which needs no type argument.
  */
-export function buildEventStreamReturn({
-  node,
-  types,
-  callConfig,
-  returnType,
-  throwOnErrorDefault,
-}: {
-  node: ast.HttpOperationNode
-  types: OperationTypeNames
-  callConfig: string
-  returnType: ReturnTypeOption
-  throwOnErrorDefault: boolean
-}): {
-  returnType: string
-  statement: string
-} {
+export function buildEventStreamReturn({ node, types, callConfig, returnType, throwOnErrorDefault }: BuildReturnStatementOptions): EventStreamReturn {
   const shape = getStream(node)?.shape ?? 'data'
   const responses = types.response.responses(node)
   const headers = buildResponseHeadersType({ node, types })
@@ -77,20 +60,18 @@ export function buildEventStreamReturn({
   return { returnType: `Unwrappable<${result('StreamResult')}>`, statement: `return withUnwrap(${call})` }
 }
 
+export type BuildEventStreamImportsOptions = {
+  node: ast.OperationNode
+  types: OperationTypeNames
+  returnType: ReturnTypeOption
+}
+
 /**
  * The stream types an operation file imports from the client for one streamed operation: the result and options types
  * for `returnType`, their `WithHeaders` form when the response declares headers, and `SuccessOf` with `TypedEvent` or
  * `ServerSentEvent` for an item type the call spells out.
  */
-export function buildEventStreamImports({
-  node,
-  types,
-  returnType,
-}: {
-  node: ast.OperationNode
-  types: OperationTypeNames
-  returnType: ReturnTypeOption
-}): Array<string> {
+export function buildEventStreamImports({ node, types, returnType }: BuildEventStreamImportsOptions): Array<string> {
   const shape = getStream(node)?.shape ?? 'data'
   const headers = buildResponseHeadersType({ node, types }) !== null
   const result = {

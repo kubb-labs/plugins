@@ -6,6 +6,7 @@ import type { PrinterZodMiniFactory } from '../printers/printerZodMini.ts'
 import { throwsOnStrictCompile } from '../printers/zodNodes.ts'
 
 import type { CompileOptions } from '../types.ts'
+import type { TypeGuardsOptions } from '@internals/shared/types'
 
 export type ZodProps = {
   name: string
@@ -24,7 +25,7 @@ export type ZodProps = {
    * @default 'infer'
    */
   inferKind?: 'infer' | 'input' | 'output'
-  typeGuards?: boolean | { is?: boolean; assert?: boolean }
+  typeGuards?: TypeGuardsOptions
   isName?: string | null
   assertName?: string | null
   mini?: boolean

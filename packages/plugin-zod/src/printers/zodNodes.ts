@@ -16,7 +16,7 @@ import {
 import {
   buildEnum,
   buildLiteral,
-  type buildObjectShape,
+  type ObjectShapeContext,
   contentEncodingCalls,
   getMemberConstraint,
   inputChecks,
@@ -26,6 +26,7 @@ import {
   type patternKeySchema,
   stringFormatCalls,
 } from '../utils.ts'
+import type { Direction } from '@internals/shared/types'
 
 /**
  * The options both Zod printers read in the shared handlers.
@@ -37,7 +38,7 @@ export type ZodNodeOptions = {
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
   resolver?: ResolverZod
   cyclicSchemas?: ReadonlySet<string>
-  direction?: 'encode' | 'decode'
+  direction?: Direction
   nodes?: Partial<Record<ast.SchemaType, unknown>>
 }
 
@@ -48,7 +49,7 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
   lengths: typeof lengthConstraints
   numbers: typeof numberConstraints
   patternKey: typeof patternKeySchema
-  objectShape: (ctx: Parameters<typeof buildObjectShape>[0], node: ast.SchemaNode) => string
+  objectShape: (ctx: ObjectShapeContext, node: ast.SchemaNode) => string
   /**
    * The coerced integer base, without its numeric checks.
    */
@@ -474,9 +475,9 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
   }
 }
 
-type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
+type ZodCheckContext = { transform: (node: ast.SchemaNode) => string | null }
 
-function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
+function containsCheck(ctx: ZodCheckContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
   if (min === 0 && max === undefined) return null
   const countBounds = [`count >= ${min}`, max !== undefined && `count <= ${max}`].filter(Boolean).join(' && ')
   const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
@@ -486,7 +487,7 @@ function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullabl
 }
 
 // A required `unknown` property means "the key is present", which a Zod object would accept as missing, so those keys are checked with `in`.
-function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
+function conditionExpression(ctx: ZodCheckContext, schema: ast.SchemaNode | undefined): string {
   if (!schema) return 'true'
   const object = ast.schema.narrow(schema, ast.schema.types.object)
   const keyOnlyNames =

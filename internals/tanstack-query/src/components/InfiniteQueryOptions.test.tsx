@@ -6,7 +6,7 @@ import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rawSources, renderTemplate, testConfig } from '#mocks'
 import { definePageParam } from '../utils.ts'
-import { InfiniteQueryOptions } from './InfiniteQueryOptions.tsx'
+import { InfiniteQueryOptions, type InfiniteQueryOptionsProps } from './InfiniteQueryOptions.tsx'
 
 const findByTagsNode = ast.factory.createOperation({
   operationId: 'findPetsByTags',
@@ -32,7 +32,7 @@ const findByTagsNode = ast.factory.createOperation({
   ],
 })
 
-type PageParams = Partial<Parameters<typeof InfiniteQueryOptions>[0]>
+type PageParams = Partial<InfiniteQueryOptionsProps>
 
 const infiniteConfig = {
   queryParam: 'pageSize',

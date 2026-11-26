@@ -1,12 +1,10 @@
 import { ast } from '@internals/ast'
 import { getResponseHeadersTypeNames, type OperationTypeNames, type OperationTypeSource } from '@internals/client'
-import { type Generator, operationKey, type RefName } from '@kubb/kit'
+import { operationKey, type RefName, type TemplateContext } from '@kubb/kit'
 import type { ContractClientFactory } from '../types.ts'
 import { getOperationSecurity, isAuthRequired, type SecurityRequirement } from './security.ts'
 import { buildValidatorHooks, type ValidatorHooks } from './validator.ts'
-import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './validatorOptions.ts'
-
-export type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]
+import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './validatorLibrary.ts'
 
 export type OperationData = {
   node: ast.HttpOperationNode
@@ -30,21 +28,18 @@ export type OperationData = {
   baseURL?: string
 }
 
+export type ResolveOperationDataOptions = {
+  node: ast.HttpOperationNode
+  ctx: TemplateContext<ContractClientFactory>
+  types: OperationTypeSource
+  custom?: boolean
+}
+
 /**
  * Resolves what the function and SDK generators both print for one operation: its name, its type and schema names, each with
  * its import, and its validator hooks, security, base URL and response headers types.
  */
-export function resolveOperationData({
-  node,
-  ctx,
-  types,
-  custom = false,
-}: {
-  node: ast.HttpOperationNode
-  ctx: GeneratorContext
-  types: OperationTypeSource
-  custom?: boolean
-}): OperationData {
+export function resolveOperationData({ node, ctx, types, custom = false }: ResolveOperationDataOptions): OperationData {
   const { validator } = ctx.options
   const library = resolveValidatorLibrary(validator)
   const schemaPlugin = library === 'valibot' ? ctx.getPlugin(pluginValibotName) : library === 'zod' ? ctx.getPlugin(pluginZodName) : null

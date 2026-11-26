@@ -91,7 +91,7 @@ export type ResolverFaker = Resolver & {
  *
  * @default { path: 'mocks', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginFakerOptions = PluginOptions<PluginFakerResolvedOptions> & {
   /**
    * Type object factories from generated values and overrides (`'inferred'`) or
    * from the declared API model (`'schema'`).
@@ -150,16 +150,16 @@ export type Options = PluginOptions<ResolvedOptions> & {
   }
 }
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
-  typeMode: NonNullable<Options['typeMode']>
-  dateParser: NonNullable<Options['dateParser']>
-  regexGenerator: NonNullable<Options['regexGenerator']>
-  seed: NonNullable<Options['seed']> | undefined
-  locale: Options['locale']
-  printer: Options['printer']
+export type PluginFakerResolvedOptions = ResolvedPluginOptions<PluginFakerResolvedOptions> & {
+  typeMode: NonNullable<PluginFakerOptions['typeMode']>
+  dateParser: NonNullable<PluginFakerOptions['dateParser']>
+  regexGenerator: NonNullable<PluginFakerOptions['regexGenerator']>
+  seed: NonNullable<PluginFakerOptions['seed']> | undefined
+  locale: PluginFakerOptions['locale']
+  printer: PluginFakerOptions['printer']
 }
 
-export type PluginFaker = PluginType<'plugin-faker', Options, ResolvedOptions, ResolverFaker, ast.Printer<PrinterFakerFactory>>
+export type PluginFaker = PluginType<'plugin-faker', PluginFakerOptions, PluginFakerResolvedOptions, ResolverFaker, ast.Printer<PrinterFakerFactory>>
 
 declare global {
   namespace Kubb {

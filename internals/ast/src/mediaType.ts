@@ -17,8 +17,10 @@ export type ContentEntry = { contentType: string; schema?: Pick<SchemaNode, 'typ
 
 const formKinds: Record<string, 'form' | 'urlencoded'> = { 'multipart/form-data': 'form', 'application/x-www-form-urlencoded': 'urlencoded' }
 
+export type MediaKind = 'json' | 'form' | 'urlencoded' | 'text' | 'binary' | 'eventStream' | 'lineStream'
+
 /** How a client reads or sends a content entry, or `null` for another media type. A `blob` schema is `binary`. */
-export function getKind(entry: string | ContentEntry): 'json' | 'form' | 'urlencoded' | 'text' | 'binary' | 'eventStream' | 'lineStream' | null {
+export function getKind(entry: string | ContentEntry): MediaKind | null {
   const content = typeof entry === 'string' ? { contentType: entry } : entry
   const baseType = getBase(content)
   if (!baseType) return null

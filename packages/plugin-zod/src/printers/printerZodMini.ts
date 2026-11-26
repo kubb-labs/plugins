@@ -3,6 +3,7 @@ import { lazyGetter, objectKey } from '@internals/utils'
 import { createPrinter } from '@kubb/kit'
 import { shouldCoerce } from '@internals/shared'
 import { applyMiniModifiers, buildObjectShape, lengthChecksMini, numberChecksMini, patternKeySchemaMini, printWithOmit } from '../utils.ts'
+import type { ObjectShapeContext } from '../utils.ts'
 import { containsDirectionalNode, type PrinterZodOptions } from './printerZod.ts'
 import { buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
@@ -42,7 +43,7 @@ export type PrinterZodMiniFactory = ast.PrinterFactoryOptions<'zod-mini', Printe
 /**
  * Builds the `{ key: value, … }` shape for an object node with the functional `zod/mini` modifiers.
  */
-function buildZodMiniObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: ast.SchemaNode): string {
+function buildZodMiniObjectShape(ctx: ObjectShapeContext, node: ast.SchemaNode): string {
   return buildObjectShape(ctx, node, ({ name, value, schema, required, meta, cyclic }) => {
     const body = applyMiniModifiers({
       value,

@@ -135,7 +135,7 @@ A plugin's docs ship inside its package, in `packages/<name>/docs/`. The registr
 - Each file starts with a `# Title` and a one-paragraph description, with no frontmatter. Links are absolute (`https://kubb.dev/...`) and there is no raw HTML.
 - Registry metadata (display name, category, icon, maintainers, dependencies, compatibility) lives in `kubb-extension.json`.
 - When a change here adds, removes, or alters an option, update `docs/options.md` in the same PR.
-- A documented option must exist in the plugin's `src/types.ts` `Options` type and be honored in `src/plugin.ts`. Keep documented defaults in step with the destructuring defaults in `plugin.ts`.
+- A documented option must exist in the plugin's `Plugin<Name>Options` type in `src/types.ts` and be honored in `src/plugin.ts`. Keep documented defaults in step with the destructuring defaults in `plugin.ts`.
 
 ## Adding a plugin
 

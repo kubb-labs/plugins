@@ -1,10 +1,10 @@
 import type { ast } from '@internals/ast'
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
-import type { Transformer } from '@internals/tanstack-query'
+import type { KeyTransformer } from '@internals/tanstack-query'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
 import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
-export type { Transformer } from '@internals/tanstack-query'
+export type { KeyTransformer, Transformer } from '@internals/tanstack-query'
 
 /**
  * The concrete resolver type for `@kubb/plugin-swr`.
@@ -84,14 +84,14 @@ export type ResolverSwr = Resolver & {
 /**
  * Customize the queryKey.
  */
-export type QueryKey = Transformer
+export type QueryKeyTransformer = KeyTransformer
 
 /**
  * Customize the mutationKey.
  */
-export type MutationKey = Transformer
+export type MutationKeyTransformer = KeyTransformer
 
-export type Query = {
+export type QueryConfig = {
   /**
    * HTTP methods to use for queries.
    *
@@ -108,7 +108,7 @@ export type Query = {
   importPath?: string
 }
 
-export type Mutation = {
+export type MutationConfig = {
   /**
    * HTTP methods to use for mutations.
    *
@@ -131,7 +131,7 @@ export type Mutation = {
  *
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginSwrOptions = PluginOptions<PluginSwrResolvedOptions> & {
   /**
    * Selects the HTTP client the generated hooks call. Every client plugin speaks the `RequestResult`
    * contract, so the hooks call a contract `<op>` that takes one grouped `options` object.
@@ -152,20 +152,20 @@ export type Options = PluginOptions<ResolvedOptions> & {
    * Custom `queryKey` builder. Use to add a version namespace, swap to
    * operation IDs, or shape keys to match an existing invalidation strategy.
    */
-  queryKey?: QueryKey
+  queryKey?: QueryKeyTransformer
   /**
    * Configure useSWR behavior.
    */
-  query?: Partial<Query> | false
+  query?: Partial<QueryConfig> | false
   /**
    * Custom `mutationKey` builder. Useful when you match keys from SWR's
    * global `mutate` for cache updates.
    */
-  mutationKey?: MutationKey
+  mutationKey?: MutationKeyTransformer
   /**
    * Configure useSWRMutation behavior.
    */
-  mutation?: Partial<Mutation> | false
+  mutation?: Partial<MutationConfig> | false
   /**
    * Override naming conventions for function names and types.
    */
@@ -176,20 +176,20 @@ export type Options = PluginOptions<ResolvedOptions> & {
   macros?: Array<ast.Macro>
 }
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
+export type PluginSwrResolvedOptions = ResolvedPluginOptions<PluginSwrResolvedOptions> & {
   /**
    * The resolved contract client the generators import and call.
    */
   client: ResolvedContractClient
   returnType?: 'data' | 'full'
-  queryKey: QueryKey | undefined
-  query: NonNullable<Required<Query>> | false
-  mutationKey: MutationKey | undefined
-  mutation: NonNullable<Required<Mutation>> | false
+  queryKey: QueryKeyTransformer | undefined
+  query: NonNullable<Required<QueryConfig>> | false
+  mutationKey: MutationKeyTransformer | undefined
+  mutation: NonNullable<Required<MutationConfig>> | false
   resolver: ResolverSwr
 }
 
-export type PluginSwr = PluginType<'plugin-swr', Options, ResolvedOptions, ResolverSwr>
+export type PluginSwr = PluginType<'plugin-swr', PluginSwrOptions, PluginSwrResolvedOptions, ResolverSwr>
 
 declare global {
   namespace Kubb {

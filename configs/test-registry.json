@@ -23,7 +23,7 @@
   "packages/plugin-client/src/builders/security.test.ts": "Branchy credential resolver: basic, digest, mutualTLS, undeclared and repeated requirements; snapshots cover only three happy paths.",
   "packages/plugin-client/src/builders/styles.test.ts": "Branchy: key quoting, allowReserved only for query, querystring flag, body encoding; pins the #1348 regression.",
   "packages/plugin-client/src/builders/validator.test.ts": "Branchy hook wiring per validator form; 3.0.x zodParams snapshots cover only zod and the full object.",
-  "packages/plugin-client/src/builders/validatorOptions.test.ts": "Pins isValidatorEnabled for every validator form and request and params opting in independently; no other test fails when they drift.",
+  "packages/plugin-client/src/builders/validatorLibrary.test.ts": "Pins isValidatorEnabled for every validator form and request and params opting in independently; no other test fails when they drift.",
   "packages/plugin-client/src/components/SdkClient.test.ts": "Pins SDK stream calls for full, plain and data (#1345); sdkGenerator snapshots have no stream operation.",
   "packages/plugin-client/src/templates/client.test.tsx": "Golden path: rendered client files for SSE, styles, security, runtime files, missing-dependency diagnostic.",
   "packages/plugin-client/src/templates/sdk.test.tsx": "Golden path: rendered SDK classes plus the sdk.mode tag with output.mode file diagnostic.",

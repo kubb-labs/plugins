@@ -1,14 +1,14 @@
 import { Code } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
-export type Member = {
+export type SdkFacadeMember = {
   className: string
   propName: string
 }
 
 export type SdkFacadeProps = {
   name: string
-  members: Array<Member>
+  members: Array<SdkFacadeMember>
 }
 
 /**

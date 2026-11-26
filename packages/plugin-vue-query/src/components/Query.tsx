@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildQueryKeyParams, buildResponseTypes, maybeRefOrGetter, resolvePageParamType } from '@internals/tanstack-query'
-import type { HookResultProps, Infinite } from '@internals/tanstack-query'
+import type { HookResultProps, InfiniteConfig } from '@internals/tanstack-query'
 import { buildClientOptionType, buildOperationComments } from '@internals/shared'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -18,7 +18,7 @@ export type QueryProps = {
   /**
    * Emits the `useInfiniteQuery` variant of the hook instead of `useQuery`. Carries the options the page param type is read from.
    */
-  infinite?: Pick<Infinite, 'initialPageParam' | 'queryParam'>
+  infinite?: Pick<InfiniteConfig, 'initialPageParam' | 'queryParam'>
 } & HookResultProps
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })

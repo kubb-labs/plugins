@@ -19,9 +19,9 @@ import { hookFileVariants } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types'
 import { withQueryKeyPath } from '../withQueryKey.ts'
 
-type Variant = 'query' | 'suspenseQuery' | 'infiniteQuery' | 'suspenseInfiniteQuery'
+type QueryTemplateVariant = 'query' | 'suspenseQuery' | 'infiniteQuery' | 'suspenseInfiniteQuery'
 
-const OBSERVER_IMPORTS: Record<Variant, Array<string>> = {
+const OBSERVER_IMPORTS: Record<QueryTemplateVariant, Array<string>> = {
   query: ['QueryObserverOptions', 'UseQueryResult'],
   suspenseQuery: ['UseSuspenseQueryOptions', 'UseSuspenseQueryResult'],
   infiniteQuery: ['InfiniteQueryObserverOptions', 'UseInfiniteQueryResult'],
@@ -32,7 +32,7 @@ const OBSERVER_IMPORTS: Record<Variant, Array<string>> = {
  * Builds the template for one `useQuery` flavor. `variant` picks the resolver namespace
  * (`resolver.query`, `resolver.suspenseQuery`, ...), the TanStack hook, and the options it needs.
  */
-export function createQueryTemplate({ variant }: { variant: Variant }) {
+export function createQueryTemplate({ variant }: { variant: QueryTemplateVariant }) {
   const suspense = variant === 'suspenseQuery' || variant === 'suspenseInfiniteQuery'
   const infinite = variant === 'infiniteQuery' || variant === 'suspenseInfiniteQuery'
   const hookImport = `use${suspense ? 'Suspense' : ''}${infinite ? 'InfiniteQuery' : 'Query'}`

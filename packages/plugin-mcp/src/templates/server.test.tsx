@@ -7,6 +7,7 @@ import { resolverZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderTemplate, testConfig } from '#mocks'
+import type { MockedPlugin } from '#mocks'
 import { resolverMcp } from '../resolvers/resolverMcp.ts'
 import type { PluginMcp } from '../types.ts'
 import { serverOperations } from './server.tsx'
@@ -126,7 +127,7 @@ async function renderServer(nodes: Array<ast.OperationNode>, clientOptions: Reco
   const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
   const driver = createMockedPluginDriver({
     name: 'showPetById',
-    plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    plugin: mockedTsPlugin as unknown as MockedPlugin,
   })
   // Register the zod plugin for the schema imports, and plugin-mcp itself for the handler imports, as the driver does.
   const originalGetPlugin = driver.getPlugin.bind(driver)

@@ -4,10 +4,8 @@ import { defineTemplate } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import { Valibot } from '../components/Valibot.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode } from '../printers/printerValibot.ts'
-import type { PrinterValibotOptions } from '../printers/printerValibot.ts'
 import type { PluginValibot } from '../types.ts'
-
-type Direction = NonNullable<PrinterValibotOptions['direction']>
+import type { Direction } from '@internals/shared/types'
 
 // A request schema is typed by the value the caller passes, every other schema by the value it returns.
 const inferKinds = { encode: 'InferInput', decode: 'InferOutput' } as const

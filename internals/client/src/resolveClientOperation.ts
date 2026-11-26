@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import path from 'node:path'
 import { operationKey, useKubb } from '@kubb/kit'
-import type { Exclude, GeneratorContext, Include, Override } from '@kubb/kit'
+import type { Exclude, TemplateContext, Include, Override } from '@kubb/kit'
 import { pluginClientName } from './resolveClient.ts'
 
 /**
@@ -78,6 +78,8 @@ function resolveImportPath(options: { importPath: string; operationFile: string 
   return isRelativeImport(importPath) ? path.resolve(path.dirname(operationFile), importPath) : importPath
 }
 
+export type ResolveClientOperationOptions = { node: ast.OperationNode; pluginName: string }
+
 /**
  * Resolves the contract client `<op>` a consumer (query hook, MCP handler) imports, from the registered contract client plugin
  * (plugin-fetch, plugin-axios, plugin-ky, or plugin-client). Returns `null` when the client plugin's `exclude` / `include` leaves this
@@ -90,8 +92,8 @@ function resolveImportPath(options: { importPath: string; operationFile: string 
  * and `ctx.file()` finds its file, so a dependent's call and import match the `<op>` actually emitted.
  * Throws `KUBB_PLUGIN_NOT_FOUND` when `pluginName` is not in the config.
  */
-export function resolveClientOperation({ node, pluginName }: { node: ast.OperationNode; pluginName: string }): ClientOperation | null {
-  const ctx = useKubb<GeneratorContext>()
+export function resolveClientOperation({ node, pluginName }: ResolveClientOperationOptions): ClientOperation | null {
+  const ctx = useKubb<TemplateContext>()
 
   return ctx.memo(`${pluginName}:clientOperation:${node.operationId}`, () => {
     const resolver = ctx.getResolver(pluginName)

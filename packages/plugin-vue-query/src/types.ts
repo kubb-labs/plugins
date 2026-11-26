@@ -1,10 +1,10 @@
 import type { ast } from '@internals/ast'
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
-import type { Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
+import type { InfiniteConfig, MutationConfig, QueryConfig, KeyTransformer } from '@internals/tanstack-query'
 import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/types'
 import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 
-export type { Infinite, Transformer } from '@internals/tanstack-query'
+export type { InfiniteConfig, KeyTransformer, Transformer } from '@internals/tanstack-query'
 
 /**
  * Resolver for Vue Query that provides naming methods for hook functions.
@@ -75,7 +75,7 @@ export type ResolverVueQuery = Resolver & {
  * @note String values are inlined verbatim into generated code. Wrap literal
  * strings in `JSON.stringify(...)`.
  */
-export type QueryKey = Transformer
+export type QueryKeyTransformer = KeyTransformer
 
 /**
  * Builds the `mutationKey` used by each generated mutation composable.
@@ -83,7 +83,7 @@ export type QueryKey = Transformer
  * @note String values are inlined verbatim into generated code. Wrap literal
  * strings in `JSON.stringify(...)`.
  */
-export type MutationKey = Transformer
+export type MutationKeyTransformer = KeyTransformer
 
 /**
  * Where the generated composables are written and how they are exported, plus the optional
@@ -91,7 +91,7 @@ export type MutationKey = Transformer
  *
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginVueQueryOptions = PluginOptions<PluginVueQueryResolvedOptions> & {
   /**
    * Selects the HTTP client the generated composables call. Every client plugin speaks the `RequestResult`
    * contract, so the composables call a contract `<op>` that takes one grouped `options` object.
@@ -114,23 +114,23 @@ export type Options = PluginOptions<ResolvedOptions> & {
    *
    * @default false
    */
-  infinite?: Partial<Infinite> | false
+  infinite?: Partial<InfiniteConfig> | false
   /**
    * Custom `queryKey` builder.
    */
-  queryKey?: QueryKey
+  queryKey?: QueryKeyTransformer
   /**
    * Configures query composables. Set to `false` to skip the query output.
    */
-  query?: Partial<Query> | false
+  query?: Partial<QueryConfig> | false
   /**
    * Custom `mutationKey` builder.
    */
-  mutationKey?: MutationKey
+  mutationKey?: MutationKeyTransformer
   /**
    * Configures mutation composables. Set to `false` to skip mutation generation.
    */
-  mutation?: Partial<Mutation> | false
+  mutation?: Partial<MutationConfig> | false
   /**
    * Override how composable names and file paths are built.
    */
@@ -148,31 +148,25 @@ export type Options = PluginOptions<ResolvedOptions> & {
   macros?: Array<ast.Macro>
 }
 
-/**
- * The resolved client strategy for the generated composables, computed once during setup. The
- * composables always import and call a registered contract client plugin's `<op>`.
- */
-export type ResolvedClient = ResolvedContractClient
-
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
+export type PluginVueQueryResolvedOptions = ResolvedPluginOptions<PluginVueQueryResolvedOptions> & {
   /**
    * The resolved contract client the generators import and call.
    */
-  client: ResolvedClient
+  client: ResolvedContractClient
   returnType?: 'data' | 'full'
   /**
    * Resolved infinite query configuration, or `false` when infinite queries are disabled.
    */
-  infinite: NonNullable<Infinite> | false
-  queryKey: QueryKey | null
-  query: NonNullable<Required<Query>> | false
-  mutationKey: MutationKey | null
-  mutation: NonNullable<Required<Mutation>> | false
+  infinite: NonNullable<InfiniteConfig> | false
+  queryKey: QueryKeyTransformer | null
+  query: NonNullable<Required<QueryConfig>> | false
+  mutationKey: MutationKeyTransformer | null
+  mutation: NonNullable<Required<MutationConfig>> | false
   hooks: boolean
   resolver: ResolverVueQuery
 }
 
-export type PluginVueQuery = PluginType<'plugin-vue-query', Options, ResolvedOptions, ResolverVueQuery>
+export type PluginVueQuery = PluginType<'plugin-vue-query', PluginVueQueryOptions, PluginVueQueryResolvedOptions, ResolverVueQuery>
 
 declare global {
   namespace Kubb {

@@ -5,7 +5,7 @@ import { resolverClient } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, renderTemplate, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
-import type { Transformer } from '@internals/tanstack-query'
+import type { KeyTransformer } from '@internals/tanstack-query'
 import { resolverSwr } from '../resolvers/resolverSwr.ts'
 import type { PluginSwr } from '../types.ts'
 import { mutationOperation } from './mutation.tsx'
@@ -64,7 +64,7 @@ const updatePetWithFormNode = ast.factory.createOperation({
 
 describe('mutationGenerator mutationKey', () => {
   test('passes the mutation variant to a custom mutationKey', async () => {
-    const mutationKey = vi.fn<Transformer>(mutationKeyTransformer)
+    const mutationKey = vi.fn<KeyTransformer>(mutationKeyTransformer)
     const options: PluginSwr['resolvedOptions'] = { ...defaultOptions, mutationKey }
     const plugin = createMockedPlugin<PluginSwr>({ name: 'plugin-swr', options, resolver: resolverSwr })
     const driver = createMultiPluginDriver('customMutationKey', plugins)

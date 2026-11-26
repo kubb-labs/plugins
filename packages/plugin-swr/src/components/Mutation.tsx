@@ -6,7 +6,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall, buildResponseTypes, resolveMutationRequestType } from '@internals/tanstack-query'
 import type { CallReturnTypeProps } from '@internals/tanstack-query'
 import type { ReturnTypeOption } from '@internals/client'
-import { buildOperationComments as getComments, buildRequestConfigType } from '@internals/shared'
+import { buildOperationComments, buildRequestConfigType } from '@internals/shared'
 
 export type MutationProps = {
   name: string
@@ -89,7 +89,7 @@ export function Mutation({
       <Type name={mutationArgTypeName} export>
         {hasMutationParams ? argTypeBody : 'never'}
       </Type>
-      <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }}>
+      <Function name={name} export params={paramsSignature} JSDoc={{ comments: buildOperationComments(node) }}>
         {`
         const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
         const mutationKey = ${mutationKeyName}()

@@ -3,7 +3,7 @@ import { createRequire } from 'node:module'
 import { getEnumNames } from '@internals/shared'
 import { createPrinter, Diagnostics, type PrinterFactory } from '@kubb/kit'
 import * as factory from '../factory.ts'
-import type { PluginTs, ResolverTs } from '../types.ts'
+import type { PluginTs, ResolvedEnumOptions, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'
 
 const { isNonNullable } = factory
@@ -77,7 +77,7 @@ export type PrinterTsOptions = {
    * `type` (the output format) and `typeSuffix` (the enum key reference suffix) matter here.
    * `constCasing` and `keyCasing` are ignored.
    */
-  enum: PluginTs['resolvedOptions']['enum']
+  enum: ResolvedEnumOptions
   /**
    * Syntax for generated declarations.
    * - `'type'` generates type aliases
@@ -127,8 +127,6 @@ export type PrinterTsOptions = {
  * TypeScript printer factory options: maps `SchemaNode` → a TS-ESTree node, printed to a type string or a full declaration string.
  */
 export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTsOptions, factory.TsNode, string>
-
-export type PrinterTs = PrinterTsFactory
 
 type HandlerContext = { transform: (node: ast.SchemaNode) => factory.TsNode | null; base: (node: ast.SchemaNode) => factory.TsNode | null }
 
@@ -228,7 +226,7 @@ export function getDeclarationParts(
  * const declaration = printer.print(schemaNode) // 'export type MyType = …'
  * ```
  */
-export const printerTs = createPrinter<PrinterTs>((options) => {
+export const printerTs = createPrinter<PrinterTsFactory>((options) => {
   const addsUndefined = options.optionalType === 'undefined' || options.optionalType === 'questionTokenAndUndefined'
 
   return {

@@ -228,7 +228,7 @@ export type EnumOptions =
  *
  * @default { path: 'types', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginTsOptions = PluginOptions<PluginTsResolvedOptions> & {
   /**
    * Whether object schemas are emitted as `type` aliases or `interface` declarations.
    * - `'type'` emits closed type aliases. Safer default for generated code.
@@ -320,16 +320,16 @@ export type ResolvedEnumOptions = {
   keyCasing: EnumKeyCasing
 }
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
+export type PluginTsResolvedOptions = ResolvedPluginOptions<PluginTsResolvedOptions> & {
   enum: ResolvedEnumOptions
-  optionalType: NonNullable<Options['optionalType']>
-  arrayType: NonNullable<Options['arrayType']>
-  syntaxType: NonNullable<Options['syntaxType']>
-  operations: NonNullable<Options['operations']>
-  printer: Options['printer']
+  optionalType: NonNullable<PluginTsOptions['optionalType']>
+  arrayType: NonNullable<PluginTsOptions['arrayType']>
+  syntaxType: NonNullable<PluginTsOptions['syntaxType']>
+  operations: NonNullable<PluginTsOptions['operations']>
+  printer: PluginTsOptions['printer']
 }
 
-export type PluginTs = PluginType<'plugin-ts', Options, ResolvedOptions, ResolverTs, ast.Printer<PrinterTsFactory>>
+export type PluginTs = PluginType<'plugin-ts', PluginTsOptions, PluginTsResolvedOptions, ResolverTs, ast.Printer<PrinterTsFactory>>
 
 declare global {
   namespace Kubb {

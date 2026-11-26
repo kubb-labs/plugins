@@ -3,6 +3,7 @@ import { type NumericBounds, defaultLiteral, formatDefault, hasInputChecks, nume
 import { buildObject, toRegExpString } from '@internals/utils'
 import { text } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
+import type { Direction } from '@internals/shared/types'
 
 /**
  * Build the Zod schema for a set of literal enum values.
@@ -78,7 +79,7 @@ export function patternKeySchemaMini({ patterns, regexType }: { patterns: Array<
 /**
  * Modifier options for applying chainable methods to Zod schema values.
  */
-export type ModifierOptions = {
+export type ApplyModifiersOptions = {
   value: string
   schema?: ast.SchemaNode
   nullable?: boolean
@@ -175,7 +176,7 @@ export function inputChecks({
  * Apply nullable / optional / nullish modifiers, an optional `.describe()` call, and an
  * optional `.meta({ examples })` call to a schema value string using the chainable Zod v4 API.
  */
-export function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, description, examples }: ModifierOptions): string {
+export function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, description, examples }: ApplyModifiersOptions): string {
   const withModifier = (() => {
     if (nullish || (nullable && optional)) return `${value}.nullish()`
     if (optional) return `${value}.optional()`
@@ -219,7 +220,7 @@ export function omitUnwrapChain(node: ast.SchemaNode, step = '.unwrap()'): strin
  * Apply nullable / optional / nullish modifiers using the functional `zod/mini` API
  * (`z.nullable()`, `z.optional()`, `z.nullish()`).
  */
-export function applyMiniModifiers({ value, schema, nullable, optional, nullish, defaultValue }: Omit<ModifierOptions, 'description'>): string {
+export function applyMiniModifiers({ value, schema, nullable, optional, nullish, defaultValue }: Omit<ApplyModifiersOptions, 'description'>): string {
   const withModifier = (() => {
     if (nullish) return `z.nullish(${value})`
     const withNullable = nullable ? `z.nullable(${value})` : value
@@ -280,7 +281,7 @@ export function getMemberConstraint({
   if (member.primitive === 'array') return lengths({ ...(ast.schema.narrow(member, 'array') ?? {}), regexType }) || undefined
 }
 
-export type PrinterContext = {
+export type ObjectShapeContext = {
   transform: (node: ast.SchemaNode) => string | null
   options: { cyclicSchemas?: ReadonlySet<string>; nodes?: Partial<Record<ast.SchemaType, unknown>> }
 }
@@ -289,7 +290,7 @@ export type PrinterContext = {
  * Builds the `{ key: value, … }` shape shared by the `z.object(...)` and `.extend(...)` renderings.
  */
 export function buildObjectShape(
-  ctx: PrinterContext,
+  ctx: ObjectShapeContext,
   node: ast.SchemaNode,
   renderProperty: (args: {
     name: string
@@ -369,7 +370,7 @@ export function printWithOmit(
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
  * input and a response (decode) schema from its output; `true` keeps `z.infer` for both.
  */
-export function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction: 'encode' | 'decode'): 'infer' | 'input' | 'output' {
+export function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction: Direction): 'infer' | 'input' | 'output' {
   if (inferred !== 'codec') return 'infer'
   return direction === 'encode' ? 'input' : 'output'
 }

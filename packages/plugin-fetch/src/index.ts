@@ -1,2 +1,2 @@
 export { default, pluginFetch, pluginFetchName } from './plugin.ts'
-export type { Options, PluginFetch, ResolvedOptions, ResolverClient } from './types.ts'
+export type { ClientResolvedOptions, Options, PluginFetch, PluginFetchOptions, ResolvedOptions, ResolverClient } from './types.ts'

@@ -33,11 +33,13 @@ export type MutationResolver = {
 /** A hook file: one of the query variants, or the mutation hook. */
 export type HookFileVariant = QueryVariant | 'mutation'
 
+export type HookFileNameOptions = { resolver: Resolver; node: ast.OperationNode; variant?: HookFileVariant }
+
 /**
  * A hook file's name before casing, such as `useGetPetByIdSuspense`. Built from the `operationId`, not the resolver's `name`,
  * so a `name` override renames hooks and leaves their files alone. Two operations with the same name get `usePetList2`.
  */
-export function hookFileName({ resolver, node, variant = '' }: { resolver: Resolver; node: ast.OperationNode; variant?: HookFileVariant }): string {
+export function hookFileName({ resolver, node, variant = '' }: HookFileNameOptions): string {
   const name = `use${casing.capitalize(ensureValidVarName(casing.camel(node.operationId)))}${variant === 'mutation' ? '' : variant}`
   return resolver.resolveName({ key: operationKey(node, 'hookFile', variant), name, scope: 'file' })
 }

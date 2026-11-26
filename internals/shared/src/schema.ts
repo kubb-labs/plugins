@@ -1,6 +1,7 @@
 import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
 import { text } from '@kubb/kit'
+import type { CoercionOptions } from './types.ts'
 
 /**
  * Marks a property required in a later `allOf` member when an earlier member already requires it.
@@ -177,10 +178,7 @@ export function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
 /**
  * Whether the `coercion` option turns on conversion for a type.
  */
-export function shouldCoerce(
-  coercion: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean } | undefined,
-  type: 'dates' | 'strings' | 'numbers',
-): boolean {
+export function shouldCoerce(coercion: CoercionOptions | undefined, type: 'dates' | 'strings' | 'numbers'): boolean {
   return coercion === true || (typeof coercion === 'object' && Boolean(coercion[type]))
 }
 

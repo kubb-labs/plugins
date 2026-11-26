@@ -9,7 +9,7 @@ import { describe, expect, test, vi } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, rawSources, renderTemplate, testConfig } from '#mocks'
 import { hookFileName, mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { Resolver } from '@kubb/kit'
-import type { Transformer } from '@internals/tanstack-query'
+import type { KeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { queryOperation } from './query.tsx'
@@ -288,7 +288,7 @@ describe('queryGenerator queryKey', () => {
   })
 
   test('passes the query variant to a custom queryKey', async () => {
-    const queryKey = vi.fn<Transformer>(queryKeyTransformer)
+    const queryKey = vi.fn<KeyTransformer>(queryKeyTransformer)
     const options: PluginReactQuery['resolvedOptions'] = { ...defaultOptions, queryKey }
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
     const driver = createMultiPluginDriver('customQueryKey', plugins)
@@ -306,7 +306,7 @@ describe('queryGenerator queryKey', () => {
   })
 
   test('wraps queryKeyTransformer and customizes the key based on variant', async () => {
-    const queryKey: Transformer = (props) => {
+    const queryKey: KeyTransformer = (props) => {
       const base = queryKeyTransformer(props)
       return props.variant === 'query' ? ["'customPrefix'", ...base] : base
     }

@@ -1,6 +1,7 @@
 import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
 import { casing, type Resolver } from '@kubb/kit'
+import type { Direction } from './types.ts'
 
 export type ContentTypeInfo = {
   contentTypes: Array<string>
@@ -42,7 +43,7 @@ export type BuildOperationCommentsOptions = {
   splitLines?: boolean
 }
 
-export type ResolveOperationTypeNameOptions = {
+export type ResolveOperationTypeNamesOptions = {
   responseStatusNames?: boolean | 'error'
   exclude?: ReadonlyArray<string | undefined>
   order?: 'params-first' | 'body-response-first'
@@ -143,7 +144,7 @@ type ResponseType = 'blob' | 'text' | 'stream'
 
 export type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | null; stream?: ast.ContentNode['stream'] }
 
-const responseTypes: Partial<Record<NonNullable<ReturnType<typeof ast.mediaType.getKind>>, ResponseType>> = {
+const responseTypes: Partial<Record<ast.mediaType.MediaKind, ResponseType>> = {
   eventStream: 'stream',
   lineStream: 'stream',
   binary: 'blob',
@@ -280,6 +281,8 @@ export type RequestOptionsNameResolver = RequestConfigResolver & {
   }
 }
 
+export type BuildRequestParamsSignatureOptions = { isConfigurable?: boolean }
+
 /**
  * Builds the grouped `{ path, query, body, headers, cookies }` parameter for a generated client
  * function, typed from the operation's `Options` (minus `url`). Only the groups the
@@ -289,7 +292,7 @@ export type RequestOptionsNameResolver = RequestConfigResolver & {
 export function buildRequestParamsSignature(
   node: ast.OperationNode,
   resolver: RequestOptionsNameResolver,
-  options: { isConfigurable?: boolean } = {},
+  options: BuildRequestParamsSignatureOptions = {},
 ): { signature: string; groups: ast.http.RequestGroups; names: Array<(typeof requestGroupOrder)[number]> } {
   const { isConfigurable = true } = options
   const groups = ast.http.getRequestGroups(node)
@@ -511,7 +514,7 @@ export function resolveStatusCodeNames(node: ast.OperationNode, resolver: Respon
 export function resolveOperationTypeNames(
   node: ast.OperationNode,
   resolver: OperationTypeNameResolver & Pick<Resolver, 'memo'>,
-  options: ResolveOperationTypeNameOptions = {},
+  options: ResolveOperationTypeNamesOptions = {},
 ): Array<string> {
   const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   return resolver.memo(`operationTypeNames:${key}`, () => {
@@ -632,9 +635,9 @@ export function buildResponseUnionSchema({
   return members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
 }
 
-type OperationSchemaEntry = { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null; direction?: 'encode' | 'decode' }
+export type OperationSchemaEntry = { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null; direction?: Direction }
 
-type OperationSchemaResolver = OperationTypeNameResolver &
+export type OperationSchemaResolver = OperationTypeNameResolver &
   ResponseStatusNameResolver & {
     name(name: string): string
     param: { name(node: ast.OperationNode, param: ast.ParameterNode): string }
@@ -645,21 +648,19 @@ type OperationSchemaResolver = OperationTypeNameResolver &
     }
   }
 
+export type BuildOperationSchemaEntriesOptions = {
+  node: ast.HttpOperationNode
+  resolver: OperationSchemaResolver
+  inferred: boolean
+}
+
 /**
  * The schemas a validator plugin writes into the file of an operation, in file order: every parameter, every response
  * and its headers, the success and error unions, the request body, and the parameter groups. `inferred` adds the
  * options object and the per-status record, for callers that take their types from the plugin.
  * A request-direction entry has `direction: 'encode'`. An entry without a schema is one the caller skips.
  */
-export function buildOperationSchemaEntries({
-  node,
-  resolver,
-  inferred,
-}: {
-  node: ast.HttpOperationNode
-  resolver: OperationSchemaResolver
-  inferred: boolean
-}): Array<OperationSchemaEntry> {
+export function buildOperationSchemaEntries({ node, resolver, inferred }: BuildOperationSchemaEntriesOptions): Array<OperationSchemaEntry> {
   const encode = (entry: OperationSchemaEntry): OperationSchemaEntry => ({ ...entry, direction: 'encode' })
   const responseUnion = (responses: Array<ast.ResponseNode>, name: string, fallbackUnknown: boolean): OperationSchemaEntry => ({
     schema: buildResponseUnionSchema({ node, responses, name, resolver, fallbackUnknown }),

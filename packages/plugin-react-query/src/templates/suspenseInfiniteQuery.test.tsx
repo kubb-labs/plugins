@@ -5,7 +5,7 @@ import { resolverClient } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
-import type { Transformer } from '@internals/tanstack-query'
+import type { KeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { suspenseInfiniteQueryOperation } from './suspenseInfiniteQuery.tsx'
@@ -114,7 +114,7 @@ describe('suspenseInfiniteQueryGenerator operation', () => {
 
 describe('suspenseInfiniteQueryGenerator queryKey', () => {
   test('passes the suspenseInfiniteQuery variant to a custom queryKey', async () => {
-    const queryKey = vi.fn<Transformer>(queryKeyTransformer)
+    const queryKey = vi.fn<KeyTransformer>(queryKeyTransformer)
     const options: PluginReactQuery['resolvedOptions'] = { ...defaultOptions, ...suspenseInfiniteConfig, queryKey }
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
     const driver = createMultiPluginDriver('customQueryKey', plugins)

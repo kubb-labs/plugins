@@ -5,7 +5,8 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderTemplate } from '#mocks'
-import { resolverClient } from '../resolver.ts'
+import type { MockedPlugin } from '#mocks'
+import { resolverClient } from '../resolvers/resolverClient.ts'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
 import { createSdkTemplate } from './sdk.tsx'
 
@@ -138,7 +139,7 @@ describe('sdkGenerator operations', () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: props.name,
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(createSdkTemplate<PluginFetch>(), 'nodes' in props ? props.nodes : operationNodes, {
@@ -164,7 +165,7 @@ describe('sdkGenerator operations invalid options', () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: 'invalidSdkModeTagWithOutputModeFile',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await expect(

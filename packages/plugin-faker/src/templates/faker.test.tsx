@@ -8,6 +8,7 @@ import { parserTs } from '@kubb/parser-ts'
 import { type PluginTs, resolverTs, typeSchema, typeOperation } from '@kubb/plugin-ts'
 import { describe, expect, onTestFinished, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, format, matchFiles, rawSources, renderTemplate, testConfig } from '#mocks'
+import type { MockedPlugin } from '#mocks'
 import { createPrinterTs } from '../../../plugin-ts/src/printers/printerTs.ts'
 import { createPrinterFaker } from '../printers/printerFaker.ts'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
@@ -400,7 +401,7 @@ const custom: true = child.custom`,
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
     const driver = createMockedPluginDriver({
       name,
-      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: defaultTsPlugin as unknown as MockedPlugin,
     })
 
     driver.inputNode = ast.factory.createInput({
@@ -439,7 +440,7 @@ const custom: true = child.custom`,
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
     const driver = createMockedPluginDriver({
       name: 'emoji',
-      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: defaultTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(fakerSchema, emojiSchema, {
@@ -469,7 +470,7 @@ const custom: true = child.custom`,
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
     const driver = createMockedPluginDriver({
       name: 'pet',
-      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: defaultTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(
@@ -897,7 +898,7 @@ body.id
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
     const driver = createMockedPluginDriver({
       name,
-      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: defaultTsPlugin as unknown as MockedPlugin,
     })
 
     driver.inputNode = ast.factory.createInput({ schemas: [apiErrorSchema, petListSchema, categorySchema, errorSchema, petSchema, treeNodeSchema] })
@@ -920,7 +921,7 @@ body.id
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
     const driver = createMockedPluginDriver({
       name: 'archiveBook',
-      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: defaultTsPlugin as unknown as MockedPlugin,
     })
     const node = ast.factory.createOperation({
       operationId: 'archiveBook',
@@ -969,7 +970,7 @@ describe('fakerGenerator — custom imports', () => {
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options, resolver: resolverFaker })
     const driver = createMockedPluginDriver({
       name: 'dateParser',
-      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: defaultTsPlugin as unknown as MockedPlugin,
     })
     const context = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverFaker, printer: createPrinterFaker }
 
@@ -1004,7 +1005,7 @@ describe('fakerGenerator — custom imports', () => {
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options, resolver: resolverFaker })
     const driver = createMockedPluginDriver({
       name: 'seed',
-      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: defaultTsPlugin as unknown as MockedPlugin,
     })
     const context = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverFaker, printer: createPrinterFaker }
 
@@ -1054,7 +1055,7 @@ describe('fakerGenerator — custom imports', () => {
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options, resolver: resolverFaker })
     const driver = createMockedPluginDriver({
       name: 'customImports',
-      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: defaultTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(fakerSchema, schema, {

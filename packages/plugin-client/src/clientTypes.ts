@@ -26,7 +26,7 @@ export type ValidatorOptions = false | ValidatorLibrary | ValidatorSlots<'zod'> 
  * - `'tag'`: one class per tag, optionally composed into a root client.
  * - `'flat'`: one class with every operation as a direct method.
  */
-export type Mode = 'tag' | 'flat'
+export type SdkMode = 'tag' | 'flat'
 
 /**
  * How generated functions take the `auth` option.
@@ -164,7 +164,7 @@ export type ClientOptions = PluginOptions<Omit<ClientResolvedOptions, 'throwOnEr
      *
      * @default 'tag'
      */
-    mode?: Mode
+    mode?: SdkMode
     /**
      * Name of the generated entry point, also the file name. With `mode: 'tag'` it emits a
      * composed root class that creates one client and shares it with every tag client. With
@@ -202,7 +202,7 @@ export type ClientResolvedOptions = {
   returnType: ReturnTypeOption
   sdk:
     | {
-        mode: Mode
+        mode: SdkMode
         name: string | undefined
       }
     | undefined

@@ -5,7 +5,7 @@ import type {
   Adapter,
   AdapterFactoryOptions,
   Config,
-  GeneratorContext,
+  TemplateContext,
   PrinterContext,
   PrinterFactory,
   KubbHooks,
@@ -68,7 +68,9 @@ function pluginNotFoundError({ pluginName, requiredBy }: { pluginName: string; r
  * Creates a driver for template tests. `getPlugin` and `getResolver` return `options.plugin` and
  * its resolver for any name, and files land in a real file manager.
  */
-export function createMockedPluginDriver(options: { name?: string; plugin?: MockedPlugin; config?: Config } = {}): MockedPluginDriver {
+export type MockedPluginDriverOptions = { name?: string; plugin?: MockedPlugin; config?: Config }
+
+export function createMockedPluginDriver(options: MockedPluginDriverOptions = {}): MockedPluginDriver {
   const config = options.config ?? ({ root: '.', output: { path: './path' } } as Config)
   const { fileManager } = new KubbDriver(config, { hooks: new Hookable<KubbHooks>() })
 
@@ -94,10 +96,12 @@ export type MockedSetupContext<TFactory extends PluginType = PluginType> = KubbP
 /**
  * Creates a `kubb:plugin:setup` context for the plugin `plugin-mock`. `requirePlugin` fails for names `plugins` does not list.
  */
+export type MockedSetupContextOptions<TFactory extends PluginType = PluginType> = { plugins?: Array<string>; options?: TFactory['options'] }
+
 export function createMockedSetupContext<TFactory extends PluginType = PluginType>({
   plugins = [],
   options = {} as TFactory['options'],
-}: { plugins?: Array<string>; options?: TFactory['options'] } = {}): MockedSetupContext<TFactory> {
+}: MockedSetupContextOptions<TFactory> = {}): MockedSetupContext<TFactory> {
   const registered = plugins.map((name) => ({ name }) as unknown as Plugin)
   const ctx = {
     config: { root: '.', output: { path: './gen' }, plugins: registered } as unknown as Config,
@@ -127,8 +131,14 @@ export function registeredTemplates(ctx: MockedSetupContext): Array<Template> {
 /**
  * Creates an adapter whose `parse` returns an empty `InputNode` unless `options.parse` is set.
  */
+export type MockedAdapterOptions<TOptions extends AdapterFactoryOptions = AdapterFactoryOptions> = {
+  name?: TOptions['name']
+  resolvedOptions?: TOptions['resolvedOptions']
+  parse?: Adapter<TOptions>['parse']
+}
+
 export function createMockedAdapter<TOptions extends AdapterFactoryOptions = AdapterFactoryOptions>(
-  options: { name?: TOptions['name']; resolvedOptions?: TOptions['resolvedOptions']; parse?: Adapter<TOptions>['parse'] } = {},
+  options: MockedAdapterOptions<TOptions> = {},
 ): Adapter<TOptions> {
   return {
     name: (options.name ?? 'oas') as TOptions['name'],
@@ -142,13 +152,15 @@ export function createMockedAdapter<TOptions extends AdapterFactoryOptions = Ada
 /**
  * Creates a plugin with the given name, options, resolver and macros.
  */
-export function createMockedPlugin<TOptions extends PluginType = PluginType>(params: {
+export type MockedPluginOptions<TOptions extends PluginType = PluginType> = {
   name: TOptions['name']
   options: TOptions['resolvedOptions']
   resolver?: TOptions['resolver']
   macros?: Array<ast.Macro>
   dependencies?: Array<string>
-}): MockedPlugin<TOptions> {
+}
+
+export function createMockedPlugin<TOptions extends PluginType = PluginType>(params: MockedPluginOptions<TOptions>): MockedPlugin<TOptions> {
   return {
     name: params.name,
     options: params.options,
@@ -172,17 +184,15 @@ export type RenderTemplateOptions<TOptions extends PluginType> = {
 }
 
 // Adds `ctx.printer`, `ctx.file` and `ctx.from`, like kit's visitor does. The factory runs with `ctx` as `useKubb()`.
-function withPrinter<TOptions extends PluginType>(ctx: PrinterContext<TOptions>, opts: RenderTemplateOptions<TOptions>): GeneratorContext<TOptions> {
-  const generatorContext = { ...ctx, printer: undefined } as GeneratorContext<TOptions>
-  generatorContext.file = (node, options) => withContext(generatorContext, () => file(node, options))
-  generatorContext.from = ((source) => withContext(generatorContext, () => from(source))) as GeneratorContext<TOptions>['from']
-  generatorContext.printer = (opts.printer && withContext(ctx, () => opts.printer!(ctx))) as GeneratorContext<TOptions>['printer']
-  return generatorContext
+function withPrinter<TOptions extends PluginType>(ctx: PrinterContext<TOptions>, opts: RenderTemplateOptions<TOptions>): TemplateContext<TOptions> {
+  const templateContext = { ...ctx, printer: undefined } as TemplateContext<TOptions>
+  templateContext.file = (node, options) => withContext(templateContext, () => file(node, options))
+  templateContext.from = ((source) => withContext(templateContext, () => from(source))) as TemplateContext<TOptions>['from']
+  templateContext.printer = (opts.printer && withContext(ctx, () => opts.printer!(ctx))) as TemplateContext<TOptions>['printer']
+  return templateContext
 }
 
-function createMockedPluginContext<TOptions extends PluginType>(
-  opts: RenderTemplateOptions<TOptions>,
-): Omit<GeneratorContext<TOptions>, 'options' | 'printer'> {
+function createMockedPluginContext<TOptions extends PluginType>(opts: RenderTemplateOptions<TOptions>): Omit<TemplateContext<TOptions>, 'options' | 'printer'> {
   // A real build registers the plugin under test, so it can look itself up by name.
   const getPlugin = (name: string) => opts.driver.getPlugin(name) ?? (name === opts.plugin.name ? opts.plugin : undefined)
   return {
@@ -208,7 +218,7 @@ function createMockedPluginContext<TOptions extends PluginType>(
     warn: (message: string) => console.warn(message),
     error: (message: string) => console.error(message),
     info: (message: string) => console.info(message),
-  } as unknown as Omit<GeneratorContext<TOptions>, 'options' | 'printer'>
+  } as unknown as Omit<TemplateContext<TOptions>, 'options' | 'printer'>
 }
 
 /**
@@ -225,7 +235,7 @@ export async function renderTemplate<TOptions extends PluginType>(
   const macros = opts.plugin.macros ?? []
   const apply = <TNode extends ast.SchemaNode | ast.OperationNode>(item: TNode): TNode => (macros.length ? ast.macro.apply(item, macros) : item)
   const transformed = Array.isArray(node) ? ast.factory.createOperations({ operations: node.map(apply) }) : apply(node)
-  const render = template.render as (node: unknown, ctx: GeneratorContext<TOptions>) => unknown
+  const render = template.render as (node: unknown, ctx: TemplateContext<TOptions>) => unknown
   const result = await withContext(ctx, () => render.call(ctx, transformed, ctx))
   await opts.driver.fileManager.dispatch({ result, renderer: isKubbElement(result) ? jsxRenderer : null })
 }

@@ -27,7 +27,7 @@ export type ResolverMsw = Resolver & {
  *
  * @default { path: 'handlers', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginMswOptions = PluginOptions<PluginMswResolvedOptions> & {
   /**
    * Base URL prepended to every handler's request URL. A `${...}` expression runs at runtime.
    * Pass `{ baseURL }` as a handler's second argument to override it per call.
@@ -58,13 +58,13 @@ export type Options = PluginOptions<ResolvedOptions> & {
   parser?: 'data' | 'faker'
 }
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
-  parser: NonNullable<Options['parser']>
-  baseURL: Options['baseURL'] | undefined
+export type PluginMswResolvedOptions = ResolvedPluginOptions<PluginMswResolvedOptions> & {
+  parser: NonNullable<PluginMswOptions['parser']>
+  baseURL: PluginMswOptions['baseURL'] | undefined
   handlers: boolean
 }
 
-export type PluginMsw = PluginType<'plugin-msw', Options, ResolvedOptions, ResolverMsw>
+export type PluginMsw = PluginType<'plugin-msw', PluginMswOptions, PluginMswResolvedOptions, ResolverMsw>
 
 declare global {
   namespace Kubb {

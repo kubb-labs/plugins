@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { resolveParamsValidator, resolveRequestValidator, resolveResponseValidator, resolveValidatorLibrary } from './validatorOptions.ts'
+import { resolveParamsValidator, resolveRequestValidator, resolveResponseValidator, resolveValidatorLibrary } from './validatorLibrary.ts'
 
 describe('validator resolvers', () => {
   test('request and params opt in independently', () => {

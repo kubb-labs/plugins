@@ -57,6 +57,8 @@ const selectorToPlugin: Record<ClientSelector, string> = {
 // Every contract client plugin, in auto-detect priority order.
 const contractPlugins = [pluginFetchName, pluginAxiosName, pluginKyName, pluginClientName] as const
 
+export type ResolveClientOptions = { client: ClientSelector | undefined; pluginNames: ReadonlyArray<string> }
+
 /**
  * Applies the `client` resolution rules. See the module comment for the strategy shape.
  *
@@ -72,7 +74,7 @@ const contractPlugins = [pluginFetchName, pluginAxiosName, pluginKyName, pluginC
  * // { kind: 'error', code: 'KUBB_MISSING_DEPENDENCY', message: 'No client plugin is registered.', help: 'Add …' }
  * ```
  */
-export function resolveClient(options: { client: ClientSelector | undefined; pluginNames: ReadonlyArray<string> }): ResolveClientResult {
+export function resolveClient(options: ResolveClientOptions): ResolveClientResult {
   const { client, pluginNames } = options
   const has = (name: string) => pluginNames.includes(name)
 
@@ -127,11 +129,13 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
  * On a misconfiguration it throws a config diagnostic tagged with `plugin`, so every consumer
  * fails fast with the same message.
  */
-export function resolveContractClient(options: {
+export type ResolveContractClientOptions = {
   plugin: string
   client: ClientSelector | undefined
   plugins?: ReadonlyArray<unknown>
-}): ResolvedContractClient {
+}
+
+export function resolveContractClient(options: ResolveContractClientOptions): ResolvedContractClient {
   const { plugin, client, plugins = [] } = options
   const pluginNames = plugins.map((plugin) => (plugin as { name?: string }).name).filter((name): name is string => Boolean(name))
   const resolved = resolveClient({ client, pluginNames })
