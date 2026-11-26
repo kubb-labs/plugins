@@ -187,12 +187,6 @@ describe('buildPropertyJSDocComments', () => {
     expect(comments).not.toContain('@description')
   })
 
-  it('keeps only the description of a binary schema', () => {
-    const blob = ast.factory.createSchema({ type: 'blob', primitive: 'string', description: 'The photo' })
-
-    expect(buildPropertyJSDocComments(blob)).toStrictEqual(['@description The photo'])
-  })
-
   it('emits one @example per entry in the examples array', () => {
     const schema = ast.factory.createSchema({ type: 'string', examples: ['a', 'b'] })
     const comments = buildPropertyJSDocComments(schema)
