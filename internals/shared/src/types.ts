@@ -30,7 +30,7 @@ export interface ResolvedPluginOptions<TResolvedOptions> {
   group: Group | null
 }
 
-/** Which side of a schema a printer writes: `decode` reads input, `encode` writes output. */
+/** Which side of a codec a printer writes: `encode` for a request the caller sends, `decode` for a response it reads. */
 export type Direction = 'encode' | 'decode'
 
 /** Coerces input before validation: `true` for every primitive, or one flag per kind. */
