@@ -12,7 +12,7 @@ export function listPetsStyled<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<ListPetsStyledResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<ListPetsStyledResponses, ThrowOnError>>(
     apiClient<ListPetsStyledResponses, ThrowOnError>({
       method: 'GET',
       url: '/pets/{petId}',

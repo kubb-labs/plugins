@@ -27,7 +27,7 @@ export function logoutUser<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<LogoutUserResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<LogoutUserResponses, ThrowOnError>>(
     apiClient<LogoutUserResponses, ThrowOnError>({
       method: 'GET',
       url: '/user/logout',

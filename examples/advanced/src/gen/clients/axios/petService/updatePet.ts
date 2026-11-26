@@ -66,7 +66,7 @@ export function updatePet<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: apiClient = client, contentType, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<UpdatePetResponses, ThrowOnError>>(
     apiClient<UpdatePetResponses, ThrowOnError>({
       method: 'PUT',
       url: '/pet',

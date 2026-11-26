@@ -57,7 +57,7 @@ export function placeOrder<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<PlaceOrderResponses, ThrowOnError>>(
     apiClient<PlaceOrderResponses, ThrowOnError>({
       method: 'POST',
       url: '/store/order',

@@ -20,7 +20,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<GetPetByIdResponses, ThrowOnError>>(
       apiClient<GetPetByIdResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/{petId}',
@@ -38,7 +38,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<DeletePetResponses, ThrowOnError>>(
       apiClient<DeletePetResponses, ThrowOnError>({
         method: 'DELETE',
         url: '/pet/{petId}',

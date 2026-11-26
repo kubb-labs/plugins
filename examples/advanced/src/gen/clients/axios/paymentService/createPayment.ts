@@ -24,7 +24,7 @@ export function createPayment<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<CreatePaymentResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<CreatePaymentResponses, ThrowOnError>>(
     apiClient<CreatePaymentResponses, ThrowOnError>({
       method: 'POST',
       url: '/store/payments',

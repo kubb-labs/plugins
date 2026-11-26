@@ -1,8 +1,8 @@
 import type { ast } from '@internals/ast'
 import { getStream } from '@internals/shared'
-import { buildResponseHeadersType, buildResultTypeRef, resultTypeName, type OperationTypeNames } from '@internals/client'
+import { buildResponseHeadersRef, buildResponseHeadersType, buildResultTypeRef, resultTypeName, type OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
-import { buildRequestResultGenerics } from './generics.ts'
+import { buildRequestResultGenerics, buildRequestResultTypeRef } from './generics.ts'
 
 export type BuildReturnStatementOptions = {
   node: ast.OperationNode
@@ -15,12 +15,13 @@ export type BuildReturnStatementOptions = {
 /**
  * Builds the return statement of a generated operation function. The client call takes the responses record and
  * `ThrowOnError` as type arguments, so its result is already the operation's `RequestResult` and needs no cast. With the
- * default `returnType: 'full'` it is wrapped in `withUnwrap`, so the caller can `await` it or call `.unwrap()`. With
- * `returnType: 'data'` it goes through `unwrapResult`, which keeps the success body when the call throws on errors.
- * With `returnType: 'plain'` it is returned as is.
+ * default `returnType: 'full'` it is wrapped in `withUnwrap`, so the caller can `await` it or call `.unwrap()`. `withUnwrap`
+ * gets its type argument, so TypeScript does not also infer it from the declared return type. With `returnType: 'data'`
+ * it goes through `unwrapResult`, which keeps the success body when the call throws on errors. With `returnType: 'plain'`
+ * it is returned as is.
  *
  * @example
- * `return withUnwrap(apiClient<AddPetResponses, ThrowOnError>({ method: 'POST', url: '/pet', ...config }))`
+ * `return withUnwrap<RequestResult<AddPetResponses, ThrowOnError>>(apiClient<AddPetResponses, ThrowOnError>({ method: 'POST', url: '/pet', ...config }))`
  * @example
  * `return unwrapResult(apiClient<AddPetResponses, ThrowOnError>({ ... }), resolveThrowOnError(config.throwOnError, true))`
  * @example
@@ -30,7 +31,7 @@ export function buildReturnStatement({ node, types, callConfig, returnType, thro
   const call = `apiClient<${buildRequestResultGenerics({ node, types })}>(${callConfig})`
   if (returnType === 'data') return `return unwrapResult(${call}, resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault}))`
   if (returnType === 'plain') return `return ${call}`
-  return `return withUnwrap(${call})`
+  return `return withUnwrap<${buildRequestResultTypeRef({ node, types })}>(${call})`
 }
 
 export type EventStreamReturn = { returnType: string; statement: string }
@@ -43,7 +44,7 @@ export type EventStreamReturn = { returnType: string; statement: string }
 export function buildEventStreamReturn({ node, types, callConfig, returnType, throwOnErrorDefault }: BuildReturnStatementOptions): EventStreamReturn {
   const shape = getStream(node)?.shape ?? 'data'
   const responses = types.response.responses(node)
-  const headers = buildResponseHeadersType({ node, types })
+  const headers = buildResponseHeadersRef({ node, types })
   const success = `SuccessOf<${responses}>`
   const item = { event: `TypedEvent<${success}>`, data: null, line: success }[shape]
   // The headers come after the item in `client.stream`, so a typed-headers call spells out the default item.
@@ -57,7 +58,7 @@ export function buildEventStreamReturn({ node, types, callConfig, returnType, th
       statement: `return unwrapResult(${call}, resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault}))`,
     }
   }
-  return { returnType: `Unwrappable<${result('StreamResult')}>`, statement: `return withUnwrap(${call})` }
+  return { returnType: `Unwrappable<${result('StreamResult')}>`, statement: `return withUnwrap<${result('StreamResult')}>(${call})` }
 }
 
 export type BuildEventStreamImportsOptions = {

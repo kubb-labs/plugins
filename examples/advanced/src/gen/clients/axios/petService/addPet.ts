@@ -65,7 +65,7 @@ export function addPet<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<AddPetResponses, ThrowOnError>>(
     apiClient<AddPetResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet',

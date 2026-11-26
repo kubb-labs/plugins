@@ -25,7 +25,7 @@ export class StoreClient {
     public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<GetInventoryResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, validator: { response: getInventoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>>(apiClient<GetInventoryResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, validator: { response: getInventoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -36,6 +36,6 @@ export class StoreClient {
     public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<PlaceOrderResponsesSchemaType, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { response: placeOrderResponseSchema, error: { 405: placeOrderStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>(apiClient<PlaceOrderResponsesSchemaType, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { response: placeOrderResponseSchema, error: { 405: placeOrderStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 }

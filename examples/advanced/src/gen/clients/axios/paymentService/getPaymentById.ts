@@ -26,7 +26,7 @@ export function getPaymentById<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<GetPaymentByIdResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<GetPaymentByIdResponses, ThrowOnError>>(
     apiClient<GetPaymentByIdResponses, ThrowOnError>({
       method: 'GET',
       url: '/store/payments/{paymentId}',

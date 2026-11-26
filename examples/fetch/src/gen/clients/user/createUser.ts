@@ -17,7 +17,7 @@ export function createUser<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<CreateUserResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<CreateUserResponses, ThrowOnError>>(
     apiClient<CreateUserResponses, ThrowOnError>({
       method: 'POST',
       url: '/user',

@@ -26,5 +26,5 @@ export function getInventory<ThrowOnError extends boolean = true>(options: Optio
 }), ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<GetInventoryResponses, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, validator: { response: getInventoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap<RequestResult<GetInventoryResponses, ThrowOnError>>(apiClient<GetInventoryResponses, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, validator: { response: getInventoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

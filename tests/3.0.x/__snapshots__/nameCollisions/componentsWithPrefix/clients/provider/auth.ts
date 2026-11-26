@@ -23,5 +23,5 @@ export function providerAuth<ThrowOnError extends boolean = true>(options: Optio
 }), ThrowOnError> = {}): Unwrappable<RequestResult<ApiProviderAuthResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<ApiProviderAuthResponses, ThrowOnError>({ method: 'POST', url: '/auth', ...config, validator: { response: providerAuthResponseSchema, error: { 400: providerAuthStatus400Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap<RequestResult<ApiProviderAuthResponses, ThrowOnError>>(apiClient<ApiProviderAuthResponses, ThrowOnError>({ method: 'POST', url: '/auth', ...config, validator: { response: providerAuthResponseSchema, error: { 400: providerAuthStatus400Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

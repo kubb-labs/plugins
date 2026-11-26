@@ -19,7 +19,7 @@ export class StoreClient {
   ): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<GetInventoryResponses, ThrowOnError>>(
       apiClient<GetInventoryResponses, ThrowOnError>({
         method: 'GET',
         url: '/store/inventory',

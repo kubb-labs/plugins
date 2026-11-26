@@ -45,5 +45,5 @@ export function placeOrder<ThrowOnError extends boolean = true>(options: Options
 }), ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<PlaceOrderResponses, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { request: placeOrderBodySchema, response: placeOrderResponseSchema, error: { 405: placeOrderStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap<RequestResult<PlaceOrderResponses, ThrowOnError>>(apiClient<PlaceOrderResponses, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { request: placeOrderBodySchema, response: placeOrderResponseSchema, error: { 405: placeOrderStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

@@ -26,7 +26,7 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
 ): Unwrappable<StreamResult<StreamPetEventsResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<StreamResult<StreamPetEventsResponses, ThrowOnError>>(
     apiClient.stream<StreamPetEventsResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/{petId}/events',

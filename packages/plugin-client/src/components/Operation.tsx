@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
-import type { OperationTypeNames } from '@internals/client'
+import { buildResponseHeadersDeclaration, type OperationTypeNames } from '@internals/client'
 import { buildOperationComments } from '@internals/shared'
-import { Function } from '@kubb/renderer-jsx'
+import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
@@ -45,7 +45,8 @@ export type OperationProps = {
  * Renders one client operation: the function that forwards a
  * single `options` object to the resolved client and returns the `Unwrappable<RequestResult>`. The
  * type, signature, and call config are built with the AST factory, and only the jsx-renderer emits
- * the source.
+ * the source. A per-status headers map is declared once above the function, so the return type and
+ * the call share it.
  */
 export function Operation({
   name,
@@ -61,21 +62,25 @@ export function Operation({
   if (!ast.http.isOperation(node)) return null
 
   const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault })
+  const headers = buildResponseHeadersDeclaration({ node, types })
 
   return (
-    <Function
-      name={name}
-      export
-      generics={body.generics}
-      params={body.paramsSignature}
-      returnType={body.returnType}
-      JSDoc={{ comments: buildOperationComments(node, { splitLines: true }) }}
-    >
-      {body.mergeContentType
-        ? 'const { client: apiClient = client, contentType, ...config } = options'
-        : 'const { client: apiClient = client, ...config } = options'}
-      <br />
-      {body.statement}
-    </Function>
+    <>
+      {headers && <Type name={headers.name}>{headers.type}</Type>}
+      <Function
+        name={name}
+        export
+        generics={body.generics}
+        params={body.paramsSignature}
+        returnType={body.returnType}
+        JSDoc={{ comments: buildOperationComments(node, { splitLines: true }) }}
+      >
+        {body.mergeContentType
+          ? 'const { client: apiClient = client, contentType, ...config } = options'
+          : 'const { client: apiClient = client, ...config } = options'}
+        <br />
+        {body.statement}
+      </Function>
+    </>
   )
 }

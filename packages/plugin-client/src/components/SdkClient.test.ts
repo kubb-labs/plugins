@@ -35,7 +35,7 @@ describe('buildSdkMethod', () => {
     expect(method).toContain('): Unwrappable<StreamResult<StreamEventsResponses, ThrowOnError>>')
     // The runtime validates each event with the response validator, by the event shape the call carries.
     expect(method).toContain(
-      `return withUnwrap(apiClient.stream<StreamEventsResponses, ThrowOnError>({ method: 'GET', url: '/events', contentType: { response: 'text/event-stream' }, eventShape: 'data', ...config, validator: { response: streamEventsResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))`,
+      `return withUnwrap<StreamResult<StreamEventsResponses, ThrowOnError>>(apiClient.stream<StreamEventsResponses, ThrowOnError>({ method: 'GET', url: '/events', contentType: { response: 'text/event-stream' }, eventShape: 'data', ...config, validator: { response: streamEventsResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))`,
     )
     expect(method).not.toMatch(/\) as \w/)
 

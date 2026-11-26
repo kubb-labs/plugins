@@ -153,7 +153,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
     const { client: apiClient = this.client, contentType, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<UpdatePetResponses, ThrowOnError>>(
       apiClient<UpdatePetResponses, ThrowOnError>({
         method: 'PUT',
         url: '/pet',
@@ -210,7 +210,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: apiClient = this.client, contentType, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<AddPetResponses, ThrowOnError>>(
       apiClient<AddPetResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet',
@@ -242,7 +242,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<FindPetsByStatusResponses, ThrowOnError>>(
       apiClient<FindPetsByStatusResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/findByStatus',
@@ -276,7 +276,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<FindPetsByTagsResponses, ThrowOnError>>(
       apiClient<FindPetsByTagsResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/findByTags',
@@ -308,7 +308,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<GetPetByIdResponses, ThrowOnError>>(
       apiClient<GetPetByIdResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/{petId}',
@@ -341,7 +341,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>(
       apiClient<UpdatePetWithFormResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet/{petId}',
@@ -374,7 +374,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<DeletePetResponses, ThrowOnError>>(
       apiClient<DeletePetResponses, ThrowOnError>({
         method: 'DELETE',
         url: '/pet/{petId}',
@@ -422,7 +422,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<UploadFileResponses, ThrowOnError>>(
       apiClient<UploadFileResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet/{petId}/uploadImage',

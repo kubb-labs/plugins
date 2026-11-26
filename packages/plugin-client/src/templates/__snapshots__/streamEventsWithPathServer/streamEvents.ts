@@ -12,7 +12,7 @@ export function streamEvents<ThrowOnError extends boolean = true>(
 ): Unwrappable<StreamResult<StreamEventsResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<StreamResult<StreamEventsResponses, ThrowOnError>>(
     apiClient.stream<StreamEventsResponses, ThrowOnError>({
       method: 'GET',
       url: '/events',

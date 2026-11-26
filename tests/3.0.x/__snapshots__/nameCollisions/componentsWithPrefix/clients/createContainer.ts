@@ -23,5 +23,5 @@ export function createContainer<ThrowOnError extends boolean = true>(options: Op
 }), ThrowOnError> = {}): Unwrappable<RequestResult<ApiCreateContainerResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<ApiCreateContainerResponses, ThrowOnError>({ method: 'POST', url: '/containers', contentType: { request: 'application/json' }, ...config, validator: { response: createContainerResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap<RequestResult<ApiCreateContainerResponses, ThrowOnError>>(apiClient<ApiCreateContainerResponses, ThrowOnError>({ method: 'POST', url: '/containers', contentType: { request: 'application/json' }, ...config, validator: { response: createContainerResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

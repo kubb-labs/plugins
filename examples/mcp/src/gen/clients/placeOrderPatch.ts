@@ -57,7 +57,7 @@ export function placeOrderPatch<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>(
     apiClient<PlaceOrderPatchResponses, ThrowOnError>({
       method: 'PATCH',
       url: '/store/order',

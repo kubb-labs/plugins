@@ -14,5 +14,5 @@ import { listEventsQuerySchema, listEventsResponseSchema } from '../zod/listEven
 export function listEvents<ThrowOnError extends boolean = true>(options: Options<ListEventsOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<ListEventsResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/events', ...config, validator: { query: listEventsQuerySchema, response: listEventsResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>>(apiClient<ListEventsResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/events', ...config, validator: { query: listEventsQuerySchema, response: listEventsResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

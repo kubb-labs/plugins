@@ -26,7 +26,7 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
 ): Unwrappable<StreamResult<StreamOrderEventsResponses, ThrowOnError, TypedEvent<SuccessOf<StreamOrderEventsResponses>>>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<StreamResult<StreamOrderEventsResponses, ThrowOnError, TypedEvent<SuccessOf<StreamOrderEventsResponses>>>>(
     apiClient.stream<StreamOrderEventsResponses, ThrowOnError, TypedEvent<SuccessOf<StreamOrderEventsResponses>>>({
       method: 'GET',
       url: '/store/order/{orderId}/events',

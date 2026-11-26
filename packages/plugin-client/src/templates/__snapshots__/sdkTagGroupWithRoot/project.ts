@@ -19,7 +19,7 @@ export class ProjectClient {
   ): Unwrappable<RequestResult<GetProjectResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<GetProjectResponses, ThrowOnError>>(
       apiClient<GetProjectResponses, ThrowOnError>({
         method: 'GET',
         url: '/projects/{project_id}',

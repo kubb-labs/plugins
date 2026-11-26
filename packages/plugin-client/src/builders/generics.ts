@@ -1,15 +1,15 @@
 import type { ast } from '@internals/ast'
-import { buildResponseHeadersType, buildResultTypeRef, type OperationTypeNames } from '@internals/client'
+import { buildResponseHeadersRef, buildResultTypeRef, type OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 
 /**
  * Builds the `RequestResult` type arguments of one operation: responses, `ThrowOnError` and the response headers, when a response declares any.
  *
  * @example
- * `buildRequestResultGenerics({ node, types }) // "LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }"`
+ * `buildRequestResultGenerics({ node, types }) // "LoginUserResponses, ThrowOnError, LoginUserResponseHeaders"`
  */
 export function buildRequestResultGenerics({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string {
-  return [types.response.responses(node), 'ThrowOnError', buildResponseHeadersType({ node, types })].filter(Boolean).join(', ')
+  return [types.response.responses(node), 'ThrowOnError', buildResponseHeadersRef({ node, types })].filter(Boolean).join(', ')
 }
 
 /**
@@ -23,7 +23,22 @@ export function buildRequestResultGenerics({ node, types }: { node: ast.Operatio
  * `buildResultType({ node, types, returnType: 'data' }) // 'Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>'`
  */
 export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ReturnTypeOption }): string {
-  const name = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
-  const result = buildResultTypeRef(name, types.response.responses(node), buildResponseHeadersType({ node, types }), ['ThrowOnError'])
+  const result = buildRequestResultTypeRef({ node, types, name: returnType === 'data' ? 'UnwrappedResult' : 'RequestResult' })
   return returnType === 'full' ? `Unwrappable<${result}>` : `Promise<${result}>`
+}
+
+/**
+ * Builds one operation's result type with its arguments, such as
+ * `RequestResultWithHeaders<AddPetResponses, AddPetResponseHeaders, ThrowOnError>`.
+ */
+export function buildRequestResultTypeRef({
+  node,
+  types,
+  name = 'RequestResult',
+}: {
+  node: ast.OperationNode
+  types: OperationTypeNames
+  name?: string
+}): string {
+  return buildResultTypeRef(name, types.response.responses(node), buildResponseHeadersRef({ node, types }), ['ThrowOnError'])
 }

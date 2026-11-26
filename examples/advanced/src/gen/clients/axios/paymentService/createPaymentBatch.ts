@@ -24,7 +24,7 @@ export function createPaymentBatch<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<CreatePaymentBatchResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<CreatePaymentBatchResponses, ThrowOnError>>(
     apiClient<CreatePaymentBatchResponses, ThrowOnError>({
       method: 'POST',
       url: '/store/payments/batch',

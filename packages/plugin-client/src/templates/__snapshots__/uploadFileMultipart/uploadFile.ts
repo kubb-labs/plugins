@@ -12,7 +12,7 @@ export function uploadFile<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<UploadFileResponses, ThrowOnError>>(
     apiClient<UploadFileResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet/{petId}/uploadImage',

@@ -25,7 +25,7 @@ export function scheduleVisit<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<ScheduleVisitResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<ScheduleVisitResponsesSchemaType, ThrowOnError>>(
     apiClient<ScheduleVisitResponsesSchemaType, ThrowOnError>({
       method: 'PUT',
       url: '/pets/{petId}/visits/{day}',

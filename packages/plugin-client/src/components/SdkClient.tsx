@@ -1,8 +1,8 @@
 import { ast } from '@internals/ast'
-import type { OperationTypeNames } from '@internals/client'
+import { buildResponseHeadersDeclaration, type OperationTypeNames } from '@internals/client'
 import { buildOperationComments } from '@internals/shared'
 import { buildJSDoc } from '@internals/utils'
-import { Code } from '@kubb/renderer-jsx'
+import { Code, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
@@ -91,10 +91,18 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
   ].join('\n')
 
   const classCode = `export class ${name} {\n${constructor}\n\n${methods.join('\n\n')}\n}`
+  const headersTypes = operations.flatMap(({ node, types }) => buildResponseHeadersDeclaration({ node, types }) ?? [])
 
   return (
-    <Code name={name} export>
-      {classCode}
-    </Code>
+    <>
+      {headersTypes.map(({ name: headersName, type }) => (
+        <Type key={headersName} name={headersName}>
+          {type}
+        </Type>
+      ))}
+      <Code name={name} export>
+        {classCode}
+      </Code>
+    </>
   )
 }

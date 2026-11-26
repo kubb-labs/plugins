@@ -26,7 +26,7 @@ export class EventClient {
     public putEvent<ThrowOnError extends boolean = true>(options: Options<PutEventOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PutEventResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<PutEventResponsesSchemaType, ThrowOnError>({ method: 'PUT', url: '/events/{day}', contentType: { request: 'application/json' }, ...config, validator: { request: putEventBodySchema, path: putEventPathSchema, query: putEventQuerySchema, headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape), response: putEventResponseSchema, error: { 409: putEventStatus409Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap<RequestResult<PutEventResponsesSchemaType, ThrowOnError>>(apiClient<PutEventResponsesSchemaType, ThrowOnError>({ method: 'PUT', url: '/events/{day}', contentType: { request: 'application/json' }, ...config, validator: { request: putEventBodySchema, path: putEventPathSchema, query: putEventQuerySchema, headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape), response: putEventResponseSchema, error: { 409: putEventStatus409Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -35,7 +35,7 @@ export class EventClient {
     public listEvents<ThrowOnError extends boolean = true>(options: Options<ListEventsOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<ListEventsResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/events', ...config, validator: { query: listEventsQuerySchema, response: listEventsResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>>(apiClient<ListEventsResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/events', ...config, validator: { query: listEventsQuerySchema, response: listEventsResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -44,6 +44,6 @@ export class EventClient {
     public getResource<ThrowOnError extends boolean = true>(options: Options<GetResourceOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<GetResourceResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/resources/{resource}', ...config, validator: { path: getResourcePathSchema, query: getResourceQuerySchema, headers: toHeadersStandardSchema(getResourceHeadersSchema, getResourceHeadersSchema.shape), response: getResourceResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>>(apiClient<GetResourceResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/resources/{resource}', ...config, validator: { path: getResourcePathSchema, query: getResourceQuerySchema, headers: toHeadersStandardSchema(getResourceHeadersSchema, getResourceHeadersSchema.shape), response: getResourceResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 }
