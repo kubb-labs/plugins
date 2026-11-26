@@ -8,6 +8,8 @@ import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deleteOrder } from '../../clients/store/deleteOrder'
 
+type DeleteOrderResponse = unknown | unknown
+
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
 
 export type DeleteOrderMutationKey = ReturnType<typeof deleteOrderMutationKey>
@@ -28,7 +30,7 @@ export type DeleteOrderMutationArg = {
  */
 export function useDeleteOrder(
   options: {
-    mutation?: SWRMutationConfiguration<unknown | unknown, ResponseErrorConfig<unknown | unknown>, DeleteOrderMutationKey | null, DeleteOrderMutationArg> & {
+    mutation?: SWRMutationConfiguration<DeleteOrderResponse, ResponseErrorConfig<unknown | unknown>, DeleteOrderMutationKey | null, DeleteOrderMutationArg> & {
       throwOnError?: boolean
     }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
@@ -38,7 +40,7 @@ export function useDeleteOrder(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = deleteOrderMutationKey()
 
-  return useSWRMutation<unknown | unknown, ResponseErrorConfig<unknown | unknown>, DeleteOrderMutationKey | null, DeleteOrderMutationArg>(
+  return useSWRMutation<DeleteOrderResponse, ResponseErrorConfig<unknown | unknown>, DeleteOrderMutationKey | null, DeleteOrderMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path } }) => {
       return deleteOrder({ ...config, path, throwOnError: true }).unwrap()

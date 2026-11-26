@@ -6,7 +6,9 @@
 import type { Order } from '../../../models/Order'
 import { http, HttpResponse } from 'msw/http'
 
-export function getOrderByIdHandlerResponse200(data?: Order | string) {
+type GetOrderByIdStatus200 = Order | string
+
+export function getOrderByIdHandlerResponse200(data?: GetOrderByIdStatus200) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -44,7 +46,7 @@ export function getOrderByIdHandlerResponse404(data?: unknown) {
 }
 
 export function getOrderByIdHandler(
-  data?: (Order | string) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?: GetOrderByIdStatus200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.get(`${options?.baseURL ?? 'http://localhost:3000'}/store/order/:orderId`, function handler(info) {

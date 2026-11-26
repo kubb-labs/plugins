@@ -8,37 +8,27 @@ import type { Order } from '../../models/Order'
 import { getOrderById } from '../../clients/store/getOrderById'
 import { queryOptions } from '@tanstack/react-query'
 
-export const getOrderByIdQueryKey = ({
-  path,
-}: Omit<
-  {
-    body?: never
-    path: {
-      orderId: bigint
-    }
-    query?: never
-    headers?: never
-  },
-  'headers'
->) => [{ url: '/store/order/:orderId', params: path }] as const
+type GetOrderByIdOptions = {
+  body?: never
+  path: {
+    orderId: bigint
+  }
+  query?: never
+  headers?: never
+}
+
+type GetOrderByIdStatus200 = Order | string
+
+export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdOptions, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
 export function getOrderByIdQueryOptions(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      orderId: bigint
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: GetOrderByIdOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getOrderByIdQueryKey({ path })
-  return queryOptions<Order | string, ResponseErrorConfig<unknown | unknown>, Order | string, typeof queryKey>({
+  return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<unknown | unknown>, GetOrderByIdStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()

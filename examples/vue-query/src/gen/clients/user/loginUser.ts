@@ -6,6 +6,24 @@
 import type { Options, Unwrappable, RequestResultWithHeaders } from '../../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
+type LoginUserResponses = {
+  '200':
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+    | {
+        contentType: 'application/json'
+        data: string
+      }
+  '400': unknown
+}
+
+type LoginUserStatus200Headers = {
+  'X-Rate-Limit'?: number
+  'X-Expires-After'?: string
+}
+
 /**
  * `GET /user/login`
  * @summary Logs user into the system
@@ -23,52 +41,15 @@ export function loginUser<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResultWithHeaders<
-    {
-      '200':
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-        | {
-            contentType: 'application/json'
-            data: string
-          }
-      '400': unknown
-    },
-    {
-      '200': {
-        'X-Rate-Limit'?: number
-        'X-Expires-After'?: string
-      }
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResultWithHeaders<LoginUserResponses, { '200': LoginUserStatus200Headers }, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200':
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-          | {
-              contentType: 'application/json'
-              data: string
-            }
-        '400': unknown
-      },
-      ThrowOnError,
-      {
-        '200': {
-          'X-Rate-Limit'?: number
-          'X-Expires-After'?: string
-        }
-      }
-    >({ method: 'GET', url: '/user/login', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
+    apiClient<LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }>({
+      method: 'GET',
+      url: '/user/login',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

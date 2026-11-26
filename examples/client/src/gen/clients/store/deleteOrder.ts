@@ -6,6 +6,11 @@
 import type { Options, RequestResult } from '../../../client'
 import { client } from '../../../client'
 
+type DeleteOrderResponses = {
+  '400': unknown
+  '404': unknown
+}
+
 /**
  * `DELETE /store/order/{orderId}`
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
@@ -23,22 +28,13 @@ export function deleteOrder<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Promise<
-  RequestResult<
-    {
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<DeleteOrderResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<DeleteOrderResponses, ThrowOnError>({
+    method: 'DELETE',
+    url: '/store/order/{orderId}',
+    ...config,
+    throwOnError: config.throwOnError ?? true,
+  })
 }

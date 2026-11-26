@@ -4,23 +4,20 @@ import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tansta
 import { createPaymentBatch } from '../../axios/paymentService/createPaymentBatch'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
+type CreatePaymentBatchOptions = {
+  body?: [Payment, ...string[]]
+  path?: never
+  query?: never
+  headers?: never
+}
+
 export const createPaymentBatchMutationKey = () => [{ url: '/store/payments/batch' }] as const
 
 export function createPaymentBatchMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const mutationKey = createPaymentBatchMutationKey()
-  return mutationOptions<
-    unknown,
-    ResponseErrorConfig<Error>,
-    {
-      body?: [Payment, ...string[]]
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >({
+  return mutationOptions<unknown, ResponseErrorConfig<Error>, CreatePaymentBatchOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       return createPaymentBatch({ ...config, body, throwOnError: true }).unwrap()
@@ -34,17 +31,7 @@ export function createPaymentBatchMutationOptions<TContext = unknown>(
  */
 export function useCreatePaymentBatch<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      unknown,
-      ResponseErrorConfig<Error>,
-      {
-        body?: [Payment, ...string[]]
-        path?: never
-        query?: never
-        headers?: never
-      },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<unknown, ResponseErrorConfig<Error>, CreatePaymentBatchOptions, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
@@ -52,44 +39,14 @@ export function useCreatePaymentBatch<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? createPaymentBatchMutationKey()
 
-  const baseOptions = createPaymentBatchMutationOptions(config) as UseMutationOptions<
-    unknown,
-    ResponseErrorConfig<Error>,
-    {
-      body?: [Payment, ...string[]]
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >
+  const baseOptions = createPaymentBatchMutationOptions(config) as UseMutationOptions<unknown, ResponseErrorConfig<Error>, CreatePaymentBatchOptions, TContext>
 
-  return useMutation<
-    unknown,
-    ResponseErrorConfig<Error>,
-    {
-      body?: [Payment, ...string[]]
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >(
+  return useMutation<unknown, ResponseErrorConfig<Error>, CreatePaymentBatchOptions, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    unknown,
-    ResponseErrorConfig<Error>,
-    {
-      body?: [Payment, ...string[]]
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >
+  ) as UseMutationResult<unknown, ResponseErrorConfig<Error>, CreatePaymentBatchOptions, TContext>
 }

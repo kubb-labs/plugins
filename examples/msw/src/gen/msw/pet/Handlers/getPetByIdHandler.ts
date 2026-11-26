@@ -6,7 +6,9 @@
 import type { Pet } from '../../../models/Pet'
 import { http, HttpResponse } from 'msw/http'
 
-export function getPetByIdHandlerResponse200(data?: Pet | string) {
+type GetPetByIdStatus200 = Pet | string
+
+export function getPetByIdHandlerResponse200(data?: GetPetByIdStatus200) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -44,7 +46,7 @@ export function getPetByIdHandlerResponse404(data?: unknown) {
 }
 
 export function getPetByIdHandler(
-  data?: (Pet | string) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?: GetPetByIdStatus200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.get(`${options?.baseURL ?? 'http://localhost:3000'}/pet/:petId\\:search`, function handler(info) {

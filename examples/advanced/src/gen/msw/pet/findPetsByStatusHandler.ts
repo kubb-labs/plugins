@@ -1,7 +1,9 @@
 import type { Pet } from '../../models/ts/Pet'
 import { http, HttpResponse } from 'msw/http'
 
-export function findPetsByStatusHandlerResponse200(data?: Array<Pet> | string) {
+type FindPetsByStatusStatus200 = Array<Pet> | string
+
+export function findPetsByStatusHandlerResponse200(data?: FindPetsByStatusStatus200) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -25,7 +27,7 @@ export function findPetsByStatusHandlerResponse400(data?: unknown) {
 }
 
 export function findPetsByStatusHandler(
-  data?: (Array<Pet> | string) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?: FindPetsByStatusStatus200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.get(`${options?.baseURL ?? ''}/pet/findByStatus/:step_id`, function handler(info) {

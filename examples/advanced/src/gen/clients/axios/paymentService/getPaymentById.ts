@@ -3,6 +3,10 @@ import type { Payment } from '../../../models/ts/Payment'
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { getPaymentByIdResponseSchema } from '../../../zod/store/payment/getPaymentByIdSchema'
 
+type GetPaymentByIdResponses = {
+  '200': Payment
+}
+
 /**
  * `GET /store/payments/{paymentId}`
  * @summary Find a payment by ID
@@ -19,23 +23,11 @@ export function getPaymentById<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200': Payment
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<GetPaymentByIdResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200': Payment
-      },
-      ThrowOnError
-    >({
+    apiClient<GetPaymentByIdResponses, ThrowOnError>({
       method: 'GET',
       url: '/store/payments/{paymentId}',
       ...config,

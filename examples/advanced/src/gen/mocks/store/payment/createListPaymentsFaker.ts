@@ -4,6 +4,8 @@ import { createPaymentErrorFaker } from '../../createPaymentErrorFaker'
 import { createPaymentFaker } from '../../createPaymentFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
+type ListPaymentsStatus2xx = Array<Payment>
+
 export function createListPaymentsQueryFaker<
   TData extends Partial<{
     status?: string
@@ -37,8 +39,8 @@ export function createListPaymentsCookiesFaker<
 /**
  * @description The payments
  */
-export function createListPaymentsStatus2xxFaker(data?: Partial<Array<Payment>>): Array<Payment> {
-  return [...faker.helpers.multiple(() => createPaymentFaker()), ...(data || []).filter((item) => item !== undefined)] as Array<Payment>
+export function createListPaymentsStatus2xxFaker(data?: Partial<ListPaymentsStatus2xx>): ListPaymentsStatus2xx {
+  return [...faker.helpers.multiple(() => createPaymentFaker()), ...(data || []).filter((item) => item !== undefined)] as ListPaymentsStatus2xx
 }
 
 /**
@@ -48,6 +50,6 @@ export function createListPaymentsStatus4xxFaker(data?: Partial<PaymentError>): 
   return createPaymentErrorFaker(data) as PaymentError
 }
 
-export function createListPaymentsResponseFaker(data?: Partial<Array<Payment>>): Array<Payment> {
-  return [...faker.helpers.multiple(() => createPaymentFaker()), ...(data || []).filter((item) => item !== undefined)] as Array<Payment>
+export function createListPaymentsResponseFaker(data?: Partial<ListPaymentsStatus2xx>): ListPaymentsStatus2xx {
+  return [...faker.helpers.multiple(() => createPaymentFaker()), ...(data || []).filter((item) => item !== undefined)] as ListPaymentsStatus2xx
 }

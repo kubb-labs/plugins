@@ -7,6 +7,14 @@ import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { User } from '../../models/User'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
+type UpdateUserPath = {
+  username: string
+}
+
+type UpdateUserResponses = {
+  default: unknown
+}
+
 /**
  * `PUT /user/{username}`
  * @description This can only be done by the logged in user.
@@ -16,9 +24,7 @@ export function updateUser<ThrowOnError extends boolean = true>(
   options: Options<
     | {
         body?: User
-        path: {
-          username: string
-        }
+        path: UpdateUserPath
         query?: never
         headers?: never
         contentType?:
@@ -29,9 +35,7 @@ export function updateUser<ThrowOnError extends boolean = true>(
       }
     | {
         body?: User
-        path: {
-          username: string
-        }
+        path: UpdateUserPath
         query?: never
         headers?: never
         contentType:
@@ -42,9 +46,7 @@ export function updateUser<ThrowOnError extends boolean = true>(
       }
     | {
         body?: User
-        path: {
-          username: string
-        }
+        path: UpdateUserPath
         query?: never
         headers?: never
         contentType:
@@ -55,23 +57,11 @@ export function updateUser<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      default: unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<UpdateUserResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        default: unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<UpdateUserResponses, ThrowOnError>({
       method: 'PUT',
       url: '/user/{username}',
       contentType: { request: 'application/json' },

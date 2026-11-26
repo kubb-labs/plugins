@@ -4,6 +4,16 @@ import type { PaymentError } from '../../../models/ts/PaymentError'
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { listPaymentsResponseSchema, listPaymentsStatus4xxSchema } from '../../../zod/store/payment/listPaymentsSchema'
 
+type ListPaymentsResponses = {
+  '2xx': Array<Payment>
+  '4xx': PaymentError
+}
+
+type ListPaymentsStatus2xxHeaders = {
+  'X-Rate-Limit': number
+  'X-Next-Page'?: string
+}
+
 /**
  * `GET /store/payments`
  * @summary List payments
@@ -25,37 +35,11 @@ export function listPayments<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResultWithHeaders<
-    {
-      '2xx': Array<Payment>
-      '4xx': PaymentError
-    },
-    {
-      '2xx': {
-        'X-Rate-Limit': number
-        'X-Next-Page'?: string
-      }
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResultWithHeaders<ListPaymentsResponses, { '2xx': ListPaymentsStatus2xxHeaders }, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '2xx': Array<Payment>
-        '4xx': PaymentError
-      },
-      ThrowOnError,
-      {
-        '2xx': {
-          'X-Rate-Limit': number
-          'X-Next-Page'?: string
-        }
-      }
-    >({
+    apiClient<ListPaymentsResponses, ThrowOnError, { '2xx': ListPaymentsStatus2xxHeaders }>({
       method: 'GET',
       url: '/store/payments',
       ...config,

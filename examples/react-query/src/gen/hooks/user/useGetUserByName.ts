@@ -8,37 +8,27 @@ import type { User } from '../../models/User'
 import { getUserByName } from '../../clients/user/getUserByName'
 import { queryOptions } from '@tanstack/react-query'
 
-export const getUserByNameQueryKey = ({
-  path,
-}: Omit<
-  {
-    body?: never
-    path: {
-      username: string
-    }
-    query?: never
-    headers?: never
-  },
-  'headers'
->) => [{ url: '/user/:username', params: path }] as const
+type GetUserByNameOptions = {
+  body?: never
+  path: {
+    username: string
+  }
+  query?: never
+  headers?: never
+}
+
+type GetUserByNameStatus200 = User | string
+
+export const getUserByNameQueryKey = ({ path }: Omit<GetUserByNameOptions, 'headers'>) => [{ url: '/user/:username', params: path }] as const
 
 type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      username: string
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: GetUserByNameOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getUserByNameQueryKey({ path })
-  return queryOptions<User | string, ResponseErrorConfig<unknown | unknown>, User | string, typeof queryKey>({
+  return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<unknown | unknown>, GetUserByNameStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getUserByName({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()

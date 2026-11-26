@@ -2,6 +2,10 @@ import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { deletePetResponseSchema, deletePetStatus400Schema } from '../../../zod/pet/deletePetSchema'
 
+type DeletePetResponses = {
+  '400': unknown
+}
+
 /**
  * `DELETE /pet/{petId}:search`
  * @description delete a pet
@@ -21,23 +25,11 @@ export function deletePet<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '400': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '400': unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<DeletePetResponses, ThrowOnError>({
       method: 'DELETE',
       url: '/pet/{petId}:search',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

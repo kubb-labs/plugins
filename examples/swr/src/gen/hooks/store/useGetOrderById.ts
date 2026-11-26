@@ -9,33 +9,23 @@ import type { Order } from '../../models/Order'
 import type { SWRConfiguration } from 'swr'
 import { getOrderById } from '../../clients/store/getOrderById'
 
-export const getOrderByIdQueryKey = ({
-  path,
-}: Omit<
-  {
-    body?: never
-    path: {
-      orderId: bigint
-    }
-    query?: never
-    headers?: never
-  },
-  'headers'
->) => [{ url: '/store/order/:orderId', params: path }] as const
+type GetOrderByIdOptions = {
+  body?: never
+  path: {
+    orderId: bigint
+  }
+  query?: never
+  headers?: never
+}
+
+type GetOrderByIdStatus200 = Order | string
+
+export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdOptions, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
 export function getOrderByIdQueryOptions(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      orderId: bigint
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: GetOrderByIdOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
@@ -51,18 +41,9 @@ export function getOrderByIdQueryOptions(
  * @summary Find purchase order by ID
  */
 export function useGetOrderById(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      orderId: bigint
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: GetOrderByIdOptions,
   options: {
-    query?: SWRConfiguration<Order | string, ResponseErrorConfig<unknown | unknown>>
+    query?: SWRConfiguration<GetOrderByIdStatus200, ResponseErrorConfig<unknown | unknown>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -72,7 +53,7 @@ export function useGetOrderById(
 
   const queryKey = getOrderByIdQueryKey({ path })
 
-  return useSWR<Order | string, ResponseErrorConfig<unknown | unknown>, GetOrderByIdQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<GetOrderByIdStatus200, ResponseErrorConfig<unknown | unknown>, GetOrderByIdQueryKey | null>(shouldFetch ? queryKey : null, {
     ...getOrderByIdQueryOptions({ path }, config),
     ...(immutable
       ? {

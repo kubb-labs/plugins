@@ -8,6 +8,22 @@ import type { AddPetRequest } from '../../models/AddPetRequest'
 import type { Pet } from '../../models/Pet'
 import { client } from '../../../client'
 
+type AddPetResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '405': {
+    code?: number
+    message?: string
+  }
+}
+
 /**
  * `POST /pet`
  * @description Add a new pet to the store
@@ -50,46 +66,10 @@ export function addPet<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   >,
-): Promise<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '405': {
-        code?: number
-        message?: string
-      }
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: apiClient = client, contentType, ...config } = options
 
-  return apiClient<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '405': {
-        code?: number
-        message?: string
-      }
-    },
-    ThrowOnError
-  >({
+  return apiClient<AddPetResponses, ThrowOnError>({
     method: 'POST',
     url: '/pet',
     security: [

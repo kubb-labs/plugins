@@ -9,33 +9,23 @@ import type { User } from '../../models/User'
 import type { SWRConfiguration } from 'swr'
 import { getUserByName } from '../../clients/user/getUserByName'
 
-export const getUserByNameQueryKey = ({
-  path,
-}: Omit<
-  {
-    body?: never
-    path: {
-      username: string
-    }
-    query?: never
-    headers?: never
-  },
-  'headers'
->) => [{ url: '/user/:username', params: path }] as const
+type GetUserByNameOptions = {
+  body?: never
+  path: {
+    username: string
+  }
+  query?: never
+  headers?: never
+}
+
+type GetUserByNameStatus200 = User | string
+
+export const getUserByNameQueryKey = ({ path }: Omit<GetUserByNameOptions, 'headers'>) => [{ url: '/user/:username', params: path }] as const
 
 type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      username: string
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: GetUserByNameOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
@@ -50,18 +40,9 @@ export function getUserByNameQueryOptions(
  * @summary Get user by user name
  */
 export function useGetUserByName(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      username: string
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: GetUserByNameOptions,
   options: {
-    query?: SWRConfiguration<User | string, ResponseErrorConfig<unknown | unknown>>
+    query?: SWRConfiguration<GetUserByNameStatus200, ResponseErrorConfig<unknown | unknown>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -71,7 +52,7 @@ export function useGetUserByName(
 
   const queryKey = getUserByNameQueryKey({ path })
 
-  return useSWR<User | string, ResponseErrorConfig<unknown | unknown>, GetUserByNameQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<GetUserByNameStatus200, ResponseErrorConfig<unknown | unknown>, GetUserByNameQueryKey | null>(shouldFetch ? queryKey : null, {
     ...getUserByNameQueryOptions({ path }, config),
     ...(immutable
       ? {

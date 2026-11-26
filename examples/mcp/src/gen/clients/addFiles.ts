@@ -7,6 +7,11 @@ import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { Pet } from '../models/ts/Pet'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
+type AddFilesResponses = {
+  '200': Omit<NonNullable<Pet>, 'name'>
+  '405': unknown
+}
+
 /**
  * `POST /pet/files`
  * @description Place a new file in the store
@@ -40,25 +45,11 @@ export function addFiles<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResult<
-    {
-      '200': Omit<NonNullable<Pet>, 'name'>
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<AddFilesResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200': Omit<NonNullable<Pet>, 'name'>
-        '405': unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<AddFilesResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet/files',
       contentType: { request: 'application/json' },

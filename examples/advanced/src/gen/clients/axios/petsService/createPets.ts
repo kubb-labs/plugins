@@ -3,6 +3,11 @@ import type { CreatePetsXEXAMPLEEnumKey } from '../../../models/ts/CreatePetsXEX
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { createPetsResponseSchema, createPetsStatusDefaultSchema } from '../../../zod/pets/createPetsSchema'
 
+type CreatePetsResponses = {
+  '201': unknown
+  default: unknown
+}
+
 /**
  * `POST /pets/{uuid}`
  * @summary Create a pet
@@ -27,25 +32,11 @@ export function createPets<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '201': unknown
-      default: unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<CreatePetsResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '201': unknown
-        default: unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<CreatePetsResponses, ThrowOnError>({
       method: 'POST',
       url: '/pets/{uuid}',
       contentType: { request: 'application/json' },

@@ -3,6 +3,24 @@ import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { updatePetResponseSchema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema } from '../../../zod/pet/updatePetSchema'
 
+type UpdatePetResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Omit<NonNullable<Pet>, 'name'>
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '202': {
+    id?: number
+  }
+  '400': unknown
+  '404': unknown
+  '405': unknown
+}
+
 /**
  * `PUT /pet`
  * @description Update an existing pet by Id
@@ -45,51 +63,11 @@ export function updatePet<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Omit<NonNullable<Pet>, 'name'>
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '202': {
-        id?: number
-      }
-      '400': unknown
-      '404': unknown
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '202': {
-          id?: number
-        }
-        '400': unknown
-        '404': unknown
-        '405': unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<UpdatePetResponses, ThrowOnError>({
       method: 'PUT',
       url: '/pet',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

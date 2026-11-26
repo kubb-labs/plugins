@@ -9,6 +9,10 @@ import type { User } from '../../models/User'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updateUser } from '../../clients/user/updateUser'
 
+type UpdateUserPath = {
+  username: string
+}
+
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
@@ -16,9 +20,7 @@ export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
 export type UpdateUserMutationArg =
   | {
       body?: User
-      path: {
-        username: string
-      }
+      path: UpdateUserPath
       query?: never
       headers?: never
       contentType?:
@@ -29,9 +31,7 @@ export type UpdateUserMutationArg =
     }
   | {
       body?: User
-      path: {
-        username: string
-      }
+      path: UpdateUserPath
       query?: never
       headers?: never
       contentType:
@@ -42,9 +42,7 @@ export type UpdateUserMutationArg =
     }
   | {
       body?: User
-      path: {
-        username: string
-      }
+      path: UpdateUserPath
       query?: never
       headers?: never
       contentType:

@@ -3,6 +3,10 @@ import type { Payment } from '../../../models/ts/Payment'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { createPaymentResponseSchema } from '../../../zod/store/payment/createPaymentSchema'
 
+type CreatePaymentResponses = {
+  '201': Payment
+}
+
 /**
  * `POST /store/payments`
  * @summary Pay for an order
@@ -17,23 +21,11 @@ export function createPayment<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '201': Payment
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<CreatePaymentResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '201': Payment
-      },
-      ThrowOnError
-    >({
+    apiClient<CreatePaymentResponses, ThrowOnError>({
       method: 'POST',
       url: '/store/payments',
       security: [{ ...securitySchemes.device_auth, scopes: ['write:payments'] }],

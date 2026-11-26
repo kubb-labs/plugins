@@ -6,7 +6,9 @@
 import type { Pet } from '../../../models/Pet'
 import { http, HttpResponse } from 'msw/http'
 
-export function optionsFindPetsByStatusHandlerResponse200(data?: Pet[]) {
+type OptionsFindPetsByStatusStatus200 = Pet[]
+
+export function optionsFindPetsByStatusHandlerResponse200(data?: OptionsFindPetsByStatusStatus200) {
   return new HttpResponse<string>(
     JSON.stringify(data, (_key, value) => {
       if (typeof value !== 'bigint') return value
@@ -24,7 +26,7 @@ export function optionsFindPetsByStatusHandlerResponse200(data?: Pet[]) {
 }
 
 export function optionsFindPetsByStatusHandler(
-  data?: Pet[] | ((info: Parameters<Parameters<typeof http.options>[1]>[0]) => Response | Promise<Response>),
+  data?: OptionsFindPetsByStatusStatus200 | ((info: Parameters<Parameters<typeof http.options>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.options(`${options?.baseURL ?? 'http://localhost:3000'}/pet/findByStatus`, function handler(info) {

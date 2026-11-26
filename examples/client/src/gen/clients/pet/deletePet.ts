@@ -6,6 +6,10 @@
 import type { Options, RequestResult } from '../../../client'
 import { client } from '../../../client'
 
+type DeletePetResponses = {
+  '400': unknown
+}
+
 /**
  * `DELETE /pet/{petId}`
  * @description delete a pet
@@ -25,22 +29,10 @@ export function deletePet<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Promise<
-  RequestResult<
-    {
-      '400': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      '400': unknown
-    },
-    ThrowOnError
-  >({
+  return apiClient<DeletePetResponses, ThrowOnError>({
     method: 'DELETE',
     url: '/pet/{petId}',
     security: [

@@ -9,6 +9,8 @@ import type { User } from '../../models/User'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { createUser } from '../../clients/user/createUser'
 
+type CreateUserStatusDefault = User | string
+
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
 export type CreateUserMutationKey = ReturnType<typeof createUserMutationKey>
@@ -55,7 +57,7 @@ export type CreateUserMutationArg =
  */
 export function useCreateUser(
   options: {
-    mutation?: SWRMutationConfiguration<User | string, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg> & {
+    mutation?: SWRMutationConfiguration<CreateUserStatusDefault, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg> & {
       throwOnError?: boolean
     }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
@@ -65,7 +67,7 @@ export function useCreateUser(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = createUserMutationKey()
 
-  return useSWRMutation<User | string, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
+  return useSWRMutation<CreateUserStatusDefault, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
       return createUser({ ...config, ...variables, throwOnError: true }).unwrap()

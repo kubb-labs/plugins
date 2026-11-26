@@ -1,5 +1,11 @@
 import type { Pet } from '../../models/ts/Pet'
 
+type UpdatePetResponse =
+  | (Omit<NonNullable<Pet>, 'name'> | string)
+  | {
+      id?: number
+    }
+
 export function updatePet(
   {
     body,
@@ -40,28 +46,13 @@ export function updatePet(
     'body'
   >,
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<
-  | (Omit<NonNullable<Pet>, 'name'> | string)
-  | {
-      id?: number
-    }
-> {
+): Cypress.Chainable<UpdatePetResponse> {
   return cy
-    .request<
-      | (Omit<NonNullable<Pet>, 'name'> | string)
-      | {
-          id?: number
-        }
-    >({
+    .request<UpdatePetResponse>({
       method: 'PUT',
       url: `/pet`,
       body,
       ...options,
     })
-    .then((res) => res.body) as Cypress.Chainable<
-    | (Omit<NonNullable<Pet>, 'name'> | string)
-    | {
-        id?: number
-      }
-  >
+    .then((res) => res.body) as Cypress.Chainable<UpdatePetResponse>
 }

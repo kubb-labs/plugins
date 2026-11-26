@@ -1,6 +1,13 @@
 import type { AddPetRequest } from '../../models/ts/AddPetRequest'
 import type { Pet } from '../../models/ts/Pet'
 
+type AddPetResponse =
+  | {
+      code?: number
+      message?: string
+    }
+  | (Omit<NonNullable<Pet>, 'name'> | string)
+
 export function addPet(
   {
     body,
@@ -41,31 +48,13 @@ export function addPet(
     'body'
   >,
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<
-  | {
-      code?: number
-      message?: string
-    }
-  | (Omit<NonNullable<Pet>, 'name'> | string)
-> {
+): Cypress.Chainable<AddPetResponse> {
   return cy
-    .request<
-      | {
-          code?: number
-          message?: string
-        }
-      | (Omit<NonNullable<Pet>, 'name'> | string)
-    >({
+    .request<AddPetResponse>({
       method: 'POST',
       url: `/pet`,
       body,
       ...options,
     })
-    .then((res) => res.body) as Cypress.Chainable<
-    | {
-        code?: number
-        message?: string
-      }
-    | (Omit<NonNullable<Pet>, 'name'> | string)
-  >
+    .then((res) => res.body) as Cypress.Chainable<AddPetResponse>
 }

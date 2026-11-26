@@ -7,35 +7,22 @@ import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import { loginUser } from '../../clients/user/loginUser'
 import { queryOptions } from '@tanstack/react-query'
 
-export const loginUserQueryKey = ({
-  query,
-}: Omit<
-  {
-    body?: never
-    path?: never
-    query?: {
-      username?: string
-      password?: string
-    }
-    headers?: never
-  },
-  'headers'
-> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
+type LoginUserOptions = {
+  body?: never
+  path?: never
+  query?: {
+    username?: string
+    password?: string
+  }
+  headers?: never
+}
+
+export const loginUserQueryKey = ({ query }: Omit<LoginUserOptions, 'headers'> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
 
 type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
-  {
-    query,
-  }: {
-    body?: never
-    path?: never
-    query?: {
-      username?: string
-      password?: string
-    }
-    headers?: never
-  } = {},
+  { query }: LoginUserOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = loginUserQueryKey({ query })

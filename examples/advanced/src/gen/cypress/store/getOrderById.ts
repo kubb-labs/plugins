@@ -1,5 +1,7 @@
 import type { Order } from '../../models/ts/Order'
 
+type GetOrderByIdStatus200 = Order | string
+
 export function getOrderById(
   {
     path,
@@ -12,12 +14,12 @@ export function getOrderById(
     headers?: never
   },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Order | string> {
+): Cypress.Chainable<GetOrderByIdStatus200> {
   return cy
-    .request<Order | string>({
+    .request<GetOrderByIdStatus200>({
       method: 'GET',
       url: `/store/order/${path.orderId}`,
       ...options,
     })
-    .then((res) => res.body) as Cypress.Chainable<Order | string>
+    .then((res) => res.body) as Cypress.Chainable<GetOrderByIdStatus200>
 }

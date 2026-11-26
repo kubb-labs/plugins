@@ -7,15 +7,17 @@ import type { Pet } from '../../models/Pet'
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
+type OptionsFindPetsByStatusStatus200 = Pet[]
+
 faker.seed([220])
 
 /**
  * @description successful operation
  */
-export function createOptionsFindPetsByStatusStatus200(data?: Partial<Pet[]>): Pet[] {
-  return [...faker.helpers.multiple(() => createPet()), ...(data || []).filter((item) => item !== undefined)] as Pet[]
+export function createOptionsFindPetsByStatusStatus200(data?: Partial<OptionsFindPetsByStatusStatus200>): OptionsFindPetsByStatusStatus200 {
+  return [...faker.helpers.multiple(() => createPet()), ...(data || []).filter((item) => item !== undefined)] as OptionsFindPetsByStatusStatus200
 }
 
-export function createOptionsFindPetsByStatusResponse(data?: Partial<Pet[]>): Pet[] {
-  return [...faker.helpers.multiple(() => createPet()), ...(data || []).filter((item) => item !== undefined)] as Pet[]
+export function createOptionsFindPetsByStatusResponse(data?: Partial<OptionsFindPetsByStatusStatus200>): OptionsFindPetsByStatusStatus200 {
+  return [...faker.helpers.multiple(() => createPet()), ...(data || []).filter((item) => item !== undefined)] as OptionsFindPetsByStatusStatus200
 }

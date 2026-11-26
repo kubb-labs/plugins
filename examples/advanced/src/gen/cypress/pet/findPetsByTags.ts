@@ -1,6 +1,8 @@
 import type { FindPetsByTagsXEXAMPLEEnumKey } from '../../models/ts/FindPetsByTagsXEXAMPLEEnum'
 import type { Pet } from '../../models/ts/Pet'
 
+type FindPetsByTagsStatus200 = Array<Pet> | string
+
 export function findPetsByTags(
   {
     query,
@@ -18,14 +20,14 @@ export function findPetsByTags(
     }
   },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Array<Pet> | string> {
+): Cypress.Chainable<FindPetsByTagsStatus200> {
   return cy
-    .request<Array<Pet> | string>({
+    .request<FindPetsByTagsStatus200>({
       method: 'GET',
       url: `/pet/findByTags`,
       qs: query,
       headers,
       ...options,
     })
-    .then((res) => res.body) as Cypress.Chainable<Array<Pet> | string>
+    .then((res) => res.body) as Cypress.Chainable<FindPetsByTagsStatus200>
 }

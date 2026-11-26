@@ -10,45 +10,28 @@ import { getOrderById } from '../../clients/store/getOrderById'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getOrderByIdQueryKey = ({
-  path,
-}: {
-  path: MaybeRefOrGetter<
-    Omit<
-      {
-        body?: never
-        path: {
-          orderId: bigint
-        }
-        query?: never
-        headers?: never
-      },
-      'headers'
-    >['path']
-  >
-}) => [{ url: '/store/order/:orderId', params: path }] as const
+type GetOrderByIdOptions = {
+  body?: never
+  path: {
+    orderId: bigint
+  }
+  query?: never
+  headers?: never
+}
+
+type GetOrderByIdStatus200 = Order | string
+
+export const getOrderByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetOrderByIdOptions, 'headers'>['path']> }) =>
+  [{ url: '/store/order/:orderId', params: path }] as const
 
 export type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
 export function getOrderByIdQueryOptions(
-  {
-    path,
-  }: {
-    path: MaybeRefOrGetter<
-      {
-        body?: never
-        path: {
-          orderId: bigint
-        }
-        query?: never
-        headers?: never
-      }['path']
-    >
-  },
+  { path }: { path: MaybeRefOrGetter<GetOrderByIdOptions['path']> },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getOrderByIdQueryKey({ path })
-  return queryOptions<Order | string, ResponseErrorConfig<unknown | unknown>, Order | string>({
+  return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<unknown | unknown>, GetOrderByIdStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getOrderById({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true }).unwrap()

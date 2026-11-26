@@ -6,6 +6,12 @@
 import type { Options, RequestResult } from '../../../client'
 import { client } from '../../../client'
 
+type GetInventoryResponses = {
+  '200': {
+    [key: string]: number
+  }
+}
+
 /**
  * `GET /store/inventory`
  * @description Returns a map of status codes to quantities
@@ -21,26 +27,10 @@ export function getInventory<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Promise<
-  RequestResult<
-    {
-      '200': {
-        [key: string]: number
-      }
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      '200': {
-        [key: string]: number
-      }
-    },
-    ThrowOnError
-  >({
+  return apiClient<GetInventoryResponses, ThrowOnError>({
     method: 'GET',
     url: '/store/inventory',
     security: [{ type: 'apiKey', name: 'api_key', in: 'header' }],

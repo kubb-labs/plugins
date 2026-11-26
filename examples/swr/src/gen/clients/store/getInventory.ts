@@ -6,6 +6,12 @@
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
+type GetInventoryResponses = {
+  '200': {
+    [key: string]: number
+  }
+}
+
 /**
  * `GET /store/inventory`
  * @description Returns a map of status codes to quantities
@@ -21,26 +27,16 @@ export function getInventory<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResult<
-    {
-      '200': {
-        [key: string]: number
-      }
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200': {
-          [key: string]: number
-        }
-      },
-      ThrowOnError
-    >({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
+    apiClient<GetInventoryResponses, ThrowOnError>({
+      method: 'GET',
+      url: '/store/inventory',
+      security: [securitySchemes.api_key],
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

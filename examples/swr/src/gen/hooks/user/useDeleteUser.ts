@@ -8,6 +8,8 @@ import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deleteUser } from '../../clients/user/deleteUser'
 
+type DeleteUserResponse = unknown | unknown
+
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export type DeleteUserMutationKey = ReturnType<typeof deleteUserMutationKey>
@@ -28,7 +30,7 @@ export type DeleteUserMutationArg = {
  */
 export function useDeleteUser(
   options: {
-    mutation?: SWRMutationConfiguration<unknown | unknown, ResponseErrorConfig<unknown | unknown>, DeleteUserMutationKey | null, DeleteUserMutationArg> & {
+    mutation?: SWRMutationConfiguration<DeleteUserResponse, ResponseErrorConfig<unknown | unknown>, DeleteUserMutationKey | null, DeleteUserMutationArg> & {
       throwOnError?: boolean
     }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
@@ -38,7 +40,7 @@ export function useDeleteUser(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = deleteUserMutationKey()
 
-  return useSWRMutation<unknown | unknown, ResponseErrorConfig<unknown | unknown>, DeleteUserMutationKey | null, DeleteUserMutationArg>(
+  return useSWRMutation<DeleteUserResponse, ResponseErrorConfig<unknown | unknown>, DeleteUserMutationKey | null, DeleteUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path } }) => {
       return deleteUser({ ...config, path, throwOnError: true }).unwrap()

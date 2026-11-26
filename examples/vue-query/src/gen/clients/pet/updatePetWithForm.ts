@@ -6,6 +6,10 @@
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
+type UpdatePetWithFormResponses = {
+  '405': unknown
+}
+
 /**
  * `POST /pet/{petId}`
  * @summary Updates a pet in the store with form data
@@ -25,23 +29,11 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '405': unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<UpdatePetWithFormResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet/{petId}',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

@@ -9,33 +9,23 @@ import type { Pet } from '../../models/Pet'
 import type { SWRConfiguration } from 'swr'
 import { getPetById } from '../../clients/pet/getPetById'
 
-export const getPetByIdQueryKey = ({
-  path,
-}: Omit<
-  {
-    body?: never
-    path: {
-      petId: bigint
-    }
-    query?: never
-    headers?: never
-  },
-  'headers'
->) => [{ url: '/pet/:petId', params: path }] as const
+type GetPetByIdOptions = {
+  body?: never
+  path: {
+    petId: bigint
+  }
+  query?: never
+  headers?: never
+}
+
+type GetPetByIdStatus200 = Pet | string
+
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 export function getPetByIdQueryOptions(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      petId: bigint
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: GetPetByIdOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
@@ -51,18 +41,9 @@ export function getPetByIdQueryOptions(
  * @summary Find pet by ID
  */
 export function useGetPetById(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      petId: bigint
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: GetPetByIdOptions,
   options: {
-    query?: SWRConfiguration<Pet | string, ResponseErrorConfig<unknown | unknown>>
+    query?: SWRConfiguration<GetPetByIdStatus200, ResponseErrorConfig<unknown | unknown>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -72,7 +53,7 @@ export function useGetPetById(
 
   const queryKey = getPetByIdQueryKey({ path })
 
-  return useSWR<Pet | string, ResponseErrorConfig<unknown | unknown>, GetPetByIdQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<GetPetByIdStatus200, ResponseErrorConfig<unknown | unknown>, GetPetByIdQueryKey | null>(shouldFetch ? queryKey : null, {
     ...getPetByIdQueryOptions({ path }, config),
     ...(immutable
       ? {

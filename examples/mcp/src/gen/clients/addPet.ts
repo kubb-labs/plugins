@@ -8,6 +8,22 @@ import type { AddPetRequest } from '../models/ts/AddPetRequest'
 import type { Pet } from '../models/ts/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
+type AddPetResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Omit<NonNullable<Pet>, 'name'>
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '405': {
+    code?: number
+    message?: string
+  }
+}
+
 /**
  * `POST /pet`
  * @description Add a new pet to the store
@@ -50,47 +66,11 @@ export function addPet<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Omit<NonNullable<Pet>, 'name'>
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '405': {
-        code?: number
-        message?: string
-      }
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '405': {
-          code?: number
-          message?: string
-        }
-      },
-      ThrowOnError
-    >({
+    apiClient<AddPetResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

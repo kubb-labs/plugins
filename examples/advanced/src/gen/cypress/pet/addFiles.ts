@@ -1,5 +1,7 @@
 import type { Pet } from '../../models/ts/Pet'
 
+type AddFilesStatus200 = Omit<NonNullable<Pet>, 'name'>
+
 export function addFiles(
   {
     body,
@@ -31,13 +33,13 @@ export function addFiles(
     'body'
   >,
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Omit<NonNullable<Pet>, 'name'>> {
+): Cypress.Chainable<AddFilesStatus200> {
   return cy
-    .request<Omit<NonNullable<Pet>, 'name'>>({
+    .request<AddFilesStatus200>({
       method: 'POST',
       url: `/pet/files`,
       body,
       ...options,
     })
-    .then((res) => res.body) as Cypress.Chainable<Omit<NonNullable<Pet>, 'name'>>
+    .then((res) => res.body) as Cypress.Chainable<AddFilesStatus200>
 }

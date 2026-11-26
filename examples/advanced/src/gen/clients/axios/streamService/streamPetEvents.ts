@@ -2,6 +2,10 @@ import type { StreamOptions, Unwrappable, StreamResult } from '../../../.kubb/cl
 import type { PetEvent } from '../../../models/ts/PetEvent'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 
+type StreamPetEventsResponses = {
+  '200': PetEvent
+}
+
 /**
  * `GET /pet/{petId}/events`
  * @description Server-Sent Events stream of changes for a single pet
@@ -19,23 +23,11 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  StreamResult<
-    {
-      '200': PetEvent
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<StreamResult<StreamPetEventsResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient.stream<
-      {
-        '200': PetEvent
-      },
-      ThrowOnError
-    >({
+    apiClient.stream<StreamPetEventsResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/{petId}/events',
       security: [securitySchemes.api_key, { ...securitySchemes.petstore_auth, scopes: ['read:pets'] }],

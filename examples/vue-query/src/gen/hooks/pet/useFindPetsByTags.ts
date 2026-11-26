@@ -10,49 +10,30 @@ import { findPetsByTags } from '../../clients/pet/findPetsByTags'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const findPetsByTagsQueryKey = ({
-  query,
-}: {
-  query?: MaybeRefOrGetter<
-    Omit<
-      {
-        body?: never
-        path?: never
-        query?: {
-          tags?: string[]
-          page?: string
-          pageSize?: string
-        }
-        headers?: never
-      },
-      'headers'
-    >['query']
-  >
-} = {}) => [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
+type FindPetsByTagsOptions = {
+  body?: never
+  path?: never
+  query?: {
+    tags?: string[]
+    page?: string
+    pageSize?: string
+  }
+  headers?: never
+}
+
+type FindPetsByTagsStatus200 = Pet[] | string
+
+export const findPetsByTagsQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<FindPetsByTagsOptions, 'headers'>['query']> } = {}) =>
+  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
-  {
-    query,
-  }: {
-    query?: MaybeRefOrGetter<
-      {
-        body?: never
-        path?: never
-        query?: {
-          tags?: string[]
-          page?: string
-          pageSize?: string
-        }
-        headers?: never
-      }['query']
-    >
-  } = {},
+  { query }: { query?: MaybeRefOrGetter<FindPetsByTagsOptions['query']> } = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
-  return queryOptions<Pet[] | string, ResponseErrorConfig<unknown>, Pet[] | string>({
+  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<unknown>, FindPetsByTagsStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTags({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true }).unwrap()

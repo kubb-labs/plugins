@@ -9,37 +9,26 @@ import type { Pet } from '../../models/Pet'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByTags } from '../../clients/pet/findPetsByTags'
 
-export const findPetsByTagsQueryKey = ({
-  query,
-}: Omit<
-  {
-    body?: never
-    path?: never
-    query?: {
-      tags?: string[]
-      page?: string
-      pageSize?: string
-    }
-    headers?: never
-  },
-  'headers'
-> = {}) => [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
+type FindPetsByTagsOptions = {
+  body?: never
+  path?: never
+  query?: {
+    tags?: string[]
+    page?: string
+    pageSize?: string
+  }
+  headers?: never
+}
+
+type FindPetsByTagsStatus200 = Pet[] | string
+
+export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'> = {}) =>
+  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
-  {
-    query,
-  }: {
-    body?: never
-    path?: never
-    query?: {
-      tags?: string[]
-      page?: string
-      pageSize?: string
-    }
-    headers?: never
-  } = {},
+  { query }: FindPetsByTagsOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
@@ -55,20 +44,9 @@ export function findPetsByTagsQueryOptions(
  * @summary Finds Pets by tags
  */
 export function useFindPetsByTags(
-  {
-    query,
-  }: {
-    body?: never
-    path?: never
-    query?: {
-      tags?: string[]
-      page?: string
-      pageSize?: string
-    }
-    headers?: never
-  } = {},
+  { query }: FindPetsByTagsOptions = {},
   options: {
-    query?: SWRConfiguration<Pet[] | string, ResponseErrorConfig<unknown>>
+    query?: SWRConfiguration<FindPetsByTagsStatus200, ResponseErrorConfig<unknown>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -78,7 +56,7 @@ export function useFindPetsByTags(
 
   const queryKey = findPetsByTagsQueryKey({ query })
 
-  return useSWR<Pet[] | string, ResponseErrorConfig<unknown>, FindPetsByTagsQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<FindPetsByTagsStatus200, ResponseErrorConfig<unknown>, FindPetsByTagsQueryKey | null>(shouldFetch ? queryKey : null, {
     ...findPetsByTagsQueryOptions({ query }, config),
     ...(immutable
       ? {

@@ -2,6 +2,11 @@ import type { CreatePetsXEXAMPLEEnumKey } from '../../models/ts/CreatePetsXEXAMP
 import { createCreatePetsXEXAMPLEEnumFaker } from '../createCreatePetsXEXAMPLEEnumFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
+type CreatePetsQuery = {
+  bool_param?: true
+  offset?: number
+}
+
 export function createCreatePetsPathFaker<
   TData extends Partial<{
     uuid: string
@@ -16,19 +21,9 @@ export function createCreatePetsPathFaker<
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createCreatePetsQueryFaker<
-  TData extends Partial<{
-    bool_param?: true
-    offset?: number
-  }> = object,
->(data?: TData) {
+export function createCreatePetsQueryFaker<TData extends Partial<CreatePetsQuery> = object>(data?: TData) {
   const defaultFakeData = {
-    bool_param: faker.helpers.arrayElement([true] as Array<
-      NonNullable<{
-        bool_param?: true
-        offset?: number
-      }>['bool_param']
-    >),
+    bool_param: faker.helpers.arrayElement([true] as Array<NonNullable<CreatePetsQuery>['bool_param']>),
     offset: faker.number.int(),
   }
   return {

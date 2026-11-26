@@ -5,58 +5,38 @@
 
 import { fakerEN as faker } from '@faker-js/faker'
 
+type GetInventoryStatus200 = {
+  [key: string]: number
+}
+
+type GetInventoryStatus401 = {
+  error: 'unauthorized'
+}
+
 /**
  * @description successful operation
  */
-export function createGetInventoryStatus200(
-  data?: Partial<{
-    [key: string]: number
-  }>,
-): {
-  [key: string]: number
-} {
+export function createGetInventoryStatus200(data?: Partial<GetInventoryStatus200>): GetInventoryStatus200 {
   const defaultFakeData = {}
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as {
-    [key: string]: number
-  }
+  } as GetInventoryStatus200
 }
 
 /**
  * @description unauthorized
  */
-export function createGetInventoryStatus401(
-  data?: Partial<{
-    error: 'unauthorized'
-  }>,
-): {
-  error: 'unauthorized'
-} {
+export function createGetInventoryStatus401(data?: Partial<GetInventoryStatus401>): GetInventoryStatus401 {
   const defaultFakeData = {
-    error: faker.helpers.arrayElement(['unauthorized'] as Array<
-      NonNullable<{
-        error: 'unauthorized'
-      }>['error']
-    >),
+    error: faker.helpers.arrayElement(['unauthorized'] as Array<NonNullable<GetInventoryStatus401>['error']>),
   }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as {
-    error: 'unauthorized'
-  }
+  } as GetInventoryStatus401
 }
 
-export function createGetInventoryResponse(
-  data?: Partial<{
-    [key: string]: number
-  }>,
-): {
-  [key: string]: number
-} {
-  return createGetInventoryStatus200(data) as {
-    [key: string]: number
-  }
+export function createGetInventoryResponse(data?: Partial<GetInventoryStatus200>): GetInventoryStatus200 {
+  return createGetInventoryStatus200(data) as GetInventoryStatus200
 }

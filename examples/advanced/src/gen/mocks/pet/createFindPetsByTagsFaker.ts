@@ -4,6 +4,10 @@ import { createFindPetsByTagsXEXAMPLEEnumFaker } from '../createFindPetsByTagsXE
 import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
+type FindPetsByTagsStatus200Json = Array<Pet>
+
+type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | string
+
 export function createFindPetsByTagsQueryFaker<
   TData extends Partial<{
     tags?: Array<string>
@@ -39,8 +43,8 @@ export function createFindPetsByTagsHeadersFaker<
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200FakerJson(data?: Partial<Array<Pet>>): Array<Pet> {
-  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || []).filter((item) => item !== undefined)] as Array<Pet>
+export function createFindPetsByTagsStatus200FakerJson(data?: Partial<FindPetsByTagsStatus200Json>): FindPetsByTagsStatus200Json {
+  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || []).filter((item) => item !== undefined)] as FindPetsByTagsStatus200Json
 }
 
 /**
@@ -53,8 +57,8 @@ export function createFindPetsByTagsStatus200FakerXml(data?: string): string {
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200Faker(data?: Partial<Array<Pet> | string>): Array<Pet> | string {
-  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200FakerJson(), createFindPetsByTagsStatus200FakerXml()])) as Array<Pet> | string
+export function createFindPetsByTagsStatus200Faker(data?: Partial<FindPetsByTagsStatus200>): FindPetsByTagsStatus200 {
+  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200FakerJson(), createFindPetsByTagsStatus200FakerXml()])) as FindPetsByTagsStatus200
 }
 
 /**
@@ -64,6 +68,6 @@ export function createFindPetsByTagsStatus400Faker() {
   return undefined
 }
 
-export function createFindPetsByTagsResponseFaker(data?: Partial<Array<Pet> | string>): Array<Pet> | string {
-  return createFindPetsByTagsStatus200Faker(data) as Array<Pet> | string
+export function createFindPetsByTagsResponseFaker(data?: Partial<FindPetsByTagsStatus200>): FindPetsByTagsStatus200 {
+  return createFindPetsByTagsStatus200Faker(data) as FindPetsByTagsStatus200
 }

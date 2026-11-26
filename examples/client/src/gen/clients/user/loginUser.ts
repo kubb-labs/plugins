@@ -6,6 +6,19 @@
 import type { Options, RequestResult } from '../../../client'
 import { client } from '../../../client'
 
+type LoginUserResponses = {
+  '200':
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+    | {
+        contentType: 'application/json'
+        data: string
+      }
+  '400': unknown
+}
+
 /**
  * `GET /user/login`
  * @summary Logs user into the system
@@ -23,38 +36,8 @@ export function loginUser<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Promise<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-        | {
-            contentType: 'application/json'
-            data: string
-          }
-      '400': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<LoginUserResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      '200':
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-        | {
-            contentType: 'application/json'
-            data: string
-          }
-      '400': unknown
-    },
-    ThrowOnError
-  >({ method: 'GET', url: '/user/login', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<LoginUserResponses, ThrowOnError>({ method: 'GET', url: '/user/login', ...config, throwOnError: config.throwOnError ?? true })
 }

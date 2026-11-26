@@ -7,6 +7,11 @@ import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { Order } from '../models/ts/Order'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
+type PlaceOrderResponses = {
+  '200': Order
+  '405': unknown
+}
+
 /**
  * `POST /store/order`
  * @description Place a new order in the store
@@ -49,25 +54,11 @@ export function placeOrder<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResult<
-    {
-      '200': Order
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200': Order
-        '405': unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<PlaceOrderResponses, ThrowOnError>({
       method: 'POST',
       url: '/store/order',
       contentType: { request: 'application/json' },

@@ -1,5 +1,7 @@
 import type { Payment } from '../../../models/ts/Payment'
 
+type ListPaymentsStatus2xx = Array<Payment>
+
 export function listPayments(
   {
     query,
@@ -17,7 +19,7 @@ export function listPayments(
     }
   } = {},
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Array<Payment>> {
+): Cypress.Chainable<ListPaymentsStatus2xx> {
   const rawCookie = (value: unknown): string => {
     const text = value instanceof Date ? value.toISOString() : String(value)
     if (!/^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/.test(text))
@@ -32,12 +34,12 @@ export function listPayments(
     )
     .join('; ')
   return cy
-    .request<Array<Payment>>({
+    .request<ListPaymentsStatus2xx>({
       method: 'GET',
       url: `/store/payments`,
       qs: query,
       headers: { ...(cookie ? { Cookie: cookie } : {}) },
       ...options,
     })
-    .then((res) => res.body) as Cypress.Chainable<Array<Payment>>
+    .then((res) => res.body) as Cypress.Chainable<ListPaymentsStatus2xx>
 }

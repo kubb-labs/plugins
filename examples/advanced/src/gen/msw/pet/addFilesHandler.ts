@@ -3,7 +3,15 @@ import type { Pet } from '../../models/ts/Pet'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 
-export function addFilesHandlerResponse200(data?: Omit<NonNullable<Pet>, 'name'>) {
+type AddFilesStatus200 = Omit<NonNullable<Pet>, 'name'>
+
+type AddFilesBody =
+  | {
+      url: string
+    }
+  | Omit<NonNullable<Pet>, 'id'>
+
+export function addFilesHandlerResponse200(data?: AddFilesStatus200) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -19,28 +27,10 @@ export function addFilesHandlerResponse405(data?: unknown) {
 }
 
 export function addFilesHandler(
-  data?:
-    | Omit<NonNullable<Pet>, 'name'>
-    | HttpResponseResolver<
-        Record<string, string>,
-        MswBody<
-          | {
-              url: string
-            }
-          | Omit<NonNullable<Pet>, 'id'>
-        >
-      >,
+  data?: AddFilesStatus200 | HttpResponseResolver<Record<string, string>, MswBody<AddFilesBody>>,
   options?: { baseURL?: string },
 ) {
-  return http.post<
-    Record<string, string>,
-    MswBody<
-      | {
-          url: string
-        }
-      | Omit<NonNullable<Pet>, 'id'>
-    >
-  >(`${options?.baseURL ?? ''}/pet/files`, function handler(info) {
+  return http.post<Record<string, string>, MswBody<AddFilesBody>>(`${options?.baseURL ?? ''}/pet/files`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return addFilesHandlerResponse200(data)
