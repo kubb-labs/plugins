@@ -11,5 +11,3 @@ pluginTs({ operations: 'export' })
 ```
 
 With a single output file, such as `output: { path: 'types.ts' }`, operation types stay exported, since that file also holds the schemas.
-
-A schema whose name matches a runtime type, such as `Options`, needs the `@kubb/ast` release that aliases clashing inlined imports.
