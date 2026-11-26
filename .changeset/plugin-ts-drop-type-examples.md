@@ -2,4 +2,4 @@
 '@kubb/plugin-ts': patch
 ---
 
-A generated type no longer carries the `@example` of its whole schema or response body, which printed a full payload on one line. Property examples such as `@example 5000` stay.
+A type no longer carries the `@example` of its whole schema. Property examples stay.
