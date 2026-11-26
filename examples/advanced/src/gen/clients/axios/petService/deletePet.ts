@@ -28,7 +28,7 @@ export function deletePet<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<DeletePetResponses, ThrowOnError>>(
     apiClient<DeletePetResponses, ThrowOnError>({
       method: 'DELETE',
       url: '/pet/{petId}:search',

@@ -4,16 +4,18 @@ import type { StreamOptions, UnwrappedStreamResultWithHeaders, SuccessOf, Server
 import type { StreamEventsOptions, StreamEventsResponses, StreamEventsStatus200Headers } from './StreamEvents'
 import { client, unwrapResult, resolveThrowOnError } from './.kubb/client'
 
+type StreamEventsResponseHeaders = { '200': StreamEventsStatus200Headers }
+
 /**
  * `GET /events`
  */
 export function streamEvents<ThrowOnError extends boolean = true>(
   options: StreamOptions<StreamEventsOptions, ThrowOnError> = {},
-): Promise<UnwrappedStreamResultWithHeaders<StreamEventsResponses, { '200': StreamEventsStatus200Headers }, ThrowOnError>> {
+): Promise<UnwrappedStreamResultWithHeaders<StreamEventsResponses, StreamEventsResponseHeaders, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return unwrapResult(
-    apiClient.stream<StreamEventsResponses, ThrowOnError, ServerSentEvent<SuccessOf<StreamEventsResponses>>, { '200': StreamEventsStatus200Headers }>({
+    apiClient.stream<StreamEventsResponses, ThrowOnError, ServerSentEvent<SuccessOf<StreamEventsResponses>>, StreamEventsResponseHeaders>({
       method: 'GET',
       url: '/events',
       contentType: { response: 'text/event-stream' },

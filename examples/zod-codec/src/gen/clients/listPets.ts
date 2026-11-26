@@ -17,7 +17,7 @@ export function listPets<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<ListPetsResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<ListPetsResponsesSchemaType, ThrowOnError>>(
     apiClient<ListPetsResponsesSchemaType, ThrowOnError>({
       method: 'GET',
       url: '/pets',

@@ -12,7 +12,7 @@ export function streamChat<ThrowOnError extends boolean = true>(
 ): Unwrappable<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>>(
     apiClient.stream<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>({
       method: 'POST',
       url: '/chat',

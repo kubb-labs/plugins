@@ -17,7 +17,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<GetPetByIdResponses, ThrowOnError>>(
     apiClient<GetPetByIdResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/{petId}',

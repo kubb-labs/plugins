@@ -17,7 +17,7 @@ export function createUsersWithListInput<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
   const { client: apiClient = client, contentType, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>>(
     apiClient<CreateUsersWithListInputResponses, ThrowOnError>({
       method: 'POST',
       url: '/user/createWithList',

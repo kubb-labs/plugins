@@ -12,7 +12,7 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<FindPetsByTagsResponses, ThrowOnError>>(
     apiClient<FindPetsByTagsResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/findByTags',

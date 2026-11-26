@@ -5,6 +5,8 @@ import type { DeletePetOptions, DeletePetResponses, DeletePetStatus204Headers } 
 import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
 import { createClient, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
+type DeletePetResponseHeaders = { '204': DeletePetStatus204Headers }
+
 export class PetClient {
   readonly client: ClientInstance
 
@@ -20,7 +22,7 @@ export class PetClient {
   ): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<GetPetByIdResponses, ThrowOnError>>(
       apiClient<GetPetByIdResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/{petId}',
@@ -35,11 +37,11 @@ export class PetClient {
    */
   public deletePet<ThrowOnError extends boolean = true>(
     options: Options<DeletePetOptions, ThrowOnError>,
-  ): Unwrappable<RequestResultWithHeaders<DeletePetResponses, { '204': DeletePetStatus204Headers }, ThrowOnError>> {
+  ): Unwrappable<RequestResultWithHeaders<DeletePetResponses, DeletePetResponseHeaders, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
-      apiClient<DeletePetResponses, ThrowOnError, { '204': DeletePetStatus204Headers }>({
+    return withUnwrap<RequestResultWithHeaders<DeletePetResponses, DeletePetResponseHeaders, ThrowOnError>>(
+      apiClient<DeletePetResponses, ThrowOnError, DeletePetResponseHeaders>({
         method: 'DELETE',
         url: '/pet/{petId}',
         ...config,

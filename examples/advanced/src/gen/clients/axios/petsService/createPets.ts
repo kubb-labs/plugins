@@ -35,7 +35,7 @@ export function createPets<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<CreatePetsResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<CreatePetsResponses, ThrowOnError>>(
     apiClient<CreatePetsResponses, ThrowOnError>({
       method: 'POST',
       url: '/pets/{uuid}',

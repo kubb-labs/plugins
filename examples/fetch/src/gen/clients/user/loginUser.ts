@@ -7,17 +7,19 @@ import type { Options, Unwrappable, RequestResultWithHeaders } from '../../.kubb
 import type { LoginUserOptions, LoginUserResponses, LoginUserStatus200Headers } from '../../models/user/LoginUser'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
+type LoginUserResponseHeaders = { '200': LoginUserStatus200Headers }
+
 /**
  * `GET /user/login`
  * @summary Logs user into the system
  */
 export function loginUser<ThrowOnError extends boolean = true>(
   options: Options<LoginUserOptions, ThrowOnError> = {},
-): Unwrappable<RequestResultWithHeaders<LoginUserResponses, { '200': LoginUserStatus200Headers }, ThrowOnError>> {
+): Unwrappable<RequestResultWithHeaders<LoginUserResponses, LoginUserResponseHeaders, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
-    apiClient<LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }>({
+  return withUnwrap<RequestResultWithHeaders<LoginUserResponses, LoginUserResponseHeaders, ThrowOnError>>(
+    apiClient<LoginUserResponses, ThrowOnError, LoginUserResponseHeaders>({
       method: 'GET',
       url: '/user/login',
       ...config,

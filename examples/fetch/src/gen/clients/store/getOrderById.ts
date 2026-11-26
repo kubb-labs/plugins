@@ -17,7 +17,7 @@ export function getOrderById<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<GetOrderByIdResponses, ThrowOnError>>(
     apiClient<GetOrderByIdResponses, ThrowOnError>({
       method: 'GET',
       url: '/store/order/{orderId}',

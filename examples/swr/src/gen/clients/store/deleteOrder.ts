@@ -31,7 +31,7 @@ export function deleteOrder<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<DeleteOrderResponses, ThrowOnError>>(
     apiClient<DeleteOrderResponses, ThrowOnError>({
       method: 'DELETE',
       url: '/store/order/{orderId}',

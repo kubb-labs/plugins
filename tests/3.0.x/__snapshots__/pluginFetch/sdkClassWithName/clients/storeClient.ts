@@ -38,7 +38,7 @@ export class StoreClient {
 }), ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<GetInventoryResponses, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap<RequestResult<GetInventoryResponses, ThrowOnError>>(apiClient<GetInventoryResponses, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -73,6 +73,6 @@ export class StoreClient {
 }), ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<PlaceOrderResponses, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap<RequestResult<PlaceOrderResponses, ThrowOnError>>(apiClient<PlaceOrderResponses, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 }

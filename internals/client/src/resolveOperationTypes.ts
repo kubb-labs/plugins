@@ -1,5 +1,5 @@
 import type { ast } from '@internals/ast'
-import { Diagnostics, type TemplateContext, text, useKubb } from '@kubb/kit'
+import { Diagnostics, operationKey, type TemplateContext, text, useKubb } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import type { PluginZod } from '@kubb/plugin-zod'
 
@@ -24,6 +24,11 @@ export type OperationTypeNames = {
      * Resolves the name of the type of the headers one response declares. Left out, results keep untyped headers.
      */
     headers?(node: ast.OperationNode, statusCode: ast.StatusCode): string
+    /**
+     * Resolves the name a generated file declares the operation's per-status headers map under, such as
+     * `LoginUserResponseHeaders`. Left out, the map is written inline wherever it is used.
+     */
+    headersMap?(node: ast.OperationNode): string
   }
 }
 
@@ -41,6 +46,17 @@ function getResponseHeadersEntries({ node, types }: { node: ast.OperationNode; t
 export function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
   const entries = getResponseHeadersEntries({ node, types }).map(([statusCode, name]) => `${text.quote(statusCode)}: ${name}`)
   return entries.length ? `{ ${entries.join('; ')} }` : null
+}
+
+/**
+ * How a generated signature refers to the per-status headers map: by its `headersMap` name when the resolver has one,
+ * otherwise as the map itself. `null` when no response declares headers. With a name, the return type and the client
+ * call share one type, so TypeScript does not compare two copies of the same `RequestResult` for every operation.
+ */
+export function buildResponseHeadersRef({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
+  const type = buildResponseHeadersType({ node, types })
+  if (!type) return null
+  return types.response.headersMap?.(node) ?? type
 }
 
 /**
@@ -104,7 +120,10 @@ export function resolveOperationTypes(): OperationTypeSource {
 
     // plugin-ts and `pluginZod({ inferred })` provide `types`, and kit picks the provider by priority.
     const resolver = ctx.getResolver('types')
-    return { response: resolver.response, resolver }
+    // Resolved through the types resolver, so the local name never clashes with a schema or another operation type.
+    const headersMap = (node: ast.OperationNode) =>
+      resolver.resolveName({ key: operationKey(node, 'response', 'headersMap'), name: resolver.name(`${node.operationId} Response Headers`) })
+    return { response: { ...resolver.response, headersMap }, resolver }
   })
 }
 

@@ -23,5 +23,5 @@ export function officeWeatherstory<ThrowOnError extends boolean = true>(options:
 }), ThrowOnError> = {}): Unwrappable<RequestResult<OfficeWeatherstoryResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<OfficeWeatherstoryResponses, ThrowOnError>({ method: 'GET', url: '/stories', ...config, validator: { response: officeWeatherstoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap<RequestResult<OfficeWeatherstoryResponses, ThrowOnError>>(apiClient<OfficeWeatherstoryResponses, ThrowOnError>({ method: 'GET', url: '/stories', ...config, validator: { response: officeWeatherstoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

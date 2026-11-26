@@ -67,7 +67,7 @@ export class StoreClient {
   ): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<GetInventoryResponses, ThrowOnError>>(
       apiClient<GetInventoryResponses, ThrowOnError>({
         method: 'GET',
         url: '/store/inventory',
@@ -123,7 +123,7 @@ export class StoreClient {
   ): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<PlaceOrderResponses, ThrowOnError>>(
       apiClient<PlaceOrderResponses, ThrowOnError>({
         method: 'POST',
         url: '/store/order',
@@ -179,7 +179,7 @@ export class StoreClient {
   ): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>(
       apiClient<PlaceOrderPatchResponses, ThrowOnError>({
         method: 'PATCH',
         url: '/store/order',
@@ -210,7 +210,7 @@ export class StoreClient {
   ): Unwrappable<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<GetOrderByIdResponses, ThrowOnError>>(
       apiClient<GetOrderByIdResponses, ThrowOnError>({
         method: 'GET',
         url: '/store/order/{orderId}',
@@ -240,7 +240,7 @@ export class StoreClient {
   ): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(
+    return withUnwrap<RequestResult<DeleteOrderResponses, ThrowOnError>>(
       apiClient<DeleteOrderResponses, ThrowOnError>({
         method: 'DELETE',
         url: '/store/order/{orderId}',

@@ -48,7 +48,7 @@ export function addFiles<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<AddFilesResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<AddFilesResponses, ThrowOnError>>(
     apiClient<AddFilesResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet/files',

@@ -2,6 +2,13 @@ export { resolveContractClient } from './resolveClient.ts'
 export type { ClientSelector, ResolvedContractClient } from './resolveClient.ts'
 export { resolveClientOperation } from './resolveClientOperation.ts'
 export type { ClientOperation } from './resolveClientOperation.ts'
-export { buildResponseHeadersType, buildResultTypeRef, getResponseHeadersTypeNames, resolveOperationTypes, resultTypeName } from './resolveOperationTypes.ts'
+export {
+  buildResponseHeadersRef,
+  buildResponseHeadersType,
+  buildResultTypeRef,
+  getResponseHeadersTypeNames,
+  resolveOperationTypes,
+  resultTypeName,
+} from './resolveOperationTypes.ts'
 export type { OperationTypeNames, OperationTypeSource } from './resolveOperationTypes.ts'
 export type { ReturnTypeOption } from './resolveClientOperation.ts'

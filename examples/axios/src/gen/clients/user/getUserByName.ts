@@ -40,7 +40,7 @@ export function getUserByName<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<GetUserByNameResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<GetUserByNameResponses, ThrowOnError>>(
     apiClient<GetUserByNameResponses, ThrowOnError>({
       method: 'GET',
       url: '/user/{username}',

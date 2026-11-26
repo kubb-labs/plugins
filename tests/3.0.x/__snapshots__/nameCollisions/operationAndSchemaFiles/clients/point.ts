@@ -25,5 +25,5 @@ export function point<ThrowOnError extends boolean = true>(options: Options<({
 }), ThrowOnError>): Unwrappable<RequestResult<PointResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<PointResponses, ThrowOnError>({ method: 'GET', url: '/points/{id}', ...config, validator: { response: pointResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap<RequestResult<PointResponses, ThrowOnError>>(apiClient<PointResponses, ThrowOnError>({ method: 'GET', url: '/points/{id}', ...config, validator: { response: pointResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

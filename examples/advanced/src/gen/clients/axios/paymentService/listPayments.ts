@@ -9,9 +9,11 @@ type ListPaymentsResponses = {
   '4xx': PaymentError
 }
 
-type ListPaymentsStatus2xxHeaders = {
-  'X-Rate-Limit': number
-  'X-Next-Page'?: string
+type ListPaymentsResponseHeaders = {
+  '2xx': {
+    'X-Rate-Limit': number
+    'X-Next-Page'?: string
+  }
 }
 
 /**
@@ -35,11 +37,11 @@ export function listPayments<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Unwrappable<RequestResultWithHeaders<ListPaymentsResponses, { '2xx': ListPaymentsStatus2xxHeaders }, ThrowOnError>> {
+): Unwrappable<RequestResultWithHeaders<ListPaymentsResponses, ListPaymentsResponseHeaders, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
-    apiClient<ListPaymentsResponses, ThrowOnError, { '2xx': ListPaymentsStatus2xxHeaders }>({
+  return withUnwrap<RequestResultWithHeaders<ListPaymentsResponses, ListPaymentsResponseHeaders, ThrowOnError>>(
+    apiClient<ListPaymentsResponses, ThrowOnError, ListPaymentsResponseHeaders>({
       method: 'GET',
       url: '/store/payments',
       ...config,

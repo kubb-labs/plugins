@@ -12,7 +12,7 @@ export function getCookies<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<GetCookiesResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<GetCookiesResponses, ThrowOnError>>(
     apiClient<GetCookiesResponses, ThrowOnError>({
       method: 'GET',
       url: '/cookies',

@@ -24,5 +24,5 @@ export function createPet<ThrowOnError extends boolean = true>(options: Options<
 }), ThrowOnError> = {}): Unwrappable<RequestResult<ApiCreatePetResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<ApiCreatePetResponses, ThrowOnError>({ method: 'POST', url: '/pets', contentType: { request: 'application/json' }, ...config, validator: { response: createPetResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap<RequestResult<ApiCreatePetResponses, ThrowOnError>>(apiClient<ApiCreatePetResponses, ThrowOnError>({ method: 'POST', url: '/pets', contentType: { request: 'application/json' }, ...config, validator: { response: createPetResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

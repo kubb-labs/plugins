@@ -40,7 +40,7 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
+  return withUnwrap<RequestResult<FindPetsByStatusResponses, ThrowOnError>>(
     apiClient<FindPetsByStatusResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/findByStatus/{step_id}',

@@ -14,5 +14,5 @@ import { putEventResponseSchema, putEventStatus409Schema } from '../zod/putEvent
 export function putEvent<ThrowOnError extends boolean = true>(options: Options<PutEventOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PutEventResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<PutEventResponsesSchemaType, ThrowOnError>({ method: 'PUT', url: '/events/{day}', contentType: { request: 'application/json' }, ...config, validator: { response: putEventResponseSchema, error: { 409: putEventStatus409Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap<RequestResult<PutEventResponsesSchemaType, ThrowOnError>>(apiClient<PutEventResponsesSchemaType, ThrowOnError>({ method: 'PUT', url: '/events/{day}', contentType: { request: 'application/json' }, ...config, validator: { response: putEventResponseSchema, error: { 409: putEventStatus409Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

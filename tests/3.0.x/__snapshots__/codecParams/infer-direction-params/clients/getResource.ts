@@ -15,5 +15,5 @@ import { getResourceHeadersSchema, getResourcePathSchema, getResourceQuerySchema
 export function getResource<ThrowOnError extends boolean = true>(options: Options<GetResourceOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<GetResourceResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/resources/{resource}', ...config, validator: { path: getResourcePathSchema, query: getResourceQuerySchema, headers: toHeadersStandardSchema(getResourceHeadersSchema, getResourceHeadersSchema.shape), response: getResourceResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>>(apiClient<GetResourceResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/resources/{resource}', ...config, validator: { path: getResourcePathSchema, query: getResourceQuerySchema, headers: toHeadersStandardSchema(getResourceHeadersSchema, getResourceHeadersSchema.shape), response: getResourceResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

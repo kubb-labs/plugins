@@ -19,9 +19,11 @@ type LoginUserResponses = {
   '400': unknown
 }
 
-type LoginUserStatus200Headers = {
-  'X-Rate-Limit'?: number
-  'X-Expires-After'?: string
+type LoginUserResponseHeaders = {
+  '200': {
+    'X-Rate-Limit'?: number
+    'X-Expires-After'?: string
+  }
 }
 
 /**
@@ -41,11 +43,11 @@ export function loginUser<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Unwrappable<RequestResultWithHeaders<LoginUserResponses, { '200': LoginUserStatus200Headers }, ThrowOnError>> {
+): Unwrappable<RequestResultWithHeaders<LoginUserResponses, LoginUserResponseHeaders, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(
-    apiClient<LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }>({
+  return withUnwrap<RequestResultWithHeaders<LoginUserResponses, LoginUserResponseHeaders, ThrowOnError>>(
+    apiClient<LoginUserResponses, ThrowOnError, LoginUserResponseHeaders>({
       method: 'GET',
       url: '/user/login',
       ...config,
