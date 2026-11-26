@@ -11,3 +11,5 @@ pluginTs({ operations: 'export' })
 ```
 
 With a single output file, such as `output: { path: 'types.ts' }`, operation types stay exported, since that file also holds the schemas.
+
+See [Migrate to v6](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/migrate-to-v6).
