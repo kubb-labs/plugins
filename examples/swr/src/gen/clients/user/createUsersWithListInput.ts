@@ -4,7 +4,7 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput'
+import type { User } from '../../models/User'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -13,12 +13,50 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @summary Creates list of users with given input array
  */
 export function createUsersWithListInput<ThrowOnError extends boolean = true>(
-  options: Options<CreateUsersWithListInputOptions, ThrowOnError> = {},
-): Unwrappable<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: User[]
+      path?: never
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  > = {},
+): Unwrappable<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: User
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      default: unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(
-    apiClient<CreateUsersWithListInputResponses, ThrowOnError>({
+    apiClient<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: User
+            }
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+        default: unknown
+      },
+      ThrowOnError
+    >({
       method: 'POST',
       url: '/user/createWithList',
       contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },

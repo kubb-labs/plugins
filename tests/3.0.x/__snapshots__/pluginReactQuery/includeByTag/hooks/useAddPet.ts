@@ -4,7 +4,8 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../types/AddPet'
+import type { AddPetRequest } from '../types/AddPetRequest'
+import type { Pet } from '../types/Pet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { addPet } from '../clients/addPet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -12,13 +13,37 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export function addPetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {}) {
-  const mutationKey = addPetMutationKey()
-  return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext>({
-    mutationKey,
-    mutationFn: async(variables) => {
-      return addPet({ ...config, ...variables, throwOnError: true }).unwrap()
-    },
-  })
+        const mutationKey = addPetMutationKey()
+        return mutationOptions<(Pet | string), ResponseErrorConfig<unknown>, ({
+    body: AddPetRequest;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType?: 'application/json' | {
+      request: 'application/json';
+    };
+  } | {
+    body: Pet;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType: 'application/xml' | {
+      request: 'application/xml';
+    };
+  } | {
+    body: Pet;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType: 'application/x-www-form-urlencoded' | {
+      request: 'application/x-www-form-urlencoded';
+    };
+  }) & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext>({
+          mutationKey,
+          mutationFn: async(variables) => {
+            return addPet({ ...config, ...variables, throwOnError: true }).unwrap()
+          },
+        })
 }
 
 /**
@@ -27,18 +52,114 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Omit<R
  * @summary Add a new pet to the store
  */
 export function useAddPet<TContext>(options: {
-  mutation?: UseMutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<(Pet | string), ResponseErrorConfig<unknown>, ({
+  body: AddPetRequest;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType?: 'application/json' | {
+    request: 'application/json';
+  };
+} | {
+  body: Pet;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/xml' | {
+    request: 'application/xml';
+  };
+} | {
+  body: Pet;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/x-www-form-urlencoded' | {
+    request: 'application/x-www-form-urlencoded';
+  };
+}) & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>,
 } = {}) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation;
-  const mutationKey = mutationOptions.mutationKey ?? addPetMutationKey()
+          const { mutation = {}, client: config = {} } = options ?? {}
+          const { client: queryClient, ...mutationOptions } = mutation;
+          const mutationKey = mutationOptions.mutationKey ?? addPetMutationKey()
 
-  const baseOptions = addPetMutationOptions(config) as UseMutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext>
+          const baseOptions = addPetMutationOptions(config) as UseMutationOptions<(Pet | string), ResponseErrorConfig<unknown>, ({
+    body: AddPetRequest;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType?: 'application/json' | {
+      request: 'application/json';
+    };
+  } | {
+    body: Pet;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType: 'application/xml' | {
+      request: 'application/xml';
+    };
+  } | {
+    body: Pet;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType: 'application/x-www-form-urlencoded' | {
+      request: 'application/x-www-form-urlencoded';
+    };
+  }) & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext>
 
-  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext>({
-    ...baseOptions,
-    mutationKey,
-    ...mutationOptions,
-  }, queryClient) as UseMutationResult<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext>
+          return useMutation<(Pet | string), ResponseErrorConfig<unknown>, ({
+    body: AddPetRequest;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType?: 'application/json' | {
+      request: 'application/json';
+    };
+  } | {
+    body: Pet;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType: 'application/xml' | {
+      request: 'application/xml';
+    };
+  } | {
+    body: Pet;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType: 'application/x-www-form-urlencoded' | {
+      request: 'application/x-www-form-urlencoded';
+    };
+  }) & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext>({
+            ...baseOptions,
+            mutationKey,
+            ...mutationOptions,
+          }, queryClient) as UseMutationResult<(Pet | string), ResponseErrorConfig<unknown>, ({
+    body: AddPetRequest;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType?: 'application/json' | {
+      request: 'application/json';
+    };
+  } | {
+    body: Pet;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType: 'application/xml' | {
+      request: 'application/xml';
+    };
+  } | {
+    body: Pet;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType: 'application/x-www-form-urlencoded' | {
+      request: 'application/x-www-form-urlencoded';
+    };
+  }) & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext>
 }

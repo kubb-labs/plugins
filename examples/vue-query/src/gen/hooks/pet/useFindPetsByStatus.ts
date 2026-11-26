@@ -4,23 +4,51 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { FindPetsByStatusOptions, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/pet/FindPetsByStatus'
+import type { Pet } from '../../models/Pet'
 import type { MaybeRefOrGetter } from 'vue'
 import { findPetsByStatus } from '../../clients/pet/findPetsByStatus'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const findPetsByStatusQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<FindPetsByStatusOptions, 'headers'>['query']> } = {}) =>
-  [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+export const findPetsByStatusQueryKey = ({
+  query,
+}: {
+  query?: MaybeRefOrGetter<
+    Omit<
+      {
+        body?: never
+        path?: never
+        query?: {
+          status?: 'available' | 'pending' | 'sold'
+        }
+        headers?: never
+      },
+      'headers'
+    >['query']
+  >
+} = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions(
-  { query }: { query?: MaybeRefOrGetter<FindPetsByStatusOptions['query']> } = {},
+  {
+    query,
+  }: {
+    query?: MaybeRefOrGetter<
+      {
+        body?: never
+        path?: never
+        query?: {
+          status?: 'available' | 'pending' | 'sold'
+        }
+        headers?: never
+      }['query']
+    >
+  } = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByStatusQueryKey({ query })
-  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200>({
+  return queryOptions<Pet[] | string, ResponseErrorConfig<unknown>, Pet[] | string>({
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByStatus({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true }).unwrap()

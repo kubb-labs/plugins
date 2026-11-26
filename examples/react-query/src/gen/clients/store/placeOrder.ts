@@ -4,7 +4,7 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/PlaceOrder'
+import type { Order } from '../../models/Order'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -13,12 +13,61 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @summary Place an order for a pet
  */
 export function placeOrder<ThrowOnError extends boolean = true>(
-  options: Options<PlaceOrderOptions, ThrowOnError> = {},
-): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    ThrowOnError
+  > = {},
+): Unwrappable<
+  RequestResult<
+    {
+      '200': Order
+      '405': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<PlaceOrderResponses, ThrowOnError>({
+    apiClient<
+      {
+        '200': Order
+        '405': unknown
+      },
+      ThrowOnError
+    >({
       method: 'POST',
       url: '/store/order',
       contentType: { request: 'application/json' },

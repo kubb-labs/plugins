@@ -3,13 +3,19 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByTagsQuery, FindPetsByTagsResponse, FindPetsByTagsStatus200, FindPetsByTagsStatus200Json } from '../../models/FindPetsByTags'
+import type { Pet } from '../../models/Pet'
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 faker.seed([220])
 
-export function createFindPetsByTagsQuery<TData extends Partial<FindPetsByTagsQuery> = object>(data?: TData) {
+export function createFindPetsByTagsQuery<
+  TData extends Partial<{
+    tags?: string[]
+    page?: string
+    pageSize?: string
+  }> = object,
+>(data?: TData) {
   const defaultFakeData = {
     tags: faker.helpers.multiple(() => faker.string.alpha()),
     page: faker.string.alpha(),
@@ -24,8 +30,8 @@ export function createFindPetsByTagsQuery<TData extends Partial<FindPetsByTagsQu
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200Json(data?: Partial<FindPetsByTagsStatus200Json>): FindPetsByTagsStatus200Json {
-  return [...faker.helpers.multiple(() => createPet()), ...(data || []).filter((item) => item !== undefined)] as FindPetsByTagsStatus200Json
+export function createFindPetsByTagsStatus200Json(data?: Partial<Pet[]>): Pet[] {
+  return [...faker.helpers.multiple(() => createPet()), ...(data || []).filter((item) => item !== undefined)] as Pet[]
 }
 
 /**
@@ -38,8 +44,8 @@ export function createFindPetsByTagsStatus200Xml(data?: string): string {
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200(data?: Partial<FindPetsByTagsStatus200>): FindPetsByTagsStatus200 {
-  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200Json(), createFindPetsByTagsStatus200Xml()])) as FindPetsByTagsStatus200
+export function createFindPetsByTagsStatus200(data?: Partial<Pet[] | string>): Pet[] | string {
+  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200Json(), createFindPetsByTagsStatus200Xml()])) as Pet[] | string
 }
 
 /**
@@ -49,6 +55,6 @@ export function createFindPetsByTagsStatus400() {
   return undefined
 }
 
-export function createFindPetsByTagsResponse(data?: Partial<FindPetsByTagsResponse>): FindPetsByTagsResponse {
-  return createFindPetsByTagsStatus200(data) as FindPetsByTagsResponse
+export function createFindPetsByTagsResponse(data?: Partial<Pet[] | string>): Pet[] | string {
+  return createFindPetsByTagsStatus200(data) as Pet[] | string
 }

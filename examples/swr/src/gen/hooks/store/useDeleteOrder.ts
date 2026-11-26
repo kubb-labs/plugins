@@ -5,7 +5,6 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { DeleteOrderOptions, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deleteOrder } from '../../clients/store/deleteOrder'
 
@@ -13,7 +12,14 @@ export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] a
 
 export type DeleteOrderMutationKey = ReturnType<typeof deleteOrderMutationKey>
 
-export type DeleteOrderMutationArg = DeleteOrderOptions
+export type DeleteOrderMutationArg = {
+  body?: never
+  path: {
+    orderId: bigint
+  }
+  query?: never
+  headers?: never
+}
 
 /**
  * `DELETE /store/order/{orderId}`
@@ -22,12 +28,9 @@ export type DeleteOrderMutationArg = DeleteOrderOptions
  */
 export function useDeleteOrder(
   options: {
-    mutation?: SWRMutationConfiguration<
-      DeleteOrderResponse,
-      ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
-      DeleteOrderMutationKey | null,
-      DeleteOrderMutationArg
-    > & { throwOnError?: boolean }
+    mutation?: SWRMutationConfiguration<unknown | unknown, ResponseErrorConfig<unknown | unknown>, DeleteOrderMutationKey | null, DeleteOrderMutationArg> & {
+      throwOnError?: boolean
+    }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
@@ -35,12 +38,7 @@ export function useDeleteOrder(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = deleteOrderMutationKey()
 
-  return useSWRMutation<
-    DeleteOrderResponse,
-    ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
-    DeleteOrderMutationKey | null,
-    DeleteOrderMutationArg
-  >(
+  return useSWRMutation<unknown | unknown, ResponseErrorConfig<unknown | unknown>, DeleteOrderMutationKey | null, DeleteOrderMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path } }) => {
       return deleteOrder({ ...config, path, throwOnError: true }).unwrap()

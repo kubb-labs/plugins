@@ -4,7 +4,6 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -13,16 +12,35 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @summary Delete purchase order by ID
  */
 export function deleteOrder<ThrowOnError extends boolean = true>(
-  options: Options<DeleteOrderOptions, ThrowOnError>,
-): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        orderId: bigint
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<DeleteOrderResponses, ThrowOnError>({
-      method: 'DELETE',
-      url: '/store/order/{orderId}',
-      ...config,
-      throwOnError: resolveThrowOnError(config.throwOnError, true),
-    }),
+    apiClient<
+      {
+        '400': unknown
+        '404': unknown
+      },
+      ThrowOnError
+    >({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
   )
 }

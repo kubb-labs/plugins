@@ -4,7 +4,7 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { OfficeWeatherstoryStatus200 } from '../types/OfficeWeatherstoryOperation'
+import type { OfficeWeatherStory } from '../types/OfficeWeatherStory'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import { officeWeatherstory } from '../clients/officeWeatherstory'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
@@ -16,7 +16,7 @@ export type OfficeWeatherstoryQueryKey = ReturnType<typeof officeWeatherstoryQue
 
 export function officeWeatherstoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = officeWeatherstoryQueryKey()
-  return queryOptions<OfficeWeatherstoryStatus200, ResponseErrorConfig<Error>, OfficeWeatherstoryStatus200>({
+  return queryOptions<OfficeWeatherStory, ResponseErrorConfig<Error>, OfficeWeatherStory>({
    queryKey,
    queryFn: async ({ signal }) => {
       return officeWeatherstory({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -27,8 +27,8 @@ export function officeWeatherstoryQueryOptions(config: Partial<Omit<RequestConfi
 /**
  * `GET /stories`
  */
-export function useOfficeWeatherstory<TData = OfficeWeatherstoryStatus200, TQueryData = OfficeWeatherstoryStatus200, TQueryKey extends QueryKey = OfficeWeatherstoryQueryKey>(options: {
-  query?: Partial<UseQueryOptions<OfficeWeatherstoryStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useOfficeWeatherstory<TData = OfficeWeatherStory, TQueryData = OfficeWeatherStory, TQueryKey extends QueryKey = OfficeWeatherstoryQueryKey>(options: {
+  query?: Partial<UseQueryOptions<OfficeWeatherStory, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
@@ -39,7 +39,7 @@ export function useOfficeWeatherstory<TData = OfficeWeatherstoryStatus200, TQuer
    ...officeWeatherstoryQueryOptions(config),
    ...resolvedOptions,
    queryKey
-  } as unknown as UseQueryOptions<OfficeWeatherstoryStatus200, ResponseErrorConfig<Error>, TData, OfficeWeatherstoryStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
+  } as unknown as UseQueryOptions<OfficeWeatherStory, ResponseErrorConfig<Error>, TData, OfficeWeatherStory, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
   queryResult.queryKey = queryKey as TQueryKey
 

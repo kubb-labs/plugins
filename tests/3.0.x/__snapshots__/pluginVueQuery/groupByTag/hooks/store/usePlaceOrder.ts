@@ -4,7 +4,7 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../types/PlaceOrder'
+import type { Order } from '../../types/Order'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { placeOrder } from '../../clients/placeOrder'
 import { useMutation } from '@tanstack/vue-query'
@@ -17,18 +17,66 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * @summary Place an order for a pet
  */
 export function usePlaceOrder<TContext>(options: {
-  mutation?: MutationObserverOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<Order, ResponseErrorConfig<unknown>, ({
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType?: 'application/json' | {
+    request: 'application/json';
+  };
+} | {
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/xml' | {
+    request: 'application/xml';
+  };
+} | {
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/x-www-form-urlencoded' | {
+    request: 'application/x-www-form-urlencoded';
+  };
+}), TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>,
 } = {}) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation;
-  const mutationKey = mutationOptions?.mutationKey ?? placeOrderMutationKey()
+          const { mutation = {}, client: config = {} } = options ?? {}
+          const { client: queryClient, ...mutationOptions } = mutation;
+          const mutationKey = mutationOptions?.mutationKey ?? placeOrderMutationKey()
 
-  return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
-    mutationFn: async(variables) => {
-      return placeOrder({ ...config, ...variables, throwOnError: true }).unwrap()
-    },
-    mutationKey,
-    ...mutationOptions
-  }, queryClient)
+          return useMutation<Order, ResponseErrorConfig<unknown>, ({
+    body?: Order;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType?: 'application/json' | {
+      request: 'application/json';
+    };
+  } | {
+    body?: Order;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType: 'application/xml' | {
+      request: 'application/xml';
+    };
+  } | {
+    body?: Order;
+    path?: never;
+    query?: never;
+    headers?: never;
+    contentType: 'application/x-www-form-urlencoded' | {
+      request: 'application/x-www-form-urlencoded';
+    };
+  }), TContext>({
+            mutationFn: async(variables) => {
+              return placeOrder({ ...config, ...variables, throwOnError: true }).unwrap()
+            },
+            mutationKey,
+            ...mutationOptions
+          }, queryClient)
 }

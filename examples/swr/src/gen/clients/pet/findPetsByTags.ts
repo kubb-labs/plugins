@@ -4,7 +4,7 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../models/pet/FindPetsByTags'
+import type { Pet } from '../../models/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
 /**
@@ -13,12 +13,54 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../
  * @summary Finds Pets by tags
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByTagsOptions, ThrowOnError> = {},
-): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path?: never
+      query?: {
+        tags?: string[]
+        page?: string
+        pageSize?: string
+      }
+      headers?: never
+    },
+    ThrowOnError
+  > = {},
+): Unwrappable<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Pet[]
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<FindPetsByTagsResponses, ThrowOnError>({
+    apiClient<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Pet[]
+            }
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+        '400': unknown
+      },
+      ThrowOnError
+    >({
       method: 'GET',
       url: '/pet/findByTags',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

@@ -5,7 +5,8 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../../models/pet/AddPet'
+import type { AddPetRequest } from '../../models/AddPetRequest'
+import type { Pet } from '../../models/Pet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { addPet } from '../../clients/pet/addPet'
 
@@ -13,7 +14,41 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
 
-export type AddPetMutationArg = AddPetOptions & { contentType?: string | { response?: 'application/json' | 'application/xml' } }
+export type AddPetMutationArg = (
+  | {
+      body: AddPetRequest
+      path?: never
+      query?: never
+      headers?: never
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
+    }
+  | {
+      body: Pet
+      path?: never
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
+    }
+  | {
+      body: Pet
+      path?: never
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
+    }
+) & { contentType?: string | { response?: 'application/json' | 'application/xml' } }
 
 /**
  * `POST /pet`
@@ -22,9 +57,15 @@ export type AddPetMutationArg = AddPetOptions & { contentType?: string | { respo
  */
 export function useAddPet(
   options: {
-    mutation?: SWRMutationConfiguration<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg> & {
-      throwOnError?: boolean
-    }
+    mutation?: SWRMutationConfiguration<
+      Pet | string,
+      ResponseErrorConfig<{
+        code?: number
+        message?: string
+      }>,
+      AddPetMutationKey | null,
+      AddPetMutationArg
+    > & { throwOnError?: boolean }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
@@ -32,7 +73,15 @@ export function useAddPet(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = addPetMutationKey()
 
-  return useSWRMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
+  return useSWRMutation<
+    Pet | string,
+    ResponseErrorConfig<{
+      code?: number
+      message?: string
+    }>,
+    AddPetMutationKey | null,
+    AddPetMutationArg
+  >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
       return addPet({ ...config, ...variables, throwOnError: true }).unwrap()

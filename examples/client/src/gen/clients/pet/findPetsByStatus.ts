@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../../models/pet/FindPetsByStatus'
+import type { Pet } from '../../models/Pet'
 import { client } from '../../../client'
 
 /**
@@ -13,11 +13,51 @@ import { client } from '../../../client'
  * @summary Finds Pets by status
  */
 export function findPetsByStatus<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByStatusOptions, ThrowOnError> = {},
-): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path?: never
+      query?: {
+        status?: 'available' | 'pending' | 'sold'
+      }
+      headers?: never
+    },
+    ThrowOnError
+  > = {},
+): Promise<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Pet[]
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<FindPetsByStatusResponses, ThrowOnError>({
+  return apiClient<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Pet[]
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+    },
+    ThrowOnError
+  >({
     method: 'GET',
     url: '/pet/findByStatus',
     security: [

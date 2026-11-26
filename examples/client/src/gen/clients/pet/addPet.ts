@@ -4,7 +4,8 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { AddPetOptions, AddPetResponses } from '../../models/pet/AddPet'
+import type { AddPetRequest } from '../../models/AddPetRequest'
+import type { Pet } from '../../models/Pet'
 import { client } from '../../../client'
 
 /**
@@ -13,11 +14,82 @@ import { client } from '../../../client'
  * @summary Add a new pet to the store
  */
 export function addPet<ThrowOnError extends boolean = true>(
-  options: Options<AddPetOptions, ThrowOnError>,
-): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body: AddPetRequest
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body: Pet
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body: Pet
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    ThrowOnError
+  >,
+): Promise<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Pet
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '405': {
+        code?: number
+        message?: string
+      }
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, contentType, ...config } = options
 
-  return apiClient<AddPetResponses, ThrowOnError>({
+  return apiClient<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Pet
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '405': {
+        code?: number
+        message?: string
+      }
+    },
+    ThrowOnError
+  >({
     method: 'POST',
     url: '/pet',
     security: [

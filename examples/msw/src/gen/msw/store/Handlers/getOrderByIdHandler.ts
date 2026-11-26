@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/GetOrderById'
+import type { Order } from '../../../models/Order'
 import { http, HttpResponse } from 'msw/http'
 
-export function getOrderByIdHandlerResponse200(data?: GetOrderByIdResponse) {
+export function getOrderByIdHandlerResponse200(data?: Order | string) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -31,20 +31,20 @@ export function getOrderByIdHandlerResponse200(data?: GetOrderByIdResponse) {
   )
 }
 
-export function getOrderByIdHandlerResponse400(data?: GetOrderByIdStatus400) {
+export function getOrderByIdHandlerResponse400(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
 
-export function getOrderByIdHandlerResponse404(data?: GetOrderByIdStatus404) {
+export function getOrderByIdHandlerResponse404(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 404,
   })
 }
 
 export function getOrderByIdHandler(
-  data?: GetOrderByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?: (Order | string) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.get(`${options?.baseURL ?? 'http://localhost:3000'}/store/order/:orderId`, function handler(info) {

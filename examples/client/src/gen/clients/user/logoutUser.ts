@@ -4,7 +4,6 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { LogoutUserOptions, LogoutUserResponses } from '../../models/user/LogoutUser'
 import { client } from '../../../client'
 
 /**
@@ -12,9 +11,29 @@ import { client } from '../../../client'
  * @summary Logs out current logged in user session
  */
 export function logoutUser<ThrowOnError extends boolean = true>(
-  options: Options<LogoutUserOptions, ThrowOnError> = {},
-): Promise<RequestResult<LogoutUserResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path?: never
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  > = {},
+): Promise<
+  RequestResult<
+    {
+      default: unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<LogoutUserResponses, ThrowOnError>({ method: 'GET', url: '/user/logout', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<
+    {
+      default: unknown
+    },
+    ThrowOnError
+  >({ method: 'GET', url: '/user/logout', ...config, throwOnError: config.throwOnError ?? true })
 }

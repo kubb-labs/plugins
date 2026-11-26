@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { OfficeWeatherstoryResponse } from '../types/OfficeWeatherstoryOperation'
+import type { OfficeWeatherStory } from '../types/OfficeWeatherStory'
 import { http, HttpResponse } from 'msw/http'
 
-export function officeWeatherstoryHandlerResponse200(data?: OfficeWeatherstoryResponse) {
+export function officeWeatherstoryHandlerResponse200(data?: OfficeWeatherStory) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -15,7 +15,7 @@ export function officeWeatherstoryHandlerResponse200(data?: OfficeWeatherstoryRe
   })
 }
 
-export function officeWeatherstoryHandler(data?: OfficeWeatherstoryResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
+export function officeWeatherstoryHandler(data?: OfficeWeatherStory | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
   return http.get(`${options?.baseURL ?? ''}/stories`, function handler(info) {
       if(typeof data === 'function') return data(info)
 

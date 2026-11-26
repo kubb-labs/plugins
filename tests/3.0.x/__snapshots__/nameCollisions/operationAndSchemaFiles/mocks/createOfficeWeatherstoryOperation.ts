@@ -3,16 +3,16 @@
 * Do not edit manually.
 */
 
-import type { OfficeWeatherstoryResponse, OfficeWeatherstoryStatus200 } from '../types/OfficeWeatherstoryOperation'
+import type { OfficeWeatherStory } from '../types/OfficeWeatherStory'
 import { createOfficeWeatherStory } from './createOfficeWeatherStory'
 
 /**
  * @description OK
  */
-export function createOfficeWeatherstoryStatus200(data?: Partial<OfficeWeatherstoryStatus200>): OfficeWeatherstoryStatus200 {
-  return createOfficeWeatherStory(data) as OfficeWeatherstoryStatus200
+export function createOfficeWeatherstoryStatus200(data?: Partial<OfficeWeatherStory>): OfficeWeatherStory {
+  return createOfficeWeatherStory(data) as OfficeWeatherStory
 }
 
-export function createOfficeWeatherstoryResponse(data?: Partial<OfficeWeatherstoryResponse>): OfficeWeatherstoryResponse {
-  return createOfficeWeatherstoryStatus200(data) as OfficeWeatherstoryResponse
+export function createOfficeWeatherstoryResponse(data?: Partial<OfficeWeatherStory>): OfficeWeatherStory {
+  return createOfficeWeatherstoryStatus200(data) as OfficeWeatherStory
 }

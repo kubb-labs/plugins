@@ -4,20 +4,42 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser'
 import { loginUser } from '../../clients/user/loginUser'
 import { queryOptions } from '@tanstack/react-query'
 
-export const loginUserQueryKey = ({ query }: Omit<LoginUserOptions, 'headers'> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
+export const loginUserQueryKey = ({
+  query,
+}: Omit<
+  {
+    body?: never
+    path?: never
+    query?: {
+      username?: string
+      password?: string
+    }
+    headers?: never
+  },
+  'headers'
+> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
 
 type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
-  { query }: LoginUserOptions = {},
+  {
+    query,
+  }: {
+    body?: never
+    path?: never
+    query?: {
+      username?: string
+      password?: string
+    }
+    headers?: never
+  } = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = loginUserQueryKey({ query })
-  return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
+  return queryOptions<string, ResponseErrorConfig<unknown>, string, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return loginUser({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()

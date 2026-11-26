@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusOptions } from '../types/FindPetsByStatus'
+import type { FindPetsByStatusStatusEnumKey } from '../types/FindPetsByStatusStatusEnum'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { findPetsByStatus } from '../clients-ky/findPetsByStatus'
 
@@ -12,7 +12,14 @@ import { findPetsByStatus } from '../clients-ky/findPetsByStatus'
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
  */
-export async function findPetsByStatusHandler({ query }: FindPetsByStatusOptions = {}, ctx: ServerContext): Promise<CallToolResult> {
+export async function findPetsByStatusHandler({ query }: ({
+  body?: never;
+  path?: never;
+  query?: ({
+  status?: FindPetsByStatusStatusEnumKey;
+});
+  headers?: never;
+}) = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await findPetsByStatus({ query, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

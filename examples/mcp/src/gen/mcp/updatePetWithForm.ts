@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetWithFormOptions } from '../models/ts/UpdatePetWithForm'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { updatePetWithForm } from '../clients/updatePetWithForm'
 
@@ -11,7 +10,23 @@ import { updatePetWithForm } from '../clients/updatePetWithForm'
  * `POST /pet/{petId}`
  * @summary Updates a pet in the store with form data
  */
-export async function updatePetWithFormHandler({ path, query }: UpdatePetWithFormOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function updatePetWithFormHandler(
+  {
+    path,
+    query,
+  }: {
+    body?: never
+    path: {
+      petId: number
+    }
+    query?: {
+      name?: string
+      status?: string
+    }
+    headers?: never
+  },
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await updatePetWithForm({ path, query, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

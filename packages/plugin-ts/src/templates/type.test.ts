@@ -161,6 +161,33 @@ describe('typeGenerator — response headers', () => {
   })
 })
 
+describe('typeGenerator — inline operations', () => {
+  test.each([
+    { mode: 'directory', inline: true },
+    { mode: 'file', inline: false },
+  ] as const)('marks the operation file inline in $mode mode: $inline', async ({ mode, inline }) => {
+    const options: PluginTs['resolvedOptions'] = {
+      ...defaultOptions,
+      operations: 'inline',
+      output: { path: mode === 'file' ? 'types.ts' : '.', mode },
+    }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `inline ${mode}` })
+
+    await renderTemplate(typeOperation, operationWithSnakeCaseParams, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    expect(driver.fileManager.files.every((file) => !!file.inline === inline)).toBe(true)
+  })
+})
+
 describe('typeGenerator — custom resolver', () => {
   test('uses name consistently for imported schema refs', async () => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions }

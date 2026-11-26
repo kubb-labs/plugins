@@ -5,15 +5,29 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { PointOptions, PointStatus200 } from '../types/PointOperation'
+import type { PointGeoJson } from '../types/PointGeoJson'
 import type { SWRConfiguration } from 'swr'
 import { point } from '../clients/point'
 
-export const pointQueryKey = ({ path }: Omit<PointOptions, 'headers'>) => [{ url: '/points/:id', params: path }] as const
+export const pointQueryKey = ({ path }: Omit<({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+}), 'headers'>) => [{ url: '/points/:id', params: path }] as const
 
 type PointQueryKey = ReturnType<typeof pointQueryKey>
 
-export function pointQueryOptions({ path }: PointOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+export function pointQueryOptions({ path }: ({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+}), config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   return {
     fetcher: async () => {
       return point({ ...config, path, throwOnError: true }).unwrap()
@@ -24,8 +38,15 @@ export function pointQueryOptions({ path }: PointOptions, config: Partial<Omit<R
 /**
  * `GET /points/{id}`
  */
-export function usePoint({ path }: PointOptions, options: {
-  query?: SWRConfiguration<PointStatus200, ResponseErrorConfig<Error>>,
+export function usePoint({ path }: ({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+}), options: {
+  query?: SWRConfiguration<PointGeoJson, ResponseErrorConfig<Error>>,
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
   immutable?: boolean
@@ -34,7 +55,7 @@ export function usePoint({ path }: PointOptions, options: {
 
   const queryKey = pointQueryKey({ path })
 
-  return useSWR<PointStatus200, ResponseErrorConfig<Error>, PointQueryKey | null>(
+  return useSWR<PointGeoJson, ResponseErrorConfig<Error>, PointQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
      ...pointQueryOptions({ path }, config),

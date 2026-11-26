@@ -5,7 +5,6 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetInventoryStatus200 } from '../../models/store/GetInventory'
 import type { SWRConfiguration } from 'swr'
 import { getInventory } from '../../clients/store/getInventory'
 
@@ -30,7 +29,12 @@ export function getInventoryQueryOptions(
  */
 export function useGetInventory(
   options: {
-    query?: SWRConfiguration<GetInventoryStatus200, ResponseErrorConfig<Error>>
+    query?: SWRConfiguration<
+      {
+        [key: string]: number
+      },
+      ResponseErrorConfig<Error>
+    >
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -40,7 +44,13 @@ export function useGetInventory(
 
   const queryKey = getInventoryQueryKey()
 
-  return useSWR<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<
+    {
+      [key: string]: number
+    },
+    ResponseErrorConfig<Error>,
+    GetInventoryQueryKey | null
+  >(shouldFetch ? queryKey : null, {
     ...getInventoryQueryOptions(config),
     ...(immutable
       ? {

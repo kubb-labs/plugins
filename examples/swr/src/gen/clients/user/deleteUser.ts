@@ -4,7 +4,6 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { DeleteUserOptions, DeleteUserResponses } from '../../models/user/DeleteUser'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -13,16 +12,35 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @summary Delete user
  */
 export function deleteUser<ThrowOnError extends boolean = true>(
-  options: Options<DeleteUserOptions, ThrowOnError>,
-): Unwrappable<RequestResult<DeleteUserResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        username: string
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<DeleteUserResponses, ThrowOnError>({
-      method: 'DELETE',
-      url: '/user/{username}',
-      ...config,
-      throwOnError: resolveThrowOnError(config.throwOnError, true),
-    }),
+    apiClient<
+      {
+        '400': unknown
+        '404': unknown
+      },
+      ThrowOnError
+    >({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
   )
 }

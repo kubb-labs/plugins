@@ -3,15 +3,24 @@
 * Do not edit manually.
 */
 
-import type { PetCreateOptions, PetCreateResponses } from '../../types/pet/Create'
+import type { Pet } from '../../types/Pet'
 import type { Options, RequestResult } from '@example/client'
 import { client } from '@example/client'
 
 /**
  * `POST /pets/create-first`
  */
-export function petCreate<ThrowOnError extends boolean = true>(options: Options<PetCreateOptions, ThrowOnError> = {}): Promise<RequestResult<PetCreateResponses, ThrowOnError>> {
+export function petCreate<ThrowOnError extends boolean = true>(options: Options<({
+  body?: never;
+  path?: never;
+  query?: never;
+  headers?: never;
+}), ThrowOnError> = {}): Promise<RequestResult<({
+  '200': Pet;
+}), ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<PetCreateResponses, ThrowOnError>({ method: 'POST', url: '/pets/create-first', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<({
+    '200': Pet;
+  }), ThrowOnError>({ method: 'POST', url: '/pets/create-first', ...config, throwOnError: config.throwOnError ?? true })
 }

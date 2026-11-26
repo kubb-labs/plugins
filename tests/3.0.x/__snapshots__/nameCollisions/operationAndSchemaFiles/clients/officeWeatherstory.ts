@@ -4,15 +4,24 @@
 */
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
-import type { OfficeWeatherstoryOptions, OfficeWeatherstoryResponses } from '../types/OfficeWeatherstoryOperation'
+import type { OfficeWeatherStory } from '../types/OfficeWeatherStory'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { officeWeatherstoryResponseSchema } from '../zod/officeWeatherstoryOperationSchema'
 
 /**
  * `GET /stories`
  */
-export function officeWeatherstory<ThrowOnError extends boolean = true>(options: Options<OfficeWeatherstoryOptions, ThrowOnError> = {}): Unwrappable<RequestResult<OfficeWeatherstoryResponses, ThrowOnError>> {
+export function officeWeatherstory<ThrowOnError extends boolean = true>(options: Options<({
+  body?: never;
+  path?: never;
+  query?: never;
+  headers?: never;
+}), ThrowOnError> = {}): Unwrappable<RequestResult<({
+  '200': OfficeWeatherStory;
+}), ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<OfficeWeatherstoryResponses, ThrowOnError>({ method: 'GET', url: '/stories', ...config, validator: { response: officeWeatherstoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap(apiClient<({
+    '200': OfficeWeatherStory;
+  }), ThrowOnError>({ method: 'GET', url: '/stories', ...config, validator: { response: officeWeatherstoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

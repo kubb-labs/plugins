@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { PetListStatus200 } from '../types/pet/List'
+import type { Pet } from '../types/Pet'
 import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import { petList } from '../clients/pet/list'
@@ -16,7 +16,7 @@ export type PetListQueryKey = ReturnType<typeof petListQueryKey>
 
 export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = petListQueryKey()
-  return queryOptions<PetListStatus200, ResponseErrorConfig<Error>, PetListStatus200>({
+  return queryOptions<Pet, ResponseErrorConfig<Error>, Pet>({
    queryKey,
    queryFn: async ({ signal }) => {
       return (await petList({ ...config, signal: config.signal ?? signal, throwOnError: true })).data
@@ -27,8 +27,8 @@ export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' |
 /**
  * `GET /pets/first`
  */
-export function usePetList<TData = PetListStatus200, TQueryData = PetListStatus200, TQueryKey extends QueryKey = PetListQueryKey>(options: {
-  query?: Partial<UseQueryOptions<PetListStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function usePetList<TData = Pet, TQueryData = Pet, TQueryKey extends QueryKey = PetListQueryKey>(options: {
+  query?: Partial<UseQueryOptions<Pet, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
@@ -39,7 +39,7 @@ export function usePetList<TData = PetListStatus200, TQueryData = PetListStatus2
    ...petListQueryOptions(config),
    ...resolvedOptions,
    queryKey
-  } as unknown as UseQueryOptions<PetListStatus200, ResponseErrorConfig<Error>, TData, PetListStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
+  } as unknown as UseQueryOptions<Pet, ResponseErrorConfig<Error>, TData, Pet, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
   queryResult.queryKey = queryKey as TQueryKey
 

@@ -3,13 +3,20 @@
 * Do not edit manually.
 */
 
-import type { DeletePetOptions, DeletePetResponse } from '../types/DeletePet'
-
-export function deletePet({ path, headers }: DeletePetOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
-  return cy.request<DeletePetResponse>({
+export function deletePet({ path, headers }: ({
+  body?: never;
+  path: ({
+  petId: bigint;
+});
+  query?: never;
+  headers?: ({
+  api_key?: string;
+});
+}), options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<unknown> {
+  return cy.request<unknown>({
     method: 'DELETE',
     url: `/pet/${path.petId}`,
     headers,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<DeletePetResponse>
+  }).then((res) => res.body) as Cypress.Chainable<unknown>
 }

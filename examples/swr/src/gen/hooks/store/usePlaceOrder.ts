@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/store/PlaceOrder'
+import type { Order } from '../../models/Order'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrder } from '../../clients/store/placeOrder'
 
@@ -13,7 +13,40 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
 export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
 
-export type PlaceOrderMutationArg = PlaceOrderOptions
+export type PlaceOrderMutationArg =
+  | {
+      body?: Order
+      path?: never
+      query?: never
+      headers?: never
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
+    }
+  | {
+      body?: Order
+      path?: never
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
+    }
+  | {
+      body?: Order
+      path?: never
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
+    }
 
 /**
  * `POST /store/order`
@@ -22,9 +55,7 @@ export type PlaceOrderMutationArg = PlaceOrderOptions
  */
 export function usePlaceOrder(
   options: {
-    mutation?: SWRMutationConfiguration<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg> & {
-      throwOnError?: boolean
-    }
+    mutation?: SWRMutationConfiguration<Order, ResponseErrorConfig<unknown>, PlaceOrderMutationKey | null, PlaceOrderMutationArg> & { throwOnError?: boolean }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
@@ -32,7 +63,7 @@ export function usePlaceOrder(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = placeOrderMutationKey()
 
-  return useSWRMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
+  return useSWRMutation<Order, ResponseErrorConfig<unknown>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
       return placeOrder({ ...config, ...variables, throwOnError: true }).unwrap()

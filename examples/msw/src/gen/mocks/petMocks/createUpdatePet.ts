@@ -3,15 +3,7 @@
  * Do not edit manually.
  */
 
-import type {
-  UpdatePetBody,
-  UpdatePetBodyFormUrlEncoded,
-  UpdatePetBodyJson,
-  UpdatePetBodyXml,
-  UpdatePetResponse,
-  UpdatePetStatus200,
-  UpdatePetStatus200Json,
-} from '../../models/UpdatePet'
+import type { Pet } from '../../models/Pet'
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
@@ -20,8 +12,8 @@ faker.seed([220])
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200Json(data?: Partial<UpdatePetStatus200Json>): UpdatePetStatus200Json {
-  return createPet(data) as UpdatePetStatus200Json
+export function createUpdatePetStatus200Json(data?: Partial<Pet>): Pet {
+  return createPet(data) as Pet
 }
 
 /**
@@ -34,12 +26,12 @@ export function createUpdatePetStatus200Xml(data?: string): string {
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
+export function createUpdatePetStatus200(data?: Partial<Pet | string>): Pet | string {
   return (
     typeof data === 'object' && data !== null && !Array.isArray(data)
-      ? faker.helpers.arrayElement([() => createUpdatePetStatus200Json(data as Partial<UpdatePetStatus200Json>)])()
+      ? faker.helpers.arrayElement([() => createUpdatePetStatus200Json(data as Partial<Pet>)])()
       : (data ?? faker.helpers.arrayElement([createUpdatePetStatus200Json(), createUpdatePetStatus200Xml()]))
-  ) as UpdatePetStatus200
+  ) as Pet | string
 }
 
 /**
@@ -66,39 +58,39 @@ export function createUpdatePetStatus405() {
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyJson(data?: Partial<UpdatePetBodyJson>): UpdatePetBodyJson {
-  return createPet(data) as UpdatePetBodyJson
+export function createUpdatePetBodyJson(data?: Partial<Pet>): Pet {
+  return createPet(data) as Pet
 }
 
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyXml(data?: Partial<UpdatePetBodyXml>): UpdatePetBodyXml {
-  return createPet(data) as UpdatePetBodyXml
+export function createUpdatePetBodyXml(data?: Partial<Pet>): Pet {
+  return createPet(data) as Pet
 }
 
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyFormUrlEncoded(data?: Partial<UpdatePetBodyFormUrlEncoded>): UpdatePetBodyFormUrlEncoded {
-  return createPet(data) as UpdatePetBodyFormUrlEncoded
+export function createUpdatePetBodyFormUrlEncoded(data?: Partial<Pet>): Pet {
+  return createPet(data) as Pet
 }
 
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBody(data?: Partial<UpdatePetBody>): UpdatePetBody {
+export function createUpdatePetBody(data?: Partial<Pet>): Pet {
   return (
     typeof data === 'object' && data !== null && !Array.isArray(data)
       ? faker.helpers.arrayElement([
-          () => createUpdatePetBodyJson(data as Partial<UpdatePetBodyJson>),
-          () => createUpdatePetBodyXml(data as Partial<UpdatePetBodyXml>),
-          () => createUpdatePetBodyFormUrlEncoded(data as Partial<UpdatePetBodyFormUrlEncoded>),
+          () => createUpdatePetBodyJson(data as Partial<Pet>),
+          () => createUpdatePetBodyXml(data as Partial<Pet>),
+          () => createUpdatePetBodyFormUrlEncoded(data as Partial<Pet>),
         ])()
       : (data ?? faker.helpers.arrayElement([createUpdatePetBodyJson(), createUpdatePetBodyXml(), createUpdatePetBodyFormUrlEncoded()]))
-  ) as UpdatePetBody
+  ) as Pet
 }
 
-export function createUpdatePetResponse(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
-  return createUpdatePetStatus200(data) as UpdatePetResponse
+export function createUpdatePetResponse(data?: Partial<Pet | string>): Pet | string {
+  return createUpdatePetStatus200(data) as Pet | string
 }

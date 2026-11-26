@@ -3,16 +3,16 @@
 * Do not edit manually.
 */
 
-import type { ApiProviderAuthResponse, ApiProviderAuthStatus400 } from '../../types/provider/Auth'
+import type { ApiProviderAuthError } from '../../types/ProviderAuthError'
 import { createProviderAuthError } from '../createProviderAuthError'
 
 /**
  * @description Error
  */
-export function createProviderAuthStatus400(data?: Partial<ApiProviderAuthStatus400>): ApiProviderAuthStatus400 {
-  return createProviderAuthError(data) as ApiProviderAuthStatus400
+export function createProviderAuthStatus400(data?: Partial<ApiProviderAuthError>): ApiProviderAuthError {
+  return createProviderAuthError(data) as ApiProviderAuthError
 }
 
-export function createProviderAuthResponse(data?: Partial<ApiProviderAuthResponse>): ApiProviderAuthResponse {
-  return createProviderAuthStatus400(data) as ApiProviderAuthResponse
+export function createProviderAuthResponse(data?: Partial<ApiProviderAuthError>): ApiProviderAuthError {
+  return createProviderAuthStatus400(data) as ApiProviderAuthError
 }

@@ -5,16 +5,37 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetOrderByIdOptions, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById'
+import type { Order } from '../../models/Order'
 import type { SWRConfiguration } from 'swr'
 import { getOrderById } from '../../clients/store/getOrderById'
 
-export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdOptions, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
+export const getOrderByIdQueryKey = ({
+  path,
+}: Omit<
+  {
+    body?: never
+    path: {
+      orderId: bigint
+    }
+    query?: never
+    headers?: never
+  },
+  'headers'
+>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
 export function getOrderByIdQueryOptions(
-  { path }: GetOrderByIdOptions,
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      orderId: bigint
+    }
+    query?: never
+    headers?: never
+  },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
@@ -30,9 +51,18 @@ export function getOrderByIdQueryOptions(
  * @summary Find purchase order by ID
  */
 export function useGetOrderById(
-  { path }: GetOrderByIdOptions,
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      orderId: bigint
+    }
+    query?: never
+    headers?: never
+  },
   options: {
-    query?: SWRConfiguration<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>>
+    query?: SWRConfiguration<Order | string, ResponseErrorConfig<unknown | unknown>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -42,18 +72,15 @@ export function useGetOrderById(
 
   const queryKey = getOrderByIdQueryKey({ path })
 
-  return useSWR<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdQueryKey | null>(
-    shouldFetch ? queryKey : null,
-    {
-      ...getOrderByIdQueryOptions({ path }, config),
-      ...(immutable
-        ? {
-            revalidateIfStale: false,
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-          }
-        : {}),
-      ...queryOptions,
-    },
-  )
+  return useSWR<Order | string, ResponseErrorConfig<unknown | unknown>, GetOrderByIdQueryKey | null>(shouldFetch ? queryKey : null, {
+    ...getOrderByIdQueryOptions({ path }, config),
+    ...(immutable
+      ? {
+          revalidateIfStale: false,
+          revalidateOnFocus: false,
+          revalidateOnReconnect: false,
+        }
+      : {}),
+    ...queryOptions,
+  })
 }

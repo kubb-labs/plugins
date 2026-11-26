@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { UpdateUserOptions, UpdateUserResponses } from '../../models/user/UpdateUser'
+import type { User } from '../../models/User'
 import { client } from '../../../client'
 
 /**
@@ -13,15 +13,62 @@ import { client } from '../../../client'
  * @summary Update user
  */
 export function updateUser<ThrowOnError extends boolean = true>(
-  options: Options<UpdateUserOptions, ThrowOnError>,
-): Promise<RequestResult<UpdateUserResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body?: User
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: User
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body?: User
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    ThrowOnError
+  >,
+): Promise<
+  RequestResult<
+    {
+      default: unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<UpdateUserResponses, ThrowOnError>({
-    method: 'PUT',
-    url: '/user/{username}',
-    contentType: { request: 'application/json' },
-    ...config,
-    throwOnError: config.throwOnError ?? true,
-  })
+  return apiClient<
+    {
+      default: unknown
+    },
+    ThrowOnError
+  >({ method: 'PUT', url: '/user/{username}', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true })
 }

@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { ApiCreateContainerBody3 } from '../types/CreateContainer'
+import type { ApiCreateContainerBody } from '../types/CreateContainerBody'
 import { createCreateContainerBody } from './createCreateContainerBody'
 
 /**
@@ -13,8 +13,8 @@ export function createCreateContainerStatus200() {
   return undefined
 }
 
-export function createCreateContainerBody3(data?: Partial<ApiCreateContainerBody3>): ApiCreateContainerBody3 {
-  return createCreateContainerBody(data) as ApiCreateContainerBody3
+export function createCreateContainerBody3(data?: Partial<ApiCreateContainerBody>): ApiCreateContainerBody {
+  return createCreateContainerBody(data) as ApiCreateContainerBody
 }
 
 export function createCreateContainerResponse() {

@@ -3,13 +3,17 @@
  * Do not edit manually.
  */
 
-import type { GetOrderByIdPath, GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus200Json } from '../../models/GetOrderById'
+import type { Order } from '../../models/Order'
 import { createOrder } from '../createOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
 faker.seed([220])
 
-export function createGetOrderByIdPath<TData extends Partial<GetOrderByIdPath> = object>(data?: TData) {
+export function createGetOrderByIdPath<
+  TData extends Partial<{
+    orderId: bigint
+  }> = object,
+>(data?: TData) {
   const defaultFakeData = {
     orderId: faker.number.bigInt(),
   }
@@ -22,8 +26,8 @@ export function createGetOrderByIdPath<TData extends Partial<GetOrderByIdPath> =
 /**
  * @description successful operation
  */
-export function createGetOrderByIdStatus200Json(data?: Partial<GetOrderByIdStatus200Json>): GetOrderByIdStatus200Json {
-  return createOrder(data) as GetOrderByIdStatus200Json
+export function createGetOrderByIdStatus200Json(data?: Partial<Order>): Order {
+  return createOrder(data) as Order
 }
 
 /**
@@ -36,12 +40,12 @@ export function createGetOrderByIdStatus200Xml(data?: string): string {
 /**
  * @description successful operation
  */
-export function createGetOrderByIdStatus200(data?: Partial<GetOrderByIdStatus200>): GetOrderByIdStatus200 {
+export function createGetOrderByIdStatus200(data?: Partial<Order | string>): Order | string {
   return (
     typeof data === 'object' && data !== null && !Array.isArray(data)
-      ? faker.helpers.arrayElement([() => createGetOrderByIdStatus200Json(data as Partial<GetOrderByIdStatus200Json>)])()
+      ? faker.helpers.arrayElement([() => createGetOrderByIdStatus200Json(data as Partial<Order>)])()
       : (data ?? faker.helpers.arrayElement([createGetOrderByIdStatus200Json(), createGetOrderByIdStatus200Xml()]))
-  ) as GetOrderByIdStatus200
+  ) as Order | string
 }
 
 /**
@@ -58,6 +62,6 @@ export function createGetOrderByIdStatus404() {
   return undefined
 }
 
-export function createGetOrderByIdResponse(data?: Partial<GetOrderByIdResponse>): GetOrderByIdResponse {
-  return createGetOrderByIdStatus200(data) as GetOrderByIdResponse
+export function createGetOrderByIdResponse(data?: Partial<Order | string>): Order | string {
+  return createGetOrderByIdStatus200(data) as Order | string
 }

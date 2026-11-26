@@ -4,7 +4,6 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { DeleteUserOptions, DeleteUserResponses } from '../../models/user/DeleteUser'
 import { client } from '../../../client'
 
 /**
@@ -13,9 +12,33 @@ import { client } from '../../../client'
  * @summary Delete user
  */
 export function deleteUser<ThrowOnError extends boolean = true>(
-  options: Options<DeleteUserOptions, ThrowOnError>,
-): Promise<RequestResult<DeleteUserResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        username: string
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Promise<
+  RequestResult<
+    {
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<DeleteUserResponses, ThrowOnError>({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<
+    {
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true })
 }

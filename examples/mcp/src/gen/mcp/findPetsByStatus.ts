@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByStatusOptions } from '../models/ts/FindPetsByStatus'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { findPetsByStatus } from '../clients/findPetsByStatus'
 
@@ -12,7 +11,19 @@ import { findPetsByStatus } from '../clients/findPetsByStatus'
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
  */
-export async function findPetsByStatusHandler({ path }: FindPetsByStatusOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function findPetsByStatusHandler(
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      step_id: string
+    }
+    query?: never
+    headers?: never
+  },
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await findPetsByStatus({ path, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { GetPetByIdOptions, GetPetByIdResponses } from '../../models/pet/GetPetById'
+import type { Pet } from '../../models/Pet'
 import { client } from '../../../client'
 
 /**
@@ -13,11 +13,53 @@ import { client } from '../../../client'
  * @summary Find pet by ID
  */
 export function getPetById<ThrowOnError extends boolean = true>(
-  options: Options<GetPetByIdOptions, ThrowOnError>,
-): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        petId: bigint
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Promise<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Pet
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<GetPetByIdResponses, ThrowOnError>({
+  return apiClient<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Pet
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >({
     method: 'GET',
     url: '/pet/{petId}',
     security: [

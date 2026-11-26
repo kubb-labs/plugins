@@ -4,23 +4,52 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser'
 import type { MaybeRefOrGetter } from 'vue'
 import { loginUser } from '../../clients/user/loginUser'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const loginUserQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<LoginUserOptions, 'headers'>['query']> } = {}) =>
-  [{ url: '/user/login' }, ...(query ? [query] : [])] as const
+export const loginUserQueryKey = ({
+  query,
+}: {
+  query?: MaybeRefOrGetter<
+    Omit<
+      {
+        body?: never
+        path?: never
+        query?: {
+          username?: string
+          password?: string
+        }
+        headers?: never
+      },
+      'headers'
+    >['query']
+  >
+} = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
 
 export type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
-  { query }: { query?: MaybeRefOrGetter<LoginUserOptions['query']> } = {},
+  {
+    query,
+  }: {
+    query?: MaybeRefOrGetter<
+      {
+        body?: never
+        path?: never
+        query?: {
+          username?: string
+          password?: string
+        }
+        headers?: never
+      }['query']
+    >
+  } = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = loginUserQueryKey({ query })
-  return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200>({
+  return queryOptions<string, ResponseErrorConfig<unknown>, string>({
     queryKey,
     queryFn: async ({ signal }) => {
       return loginUser({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true }).unwrap()

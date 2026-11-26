@@ -3,12 +3,15 @@
  * Do not edit manually.
  */
 
-import type { DeleteOrderPath, DeleteOrderResponse } from '../../models/DeleteOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
 faker.seed([220])
 
-export function createDeleteOrderPath<TData extends Partial<DeleteOrderPath> = object>(data?: TData) {
+export function createDeleteOrderPath<
+  TData extends Partial<{
+    orderId: bigint
+  }> = object,
+>(data?: TData) {
   const defaultFakeData = {
     orderId: faker.number.bigInt(),
   }
@@ -32,6 +35,6 @@ export function createDeleteOrderStatus404() {
   return undefined
 }
 
-export function createDeleteOrderResponse(data?: Partial<DeleteOrderResponse>): DeleteOrderResponse {
-  return (data ?? faker.helpers.arrayElement([createDeleteOrderStatus400(), createDeleteOrderStatus404()])) as DeleteOrderResponse
+export function createDeleteOrderResponse(data?: Partial<unknown | unknown>): unknown | unknown {
+  return (data ?? faker.helpers.arrayElement([createDeleteOrderStatus400(), createDeleteOrderStatus404()])) as unknown | unknown
 }

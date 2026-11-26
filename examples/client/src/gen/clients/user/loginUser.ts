@@ -4,7 +4,6 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { LoginUserOptions, LoginUserResponses } from '../../models/user/LoginUser'
 import { client } from '../../../client'
 
 /**
@@ -12,9 +11,50 @@ import { client } from '../../../client'
  * @summary Logs user into the system
  */
 export function loginUser<ThrowOnError extends boolean = true>(
-  options: Options<LoginUserOptions, ThrowOnError> = {},
-): Promise<RequestResult<LoginUserResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path?: never
+      query?: {
+        username?: string
+        password?: string
+      }
+      headers?: never
+    },
+    ThrowOnError
+  > = {},
+): Promise<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+        | {
+            contentType: 'application/json'
+            data: string
+          }
+      '400': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<LoginUserResponses, ThrowOnError>({ method: 'GET', url: '/user/login', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<
+    {
+      '200':
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+        | {
+            contentType: 'application/json'
+            data: string
+          }
+      '400': unknown
+    },
+    ThrowOnError
+  >({ method: 'GET', url: '/user/login', ...config, throwOnError: config.throwOnError ?? true })
 }

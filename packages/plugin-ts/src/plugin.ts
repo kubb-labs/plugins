@@ -50,7 +50,7 @@ export const pluginTs = defineExtension<PluginTs>({
       optionalType = 'questionToken',
       arrayType = 'array',
       syntaxType = 'type',
-      operations = 'export',
+      operations = 'inline',
       printer,
       resolver: userResolver,
       macros: userMacros,

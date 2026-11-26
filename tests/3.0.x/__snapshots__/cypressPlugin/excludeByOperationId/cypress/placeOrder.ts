@@ -3,13 +3,37 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderOptions, PlaceOrderResponse } from '../types/PlaceOrder'
+import type { Order } from '../types/Order'
 
-export function placeOrder({ body }: Pick<PlaceOrderOptions, 'body'> = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
-  return cy.request<PlaceOrderResponse>({
+export function placeOrder({ body }: Pick<({
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType?: 'application/json' | {
+    request: 'application/json';
+  };
+} | {
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/xml' | {
+    request: 'application/xml';
+  };
+} | {
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/x-www-form-urlencoded' | {
+    request: 'application/x-www-form-urlencoded';
+  };
+}), 'body'> = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<Order> {
+  return cy.request<Order>({
     method: 'POST',
     url: `/store/order`,
     body,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<PlaceOrderResponse>
+  }).then((res) => res.body) as Cypress.Chainable<Order>
 }

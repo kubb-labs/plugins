@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../types/FindPetsByStatus'
+import type { Pet } from '../../types/Pet'
 import { http, HttpResponse } from 'msw/http'
 
-export function findPetsByStatusHandlerResponse200(data?: FindPetsByStatusResponse) {
+export function findPetsByStatusHandlerResponse200(data?: (((Pet[]) | string))) {
   if (typeof data === 'string') return new HttpResponse<string>(data, {
     status: 200,
     headers: {
@@ -26,13 +26,13 @@ export function findPetsByStatusHandlerResponse200(data?: FindPetsByStatusRespon
   })
 }
 
-export function findPetsByStatusHandlerResponse400(data?: FindPetsByStatusStatus400) {
+export function findPetsByStatusHandlerResponse400(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
 
-export function findPetsByStatusHandler(data?: FindPetsByStatusResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
+export function findPetsByStatusHandler(data?: (((Pet[]) | string)) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
   return http.get(`${options?.baseURL ?? ''}/pet/findByStatus`, function handler(info) {
       if(typeof data === 'function') return data(info)
 

@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/PlaceOrder'
+import type { Order } from '../../models/Order'
 import { client } from '../../../client'
 
 /**
@@ -13,15 +13,58 @@ import { client } from '../../../client'
  * @summary Place an order for a pet
  */
 export function placeOrder<ThrowOnError extends boolean = true>(
-  options: Options<PlaceOrderOptions, ThrowOnError> = {},
-): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    ThrowOnError
+  > = {},
+): Promise<
+  RequestResult<
+    {
+      '200': Order
+      '405': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<PlaceOrderResponses, ThrowOnError>({
-    method: 'POST',
-    url: '/store/order',
-    contentType: { request: 'application/json' },
-    ...config,
-    throwOnError: config.throwOnError ?? true,
-  })
+  return apiClient<
+    {
+      '200': Order
+      '405': unknown
+    },
+    ThrowOnError
+  >({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true })
 }

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderPatchOptions } from '../models/ts/PlaceOrderPatch'
+import type { Order } from '../models/ts/Order'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { placeOrderPatch } from '../clients/placeOrderPatch'
 
@@ -12,7 +12,47 @@ import { placeOrderPatch } from '../clients/placeOrderPatch'
  * @description Place a new order in the store with patch
  * @summary Place an order for a pet with patch
  */
-export async function placeOrderPatchHandler({ body }: Pick<PlaceOrderPatchOptions, 'body'> = {}, ctx: ServerContext): Promise<CallToolResult> {
+export async function placeOrderPatchHandler(
+  {
+    body,
+  }: Pick<
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    'body'
+  > = {},
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await placeOrderPatch({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0])
 
   return {

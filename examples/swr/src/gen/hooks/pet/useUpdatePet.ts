@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { UpdatePetOptions, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/pet/UpdatePet'
+import type { Pet } from '../../models/Pet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updatePet } from '../../clients/pet/updatePet'
 
@@ -13,7 +13,41 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
 export type UpdatePetMutationKey = ReturnType<typeof updatePetMutationKey>
 
-export type UpdatePetMutationArg = UpdatePetOptions & { contentType?: string | { response?: 'application/json' | 'application/xml' } }
+export type UpdatePetMutationArg = (
+  | {
+      body: Pet
+      path?: never
+      query?: never
+      headers?: never
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
+    }
+  | {
+      body: Pet
+      path?: never
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
+    }
+  | {
+      body: Pet
+      path?: never
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
+    }
+) & { contentType?: string | { response?: 'application/json' | 'application/xml' } }
 
 /**
  * `PUT /pet`
@@ -22,12 +56,9 @@ export type UpdatePetMutationArg = UpdatePetOptions & { contentType?: string | {
  */
 export function useUpdatePet(
   options: {
-    mutation?: SWRMutationConfiguration<
-      UpdatePetStatus200,
-      ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-      UpdatePetMutationKey | null,
-      UpdatePetMutationArg
-    > & { throwOnError?: boolean }
+    mutation?: SWRMutationConfiguration<Pet | string, ResponseErrorConfig<unknown | unknown | unknown>, UpdatePetMutationKey | null, UpdatePetMutationArg> & {
+      throwOnError?: boolean
+    }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
@@ -35,12 +66,7 @@ export function useUpdatePet(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = updatePetMutationKey()
 
-  return useSWRMutation<
-    UpdatePetStatus200,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetMutationKey | null,
-    UpdatePetMutationArg
-  >(
+  return useSWRMutation<Pet | string, ResponseErrorConfig<unknown | unknown | unknown>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
       return updatePet({ ...config, ...variables, throwOnError: true }).unwrap()

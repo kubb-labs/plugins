@@ -5,16 +5,37 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
+import type { Pet } from '../../models/Pet'
 import type { SWRConfiguration } from 'swr'
 import { getPetById } from '../../clients/pet/getPetById'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({
+  path,
+}: Omit<
+  {
+    body?: never
+    path: {
+      petId: bigint
+    }
+    query?: never
+    headers?: never
+  },
+  'headers'
+>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 export function getPetByIdQueryOptions(
-  { path }: GetPetByIdOptions,
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      petId: bigint
+    }
+    query?: never
+    headers?: never
+  },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
@@ -30,9 +51,18 @@ export function getPetByIdQueryOptions(
  * @summary Find pet by ID
  */
 export function useGetPetById(
-  { path }: GetPetByIdOptions,
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      petId: bigint
+    }
+    query?: never
+    headers?: never
+  },
   options: {
-    query?: SWRConfiguration<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>
+    query?: SWRConfiguration<Pet | string, ResponseErrorConfig<unknown | unknown>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -42,7 +72,7 @@ export function useGetPetById(
 
   const queryKey = getPetByIdQueryKey({ path })
 
-  return useSWR<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<Pet | string, ResponseErrorConfig<unknown | unknown>, GetPetByIdQueryKey | null>(shouldFetch ? queryKey : null, {
     ...getPetByIdQueryOptions({ path }, config),
     ...(immutable
       ? {

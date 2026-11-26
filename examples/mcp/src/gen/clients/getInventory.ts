@@ -4,7 +4,6 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
-import type { GetInventoryOptions, GetInventoryResponses } from '../models/ts/GetInventory'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
 /**
@@ -13,17 +12,35 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.ku
  * @summary Returns pet inventories by status
  */
 export function getInventory<ThrowOnError extends boolean = true>(
-  options: Options<GetInventoryOptions, ThrowOnError> = {},
-): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path?: never
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  > = {},
+): Unwrappable<
+  RequestResult<
+    {
+      '200': {
+        [key: string]: number
+      }
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<GetInventoryResponses, ThrowOnError>({
-      method: 'GET',
-      url: '/store/inventory',
-      security: [securitySchemes.api_key],
-      ...config,
-      throwOnError: resolveThrowOnError(config.throwOnError, true),
-    }),
+    apiClient<
+      {
+        '200': {
+          [key: string]: number
+        }
+      },
+      ThrowOnError
+    >({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
   )
 }

@@ -5,7 +5,6 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { LogoutUserResponse } from '../../models/user/LogoutUser'
 import type { SWRConfiguration } from 'swr'
 import { logoutUser } from '../../clients/user/logoutUser'
 
@@ -27,7 +26,7 @@ export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path
  */
 export function useLogoutUser(
   options: {
-    query?: SWRConfiguration<LogoutUserResponse, ResponseErrorConfig<Error>>
+    query?: SWRConfiguration<unknown, ResponseErrorConfig<Error>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -37,7 +36,7 @@ export function useLogoutUser(
 
   const queryKey = logoutUserQueryKey()
 
-  return useSWR<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<unknown, ResponseErrorConfig<Error>, LogoutUserQueryKey | null>(shouldFetch ? queryKey : null, {
     ...logoutUserQueryOptions(config),
     ...(immutable
       ? {

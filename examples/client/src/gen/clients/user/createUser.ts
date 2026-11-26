@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { CreateUserOptions, CreateUserResponses } from '../../models/user/CreateUser'
+import type { User } from '../../models/User'
 import { client } from '../../../client'
 
 /**
@@ -13,15 +13,72 @@ import { client } from '../../../client'
  * @summary Create user
  */
 export function createUser<ThrowOnError extends boolean = true>(
-  options: Options<CreateUserOptions, ThrowOnError> = {},
-): Promise<RequestResult<CreateUserResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body?: User
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: User
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body?: User
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    ThrowOnError
+  > = {},
+): Promise<
+  RequestResult<
+    {
+      default:
+        | {
+            contentType: 'application/json'
+            data: User
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<CreateUserResponses, ThrowOnError>({
-    method: 'POST',
-    url: '/user',
-    contentType: { request: 'application/json' },
-    ...config,
-    throwOnError: config.throwOnError ?? true,
-  })
+  return apiClient<
+    {
+      default:
+        | {
+            contentType: 'application/json'
+            data: User
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+    },
+    ThrowOnError
+  >({ method: 'POST', url: '/user', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true })
 }

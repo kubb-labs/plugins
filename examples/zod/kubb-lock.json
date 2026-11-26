@@ -143,10 +143,6 @@
       "source": "98295fe0b56c0fe11f08065da9133dffa0c63d9c641423e15b9fbab39b49f85a",
       "output": "22d1e1e8c10599ae26ce40e1fbb531ce5eaaf396be90bfb35e029df81838f4a2"
     },
-    "src/zod/ts/AddPet.ts": {
-      "source": "63f4c38c396882c0f45127c5f0ace15f201dcad87580ccc3c550edaf078c91d0",
-      "output": "4bbbaa7110f737ec93913e2e504b58757d5cbe36fca52fe07ed29ea9e0bbcdd4"
-    },
     "src/zod/ts/AddPetRequest.ts": {
       "source": "2ffb00454734d36e312267c844f50e93991e1afd649dad4355183b1689311f5b",
       "output": "03adffc1b53c3f37336e1203ac2c843be42552f6fab0ae0ff4ced7ccaf7e5af2"
@@ -158,42 +154,6 @@
     "src/zod/ts/Category.ts": {
       "source": "1154cc4c740d29f3e40e0e9a4d42493407ba069eb3746929e2d0a247363c0404",
       "output": "fa4f35cdff794251a375ed91fda4a9671540fd7bd546474cce2ce331c012459c"
-    },
-    "src/zod/ts/CreatePets.ts": {
-      "source": "9439d270d3d003381dc3f746da1a5e7d85b15ef6b6ce861eafe515d039e2aa8a",
-      "output": "5984c21bb777a427e00a344573f35409eb655c95cc3138848258f52da2fcc769"
-    },
-    "src/zod/ts/DeleteOrder.ts": {
-      "source": "2ebaabbacdcf01dc41019c0ef48fb504bffc7efce17dc01b607fafc2c803e912",
-      "output": "06e53fa008196ec01064b6c5866e2e46298a12f7886c1e4b89d853e9a9dd8aaa"
-    },
-    "src/zod/ts/DeletePet.ts": {
-      "source": "3b283bb071903be91279ea677cf28c89c2f530f94d46760d011e6536c24ef728",
-      "output": "cc4843841d2548f1e4b94bd2e695fe2bed19c230923956b721dfb34544295b6a"
-    },
-    "src/zod/ts/FindPetsByStatus.ts": {
-      "source": "6609d38a5be4b8a9238f81a6d82b0b699ab13fc11f350111484eef29eec33976",
-      "output": "b8e48a0e6baf8decfaaaa4c98c67166d27563c776a91c6614e2442901f993ebb"
-    },
-    "src/zod/ts/FindPetsByTags.ts": {
-      "source": "bae5142db7e5e66ab1257c343521f70e9f6f7c629d7d560cb12ceb03b630c3dd",
-      "output": "08046185e43dea1c55a4c365e72e33ec30ecfebd2321f56aee4cc1882921a64e"
-    },
-    "src/zod/ts/GetInventory.ts": {
-      "source": "feb424c06e4d4004628e10d7ff82b2b514986555ca62902756e64ef65ad146a6",
-      "output": "f86ed4627cf53f66080ca1545a7024c15cbc8e8871fc66e03df7a69d64be1022"
-    },
-    "src/zod/ts/GetOrderById.ts": {
-      "source": "63504f24b47126cf5f381789cdc9ec10062331cc324213bc65468c67ffe3781c",
-      "output": "aa5833308723b1292c0c20fee94992f11e2a8a5c36741961d0ce7a028408a683"
-    },
-    "src/zod/ts/GetPetById.ts": {
-      "source": "f69515a94f6a38f2028418392ab8e06b2a4ef5bdcdaa7cf34349d6582bd49ce6",
-      "output": "b2f4050a34b2cd6aad1f28089f359e122445eb82398f1fb4c310836565667554"
-    },
-    "src/zod/ts/GetThings.ts": {
-      "source": "aa2516a227dc2429a29cb382748e48b3763dc5e263a34c39a79b2b8fe183eda3",
-      "output": "c0ecebba39bf924e6d2b755d94a8115e437fdb9b8f13eb788108a6eccde4bcfe"
     },
     "src/zod/ts/Order.ts": {
       "source": "ef646382b71e19fd7b408b610257ab8ca83e27366d8b34e653b6760346ea2d5b",
@@ -227,29 +187,9 @@
       "source": "c8ae3b5adf8daad46aa0314df5f234731bc772bc7dfcef8ab2b17abf0d3618a3",
       "output": "4f220cb834855e1051ee64b7b4d37dcbbf46dc04bec03b59005323644e57e3dc"
     },
-    "src/zod/ts/PlaceOrder.ts": {
-      "source": "05cee850379d97589bac08aaf900a7ab701072eed5874cd712eed182e985134e",
-      "output": "cc9702b20af6c0c1f587a4d28e71d1fcb6d79b45d7d6c14d55dfae86b24b044c"
-    },
-    "src/zod/ts/PlaceOrderPatch.ts": {
-      "source": "1c426bc6376e9164926d39dd76ab6241b0a31fae7bd792e3edbbbf82b3410b72",
-      "output": "03fe3eb8b379a456073cccbd23fe7a3a80b56f18e4439c3e94dc9b010a7dd5d8"
-    },
     "src/zod/ts/Tag.ts": {
       "source": "65125492643f16de0b962a470cf59e6419b3981dfccf9543f4392cf151d254cb",
       "output": "65f54923390dc826df74089d184b1ec6fa57b448716a503b0ab00e12f066e2a3"
-    },
-    "src/zod/ts/UpdatePet.ts": {
-      "source": "32943d01c550114d4895bc9a4d403ce06a550b7d5b63b127b257daf00f96c76e",
-      "output": "0ba30faf75d8b9f37b24d923b1bd8385bd27eb06cd3e19604fa0ffd67336f6f2"
-    },
-    "src/zod/ts/UpdatePetWithForm.ts": {
-      "source": "4fb07ca283edc7e9a4e2c8d55d613d005aba4792e4a4c892cfb266b6123381fb",
-      "output": "6b22a6cd65d0322b7d5c42010c631ad7216207d679bbfe6b602e86f5b2ed338e"
-    },
-    "src/zod/ts/UploadFile.ts": {
-      "source": "437314bae4921d537e3d0d526e96803ecb09c48cf7268755a92fc6d980a7aaa6",
-      "output": "68e8ef6c756e40f54ba9540bbc888d1d8341460acf6217c795bf8bf7ab542d51"
     },
     "src/zod/zod/addPetRequestSchema.ts": {
       "source": "327c0073164ba531073c21c43f6bb3763d3d1995d9bd8716c14b0d28be1c60e1",

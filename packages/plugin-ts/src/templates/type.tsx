@@ -57,7 +57,8 @@ export const typeOperation = defineTemplate<PluginTs>({
   render(node, ctx) {
     const { enum: enumOptions, group, output, operations } = ctx.options
     const { resolver, root } = ctx
-    const inline = operations === 'inline'
+    // A single output file also holds the schemas, so marking it inline would drop them. Operation types stay exported there.
+    const inline = operations === 'inline' && output.mode !== 'file'
 
     const meta = {
       file: ctx.file(node),

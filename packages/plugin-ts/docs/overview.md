@@ -16,7 +16,7 @@ No other plugins or packages are needed.
 | [`syntaxType`](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#syntaxtype)     | `'type'`          | Writes object schemas as `type` or `interface`.                                          |
 | [`optionalType`](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#optionaltype) | `'questionToken'` | Writes `a?: T`, `a: T \| undefined`, or both.                                            |
 | [`arrayType`](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#arraytype)       | `'array'`         | Writes arrays as `T[]` or `Array<T>`.                                                    |
-| [`operations`](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#operations)     | `'export'`        | `'inline'` skips the per-operation type files.                                           |
+| [`operations`](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#operations)     | `'inline'`        | `'export'` writes a types file per operation.                                            |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)                    | None              | Splits the output into folders by tag or path. Does not work with `output.mode: 'file'`. |
 
 > [!TIP]

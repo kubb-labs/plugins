@@ -4,11 +4,12 @@
 */
 
 import type { MswBody } from '../.kubb/mswBody'
-import type { AddPetBody, AddPetResponse, AddPetStatus405 } from '../types/AddPet'
+import type { AddPetRequest } from '../types/AddPetRequest'
+import type { Pet } from '../types/Pet'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 
-export function addPetHandlerResponse200(data?: AddPetResponse) {
+export function addPetHandlerResponse200(data?: ((Pet | string))) {
   if (typeof data === 'string') return new HttpResponse<string>(data, {
     status: 200,
     headers: {
@@ -28,14 +29,14 @@ export function addPetHandlerResponse200(data?: AddPetResponse) {
   })
 }
 
-export function addPetHandlerResponse405(data?: AddPetStatus405) {
+export function addPetHandlerResponse405(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 405,
   })
 }
 
-export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, MswBody<AddPetBody>>, options?: { baseURL?: string }) {
-  return http.post<Record<string, string>, MswBody<AddPetBody>>(`${options?.baseURL ?? "http://localhost:3000"}/pet`, function handler(info) {
+export function addPetHandler(data?: ((Pet | string)) | HttpResponseResolver<Record<string, string>, MswBody<(AddPetRequest | Pet)>>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, MswBody<(AddPetRequest | Pet)>>(`${options?.baseURL ?? "http://localhost:3000"}/pet`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return addPetHandlerResponse200(data)

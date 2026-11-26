@@ -4,20 +4,41 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
+import type { Pet } from '../../models/Pet'
 import { getPetById } from '../../clients/pet/getPetById'
 import { queryOptions } from '@tanstack/react-query'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({
+  path,
+}: Omit<
+  {
+    body?: never
+    path: {
+      petId: bigint
+    }
+    query?: never
+    headers?: never
+  },
+  'headers'
+>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 export function getPetByIdQueryOptions(
-  { path }: GetPetByIdOptions,
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      petId: bigint
+    }
+    query?: never
+    headers?: never
+  },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
-  return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
+  return queryOptions<Pet | string, ResponseErrorConfig<unknown | unknown>, Pet | string, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()

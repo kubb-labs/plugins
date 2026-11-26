@@ -4,11 +4,11 @@
  */
 
 import type { MswBody } from '../../../.kubb/mswBody'
-import type { UploadFileBody, UploadFileResponse } from '../../../models/UploadFile'
+import type { ApiResponse } from '../../../models/ApiResponse'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 
-export function uploadFileHandlerResponse200(data?: UploadFileResponse) {
+export function uploadFileHandlerResponse200(data?: ApiResponse) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -17,16 +17,10 @@ export function uploadFileHandlerResponse200(data?: UploadFileResponse) {
   })
 }
 
-export function uploadFileHandler(
-  data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, MswBody<UploadFileBody>>,
-  options?: { baseURL?: string },
-) {
-  return http.post<Record<string, string>, MswBody<UploadFileBody>>(
-    `${options?.baseURL ?? 'http://localhost:3000'}/pet/:petId/uploadImage`,
-    function handler(info) {
-      if (typeof data === 'function') return data(info)
+export function uploadFileHandler(data?: ApiResponse | HttpResponseResolver<Record<string, string>, MswBody<Blob>>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, MswBody<Blob>>(`${options?.baseURL ?? 'http://localhost:3000'}/pet/:petId/uploadImage`, function handler(info) {
+    if (typeof data === 'function') return data(info)
 
-      return uploadFileHandlerResponse200(data)
-    },
-  )
+    return uploadFileHandlerResponse200(data)
+  })
 }

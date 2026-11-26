@@ -4,7 +4,8 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../../models/pet/AddPet'
+import type { AddPetRequest } from '../../models/AddPetRequest'
+import type { Pet } from '../../models/Pet'
 import { addPet } from '../../clients/pet/addPet'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -15,9 +16,46 @@ export function addPetMutationOptions<TContext = unknown>(
 ) {
   const mutationKey = addPetMutationKey()
   return mutationOptions<
-    AddPetStatus200,
-    ResponseErrorConfig<AddPetStatus405>,
-    AddPetOptions & { contentType?: string | { response?: 'application/json' | 'application/xml' } },
+    Pet | string,
+    ResponseErrorConfig<{
+      code?: number
+      message?: string
+    }>,
+    (
+      | {
+          body: AddPetRequest
+          path?: never
+          query?: never
+          headers?: never
+          contentType?:
+            | 'application/json'
+            | {
+                request: 'application/json'
+              }
+        }
+      | {
+          body: Pet
+          path?: never
+          query?: never
+          headers?: never
+          contentType:
+            | 'application/xml'
+            | {
+                request: 'application/xml'
+              }
+        }
+      | {
+          body: Pet
+          path?: never
+          query?: never
+          headers?: never
+          contentType:
+            | 'application/x-www-form-urlencoded'
+            | {
+                request: 'application/x-www-form-urlencoded'
+              }
+        }
+    ) & { contentType?: string | { response?: 'application/json' | 'application/xml' } },
     TContext
   >({
     mutationKey,

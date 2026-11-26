@@ -4,7 +4,7 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
-import type { UpdatePetOptions, UpdatePetResponses } from '../models/ts/UpdatePet'
+import type { Pet } from '../models/ts/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
 /**
@@ -13,12 +13,87 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.ku
  * @summary Update an existing pet
  */
 export function updatePet<ThrowOnError extends boolean = true>(
-  options: Options<UpdatePetOptions, ThrowOnError>,
-): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Omit<NonNullable<Pet>, 'name'>
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '202': {
+        id?: number
+      }
+      '400': unknown
+      '404': unknown
+      '405': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(
-    apiClient<UpdatePetResponses, ThrowOnError>({
+    apiClient<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+        '202': {
+          id?: number
+        }
+        '400': unknown
+        '404': unknown
+        '405': unknown
+      },
+      ThrowOnError
+    >({
       method: 'PUT',
       url: '/pet',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

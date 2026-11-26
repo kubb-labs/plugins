@@ -3,12 +3,19 @@
 * Do not edit manually.
 */
 
-import type { GetPetByIdOptions, GetPetByIdResponse } from '../types/GetPetById'
+import type { Pet } from '../types/Pet'
 
-export function getPetById({ path }: GetPetByIdOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetByIdResponse> {
-  return cy.request<GetPetByIdResponse>({
+export function getPetById({ path }: ({
+  body?: never;
+  path: ({
+  petId: bigint;
+});
+  query?: never;
+  headers?: never;
+}), options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<((Pet | string))> {
+  return cy.request<((Pet | string))>({
     method: 'GET',
     url: `/pet/${path.petId}`,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<GetPetByIdResponse>
+  }).then((res) => res.body) as Cypress.Chainable<((Pet | string))>
 }

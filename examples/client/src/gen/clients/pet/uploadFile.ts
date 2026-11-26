@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/UploadFile'
+import type { ApiResponse } from '../../models/ApiResponse'
 import { client } from '../../../client'
 
 /**
@@ -12,11 +12,59 @@ import { client } from '../../../client'
  * @summary uploads an image
  */
 export function uploadFile<ThrowOnError extends boolean = true>(
-  options: Options<UploadFileOptions, ThrowOnError>,
-): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body: {
+          url: string
+        }
+        path: {
+          petId: bigint
+        }
+        query?: {
+          additionalMetadata?: string
+        }
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body: {
+          file: Blob
+        }
+        path: {
+          petId: bigint
+        }
+        query?: {
+          additionalMetadata?: string
+        }
+        headers?: never
+        contentType:
+          | 'multipart/form-data'
+          | {
+              request: 'multipart/form-data'
+            }
+      },
+    ThrowOnError
+  >,
+): Promise<
+  RequestResult<
+    {
+      '200': ApiResponse
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<UploadFileResponses, ThrowOnError>({
+  return apiClient<
+    {
+      '200': ApiResponse
+    },
+    ThrowOnError
+  >({
     method: 'POST',
     url: '/pet/{petId}/uploadImage',
     security: [

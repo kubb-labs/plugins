@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import type { OfficeWeatherstoryResponse } from '../types/OfficeWeatherstoryOperation'
+import type { OfficeWeatherStory } from '../types/OfficeWeatherStory'
 
-export function officeWeatherstory(options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<OfficeWeatherstoryResponse> {
-  return cy.request<OfficeWeatherstoryResponse>({
+export function officeWeatherstory(options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<OfficeWeatherStory> {
+  return cy.request<OfficeWeatherStory>({
     method: 'GET',
     url: `/stories`,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<OfficeWeatherstoryResponse>
+  }).then((res) => res.body) as Cypress.Chainable<OfficeWeatherStory>
 }

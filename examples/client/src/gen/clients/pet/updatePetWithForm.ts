@@ -4,7 +4,6 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../../models/pet/UpdatePetWithForm'
 import { client } from '../../../client'
 
 /**
@@ -12,11 +11,36 @@ import { client } from '../../../client'
  * @summary Updates a pet in the store with form data
  */
 export function updatePetWithForm<ThrowOnError extends boolean = true>(
-  options: Options<UpdatePetWithFormOptions, ThrowOnError>,
-): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        petId: bigint
+      }
+      query?: {
+        name?: string
+        status?: string
+      }
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Promise<
+  RequestResult<
+    {
+      '405': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<UpdatePetWithFormResponses, ThrowOnError>({
+  return apiClient<
+    {
+      '405': unknown
+    },
+    ThrowOnError
+  >({
     method: 'POST',
     url: '/pet/{petId}',
     security: [

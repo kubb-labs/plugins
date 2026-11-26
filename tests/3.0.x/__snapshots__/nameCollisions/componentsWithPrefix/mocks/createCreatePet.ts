@@ -3,7 +3,6 @@
 * Do not edit manually.
 */
 
-import type { ApiCreatePetBody2 } from '../types/CreatePet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**
@@ -13,7 +12,9 @@ export function createCreatePetStatus200() {
   return undefined
 }
 
-export function createCreatePetBody2<TData extends Partial<ApiCreatePetBody2> = object>(data?: TData) {
+export function createCreatePetBody2<TData extends Partial<({
+  name?: string;
+})> = object>(data?: TData) {
   const defaultFakeData = {
     name: faker.string.alpha(),
   }

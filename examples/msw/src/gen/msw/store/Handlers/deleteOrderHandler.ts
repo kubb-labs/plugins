@@ -3,16 +3,15 @@
  * Do not edit manually.
  */
 
-import type { DeleteOrderStatus400, DeleteOrderStatus404 } from '../../../models/DeleteOrder'
 import { http, HttpResponse } from 'msw/http'
 
-export function deleteOrderHandlerResponse400(data?: DeleteOrderStatus400) {
+export function deleteOrderHandlerResponse400(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
 
-export function deleteOrderHandlerResponse404(data?: DeleteOrderStatus404) {
+export function deleteOrderHandlerResponse404(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 404,
   })

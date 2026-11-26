@@ -5,7 +5,6 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { DeleteUserOptions, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/user/DeleteUser'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deleteUser } from '../../clients/user/deleteUser'
 
@@ -13,7 +12,14 @@ export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export type DeleteUserMutationKey = ReturnType<typeof deleteUserMutationKey>
 
-export type DeleteUserMutationArg = DeleteUserOptions
+export type DeleteUserMutationArg = {
+  body?: never
+  path: {
+    username: string
+  }
+  query?: never
+  headers?: never
+}
 
 /**
  * `DELETE /user/{username}`
@@ -22,12 +28,9 @@ export type DeleteUserMutationArg = DeleteUserOptions
  */
 export function useDeleteUser(
   options: {
-    mutation?: SWRMutationConfiguration<
-      DeleteUserResponse,
-      ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>,
-      DeleteUserMutationKey | null,
-      DeleteUserMutationArg
-    > & { throwOnError?: boolean }
+    mutation?: SWRMutationConfiguration<unknown | unknown, ResponseErrorConfig<unknown | unknown>, DeleteUserMutationKey | null, DeleteUserMutationArg> & {
+      throwOnError?: boolean
+    }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
@@ -35,12 +38,7 @@ export function useDeleteUser(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = deleteUserMutationKey()
 
-  return useSWRMutation<
-    DeleteUserResponse,
-    ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>,
-    DeleteUserMutationKey | null,
-    DeleteUserMutationArg
-  >(
+  return useSWRMutation<unknown | unknown, ResponseErrorConfig<unknown | unknown>, DeleteUserMutationKey | null, DeleteUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path } }) => {
       return deleteUser({ ...config, path, throwOnError: true }).unwrap()

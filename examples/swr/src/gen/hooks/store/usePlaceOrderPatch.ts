@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { PlaceOrderPatchOptions, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/store/PlaceOrderPatch'
+import type { Order } from '../../models/Order'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrderPatch } from '../../clients/store/placeOrderPatch'
 
@@ -13,7 +13,40 @@ export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as con
 
 export type PlaceOrderPatchMutationKey = ReturnType<typeof placeOrderPatchMutationKey>
 
-export type PlaceOrderPatchMutationArg = PlaceOrderPatchOptions
+export type PlaceOrderPatchMutationArg =
+  | {
+      body?: Order
+      path?: never
+      query?: never
+      headers?: never
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
+    }
+  | {
+      body?: Order
+      path?: never
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
+    }
+  | {
+      body?: Order
+      path?: never
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
+    }
 
 /**
  * `PATCH /store/order`
@@ -22,12 +55,9 @@ export type PlaceOrderPatchMutationArg = PlaceOrderPatchOptions
  */
 export function usePlaceOrderPatch(
   options: {
-    mutation?: SWRMutationConfiguration<
-      PlaceOrderPatchStatus200,
-      ResponseErrorConfig<PlaceOrderPatchStatus405>,
-      PlaceOrderPatchMutationKey | null,
-      PlaceOrderPatchMutationArg
-    > & { throwOnError?: boolean }
+    mutation?: SWRMutationConfiguration<Order, ResponseErrorConfig<unknown>, PlaceOrderPatchMutationKey | null, PlaceOrderPatchMutationArg> & {
+      throwOnError?: boolean
+    }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
@@ -35,7 +65,7 @@ export function usePlaceOrderPatch(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = placeOrderPatchMutationKey()
 
-  return useSWRMutation<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchMutationKey | null, PlaceOrderPatchMutationArg>(
+  return useSWRMutation<Order, ResponseErrorConfig<unknown>, PlaceOrderPatchMutationKey | null, PlaceOrderPatchMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
       return placeOrderPatch({ ...config, ...variables, throwOnError: true }).unwrap()

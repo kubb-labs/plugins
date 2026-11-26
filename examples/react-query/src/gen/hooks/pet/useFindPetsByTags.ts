@@ -4,21 +4,45 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags'
+import type { Pet } from '../../models/Pet'
 import { findPetsByTags } from '../../clients/pet/findPetsByTags'
 import { queryOptions } from '@tanstack/react-query'
 
-export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'> = {}) =>
-  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
+export const findPetsByTagsQueryKey = ({
+  query,
+}: Omit<
+  {
+    body?: never
+    path?: never
+    query?: {
+      tags?: string[]
+      page?: string
+      pageSize?: string
+    }
+    headers?: never
+  },
+  'headers'
+> = {}) => [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
-  { query }: FindPetsByTagsOptions = {},
+  {
+    query,
+  }: {
+    body?: never
+    path?: never
+    query?: {
+      tags?: string[]
+      page?: string
+      pageSize?: string
+    }
+    headers?: never
+  } = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
-  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, typeof queryKey>({
+  return queryOptions<Pet[] | string, ResponseErrorConfig<unknown>, Pet[] | string, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()

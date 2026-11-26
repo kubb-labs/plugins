@@ -4,7 +4,7 @@
 */
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
-import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder'
+import type { Order } from '../types/Order'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { placeOrderBodySchema, placeOrderResponseSchema, placeOrderStatus405Schema } from '../valibot/placeOrderSchema'
 
@@ -13,8 +13,38 @@ import { placeOrderBodySchema, placeOrderResponseSchema, placeOrderStatus405Sche
  * @description Place a new order in the store
  * @summary Place an order for a pet
  */
-export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptions, ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+export function placeOrder<ThrowOnError extends boolean = true>(options: Options<({
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType?: 'application/json' | {
+    request: 'application/json';
+  };
+} | {
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/xml' | {
+    request: 'application/xml';
+  };
+} | {
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/x-www-form-urlencoded' | {
+    request: 'application/x-www-form-urlencoded';
+  };
+}), ThrowOnError> = {}): Unwrappable<RequestResult<({
+  '200': Order;
+  '405': unknown;
+}), ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<PlaceOrderResponses, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { request: placeOrderBodySchema, response: placeOrderResponseSchema, error: { 405: placeOrderStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap(apiClient<({
+    '200': Order;
+    '405': unknown;
+  }), ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { request: placeOrderBodySchema, response: placeOrderResponseSchema, error: { 405: placeOrderStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

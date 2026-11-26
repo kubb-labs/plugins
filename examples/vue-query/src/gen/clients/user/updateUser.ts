@@ -4,7 +4,7 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { UpdateUserOptions, UpdateUserResponses } from '../../models/user/UpdateUser'
+import type { User } from '../../models/User'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -13,12 +13,65 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @summary Update user
  */
 export function updateUser<ThrowOnError extends boolean = true>(
-  options: Options<UpdateUserOptions, ThrowOnError>,
-): Unwrappable<RequestResult<UpdateUserResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body?: User
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: User
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body?: User
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      default: unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<UpdateUserResponses, ThrowOnError>({
+    apiClient<
+      {
+        default: unknown
+      },
+      ThrowOnError
+    >({
       method: 'PUT',
       url: '/user/{username}',
       contentType: { request: 'application/json' },

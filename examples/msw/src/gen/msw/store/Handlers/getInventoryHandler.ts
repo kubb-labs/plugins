@@ -3,10 +3,9 @@
  * Do not edit manually.
  */
 
-import type { GetInventoryResponse } from '../../../models/GetInventory'
 import { http, HttpResponse } from 'msw/http'
 
-export function getInventoryHandlerResponse200(data?: GetInventoryResponse) {
+export function getInventoryHandlerResponse200(data?: { [key: string]: number }) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -16,7 +15,11 @@ export function getInventoryHandlerResponse200(data?: GetInventoryResponse) {
 }
 
 export function getInventoryHandler(
-  data?: GetInventoryResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?:
+    | {
+        [key: string]: number
+      }
+    | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.get(`${options?.baseURL ?? 'http://localhost:3000'}/store/inventory`, function handler(info) {

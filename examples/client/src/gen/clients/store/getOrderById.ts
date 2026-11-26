@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/store/GetOrderById'
+import type { Order } from '../../models/Order'
 import { client } from '../../../client'
 
 /**
@@ -13,9 +13,51 @@ import { client } from '../../../client'
  * @summary Find purchase order by ID
  */
 export function getOrderById<ThrowOnError extends boolean = true>(
-  options: Options<GetOrderByIdOptions, ThrowOnError>,
-): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        orderId: bigint
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Promise<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Order
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<GetOrderByIdResponses, ThrowOnError>({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Order
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true })
 }

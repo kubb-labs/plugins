@@ -68,100 +68,100 @@
       "output": "8112c667a9e39b3c36624932406d7dd2b4789f3eccc43b00f65cab42b2878655"
     },
     "src/gen/clients/pet/addPet.ts": {
-      "source": "da4bcf0554a69a445504a51ccc8d41df51738aea3d9734fc6543f583f002e976",
-      "output": "401e6af3af030737b05f762059838c6977169f0cdae4b4e10bc7f4b2ca05b5c2"
+      "source": "86ac97b75e18d13016cdec10263247c0cc6533448a8e130a817fd7e3990c4874",
+      "output": "df79c6475830ac1940e668410a395669f7d24b66594db72e9bec129195484322"
     },
     "src/gen/clients/pet/deletePet.ts": {
-      "source": "fc6180874e2e74f06a461865407dc6106ccd45e74482059a368cabdb8b9e83b7",
-      "output": "f3216ef2553594bafb5ae0ecdd547ebe08e8318a36a662bf4045068400dc2cf8"
+      "source": "7a1e413ea7bdd29eb934c0651aaf9cda12c9dec617eb23db2dde022e251f6040",
+      "output": "6f0e477ac104f6de9e30fe669ed8141001a31a5e0cea3e17af89cc757933d9ac"
     },
     "src/gen/clients/pet/findPetsByStatus.ts": {
-      "source": "3cec040cbae97c49ff136bed3a9295de83219b4f1555e707534b0229b8121ced",
-      "output": "ce8f4b84298ae2868a269b025b17066c1fa2d4143ae0f429881562d06485c743"
+      "source": "22ef48710a90393951464dde84b7bbb2d002abfc52fff76f4d7f9d60d526960d",
+      "output": "fe664786333a9bf70f12161801742c30e28dbd947337e040bb80099c9d21a3dc"
     },
     "src/gen/clients/pet/findPetsByTags.ts": {
-      "source": "9a90504ca069d6683ea63a2a59c5fff2889bbb093060c1512d3a29f498c95f70",
-      "output": "a61467287ea7ea9e142c5e7daed5135a91516d46c12215101dc205164e867a65"
+      "source": "b6182823acd1ab77a6f60e317469c0af8994769facf15357240a3715ecf6b8f4",
+      "output": "4323c5dae09b66b6510311f5664d13d42faf0fc8d933bdf40ff38762ccfe9bbd"
     },
     "src/gen/clients/pet/getPetById.ts": {
-      "source": "b4f193be5285ac35ed5a85871ae39dd46d78e5e00c23e0d0e06f13e5caf161f1",
-      "output": "613ec33e2498fbed8be19185d2872e6e402b92b00773f03ba199600442b764b1"
+      "source": "f6dc6940f11d084e010dc3a6734f04b5dd3586957760ad73b0b48d25a69f6bad",
+      "output": "efff01fd7b0ffcca724ae9932d54669727a8e03e3ace83d7120838059253e793"
     },
     "src/gen/clients/pet/index.ts": {
       "source": "ef6673883a00ab071522eb66686cd417c4b2ce2cb444843c75f3f252b224cfb1",
       "output": "35e5c355d1d5d4200a62d5e39c98310c4a3fe7a84f99ec17efcfded0926cab47"
     },
     "src/gen/clients/pet/updatePet.ts": {
-      "source": "c4f19ada7d8ba20e0a85690d6a933019a2cbd7085b321f2e7b6794310abf3435",
-      "output": "78d9c512349d8d2ee9d1721b68b5ed05d722e81d0f0cce805b2b8fd93c1255f4"
+      "source": "b99a355da7b0f33867b1c9521756164bcc51bfbf9bc7cb8bc23deb0bad154135",
+      "output": "28cad2dace756b638db815ad49be113cfde4c1d9f4ecb4a1f0d0c3f98277ea26"
     },
     "src/gen/clients/pet/updatePetWithForm.ts": {
-      "source": "db0225acef871859a0c1a2ad3966eea1cc712da097385da587a9d3b444e61585",
-      "output": "0bf05087be35739d15453f06b4a8029c1ca6cd078da54d5ddae5a2ffb364166e"
+      "source": "c2b0e317347c16bc1d02f11bcae274de52b31619c553c303e41be6622798f73b",
+      "output": "668f36b63ef6c5741b27ee73f27ef73002be03395daeecd17c812c6d8257111b"
     },
     "src/gen/clients/pet/uploadFile.ts": {
-      "source": "6a7150c5dc231c401a0b267d7e92d80566918caeebca3c9cba6195686b899604",
-      "output": "c70efa620de328fae17f66694ce6363d50a2cfa690fafc2f13d7f9f118c2840a"
+      "source": "c65d6ac7d8b55b4044852c88c6234238bcea1057c5ab2e9da94cecd1a2558958",
+      "output": "3208ec127fe2549167c24c7901f3999bd860dd65d32ed4a70dd56dccb6d73233"
     },
     "src/gen/clients/store/deleteOrder.ts": {
-      "source": "c6adabad02e153fcc823b7df2d840f356c497fe21ae18aa96eed1777ad64d7ee",
-      "output": "33c913823c27503cb7b0e1b62b7bee6ea106149b7b2e5b3e6fa50015b73e4ff5"
+      "source": "3e36cd226f3b922d1e372f98aa69c70e5af50955ac8ae466209b86a10229f86c",
+      "output": "6e9e5a4e70b83a9ef3b8abcc309c16da8ece338288837e6544c903701a36f01f"
     },
     "src/gen/clients/store/getInventory.ts": {
-      "source": "cbc1a600d3e051060a37d9d7f5d1cec59bd015dee386db055f3b74f666fb29f7",
-      "output": "12c5217f18477cf2e41e1aecb949d7c1cc9c9dd11fe955530e1983bb0dd408ae"
+      "source": "0699febb877fffd614a88b9d1bc39532df8a2df72949d38ecb0bfb3180ecb331",
+      "output": "d83b3bcb19dd157d38c3e6c2436b1a79f6009545ac208f5e14f0d7f9afa9473d"
     },
     "src/gen/clients/store/getOrderById.ts": {
-      "source": "086c63f2d6ab584f608bc6e5365ea4bd1024f4c28f2cd4e6a7820906336829fe",
-      "output": "a3a48e71bb7920ba5421d1bb7d247d52cc491af2819095b056d34659c78caf45"
+      "source": "df56d73772d2885ec5ce6dcb3ea8013ff8979e2d625e0d5cb1837e85211faca1",
+      "output": "957d53620d9a57bc5e7ca254c238638c38c62c8e25bae05d44425354da82bee1"
     },
     "src/gen/clients/store/index.ts": {
       "source": "b61f0f30f50e7b4894c3221b3723228bd0b582918715704b93b9b5bf8cc4ab6a",
       "output": "df449b999eede8f07c8050fe0795ec3a8d2d15a7a4eaeda3e86e01161c5d9afa"
     },
     "src/gen/clients/store/placeOrder.ts": {
-      "source": "e5d8c520250391bef29348e5e12a366468a745666e0bb70879a4ccd35e66c82f",
-      "output": "819e88ceb3318d0527a51fd791aebab39ae352350fa533dedb568b824d4da549"
+      "source": "8783afcbbf7b781820d2634ce1dc4d578537417d6ff2ca9cefb4030aebac4a4d",
+      "output": "71cbe1692b20414a894c3d669cf577d3e40e89f66ff13e1018bf95ba4b9c1887"
     },
     "src/gen/clients/store/placeOrderPatch.ts": {
-      "source": "97e970c167bf87724f6cd7bb1e437deebfd88c41d7dd463191d64bb4f9e87ee0",
-      "output": "7ad086fb7809fb6e0210b2866ea6b40020a0fde60e78a9838b78770603d8cba8"
+      "source": "b3e90a5f876a9c5d26051ee049077aeeedc736869accc2216d103d8dc97c6c32",
+      "output": "01bd7ac3b0e73614543479e9e355e8302ffd76abadbd935134855c8c672b27e3"
     },
     "src/gen/clients/user/createUser.ts": {
-      "source": "61047be2423203202ee1307d835709fa7f1a496efeef7b86283cd66bf9c41e60",
-      "output": "7e01eedf61878b1b576049c2122eeb49c833bb3a99558dcb31251ed14b7f30b4"
+      "source": "7db7e3987cdfee96d6855996a820bdd0c4e5fbc6b3433e2e809dd159ddfdc655",
+      "output": "d9dd0ea20efe219c4426c70befb5c7c82876864e70d09f5b6989bfc139fd5753"
     },
     "src/gen/clients/user/createUsersWithListInput.ts": {
-      "source": "616139dd1cb1febc88e344dd681c4870f13e4f6e138bd9a0ba2f2e1318e76eb6",
-      "output": "9c6f89629b932d3281ad96374391a7f8f0e4e84da288093a09324d024aca4292"
+      "source": "009e6fdb52863c1108a5320b98141dd21529f3a8f8c9184454da3faeab443f27",
+      "output": "2db44c406f4eb92d96b6282c86f3cb4e2b92224c6e23cd439da05ca9f38ce4ee"
     },
     "src/gen/clients/user/deleteUser.ts": {
-      "source": "dee1d6c13bf39fbdd620c8baafd0efd266c3f7131259e7b5805c5335523fac54",
-      "output": "4c792da40c47f86b3f4d161e11dce984b2d8867f63c38dddb66346b06cd240f0"
+      "source": "8ec74ad240e71d0aadab7f303b28dd4ea6f777d1bb5345bafa3028f734613457",
+      "output": "f8164577a25db020a296b8d1d36a180a3a1a64ec5cabb615628f8431c47e5de9"
     },
     "src/gen/clients/user/getUserByName.ts": {
-      "source": "ca6df921ccb68f3f2e524fcce8fde4e30eef3558fb436cba5f236581dbc2a91a",
-      "output": "e6e0c0bfa2e37abb305fb1347117ba5e4b3c430f6461bf5edc5c822379dfb9db"
+      "source": "c2c4fe0328f5a48e2bc00a8bb16f06bd0d2635d0378fe6396bbae83cc2749b6b",
+      "output": "427b01fa89e918668bdac134ee4340ae90abb392e23625ef1cd3e995a8b11427"
     },
     "src/gen/clients/user/index.ts": {
       "source": "35f1eae14d7a36a19391a35e7b958f0962b9457a772810405c46a32e69818cbf",
       "output": "6a8829eeb81b0457515068d53ba4869d86d617be0567aa097bf3ef4b42e1dad2"
     },
     "src/gen/clients/user/loginUser.ts": {
-      "source": "4be87fac1d7eac49e35763448c5d8b9932ea40d8fa0dcc20e0771baa758abcf7",
-      "output": "b9e8777850f8bf01ec503d6b84a1f99deedb502d3626ca452eb12f75e123fc79"
+      "source": "a527aa763d3e11bfd5aadec92f19e781b4c193111e2eb815d840b6c67667fc9a",
+      "output": "0cca2fe1d0ffd881c42b8a9e0ccf00b9f07cb5c9ca087bf6212bd542d96aa488"
     },
     "src/gen/clients/user/logoutUser.ts": {
-      "source": "1bdfa26d1da315d1d704ff17d0492c8cd36feba46a766e8f2792d8db2680fbf8",
-      "output": "72abd75d810713c8da54cb808725485d0f491fdd8fb60c578efddb43e5e32f06"
+      "source": "65b7a43536b1dbc2606b275b0b195ddae14e1266d30066cf4d788bdfdb7b6f0d",
+      "output": "11da84d6acb18f05c09c5907478efb2702e2c21ce71b0ddf74f6f4dc7fec5080"
     },
     "src/gen/clients/user/updateUser.ts": {
-      "source": "8db8bafc5909e4e7b5c191e904306ea0cfb11533fe9bfffaf99f33420684bea7",
-      "output": "153b31416ea01f12fb21a3499d777a5d3d0cbb8f45c7aeb42f2f63438ed5334a"
+      "source": "b6d6295f92458d422d0279502bf129935e0167bc67943a92d210ea04f8c2f11a",
+      "output": "e7fbad92637518d83b784f499bbb97b42482681ef717f2fabecb48113878d2d4"
     },
     "src/gen/index.ts": {
-      "source": "9a6cef9234a717e674397f2d5d3c4c560d0e76be5a48b2cdf940a6f14792f0b5",
-      "output": "0a94f44ee92c9f5878a8b2962b0ff45021a33bc8864587a31e045daf8140221a"
+      "source": "405bdd72a84cb3353eeb1dbac486c3fac60808d1ed83f8c9f6d4e521c581158c",
+      "output": "13d114e0ae5dfc41d9583dac06c763ade7874b02edf822fdd80c627e550c07f0"
     },
     "src/gen/models/AddPetRequest.ts": {
       "source": "2ffb00454734d36e312267c844f50e93991e1afd649dad4355183b1689311f5b",
@@ -208,100 +208,8 @@
       "output": "01858e08b952b7a93559e80be5f7d85e6c6fc046f51aef44577bab80ed7421d1"
     },
     "src/gen/models/index.ts": {
-      "source": "58581de5baca8f742ff51e667987735f8fbdd922c7f74aff8cc4697b871758a4",
-      "output": "b5eb6231b7a40ed533b0487901d1ce5042ae40c35e5f13f2936d52b75a49adc9"
-    },
-    "src/gen/models/pet/AddPet.ts": {
-      "source": "9535df92d38f2570f20b1885f6aa48774f526e4439217bb26ee5336a5a007ab0",
-      "output": "74d357b44f837c58d9ad31549babce751b3ae067b49878c15af91f44e34e6849"
-    },
-    "src/gen/models/pet/DeletePet.ts": {
-      "source": "cdf6b5b6ba4244957ebc8ec52a814f59fbc64864152b3c90adb2562f07755d60",
-      "output": "e38648262c7ce8313593502053369ed46f0198f61bdd0ec5d827a6e23bea7a0f"
-    },
-    "src/gen/models/pet/FindPetsByStatus.ts": {
-      "source": "25be31beff8e9c6f1355a2ede8abf045475f5121e53d3b28d191ac7f38a9aa6a",
-      "output": "a4d694e316db121f7fbddc00cefe452c4147c0aa2d943a015d2fcb333d2c1d50"
-    },
-    "src/gen/models/pet/FindPetsByTags.ts": {
-      "source": "bfbb3ca1ba9ba6d9e90dd02d2f7e8a0bc755b323c54640fc919b4a35515d2a6f",
-      "output": "6887455df9040130a5781638cc87c2f628410aef1294936a17a71de277721216"
-    },
-    "src/gen/models/pet/GetPetById.ts": {
-      "source": "1b03e2dd65b1ab7411c9a394691b9f3117063e05a9cbaf9fab1a4af2e21e0c12",
-      "output": "7f15a96fd51cce7337a44c9e87b19bbc543282e972ba269bce720b773f706ebb"
-    },
-    "src/gen/models/pet/UpdatePet.ts": {
-      "source": "7827a032343935601c594cd38482cc0a68cb43a3c8b49a385da42fcc3b32ac8f",
-      "output": "978c7444a4bb479668813d2522576263007c422d4b49ba377a0faa6b2ca14924"
-    },
-    "src/gen/models/pet/UpdatePetWithForm.ts": {
-      "source": "4fb07ca283edc7e9a4e2c8d55d613d005aba4792e4a4c892cfb266b6123381fb",
-      "output": "6b22a6cd65d0322b7d5c42010c631ad7216207d679bbfe6b602e86f5b2ed338e"
-    },
-    "src/gen/models/pet/UploadFile.ts": {
-      "source": "783793d9dc98af73a16dd8e6f619684d89cfb696d917f9cd8793e5ea48a6f95c",
-      "output": "42055e8f61160ef28baff788054328bcfb78128cf9bc62cee90a2d23158fd452"
-    },
-    "src/gen/models/pet/index.ts": {
-      "source": "2eacd137fd70284788ae74e7f112553d61bf99bf14fde707ab226fdd8d437121",
-      "output": "f2f9974c4faeb60fadf25d2d8d89d9995d9c2f46d8bf468f4bf7213b668bb922"
-    },
-    "src/gen/models/store/DeleteOrder.ts": {
-      "source": "2ebaabbacdcf01dc41019c0ef48fb504bffc7efce17dc01b607fafc2c803e912",
-      "output": "06e53fa008196ec01064b6c5866e2e46298a12f7886c1e4b89d853e9a9dd8aaa"
-    },
-    "src/gen/models/store/GetInventory.ts": {
-      "source": "feb424c06e4d4004628e10d7ff82b2b514986555ca62902756e64ef65ad146a6",
-      "output": "f86ed4627cf53f66080ca1545a7024c15cbc8e8871fc66e03df7a69d64be1022"
-    },
-    "src/gen/models/store/GetOrderById.ts": {
-      "source": "38162b009ae08b3d74e7e25fb5396b935153f0f1d60019958030ce6323d01f1f",
-      "output": "9cc8f00aba095e107470ee12aec6491e315d68c7fcad0854d33377f9431f0ccb"
-    },
-    "src/gen/models/store/PlaceOrder.ts": {
-      "source": "eaa5a5383349be345ceaaa2699f9c8aca2e7d8c9f81b1a8a8323ca080ee5aed9",
-      "output": "c8a1235055dbde75bab0d44820670c2d6907cb013aa4d931b1a0101c812c548e"
-    },
-    "src/gen/models/store/PlaceOrderPatch.ts": {
-      "source": "0419a1b68270f8294e1240cdc717558ea47171e44429c6a2ca00b9b411461dca",
-      "output": "291fda88e92c389902b49f9b0d1689acf6647c5581ccdc0b2661a8f2a7e36009"
-    },
-    "src/gen/models/store/index.ts": {
-      "source": "bee5668898797d449e7430018dcf70b30f72799c24efa44cdd8f7e517a1df2e0",
-      "output": "cfaf2c52eecbb370e7eefdf230a9df7a42b9780464ac0fbed53f6f8fdd47a544"
-    },
-    "src/gen/models/user/CreateUser.ts": {
-      "source": "597bae888a72d120d056c47de58ba24c318b39197e42fbae518bbadd67a902b8",
-      "output": "6d5ccc6c8b392b823a92c111d9a008decf67033932819bae01d5b2a5af1a7af5"
-    },
-    "src/gen/models/user/CreateUsersWithListInput.ts": {
-      "source": "7eeb3e8e688409b2553292cf66066ba9199680b4cdaac1985fcb25a42a12bd66",
-      "output": "c386b1d88ebfe1b0d8f209dabc580d5a36629d6e7ac48a7c10f857d2049747d0"
-    },
-    "src/gen/models/user/DeleteUser.ts": {
-      "source": "2c0b4d6d8744cfb75775ebcf4cd057cd483a466da3aa1a3e46436fd7b913cbc3",
-      "output": "bbf6d50e32b3162d422026f67b663898d5638e60a355135b91406dbcc6013c17"
-    },
-    "src/gen/models/user/GetUserByName.ts": {
-      "source": "38aad5a891701b08aab05faa9929305997252e90d4f34f43b94f32642649ea58",
-      "output": "e5a96ed7452a85fcd07f3b9682df99135fa1e6780bfac3d26e9238d26e687706"
-    },
-    "src/gen/models/user/LoginUser.ts": {
-      "source": "259ff9a016931b2adbaa2e25d5532a534df3ab0ff5062b9d73de52b4b90a5f16",
-      "output": "7a592fa481b92719545d66efc66904a1b3b9a0de714bc91f011ce81afadcb65a"
-    },
-    "src/gen/models/user/LogoutUser.ts": {
-      "source": "cc97ac1b69fd444a3de1910f33064d61ba613a83b91bd9194def8ccb06a192cf",
-      "output": "124a0b604b9b8ae8ae9ed38b985b119aa650c717ef3a2d6eab094b46478b5792"
-    },
-    "src/gen/models/user/UpdateUser.ts": {
-      "source": "78838498687265042cbf39bded58079fc2ba3cd83532412ad81fb6db28291a4b",
-      "output": "3da203edaa07b8051d0b83cf5a6d89f98d6d714f57fb1525e9d00758cc484aa4"
-    },
-    "src/gen/models/user/index.ts": {
-      "source": "3647d98f448be97f17c5d9011055abac76a3bd1a2cef74186113edce722cffc3",
-      "output": "ab2c28d9a336ed3f44c68b2d9df6660939f38bc79d3b65c8a63e0619247fac42"
+      "source": "78b62ea35c35999bffc13212211115296aea3a6c5b294faaf9eec6f9a11cb7a4",
+      "output": "e325a9d76d5786583fe4442a969e72a7b077998600d02644633414196bf8d859"
     }
   }
 }

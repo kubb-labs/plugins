@@ -260,7 +260,8 @@ export type PluginTsOptions = PluginOptions<PluginTsResolvedOptions> & {
    * How operation types (`AddPetOptions`, `AddPetStatus200`) are emitted.
    * - `'export'` — one file per operation with its aliases and aggregates.
    * - `'inline'` — no operation files: clients, hooks, and mocks reference `Pet` and print the rest inline (`{ body: Pet }`).
-   * @default 'export'
+   *   With a single output file (`output.path: 'types.ts'`), operation types stay exported.
+   * @default 'inline'
    */
   operations?: 'export' | 'inline'
   /**

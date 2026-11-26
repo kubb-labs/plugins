@@ -3,7 +3,8 @@
 * Do not edit manually.
 */
 
-import type { AddPetBody, AddPetBodyFormUrlEncoded, AddPetBodyJson, AddPetBodyXml, AddPetResponse, AddPetStatus200, AddPetStatus200Json } from '../types/AddPet'
+import type { AddPetRequest } from '../types/AddPetRequest'
+import type { Pet } from '../types/Pet'
 import { createAddPetRequest } from './createAddPetRequest'
 import { createPet } from './createPet'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -13,8 +14,8 @@ faker.seed([42])
 /**
  * @description Successful operation
  */
-export function createAddPetStatus200Json(data?: Partial<AddPetStatus200Json>): AddPetStatus200Json {
-  return createPet(data) as AddPetStatus200Json
+export function createAddPetStatus200Json(data?: Partial<Pet>): Pet {
+  return createPet(data) as Pet
 }
 
 /**
@@ -27,8 +28,8 @@ export function createAddPetStatus200Xml(data?: string): string {
 /**
  * @description Successful operation
  */
-export function createAddPetStatus200(data?: Partial<AddPetStatus200>): AddPetStatus200 {
-  return (typeof data === 'object' && data !== null && !Array.isArray(data) ? faker.helpers.arrayElement([() => createAddPetStatus200Json(data as Partial<AddPetStatus200Json>)])() : data ?? faker.helpers.arrayElement([createAddPetStatus200Json(), createAddPetStatus200Xml()])) as AddPetStatus200
+export function createAddPetStatus200(data?: Partial<(Pet | string)>): (Pet | string) {
+  return (typeof data === 'object' && data !== null && !Array.isArray(data) ? faker.helpers.arrayElement([() => createAddPetStatus200Json(data as Partial<Pet>)])() : data ?? faker.helpers.arrayElement([createAddPetStatus200Json(), createAddPetStatus200Xml()])) as (Pet | string)
 }
 
 /**
@@ -41,31 +42,31 @@ export function createAddPetStatus405() {
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetBodyJson(data?: Partial<AddPetBodyJson>): AddPetBodyJson {
-  return createAddPetRequest(data) as AddPetBodyJson
+export function createAddPetBodyJson(data?: Partial<AddPetRequest>): AddPetRequest {
+  return createAddPetRequest(data) as AddPetRequest
 }
 
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetBodyXml(data?: Partial<AddPetBodyXml>): AddPetBodyXml {
-  return createPet(data) as AddPetBodyXml
+export function createAddPetBodyXml(data?: Partial<Pet>): Pet {
+  return createPet(data) as Pet
 }
 
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetBodyFormUrlEncoded(data?: Partial<AddPetBodyFormUrlEncoded>): AddPetBodyFormUrlEncoded {
-  return createPet(data) as AddPetBodyFormUrlEncoded
+export function createAddPetBodyFormUrlEncoded(data?: Partial<Pet>): Pet {
+  return createPet(data) as Pet
 }
 
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetBody(data?: Partial<AddPetBody>): AddPetBody {
-  return (typeof data === 'object' && data !== null && !Array.isArray(data) ? faker.helpers.arrayElement([() => createAddPetBodyJson(data as Partial<AddPetBodyJson>), () => createAddPetBodyXml(data as Partial<AddPetBodyXml>), () => createAddPetBodyFormUrlEncoded(data as Partial<AddPetBodyFormUrlEncoded>)])() : data ?? faker.helpers.arrayElement([createAddPetBodyJson(), createAddPetBodyXml(), createAddPetBodyFormUrlEncoded()])) as AddPetBody
+export function createAddPetBody(data?: Partial<(AddPetRequest | Pet)>): (AddPetRequest | Pet) {
+  return (typeof data === 'object' && data !== null && !Array.isArray(data) ? faker.helpers.arrayElement([() => createAddPetBodyJson(data as Partial<AddPetRequest>), () => createAddPetBodyXml(data as Partial<Pet>), () => createAddPetBodyFormUrlEncoded(data as Partial<Pet>)])() : data ?? faker.helpers.arrayElement([createAddPetBodyJson(), createAddPetBodyXml(), createAddPetBodyFormUrlEncoded()])) as (AddPetRequest | Pet)
 }
 
-export function createAddPetResponse(data?: Partial<AddPetResponse>): AddPetResponse {
-  return createAddPetStatus200(data) as AddPetResponse
+export function createAddPetResponse(data?: Partial<((Pet | string))>): ((Pet | string)) {
+  return createAddPetStatus200(data) as ((Pet | string))
 }

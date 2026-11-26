@@ -3,16 +3,16 @@
 * Do not edit manually.
 */
 
-import type { PetListResponse, PetListStatus200 } from '../../types/pet/List'
+import type { Pet } from '../../types/Pet'
 import { createPet } from '../createPet'
 
 /**
  * @description OK
  */
-export function createPetListStatus200(data?: Partial<PetListStatus200>): PetListStatus200 {
-  return createPet(data) as PetListStatus200
+export function createPetListStatus200(data?: Partial<Pet>): Pet {
+  return createPet(data) as Pet
 }
 
-export function createPetListResponse(data?: Partial<PetListResponse>): PetListResponse {
-  return createPetListStatus200(data) as PetListResponse
+export function createPetListResponse(data?: Partial<Pet>): Pet {
+  return createPetListStatus200(data) as Pet
 }
