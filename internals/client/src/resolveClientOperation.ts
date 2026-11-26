@@ -1,7 +1,7 @@
 import type { ast } from '@internals/ast'
 import path from 'node:path'
 import { operationKey, useKubb } from '@kubb/kit'
-import type { Exclude, GeneratorContext, Include, Override } from '@kubb/kit'
+import type { Exclude, TemplateContext, Include, Override } from '@kubb/kit'
 import { pluginClientName } from './resolveClient.ts'
 
 /**
@@ -91,7 +91,7 @@ function resolveImportPath(options: { importPath: string; operationFile: string 
  * Throws `KUBB_PLUGIN_NOT_FOUND` when `pluginName` is not in the config.
  */
 export function resolveClientOperation({ node, pluginName }: { node: ast.OperationNode; pluginName: string }): ClientOperation | null {
-  const ctx = useKubb<GeneratorContext>()
+  const ctx = useKubb<TemplateContext>()
 
   return ctx.memo(`${pluginName}:clientOperation:${node.operationId}`, () => {
     const resolver = ctx.getResolver(pluginName)

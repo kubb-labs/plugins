@@ -1,12 +1,10 @@
 import { ast } from '@internals/ast'
 import { getResponseHeadersTypeNames, type OperationTypeNames, type OperationTypeSource } from '@internals/client'
-import { type Generator, operationKey, type RefName } from '@kubb/kit'
+import { operationKey, type RefName, type TemplateContext } from '@kubb/kit'
 import type { ContractClientFactory } from '../types.ts'
 import { getOperationSecurity, isAuthRequired, type SecurityRequirement } from './security.ts'
 import { buildValidatorHooks, type ValidatorHooks } from './validator.ts'
 import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './validatorOptions.ts'
-
-export type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]
 
 export type OperationData = {
   node: ast.HttpOperationNode
@@ -41,7 +39,7 @@ export function resolveOperationData({
   custom = false,
 }: {
   node: ast.HttpOperationNode
-  ctx: GeneratorContext
+  ctx: TemplateContext<ContractClientFactory>
   types: OperationTypeSource
   custom?: boolean
 }): OperationData {

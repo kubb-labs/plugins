@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import { getResponseHeadersTypeNames, resolveOperationTypes } from '@internals/client'
 import { resolveOperationTypeNames } from '@internals/shared'
-import { code, Diagnostics, type FileTarget, type GeneratorContext, useKubb } from '@kubb/kit'
+import { code, Diagnostics, type FileTarget, type TemplateContext, useKubb } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
 import { type HookFileVariant, hookFileName } from '../resolver.ts'
@@ -40,7 +40,7 @@ export type ResolvedHookFile = {
  * Resolves what every TanStack hook file shares: its file with banner and footer, and the type imports from the `types` provider.
  */
 export function resolveHookFile(node: ast.OperationNode, options: ResolveHookFileOptions): ResolvedHookFile {
-  const ctx = useKubb<GeneratorContext>()
+  const ctx = useKubb<TemplateContext>()
   const { variant = '', contractOp, keyTypeName, extraTypeNames = [], returnType = 'data' } = options
   if (returnType !== 'data' && contractOp.returnType === 'data') {
     throw new Diagnostics.Error({

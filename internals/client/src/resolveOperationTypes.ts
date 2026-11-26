@@ -1,5 +1,5 @@
 import type { ast } from '@internals/ast'
-import { Diagnostics, type GeneratorContext, text, useKubb } from '@kubb/kit'
+import { Diagnostics, type TemplateContext, text, useKubb } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import type { PluginZod } from '@kubb/plugin-zod'
 
@@ -88,7 +88,7 @@ export type OperationTypeSource = OperationTypeNames & {
  * ```
  */
 export function resolveOperationTypes(): OperationTypeSource {
-  const ctx = useKubb<GeneratorContext>()
+  const ctx = useKubb<TemplateContext>()
   const pluginName = ctx.plugin.name
   return ctx.memo(`operationTypes:${pluginName}`, () => {
     if (!ctx.getPlugin(pluginTsName) && !ctx.getPlugin(pluginZodName)?.options?.inferred) {

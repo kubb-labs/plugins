@@ -4,9 +4,9 @@ import { getStream, namedFile } from '@internals/shared'
 import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
 import { ensureValidVarName } from '@internals/utils'
 import { code, defineTemplate, Diagnostics } from '@kubb/kit'
-import type { FileTarget, Template } from '@kubb/kit'
+import type { FileTarget, Template, TemplateContext } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
-import { type GeneratorContext, type OperationData, resolveOperationData } from '../builders/operationData.ts'
+import { type OperationData, resolveOperationData } from '../builders/operationData.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
 import { ClientRuntime } from '../components/ClientRuntime.tsx'
@@ -24,7 +24,7 @@ type Controller = {
  * Groups operations into one controller per tag. Operations without a tag fall back to a single
  * `Client`/`ApiClient` controller, matching the resolver's default naming.
  */
-function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: GeneratorContext, types: OperationTypeSource): Array<Controller> {
+function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: TemplateContext<ContractClientFactory>, types: OperationTypeSource): Array<Controller> {
   return nodes.reduce((acc, operationNode) => {
     if (!ast.http.isOperation(operationNode)) return acc
     const tag = operationNode.tags[0]
