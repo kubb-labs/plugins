@@ -1,5 +1,13 @@
 # @kubb/plugin-axios
 
+## 6.7.2
+
+### Patch Changes
+
+- [#1628](https://github.com/kubb-labs/plugins/pull/1628) [`85b1545`](https://github.com/kubb-labs/plugins/commit/85b1545c56ae8ee026f8bc7ef2ae725e9135125b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use Kubb 5.28.0. With `operations: 'inline'`, a type a generated file uses more than once is now declared once in that file instead of being repeated at each use.
+- Updated dependencies [[`d855536`](https://github.com/kubb-labs/plugins/commit/d855536c496d3e11b55a5adde209741e972d6ed3), [`85b1545`](https://github.com/kubb-labs/plugins/commit/85b1545c56ae8ee026f8bc7ef2ae725e9135125b)]:
+  - @kubb/plugin-client@6.7.2
+
 ## 6.7.1
 
 ### Patch Changes
