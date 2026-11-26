@@ -5,7 +5,7 @@ import { resolverClient } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
-import type { Transformer } from '@internals/tanstack-query'
+import type { KeyTransformer } from '@internals/tanstack-query'
 import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from '../types.ts'
 import { infiniteQueryOperation } from './infiniteQuery.tsx'
@@ -142,7 +142,7 @@ describe('infiniteQueryGenerator operation with hooks disabled', () => {
 
 describe('infiniteQueryGenerator queryKey', () => {
   test('passes the infiniteQuery variant to a custom queryKey', async () => {
-    const queryKey = vi.fn<Transformer>(queryKeyTransformer)
+    const queryKey = vi.fn<KeyTransformer>(queryKeyTransformer)
     const options: PluginVueQuery['resolvedOptions'] = { ...defaultOptions, infinite: infiniteOptions, queryKey }
     const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
     const driver = createMultiPluginDriver('customQueryKey', plugins)

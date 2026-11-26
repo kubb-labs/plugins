@@ -17,17 +17,24 @@ export type CallReturnTypeProps = HookResultProps & { clientReturnType: ReturnTy
  */
 export type KeyVariant = 'query' | 'suspenseQuery' | 'infiniteQuery' | 'suspenseInfiniteQuery' | 'mutation'
 
+export type KeyTransformerProps = { node: ast.OperationNode; casing: ParamsCasing; variant: KeyVariant }
+
 /**
  * Builds query or mutation key segments for an operation node.
  * Receives `variant` indicating which hook or composable the key is built for.
  */
-export type Transformer = (props: { node: ast.OperationNode; casing: ParamsCasing; variant: KeyVariant }) => Array<unknown>
+export type KeyTransformer = (props: KeyTransformerProps) => Array<unknown>
+
+/**
+ * @deprecated Use `KeyTransformer`. Removed in v6.
+ */
+export type Transformer = KeyTransformer
 
 /**
  * Configures the query side of a TanStack-family plugin: which HTTP methods produce query
  * hooks and where the query runtime is imported from.
  */
-export type Query = {
+export type QueryConfig = {
   /**
    * HTTP methods treated as queries. Operations using these methods produce
    * `useQuery`-style hooks.
@@ -48,7 +55,7 @@ export type Query = {
  * Configures the mutation side of a TanStack-family plugin: which HTTP methods produce
  * mutation hooks and where the mutation runtime is imported from.
  */
-export type Mutation = {
+export type MutationConfig = {
   /**
    * HTTP methods treated as mutations. Operations using these methods produce
    * `useMutation`-style hooks.
@@ -64,7 +71,7 @@ export type Mutation = {
   importPath?: string
 }
 
-export type Infinite = {
+export type InfiniteConfig = {
   /**
    * Name of the query parameter that holds the page cursor.
    *

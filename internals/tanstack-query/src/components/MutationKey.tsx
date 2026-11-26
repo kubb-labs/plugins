@@ -3,12 +3,12 @@ import { text, Url } from '@kubb/kit'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { Transformer } from '../types.ts'
+import type { KeyTransformer } from '../types.ts'
 
 export type MutationKeyProps = {
   name: string
   node: ast.OperationNode
-  transformer: Transformer | null | undefined
+  transformer: KeyTransformer | null | undefined
   /**
    * Also emits `ReturnType<typeof name>` as an exported type alias of this name.
    */
@@ -27,7 +27,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
  * mutationKey: (props) => [JSON.stringify(props.node.operationId), ...mutationKeyTransformer(props)]
  * ```
  */
-export const mutationKeyTransformer: Transformer = ({ node }) => {
+export const mutationKeyTransformer: KeyTransformer = ({ node }) => {
   if (!node.path) return []
   return [`{ url: ${text.quote(Url.toPath(node.path))} }`]
 }

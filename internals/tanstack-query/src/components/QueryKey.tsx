@@ -4,7 +4,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { KeyVariant, Transformer } from '../types.ts'
+import type { KeyVariant, KeyTransformer } from '../types.ts'
 import { buildQueryKeyParams } from '../utils.ts'
 
 export type QueryKeyProps = {
@@ -12,7 +12,7 @@ export type QueryKeyProps = {
   typeName: string
   node: ast.OperationNode
   tsResolver: PluginTs['resolver']
-  transformer: Transformer | null | undefined
+  transformer: KeyTransformer | null | undefined
   /**
    * @default 'query'
    */
@@ -39,7 +39,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
  * queryKey: (props) => [JSON.stringify(props.node.operationId), ...queryKeyTransformer(props)]
  * ```
  */
-export const queryKeyTransformer: Transformer = ({ node, variant }) => {
+export const queryKeyTransformer: KeyTransformer = ({ node, variant }) => {
   if (!node.path) return []
   const { path, query } = ast.http.groupParameters(node)
   // Embedding `infinite: true` inside the URL segment separates infinite queries in the cache

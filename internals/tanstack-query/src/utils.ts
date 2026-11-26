@@ -5,7 +5,7 @@ import { createFunctionParameter, createFunctionParameters, createObjectBindingP
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
 import { buildResponseHeadersType, buildResultTypeRef } from '@internals/client'
 import type { ReturnTypeOption } from '@internals/client'
-import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
+import type { InfiniteConfig, MutationConfig, PageParamFn, QueryConfig } from './types.ts'
 
 export type RequestGroupKey = (typeof requestGroupOrder)[number]
 
@@ -211,10 +211,10 @@ export type PageParamType = {
   pageParamType: string
 }
 
-export type ResolvePageParamTypeParams = {
+export type ResolvePageParamTypeOptions = {
   resolver: ResolverTs
-  initialPageParam: Infinite['initialPageParam']
-  queryParam?: Infinite['queryParam']
+  initialPageParam: InfiniteConfig['initialPageParam']
+  queryParam?: InfiniteConfig['queryParam']
 }
 
 /**
@@ -244,7 +244,7 @@ export function buildResponseTypes(
   })
 }
 
-function resolveFallbackPageParamType(initialPageParam: Infinite['initialPageParam']): string {
+function resolveFallbackPageParamType(initialPageParam: InfiniteConfig['initialPageParam']): string {
   if (typeof initialPageParam === 'number') return 'number'
   if (typeof initialPageParam === 'boolean') return 'boolean'
   if (typeof initialPageParam !== 'string') return 'unknown'
@@ -259,7 +259,7 @@ function resolveFallbackPageParamType(initialPageParam: Infinite['initialPagePar
  * `initialPageParam` when that parameter type is unavailable. Also returns the query params type name
  * so callers can reuse it when rewriting the paginated request.
  */
-export function resolvePageParamType(node: ast.OperationNode, { resolver, initialPageParam, queryParam }: ResolvePageParamTypeParams): PageParamType {
+export function resolvePageParamType(node: ast.OperationNode, { resolver, initialPageParam, queryParam }: ResolvePageParamTypeOptions): PageParamType {
   const firstQueryParam = ast.http.groupParameters(node).query[0]
   const groupName = firstQueryParam ? resolver.param.query(node, firstQueryParam) : null
   const individualName = firstQueryParam ? resolver.param.name(node, firstQueryParam) : null
@@ -281,7 +281,7 @@ export function resolvePageParamType(node: ast.OperationNode, { resolver, initia
  * object merges over `methods: ['GET', 'QUERY']` and the plugin's runtime `importPath`. QUERY
  * (RFC 10008) is a safe, idempotent read that carries its input in the body, so it is a query too.
  */
-export function resolveQueryConfig(query: Partial<Query> | false, options: { importPath: string }): Required<Query> | false {
+export function resolveQueryConfig(query: Partial<QueryConfig> | false, options: { importPath: string }): Required<QueryConfig> | false {
   if (query === false) return false
   return { importPath: options.importPath, methods: ['GET', 'QUERY'], ...query }
 }
@@ -291,7 +291,7 @@ export function resolveQueryConfig(query: Partial<Query> | false, options: { imp
  * and an object merges over `methods: ['POST', 'PUT', 'PATCH', 'DELETE']` and the plugin's runtime
  * `importPath`.
  */
-export function resolveMutationConfig(mutation: Partial<Mutation> | false, options: { importPath: string }): Required<Mutation> | false {
+export function resolveMutationConfig(mutation: Partial<MutationConfig> | false, options: { importPath: string }): Required<MutationConfig> | false {
   if (mutation === false) return false
   return { importPath: options.importPath, methods: ['POST', 'PUT', 'PATCH', 'DELETE'], ...mutation }
 }
@@ -301,9 +301,9 @@ export type OperationClassification = {
   isMutation: boolean
 }
 
-export type ClassifyOperationParams = {
-  query: Required<Query> | false
-  mutation: Required<Mutation> | false
+export type ClassifyOperationOptions = {
+  query: Required<QueryConfig> | false
+  mutation: Required<MutationConfig> | false
 }
 
 /**
@@ -312,7 +312,7 @@ export type ClassifyOperationParams = {
  * enabled query config never counts as a mutation. Event streams are consumed through the client
  * directly, so they do not generate query or mutation hooks.
  */
-export function classifyOperation(node: ast.HttpOperationNode, { query, mutation }: ClassifyOperationParams): OperationClassification {
+export function classifyOperation(node: ast.HttpOperationNode, { query, mutation }: ClassifyOperationOptions): OperationClassification {
   if (getStream(node)?.shape) return { isQuery: false, isMutation: false }
 
   const isQuery = !!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase())
@@ -343,7 +343,7 @@ export function definePageParam<TPage = any, TParam = any>(fn: PageParamFn<TPage
  * queries, and an object merges over `queryParam: 'id'` and `initialPageParam: 0` with the cursor
  * paths cleared.
  */
-export function resolveInfiniteConfig(infinite: Partial<Infinite> | false): Required<Infinite> | false {
+export function resolveInfiniteConfig(infinite: Partial<InfiniteConfig> | false): Required<InfiniteConfig> | false {
   if (!infinite) return false
   const hasExplicitInitialPageParam = infinite.hasExplicitInitialPageParam ?? infinite.initialPageParam !== undefined
   const getNextPageParam = infinite.getNextPageParam
@@ -376,7 +376,7 @@ export function resolveInfiniteConfig(infinite: Partial<Infinite> | false): Requ
  * Whether the infinite hook for `node` should be generated: the operation takes the configured
  * `queryParam`.
  */
-export function matchesInfinite(node: ast.OperationNode, infinite: Infinite): boolean {
+export function matchesInfinite(node: ast.OperationNode, infinite: InfiniteConfig): boolean {
   if (!infinite.queryParam) return false
   // Strip trailing '?' which OpenAPI specs sometimes append to parameter names to denote optionality
   return ast.http.groupParameters(node).query.some((param) => param.name.replace(/\?$/, '') === infinite.queryParam)
@@ -386,7 +386,7 @@ export function matchesInfinite(node: ast.OperationNode, infinite: Infinite): bo
  * Warning for an infinite hook that falls back to the built-in page params on a response that
  * isn't an array. Those params only stop on an empty array, so `hasNextPage` never turns false.
  */
-export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: Infinite): string | null {
+export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: InfiniteConfig): string | null {
   const usesDefault =
     infinite.getNextPageParam == null &&
     infinite.getPreviousPageParam == null &&

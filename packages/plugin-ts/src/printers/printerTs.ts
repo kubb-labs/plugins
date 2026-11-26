@@ -128,8 +128,6 @@ export type PrinterTsOptions = {
  */
 export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTsOptions, factory.TsNode, string>
 
-export type PrinterTs = PrinterTsFactory
-
 type HandlerContext = { transform: (node: ast.SchemaNode) => factory.TsNode | null; base: (node: ast.SchemaNode) => factory.TsNode | null }
 
 // Adds the `| null` of an OpenAPI 3.0 `nullable: true` set on an array item or union member itself.
@@ -228,7 +226,7 @@ export function getDeclarationParts(
  * const declaration = printer.print(schemaNode) // 'export type MyType = …'
  * ```
  */
-export const printerTs = createPrinter<PrinterTs>((options) => {
+export const printerTs = createPrinter<PrinterTsFactory>((options) => {
   const addsUndefined = options.optionalType === 'undefined' || options.optionalType === 'questionTokenAndUndefined'
 
   return {

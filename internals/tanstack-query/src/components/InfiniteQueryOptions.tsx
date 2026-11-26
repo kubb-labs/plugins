@@ -5,7 +5,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { CallReturnTypeProps, Infinite } from '../types.ts'
+import type { CallReturnTypeProps, InfiniteConfig } from '../types.ts'
 import {
   buildCallResultBody,
   buildClientCall,
@@ -22,14 +22,14 @@ export type InfiniteQueryOptionsProps = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  initialPageParam: Infinite['initialPageParam']
+  initialPageParam: InfiniteConfig['initialPageParam']
   hasExplicitInitialPageParam?: boolean
-  cursorParam: Infinite['cursorParam']
-  nextParam: Infinite['nextParam']
-  previousParam: Infinite['previousParam']
-  getNextPageParam?: Infinite['getNextPageParam']
-  getPreviousPageParam?: Infinite['getPreviousPageParam']
-  queryParam: Infinite['queryParam']
+  cursorParam: InfiniteConfig['cursorParam']
+  nextParam: InfiniteConfig['nextParam']
+  previousParam: InfiniteConfig['previousParam']
+  getNextPageParam?: InfiniteConfig['getNextPageParam']
+  getPreviousPageParam?: InfiniteConfig['getPreviousPageParam']
+  queryParam: InfiniteConfig['queryParam']
   /**
    * The `TQueryKey` generic written into the emitted `infiniteQueryOptions` call. react-query
    * points it at the local `queryKey` const, vue-query uses the imported `QueryKey` type.

@@ -42,7 +42,7 @@ export type BuildOperationCommentsOptions = {
   splitLines?: boolean
 }
 
-export type ResolveOperationTypeNameOptions = {
+export type ResolveOperationTypeNamesOptions = {
   responseStatusNames?: boolean | 'error'
   exclude?: ReadonlyArray<string | undefined>
   order?: 'params-first' | 'body-response-first'
@@ -511,7 +511,7 @@ export function resolveStatusCodeNames(node: ast.OperationNode, resolver: Respon
 export function resolveOperationTypeNames(
   node: ast.OperationNode,
   resolver: OperationTypeNameResolver & Pick<Resolver, 'memo'>,
-  options: ResolveOperationTypeNameOptions = {},
+  options: ResolveOperationTypeNamesOptions = {},
 ): Array<string> {
   const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   return resolver.memo(`operationTypeNames:${key}`, () => {

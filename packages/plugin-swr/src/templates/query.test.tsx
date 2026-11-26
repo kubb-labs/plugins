@@ -7,7 +7,7 @@ import { resolverClient } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, renderTemplate, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
-import type { Transformer } from '@internals/tanstack-query'
+import type { KeyTransformer } from '@internals/tanstack-query'
 import { resolverSwr } from '../resolvers/resolverSwr.ts'
 import type { PluginSwr } from '../types.ts'
 import { queryOperation } from './query.tsx'
@@ -71,7 +71,7 @@ const findByTagsNode = ast.factory.createOperation({
 
 describe('queryGenerator queryKey', () => {
   test('passes the query variant to a custom queryKey', async () => {
-    const queryKey = vi.fn<Transformer>(queryKeyTransformer)
+    const queryKey = vi.fn<KeyTransformer>(queryKeyTransformer)
     const options: PluginSwr['resolvedOptions'] = { ...defaultOptions, queryKey }
     const plugin = createMockedPlugin<PluginSwr>({ name: 'plugin-swr', options, resolver: resolverSwr })
     const driver = createMultiPluginDriver('customQueryKey', plugins)

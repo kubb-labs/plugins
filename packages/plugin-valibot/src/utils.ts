@@ -8,7 +8,7 @@ export type LengthConstraints = { min?: number; max?: number; pattern?: string }
 
 export type ValibotPrinterContext = { transform: (node: ast.SchemaNode) => string | null; options: PrinterValibotOptions }
 
-type ModifierOptions = {
+type ApplyModifiersOptions = {
   value: string
   schema: ast.SchemaNode
   nullable?: boolean
@@ -126,7 +126,18 @@ export const hasChecks = (node: ast.SchemaNode) => getChecks(node).length > 0
 
 // Wraps a value in `v.nullable(...)` and `v.optional(...)`. A default goes in as the second argument
 // of `v.optional`, so `null` stays `null` and only a missing value takes the default.
-export function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, title, description, examples, direction }: ModifierOptions): string {
+export function applyModifiers({
+  value,
+  schema,
+  nullable,
+  optional,
+  nullish,
+  defaultValue,
+  title,
+  description,
+  examples,
+  direction,
+}: ApplyModifiersOptions): string {
   const metadata = [
     title && `v.title(${text.quote(title)})`,
     description && `v.description(${text.quote(description)})`,

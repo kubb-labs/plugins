@@ -40,14 +40,14 @@ export function resolveInlineEnumNames({
  * with a `typeSuffix` uses its suffixed key alias (e.g. `StatusKey`); every other schema uses its
  * plain resolved name.
  */
-export type EnumTypeNameProps = {
+export type EnumTypeNameOptions = {
   resolver: ResolverTs
   name: string
   enumOptions: { type?: string; typeSuffix?: string } | undefined
   isEnum: boolean
 }
 
-export function enumTypeName({ resolver, name, enumOptions, isEnum }: EnumTypeNameProps): string {
+export function enumTypeName({ resolver, name, enumOptions, isEnum }: EnumTypeNameOptions): string {
   return isEnum && enumOptions?.type === 'asConst' && enumOptions.typeSuffix ? resolver.enum.keyName({ name }, enumOptions.typeSuffix) : resolver.name(name)
 }
 
@@ -154,7 +154,7 @@ export function buildResponseComments(response: ast.ResponseNode): Array<string>
   return [...(response.summary ? [`@summary ${jsDocEscape(response.summary)}`] : []), ...links]
 }
 
-export type BuildParamsSchemaOptions = {
+export type BuildParamsOptions = {
   params: Array<ast.ParameterNode>
   /**
    * Adds each serialized example to `examples` as a `<caption>Serialized</caption>` JSDoc line.
@@ -167,7 +167,7 @@ export type BuildParamsSchemaOptions = {
  * Builds the object schema for one parameter group or a response's headers. Each entry embeds its own schema and JSDoc,
  * so the group is the only type these entries are exported as.
  */
-export function buildParams({ params, serializedExamples }: BuildParamsSchemaOptions): ast.SchemaNode {
+export function buildParams({ params, serializedExamples }: BuildParamsOptions): ast.SchemaNode {
   const pointer = params[0]?.pointer
   return ast.factory.createSchema({
     type: 'object',

@@ -8,7 +8,7 @@ import { describe, expect, test, vi } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderTemplate, testConfig } from '#mocks'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
 import { queryKeyTransformer } from '@internals/tanstack-query'
-import type { Transformer } from '@internals/tanstack-query'
+import type { KeyTransformer } from '@internals/tanstack-query'
 import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from '../types.ts'
 import { queryOperation } from './query.tsx'
@@ -116,7 +116,7 @@ describe('queryGenerator operation', () => {
 
 describe('queryGenerator queryKey', () => {
   test('passes the query variant to a custom queryKey', async () => {
-    const queryKey = vi.fn<Transformer>(queryKeyTransformer)
+    const queryKey = vi.fn<KeyTransformer>(queryKeyTransformer)
     const options: PluginVueQuery['resolvedOptions'] = { ...defaultOptions, queryKey }
     const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
     const driver = createMultiPluginDriver('customQueryKey', plugins)

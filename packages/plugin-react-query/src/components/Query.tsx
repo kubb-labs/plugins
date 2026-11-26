@@ -13,7 +13,7 @@ import {
   maybeValueOrGetter,
   resolvePageParamType,
 } from '@internals/tanstack-query'
-import type { HookResultProps, Infinite } from '@internals/tanstack-query'
+import type { HookResultProps, InfiniteConfig } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 
 export type QueryProps = {
@@ -33,8 +33,8 @@ export type QueryProps = {
    * Emits the infinite variant of the hook (`useInfiniteQuery`) with the page param type resolved from these.
    */
   infinite?: {
-    initialPageParam: Infinite['initialPageParam']
-    queryParam?: Infinite['queryParam']
+    initialPageParam: InfiniteConfig['initialPageParam']
+    queryParam?: InfiniteConfig['queryParam']
   }
 } & HookResultProps
 

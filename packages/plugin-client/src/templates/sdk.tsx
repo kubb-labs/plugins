@@ -13,7 +13,7 @@ import { ClientRuntime } from '../components/ClientRuntime.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
 import type { ContractClientFactory } from '../types.ts'
 
-type Controller = {
+type SdkController = {
   name: string
   tag: string | undefined
   file: FileTarget
@@ -24,7 +24,11 @@ type Controller = {
  * Groups operations into one controller per tag. Operations without a tag fall back to a single
  * `Client`/`ApiClient` controller, matching the resolver's default naming.
  */
-function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: TemplateContext<ContractClientFactory>, types: OperationTypeSource): Array<Controller> {
+function buildControllers(
+  nodes: ReadonlyArray<ast.OperationNode>,
+  ctx: TemplateContext<ContractClientFactory>,
+  types: OperationTypeSource,
+): Array<SdkController> {
   return nodes.reduce((acc, operationNode) => {
     if (!ast.http.isOperation(operationNode)) return acc
     const tag = operationNode.tags[0]
@@ -42,7 +46,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Template
     }
 
     return acc
-  }, [] as Array<Controller>)
+  }, [] as Array<SdkController>)
 }
 
 /**
@@ -91,7 +95,7 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
       const standardSchemaPath = path.resolve(ctx.root, '.kubb/standardSchema.ts')
       const importRoot = (file: string) => (importPath === undefined ? file : undefined)
 
-      const renderClassFile = ({ name: className, file, operations: ops }: Pick<Controller, 'name' | 'file' | 'operations'>) => {
+      const renderClassFile = ({ name: className, file, operations: ops }: Pick<SdkController, 'name' | 'file' | 'operations'>) => {
         const typeImports = code.join(ops.flatMap((op) => op.typeNames)).imports
         const schemaImports = code.join(ops.flatMap((op) => op.schemaNames)).imports
         const resultOps = ops.filter((op) => !getStream(op.node)?.shape)

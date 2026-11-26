@@ -78,7 +78,7 @@ export function patternKeySchemaMini({ patterns, regexType }: { patterns: Array<
 /**
  * Modifier options for applying chainable methods to Zod schema values.
  */
-export type ModifierOptions = {
+export type ApplyModifiersOptions = {
   value: string
   schema?: ast.SchemaNode
   nullable?: boolean
@@ -175,7 +175,7 @@ export function inputChecks({
  * Apply nullable / optional / nullish modifiers, an optional `.describe()` call, and an
  * optional `.meta({ examples })` call to a schema value string using the chainable Zod v4 API.
  */
-export function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, description, examples }: ModifierOptions): string {
+export function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, description, examples }: ApplyModifiersOptions): string {
   const withModifier = (() => {
     if (nullish || (nullable && optional)) return `${value}.nullish()`
     if (optional) return `${value}.optional()`
@@ -219,7 +219,7 @@ export function omitUnwrapChain(node: ast.SchemaNode, step = '.unwrap()'): strin
  * Apply nullable / optional / nullish modifiers using the functional `zod/mini` API
  * (`z.nullable()`, `z.optional()`, `z.nullish()`).
  */
-export function applyMiniModifiers({ value, schema, nullable, optional, nullish, defaultValue }: Omit<ModifierOptions, 'description'>): string {
+export function applyMiniModifiers({ value, schema, nullable, optional, nullish, defaultValue }: Omit<ApplyModifiersOptions, 'description'>): string {
   const withModifier = (() => {
     if (nullish) return `z.nullish(${value})`
     const withNullable = nullable ? `z.nullable(${value})` : value
