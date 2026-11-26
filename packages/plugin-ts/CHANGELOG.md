@@ -1,5 +1,21 @@
 # @kubb/plugin-ts
 
+## 6.0.0
+
+### Major Changes
+
+- [#1624](https://github.com/kubb-labs/plugins/pull/1624) [`30e01bf`](https://github.com/kubb-labs/plugins/commit/30e01bf75d7dfe7376a8325409278e8c39429ff0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - `operations` now defaults to `'inline'`: `@kubb/plugin-ts` writes only the schema types, and clients, hooks, and mocks print operation types where they use them. To keep importing types such as `AddPetResponses`, set `pluginTs({ operations: 'export' })`. See [Migrate to v6](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/migrate-to-v6).
+
+### Patch Changes
+
+- [#1624](https://github.com/kubb-labs/plugins/pull/1624) [`30e01bf`](https://github.com/kubb-labs/plugins/commit/30e01bf75d7dfe7376a8325409278e8c39429ff0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb `^5.27.1`, which aliases an inlined import that clashes with a name the file already uses.
+
+- [#1624](https://github.com/kubb-labs/plugins/pull/1624) [`30e01bf`](https://github.com/kubb-labs/plugins/commit/30e01bf75d7dfe7376a8325409278e8c39429ff0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - A type no longer carries the `@example` of its whole schema. Property examples stay.
+
+- [#1624](https://github.com/kubb-labs/plugins/pull/1624) [`30e01bf`](https://github.com/kubb-labs/plugins/commit/30e01bf75d7dfe7376a8325409278e8c39429ff0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Property comments no longer end with `@type`, which repeated the TypeScript type.
+
+- [#1624](https://github.com/kubb-labs/plugins/pull/1624) [`30e01bf`](https://github.com/kubb-labs/plugins/commit/30e01bf75d7dfe7376a8325409278e8c39429ff0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - A status code whose response headers match an earlier one aliases its type, such as `ListPetsStatus429Headers = ListPetsStatus200Headers`.
+
 ## 5.7.4
 
 ### Patch Changes
