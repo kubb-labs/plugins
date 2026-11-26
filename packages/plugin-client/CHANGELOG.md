@@ -1,5 +1,15 @@
 # @kubb/plugin-client
 
+## 6.7.2
+
+### Patch Changes
+
+- [#1631](https://github.com/kubb-labs/plugins/pull/1631) [`d855536`](https://github.com/kubb-labs/plugins/commit/d855536c496d3e11b55a5adde209741e972d6ed3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generated clients type-check faster. An operation's per-status response headers map is now declared once in its file, such as `type AddPetResponseHeaders = { '201': AddPetStatus201Headers }`, and `withUnwrap` gets its result type as a type argument. On the DigitalOcean spec with `pluginFetch()`, this cuts TypeScript instantiations from 450,746 to 195,122 and check time by about a third. The generated types are unchanged.
+
+- [#1628](https://github.com/kubb-labs/plugins/pull/1628) [`85b1545`](https://github.com/kubb-labs/plugins/commit/85b1545c56ae8ee026f8bc7ef2ae725e9135125b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use Kubb 5.28.0. With `operations: 'inline'`, a type a generated file uses more than once is now declared once in that file instead of being repeated at each use.
+- Updated dependencies [[`85b1545`](https://github.com/kubb-labs/plugins/commit/85b1545c56ae8ee026f8bc7ef2ae725e9135125b)]:
+  - @kubb/plugin-ts@6.0.1
+
 ## 6.7.1
 
 ### Patch Changes

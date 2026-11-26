@@ -1,5 +1,14 @@
 # @kubb/plugin-msw
 
+## 6.3.7
+
+### Patch Changes
+
+- [#1628](https://github.com/kubb-labs/plugins/pull/1628) [`85b1545`](https://github.com/kubb-labs/plugins/commit/85b1545c56ae8ee026f8bc7ef2ae725e9135125b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use Kubb 5.28.0. With `operations: 'inline'`, a type a generated file uses more than once is now declared once in that file instead of being repeated at each use.
+- Updated dependencies [[`85b1545`](https://github.com/kubb-labs/plugins/commit/85b1545c56ae8ee026f8bc7ef2ae725e9135125b)]:
+  - @kubb/plugin-faker@5.6.5
+  - @kubb/plugin-ts@6.0.1
+
 ## 6.3.6
 
 ### Patch Changes

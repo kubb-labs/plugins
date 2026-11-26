@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-ky",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Generate a slim, type-safe HTTP client with Kubb based on Ky.",
   "keywords": [
     "api-client",
