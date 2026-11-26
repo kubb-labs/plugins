@@ -11,6 +11,7 @@ import { pluginTs } from '@kubb/plugin-ts'
 import { pluginVueQuery } from '@kubb/plugin-vue-query'
 import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb/config'
+import { casing } from 'kubb/kit'
 
 const schemas = [
   // { name: 'test', path: '../../schemas/3.0.x/test.json' },
@@ -155,8 +156,9 @@ const baseConfig = {
       },
       group: {
         type: 'tag',
+        // camelCase like the default group name, so tags that differ only in case (sendgrid) share one folder on Windows.
         name({ group }) {
-          return `${group}Service`
+          return `${casing.camel(group)}Service`
         },
       },
     }),
@@ -169,7 +171,7 @@ const baseConfig = {
       group: {
         type: 'tag',
         name({ group }) {
-          return `${group}Requests`
+          return `${casing.camel(group)}Requests`
         },
       },
     }),
