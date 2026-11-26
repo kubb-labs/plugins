@@ -2,55 +2,55 @@
   "lockfileVersion": 1,
   "inputs": {
     "src/legacy": {
-      "hash": "159fcda691652c06f61bb7c592dcb6c7adb9e5ca7c61f052620b1914845ed7b8",
+      "hash": "a87486b3d545f68185673fe4631a809e8078aa99707cf5e94370e1f1574bbf1b",
       "sources": ["petStore.yaml"]
     },
     "src/gen": {
-      "hash": "20022654c769faf8eae8d146c92a755b642e70812bd38fd8d8c39c6eed010745",
+      "hash": "633e208000ec493ecf9b8145611911edeba19104ab6e9d212315649e35611e92",
       "sources": ["petStore.yaml"]
     },
     "src/gen2": {
-      "hash": "d0dea55a80ed8df736d2b1d830e02d83732ede8097ff9484fe67594e43143691",
+      "hash": "11fcb3813b81a63f80e6566df0b2b543bf31b413922f650681a6acabafdd1516",
       "sources": ["petStore.yaml"]
     },
     "src/gen3": {
-      "hash": "c8f0b5c83d928ceeb43ab250fd879f1246c7d864643d1f76bed1ff140ee4f935",
+      "hash": "a8772d021b5471cb485a64d682cca7df91ad484ada46bb868419b194159c6a33",
       "sources": ["petStore.yaml"]
     },
     "src/gen4": {
-      "hash": "1e71b2707fd8f34a1ae13fd450b738ea275f236ddbdbaf7479e77cc26b5d42d3",
+      "hash": "924cf6205eefdfc66861154d25e733a3b460514c231d80659ba9ecab365d1a19",
       "sources": ["petStore.yaml"]
     },
     "src/gen5": {
-      "hash": "68300b3648579947a569b6e7b8827e1806af85c46d1a98cd6e43d8ee242f49f1",
+      "hash": "b6bd3b5e757aba2358fce0cc4db293ff3a3eabe6b6338d8d2f37cec2d718ac41",
       "sources": ["petStore.yaml"]
     },
     "src/gen6": {
-      "hash": "adf8b85e6c723aa999d621efbf7ac7be09bbdda2407586c6d31cff87a2f4257b",
+      "hash": "4dea5ee67c2deac9b2074c9ef0158b64a9e076422d9f2043672b378baff61f0f",
       "sources": ["petStore.yaml"]
     },
     "src/gen7": {
-      "hash": "e5b2fd1808a5caf4408406b4a1926f309e05d282b39890fc9918cadcfbf21776",
+      "hash": "2090051c3876a3a41ed7fa7f9128fcdf1681c7942d77455af3adc08494053d94",
       "sources": ["petStore.yaml"]
     },
     "src/gen8": {
-      "hash": "b1c46c1423702a964ed92f6e379ee4cd3994e20a4037ebc8a6600046002f063c",
+      "hash": "2bc4520d6582761288d529390abc0cfbac2d77b471205ab89a3722a1375788d8",
       "sources": ["petStore.yaml"]
     },
     "src/gen9": {
-      "hash": "aa9506a45d64478240a86dd882eeb3d561e99581e30e333d2fee261ece2bc340",
+      "hash": "994054ac39e980fac12c6190156fd741e3010009c45547c766e5ef051f2697ce",
       "sources": ["petStore.yaml"]
     },
     "src/gen10": {
-      "hash": "bcd5225539fc68ac1988c76f8068df6c32bc6e14a6440446741ad1079f981a02",
+      "hash": "8749219502af28eb89af49298b02b860036f166b7e20966d98676416ae0a0a4a",
       "sources": ["petStore.yaml"]
     },
     "src/gen11": {
-      "hash": "14ca4923d249072c8ca17297b3134f434b4b0db0f6b9954a641712def98e157e",
+      "hash": "659de2d49a91edca224341e7a47a5a08ff3102a230258082137e2a36b8270341",
       "sources": ["petStore.yaml"]
     },
     "src/gen12": {
-      "hash": "458abaee99303ccebfb7afd40f7189ea3191b43e29cca74bdff8ed44dbc5cb0a",
+      "hash": "d851d615dcd7cbfc64b3512e5e94f820cc6a6c205a308556323209301540eddb",
       "sources": ["petStore.yaml"]
     }
   },
