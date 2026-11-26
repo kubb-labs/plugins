@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../models/pet/FindPetsByTags'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
@@ -12,7 +12,9 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
  * @summary Finds Pets by tags
  */
-export function findPetsByTags<ThrowOnError extends boolean = true>(options: Options<FindPetsByTagsOptions, ThrowOnError> = {}) {
+export function findPetsByTags<ThrowOnError extends boolean = true>(
+  options: Options<FindPetsByTagsOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

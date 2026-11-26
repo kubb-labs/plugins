@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { Order } from '../types/Order'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { placeOrderBodySchema, placeOrderResponseSchema, placeOrderStatus405Schema } from '../valibot/placeOrderSchema'
@@ -37,7 +37,10 @@ export function placeOrder<ThrowOnError extends boolean = true>(options: Options
   contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
-}), ThrowOnError> = {}) {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<({
+  '200': Order;
+  '405': unknown;
+}), ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(apiClient<({

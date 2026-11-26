@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { OfficeWeatherStory } from '../types/OfficeWeatherStory'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { officeWeatherstoryResponseSchema } from '../zod/officeWeatherstoryOperationSchema'
@@ -16,7 +16,9 @@ export function officeWeatherstory<ThrowOnError extends boolean = true>(options:
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}) {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<({
+  '200': OfficeWeatherStory;
+}), ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(apiClient<({

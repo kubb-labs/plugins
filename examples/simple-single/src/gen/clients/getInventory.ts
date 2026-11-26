@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetInventoryOptions, GetInventoryResponses } from '../models'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
@@ -12,7 +12,9 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.ku
  * @description Returns a map of status codes to quantities
  * @summary Returns pet inventories by status
  */
-export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptions, ThrowOnError> = {}) {
+export function getInventory<ThrowOnError extends boolean = true>(
+  options: Options<GetInventoryOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

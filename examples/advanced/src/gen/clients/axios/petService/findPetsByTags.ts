@@ -1,4 +1,4 @@
-import type { Options } from '../../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { FindPetsByTagsXEXAMPLEEnumKey } from '../../../models/ts/FindPetsByTagsXEXAMPLEEnum'
 import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
@@ -25,7 +25,23 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-) {
+): Unwrappable<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Array<Pet>
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

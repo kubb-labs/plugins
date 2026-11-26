@@ -1,13 +1,15 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options } from './.kubb/client'
+import type { Options, Unwrappable, RequestResult } from './.kubb/client'
 import type { GetCookiesOptions, GetCookiesResponses } from './GetCookies'
 import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 /**
  * `GET /cookies`
  */
-export function getCookies<ThrowOnError extends boolean = true>(options: Options<GetCookiesOptions, ThrowOnError> = {}) {
+export function getCookies<ThrowOnError extends boolean = true>(
+  options: Options<GetCookiesOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<GetCookiesResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

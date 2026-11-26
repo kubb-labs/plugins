@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { ApiCreateContainerBody } from '../types/CreateContainerBody'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { createContainerResponseSchema } from '../zod/createContainerSchema'
@@ -16,7 +16,9 @@ export function createContainer<ThrowOnError extends boolean = true>(options: Op
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}) {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<({
+  '200': unknown;
+}), ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(apiClient<({

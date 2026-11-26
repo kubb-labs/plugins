@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { ClientConfig, ClientInstance, Options } from '../.kubb/client'
+import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { Order } from '../types/Order'
 import { createClient, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
@@ -24,7 +24,11 @@ export class StoreClient {
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}) {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<({
+  '200': ({
+  [key: string]: number;
+});
+}), ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(apiClient<({
@@ -63,7 +67,10 @@ export class StoreClient {
   contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
-}), ThrowOnError> = {}) {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<({
+  '200': Order;
+  '405': unknown;
+}), ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(apiClient<({

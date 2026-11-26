@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { ListEventsOptionsSchemaType, ListEventsResponsesSchemaType } from '../zod/listEventsSchema'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { listEventsQuerySchema, listEventsResponseSchema } from '../zod/listEventsSchema'
@@ -11,7 +11,7 @@ import { listEventsQuerySchema, listEventsResponseSchema } from '../zod/listEven
 /**
  * `GET /events`
  */
-export function listEvents<ThrowOnError extends boolean = true>(options: Options<ListEventsOptionsSchemaType, ThrowOnError> = {}) {
+export function listEvents<ThrowOnError extends boolean = true>(options: Options<ListEventsOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(apiClient<ListEventsResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/events', ...config, validator: { query: listEventsQuerySchema, response: listEventsResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))

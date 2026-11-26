@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { GetUserByNameOptions, GetUserByNameResponses } from '../../models/user/GetUserByName'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
@@ -11,7 +11,9 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * `GET /user/{username}`
  * @summary Get user by user name
  */
-export function getUserByName<ThrowOnError extends boolean = true>(options: Options<GetUserByNameOptions, ThrowOnError>) {
+export function getUserByName<ThrowOnError extends boolean = true>(
+  options: Options<GetUserByNameOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetUserByNameResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

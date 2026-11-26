@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../.kubb/client.ts'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client.ts'
 import type { ScheduleVisitOptionsSchemaType, ScheduleVisitResponsesSchemaType } from '../zod/scheduleVisitSchema.ts'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client.ts'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema.ts'
@@ -20,7 +20,9 @@ import {
  * `PUT /pets/{petId}/visits/{day}`
  * @summary Schedule a vet visit on a day
  */
-export function scheduleVisit<ThrowOnError extends boolean = true>(options: Options<ScheduleVisitOptionsSchemaType, ThrowOnError>) {
+export function scheduleVisit<ThrowOnError extends boolean = true>(
+  options: Options<ScheduleVisitOptionsSchemaType, ThrowOnError>,
+): Unwrappable<RequestResult<ScheduleVisitResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

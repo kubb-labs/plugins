@@ -1,13 +1,15 @@
 /* eslint-disable no-alert, no-console */
 
-import type { StreamOptions, SuccessOf, ServerSentEvent } from './.kubb/client'
+import type { StreamOptions, Unwrappable, StreamResultWithHeaders, SuccessOf, ServerSentEvent } from './.kubb/client'
 import type { StreamEventsOptions, StreamEventsResponses, StreamEventsStatus200Headers } from './StreamEvents'
 import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 /**
  * `GET /events`
  */
-export function streamEvents<ThrowOnError extends boolean = true>(options: StreamOptions<StreamEventsOptions, ThrowOnError> = {}) {
+export function streamEvents<ThrowOnError extends boolean = true>(
+  options: StreamOptions<StreamEventsOptions, ThrowOnError> = {},
+): Unwrappable<StreamResultWithHeaders<StreamEventsResponses, { '200': StreamEventsStatus200Headers }, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

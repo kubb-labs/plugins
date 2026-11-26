@@ -1,4 +1,4 @@
-import type { Options } from '../../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { ApiResponse } from '../../../models/ts/ApiResponse'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 
@@ -20,7 +20,14 @@ export function uploadFile<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-) {
+): Unwrappable<
+  RequestResult<
+    {
+      '200': ApiResponse
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

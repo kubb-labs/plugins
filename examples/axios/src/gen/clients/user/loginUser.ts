@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResultWithHeaders } from '../../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -23,7 +23,29 @@ export function loginUser<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-) {
+): Unwrappable<
+  RequestResultWithHeaders<
+    {
+      '200':
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+        | {
+            contentType: 'application/json'
+            data: string
+          }
+      '400': unknown
+    },
+    {
+      '200': {
+        'X-Rate-Limit'?: number
+        'X-Expires-After'?: string
+      }
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

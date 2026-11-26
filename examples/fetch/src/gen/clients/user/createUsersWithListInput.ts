@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
@@ -12,7 +12,9 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @description Creates list of users with given input array
  * @summary Creates list of users with given input array
  */
-export function createUsersWithListInput<ThrowOnError extends boolean = true>(options: Options<CreateUsersWithListInputOptions, ThrowOnError> = {}) {
+export function createUsersWithListInput<ThrowOnError extends boolean = true>(
+  options: Options<CreateUsersWithListInputOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
   const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(

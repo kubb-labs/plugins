@@ -64,64 +64,64 @@
       "output": "452d67b7fa504e6657db01f4537d0a21c27ab7b6c5c1bcdc3739a0add699c20b"
     },
     "src/gen/clients/addFiles.ts": {
-      "source": "a42a928fbb698993a421fda26dba42617dc269c82b248e088f8c853fa0c10678",
-      "output": "f0a416fd203d4a25f7b8f332399dc41278842f13a30b4675777fa8ec21a899a1"
+      "source": "fc631a82f018c76bc8dae2ba5ec59b39edac4e8a816e5193fa74a264a13d2aff",
+      "output": "6df2ebf0e9d41e94ae159a125b8b72581830f25128bc987c7d5ab252602602d5"
     },
     "src/gen/clients/addPet.ts": {
-      "source": "926829de166286eb04118fec6a607347a1b18b4dffbc8477106a9808b729dfd9",
-      "output": "f68bc922a7c6992a6bf7d623a14a73ab8dd7ea80b6a588b7ee4b94699fc1387b"
+      "source": "992a93584a7db24945d95041e4914e132d811cda71bdcebfceb73a720a29a560",
+      "output": "f80f4f2a76acaf0b4d110d3fff4c7e0ad260abb3274f83c904d5e8c957621871"
     },
     "src/gen/clients/createPets.ts": {
-      "source": "98c5f2e9dadd44ab1c8d10341bcdd4cad10cfdb72768efe01aa5766ddd1a06aa",
-      "output": "991a274df7ec6c391a627307792f24c90cccad3b5f2a017dad34d74093ed1678"
+      "source": "f1bead26d8a9aa6cbd2d126d3dda7142d223ca8caec22d0b398d4879dbc273a5",
+      "output": "af60b7a01f592ca4ab9448275e7798c3dadf753389276bfb053a498dd01d663c"
     },
     "src/gen/clients/deleteOrder.ts": {
-      "source": "0c3c52050713b4bf0aafeace74dc0a4d0337ff09115dbd26d533509ab24c8dc8",
-      "output": "1a1790e4a5c8811a61c6a76cf64337297af6af4d918ee0eef7dc1a89fa5c6849"
+      "source": "1fcd48e255872035730ca9230bdc1088e2b0bff378d83e3f6127b2b7453a1ea5",
+      "output": "a3ea22660a2af42d7944e585d6a4d463f99a945dcd5a9e43a60172b180a530cb"
     },
     "src/gen/clients/deletePet.ts": {
-      "source": "ffe2299e4b4cf791cdfa8eb0af621650bc98d5323e8aaa2e018c91d09f5a3d94",
-      "output": "d974486469f0e92d3fc5096a0efd176d5531134da646cb844fd8f9b97862b4dc"
+      "source": "3edb243c99abbd29b23501684fc31aef10dc51743ab186fd24bced17fb9155ff",
+      "output": "bcaa0935ac21b253694f08119de24d39ea22ab8d6af16b04ed1b9888204ef20b"
     },
     "src/gen/clients/findPetsByStatus.ts": {
-      "source": "f9991b00e49588115e7afe9540596706c0d0f82a296f325a23f9ceeb43c4249c",
-      "output": "2d163f2d1804d41023b6bbe2418ef7d94bf9419d11ce733546a259d8a5584649"
+      "source": "2414e95253cae4c6c7e6ad0666e14d9cacbff574b04af94abb9da986e3b0db52",
+      "output": "416ea1f9cfedb675cab6d8a7d3ced7bd79dc29ed402566bb3c44c0c46aab840b"
     },
     "src/gen/clients/findPetsByTags.ts": {
-      "source": "3ddc5d56a9ea91c44e1b6f038f5e1768e194f69695a912622ed9ee0aa7eda40f",
-      "output": "477f63d183e74012654a6f229f8e137e5df85efcad96036378b1c6d42e97710f"
+      "source": "c40c69cc217510db6921fd074e40546582b9a563e9ccca9cbd4207459b69e6b9",
+      "output": "76b7c08a0c8633d1108ec957b50104ec336097320aa8ba672c6028e1d5ff9166"
     },
     "src/gen/clients/getInventory.ts": {
-      "source": "34e6e2ea8920dd52d9b2c6990ea46ec6107030ef43e4a565107024f24f6a2e75",
-      "output": "5a9c6135ad9688d4a6e7804817a0728f8c8f10751ef32f864d4b9e17ed2d9eed"
+      "source": "3a6eabd6e22062eb12cf988b721c8dd7960b02d66a513c868a4a9f4233f7157c",
+      "output": "a5c70cb481e6f3db0ea3f448dfb08b7993da8f5df9f8169089fecc347c636693"
     },
     "src/gen/clients/getOrderById.ts": {
-      "source": "cacf7881dd12be348b0ab8e1a604fc6f8410489449d3bb63bc88ed602f4b38c0",
-      "output": "c9e558b18666055877118aa66d18ff8d12d2dbc8755d762f38296ff315bf80ee"
+      "source": "a3f423a43da2f0f0968185b54ffbef7a00a1ec9e356e05c0fac2d4ec4dfd101d",
+      "output": "decedb250419aa8a0d6b4750406f2fb2739f61c33ede810a57b0eaa03804257c"
     },
     "src/gen/clients/getPetById.ts": {
-      "source": "11523b0ea696889dc6e6f5946f776da47f85074c2634051ac80cff404fc7fa74",
-      "output": "7aa78b7a9660da6b515adf9558fa7e224cf1253cbdcbb9c1e822f69a2b387e3d"
+      "source": "188e5eedde9ae31d1a254c618ea1b9f4a09ae537f62287dcf925f4eb28069047",
+      "output": "787b6f807b9599e94877e8649db59e71934426ab9aa0b543240c558b8afb035a"
     },
     "src/gen/clients/index.ts": {
       "source": "a8ff969f49ace072d8602d48492c41f03dd6c15b079f0b1033e9dc9aecb44dfd",
       "output": "d797c506c480eaa7b4d6e7ddd4ddcb70eeee8769a7a1d94a4820dd95b2624ca0"
     },
     "src/gen/clients/placeOrder.ts": {
-      "source": "f3d1de604591daae9bbb73de51a50fd5699abd6557775e8d7adbff700125f056",
-      "output": "b88c341eb8c8b09d21b09d17b26534b0dc825598a0d1be550bab3fc9761ccccc"
+      "source": "03a91d6194a1071e5ec5117f0cd3833c2d240c46c00f3b2fa399293484d2bb1c",
+      "output": "7fb182580c2cbee37593de9f3b120291b0dfc203b4b19a494709e13c61237fa3"
     },
     "src/gen/clients/placeOrderPatch.ts": {
-      "source": "1c4d428da38f446daa53180d59857a93c613de0d2a700a9660e9d735ca6b0f4e",
-      "output": "1818d4fdab0292c0221811b434d89fb7d17ddd655a82c02d7f1c6f6e41e3592a"
+      "source": "6318bd9f52c68a628c040b13e79bca5f02e482369ae016dd482e604aed6edcd4",
+      "output": "01d659482a3024fa950618c3fd56b6333384b791a0b18b43af518e220c378441"
     },
     "src/gen/clients/updatePet.ts": {
-      "source": "308e5b46a13a0e891f45e29ae3a25c3468eaf463bcee3b9328234048fc5c9840",
-      "output": "8f5dd3f97b0a14ea0bad7769d5631923796d1161cc1959cc6f8fac7d3e381a4d"
+      "source": "36bb7325fc67270c2d67b7ed233792edf948c70aeb115e46b5a704f289f41a42",
+      "output": "3b67f8e96e07f2d0d64d2df5a45a249a93f797181558313c365a20799c3dd06a"
     },
     "src/gen/clients/updatePetWithForm.ts": {
-      "source": "9ba2ca395d1b5e04b17a8e5c7c2f6ceeee301d00aade0d1cbb1024eb544c6867",
-      "output": "d50938cf683a29bba8c68f813f15c79050379a80f109c4d8936b70ac8418cfcf"
+      "source": "c73d61b19b4f5a10118d1e880669d474abebe1d754637512b9f8827f106708bd",
+      "output": "cbf51bf3668f50e5c2c930ea08ad37ee782a85d7e886033743950745fb52fe53"
     },
     "src/gen/index.ts": {
       "source": "2222a0612af25b1e3c82c2c6a20f44a5c62c0684e83919516789629a9406a013",

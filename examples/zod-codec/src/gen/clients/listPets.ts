@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../.kubb/client.ts'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client.ts'
 import type { ListPetsOptionsSchemaType, ListPetsResponsesSchemaType } from '../zod/listPetsSchema.ts'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client.ts'
 import { listPetsQuerySchema, listPetsResponseSchema } from '../zod/listPetsSchema.ts'
@@ -12,7 +12,9 @@ import { listPetsQuerySchema, listPetsResponseSchema } from '../zod/listPetsSche
  * `GET /pets`
  * @summary List pets born after a date
  */
-export function listPets<ThrowOnError extends boolean = true>(options: Options<ListPetsOptionsSchemaType, ThrowOnError>) {
+export function listPets<ThrowOnError extends boolean = true>(
+  options: Options<ListPetsOptionsSchemaType, ThrowOnError>,
+): Unwrappable<RequestResult<ListPetsResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

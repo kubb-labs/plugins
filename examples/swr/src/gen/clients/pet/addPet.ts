@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { AddPetRequest } from '../../models/AddPetRequest'
 import type { Pet } from '../../models/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
@@ -50,7 +50,26 @@ export function addPet<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   >,
-) {
+): Unwrappable<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Pet
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '405': {
+        code?: number
+        message?: string
+      }
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(
