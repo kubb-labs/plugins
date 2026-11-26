@@ -176,16 +176,10 @@ catalogs:
     '@kubb/adapter-oas':
       specifier: ^5.27.1
       version: 5.27.1
-    '@kubb/ast':
-      specifier: ^5.27.1
-      version: 5.27.1
     '@kubb/core':
       specifier: ^5.27.1
       version: 5.27.1
     '@kubb/kit':
-      specifier: ^5.27.1
-      version: 5.27.1
-    '@kubb/parser-ts':
       specifier: ^5.27.1
       version: 5.27.1
     '@kubb/plugin-barrel':
@@ -228,6 +222,10 @@ catalogs:
       specifier: ^5.1.1
       version: 5.1.1
 
+overrides:
+  '@kubb/ast': link:../kubb/packages/ast
+  '@kubb/parser-ts': link:../kubb/packages/parser-ts
+
 importers:
 
   .:
@@ -246,16 +244,16 @@ importers:
         version: 5.27.1
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/parser-ts':
-        specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        specifier: link:../kubb/packages/parser-ts
+        version: link:../kubb/packages/parser-ts
       '@kubb/plugin-barrel':
         specifier: 'catalog:'
         version: 5.27.1
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
       '@types/node':
         specifier: 'catalog:'
         version: 22.20.5
@@ -525,8 +523,8 @@ importers:
         specifier: 'catalog:'
         version: 5.27.1(@scalar/openapi-types@0.9.10)
       '@kubb/parser-ts':
-        specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        specifier: link:../../../kubb/packages/parser-ts
+        version: link:../../../kubb/packages/parser-ts
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -646,8 +644,8 @@ importers:
         specifier: 'catalog:'
         version: 5.27.1(@scalar/openapi-types@0.9.10)
       '@kubb/parser-ts':
-        specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        specifier: link:../../../kubb/packages/parser-ts
+        version: link:../../../kubb/packages/parser-ts
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -811,8 +809,8 @@ importers:
         specifier: 'catalog:'
         version: 5.27.1(@scalar/openapi-types@0.9.10)
       '@kubb/parser-ts':
-        specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        specifier: link:../../../kubb/packages/parser-ts
+        version: link:../../../kubb/packages/parser-ts
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -836,11 +834,11 @@ importers:
   internals/ast:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -853,7 +851,7 @@ importers:
         version: link:../ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -875,7 +873,7 @@ importers:
         version: link:../utils
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -897,13 +895,13 @@ importers:
         version: link:../utils
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -913,7 +911,7 @@ importers:
     dependencies:
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -923,7 +921,7 @@ importers:
     dependencies:
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-client':
         specifier: workspace:^
         version: link:../plugin-client
@@ -938,17 +936,17 @@ importers:
   packages/plugin-client:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -975,17 +973,17 @@ importers:
   packages/plugin-cypress:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1003,17 +1001,17 @@ importers:
   packages/plugin-faker:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@faker-js/faker':
         specifier: ^10.6.0
@@ -1032,7 +1030,7 @@ importers:
     dependencies:
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-client':
         specifier: workspace:^
         version: link:../plugin-client
@@ -1045,7 +1043,7 @@ importers:
     dependencies:
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-client':
         specifier: workspace:^
         version: link:../plugin-client
@@ -1060,11 +1058,11 @@ importers:
   packages/plugin-mcp:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
@@ -1073,7 +1071,7 @@ importers:
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1100,11 +1098,11 @@ importers:
   packages/plugin-msw:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-faker':
         specifier: workspace:^
         version: link:../plugin-faker
@@ -1113,7 +1111,7 @@ importers:
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1131,17 +1129,17 @@ importers:
   packages/plugin-react-query:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1165,11 +1163,11 @@ importers:
   packages/plugin-redoc:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1178,17 +1176,17 @@ importers:
   packages/plugin-swr:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1212,14 +1210,17 @@ importers:
   packages/plugin-ts:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
+      '@kubb/parser-ts':
+        specifier: link:../../../kubb/packages/parser-ts
+        version: link:../../../kubb/packages/parser-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
       '@typescript/typescript6':
         specifier: ^6.0.2
         version: 6.0.2
@@ -1236,9 +1237,6 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
-      '@kubb/parser-ts':
-        specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -1246,14 +1244,14 @@ importers:
   packages/plugin-valibot:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1271,17 +1269,17 @@ importers:
   packages/plugin-vue-query:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1308,14 +1306,14 @@ importers:
   packages/plugin-zod:
     dependencies:
       '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.27.1
+        specifier: link:../../../kubb/packages/ast
+        version: link:../../../kubb/packages/ast
       '@kubb/kit':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)
+        version: 5.27.1(@kubb/ast@kubb+packages+ast)
     devDependencies:
       '@internals/ast':
         specifier: workspace:*
@@ -1345,8 +1343,8 @@ importers:
         specifier: 'catalog:'
         version: 5.27.1
       '@kubb/parser-ts':
-        specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        specifier: link:../../../kubb/packages/parser-ts
+        version: link:../../../kubb/packages/parser-ts
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -1418,8 +1416,8 @@ importers:
         specifier: 'catalog:'
         version: 5.27.1(@scalar/openapi-types@0.9.10)
       '@kubb/parser-ts':
-        specifier: 'catalog:'
-        version: 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+        specifier: link:../../../kubb/packages/parser-ts
+        version: link:../../../kubb/packages/parser-ts
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -1778,10 +1776,6 @@ packages:
     resolution: {integrity: sha512-BMu4crpQYaZ47+aVlWdUoBTUoMcWpDeUi5tb/sRjgZNTqeoIDR2CL+WOwptyGhXm3kKIauz9mYXODvKPs7l2Ig==}
     engines: {node: '>=22.22'}
 
-  '@kubb/ast@5.27.1':
-    resolution: {integrity: sha512-kmclXCGBxUPxiODZLp0yldXRy2nmS//hi4vyrst2c4e6HDMP/MkdlzWwNH4cTm2PmCSiE5skgXA6XTqrxULRRQ==}
-    engines: {node: '>=22.22'}
-
   '@kubb/cli@5.27.1':
     resolution: {integrity: sha512-HdwHe5S79lQBP6AcguDs2lTeQl9noaQHJ3fRKerRzmpc4HU19mEXKuFVYml8qfVDWB5vWMY/2qZ6rhpBnPhz7A==}
     engines: {node: '>=22.22'}
@@ -1818,13 +1812,6 @@ packages:
 
   '@kubb/parser-md@5.27.1':
     resolution: {integrity: sha512-uLlbETxEh51Euy/CppHGtIFshh7cNsI4e+QJRqZYiIwP4PH/3RnlBwsB9UuUKOu2yqIr47T8r7E89U9Rmo/yBA==}
-    engines: {node: '>=22.22'}
-    peerDependencies:
-      '@kubb/ast': ^5.27.1
-      '@kubb/core': ^5.27.1
-
-  '@kubb/parser-ts@5.27.1':
-    resolution: {integrity: sha512-tI6XYOeBGy+2T2bWHxjXfCBgMGfhtBK4oK4x56ooLfnO4AvzOuTdWztQLSSJh02CkPNuIvxE7MM3s494bCDe8g==}
     engines: {node: '>=22.22'}
     peerDependencies:
       '@kubb/ast': ^5.27.1
@@ -4727,9 +4714,9 @@ snapshots:
 
   '@kubb/adapter-oas@5.27.1(@scalar/openapi-types@0.9.10)':
     dependencies:
-      '@kubb/ast': 5.27.1
+      '@kubb/ast': link:../kubb/packages/ast
       '@kubb/core': 5.27.1
-      '@kubb/kit': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+      '@kubb/kit': 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
       '@readme/openapi-parser': 11.0.0(@scalar/openapi-types@0.9.10)
       '@scalar/openapi-upgrader': 0.5.1
       api-ref-bundler: 0.5.1
@@ -4738,9 +4725,7 @@ snapshots:
     transitivePeerDependencies:
       - '@scalar/openapi-types'
 
-  '@kubb/ast@5.27.1': {}
-
-  '@kubb/cli@5.27.1(@kubb/adapter-oas@5.27.1(@scalar/openapi-types@0.9.10))(@kubb/mcp@5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@5.27.1))(@scalar/openapi-types@0.9.10)(typescript@7.0.2))(@kubb/studio@5.27.1(tsdown@0.23.7(typescript@7.0.2)))':
+  '@kubb/cli@5.27.1(@kubb/adapter-oas@5.27.1(@scalar/openapi-types@0.9.10))(@kubb/mcp@5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@kubb+packages+ast))(@scalar/openapi-types@0.9.10)(typescript@7.0.2))(@kubb/studio@5.27.1(tsdown@0.23.7(typescript@7.0.2)))':
     dependencies:
       '@clack/prompts': 1.9.0
       '@gunshi/plugin-dryrun': 0.37.3
@@ -4756,28 +4741,28 @@ snapshots:
       yuku: 0.28.1
     optionalDependencies:
       '@kubb/adapter-oas': 5.27.1(@scalar/openapi-types@0.9.10)
-      '@kubb/mcp': 5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@5.27.1))(@scalar/openapi-types@0.9.10)(typescript@7.0.2)
+      '@kubb/mcp': 5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@kubb+packages+ast))(@scalar/openapi-types@0.9.10)(typescript@7.0.2)
       '@kubb/studio': 5.27.1(tsdown@0.23.7(typescript@7.0.2))
     transitivePeerDependencies:
       - '@yuku-toolchain/wasm'
 
   '@kubb/core@5.27.1':
     dependencies:
-      '@kubb/ast': 5.27.1
+      '@kubb/ast': link:../kubb/packages/ast
       tinyexec: 1.3.1
       verkit: 0.5.0
 
-  '@kubb/kit@5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)':
+  '@kubb/kit@5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)':
     dependencies:
-      '@kubb/ast': 5.27.1
+      '@kubb/ast': link:../kubb/packages/ast
       '@kubb/core': 5.27.1
-      '@kubb/renderer-jsx': 5.27.1(@kubb/ast@5.27.1)
+      '@kubb/renderer-jsx': 5.27.1(@kubb/ast@kubb+packages+ast)
 
-  '@kubb/mcp@5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@5.27.1))(@scalar/openapi-types@0.9.10)(typescript@7.0.2)':
+  '@kubb/mcp@5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@kubb+packages+ast))(@scalar/openapi-types@0.9.10)(typescript@7.0.2)':
     dependencies:
       '@kubb/adapter-oas': 5.27.1(@scalar/openapi-types@0.9.10)
       '@kubb/core': 5.27.1
-      '@kubb/renderer-jsx': 5.27.1(@kubb/ast@5.27.1)
+      '@kubb/renderer-jsx': 5.27.1(@kubb/ast@kubb+packages+ast)
       '@tmcp/adapter-valibot': 0.1.7(tmcp@1.20.1(typescript@7.0.2))(valibot@1.5.0(typescript@7.0.2))
       '@tmcp/transport-stdio': 0.5.2(tmcp@1.20.1(typescript@7.0.2))
       jiti: 2.7.0
@@ -4787,34 +4772,26 @@ snapshots:
       - '@scalar/openapi-types'
       - typescript
 
-  '@kubb/parser-md@5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)':
+  '@kubb/parser-md@5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)':
     dependencies:
-      '@kubb/ast': 5.27.1
+      '@kubb/ast': link:../kubb/packages/ast
       '@kubb/core': 5.27.1
       yaml: 2.9.1
 
-  '@kubb/parser-ts@5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)':
-    dependencies:
-      '@kubb/ast': 5.27.1
-      '@kubb/core': 5.27.1
-      yuku: 0.28.1
-    transitivePeerDependencies:
-      - '@yuku-toolchain/wasm'
-
   '@kubb/plugin-barrel@5.27.1':
     dependencies:
-      '@kubb/ast': 5.27.1
+      '@kubb/ast': link:../kubb/packages/ast
       '@kubb/core': 5.27.1
-      '@kubb/kit': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+      '@kubb/kit': 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
 
-  '@kubb/renderer-jsx@5.27.1(@kubb/ast@5.27.1)':
+  '@kubb/renderer-jsx@5.27.1(@kubb/ast@kubb+packages+ast)':
     dependencies:
-      '@kubb/ast': 5.27.1
+      '@kubb/ast': link:../kubb/packages/ast
       yaml: 2.9.1
 
   '@kubb/studio@5.27.1(tsdown@0.23.7(typescript@7.0.2))':
     dependencies:
-      '@kubb/ast': 5.27.1
+      '@kubb/ast': link:../kubb/packages/ast
       '@kubb/core': 5.27.1
       capnweb: 0.13.1
       diff: 9.0.0
@@ -6086,15 +6063,15 @@ snapshots:
   kubb@5.27.1(@scalar/openapi-types@0.9.10)(rolldown@1.2.18)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
       '@kubb/adapter-oas': 5.27.1(@scalar/openapi-types@0.9.10)
-      '@kubb/ast': 5.27.1
-      '@kubb/cli': 5.27.1(@kubb/adapter-oas@5.27.1(@scalar/openapi-types@0.9.10))(@kubb/mcp@5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@5.27.1))(@scalar/openapi-types@0.9.10)(typescript@7.0.2))(@kubb/studio@5.27.1(tsdown@0.23.7(typescript@7.0.2)))
+      '@kubb/ast': link:../kubb/packages/ast
+      '@kubb/cli': 5.27.1(@kubb/adapter-oas@5.27.1(@scalar/openapi-types@0.9.10))(@kubb/mcp@5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@kubb+packages+ast))(@scalar/openapi-types@0.9.10)(typescript@7.0.2))(@kubb/studio@5.27.1(tsdown@0.23.7(typescript@7.0.2)))
       '@kubb/core': 5.27.1
-      '@kubb/kit': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
-      '@kubb/mcp': 5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@5.27.1))(@scalar/openapi-types@0.9.10)(typescript@7.0.2)
-      '@kubb/parser-md': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
-      '@kubb/parser-ts': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+      '@kubb/kit': 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
+      '@kubb/mcp': 5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@kubb+packages+ast))(@scalar/openapi-types@0.9.10)(typescript@7.0.2)
+      '@kubb/parser-md': 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
+      '@kubb/parser-ts': link:../kubb/packages/parser-ts
       '@kubb/plugin-barrel': 5.27.1
-      '@kubb/renderer-jsx': 5.27.1(@kubb/ast@5.27.1)
+      '@kubb/renderer-jsx': 5.27.1(@kubb/ast@kubb+packages+ast)
       '@kubb/studio': 5.27.1(tsdown@0.23.7(typescript@7.0.2))
       unplugin-kubb: 5.27.1(@scalar/openapi-types@0.9.10)(rolldown@1.2.18)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     transitivePeerDependencies:
@@ -6118,15 +6095,15 @@ snapshots:
   kubb@5.27.1(@scalar/openapi-types@0.9.10)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
       '@kubb/adapter-oas': 5.27.1(@scalar/openapi-types@0.9.10)
-      '@kubb/ast': 5.27.1
-      '@kubb/cli': 5.27.1(@kubb/adapter-oas@5.27.1(@scalar/openapi-types@0.9.10))(@kubb/mcp@5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@5.27.1))(@scalar/openapi-types@0.9.10)(typescript@7.0.2))(@kubb/studio@5.27.1(tsdown@0.23.7(typescript@7.0.2)))
+      '@kubb/ast': link:../kubb/packages/ast
+      '@kubb/cli': 5.27.1(@kubb/adapter-oas@5.27.1(@scalar/openapi-types@0.9.10))(@kubb/mcp@5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@kubb+packages+ast))(@scalar/openapi-types@0.9.10)(typescript@7.0.2))(@kubb/studio@5.27.1(tsdown@0.23.7(typescript@7.0.2)))
       '@kubb/core': 5.27.1
-      '@kubb/kit': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
-      '@kubb/mcp': 5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@5.27.1))(@scalar/openapi-types@0.9.10)(typescript@7.0.2)
-      '@kubb/parser-md': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
-      '@kubb/parser-ts': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+      '@kubb/kit': 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
+      '@kubb/mcp': 5.27.1(@kubb/renderer-jsx@5.27.1(@kubb/ast@kubb+packages+ast))(@scalar/openapi-types@0.9.10)(typescript@7.0.2)
+      '@kubb/parser-md': 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
+      '@kubb/parser-ts': link:../kubb/packages/parser-ts
       '@kubb/plugin-barrel': 5.27.1
-      '@kubb/renderer-jsx': 5.27.1(@kubb/ast@5.27.1)
+      '@kubb/renderer-jsx': 5.27.1(@kubb/ast@kubb+packages+ast)
       '@kubb/studio': 5.27.1(tsdown@0.23.7(typescript@7.0.2))
       unplugin-kubb: 5.27.1(@scalar/openapi-types@0.9.10)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     transitivePeerDependencies:
@@ -6831,10 +6808,10 @@ snapshots:
   unplugin-kubb@5.27.1(@scalar/openapi-types@0.9.10)(rolldown@1.2.18)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
       '@kubb/adapter-oas': 5.27.1(@scalar/openapi-types@0.9.10)
-      '@kubb/ast': 5.27.1
+      '@kubb/ast': link:../kubb/packages/ast
       '@kubb/core': 5.27.1
-      '@kubb/parser-md': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
-      '@kubb/parser-ts': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+      '@kubb/parser-md': 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
+      '@kubb/parser-ts': link:../kubb/packages/parser-ts
       '@kubb/plugin-barrel': 5.27.1
       jiti: 2.7.0
       unplugin: 3.7.0(rolldown@1.2.18)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
@@ -6853,10 +6830,10 @@ snapshots:
   unplugin-kubb@5.27.1(@scalar/openapi-types@0.9.10)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
       '@kubb/adapter-oas': 5.27.1(@scalar/openapi-types@0.9.10)
-      '@kubb/ast': 5.27.1
+      '@kubb/ast': link:../kubb/packages/ast
       '@kubb/core': 5.27.1
-      '@kubb/parser-md': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
-      '@kubb/parser-ts': 5.27.1(@kubb/ast@5.27.1)(@kubb/core@5.27.1)
+      '@kubb/parser-md': 5.27.1(@kubb/ast@kubb+packages+ast)(@kubb/core@5.27.1)
+      '@kubb/parser-ts': link:../kubb/packages/parser-ts
       '@kubb/plugin-barrel': 5.27.1
       jiti: 2.7.0
       unplugin: 3.7.0(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))

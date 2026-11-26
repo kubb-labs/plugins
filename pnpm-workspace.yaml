@@ -49,6 +49,11 @@ catalog:
 #  kubb: link:../kubb/packages/kubb
 #  unplugin-kubb: link:../kubb/packages/unplugin-kubb
 
+# Local builds of kubb-labs/kubb#4810, the two packages it changes. Replace with a catalog bump once it is released.
+overrides:
+  '@kubb/ast': link:../kubb/packages/ast
+  '@kubb/parser-ts': link:../kubb/packages/parser-ts
+
 minimumReleaseAge: 2880 # 48 hours, matches CI's SAFE_CHAIN_MINIMUM_PACKAGE_AGE_HOURS
 minimumReleaseAgeExclude:
   - '@kubb/*'
