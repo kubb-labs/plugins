@@ -40,7 +40,10 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
     )
   }
 
-  const enumSchemaNodes = ast.node.collect<ast.EnumSchemaNode>(node, {
+  // The type never references an enum that only appears inside `not`, so its declaration would be dead
+  // code in the public API. Enums that also appear outside `not` are still collected there.
+  const withoutNegations = ast.node.transform(node, { schema: (n) => (n.type === ast.schema.types.not ? { ...n, members: [] } : undefined) })
+  const enumSchemaNodes = ast.node.collect<ast.EnumSchemaNode>(withoutNegations, {
     schema(n): ast.EnumSchemaNode | undefined {
       const enumNode = ast.schema.narrow(n, ast.schema.types.enum)
       // Skip an inline `const` (single-value enum the adapter did not register): it renders as a
