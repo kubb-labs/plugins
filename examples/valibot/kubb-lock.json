@@ -1,0 +1,119 @@
+{
+  "lockfileVersion": 1,
+  "inputs": {
+    "src/gen": {
+      "hash": "4f80af9a71b348fb3db0345bc3f1d18b26d6043481de7da777dd8ee4ca38189d",
+      "sources": ["petStore.yaml"]
+    }
+  },
+  "files": {
+    "src/gen/valibot/addPetRequestSchema.ts": {
+      "source": "c153b18564f41e819334563d96b2e60d04b746cd9fd8efc685635303112b4f4b",
+      "output": "bd6f6377801a970e9eb841b746139d169d6f09b878f638b0c4b993d5a23eb245"
+    },
+    "src/gen/valibot/addPetSchema.ts": {
+      "source": "ea4c0ac790d5e7d328dc8b949ed4d70de6859137f76d3ed75160bd87d70f128c",
+      "output": "c553e6fb76ff9f0275ed178ac0545ffe5abe4219ff58f38a87b34d471b70d1ba"
+    },
+    "src/gen/valibot/apiResponseSchema.ts": {
+      "source": "a576044dff318d672578a7a1e5366bd48964daeb02dc75fdf41ce925789f83c0",
+      "output": "e05af1f003b5a19cf6b8204e2af462f5873ef26007984aeadffccb49467d4e0b"
+    },
+    "src/gen/valibot/categorySchema.ts": {
+      "source": "511743fd9e46e8b05b613e4881a11577a50a1d43454212c2f0249a6632a64552",
+      "output": "c64ae17c181f17c57a985bbd53962ebcdcf381df09751d2d4786cc3b460add75"
+    },
+    "src/gen/valibot/createPetsSchema.ts": {
+      "source": "aa652fe55e21b75d9144200765929b1f6f0526888e0ac482ae43cfd4796959d0",
+      "output": "9cb41230525d6f3c1e251f24aea65a39e9a7016004dd898343978d0fdaaae50f"
+    },
+    "src/gen/valibot/deleteOrderSchema.ts": {
+      "source": "08907a90e82c5fa9e589b66b662ac909f528c55c253146c31c54e1630080c542",
+      "output": "756431e643b4b44fbd5fdef9c56c9aa93a344a3409d0832204197663a45969ab"
+    },
+    "src/gen/valibot/deletePetSchema.ts": {
+      "source": "4eef5dff9133d05008e7b91091e1f1e25bac0c5f8bed62892a13a191d4f5a951",
+      "output": "93cc286e6b929404980a1c8b036fa8f84b7d86082093c7184a99fb3e30fb9b1f"
+    },
+    "src/gen/valibot/findPetsByStatusSchema.ts": {
+      "source": "4ea11555d685e6079529cd05342fb2d59d02f37665631c448bc54be1c4fa9516",
+      "output": "6e1e60c29d85fdc3fe04f4c196f7ef26522497f6a3eaaf63d56d3d5a5f0b537c"
+    },
+    "src/gen/valibot/findPetsByTagsSchema.ts": {
+      "source": "90e78a5cf478d2f68026ada2a7f0c6e621d701bd506b5ce2a73c71c10dc30bfb",
+      "output": "67c09dbb045f746979b9ca172fbe5aa0b67554ab81e5bd8567b9c9a5a2ab397c"
+    },
+    "src/gen/valibot/getInventorySchema.ts": {
+      "source": "bc3d066dc9bd34ae4b0d9d19cdcd4a84b4f157945e51907e597eabadc190be54",
+      "output": "5a5c952d13f32ca6f02cd14a4953390d1eb4e645cced8a9acc8800efeb502b02"
+    },
+    "src/gen/valibot/getOrderByIdSchema.ts": {
+      "source": "0c5191f7a64c1a58f5ff0298bb16e2b0b2700ba7fd6496fd9886e5ef74a72fce",
+      "output": "ac95f9cc40596287d97da70383e1c78e0a2f4309181de8c3d2cacfcd56e5f39d"
+    },
+    "src/gen/valibot/getPetByIdSchema.ts": {
+      "source": "d0527f2e0b9b410b685b0763c3461152c93a2ea81718ae5efff91401c7b0fd01",
+      "output": "65a6ca68cecc2ec699fb963b5a022f0bf13fd1c9cb977f0d9e3c78b41b2762f1"
+    },
+    "src/gen/valibot/getThingsSchema.ts": {
+      "source": "a1c9b40ad2652d2bbeb1688fcb5607ca2dfd88aa2f7ff5940bf007795dd34460",
+      "output": "de3e6afa2244e214dcd6a579dd1e57dd216a291b4c4ec70bdc300e185ba6b57c"
+    },
+    "src/gen/valibot/orderSchema.ts": {
+      "source": "df25f07de131f655474213960a64931ee477137655ce473e3c217f8fa0aa8096",
+      "output": "7b4ec0d4551424c8af7db9f1460a375578f4243f8f041c56435644dce77e7f74"
+    },
+    "src/gen/valibot/paymentErrorSchema.ts": {
+      "source": "e764df02148999437c8e1ff07dacf29f47c25a85774f8b2589c1833cee19597c",
+      "output": "c158a12d9541509aafc75f2d13d191f1336c0fe24e5cca895cc5be2f38d084a2"
+    },
+    "src/gen/valibot/paymentSchema.ts": {
+      "source": "9897f58e61601599bf3dc0510a99491c132af49bc05c96bd5a5b6c4b888c82dd",
+      "output": "58263c3216dae62739855fa3cb2633acdccf47a57bb000e1c9bdf2c09bec3f3d"
+    },
+    "src/gen/valibot/petNotFoundSchema.ts": {
+      "source": "7232967af7b23d67874c242bee708b8a21194f61f685be8de0c6a2f70222e659",
+      "output": "8986e6f3c2af00f1daaa7a13facd7ef1d765d9839c17cf1ab9f95175fd0e102f"
+    },
+    "src/gen/valibot/petSchema.ts": {
+      "source": "1fcd95f8bda9fcb94b1a728c3c6c816839eb0f51146b6ac15e698fad1b4bd77d",
+      "output": "8c9f68e0750c7706ea5011210c253ce53fcb84b58d6d64596e057fb666109ce5"
+    },
+    "src/gen/valibot/phoneNumberSchema.ts": {
+      "source": "51beaa729b134b3b759d493a8863a28ab0de6c1aae3bba501a54100a5aab83d1",
+      "output": "e5b41d69029cf031e4b33313ec32fa3f15f91c29993159826f033c0556b97093"
+    },
+    "src/gen/valibot/phoneWithMaxLengthExplicitSchema.ts": {
+      "source": "fdb419db80b8b38bb15a0df2ac1867cd6a480ae2ebef4f349a8e04d1370f2671",
+      "output": "6cc9b08f3e98872fabaada41f6506604e290a1d65ef114792a4959e222f12314"
+    },
+    "src/gen/valibot/phoneWithMaxLengthSchema.ts": {
+      "source": "942a93277547b16310b87694067095141fc9b09603028608fa465c1fd6cc1530",
+      "output": "cedc33c6ac205918011491987ff5a28a21d178742f526d527a79a35f234b0090"
+    },
+    "src/gen/valibot/placeOrderPatchSchema.ts": {
+      "source": "e00309bd640f4545b886e571ae65d3a0d9b1f690e95d793f3c2aa38f29ba2e3c",
+      "output": "177a1199dcaf0145f5e7788bd61d8ed48313590acf50d2935ec728bc2dec35cc"
+    },
+    "src/gen/valibot/placeOrderSchema.ts": {
+      "source": "ff1d7e5a57e689229bd9e71bda50d95fa3d6dcb5f425c20c53a6c205f091c62b",
+      "output": "677c812a911b062abb7041811a624f0cdb2a84370b02939515ae38d20d17f102"
+    },
+    "src/gen/valibot/tagSchema.ts": {
+      "source": "8e759f7d056084fc9def1e89a9821066a8920ab65938e1a27031c68596cf044f",
+      "output": "bc045f32e60abf8bf9e84d6d2cc28dce9c9da8c554a0c208c3fe6de879cc6cff"
+    },
+    "src/gen/valibot/updatePetSchema.ts": {
+      "source": "8fd65f16c9ca8f1a89a63ad97a6167f329b61a30a1f77472a50f135a72aa0d5b",
+      "output": "bac8e850d953af8ada61252dfa7ce2f4386d22710fbe041a7c3aa32e0c783813"
+    },
+    "src/gen/valibot/updatePetWithFormSchema.ts": {
+      "source": "0c1df368b207ad8927ea464896d229095aefe0a0410cf048a835108f9a223b60",
+      "output": "13f246a15fdd5c3e9c2ff790d4f235564e7d9055848056662cfcf53f10f59587"
+    },
+    "src/gen/valibot/uploadFileSchema.ts": {
+      "source": "899f7504b101361b2a66b2ffdf6b00a92999a6874d9f1a1ea571c373387eb265",
+      "output": "2c3665d8e78f92722a4235c22fa0b2f6bd5586e1bfd4c7b0e9e6b0b985953620"
+    }
+  }
+}

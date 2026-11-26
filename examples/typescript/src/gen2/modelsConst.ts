@@ -64,13 +64,13 @@ export const paymentMethodEnum = {
 
 export type PaymentMethodEnumenumType = (typeof paymentMethodEnum)[keyof typeof paymentMethodEnum]
 
-export const findPetsByStatusStatus = {
+export const findPetsByStatusStatusEnum = {
   available: 'available',
   pending: 'pending',
   sold: 'sold',
 } as const
 
-export type FindPetsByStatusStatusenumType = (typeof findPetsByStatusStatus)[keyof typeof findPetsByStatusStatus]
+export type FindPetsByStatusStatusEnumenumType = (typeof findPetsByStatusStatusEnum)[keyof typeof findPetsByStatusStatusEnum]
 
 export const deletePetStatus200Enum = {
   TYPE1: 'TYPE1',
@@ -496,7 +496,7 @@ export type FindPetsByStatusQuery = {
    * @description Status values that need to be considered for filter
    * @default available
    */
-  status?: FindPetsByStatusStatusenumType
+  status?: FindPetsByStatusStatusEnumenumType
 }
 
 export type FindPetsByStatusStatus200Json = Array<Pet>

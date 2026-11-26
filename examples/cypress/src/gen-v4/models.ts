@@ -364,13 +364,13 @@ export type OptionsFindPetsByStatusResponses = {
  */
 export type OptionsFindPetsByStatusResponse = OptionsFindPetsByStatusStatus200
 
-export const findPetsByStatusStatus = {
+export const findPetsByStatusStatusEnum = {
   available: 'available',
   pending: 'pending',
   sold: 'sold',
 } as const
 
-export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof typeof findPetsByStatusStatus]
+export type FindPetsByStatusStatusEnumKey = (typeof findPetsByStatusStatusEnum)[keyof typeof findPetsByStatusStatusEnum]
 
 export type FindPetsByStatusQuery = {
   /**
@@ -378,7 +378,7 @@ export type FindPetsByStatusQuery = {
    * @default 'available'
    * @type string | undefined
    */
-  status?: FindPetsByStatusStatusKey
+  status?: FindPetsByStatusStatusEnumKey
 }
 
 export type FindPetsByStatusStatus200Json = Array<Pet>

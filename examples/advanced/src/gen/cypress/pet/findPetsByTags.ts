@@ -1,4 +1,4 @@
-import type { FindPetsByTagsXEXAMPLEKey } from '../../models/ts/FindPetsByTagsXEXAMPLE'
+import type { FindPetsByTagsXEXAMPLEEnumKey } from '../../models/ts/FindPetsByTagsXEXAMPLEEnum'
 import type { Pet } from '../../models/ts/Pet'
 
 export function findPetsByTags(
@@ -14,7 +14,7 @@ export function findPetsByTags(
       pageSize?: number
     }
     headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
     }
   },
   options: Partial<Cypress.RequestOptions> = {},

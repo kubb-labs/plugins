@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE'
+import type { FindPetsByTagsXEXAMPLEEnumKey } from './FindPetsByTagsXEXAMPLEEnum'
 import type { Pet } from './Pet'
 
 export type FindPetsByTagsQuery = {
@@ -28,7 +28,7 @@ export type FindPetsByTagsHeaders = {
   /**
    * @description Header parameters
    */
-  'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+  'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
 }
 
 export type FindPetsByTagsStatus200Json = Pet[]

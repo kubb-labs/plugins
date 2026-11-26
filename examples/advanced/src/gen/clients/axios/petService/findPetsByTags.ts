@@ -1,5 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
+import type { FindPetsByTagsXEXAMPLEEnumKey } from '../../../models/ts/FindPetsByTagsXEXAMPLEEnum'
 import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { findPetsByTagsResponseSchema, findPetsByTagsStatus400Schema } from '../../../zod/pet/findPetsByTagsSchema'
@@ -20,7 +20,7 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
         pageSize?: number
       }
       headers: {
-        'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+        'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
       }
     },
     ThrowOnError

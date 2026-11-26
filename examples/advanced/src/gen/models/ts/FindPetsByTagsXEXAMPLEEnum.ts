@@ -1,0 +1,7 @@
+export const findPetsByTagsXEXAMPLEEnum = {
+  ONE: 'ONE',
+  TWO: 'TWO',
+  THREE: 'THREE',
+} as const
+
+export type FindPetsByTagsXEXAMPLEEnumKey = (typeof findPetsByTagsXEXAMPLEEnum)[keyof typeof findPetsByTagsXEXAMPLEEnum]

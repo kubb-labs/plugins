@@ -1,6 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import type { CreatePetsBoolParamKey } from '../../../models/ts/CreatePetsBoolParam'
-import type { CreatePetsXEXAMPLEKey } from '../../../models/ts/CreatePetsXEXAMPLE'
+import type { CreatePetsXEXAMPLEEnumKey } from '../../../models/ts/CreatePetsXEXAMPLEEnum'
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { createPetsResponseSchema, createPetsStatusDefaultSchema } from '../../../zod/pets/createPetsSchema'
 
@@ -19,11 +18,11 @@ export function createPets<ThrowOnError extends boolean = true>(
         uuid: string
       }
       query?: {
-        bool_param?: CreatePetsBoolParamKey
+        bool_param?: true
         offset?: number
       }
       headers: {
-        'X-EXAMPLE': CreatePetsXEXAMPLEKey
+        'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
       }
     },
     ThrowOnError

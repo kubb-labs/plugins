@@ -19,20 +19,20 @@ export type CreatePetsQuery = {
   offset?: number
 }
 
-export const createPetsXEXAMPLE = {
+export const createPetsXEXAMPLEEnum = {
   ONE: 'ONE',
   TWO: 'TWO',
   THREE: 'THREE',
 } as const
 
-export type CreatePetsXEXAMPLEKey = (typeof createPetsXEXAMPLE)[keyof typeof createPetsXEXAMPLE]
+export type CreatePetsXEXAMPLEEnumKey = (typeof createPetsXEXAMPLEEnum)[keyof typeof createPetsXEXAMPLEEnum]
 
 export type CreatePetsHeaders = {
   /**
    * @description Header parameters
    * @type string
    */
-  'X-EXAMPLE': CreatePetsXEXAMPLEKey
+  'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
 }
 
 export type CreatePetsStatus201 = unknown

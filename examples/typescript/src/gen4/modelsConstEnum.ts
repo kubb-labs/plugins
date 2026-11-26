@@ -48,7 +48,7 @@ export const enum PaymentMethodEnum {
   cash = 'cash',
 }
 
-export const enum FindPetsByStatusStatus {
+export const enum FindPetsByStatusStatusEnum {
   available = 'available',
   pending = 'pending',
   sold = 'sold',
@@ -476,7 +476,7 @@ export type FindPetsByStatusQuery = {
    * @description Status values that need to be considered for filter
    * @default available
    */
-  status?: FindPetsByStatusStatus
+  status?: FindPetsByStatusStatusEnum
 }
 
 export type FindPetsByStatusStatus200Json = Array<Pet>

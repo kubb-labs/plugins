@@ -1,6 +1,6 @@
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '../../../../tanstack-query-hook'
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
-import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
+import type { FindPetsByTagsXEXAMPLEEnumKey } from '../../../models/ts/FindPetsByTagsXEXAMPLEEnum'
 import type { Pet } from '../../../models/ts/Pet'
 import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
 import { withQueryKey } from '../../../.kubb/withQueryKey'
@@ -19,7 +19,7 @@ export const findPetsByTagsInfiniteQueryKey = ({
       pageSize?: number
     }
     headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
     }
   },
   'headers'
@@ -33,7 +33,7 @@ export const findPetsByTagsInfiniteQueryKey = ({
       pageSize?: number
     }
     headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
     }
   }['headers']
 } = {}) => [{ url: '/pet/findByTags', infinite: true }, ...(query ? [query] : [])] as const
@@ -53,7 +53,7 @@ export function findPetsByTagsInfiniteQueryOptions(
       pageSize?: number
     }
     headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
     }
   },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
@@ -114,7 +114,7 @@ export function useFindPetsByTagsInfinite<
             pageSize?: number
           }
           headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
           }
         }['headers']
       | (() => {
@@ -126,7 +126,7 @@ export function useFindPetsByTagsInfinite<
             pageSize?: number
           }
           headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
           }
         }['headers'])
     query?:
@@ -139,7 +139,7 @@ export function useFindPetsByTagsInfinite<
             pageSize?: number
           }
           headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
           }
         }['query']
       | (() => {
@@ -151,7 +151,7 @@ export function useFindPetsByTagsInfinite<
             pageSize?: number
           }
           headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
           }
         }['query'])
   },

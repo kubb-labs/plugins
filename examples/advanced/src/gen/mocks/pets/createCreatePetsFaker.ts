@@ -1,7 +1,5 @@
-import type { CreatePetsBoolParamKey } from '../../models/ts/CreatePetsBoolParam'
-import type { CreatePetsXEXAMPLEKey } from '../../models/ts/CreatePetsXEXAMPLE'
-import { createCreatePetsBoolParamFaker } from '../createCreatePetsBoolParamFaker'
-import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker'
+import type { CreatePetsXEXAMPLEEnumKey } from '../../models/ts/CreatePetsXEXAMPLEEnum'
+import { createCreatePetsXEXAMPLEEnumFaker } from '../createCreatePetsXEXAMPLEEnumFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createCreatePetsPathFaker<
@@ -20,12 +18,17 @@ export function createCreatePetsPathFaker<
 
 export function createCreatePetsQueryFaker<
   TData extends Partial<{
-    bool_param?: CreatePetsBoolParamKey
+    bool_param?: true
     offset?: number
   }> = object,
 >(data?: TData) {
   const defaultFakeData = {
-    bool_param: createCreatePetsBoolParamFaker(),
+    bool_param: faker.helpers.arrayElement([true] as Array<
+      NonNullable<{
+        bool_param?: true
+        offset?: number
+      }>['bool_param']
+    >),
     offset: faker.number.int(),
   }
   return {
@@ -36,11 +39,11 @@ export function createCreatePetsQueryFaker<
 
 export function createCreatePetsHeadersFaker<
   TData extends Partial<{
-    'X-EXAMPLE': CreatePetsXEXAMPLEKey
+    'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
   }> = object,
 >(data?: TData) {
   const defaultFakeData = {
-    'X-EXAMPLE': createCreatePetsXEXAMPLEFaker(),
+    'X-EXAMPLE': createCreatePetsXEXAMPLEEnumFaker(),
   }
   return {
     ...defaultFakeData,

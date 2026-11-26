@@ -36,7 +36,7 @@ export type {
   CreatePetsStatus201,
   CreatePetsStatusDefault,
 } from './CreatePets'
-export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE'
+export type { CreatePetsXEXAMPLEEnumKey } from './CreatePetsXEXAMPLEEnum'
 export type { DeleteOrderOptions, DeleteOrderPath, DeleteOrderResponse, DeleteOrderResponses, DeleteOrderStatus400, DeleteOrderStatus404 } from './DeleteOrder'
 export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './DeletePet'
 export type {
@@ -60,7 +60,7 @@ export type {
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from './FindPetsByTags'
-export type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE'
+export type { FindPetsByTagsXEXAMPLEEnumKey } from './FindPetsByTagsXEXAMPLEEnum'
 export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory'
 export type {
   GetOrderByIdOptions,
@@ -139,8 +139,8 @@ export type {
 } from './UpdatePetWithForm'
 export type { TagTag } from './tag/Tag'
 export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum'
-export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE'
-export { findPetsByTagsXEXAMPLE } from './FindPetsByTagsXEXAMPLE'
+export { createPetsXEXAMPLEEnum } from './CreatePetsXEXAMPLEEnum'
+export { findPetsByTagsXEXAMPLEEnum } from './FindPetsByTagsXEXAMPLEEnum'
 export { orderHttpStatusEnum } from './OrderHttpStatusEnum'
 export { orderOrderTypeEnum } from './OrderOrderTypeEnum'
 export { orderStatusEnum } from './OrderStatusEnum'
