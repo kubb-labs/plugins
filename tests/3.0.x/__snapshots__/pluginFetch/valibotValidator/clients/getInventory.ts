@@ -7,6 +7,12 @@ import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 import { getInventoryResponseSchema } from '../valibot/getInventorySchema'
 
+type GetInventoryResponses = {
+  '200': ({
+  [key: string]: number;
+});
+}
+
 /**
  * `GET /store/inventory`
  * @description Returns a map of status codes to quantities
@@ -17,16 +23,8 @@ export function getInventory<ThrowOnError extends boolean = true>(options: Optio
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '200': ({
-  [key: string]: number;
-});
-}), ThrowOnError>> {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<({
-    '200': ({
-    [key: string]: number;
-  });
-  }), ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, validator: { response: getInventoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap(apiClient<GetInventoryResponses, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, validator: { response: getInventoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

@@ -11,25 +11,20 @@ import { point } from '../clients/point'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const pointQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<({
+type PointOptions = {
   body?: never;
   path: ({
   id: string;
 });
   query?: never;
   headers?: never;
-}), 'headers'>['path']> }) => [{ url: '/points/:id', params: path }] as const
+}
+
+export const pointQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<PointOptions, 'headers'>['path']> }) => [{ url: '/points/:id', params: path }] as const
 
 export type PointQueryKey = ReturnType<typeof pointQueryKey>
 
-export function pointQueryOptions({ path }: { path: MaybeRefOrGetter<({
-  body?: never;
-  path: ({
-  id: string;
-});
-  query?: never;
-  headers?: never;
-})['path']> }, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+export function pointQueryOptions({ path }: { path: MaybeRefOrGetter<PointOptions['path']> }, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = pointQueryKey({ path })
   return queryOptions<PointGeoJson, ResponseErrorConfig<Error>, PointGeoJson>({
    queryKey,
@@ -42,14 +37,7 @@ export function pointQueryOptions({ path }: { path: MaybeRefOrGetter<({
 /**
  * `GET /points/{id}`
  */
-export function usePoint<TData = PointGeoJson, TQueryData = PointGeoJson, TQueryKey extends QueryKey = PointQueryKey>({ path }: { path: MaybeRefOrGetter<({
-  body?: never;
-  path: ({
-  id: string;
-});
-  query?: never;
-  headers?: never;
-})['path']> }, options: {
+export function usePoint<TData = PointGeoJson, TQueryData = PointGeoJson, TQueryKey extends QueryKey = PointQueryKey>({ path }: { path: MaybeRefOrGetter<PointOptions['path']> }, options: {
   query?: Partial<UseQueryOptions<PointGeoJson, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {

@@ -10,6 +10,8 @@ import type { Pet } from '../types/Pet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { addPet } from '../clients-ky/addPet'
 
+type AddPetStatus200 = Pet | string
+
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
@@ -46,14 +48,14 @@ export type AddPetMutationArg = ({
  * @summary Add a new pet to the store
  */
 export function useAddPet(options: {
-  mutation?: SWRMutationConfiguration<(Pet | string), ResponseErrorConfig<unknown>, AddPetMutationKey | null, AddPetMutationArg> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<AddPetStatus200, ResponseErrorConfig<unknown>, AddPetMutationKey | null, AddPetMutationArg> & { throwOnError?: boolean },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = addPetMutationKey()
 
-  return useSWRMutation<(Pet | string), ResponseErrorConfig<unknown>, AddPetMutationKey | null, AddPetMutationArg>(
+  return useSWRMutation<AddPetStatus200, ResponseErrorConfig<unknown>, AddPetMutationKey | null, AddPetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
       return addPet({ ...config, ...variables, throwOnError: true }).unwrap()

@@ -10,25 +10,22 @@ import type { Pet } from '../types/Pet'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByStatus } from '../clients/findPetsByStatus'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<({
+type FindPetsByStatusOptions = {
   body?: never;
   path?: never;
   query?: ({
   status?: FindPetsByStatusStatusEnumKey;
 });
   headers?: never;
-}), 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+}
+
+type FindPetsByStatusStatus200 = (Pet[]) | string
+
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusOptions, 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-export function findPetsByStatusQueryOptions({ query }: ({
-  body?: never;
-  path?: never;
-  query?: ({
-  status?: FindPetsByStatusStatusEnumKey;
-});
-  headers?: never;
-}) = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusOptions = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   return {
     fetcher: async () => {
       return findPetsByStatus({ ...config, query, throwOnError: true }).unwrap()
@@ -41,15 +38,8 @@ export function findPetsByStatusQueryOptions({ query }: ({
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
  */
-export function useFindPetsByStatus({ query }: ({
-  body?: never;
-  path?: never;
-  query?: ({
-  status?: FindPetsByStatusStatusEnumKey;
-});
-  headers?: never;
-}) = {}, options: {
-  query?: SWRConfiguration<((Pet[]) | string), ResponseErrorConfig<unknown>>,
+export function useFindPetsByStatus({ query }: FindPetsByStatusOptions = {}, options: {
+  query?: SWRConfiguration<FindPetsByStatusStatus200, ResponseErrorConfig<unknown>>,
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
   immutable?: boolean
@@ -58,7 +48,7 @@ export function useFindPetsByStatus({ query }: ({
 
   const queryKey = findPetsByStatusQueryKey({ query })
 
-  return useSWR<((Pet[]) | string), ResponseErrorConfig<unknown>, FindPetsByStatusQueryKey | null>(
+  return useSWR<FindPetsByStatusStatus200, ResponseErrorConfig<unknown>, FindPetsByStatusQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
      ...findPetsByStatusQueryOptions({ query }, config),

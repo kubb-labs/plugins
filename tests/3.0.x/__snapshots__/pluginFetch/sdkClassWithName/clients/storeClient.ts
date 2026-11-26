@@ -7,6 +7,17 @@ import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult 
 import type { Order } from '../types/Order'
 import { createClient, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
+type GetInventoryResponses = {
+  '200': ({
+  [key: string]: number;
+});
+}
+
+type PlaceOrderResponses = {
+  '200': Order;
+  '405': unknown;
+}
+
 export class StoreClient {
   readonly client: ClientInstance
 
@@ -24,18 +35,10 @@ export class StoreClient {
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '200': ({
-  [key: string]: number;
-});
-}), ThrowOnError>> {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<({
-  '200': ({
-  [key: string]: number;
-});
-}), ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap(apiClient<GetInventoryResponses, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -67,15 +70,9 @@ export class StoreClient {
   contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '200': Order;
-  '405': unknown;
-}), ThrowOnError>> {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(apiClient<({
-  '200': Order;
-  '405': unknown;
-}), ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+    return withUnwrap(apiClient<PlaceOrderResponses, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 }

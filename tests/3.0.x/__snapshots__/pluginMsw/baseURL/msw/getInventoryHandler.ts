@@ -5,9 +5,11 @@
 
 import { http, HttpResponse } from 'msw/http'
 
-export function getInventoryHandlerResponse200(data?: (({
+type GetInventoryStatus200 = {
   [key: string]: number;
-}))) {
+}
+
+export function getInventoryHandlerResponse200(data?: GetInventoryStatus200) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -16,9 +18,7 @@ export function getInventoryHandlerResponse200(data?: (({
   })
 }
 
-export function getInventoryHandler(data?: (({
-  [key: string]: number;
-})) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
+export function getInventoryHandler(data?: GetInventoryStatus200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
   return http.get(`${options?.baseURL ?? "http://localhost:3000"}/store/inventory`, function handler(info) {
       if(typeof data === 'function') return data(info)
 

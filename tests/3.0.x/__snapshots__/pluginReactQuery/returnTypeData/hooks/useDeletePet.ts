@@ -8,34 +8,7 @@ import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tansta
 import { deletePet } from '../clients/deletePet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
-export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
-
-export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
-        const mutationKey = deletePetMutationKey()
-        return mutationOptions<unknown, ResponseErrorConfig<unknown>, ({
-    body?: never;
-    path: ({
-    petId: bigint;
-  });
-    query?: never;
-    headers?: ({
-    api_key?: string;
-  });
-  }), TContext>({
-          mutationKey,
-          mutationFn: async({ path, headers }) => {
-            return deletePet({ ...config, path, headers, throwOnError: true })
-          },
-        })
-}
-
-/**
- * `DELETE /pet/{petId}`
- * @description delete a pet
- * @summary Deletes a pet
- */
-export function useDeletePet<TContext>(options: {
-  mutation?: UseMutationOptions<unknown, ResponseErrorConfig<unknown>, ({
+type DeletePetOptions = {
   body?: never;
   path: ({
   petId: bigint;
@@ -44,45 +17,38 @@ export function useDeletePet<TContext>(options: {
   headers?: ({
   api_key?: string;
 });
-}), TContext> & { client?: QueryClient },
+}
+
+export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
+
+export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+  const mutationKey = deletePetMutationKey()
+  return mutationOptions<unknown, ResponseErrorConfig<unknown>, DeletePetOptions, TContext>({
+    mutationKey,
+    mutationFn: async({ path, headers }) => {
+      return deletePet({ ...config, path, headers, throwOnError: true })
+    },
+  })
+}
+
+/**
+ * `DELETE /pet/{petId}`
+ * @description delete a pet
+ * @summary Deletes a pet
+ */
+export function useDeletePet<TContext>(options: {
+  mutation?: UseMutationOptions<unknown, ResponseErrorConfig<unknown>, DeletePetOptions, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
 } = {}) {
-          const { mutation = {}, client: config = {} } = options ?? {}
-          const { client: queryClient, ...mutationOptions } = mutation;
-          const mutationKey = mutationOptions.mutationKey ?? deletePetMutationKey()
+  const { mutation = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...mutationOptions } = mutation;
+  const mutationKey = mutationOptions.mutationKey ?? deletePetMutationKey()
 
-          const baseOptions = deletePetMutationOptions(config) as UseMutationOptions<unknown, ResponseErrorConfig<unknown>, ({
-    body?: never;
-    path: ({
-    petId: bigint;
-  });
-    query?: never;
-    headers?: ({
-    api_key?: string;
-  });
-  }), TContext>
+  const baseOptions = deletePetMutationOptions(config) as UseMutationOptions<unknown, ResponseErrorConfig<unknown>, DeletePetOptions, TContext>
 
-          return useMutation<unknown, ResponseErrorConfig<unknown>, ({
-    body?: never;
-    path: ({
-    petId: bigint;
-  });
-    query?: never;
-    headers?: ({
-    api_key?: string;
-  });
-  }), TContext>({
-            ...baseOptions,
-            mutationKey,
-            ...mutationOptions,
-          }, queryClient) as UseMutationResult<unknown, ResponseErrorConfig<unknown>, ({
-    body?: never;
-    path: ({
-    petId: bigint;
-  });
-    query?: never;
-    headers?: ({
-    api_key?: string;
-  });
-  }), TContext>
+  return useMutation<unknown, ResponseErrorConfig<unknown>, DeletePetOptions, TContext>({
+    ...baseOptions,
+    mutationKey,
+    ...mutationOptions,
+  }, queryClient) as UseMutationResult<unknown, ResponseErrorConfig<unknown>, DeletePetOptions, TContext>
 }

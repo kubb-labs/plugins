@@ -6,6 +6,8 @@
 import type { AddPetRequest } from '../types/AddPetRequest'
 import type { Pet } from '../types/Pet'
 
+type AddPetStatus200 = Pet | string
+
 export function addPet({ body }: Pick<({
   body: AddPetRequest;
   path?: never;
@@ -30,11 +32,11 @@ export function addPet({ body }: Pick<({
   contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
-}), 'body'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<((Pet | string))> {
-  return cy.request<((Pet | string))>({
+}), 'body'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<AddPetStatus200> {
+  return cy.request<AddPetStatus200>({
     method: 'POST',
     url: `/pet`,
     body,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<((Pet | string))>
+  }).then((res) => res.body) as Cypress.Chainable<AddPetStatus200>
 }

@@ -9,22 +9,22 @@ import { getInventory } from '../clients/getInventory'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
+type GetInventoryStatus200 = {
+  [key: string]: number;
+}
+
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 export type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
 export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
-        const queryKey = getInventoryQueryKey()
-        return queryOptions<({
-    [key: string]: number;
-  }), ResponseErrorConfig<Error>, ({
-    [key: string]: number;
-  })>({
-         queryKey,
-         queryFn: async ({ signal }) => {
-            return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()
-         },
-        })
+  const queryKey = getInventoryQueryKey()
+  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200>({
+   queryKey,
+   queryFn: async ({ signal }) => {
+      return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+   },
+  })
 }
 
 /**
@@ -32,31 +32,21 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
  * @description Returns a map of status codes to quantities
  * @summary Returns pet inventories by status
  */
-export function useGetInventory<TData = ({
-  [key: string]: number;
-}), TQueryData = ({
-  [key: string]: number;
-}), TQueryKey extends QueryKey = GetInventoryQueryKey>(options: {
-  query?: Partial<UseQueryOptions<({
-  [key: string]: number;
-}), ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventoryQueryKey>(options: {
+  query?: Partial<UseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
-         const { query: queryConfig = {}, client: config = {} } = options ?? {}
-         const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? getInventoryQueryKey()
+  const { query: queryConfig = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? getInventoryQueryKey()
 
-         const queryResult = useQuery({
-          ...getInventoryQueryOptions(config),
-          ...resolvedOptions,
-          queryKey
-         } as unknown as UseQueryOptions<({
-    [key: string]: number;
-  }), ResponseErrorConfig<Error>, TData, ({
-    [key: string]: number;
-  }), TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
+  const queryResult = useQuery({
+   ...getInventoryQueryOptions(config),
+   ...resolvedOptions,
+   queryKey
+  } as unknown as UseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, GetInventoryStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-         queryResult.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-         return queryResult
+  return queryResult
 }
