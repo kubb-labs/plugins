@@ -635,9 +635,9 @@ export function buildResponseUnionSchema({
   return members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
 }
 
-type OperationSchemaEntry = { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null; direction?: Direction }
+export type OperationSchemaEntry = { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null; direction?: Direction }
 
-type OperationSchemaResolver = OperationTypeNameResolver &
+export type OperationSchemaResolver = OperationTypeNameResolver &
   ResponseStatusNameResolver & {
     name(name: string): string
     param: { name(node: ast.OperationNode, param: ast.ParameterNode): string }

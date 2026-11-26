@@ -8,7 +8,7 @@ export type LengthConstraints = { min?: number; max?: number; pattern?: string }
 
 export type ValibotPrinterContext = { transform: (node: ast.SchemaNode) => string | null; options: PrinterValibotOptions }
 
-type ApplyModifiersOptions = {
+export type ApplyModifiersOptions = {
   value: string
   schema: ast.SchemaNode
   nullable?: boolean
