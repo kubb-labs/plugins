@@ -1,2 +1,2 @@
 export { default, pluginAxios, pluginAxiosName } from './plugin.ts'
-export type { Options, PluginAxios, ResolvedOptions, ResolverClient } from './types.ts'
+export type { ClientResolvedOptions, Options, PluginAxios, PluginAxiosOptions, ResolvedOptions, ResolverClient } from './types.ts'

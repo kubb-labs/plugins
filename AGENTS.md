@@ -68,7 +68,7 @@ Each plugin ships its docs in `packages/<name>/docs/`. The registry reads the fo
 > [!IMPORTANT]
 > **Changing a plugin's options? Update `packages/<name>/docs/options.md` in the same PR.**
 >
-> A documented option must exist in the plugin's `src/types.ts` `Options` type and be honored in `src/plugin.ts`. Keep the documented defaults matching the destructuring defaults in `plugin.ts`.
+> A documented option must exist in the plugin's `Plugin<Name>Options` type in `src/types.ts` and be honored in `src/plugin.ts`. Keep the documented defaults matching the destructuring defaults in `plugin.ts`.
 
 ### Examples and tests
 

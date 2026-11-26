@@ -2,9 +2,9 @@ import { kubbContext } from '@kubb/kit'
 import { createMockedSetupContext, registeredTemplates } from '#mocks'
 import { describe, expect, test } from 'vitest'
 import { pluginTs } from './plugin.ts'
-import type { Options, PluginTs } from './types.ts'
+import type { PluginTsOptions, PluginTs } from './types.ts'
 
-function setup(options: Options) {
+function setup(options: PluginTsOptions) {
   const plugin = pluginTs(options)
   const ctx = createMockedSetupContext<PluginTs>()
 

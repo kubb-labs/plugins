@@ -182,7 +182,7 @@ export type CompileOptions = {
  *
  * @default { path: 'zod', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginZodOptions = PluginOptions<PluginZodResolvedOptions> & {
   /**
    * Module specifier used in the `import { z } from '...'` statement.
    * Use `'zod/mini'` for the tree-shakeable bundle.
@@ -295,20 +295,26 @@ export type Options = PluginOptions<ResolvedOptions> & {
   macros?: Array<ast.Macro>
 }
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
+export type PluginZodResolvedOptions = ResolvedPluginOptions<PluginZodResolvedOptions> & {
   inferred: boolean | 'codec'
-  importPath: NonNullable<Options['importPath']>
-  coercion: NonNullable<Options['coercion']>
-  guidType: NonNullable<Options['guidType']>
-  regexType: NonNullable<Options['regexType']>
-  oneOfType: NonNullable<Options['oneOfType']>
-  compile: NonNullable<Options['compile']>
-  mini: NonNullable<Options['mini']>
-  typeGuards: NonNullable<Options['typeGuards']>
-  printer: Options['printer']
+  importPath: NonNullable<PluginZodOptions['importPath']>
+  coercion: NonNullable<PluginZodOptions['coercion']>
+  guidType: NonNullable<PluginZodOptions['guidType']>
+  regexType: NonNullable<PluginZodOptions['regexType']>
+  oneOfType: NonNullable<PluginZodOptions['oneOfType']>
+  compile: NonNullable<PluginZodOptions['compile']>
+  mini: NonNullable<PluginZodOptions['mini']>
+  typeGuards: NonNullable<PluginZodOptions['typeGuards']>
+  printer: PluginZodOptions['printer']
 }
 
-export type PluginZod = PluginType<'plugin-zod', Options, ResolvedOptions, ResolverZod, ast.Printer<PrinterZodFactory> | ast.Printer<PrinterZodMiniFactory>>
+export type PluginZod = PluginType<
+  'plugin-zod',
+  PluginZodOptions,
+  PluginZodResolvedOptions,
+  ResolverZod,
+  ast.Printer<PrinterZodFactory> | ast.Printer<PrinterZodMiniFactory>
+>
 
 declare global {
   namespace Kubb {

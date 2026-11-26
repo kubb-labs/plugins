@@ -193,7 +193,7 @@ export type CustomOptions = {
  *
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginReactQueryOptions = PluginOptions<PluginReactQueryResolvedOptions> & {
   /**
    * Selects the HTTP client the generated hooks call. Every client plugin speaks the `RequestResult`
    * contract, so the hooks call a contract `<op>` that takes one grouped `options` object.
@@ -276,7 +276,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
  */
 export type ResolvedClient = ResolvedContractClient
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
+export type PluginReactQueryResolvedOptions = ResolvedPluginOptions<PluginReactQueryResolvedOptions> & {
   /**
    * The resolved contract client the generators import and call.
    */
@@ -296,7 +296,7 @@ export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   resolver: ResolverReactQuery
 }
 
-export type PluginReactQuery = PluginType<'plugin-react-query', Options, ResolvedOptions, ResolverReactQuery>
+export type PluginReactQuery = PluginType<'plugin-react-query', PluginReactQueryOptions, PluginReactQueryResolvedOptions, ResolverReactQuery>
 
 declare global {
   namespace Kubb {

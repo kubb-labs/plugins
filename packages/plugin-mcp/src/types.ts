@@ -39,7 +39,7 @@ export type ResolverMcp = Resolver & {
  *
  * @default { path: 'mcp', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginMcpOptions = PluginOptions<PluginMcpResolvedOptions> & {
   /**
    * Selects the HTTP client each MCP handler calls. Every client plugin speaks the `RequestResult`
    * contract, so each handler calls a contract `<op>` that takes one grouped `{ path, query, headers,
@@ -62,7 +62,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
   macros?: Array<ast.Macro>
 }
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
+export type PluginMcpResolvedOptions = ResolvedPluginOptions<PluginMcpResolvedOptions> & {
   /**
    * The resolved client strategy the generators branch on.
    */
@@ -70,7 +70,7 @@ export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   resolver: ResolverMcp
 }
 
-export type PluginMcp = PluginType<'plugin-mcp', Options, ResolvedOptions, ResolverMcp>
+export type PluginMcp = PluginType<'plugin-mcp', PluginMcpOptions, PluginMcpResolvedOptions, ResolverMcp>
 
 declare global {
   namespace Kubb {

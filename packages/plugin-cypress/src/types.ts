@@ -13,7 +13,7 @@ export type ResolverCypress = Resolver
  *
  * @default { path: 'cypress', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginCypressOptions = PluginOptions<PluginCypressResolvedOptions> & {
   /**
    * Base URL prepended to every request URL. When omitted, requests use the operation path
    * only, so Cypress resolves it against its own `baseUrl`. The adapter's server URL is not used.
@@ -29,11 +29,11 @@ export type Options = PluginOptions<ResolvedOptions> & {
   macros?: Array<ast.Macro>
 }
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
-  baseURL: Options['baseURL'] | undefined
+export type PluginCypressResolvedOptions = ResolvedPluginOptions<PluginCypressResolvedOptions> & {
+  baseURL: PluginCypressOptions['baseURL'] | undefined
 }
 
-export type PluginCypress = PluginType<'plugin-cypress', Options, ResolvedOptions, ResolverCypress>
+export type PluginCypress = PluginType<'plugin-cypress', PluginCypressOptions, PluginCypressResolvedOptions, ResolverCypress>
 
 declare global {
   namespace Kubb {

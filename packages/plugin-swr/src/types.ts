@@ -131,7 +131,7 @@ export type Mutation = {
  *
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginSwrOptions = PluginOptions<PluginSwrResolvedOptions> & {
   /**
    * Selects the HTTP client the generated hooks call. Every client plugin speaks the `RequestResult`
    * contract, so the hooks call a contract `<op>` that takes one grouped `options` object.
@@ -176,7 +176,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
   macros?: Array<ast.Macro>
 }
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
+export type PluginSwrResolvedOptions = ResolvedPluginOptions<PluginSwrResolvedOptions> & {
   /**
    * The resolved contract client the generators import and call.
    */
@@ -189,7 +189,7 @@ export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   resolver: ResolverSwr
 }
 
-export type PluginSwr = PluginType<'plugin-swr', Options, ResolvedOptions, ResolverSwr>
+export type PluginSwr = PluginType<'plugin-swr', PluginSwrOptions, PluginSwrResolvedOptions, ResolverSwr>
 
 declare global {
   namespace Kubb {

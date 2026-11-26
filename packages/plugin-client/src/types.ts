@@ -19,7 +19,7 @@ export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omi
  * pluginClient({ importPath: '../../../client' })
  * ```
  */
-export type Options = DistributiveOmit<ClientOptions, 'sdk' | 'returnType' | 'baseURL' | 'override'> & {
+export type PluginClientOptions = DistributiveOmit<ClientOptions, 'sdk' | 'returnType' | 'baseURL' | 'override'> & {
   /**
    * Shape of the value a generated operation resolves to. `'full'` and `'data'` import `withUnwrap` or `unwrapResult`
    * and their types from your `importPath` module, so that module must export them.
@@ -36,7 +36,7 @@ export type Options = DistributiveOmit<ClientOptions, 'sdk' | 'returnType' | 'ba
    * Applies different options to operations that match a pattern.
    * `sdk`, `returnType`, and `baseURL` are not available, because this plugin generates standalone operations and your client module owns the base URL.
    */
-  override?: Array<Override<Omit<ResolvedOptions, 'throwOnErrorDefault' | 'sdk' | 'returnType' | 'baseURL'>>>
+  override?: Array<Override<Omit<PluginClientResolvedOptions, 'throwOnErrorDefault' | 'sdk' | 'returnType' | 'baseURL'>>>
   /**
    * Import specifier of your own client module, written into every generated import exactly as given.
    * It must resolve from the generated file, so use a relative path, a package name, or an alias.
@@ -53,11 +53,11 @@ export type Options = DistributiveOmit<ClientOptions, 'sdk' | 'returnType' | 'ba
 /**
  * Options after `pluginClient` applies its defaults.
  */
-export type ResolvedOptions = ClientResolvedOptions & { importPath: string }
+export type PluginClientResolvedOptions = ClientResolvedOptions & { importPath: string }
 /**
  * Plugin type of `@kubb/plugin-client`, registered in the Kubb plugin registry.
  */
-export type PluginClient = PluginType<'plugin-client', Options, ResolvedOptions, ResolverClient>
+export type PluginClient = PluginType<'plugin-client', PluginClientOptions, PluginClientResolvedOptions, ResolverClient>
 
 declare global {
   namespace Kubb {
@@ -66,3 +66,13 @@ declare global {
     }
   }
 }
+
+/**
+ * @deprecated Use `PluginClientOptions`. Removed in v6.
+ */
+export type Options = PluginClientOptions
+
+/**
+ * @deprecated Use `PluginClientResolvedOptions`. Removed in v6.
+ */
+export type ResolvedOptions = PluginClientResolvedOptions

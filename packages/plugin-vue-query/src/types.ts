@@ -91,7 +91,7 @@ export type MutationKey = Transformer
  *
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
-export type Options = PluginOptions<ResolvedOptions> & {
+export type PluginVueQueryOptions = PluginOptions<PluginVueQueryResolvedOptions> & {
   /**
    * Selects the HTTP client the generated composables call. Every client plugin speaks the `RequestResult`
    * contract, so the composables call a contract `<op>` that takes one grouped `options` object.
@@ -154,7 +154,7 @@ export type Options = PluginOptions<ResolvedOptions> & {
  */
 export type ResolvedClient = ResolvedContractClient
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
+export type PluginVueQueryResolvedOptions = ResolvedPluginOptions<PluginVueQueryResolvedOptions> & {
   /**
    * The resolved contract client the generators import and call.
    */
@@ -172,7 +172,7 @@ export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
   resolver: ResolverVueQuery
 }
 
-export type PluginVueQuery = PluginType<'plugin-vue-query', Options, ResolvedOptions, ResolverVueQuery>
+export type PluginVueQuery = PluginType<'plugin-vue-query', PluginVueQueryOptions, PluginVueQueryResolvedOptions, ResolverVueQuery>
 
 declare global {
   namespace Kubb {

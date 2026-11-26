@@ -1,6 +1,6 @@
 import type { Output, PluginType } from '@kubb/kit'
 
-export type Options = {
+export type PluginRedocOptions = {
   /**
    * Output location of the generated Redoc HTML file. The path is resolved
    * against the global `output.path` set on `defineConfig`.
@@ -16,11 +16,11 @@ export type Options = {
   }
 }
 
-export type ResolveOptions = {
+export type PluginRedocResolvedOptions = {
   output: Output
 }
 
-export type PluginRedoc = PluginType<'plugin-redoc', Options, ResolveOptions>
+export type PluginRedoc = PluginType<'plugin-redoc', PluginRedocOptions, PluginRedocResolvedOptions>
 
 declare global {
   namespace Kubb {

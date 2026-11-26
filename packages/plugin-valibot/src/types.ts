@@ -83,7 +83,7 @@ export type ResolverValibot = Resolver & {
   }
 }
 
-export type Options = OutputOptions & {
+export type PluginValibotOptions = OutputOptions & {
   /**
    * Skip any operation, tag, path, or schema that matches one of these patterns.
    */
@@ -95,7 +95,7 @@ export type Options = OutputOptions & {
   /**
    * Apply different plugin options to the operations or schemas that match a pattern.
    */
-  override?: Array<Override<ResolvedOptions>>
+  override?: Array<Override<PluginValibotResolvedOptions>>
   /**
    * Module specifier the generated files import `v` from.
    *
@@ -164,17 +164,23 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
-export type ResolvedOptions = ResolvedPluginOptions<ResolvedOptions> & {
-  importPath: NonNullable<Options['importPath']>
-  inferred: NonNullable<Options['inferred']>
-  regexType: NonNullable<Options['regexType']>
-  oneOfType: NonNullable<Options['oneOfType']>
-  coercion: NonNullable<Options['coercion']>
-  typeGuards: NonNullable<Options['typeGuards']>
-  printer: Options['printer']
+export type PluginValibotResolvedOptions = ResolvedPluginOptions<PluginValibotResolvedOptions> & {
+  importPath: NonNullable<PluginValibotOptions['importPath']>
+  inferred: NonNullable<PluginValibotOptions['inferred']>
+  regexType: NonNullable<PluginValibotOptions['regexType']>
+  oneOfType: NonNullable<PluginValibotOptions['oneOfType']>
+  coercion: NonNullable<PluginValibotOptions['coercion']>
+  typeGuards: NonNullable<PluginValibotOptions['typeGuards']>
+  printer: PluginValibotOptions['printer']
 }
 
-export type PluginValibot = PluginType<'plugin-valibot', Options, ResolvedOptions, ResolverValibot, ast.Printer<PrinterValibotFactory>>
+export type PluginValibot = PluginType<
+  'plugin-valibot',
+  PluginValibotOptions,
+  PluginValibotResolvedOptions,
+  ResolverValibot,
+  ast.Printer<PrinterValibotFactory>
+>
 
 declare global {
   namespace Kubb {
