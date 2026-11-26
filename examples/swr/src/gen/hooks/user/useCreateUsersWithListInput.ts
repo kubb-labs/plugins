@@ -9,6 +9,8 @@ import type { User } from '../../models/User'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput'
 
+type CreateUsersWithListInputStatus200 = User | string
+
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 
 export type CreateUsersWithListInputMutationKey = ReturnType<typeof createUsersWithListInputMutationKey>
@@ -28,7 +30,7 @@ export type CreateUsersWithListInputMutationArg = {
 export function useCreateUsersWithListInput(
   options: {
     mutation?: SWRMutationConfiguration<
-      User | string,
+      CreateUsersWithListInputStatus200,
       ResponseErrorConfig<Error>,
       CreateUsersWithListInputMutationKey | null,
       CreateUsersWithListInputMutationArg
@@ -42,7 +44,12 @@ export function useCreateUsersWithListInput(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = createUsersWithListInputMutationKey()
 
-  return useSWRMutation<User | string, ResponseErrorConfig<Error>, CreateUsersWithListInputMutationKey | null, CreateUsersWithListInputMutationArg>(
+  return useSWRMutation<
+    CreateUsersWithListInputStatus200,
+    ResponseErrorConfig<Error>,
+    CreateUsersWithListInputMutationKey | null,
+    CreateUsersWithListInputMutationArg
+  >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { body } }) => {
       return createUsersWithListInput({ ...config, body, throwOnError: true }).unwrap()

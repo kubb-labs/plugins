@@ -3,28 +3,25 @@ import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tansta
 import { updatePetWithForm } from '../../axios/petService/updatePetWithForm'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
+type UpdatePetWithFormOptions = {
+  body?: never
+  path: {
+    petId: number
+  }
+  query?: {
+    name?: string
+    status?: string
+  }
+  headers?: never
+}
+
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId:search' }] as const
 
 export function updatePetWithFormMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const mutationKey = updatePetWithFormMutationKey()
-  return mutationOptions<
-    unknown,
-    ResponseErrorConfig<unknown>,
-    {
-      body?: never
-      path: {
-        petId: number
-      }
-      query?: {
-        name?: string
-        status?: string
-      }
-      headers?: never
-    },
-    TContext
-  >({
+  return mutationOptions<unknown, ResponseErrorConfig<unknown>, UpdatePetWithFormOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, query }) => {
       return updatePetWithForm({ ...config, path, query, throwOnError: true }).unwrap()
@@ -38,22 +35,7 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(
  */
 export function useUpdatePetWithForm<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      unknown,
-      ResponseErrorConfig<unknown>,
-      {
-        body?: never
-        path: {
-          petId: number
-        }
-        query?: {
-          name?: string
-          status?: string
-        }
-        headers?: never
-      },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<unknown, ResponseErrorConfig<unknown>, UpdatePetWithFormOptions, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
@@ -61,59 +43,14 @@ export function useUpdatePetWithForm<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? updatePetWithFormMutationKey()
 
-  const baseOptions = updatePetWithFormMutationOptions(config) as UseMutationOptions<
-    unknown,
-    ResponseErrorConfig<unknown>,
-    {
-      body?: never
-      path: {
-        petId: number
-      }
-      query?: {
-        name?: string
-        status?: string
-      }
-      headers?: never
-    },
-    TContext
-  >
+  const baseOptions = updatePetWithFormMutationOptions(config) as UseMutationOptions<unknown, ResponseErrorConfig<unknown>, UpdatePetWithFormOptions, TContext>
 
-  return useMutation<
-    unknown,
-    ResponseErrorConfig<unknown>,
-    {
-      body?: never
-      path: {
-        petId: number
-      }
-      query?: {
-        name?: string
-        status?: string
-      }
-      headers?: never
-    },
-    TContext
-  >(
+  return useMutation<unknown, ResponseErrorConfig<unknown>, UpdatePetWithFormOptions, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    unknown,
-    ResponseErrorConfig<unknown>,
-    {
-      body?: never
-      path: {
-        petId: number
-      }
-      query?: {
-        name?: string
-        status?: string
-      }
-      headers?: never
-    },
-    TContext
-  >
+  ) as UseMutationResult<unknown, ResponseErrorConfig<unknown>, UpdatePetWithFormOptions, TContext>
 }

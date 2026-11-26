@@ -7,6 +7,8 @@ import type { Order } from '../../models/Order'
 import { createOrder } from '../createOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
+type GetOrderByIdStatus200 = Order | string
+
 faker.seed([220])
 
 export function createGetOrderByIdPath<
@@ -40,12 +42,12 @@ export function createGetOrderByIdStatus200Xml(data?: string): string {
 /**
  * @description successful operation
  */
-export function createGetOrderByIdStatus200(data?: Partial<Order | string>): Order | string {
+export function createGetOrderByIdStatus200(data?: Partial<GetOrderByIdStatus200>): GetOrderByIdStatus200 {
   return (
     typeof data === 'object' && data !== null && !Array.isArray(data)
       ? faker.helpers.arrayElement([() => createGetOrderByIdStatus200Json(data as Partial<Order>)])()
       : (data ?? faker.helpers.arrayElement([createGetOrderByIdStatus200Json(), createGetOrderByIdStatus200Xml()]))
-  ) as Order | string
+  ) as GetOrderByIdStatus200
 }
 
 /**
@@ -62,6 +64,6 @@ export function createGetOrderByIdStatus404() {
   return undefined
 }
 
-export function createGetOrderByIdResponse(data?: Partial<Order | string>): Order | string {
-  return createGetOrderByIdStatus200(data) as Order | string
+export function createGetOrderByIdResponse(data?: Partial<GetOrderByIdStatus200>): GetOrderByIdStatus200 {
+  return createGetOrderByIdStatus200(data) as GetOrderByIdStatus200
 }

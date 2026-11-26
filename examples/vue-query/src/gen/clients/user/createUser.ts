@@ -7,6 +7,18 @@ import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { User } from '../../models/User'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
+type CreateUserResponses = {
+  default:
+    | {
+        contentType: 'application/json'
+        data: User
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+}
+
 /**
  * `POST /user`
  * @description This can only be done by the logged in user.
@@ -49,38 +61,16 @@ export function createUser<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResult<
-    {
-      default:
-        | {
-            contentType: 'application/json'
-            data: User
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<CreateUserResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        default:
-          | {
-              contentType: 'application/json'
-              data: User
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-      },
-      ThrowOnError
-    >({ method: 'POST', url: '/user', contentType: { request: 'application/json' }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
+    apiClient<CreateUserResponses, ThrowOnError>({
+      method: 'POST',
+      url: '/user',
+      contentType: { request: 'application/json' },
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

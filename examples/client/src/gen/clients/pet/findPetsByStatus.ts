@@ -7,6 +7,19 @@ import type { Options, RequestResult } from '../../../client'
 import type { Pet } from '../../models/Pet'
 import { client } from '../../../client'
 
+type FindPetsByStatusResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet[]
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+}
+
 /**
  * `GET /pet/findByStatus`
  * @description Multiple status values can be provided with comma separated strings
@@ -24,40 +37,10 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Promise<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet[]
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet[]
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-    },
-    ThrowOnError
-  >({
+  return apiClient<FindPetsByStatusResponses, ThrowOnError>({
     method: 'GET',
     url: '/pet/findByStatus',
     security: [

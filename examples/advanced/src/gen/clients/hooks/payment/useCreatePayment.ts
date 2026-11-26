@@ -4,23 +4,20 @@ import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tansta
 import { createPayment } from '../../axios/paymentService/createPayment'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
+type CreatePaymentOptions = {
+  body: Payment
+  path?: never
+  query?: never
+  headers?: never
+}
+
 export const createPaymentMutationKey = () => [{ url: '/store/payments' }] as const
 
 export function createPaymentMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const mutationKey = createPaymentMutationKey()
-  return mutationOptions<
-    Payment,
-    ResponseErrorConfig<Error>,
-    {
-      body: Payment
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >({
+  return mutationOptions<Payment, ResponseErrorConfig<Error>, CreatePaymentOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       return createPayment({ ...config, body, throwOnError: true }).unwrap()
@@ -34,17 +31,7 @@ export function createPaymentMutationOptions<TContext = unknown>(
  */
 export function useCreatePayment<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      Payment,
-      ResponseErrorConfig<Error>,
-      {
-        body: Payment
-        path?: never
-        query?: never
-        headers?: never
-      },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<Payment, ResponseErrorConfig<Error>, CreatePaymentOptions, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
@@ -52,44 +39,14 @@ export function useCreatePayment<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? createPaymentMutationKey()
 
-  const baseOptions = createPaymentMutationOptions(config) as UseMutationOptions<
-    Payment,
-    ResponseErrorConfig<Error>,
-    {
-      body: Payment
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >
+  const baseOptions = createPaymentMutationOptions(config) as UseMutationOptions<Payment, ResponseErrorConfig<Error>, CreatePaymentOptions, TContext>
 
-  return useMutation<
-    Payment,
-    ResponseErrorConfig<Error>,
-    {
-      body: Payment
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >(
+  return useMutation<Payment, ResponseErrorConfig<Error>, CreatePaymentOptions, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    Payment,
-    ResponseErrorConfig<Error>,
-    {
-      body: Payment
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >
+  ) as UseMutationResult<Payment, ResponseErrorConfig<Error>, CreatePaymentOptions, TContext>
 }

@@ -9,25 +9,20 @@ import type { PointGeoJson } from '../types/PointGeoJson'
 import type { SWRConfiguration } from 'swr'
 import { point } from '../clients/point'
 
-export const pointQueryKey = ({ path }: Omit<({
+type PointOptions = {
   body?: never;
   path: ({
   id: string;
 });
   query?: never;
   headers?: never;
-}), 'headers'>) => [{ url: '/points/:id', params: path }] as const
+}
+
+export const pointQueryKey = ({ path }: Omit<PointOptions, 'headers'>) => [{ url: '/points/:id', params: path }] as const
 
 type PointQueryKey = ReturnType<typeof pointQueryKey>
 
-export function pointQueryOptions({ path }: ({
-  body?: never;
-  path: ({
-  id: string;
-});
-  query?: never;
-  headers?: never;
-}), config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+export function pointQueryOptions({ path }: PointOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   return {
     fetcher: async () => {
       return point({ ...config, path, throwOnError: true }).unwrap()
@@ -38,14 +33,7 @@ export function pointQueryOptions({ path }: ({
 /**
  * `GET /points/{id}`
  */
-export function usePoint({ path }: ({
-  body?: never;
-  path: ({
-  id: string;
-});
-  query?: never;
-  headers?: never;
-}), options: {
+export function usePoint({ path }: PointOptions, options: {
   query?: SWRConfiguration<PointGeoJson, ResponseErrorConfig<Error>>,
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,

@@ -7,6 +7,20 @@ import type { Options, RequestResult } from '../../../client'
 import type { Pet } from '../../models/Pet'
 import { client } from '../../../client'
 
+type GetPetByIdResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+  '404': unknown
+}
+
 /**
  * `GET /pet/{petId}`
  * @description Returns a single pet
@@ -24,42 +38,10 @@ export function getPetById<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Promise<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >({
+  return apiClient<GetPetByIdResponses, ThrowOnError>({
     method: 'GET',
     url: '/pet/{petId}',
     security: [

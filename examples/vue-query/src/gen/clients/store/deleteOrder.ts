@@ -6,6 +6,11 @@
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
+type DeleteOrderResponses = {
+  '400': unknown
+  '404': unknown
+}
+
 /**
  * `DELETE /store/order/{orderId}`
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
@@ -23,24 +28,15 @@ export function deleteOrder<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '400': unknown
-        '404': unknown
-      },
-      ThrowOnError
-    >({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
+    apiClient<DeleteOrderResponses, ThrowOnError>({
+      method: 'DELETE',
+      url: '/store/order/{orderId}',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

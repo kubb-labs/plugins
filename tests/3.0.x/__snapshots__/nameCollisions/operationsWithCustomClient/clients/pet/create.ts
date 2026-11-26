@@ -7,6 +7,10 @@ import type { Pet } from '../../types/Pet'
 import type { Options, RequestResult } from '@example/client'
 import { client } from '@example/client'
 
+type PetCreateResponses = {
+  '200': Pet;
+}
+
 /**
  * `POST /pets/create-first`
  */
@@ -15,12 +19,8 @@ export function petCreate<ThrowOnError extends boolean = true>(options: Options<
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}): Promise<RequestResult<({
-  '200': Pet;
-}), ThrowOnError>> {
+}), ThrowOnError> = {}): Promise<RequestResult<PetCreateResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<({
-    '200': Pet;
-  }), ThrowOnError>({ method: 'POST', url: '/pets/create-first', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<PetCreateResponses, ThrowOnError>({ method: 'POST', url: '/pets/create-first', ...config, throwOnError: config.throwOnError ?? true })
 }

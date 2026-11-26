@@ -8,6 +8,10 @@ import type { PointGeoJson } from '../types/PointGeoJson'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { pointResponseSchema } from '../zod/pointOperationSchema'
 
+type PointResponses = {
+  '200': PointGeoJson;
+}
+
 /**
  * `GET /points/{id}`
  */
@@ -18,12 +22,8 @@ export function point<ThrowOnError extends boolean = true>(options: Options<({
 });
   query?: never;
   headers?: never;
-}), ThrowOnError>): Unwrappable<RequestResult<({
-  '200': PointGeoJson;
-}), ThrowOnError>> {
+}), ThrowOnError>): Unwrappable<RequestResult<PointResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<({
-    '200': PointGeoJson;
-  }), ThrowOnError>({ method: 'GET', url: '/points/{id}', ...config, validator: { response: pointResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap(apiClient<PointResponses, ThrowOnError>({ method: 'GET', url: '/points/{id}', ...config, validator: { response: pointResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

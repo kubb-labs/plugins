@@ -7,6 +7,8 @@ import type { Pet } from '../../models/Pet'
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
+type UpdatePetStatus200 = Pet | string
+
 faker.seed([220])
 
 /**
@@ -26,12 +28,12 @@ export function createUpdatePetStatus200Xml(data?: string): string {
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200(data?: Partial<Pet | string>): Pet | string {
+export function createUpdatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
   return (
     typeof data === 'object' && data !== null && !Array.isArray(data)
       ? faker.helpers.arrayElement([() => createUpdatePetStatus200Json(data as Partial<Pet>)])()
       : (data ?? faker.helpers.arrayElement([createUpdatePetStatus200Json(), createUpdatePetStatus200Xml()]))
-  ) as Pet | string
+  ) as UpdatePetStatus200
 }
 
 /**
@@ -91,6 +93,6 @@ export function createUpdatePetBody(data?: Partial<Pet>): Pet {
   ) as Pet
 }
 
-export function createUpdatePetResponse(data?: Partial<Pet | string>): Pet | string {
-  return createUpdatePetStatus200(data) as Pet | string
+export function createUpdatePetResponse(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
+  return createUpdatePetStatus200(data) as UpdatePetStatus200
 }

@@ -10,45 +10,28 @@ import { getPetById } from '../../clients/pet/getPetById'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getPetByIdQueryKey = ({
-  path,
-}: {
-  path: MaybeRefOrGetter<
-    Omit<
-      {
-        body?: never
-        path: {
-          petId: bigint
-        }
-        query?: never
-        headers?: never
-      },
-      'headers'
-    >['path']
-  >
-}) => [{ url: '/pet/:petId', params: path }] as const
+type GetPetByIdOptions = {
+  body?: never
+  path: {
+    petId: bigint
+  }
+  query?: never
+  headers?: never
+}
+
+type GetPetByIdStatus200 = Pet | string
+
+export const getPetByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdOptions, 'headers'>['path']> }) =>
+  [{ url: '/pet/:petId', params: path }] as const
 
 export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 export function getPetByIdQueryOptions(
-  {
-    path,
-  }: {
-    path: MaybeRefOrGetter<
-      {
-        body?: never
-        path: {
-          petId: bigint
-        }
-        query?: never
-        headers?: never
-      }['path']
-    >
-  },
+  { path }: { path: MaybeRefOrGetter<GetPetByIdOptions['path']> },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
-  return queryOptions<Pet | string, ResponseErrorConfig<unknown | unknown>, Pet | string>({
+  return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<unknown | unknown>, GetPetByIdStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetById({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true }).unwrap()

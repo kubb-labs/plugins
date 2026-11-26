@@ -7,6 +7,10 @@ import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { createPetResponseSchema } from '../zod/createPetSchema'
 
+type ApiCreatePetResponses = {
+  '200': unknown;
+}
+
 /**
  * `POST /pets`
  */
@@ -17,12 +21,8 @@ export function createPet<ThrowOnError extends boolean = true>(options: Options<
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '200': unknown;
-}), ThrowOnError>> {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<ApiCreatePetResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<({
-    '200': unknown;
-  }), ThrowOnError>({ method: 'POST', url: '/pets', contentType: { request: 'application/json' }, ...config, validator: { response: createPetResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap(apiClient<ApiCreatePetResponses, ThrowOnError>({ method: 'POST', url: '/pets', contentType: { request: 'application/json' }, ...config, validator: { response: createPetResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

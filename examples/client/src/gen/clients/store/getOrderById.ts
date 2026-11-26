@@ -7,6 +7,20 @@ import type { Options, RequestResult } from '../../../client'
 import type { Order } from '../../models/Order'
 import { client } from '../../../client'
 
+type GetOrderByIdResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Order
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+  '404': unknown
+}
+
 /**
  * `GET /store/order/{orderId}`
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
@@ -24,40 +38,8 @@ export function getOrderById<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Promise<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Order
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Order
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<GetOrderByIdResponses, ThrowOnError>({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true })
 }

@@ -6,6 +6,11 @@
 import type { Options, RequestResult } from '../../../client'
 import { client } from '../../../client'
 
+type DeleteUserResponses = {
+  '400': unknown
+  '404': unknown
+}
+
 /**
  * `DELETE /user/{username}`
  * @description This can only be done by the logged in user.
@@ -23,22 +28,8 @@ export function deleteUser<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Promise<
-  RequestResult<
-    {
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<DeleteUserResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<DeleteUserResponses, ThrowOnError>({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true })
 }

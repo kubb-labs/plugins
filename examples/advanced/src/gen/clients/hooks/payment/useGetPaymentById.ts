@@ -5,33 +5,21 @@ import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { withQueryKey } from '../../../.kubb/withQueryKey'
 import { getPaymentById } from '../../axios/paymentService/getPaymentById'
 
-export const getPaymentByIdQueryKey = ({
-  path,
-}: Omit<
-  {
-    body?: never
-    path: {
-      paymentId: number
-    }
-    query?: never
-    headers?: never
-  },
-  'headers'
->) => [{ url: '/store/payments/:paymentId', params: path }] as const
+type GetPaymentByIdOptions = {
+  body?: never
+  path: {
+    paymentId: number
+  }
+  query?: never
+  headers?: never
+}
+
+export const getPaymentByIdQueryKey = ({ path }: Omit<GetPaymentByIdOptions, 'headers'>) => [{ url: '/store/payments/:paymentId', params: path }] as const
 
 type GetPaymentByIdQueryKey = ReturnType<typeof getPaymentByIdQueryKey>
 
 export function getPaymentByIdQueryOptions(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      paymentId: number
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: GetPaymentByIdOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getPaymentByIdQueryKey({ path })
@@ -48,27 +36,7 @@ export function getPaymentByIdQueryOptions(
  * @summary Find a payment by ID
  */
 export function useGetPaymentById<TData = Payment, TQueryData = Payment, TQueryKey extends QueryKey = GetPaymentByIdQueryKey>(
-  {
-    path,
-  }: {
-    path:
-      | {
-          body?: never
-          path: {
-            paymentId: number
-          }
-          query?: never
-          headers?: never
-        }['path']
-      | (() => {
-          body?: never
-          path: {
-            paymentId: number
-          }
-          query?: never
-          headers?: never
-        }['path'])
-  },
+  { path }: { path: GetPaymentByIdOptions['path'] | (() => GetPaymentByIdOptions['path']) },
   options: {
     query?: Partial<QueryObserverOptions<Payment, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>

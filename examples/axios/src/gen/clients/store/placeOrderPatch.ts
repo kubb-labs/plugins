@@ -7,6 +7,11 @@ import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { Order } from '../../models/Order'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
+type PlaceOrderPatchResponses = {
+  '200': Order
+  '405': unknown
+}
+
 /**
  * `PATCH /store/order`
  * @description Place a new order in the store with patch
@@ -49,25 +54,11 @@ export function placeOrderPatch<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResult<
-    {
-      '200': Order
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200': Order
-        '405': unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<PlaceOrderPatchResponses, ThrowOnError>({
       method: 'PATCH',
       url: '/store/order',
       contentType: { request: 'application/json' },

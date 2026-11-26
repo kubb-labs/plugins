@@ -2,6 +2,10 @@ import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { ApiResponse } from '../../../models/ts/ApiResponse'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 
+type UploadFileResponses = {
+  '200': ApiResponse
+}
+
 /**
  * `POST /pet/{petId}/uploadImage`
  * @summary uploads an image
@@ -20,23 +24,11 @@ export function uploadFile<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200': ApiResponse
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200': ApiResponse
-      },
-      ThrowOnError
-    >({
+    apiClient<UploadFileResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet/{petId}/uploadImage',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

@@ -5,6 +5,8 @@
 
 import type { Pet } from '../types/Pet'
 
+type GetPetByIdStatus200 = Pet | string
+
 export function getPetById({ path }: ({
   body?: never;
   path: ({
@@ -12,10 +14,10 @@ export function getPetById({ path }: ({
 });
   query?: never;
   headers?: never;
-}), options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<((Pet | string))> {
-  return cy.request<((Pet | string))>({
+}), options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetByIdStatus200> {
+  return cy.request<GetPetByIdStatus200>({
     method: 'GET',
     url: `/pet/${path.petId}`,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<((Pet | string))>
+  }).then((res) => res.body) as Cypress.Chainable<GetPetByIdStatus200>
 }

@@ -7,6 +7,10 @@ import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import { getInventory } from '../../clients/store/getInventory'
 import { queryOptions } from '@tanstack/react-query'
 
+type GetInventoryStatus200 = {
+  [key: string]: number
+}
+
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
@@ -15,16 +19,7 @@ export function getInventoryQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getInventoryQueryKey()
-  return queryOptions<
-    {
-      [key: string]: number
-    },
-    ResponseErrorConfig<Error>,
-    {
-      [key: string]: number
-    },
-    typeof queryKey
-  >({
+  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()

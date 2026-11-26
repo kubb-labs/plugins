@@ -8,6 +8,11 @@ import type { Order } from '../types/Order'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { placeOrderBodySchema, placeOrderResponseSchema, placeOrderStatus405Schema } from '../valibot/placeOrderSchema'
 
+type PlaceOrderResponses = {
+  '200': Order;
+  '405': unknown;
+}
+
 /**
  * `POST /store/order`
  * @description Place a new order in the store
@@ -37,14 +42,8 @@ export function placeOrder<ThrowOnError extends boolean = true>(options: Options
   contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '200': Order;
-  '405': unknown;
-}), ThrowOnError>> {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<({
-    '200': Order;
-    '405': unknown;
-  }), ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { request: placeOrderBodySchema, response: placeOrderResponseSchema, error: { 405: placeOrderStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap(apiClient<PlaceOrderResponses, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { request: placeOrderBodySchema, response: placeOrderResponseSchema, error: { 405: placeOrderStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

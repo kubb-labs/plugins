@@ -7,6 +7,20 @@ import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { Order } from '../../models/Order'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
+type GetOrderByIdResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Order
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+  '404': unknown
+}
+
 /**
  * `GET /store/order/{orderId}`
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
@@ -24,42 +38,15 @@ export function getOrderById<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Order
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Order
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '400': unknown
-        '404': unknown
-      },
-      ThrowOnError
-    >({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
+    apiClient<GetOrderByIdResponses, ThrowOnError>({
+      method: 'GET',
+      url: '/store/order/{orderId}',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

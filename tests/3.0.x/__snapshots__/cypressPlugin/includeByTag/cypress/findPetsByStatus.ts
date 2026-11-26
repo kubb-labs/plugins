@@ -6,6 +6,8 @@
 import type { FindPetsByStatusStatusEnumKey } from '../types/FindPetsByStatusStatusEnum'
 import type { Pet } from '../types/Pet'
 
+type FindPetsByStatusStatus200 = (Pet[]) | string
+
 export function findPetsByStatus({ query }: ({
   body?: never;
   path?: never;
@@ -13,11 +15,11 @@ export function findPetsByStatus({ query }: ({
   status?: FindPetsByStatusStatusEnumKey;
 });
   headers?: never;
-}) = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<(((Pet[]) | string))> {
-  return cy.request<(((Pet[]) | string))>({
+}) = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<FindPetsByStatusStatus200> {
+  return cy.request<FindPetsByStatusStatus200>({
     method: 'GET',
     url: `/pet/findByStatus`,
     qs: query,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<(((Pet[]) | string))>
+  }).then((res) => res.body) as Cypress.Chainable<FindPetsByStatusStatus200>
 }

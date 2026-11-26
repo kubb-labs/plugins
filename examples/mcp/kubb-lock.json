@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "inputs": {
     "src/gen": {
-      "hash": "54a03031d629e870eacece9797fdbb006b3f5f13ca3cf295cc2ecc267297b560",
+      "hash": "ef3bc67ec6458a09a72a6ca9b5d9109135b27605a8d80353f84ed6d48c9f3a59",
       "sources": ["petStore.yaml"]
     }
   },
@@ -64,64 +64,64 @@
       "output": "452d67b7fa504e6657db01f4537d0a21c27ab7b6c5c1bcdc3739a0add699c20b"
     },
     "src/gen/clients/addFiles.ts": {
-      "source": "fc631a82f018c76bc8dae2ba5ec59b39edac4e8a816e5193fa74a264a13d2aff",
-      "output": "6df2ebf0e9d41e94ae159a125b8b72581830f25128bc987c7d5ab252602602d5"
+      "source": "95711b21d8f6b3f0e4a659f890554ca22f736f526cd0a29974f5430e328a8acb",
+      "output": "e242b2fb385e5235b5fa35b904842f61c5964ef942216eebd5fc58aca4da0f91"
     },
     "src/gen/clients/addPet.ts": {
-      "source": "992a93584a7db24945d95041e4914e132d811cda71bdcebfceb73a720a29a560",
-      "output": "f80f4f2a76acaf0b4d110d3fff4c7e0ad260abb3274f83c904d5e8c957621871"
+      "source": "99c89ac2e7667ce41c6c8472c4e2eafbc956524bbb6e8d83559afad02e44f7ea",
+      "output": "bc727112b7501e0f249290e229da3d61e12842f4bb7946e0d5b8bc730ae405c3"
     },
     "src/gen/clients/createPets.ts": {
-      "source": "f1bead26d8a9aa6cbd2d126d3dda7142d223ca8caec22d0b398d4879dbc273a5",
-      "output": "af60b7a01f592ca4ab9448275e7798c3dadf753389276bfb053a498dd01d663c"
+      "source": "7f7d2b86569a2fec9bcc8a11a7065d669d3cea98165e5cf654a427ec0e8fe3e4",
+      "output": "f8ae1e25797ef730aba4e51d2de4d31c646cf4471a66a17d5803584477a1f86f"
     },
     "src/gen/clients/deleteOrder.ts": {
-      "source": "1fcd48e255872035730ca9230bdc1088e2b0bff378d83e3f6127b2b7453a1ea5",
-      "output": "a3ea22660a2af42d7944e585d6a4d463f99a945dcd5a9e43a60172b180a530cb"
+      "source": "33184dbff189221b27a2f4d7e7a4856b7c844bbe221420eb83f6ef41bbaa1ddf",
+      "output": "e9225d10cb72fc0a5594e2e013acafdf0910ae1df234d271755a54fdfdeabc14"
     },
     "src/gen/clients/deletePet.ts": {
-      "source": "3edb243c99abbd29b23501684fc31aef10dc51743ab186fd24bced17fb9155ff",
-      "output": "bcaa0935ac21b253694f08119de24d39ea22ab8d6af16b04ed1b9888204ef20b"
+      "source": "61b202b4d408fd10e1df57a637a88b325764ac89730250c38e68a189d804e326",
+      "output": "11ca3864b089771a432b3a84e42d359ea1f611b50dd036d603782f99412e696c"
     },
     "src/gen/clients/findPetsByStatus.ts": {
-      "source": "2414e95253cae4c6c7e6ad0666e14d9cacbff574b04af94abb9da986e3b0db52",
-      "output": "416ea1f9cfedb675cab6d8a7d3ced7bd79dc29ed402566bb3c44c0c46aab840b"
+      "source": "9fb567f699def8344b7c5b85f7db83a77db1c6cdd21da33fa95098eea82a99c8",
+      "output": "a16a286fc792cc8ea26004e0f632ca20f81a082f7830daa900d719320f9844f7"
     },
     "src/gen/clients/findPetsByTags.ts": {
-      "source": "c40c69cc217510db6921fd074e40546582b9a563e9ccca9cbd4207459b69e6b9",
-      "output": "76b7c08a0c8633d1108ec957b50104ec336097320aa8ba672c6028e1d5ff9166"
+      "source": "b9ba4da2e145f6ad49d76a2fc26f3541b44ff4f21a963a1bb52df2e72c876b4f",
+      "output": "d5e049a5907562c829ec9c6f41faed752fefd8f700533327dda9c302de92d8b0"
     },
     "src/gen/clients/getInventory.ts": {
-      "source": "3a6eabd6e22062eb12cf988b721c8dd7960b02d66a513c868a4a9f4233f7157c",
-      "output": "a5c70cb481e6f3db0ea3f448dfb08b7993da8f5df9f8169089fecc347c636693"
+      "source": "b645b7532b925b02f37954f5d27e57f1b17dd744aacbfd1932d61a3ce9e9e173",
+      "output": "ccfbf2048c7c8cbd910fd03868b8c13bbea59553f4f2cf04d320fd4d8e7d6b68"
     },
     "src/gen/clients/getOrderById.ts": {
-      "source": "a3f423a43da2f0f0968185b54ffbef7a00a1ec9e356e05c0fac2d4ec4dfd101d",
-      "output": "decedb250419aa8a0d6b4750406f2fb2739f61c33ede810a57b0eaa03804257c"
+      "source": "ac00ba58b71c9511ab3732afbd1b0eb2e3ebf8271b96a34fcc7845a8432b422c",
+      "output": "d29958873770494c3cc10f41fd2914919a14e50dddb653ba76b9023e0c8a0fc1"
     },
     "src/gen/clients/getPetById.ts": {
-      "source": "188e5eedde9ae31d1a254c618ea1b9f4a09ae537f62287dcf925f4eb28069047",
-      "output": "787b6f807b9599e94877e8649db59e71934426ab9aa0b543240c558b8afb035a"
+      "source": "58e0688ea2428e312317d0fcf4a96a2283efac081dd0bfba1e93c59732fb553b",
+      "output": "3c58cc95cfa7070d45b669d78a9eaaab01f953d30cbc54a5856a8cfa0f01e92e"
     },
     "src/gen/clients/index.ts": {
       "source": "a8ff969f49ace072d8602d48492c41f03dd6c15b079f0b1033e9dc9aecb44dfd",
       "output": "d797c506c480eaa7b4d6e7ddd4ddcb70eeee8769a7a1d94a4820dd95b2624ca0"
     },
     "src/gen/clients/placeOrder.ts": {
-      "source": "03a91d6194a1071e5ec5117f0cd3833c2d240c46c00f3b2fa399293484d2bb1c",
-      "output": "7fb182580c2cbee37593de9f3b120291b0dfc203b4b19a494709e13c61237fa3"
+      "source": "db6d0eef128c38600c3bf24e0877141984ef69371c814525d67d66b7ddd2ccfc",
+      "output": "fa798c88a0d9ed249b8ecca74b2ae80746593ed4cdc737c1e9de92714a447449"
     },
     "src/gen/clients/placeOrderPatch.ts": {
-      "source": "6318bd9f52c68a628c040b13e79bca5f02e482369ae016dd482e604aed6edcd4",
-      "output": "01d659482a3024fa950618c3fd56b6333384b791a0b18b43af518e220c378441"
+      "source": "8ae795c7906198c7416ec82ce6aa10419885392c5333a8fafae5605b37677dec",
+      "output": "251f2baf77ead7181b223249a33148e2f01078d7fe7b70687b2feac526e340e1"
     },
     "src/gen/clients/updatePet.ts": {
-      "source": "36bb7325fc67270c2d67b7ed233792edf948c70aeb115e46b5a704f289f41a42",
-      "output": "3b67f8e96e07f2d0d64d2df5a45a249a93f797181558313c365a20799c3dd06a"
+      "source": "1384104ca33c41cfb9c1748f41846a7a303365fb1473ba266c20abe8b9cd181d",
+      "output": "676eb1568968c115c218e463203d542dfcd5ab7bea3d4b08498affab539676e1"
     },
     "src/gen/clients/updatePetWithForm.ts": {
-      "source": "c73d61b19b4f5a10118d1e880669d474abebe1d754637512b9f8827f106708bd",
-      "output": "cbf51bf3668f50e5c2c930ea08ad37ee782a85d7e886033743950745fb52fe53"
+      "source": "347a91028720c061d54792145bd6c190fd81a71f5e5c0c0df41e1f7c0fa4d807",
+      "output": "0abfe0df659a747cdd847e86630598da79f07712b980791e55c32635696342d9"
     },
     "src/gen/index.ts": {
       "source": "2222a0612af25b1e3c82c2c6a20f44a5c62c0684e83919516789629a9406a013",

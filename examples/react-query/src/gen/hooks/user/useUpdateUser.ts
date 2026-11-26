@@ -8,6 +8,10 @@ import type { User } from '../../models/User'
 import { updateUser } from '../../clients/user/updateUser'
 import { mutationOptions } from '@tanstack/react-query'
 
+type UpdateUserPath = {
+  username: string
+}
+
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export function updateUserMutationOptions<TContext = unknown>(
@@ -19,9 +23,7 @@ export function updateUserMutationOptions<TContext = unknown>(
     ResponseErrorConfig<Error>,
     | {
         body?: User
-        path: {
-          username: string
-        }
+        path: UpdateUserPath
         query?: never
         headers?: never
         contentType?:
@@ -32,9 +34,7 @@ export function updateUserMutationOptions<TContext = unknown>(
       }
     | {
         body?: User
-        path: {
-          username: string
-        }
+        path: UpdateUserPath
         query?: never
         headers?: never
         contentType:
@@ -45,9 +45,7 @@ export function updateUserMutationOptions<TContext = unknown>(
       }
     | {
         body?: User
-        path: {
-          username: string
-        }
+        path: UpdateUserPath
         query?: never
         headers?: never
         contentType:

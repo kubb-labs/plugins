@@ -7,6 +7,19 @@ import type { Options, RequestResult } from '../../../client'
 import type { Pet } from '../../models/Pet'
 import { client } from '../../../client'
 
+type FindPetsByTagsResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet[]
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+}
+
 /**
  * `GET /pet/findByTags`
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -26,40 +39,10 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Promise<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet[]
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet[]
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-    },
-    ThrowOnError
-  >({
+  return apiClient<FindPetsByTagsResponses, ThrowOnError>({
     method: 'GET',
     url: '/pet/findByTags',
     security: [

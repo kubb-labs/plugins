@@ -49,10 +49,12 @@ describe("pluginTs({ operations: 'inline' }) with its consumers", () => {
 
     const hook = await fs.readFile(path.join(output, 'hooks/usePlaceOrder.ts'), 'utf-8')
     expect(hook).toContain("import type { Order } from '../types/Order'")
-    // `placeOrder` takes three content types with one schema, so its body collapses to `Order`.
-    expect(hook).toMatch(/mutationOptions<Order, ResponseErrorConfig<unknown>, \(\{\s*body\?: Order;/)
-    // The infinite query indexes the printed query type for its page param.
-    expect(await fs.readFile(path.join(output, 'hooks/useFindPetsByStatusInfinite.ts'), 'utf-8')).toMatch(/\}\)\['status'\]/)
+    // `placeOrder` takes three content types with one schema, so its body collapses to `Order`. The hook uses its options type
+    // twice, so it is declared once in the file.
+    expect(hook).toMatch(/type PlaceOrderOptions = \{\s*body\?: Order;/)
+    expect(hook).toContain('mutationOptions<Order, ResponseErrorConfig<unknown>, PlaceOrderOptions, TContext>')
+    // The infinite query indexes the local query type for its page param.
+    expect(await fs.readFile(path.join(output, 'hooks/useFindPetsByStatusInfinite.ts'), 'utf-8')).toContain("NonNullable<FindPetsByStatusQuery['status']>")
   })
 
   function tsc(dirs: Array<string>, flags: string): Array<string> {

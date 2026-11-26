@@ -7,6 +7,20 @@ import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { User } from '../../models/User'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
+type GetUserByNameResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: User
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+  '404': unknown
+}
+
 /**
  * `GET /user/{username}`
  * @summary Get user by user name
@@ -23,42 +37,15 @@ export function getUserByName<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: User
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<GetUserByNameResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: User
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '400': unknown
-        '404': unknown
-      },
-      ThrowOnError
-    >({ method: 'GET', url: '/user/{username}', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
+    apiClient<GetUserByNameResponses, ThrowOnError>({
+      method: 'GET',
+      url: '/user/{username}',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

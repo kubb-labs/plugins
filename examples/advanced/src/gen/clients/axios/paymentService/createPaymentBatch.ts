@@ -3,6 +3,10 @@ import type { Payment } from '../../../models/ts/Payment'
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { createPaymentBatchResponseSchema } from '../../../zod/store/payment/createPaymentBatchSchema'
 
+type CreatePaymentBatchResponses = {
+  '204': unknown
+}
+
 /**
  * `POST /store/payments/batch`
  * @summary Pay for several orders at once
@@ -17,23 +21,11 @@ export function createPaymentBatch<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResult<
-    {
-      '204': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<CreatePaymentBatchResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '204': unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<CreatePaymentBatchResponses, ThrowOnError>({
       method: 'POST',
       url: '/store/payments/batch',
       contentType: { request: 'multipart/mixed' },

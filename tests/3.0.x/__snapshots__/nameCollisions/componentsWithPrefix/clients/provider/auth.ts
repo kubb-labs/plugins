@@ -8,6 +8,10 @@ import type { ApiProviderAuthError } from '../../types/ProviderAuthError'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 import { providerAuthResponseSchema, providerAuthStatus400Schema } from '../../zod/provider/authSchema'
 
+type ApiProviderAuthResponses = {
+  '400': ApiProviderAuthError;
+}
+
 /**
  * `POST /auth`
  */
@@ -16,12 +20,8 @@ export function providerAuth<ThrowOnError extends boolean = true>(options: Optio
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '400': ApiProviderAuthError;
-}), ThrowOnError>> {
+}), ThrowOnError> = {}): Unwrappable<RequestResult<ApiProviderAuthResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<({
-    '400': ApiProviderAuthError;
-  }), ThrowOnError>({ method: 'POST', url: '/auth', ...config, validator: { response: providerAuthResponseSchema, error: { 400: providerAuthStatus400Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap(apiClient<ApiProviderAuthResponses, ThrowOnError>({ method: 'POST', url: '/auth', ...config, validator: { response: providerAuthResponseSchema, error: { 400: providerAuthStatus400Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

@@ -6,60 +6,32 @@ import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { withQueryKey } from '../../../.kubb/withQueryKey'
 import { findPetsByTags } from '../../axios/petService/findPetsByTags'
 
-export const findPetsByTagsQueryKey = ({
-  query,
-  headers,
-}: Omit<
-  {
-    body?: never
-    path?: never
-    query?: {
-      tags?: Array<string>
-      page?: string
-      pageSize?: number
-    }
-    headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
-    }
-  },
-  'headers'
-> & {
-  headers?: {
-    body?: never
-    path?: never
-    query?: {
-      tags?: Array<string>
-      page?: string
-      pageSize?: number
-    }
-    headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
-    }
-  }['headers']
-} = {}) => [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
+type FindPetsByTagsOptions = {
+  body?: never
+  path?: never
+  query?: {
+    tags?: Array<string>
+    page?: string
+    pageSize?: number
+  }
+  headers: {
+    'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
+  }
+}
+
+type FindPetsByTagsStatus200 = Array<Pet> | string
+
+export const findPetsByTagsQueryKey = ({ query, headers }: Omit<FindPetsByTagsOptions, 'headers'> & { headers?: FindPetsByTagsOptions['headers'] } = {}) =>
+  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
-  {
-    query,
-    headers,
-  }: {
-    body?: never
-    path?: never
-    query?: {
-      tags?: Array<string>
-      page?: string
-      pageSize?: number
-    }
-    headers: {
-      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
-    }
-  },
+  { query, headers }: FindPetsByTagsOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query, headers })
-  return queryOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, Array<Pet> | string, typeof queryKey>({
+  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<unknown>, FindPetsByTagsStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -72,64 +44,16 @@ export function findPetsByTagsQueryOptions(
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
  * @summary Finds Pets by tags
  */
-export function useFindPetsByTags<TData = Array<Pet> | string, TQueryData = Array<Pet> | string, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
+export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
   {
     headers,
     query,
   }: {
-    headers:
-      | {
-          body?: never
-          path?: never
-          query?: {
-            tags?: Array<string>
-            page?: string
-            pageSize?: number
-          }
-          headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
-          }
-        }['headers']
-      | (() => {
-          body?: never
-          path?: never
-          query?: {
-            tags?: Array<string>
-            page?: string
-            pageSize?: number
-          }
-          headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
-          }
-        }['headers'])
-    query?:
-      | {
-          body?: never
-          path?: never
-          query?: {
-            tags?: Array<string>
-            page?: string
-            pageSize?: number
-          }
-          headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
-          }
-        }['query']
-      | (() => {
-          body?: never
-          path?: never
-          query?: {
-            tags?: Array<string>
-            page?: string
-            pageSize?: number
-          }
-          headers: {
-            'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
-          }
-        }['query'])
+    headers: FindPetsByTagsOptions['headers'] | (() => FindPetsByTagsOptions['headers'])
+    query?: FindPetsByTagsOptions['query'] | (() => FindPetsByTagsOptions['query'])
   },
   options: {
-    query?: Partial<QueryObserverOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<FindPetsByTagsStatus200, ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {

@@ -8,35 +8,22 @@ import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { SWRConfiguration } from 'swr'
 import { loginUser } from '../../clients/user/loginUser'
 
-export const loginUserQueryKey = ({
-  query,
-}: Omit<
-  {
-    body?: never
-    path?: never
-    query?: {
-      username?: string
-      password?: string
-    }
-    headers?: never
-  },
-  'headers'
-> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
+type LoginUserOptions = {
+  body?: never
+  path?: never
+  query?: {
+    username?: string
+    password?: string
+  }
+  headers?: never
+}
+
+export const loginUserQueryKey = ({ query }: Omit<LoginUserOptions, 'headers'> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
 
 type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
-  {
-    query,
-  }: {
-    body?: never
-    path?: never
-    query?: {
-      username?: string
-      password?: string
-    }
-    headers?: never
-  } = {},
+  { query }: LoginUserOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
@@ -51,17 +38,7 @@ export function loginUserQueryOptions(
  * @summary Logs user into the system
  */
 export function useLoginUser(
-  {
-    query,
-  }: {
-    body?: never
-    path?: never
-    query?: {
-      username?: string
-      password?: string
-    }
-    headers?: never
-  } = {},
+  { query }: LoginUserOptions = {},
   options: {
     query?: SWRConfiguration<string, ResponseErrorConfig<unknown>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>

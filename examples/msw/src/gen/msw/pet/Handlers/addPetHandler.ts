@@ -9,7 +9,11 @@ import type { Pet } from '../../../models/Pet'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 
-export function addPetHandlerResponse200(data?: Pet | string) {
+type AddPetStatus200 = Pet | string
+
+type AddPetBody = AddPetRequest | Pet
+
+export function addPetHandlerResponse200(data?: AddPetStatus200) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -43,11 +47,8 @@ export function addPetHandlerResponse405(data?: { code?: number; message?: strin
   })
 }
 
-export function addPetHandler(
-  data?: (Pet | string) | HttpResponseResolver<Record<string, string>, MswBody<AddPetRequest | Pet>>,
-  options?: { baseURL?: string },
-) {
-  return http.post<Record<string, string>, MswBody<AddPetRequest | Pet>>(`${options?.baseURL ?? 'http://localhost:3000'}/pet`, function handler(info) {
+export function addPetHandler(data?: AddPetStatus200 | HttpResponseResolver<Record<string, string>, MswBody<AddPetBody>>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, MswBody<AddPetBody>>(`${options?.baseURL ?? 'http://localhost:3000'}/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return addPetHandlerResponse200(data)

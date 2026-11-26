@@ -7,6 +7,18 @@ import type { Options, RequestResult } from '../../../client'
 import type { User } from '../../models/User'
 import { client } from '../../../client'
 
+type CreateUserResponses = {
+  default:
+    | {
+        contentType: 'application/json'
+        data: User
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+}
+
 /**
  * `POST /user`
  * @description This can only be done by the logged in user.
@@ -49,36 +61,14 @@ export function createUser<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   > = {},
-): Promise<
-  RequestResult<
-    {
-      default:
-        | {
-            contentType: 'application/json'
-            data: User
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<CreateUserResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      default:
-        | {
-            contentType: 'application/json'
-            data: User
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-    },
-    ThrowOnError
-  >({ method: 'POST', url: '/user', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<CreateUserResponses, ThrowOnError>({
+    method: 'POST',
+    url: '/user',
+    contentType: { request: 'application/json' },
+    ...config,
+    throwOnError: config.throwOnError ?? true,
+  })
 }

@@ -2,6 +2,10 @@ import type { Pet } from '../../models/ts/Pet'
 import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
+type GetPetByIdStatus200Json = Omit<NonNullable<Pet>, 'name'>
+
+type GetPetByIdStatus200 = GetPetByIdStatus200Json | string
+
 export function createGetPetByIdPathFaker<
   TData extends Partial<{
     petId: number
@@ -19,7 +23,7 @@ export function createGetPetByIdPathFaker<
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200FakerJson<TData extends Partial<Omit<NonNullable<Pet>, 'name'>> = object>(data?: TData) {
+export function createGetPetByIdStatus200FakerJson<TData extends Partial<GetPetByIdStatus200Json> = object>(data?: TData) {
   const { name: _omit0, ...defaultFakeData } = createPetFaker()
   return {
     ...defaultFakeData,
@@ -37,12 +41,12 @@ export function createGetPetByIdStatus200FakerXml(data?: string): string {
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200Faker(data?: Partial<Omit<NonNullable<Pet>, 'name'> | string>): Omit<NonNullable<Pet>, 'name'> | string {
+export function createGetPetByIdStatus200Faker(data?: Partial<GetPetByIdStatus200>): GetPetByIdStatus200 {
   return (
     typeof data === 'object' && data !== null && !Array.isArray(data)
-      ? faker.helpers.arrayElement([() => createGetPetByIdStatus200FakerJson(data as Partial<Omit<NonNullable<Pet>, 'name'>>)])()
+      ? faker.helpers.arrayElement([() => createGetPetByIdStatus200FakerJson(data as Partial<GetPetByIdStatus200Json>)])()
       : (data ?? faker.helpers.arrayElement([createGetPetByIdStatus200FakerJson(), createGetPetByIdStatus200FakerXml()]))
-  ) as Omit<NonNullable<Pet>, 'name'> | string
+  ) as GetPetByIdStatus200
 }
 
 /**
@@ -59,6 +63,6 @@ export function createGetPetByIdStatus404Faker() {
   return undefined
 }
 
-export function createGetPetByIdResponseFaker(data?: Partial<Omit<NonNullable<Pet>, 'name'> | string>): Omit<NonNullable<Pet>, 'name'> | string {
-  return createGetPetByIdStatus200Faker(data) as Omit<NonNullable<Pet>, 'name'> | string
+export function createGetPetByIdResponseFaker(data?: Partial<GetPetByIdStatus200>): GetPetByIdStatus200 {
+  return createGetPetByIdStatus200Faker(data) as GetPetByIdStatus200
 }

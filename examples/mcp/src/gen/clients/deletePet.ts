@@ -6,6 +6,10 @@
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
+type DeletePetResponses = {
+  '400': unknown
+}
+
 /**
  * `DELETE /pet/{petId}`
  * @description delete a pet
@@ -25,23 +29,11 @@ export function deletePet<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '400': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '400': unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<DeletePetResponses, ThrowOnError>({
       method: 'DELETE',
       url: '/pet/{petId}',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

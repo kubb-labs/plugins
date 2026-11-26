@@ -2,15 +2,15 @@
   "lockfileVersion": 1,
   "inputs": {
     "zod": {
-      "hash": "7e2c80605460af4aca38b708f6e39c948ae4fd36200035a06a504ed483216adb",
+      "hash": "715ac274feeee5d222fa7d5f7a262bab4e739a16658700dc4d9556f0f5b84c15",
       "sources": ["petStore.yaml"]
     },
     "zod-mini": {
-      "hash": "780b416d96499c75328a003dee69a783a04512b5225bb1b46dce021909ecd425",
+      "hash": "f6903a7f4d3b1c438c536f2ff22e5243f67c966814a4f7074be5426c3689cc00",
       "sources": ["petStore.yaml"]
     },
     "zod-union": {
-      "hash": "bd7f9b3f37bc020a9ad1bf9d9c427c19bdc0dbfbf64b30f4330ccefab5008e89",
+      "hash": "8dc132be2d61c815196f1aa06e5c322675cc61c96750ee458573182ed6899c8d",
       "sources": ["unionWithReadOnly.yaml"]
     }
   },

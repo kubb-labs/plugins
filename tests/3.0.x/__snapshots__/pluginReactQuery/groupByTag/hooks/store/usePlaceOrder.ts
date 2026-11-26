@@ -9,49 +9,7 @@ import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tansta
 import { placeOrder } from '../../clients/placeOrder'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
-export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
-
-export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {}) {
-        const mutationKey = placeOrderMutationKey()
-        return mutationOptions<Order, ResponseErrorConfig<unknown>, ({
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType?: 'application/json' | {
-      request: 'application/json';
-    };
-  } | {
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType: 'application/xml' | {
-      request: 'application/xml';
-    };
-  } | {
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType: 'application/x-www-form-urlencoded' | {
-      request: 'application/x-www-form-urlencoded';
-    };
-  }), TContext>({
-          mutationKey,
-          mutationFn: async(variables) => {
-            return placeOrder({ ...config, ...variables, throwOnError: true }).unwrap()
-          },
-        })
-}
-
-/**
- * `POST /store/order`
- * @description Place a new order in the store
- * @summary Place an order for a pet
- */
-export function usePlaceOrder<TContext>(options: {
-  mutation?: UseMutationOptions<Order, ResponseErrorConfig<unknown>, ({
+type PlaceOrderOptions = {
   body?: Order;
   path?: never;
   query?: never;
@@ -75,90 +33,38 @@ export function usePlaceOrder<TContext>(options: {
   contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
-}), TContext> & { client?: QueryClient },
+}
+
+export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
+
+export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {}) {
+  const mutationKey = placeOrderMutationKey()
+  return mutationOptions<Order, ResponseErrorConfig<unknown>, PlaceOrderOptions, TContext>({
+    mutationKey,
+    mutationFn: async(variables) => {
+      return placeOrder({ ...config, ...variables, throwOnError: true }).unwrap()
+    },
+  })
+}
+
+/**
+ * `POST /store/order`
+ * @description Place a new order in the store
+ * @summary Place an order for a pet
+ */
+export function usePlaceOrder<TContext>(options: {
+  mutation?: UseMutationOptions<Order, ResponseErrorConfig<unknown>, PlaceOrderOptions, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>,
 } = {}) {
-          const { mutation = {}, client: config = {} } = options ?? {}
-          const { client: queryClient, ...mutationOptions } = mutation;
-          const mutationKey = mutationOptions.mutationKey ?? placeOrderMutationKey()
+  const { mutation = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...mutationOptions } = mutation;
+  const mutationKey = mutationOptions.mutationKey ?? placeOrderMutationKey()
 
-          const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<Order, ResponseErrorConfig<unknown>, ({
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType?: 'application/json' | {
-      request: 'application/json';
-    };
-  } | {
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType: 'application/xml' | {
-      request: 'application/xml';
-    };
-  } | {
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType: 'application/x-www-form-urlencoded' | {
-      request: 'application/x-www-form-urlencoded';
-    };
-  }), TContext>
+  const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<Order, ResponseErrorConfig<unknown>, PlaceOrderOptions, TContext>
 
-          return useMutation<Order, ResponseErrorConfig<unknown>, ({
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType?: 'application/json' | {
-      request: 'application/json';
-    };
-  } | {
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType: 'application/xml' | {
-      request: 'application/xml';
-    };
-  } | {
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType: 'application/x-www-form-urlencoded' | {
-      request: 'application/x-www-form-urlencoded';
-    };
-  }), TContext>({
-            ...baseOptions,
-            mutationKey,
-            ...mutationOptions,
-          }, queryClient) as UseMutationResult<Order, ResponseErrorConfig<unknown>, ({
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType?: 'application/json' | {
-      request: 'application/json';
-    };
-  } | {
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType: 'application/xml' | {
-      request: 'application/xml';
-    };
-  } | {
-    body?: Order;
-    path?: never;
-    query?: never;
-    headers?: never;
-    contentType: 'application/x-www-form-urlencoded' | {
-      request: 'application/x-www-form-urlencoded';
-    };
-  }), TContext>
+  return useMutation<Order, ResponseErrorConfig<unknown>, PlaceOrderOptions, TContext>({
+    ...baseOptions,
+    mutationKey,
+    ...mutationOptions,
+  }, queryClient) as UseMutationResult<Order, ResponseErrorConfig<unknown>, PlaceOrderOptions, TContext>
 }

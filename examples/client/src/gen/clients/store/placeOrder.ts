@@ -7,6 +7,11 @@ import type { Options, RequestResult } from '../../../client'
 import type { Order } from '../../models/Order'
 import { client } from '../../../client'
 
+type PlaceOrderResponses = {
+  '200': Order
+  '405': unknown
+}
+
 /**
  * `POST /store/order`
  * @description Place a new order in the store
@@ -49,22 +54,14 @@ export function placeOrder<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   > = {},
-): Promise<
-  RequestResult<
-    {
-      '200': Order
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      '200': Order
-      '405': unknown
-    },
-    ThrowOnError
-  >({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<PlaceOrderResponses, ThrowOnError>({
+    method: 'POST',
+    url: '/store/order',
+    contentType: { request: 'application/json' },
+    ...config,
+    throwOnError: config.throwOnError ?? true,
+  })
 }

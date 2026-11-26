@@ -8,37 +8,27 @@ import type { Pet } from '../../models/Pet'
 import { getPetById } from '../../clients/pet/getPetById'
 import { queryOptions } from '@tanstack/react-query'
 
-export const getPetByIdQueryKey = ({
-  path,
-}: Omit<
-  {
-    body?: never
-    path: {
-      petId: bigint
-    }
-    query?: never
-    headers?: never
-  },
-  'headers'
->) => [{ url: '/pet/:petId', params: path }] as const
+type GetPetByIdOptions = {
+  body?: never
+  path: {
+    petId: bigint
+  }
+  query?: never
+  headers?: never
+}
+
+type GetPetByIdStatus200 = Pet | string
+
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 export function getPetByIdQueryOptions(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      petId: bigint
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: GetPetByIdOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
-  return queryOptions<Pet | string, ResponseErrorConfig<unknown | unknown>, Pet | string, typeof queryKey>({
+  return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<unknown | unknown>, GetPetByIdStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()

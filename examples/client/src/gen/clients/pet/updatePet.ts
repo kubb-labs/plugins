@@ -7,6 +7,21 @@ import type { Options, RequestResult } from '../../../client'
 import type { Pet } from '../../models/Pet'
 import { client } from '../../../client'
 
+type UpdatePetResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+  '404': unknown
+  '405': unknown
+}
+
 /**
  * `PUT /pet`
  * @description Update an existing pet by Id
@@ -49,44 +64,10 @@ export function updatePet<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   >,
-): Promise<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-      '404': unknown
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: apiClient = client, contentType, ...config } = options
 
-  return apiClient<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-      '404': unknown
-      '405': unknown
-    },
-    ThrowOnError
-  >({
+  return apiClient<UpdatePetResponses, ThrowOnError>({
     method: 'PUT',
     url: '/pet',
     security: [

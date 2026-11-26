@@ -1,5 +1,7 @@
 import type { Pet } from '../../models/ts/Pet'
 
+type FindPetsByStatusStatus200 = Array<Pet> | string
+
 export function findPetsByStatus(
   {
     path,
@@ -12,12 +14,12 @@ export function findPetsByStatus(
     headers?: never
   },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Array<Pet> | string> {
+): Cypress.Chainable<FindPetsByStatusStatus200> {
   return cy
-    .request<Array<Pet> | string>({
+    .request<FindPetsByStatusStatus200>({
       method: 'GET',
       url: `/pet/findByStatus/${path.step_id}`,
       ...options,
     })
-    .then((res) => res.body) as Cypress.Chainable<Array<Pet> | string>
+    .then((res) => res.body) as Cypress.Chainable<FindPetsByStatusStatus200>
 }

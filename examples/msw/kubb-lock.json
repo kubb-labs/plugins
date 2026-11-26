@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "inputs": {
     "src/gen": {
-      "hash": "d8976eb29f01879a9d217c23975ebb44925727e8fd0826d63aa6837477788baa",
+      "hash": "759bd00edd780dd1d1c513fa669c1331fa79b040eb9153a71ca6b66fcd520a81",
       "sources": ["petStore.yaml"]
     }
   },
@@ -60,32 +60,32 @@
       "output": "eb2538a6a9af219914d6b0453b72e87eeaf6e60a4d79150ac63771613c6e946e"
     },
     "src/gen/mocks/petMocks/createAddPet.ts": {
-      "source": "fd7e6b22339f9a66b23678edabdb1688d12d6fa87fbbf33378708bded35cd04b",
-      "output": "7da2e5ccf37751a4590ad747f120233f8f7415791d0b5916d6c0786ad44854f1"
+      "source": "cdd79fe49fa6a4fd0ec944130dfd1e377f236f46f33168c82b99b40f8a831b36",
+      "output": "9fc39c348cc2c56197cf1071f3e1290448b93db59fe5ca8734bbd18f0168604a"
     },
     "src/gen/mocks/petMocks/createDeletePet.ts": {
       "source": "be780f3b76b25265e05b27d9177597ee247c3d1d5a45352aeee61f5731d92603",
       "output": "63f47076736f55592f120ac757e6cdd5eab94a1bb0f88b96126a5b533c9752e9"
     },
     "src/gen/mocks/petMocks/createFindPetsByStatus.ts": {
-      "source": "0c32383d984c16935847c4b1734eac5e1f4ae1ec4880b75417157144bdd589b0",
-      "output": "7f094a64e658c36eedbba8e37dd70f397a58821701fe9e80a74bd4035ffe636a"
+      "source": "0b6bdcec3f3d787f0f65ceacdc72f0bc3f41fa3e4d9bff33f48076a19ba9c75d",
+      "output": "ea815e28f443d5f0ac4a366adb56f8e92aa85f74aeed585fdc84cd4a0d4a2844"
     },
     "src/gen/mocks/petMocks/createFindPetsByTags.ts": {
-      "source": "d6f6334acb0fafe4a16a7bd6e25c30cb3bc491247489c04317f46abea5690ab6",
-      "output": "6486d93997b3b1c5d3f6884e6479d19f4ba5fb059a47d63a0ca8775dfa889b36"
+      "source": "9ae117e0b9981ee612d27553664e2235166586381e75ffcab3338f5bc3be9e8a",
+      "output": "995735c44641751f163c5dc1e8a77f357f7502b65bb87cb1e6a05913fa93067e"
     },
     "src/gen/mocks/petMocks/createGetPetById.ts": {
-      "source": "769ae7bfee2aff4a5fd7cc832f7d289b844d90aeebf398135614891b96e6f5ab",
-      "output": "f280cd05b7d8de2d556d6e380336a10d31ff4102b1f58c071c1f2f31cc16a239"
+      "source": "0479782bd5699f58d6dbd85d142109aadfc7e7dbd4d2133f9ca9fa6f94e12ebc",
+      "output": "9d906391557854070a3aae8b118bfa0f2f2234568476b3545bebc50f167cba1b"
     },
     "src/gen/mocks/petMocks/createOptionsFindPetsByStatus.ts": {
-      "source": "43ffc750c446b23b8fd44943ad08aef5e6f018ace1d77cab503fa1ab17c518bf",
-      "output": "27ab813664a1d36f9c01f1bc3a37be5c37fb3d6858eebad07073381c81fcc4e9"
+      "source": "8668069175329a8386ee822e4bbe8305ecb2b92a3347660be098c03a5dfca175",
+      "output": "866d682462008210abb20d64b5f7152ea6d8fe488755b1dc1ee34aab01b63b7a"
     },
     "src/gen/mocks/petMocks/createUpdatePet.ts": {
-      "source": "00fdeeb9ac1af2812eb6d1ad7e93570c5af6fb0cac0a1c17ad6af15ea0f425e6",
-      "output": "4d964d4447f7a13682c6d055949a1680b3aefbb875844005fe677552de0b005b"
+      "source": "1660229c96186cc40e4c68520f48788c6aa1cb25150c8e6277b47ee619ead563",
+      "output": "cb760599dca3dd83a3b8e0398d385d263fc493bb7551ffc07acf62e6265c9ac2"
     },
     "src/gen/mocks/petMocks/createUpdatePetWithForm.ts": {
       "source": "5d932202e261c0c0c4491c21ec5394332360bf157e34f38dd8d81a55a1553baf",
@@ -96,16 +96,16 @@
       "output": "681593feee91ef64c2b3a5b1e987b38325d46d8855ae7d9bb8e32e89b52069ba"
     },
     "src/gen/mocks/storeMocks/createDeleteOrder.ts": {
-      "source": "7d5017652c45f5a0e28b9445a2054756938cbd25eda4990c66f1b1dc70ec1904",
-      "output": "6b11aa1ee1dc9c92606001283cd3ee40bf8c619cd46139243657fdbdc757b07e"
+      "source": "f5567a8fb86c7fb03052d7beb7879051076c9e0bbe0d5b5617963f9aec112e83",
+      "output": "442a2b4b117eb170922ac05f66388d2d4f49ba197ad4fb83cb7be0a07e9733af"
     },
     "src/gen/mocks/storeMocks/createGetInventory.ts": {
-      "source": "2751797576de866f5c4de73b749567d65a0ce37ef947f377735f6fb1e89c2753",
-      "output": "0c7225d918611402f8e6f6d4474fda53cd7c3534e1cfe6ec305339cd7051979e"
+      "source": "892731d372c5503e3733ae1cb7e3670028081d90b754f2958ead6b9ccba837d8",
+      "output": "be01bdaaf3190e0681cdebe3d0f74796375743605f1243fcbf5ee8ef5094b396"
     },
     "src/gen/mocks/storeMocks/createGetOrderById.ts": {
-      "source": "3b8ad43b0add13bf7d6ee94ac34216baf10c3d9789ce6efa554797cd8f49a96e",
-      "output": "99ba1e4be458b69a14f09329d60ef6e026fd05eb76d6cb9d9d8f3a975e2f2e95"
+      "source": "19bcda7bbe00c0f49d29dedd2f9975b843a5f761755fd16b0a5e7a32fde28df0",
+      "output": "3e8a32b86fae7fe1ba11c4b6f38a207e180948ac54bb919fbf6dd5dd2a402cbd"
     },
     "src/gen/mocks/storeMocks/createPlaceOrder.ts": {
       "source": "5dd9fe656f9518d9c8be2eb6bf22d8db179d253d6073561410ce75cc67029a09",
@@ -168,32 +168,32 @@
       "output": "c2469115b9012259d17a421aee8b2d51fc315f337a82de76a32a845da7a0f404"
     },
     "src/gen/msw/pet/Handlers/addPetHandler.ts": {
-      "source": "3662d3fa542a102a2b075edc0f39a435341be0b1c4bbeaacab47a197d33649e0",
-      "output": "b6ccf65a191356a0e73f7fe90be1a2bcf55de4866cd0c506625eb9d5229f4222"
+      "source": "cfcea987ee201567291b5a31af1cc624c2eb7f321cca68b710ce630c9560a766",
+      "output": "47c522b8a2645df0234b5dbb01ab722dd83e04e88d7c335ed759468bf83f6395"
     },
     "src/gen/msw/pet/Handlers/deletePetHandler.ts": {
       "source": "cd58b129e029244548b0f7a5392b0b0e7a7f60cf0d6041ca3a09813c5e9f665d",
       "output": "56021736a0dd05674fc3dc3e3e9cd2f4d4bc75b968d98e426dc5438455c85118"
     },
     "src/gen/msw/pet/Handlers/findPetsByStatusHandler.ts": {
-      "source": "71bbce1c599c475e0a7f50f02c7a2dedd468b93f5d4814e66f648ccc2a3b7122",
-      "output": "822c7d84db96be98eef8943a688292b9ffefdd5ccd1be22c06d2680328271f22"
+      "source": "3c9db52121f53c3b514a4a51df9d261de62e2a4a2897fb83001410f14a1bf1b5",
+      "output": "4cd844b444d4046de58f8a0b1b49698ada1b42c1d1acf05ced52face9710b55b"
     },
     "src/gen/msw/pet/Handlers/findPetsByTagsHandler.ts": {
-      "source": "01a4c8ceeeba7dc31fec6bdcf0ab44cc9cae9e1cc289bb9b5f7d2a3916f58981",
-      "output": "70e631ee83f49f634253d45eafb8da817985ec36b65441488459e25b3fc728ed"
+      "source": "2e72c53933e938d08870c0ff23102d0ee58e55b7c437e9aa501f7e8ca2da7ec3",
+      "output": "4efc51c2c6c2d07e4fdc666c219b946d6ca25f9bde6139a89e2401bc7406e640"
     },
     "src/gen/msw/pet/Handlers/getPetByIdHandler.ts": {
-      "source": "387632eb4a68fea7dfc07211c7234390ec8504e03ec994a063f69b962eba5703",
-      "output": "f67c64dd6facd2af20cb181909fe0e2cbbdc65e15b84b6ca3e424b2273e1208f"
+      "source": "4cc2bfbfa9ac0ad33288a993e50a2571bf5d43df8dbc7cf56783efb4576f6ca3",
+      "output": "49dd21d7399fb2859eecbc345c70d5b79d0010297140b7866f644b55acc7591d"
     },
     "src/gen/msw/pet/Handlers/optionsFindPetsByStatusHandler.ts": {
-      "source": "558d2770137f59dfc8330fc0b7fe3059d5a3f12acfe3d8008a529015ba4afc7d",
-      "output": "60c735adcd17ac70fbbf6c107801f10be214082961ebbdb60b78da1dae7b6478"
+      "source": "31d74b9625c9b0889eff966f333c2a4fe96ef52d28af65e7880a59286c93e7c1",
+      "output": "8e7f2cb54442f1e641d2196e0f32ab2277ea0706bf9bc359e53182d766593c1c"
     },
     "src/gen/msw/pet/Handlers/updatePetHandler.ts": {
-      "source": "3aa4af2d62bbcef08b26367339f823b6a4a8a4d3ad618b117b2a72fc6bb541f4",
-      "output": "c02b5ef4b1e13d6131f5775fdf3e1c67483bd687bd38ab22b826510af92aafb6"
+      "source": "9b1d61fcaaea987c10f6b5e532a6e64975baa07ba5579e595175f67a2372406d",
+      "output": "1213145bf1fe2cca6b778bef99b04a439511d51edc1e0324892526b1a12c0c85"
     },
     "src/gen/msw/pet/Handlers/updatePetWithFormHandler.ts": {
       "source": "9985a03e1344518a7485b3ca9efa6f2c0027166b5184e97116aeb9d414ea93dd",
@@ -208,12 +208,12 @@
       "output": "3c4b61b81a601c4e8d6233482e0eb96013069529bbea07326635687571458940"
     },
     "src/gen/msw/store/Handlers/getInventoryHandler.ts": {
-      "source": "b25a55104b4266c4036baa9684b6143543801cf67078c4a544ca078b2c1bbe0b",
-      "output": "956be44dc3b90697d6f818a1cb5087572183c6a1fe5ade60c44d6d8942f7adff"
+      "source": "07059be72a48aa2584fd5908587e7ad88f12c49f761df1fa0e61a44520c15e4a",
+      "output": "190e0a91469223fee4e3174b993aef8e96dacd6d66c359a1ebe870082d9feee3"
     },
     "src/gen/msw/store/Handlers/getOrderByIdHandler.ts": {
-      "source": "f9f44875f0f267d74d5e04f67fdfdb9a20783bbf95952f4bb77755d5eb9cb2fb",
-      "output": "2b763cf8be105da6e43cb817db7349bdc44daee26aa615f149dab7f7aaaab124"
+      "source": "2948a04e36df4d4145085839265951dc64a767e53f8d4fc8a286dcb4a9a66b54",
+      "output": "1e06535752b74a9e1e07fad8aa1d3bc9b8f77c4795bf544621bcd23dff7b08aa"
     },
     "src/gen/msw/store/Handlers/placeOrderHandler.ts": {
       "source": "1bc7eff20f9c59c2027dd8645a8d46d1c4921c9288ea4a0b5a49b04a6939cd7b",

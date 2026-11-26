@@ -9,33 +9,24 @@ import type { Pet } from '../../models/Pet'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByStatus } from '../../clients/pet/findPetsByStatus'
 
-export const findPetsByStatusQueryKey = ({
-  query,
-}: Omit<
-  {
-    body?: never
-    path?: never
-    query?: {
-      status?: 'available' | 'pending' | 'sold'
-    }
-    headers?: never
-  },
-  'headers'
-> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+type FindPetsByStatusOptions = {
+  body?: never
+  path?: never
+  query?: {
+    status?: 'available' | 'pending' | 'sold'
+  }
+  headers?: never
+}
+
+type FindPetsByStatusStatus200 = Pet[] | string
+
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusOptions, 'headers'> = {}) =>
+  [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions(
-  {
-    query,
-  }: {
-    body?: never
-    path?: never
-    query?: {
-      status?: 'available' | 'pending' | 'sold'
-    }
-    headers?: never
-  } = {},
+  { query }: FindPetsByStatusOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
@@ -51,18 +42,9 @@ export function findPetsByStatusQueryOptions(
  * @summary Finds Pets by status
  */
 export function useFindPetsByStatus(
-  {
-    query,
-  }: {
-    body?: never
-    path?: never
-    query?: {
-      status?: 'available' | 'pending' | 'sold'
-    }
-    headers?: never
-  } = {},
+  { query }: FindPetsByStatusOptions = {},
   options: {
-    query?: SWRConfiguration<Pet[] | string, ResponseErrorConfig<unknown>>
+    query?: SWRConfiguration<FindPetsByStatusStatus200, ResponseErrorConfig<unknown>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -72,7 +54,7 @@ export function useFindPetsByStatus(
 
   const queryKey = findPetsByStatusQueryKey({ query })
 
-  return useSWR<Pet[] | string, ResponseErrorConfig<unknown>, FindPetsByStatusQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<FindPetsByStatusStatus200, ResponseErrorConfig<unknown>, FindPetsByStatusQueryKey | null>(shouldFetch ? queryKey : null, {
     ...findPetsByStatusQueryOptions({ query }, config),
     ...(immutable
       ? {

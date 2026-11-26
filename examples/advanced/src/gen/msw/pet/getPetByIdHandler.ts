@@ -1,7 +1,9 @@
 import type { Pet } from '../../models/ts/Pet'
 import { http, HttpResponse } from 'msw/http'
 
-export function getPetByIdHandlerResponse200(data?: Omit<NonNullable<Pet>, 'name'> | string) {
+type GetPetByIdStatus200 = Omit<NonNullable<Pet>, 'name'> | string
+
+export function getPetByIdHandlerResponse200(data?: GetPetByIdStatus200) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -31,7 +33,7 @@ export function getPetByIdHandlerResponse404(data?: unknown) {
 }
 
 export function getPetByIdHandler(
-  data?: (Omit<NonNullable<Pet>, 'name'> | string) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?: GetPetByIdStatus200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.get(`${options?.baseURL ?? ''}/pet/:petId\\:search`, function handler(info) {

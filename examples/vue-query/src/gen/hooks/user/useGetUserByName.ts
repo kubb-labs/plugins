@@ -10,45 +10,28 @@ import { getUserByName } from '../../clients/user/getUserByName'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getUserByNameQueryKey = ({
-  path,
-}: {
-  path: MaybeRefOrGetter<
-    Omit<
-      {
-        body?: never
-        path: {
-          username: string
-        }
-        query?: never
-        headers?: never
-      },
-      'headers'
-    >['path']
-  >
-}) => [{ url: '/user/:username', params: path }] as const
+type GetUserByNameOptions = {
+  body?: never
+  path: {
+    username: string
+  }
+  query?: never
+  headers?: never
+}
+
+type GetUserByNameStatus200 = User | string
+
+export const getUserByNameQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetUserByNameOptions, 'headers'>['path']> }) =>
+  [{ url: '/user/:username', params: path }] as const
 
 export type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions(
-  {
-    path,
-  }: {
-    path: MaybeRefOrGetter<
-      {
-        body?: never
-        path: {
-          username: string
-        }
-        query?: never
-        headers?: never
-      }['path']
-    >
-  },
+  { path }: { path: MaybeRefOrGetter<GetUserByNameOptions['path']> },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getUserByNameQueryKey({ path })
-  return queryOptions<User | string, ResponseErrorConfig<unknown | unknown>, User | string>({
+  return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<unknown | unknown>, GetUserByNameStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getUserByName({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true }).unwrap()

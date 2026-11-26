@@ -5,14 +5,16 @@
 
 import { fakerEN as faker } from '@faker-js/faker'
 
+type GetInventoryStatus200 = {
+  [key: string]: number;
+}
+
 faker.seed([42])
 
 /**
  * @description successful operation
  */
-export function createGetInventoryStatus200<TData extends Partial<({
-  [key: string]: number;
-})> = object>(data?: TData) {
+export function createGetInventoryStatus200<TData extends Partial<GetInventoryStatus200> = object>(data?: TData) {
   const defaultFakeData = {}
   return {
     ...defaultFakeData,
@@ -20,12 +22,6 @@ export function createGetInventoryStatus200<TData extends Partial<({
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createGetInventoryResponse(data?: Partial<(({
-  [key: string]: number;
-}))>): (({
-  [key: string]: number;
-})) {
-  return createGetInventoryStatus200(data) as (({
-    [key: string]: number;
-  }))
+export function createGetInventoryResponse(data?: Partial<GetInventoryStatus200>): GetInventoryStatus200 {
+  return createGetInventoryStatus200(data) as GetInventoryStatus200
 }

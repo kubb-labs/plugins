@@ -7,6 +7,14 @@ import type { Options, RequestResult } from '../../../client'
 import type { User } from '../../models/User'
 import { client } from '../../../client'
 
+type UpdateUserPath = {
+  username: string
+}
+
+type UpdateUserResponses = {
+  default: unknown
+}
+
 /**
  * `PUT /user/{username}`
  * @description This can only be done by the logged in user.
@@ -16,9 +24,7 @@ export function updateUser<ThrowOnError extends boolean = true>(
   options: Options<
     | {
         body?: User
-        path: {
-          username: string
-        }
+        path: UpdateUserPath
         query?: never
         headers?: never
         contentType?:
@@ -29,9 +35,7 @@ export function updateUser<ThrowOnError extends boolean = true>(
       }
     | {
         body?: User
-        path: {
-          username: string
-        }
+        path: UpdateUserPath
         query?: never
         headers?: never
         contentType:
@@ -42,9 +46,7 @@ export function updateUser<ThrowOnError extends boolean = true>(
       }
     | {
         body?: User
-        path: {
-          username: string
-        }
+        path: UpdateUserPath
         query?: never
         headers?: never
         contentType:
@@ -55,20 +57,14 @@ export function updateUser<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   >,
-): Promise<
-  RequestResult<
-    {
-      default: unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<UpdateUserResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<
-    {
-      default: unknown
-    },
-    ThrowOnError
-  >({ method: 'PUT', url: '/user/{username}', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<UpdateUserResponses, ThrowOnError>({
+    method: 'PUT',
+    url: '/user/{username}',
+    contentType: { request: 'application/json' },
+    ...config,
+    throwOnError: config.throwOnError ?? true,
+  })
 }

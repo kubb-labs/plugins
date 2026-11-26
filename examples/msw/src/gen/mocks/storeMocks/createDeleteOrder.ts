@@ -5,6 +5,8 @@
 
 import { fakerEN as faker } from '@faker-js/faker'
 
+type DeleteOrderResponse = unknown | unknown
+
 faker.seed([220])
 
 export function createDeleteOrderPath<
@@ -35,6 +37,6 @@ export function createDeleteOrderStatus404() {
   return undefined
 }
 
-export function createDeleteOrderResponse(data?: Partial<unknown | unknown>): unknown | unknown {
-  return (data ?? faker.helpers.arrayElement([createDeleteOrderStatus400(), createDeleteOrderStatus404()])) as unknown | unknown
+export function createDeleteOrderResponse(data?: Partial<DeleteOrderResponse>): DeleteOrderResponse {
+  return (data ?? faker.helpers.arrayElement([createDeleteOrderStatus400(), createDeleteOrderStatus404()])) as DeleteOrderResponse
 }

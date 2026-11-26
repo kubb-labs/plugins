@@ -6,7 +6,9 @@
 import type { Pet } from '../types/Pet'
 import { http, HttpResponse } from 'msw/http'
 
-export function findPetsByStatusHandlerResponse200(data?: (((Pet[]) | string))) {
+type FindPetsByStatusStatus200 = (Pet[]) | string
+
+export function findPetsByStatusHandlerResponse200(data?: FindPetsByStatusStatus200) {
   if (typeof data === 'string') return new HttpResponse<string>(data, {
     status: 200,
     headers: {
@@ -32,7 +34,7 @@ export function findPetsByStatusHandlerResponse400(data?: unknown) {
   })
 }
 
-export function findPetsByStatusHandler(data?: (((Pet[]) | string)) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
+export function findPetsByStatusHandler(data?: FindPetsByStatusStatus200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
   return http.get(`${options?.baseURL ?? ''}/pet/findByStatus`, function handler(info) {
       if(typeof data === 'function') return data(info)
 

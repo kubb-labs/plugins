@@ -1,5 +1,7 @@
 import type { Pet } from '../../models/ts/Pet'
 
+type GetPetByIdStatus200 = Omit<NonNullable<Pet>, 'name'> | string
+
 export function getPetById(
   {
     path,
@@ -12,12 +14,12 @@ export function getPetById(
     headers?: never
   },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Omit<NonNullable<Pet>, 'name'> | string> {
+): Cypress.Chainable<GetPetByIdStatus200> {
   return cy
-    .request<Omit<NonNullable<Pet>, 'name'> | string>({
+    .request<GetPetByIdStatus200>({
       method: 'GET',
       url: `/pet/${path.petId}:search`,
       ...options,
     })
-    .then((res) => res.body) as Cypress.Chainable<Omit<NonNullable<Pet>, 'name'> | string>
+    .then((res) => res.body) as Cypress.Chainable<GetPetByIdStatus200>
 }

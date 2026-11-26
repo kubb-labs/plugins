@@ -9,6 +9,14 @@ import type { ApiResponse } from '../../models/ApiResponse'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { uploadFile } from '../../clients/pet/uploadFile'
 
+type UploadFilePath = {
+  petId: bigint
+}
+
+type UploadFileQuery = {
+  additionalMetadata?: string
+}
+
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
 export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
@@ -18,12 +26,8 @@ export type UploadFileMutationArg =
       body: {
         url: string
       }
-      path: {
-        petId: bigint
-      }
-      query?: {
-        additionalMetadata?: string
-      }
+      path: UploadFilePath
+      query?: UploadFileQuery
       headers?: never
       contentType?:
         | 'application/json'
@@ -35,12 +39,8 @@ export type UploadFileMutationArg =
       body: {
         file: Blob
       }
-      path: {
-        petId: bigint
-      }
-      query?: {
-        additionalMetadata?: string
-      }
+      path: UploadFilePath
+      query?: UploadFileQuery
       headers?: never
       contentType:
         | 'multipart/form-data'

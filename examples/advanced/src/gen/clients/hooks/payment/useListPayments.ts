@@ -6,46 +6,32 @@ import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { withQueryKey } from '../../../.kubb/withQueryKey'
 import { listPayments } from '../../axios/paymentService/listPayments'
 
-export const listPaymentsQueryKey = ({
-  query,
-}: Omit<
-  {
-    body?: never
-    path?: never
-    query?: {
-      status?: string
-      filter?: string
-    }
-    headers?: never
-    cookies?: {
-      session?: string
-    }
-  },
-  'headers' | 'cookies'
-> = {}) => [{ url: '/store/payments' }, ...(query ? [query] : [])] as const
+type ListPaymentsOptions = {
+  body?: never
+  path?: never
+  query?: {
+    status?: string
+    filter?: string
+  }
+  headers?: never
+  cookies?: {
+    session?: string
+  }
+}
+
+type ListPaymentsStatus2xx = Array<Payment>
+
+export const listPaymentsQueryKey = ({ query }: Omit<ListPaymentsOptions, 'headers' | 'cookies'> = {}) =>
+  [{ url: '/store/payments' }, ...(query ? [query] : [])] as const
 
 type ListPaymentsQueryKey = ReturnType<typeof listPaymentsQueryKey>
 
 export function listPaymentsQueryOptions(
-  {
-    query,
-    cookies,
-  }: {
-    body?: never
-    path?: never
-    query?: {
-      status?: string
-      filter?: string
-    }
-    headers?: never
-    cookies?: {
-      session?: string
-    }
-  } = {},
+  { query, cookies }: ListPaymentsOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = listPaymentsQueryKey({ query })
-  return queryOptions<Array<Payment>, ResponseErrorConfig<PaymentError>, Array<Payment>, typeof queryKey>({
+  return queryOptions<ListPaymentsStatus2xx, ResponseErrorConfig<PaymentError>, ListPaymentsStatus2xx, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return listPayments({ ...config, query, cookies, signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -58,64 +44,16 @@ export function listPaymentsQueryOptions(
  * @summary List payments
  * @see http://swagger.io Payment guide
  */
-export function useListPayments<TData = Array<Payment>, TQueryData = Array<Payment>, TQueryKey extends QueryKey = ListPaymentsQueryKey>(
+export function useListPayments<TData = ListPaymentsStatus2xx, TQueryData = ListPaymentsStatus2xx, TQueryKey extends QueryKey = ListPaymentsQueryKey>(
   {
     query,
     cookies,
   }: {
-    query?:
-      | {
-          body?: never
-          path?: never
-          query?: {
-            status?: string
-            filter?: string
-          }
-          headers?: never
-          cookies?: {
-            session?: string
-          }
-        }['query']
-      | (() => {
-          body?: never
-          path?: never
-          query?: {
-            status?: string
-            filter?: string
-          }
-          headers?: never
-          cookies?: {
-            session?: string
-          }
-        }['query'])
-    cookies?:
-      | {
-          body?: never
-          path?: never
-          query?: {
-            status?: string
-            filter?: string
-          }
-          headers?: never
-          cookies?: {
-            session?: string
-          }
-        }['cookies']
-      | (() => {
-          body?: never
-          path?: never
-          query?: {
-            status?: string
-            filter?: string
-          }
-          headers?: never
-          cookies?: {
-            session?: string
-          }
-        }['cookies'])
+    query?: ListPaymentsOptions['query'] | (() => ListPaymentsOptions['query'])
+    cookies?: ListPaymentsOptions['cookies'] | (() => ListPaymentsOptions['cookies'])
   } = {},
   options: {
-    query?: Partial<QueryObserverOptions<Array<Payment>, ResponseErrorConfig<PaymentError>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<ListPaymentsStatus2xx, ResponseErrorConfig<PaymentError>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {

@@ -10,14 +10,7 @@ import { uploadFile } from '../../clients/uploadFile'
 import { useMutation } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
-
-/**
- * `POST /pet/{petId}/uploadImage`
- * @summary uploads an image
- */
-export function useUploadFile<TContext>(options: {
-  mutation?: MutationObserverOptions<ApiResponse, ResponseErrorConfig<Error>, ({
+type UploadFileOptions = {
   body?: Blob;
   path: ({
   petId: bigint;
@@ -26,54 +19,27 @@ export function useUploadFile<TContext>(options: {
   additionalMetadata?: string;
 });
   headers?: never;
-}), TContext> & { client?: QueryClient },
+}
+
+export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
+
+/**
+ * `POST /pet/{petId}/uploadImage`
+ * @summary uploads an image
+ */
+export function useUploadFile<TContext>(options: {
+  mutation?: MutationObserverOptions<ApiResponse, ResponseErrorConfig<Error>, UploadFileOptions, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
 } = {}) {
-          const { mutation = {}, client: config = {} } = options ?? {}
-          const { client: queryClient, ...mutationOptions } = mutation;
-          const mutationKey = mutationOptions?.mutationKey ?? uploadFileMutationKey()
+  const { mutation = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...mutationOptions } = mutation;
+  const mutationKey = mutationOptions?.mutationKey ?? uploadFileMutationKey()
 
-          return useMutation<ApiResponse, ResponseErrorConfig<Error>, ({
-    body?: Blob;
-    path: ({
-    petId: bigint;
-  });
-    query?: ({
-    additionalMetadata?: string;
-  });
-    headers?: never;
-  }), TContext>({
-            mutationFn: async({ path, query, body }) => {
-              return uploadFile({ ...config, path: toValue<({
-    body?: Blob;
-    path: ({
-    petId: bigint;
-  });
-    query?: ({
-    additionalMetadata?: string;
-  });
-    headers?: never;
-  })['path']>(path), query: toValue<({
-    body?: Blob;
-    path: ({
-    petId: bigint;
-  });
-    query?: ({
-    additionalMetadata?: string;
-  });
-    headers?: never;
-  })['query']>(query), body: toValue<({
-    body?: Blob;
-    path: ({
-    petId: bigint;
-  });
-    query?: ({
-    additionalMetadata?: string;
-  });
-    headers?: never;
-  })['body']>(body), throwOnError: true }).unwrap()
-            },
-            mutationKey,
-            ...mutationOptions
-          }, queryClient)
+  return useMutation<ApiResponse, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
+    mutationFn: async({ path, query, body }) => {
+      return uploadFile({ ...config, path: toValue<UploadFileOptions['path']>(path), query: toValue<UploadFileOptions['query']>(query), body: toValue<UploadFileOptions['body']>(body), throwOnError: true }).unwrap()
+    },
+    mutationKey,
+    ...mutationOptions
+  }, queryClient)
 }

@@ -9,43 +9,23 @@ import { loginUser } from '../../clients/user/loginUser'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const loginUserQueryKey = ({
-  query,
-}: {
-  query?: MaybeRefOrGetter<
-    Omit<
-      {
-        body?: never
-        path?: never
-        query?: {
-          username?: string
-          password?: string
-        }
-        headers?: never
-      },
-      'headers'
-    >['query']
-  >
-} = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
+type LoginUserOptions = {
+  body?: never
+  path?: never
+  query?: {
+    username?: string
+    password?: string
+  }
+  headers?: never
+}
+
+export const loginUserQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<LoginUserOptions, 'headers'>['query']> } = {}) =>
+  [{ url: '/user/login' }, ...(query ? [query] : [])] as const
 
 export type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
-  {
-    query,
-  }: {
-    query?: MaybeRefOrGetter<
-      {
-        body?: never
-        path?: never
-        query?: {
-          username?: string
-          password?: string
-        }
-        headers?: never
-      }['query']
-    >
-  } = {},
+  { query }: { query?: MaybeRefOrGetter<LoginUserOptions['query']> } = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = loginUserQueryKey({ query })

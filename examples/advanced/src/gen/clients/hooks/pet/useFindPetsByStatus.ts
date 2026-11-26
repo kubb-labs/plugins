@@ -5,37 +5,27 @@ import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { withQueryKey } from '../../../.kubb/withQueryKey'
 import { findPetsByStatus } from '../../axios/petService/findPetsByStatus'
 
-export const findPetsByStatusQueryKey = ({
-  path,
-}: Omit<
-  {
-    body?: never
-    path: {
-      step_id: string
-    }
-    query?: never
-    headers?: never
-  },
-  'headers'
->) => [{ url: '/pet/findByStatus/:step_id', params: path }] as const
+type FindPetsByStatusOptions = {
+  body?: never
+  path: {
+    step_id: string
+  }
+  query?: never
+  headers?: never
+}
+
+type FindPetsByStatusStatus200 = Array<Pet> | string
+
+export const findPetsByStatusQueryKey = ({ path }: Omit<FindPetsByStatusOptions, 'headers'>) => [{ url: '/pet/findByStatus/:step_id', params: path }] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      step_id: string
-    }
-    query?: never
-    headers?: never
-  },
+  { path }: FindPetsByStatusOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByStatusQueryKey({ path })
-  return queryOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, Array<Pet> | string, typeof queryKey>({
+  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<unknown>, FindPetsByStatusStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByStatus({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -48,30 +38,14 @@ export function findPetsByStatusQueryOptions(
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
  */
-export function useFindPetsByStatus<TData = Array<Pet> | string, TQueryData = Array<Pet> | string, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(
-  {
-    path,
-  }: {
-    path:
-      | {
-          body?: never
-          path: {
-            step_id: string
-          }
-          query?: never
-          headers?: never
-        }['path']
-      | (() => {
-          body?: never
-          path: {
-            step_id: string
-          }
-          query?: never
-          headers?: never
-        }['path'])
-  },
+export function useFindPetsByStatus<
+  TData = FindPetsByStatusStatus200,
+  TQueryData = FindPetsByStatusStatus200,
+  TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
+>(
+  { path }: { path: FindPetsByStatusOptions['path'] | (() => FindPetsByStatusOptions['path']) },
   options: {
-    query?: Partial<QueryObserverOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {

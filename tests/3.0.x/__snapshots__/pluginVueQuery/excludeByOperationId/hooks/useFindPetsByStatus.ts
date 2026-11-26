@@ -12,27 +12,24 @@ import { findPetsByStatus } from '../clients/findPetsByStatus'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const findPetsByStatusQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<({
+type FindPetsByStatusOptions = {
   body?: never;
   path?: never;
   query?: ({
   status?: FindPetsByStatusStatusEnumKey;
 });
   headers?: never;
-}), 'headers'>['query']> } = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+}
+
+type FindPetsByStatusStatus200 = (Pet[]) | string
+
+export const findPetsByStatusQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<FindPetsByStatusOptions, 'headers'>['query']> } = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-export function findPetsByStatusQueryOptions({ query }: { query?: MaybeRefOrGetter<({
-  body?: never;
-  path?: never;
-  query?: ({
-  status?: FindPetsByStatusStatusEnumKey;
-});
-  headers?: never;
-})['query']> } = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+export function findPetsByStatusQueryOptions({ query }: { query?: MaybeRefOrGetter<FindPetsByStatusOptions['query']> } = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = findPetsByStatusQueryKey({ query })
-  return queryOptions<((Pet[]) | string), ResponseErrorConfig<unknown>, ((Pet[]) | string)>({
+  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<unknown>, FindPetsByStatusStatus200>({
    queryKey,
    queryFn: async ({ signal }) => {
       return findPetsByStatus({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -45,15 +42,8 @@ export function findPetsByStatusQueryOptions({ query }: { query?: MaybeRefOrGett
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
  */
-export function useFindPetsByStatus<TData = ((Pet[]) | string), TQueryData = ((Pet[]) | string), TQueryKey extends QueryKey = FindPetsByStatusQueryKey>({ query }: { query?: MaybeRefOrGetter<({
-  body?: never;
-  path?: never;
-  query?: ({
-  status?: FindPetsByStatusStatusEnumKey;
-});
-  headers?: never;
-})['query']> } = {}, options: {
-  query?: Partial<UseQueryOptions<((Pet[]) | string), ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>({ query }: { query?: MaybeRefOrGetter<FindPetsByStatusOptions['query']> } = {}, options: {
+  query?: Partial<UseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
@@ -64,7 +54,7 @@ export function useFindPetsByStatus<TData = ((Pet[]) | string), TQueryData = ((P
    ...findPetsByStatusQueryOptions({ query }, config),
    ...resolvedOptions,
    queryKey
-  } as unknown as UseQueryOptions<((Pet[]) | string), ResponseErrorConfig<unknown>, TData, ((Pet[]) | string), TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<unknown>> & { queryKey: TQueryKey }
+  } as unknown as UseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<unknown>, TData, FindPetsByStatusStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<unknown>> & { queryKey: TQueryKey }
 
   queryResult.queryKey = queryKey as TQueryKey
 

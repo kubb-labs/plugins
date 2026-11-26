@@ -3,6 +3,20 @@ import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { getPetByIdResponseSchema, getPetByIdStatus400Schema, getPetByIdStatus404Schema } from '../../../zod/pet/getPetByIdSchema'
 
+type GetPetByIdResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Omit<NonNullable<Pet>, 'name'>
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+  '404': unknown
+}
+
 /**
  * `GET /pet/{petId}:search`
  * @description Returns a single pet
@@ -20,43 +34,11 @@ export function getPetById<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Omit<NonNullable<Pet>, 'name'>
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '400': unknown
-        '404': unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<GetPetByIdResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/{petId}:search',
       security: [securitySchemes.api_key, { ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

@@ -10,6 +10,97 @@ import type { FindPetsByStatusStatusEnumKey } from '../../models/FindPetsByStatu
 import type { Pet } from '../../models/Pet'
 import { createClient, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
+type UpdatePetResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+  '404': unknown
+  '405': unknown
+}
+
+type AddPetResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '405': {
+    code?: number
+    message?: string
+  }
+}
+
+type FindPetsByStatusResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet[]
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+}
+
+type FindPetsByTagsResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet[]
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+}
+
+type GetPetByIdResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+  '404': unknown
+}
+
+type UpdatePetWithFormResponses = {
+  '405': unknown
+}
+
+type DeletePetResponses = {
+  '400': unknown
+}
+
+type UploadFilePath = {
+  petId: bigint
+}
+
+type UploadFileQuery = {
+  additionalMetadata?: string
+}
+
+type UploadFileResponses = {
+  '200': ApiResponse
+}
+
 export class PetClient {
   readonly client: ClientInstance
 
@@ -59,45 +150,11 @@ export class PetClient {
         },
       ThrowOnError
     >,
-  ): Unwrappable<
-    RequestResult<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Pet
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '400': unknown
-        '404': unknown
-        '405': unknown
-      },
-      ThrowOnError
-    >
-  > {
+  ): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
     const { client: apiClient = this.client, contentType, ...config } = options
 
     return withUnwrap(
-      apiClient<
-        {
-          '200':
-            | {
-                contentType: 'application/json'
-                data: Pet
-              }
-            | {
-                contentType: 'application/xml'
-                data: string
-              }
-          '400': unknown
-          '404': unknown
-          '405': unknown
-        },
-        ThrowOnError
-      >({
+      apiClient<UpdatePetResponses, ThrowOnError>({
         method: 'PUT',
         url: '/pet',
         security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
@@ -150,47 +207,11 @@ export class PetClient {
         },
       ThrowOnError
     >,
-  ): Unwrappable<
-    RequestResult<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Pet
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '405': {
-          code?: number
-          message?: string
-        }
-      },
-      ThrowOnError
-    >
-  > {
+  ): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: apiClient = this.client, contentType, ...config } = options
 
     return withUnwrap(
-      apiClient<
-        {
-          '200':
-            | {
-                contentType: 'application/json'
-                data: Pet
-              }
-            | {
-                contentType: 'application/xml'
-                data: string
-              }
-          '405': {
-            code?: number
-            message?: string
-          }
-        },
-        ThrowOnError
-      >({
+      apiClient<AddPetResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet',
         security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
@@ -218,41 +239,11 @@ export class PetClient {
       },
       ThrowOnError
     > = {},
-  ): Unwrappable<
-    RequestResult<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Pet[]
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '400': unknown
-      },
-      ThrowOnError
-    >
-  > {
+  ): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<
-        {
-          '200':
-            | {
-                contentType: 'application/json'
-                data: Pet[]
-              }
-            | {
-                contentType: 'application/xml'
-                data: string
-              }
-          '400': unknown
-        },
-        ThrowOnError
-      >({
+      apiClient<FindPetsByStatusResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/findByStatus',
         security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
@@ -282,41 +273,11 @@ export class PetClient {
       },
       ThrowOnError
     > = {},
-  ): Unwrappable<
-    RequestResult<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Pet[]
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '400': unknown
-      },
-      ThrowOnError
-    >
-  > {
+  ): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<
-        {
-          '200':
-            | {
-                contentType: 'application/json'
-                data: Pet[]
-              }
-            | {
-                contentType: 'application/xml'
-                data: string
-              }
-          '400': unknown
-        },
-        ThrowOnError
-      >({
+      apiClient<FindPetsByTagsResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/findByTags',
         security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
@@ -344,43 +305,11 @@ export class PetClient {
       },
       ThrowOnError
     >,
-  ): Unwrappable<
-    RequestResult<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Pet
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '400': unknown
-        '404': unknown
-      },
-      ThrowOnError
-    >
-  > {
+  ): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<
-        {
-          '200':
-            | {
-                contentType: 'application/json'
-                data: Pet
-              }
-            | {
-                contentType: 'application/xml'
-                data: string
-              }
-          '400': unknown
-          '404': unknown
-        },
-        ThrowOnError
-      >({
+      apiClient<GetPetByIdResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/{petId}',
         security: [securitySchemes.api_key, { ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
@@ -409,23 +338,11 @@ export class PetClient {
       },
       ThrowOnError
     >,
-  ): Unwrappable<
-    RequestResult<
-      {
-        '405': unknown
-      },
-      ThrowOnError
-    >
-  > {
+  ): Unwrappable<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<
-        {
-          '405': unknown
-        },
-        ThrowOnError
-      >({
+      apiClient<UpdatePetWithFormResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet/{petId}',
         security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
@@ -454,23 +371,11 @@ export class PetClient {
       },
       ThrowOnError
     >,
-  ): Unwrappable<
-    RequestResult<
-      {
-        '400': unknown
-      },
-      ThrowOnError
-    >
-  > {
+  ): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<
-        {
-          '400': unknown
-        },
-        ThrowOnError
-      >({
+      apiClient<DeletePetResponses, ThrowOnError>({
         method: 'DELETE',
         url: '/pet/{petId}',
         security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],
@@ -490,12 +395,8 @@ export class PetClient {
           body: {
             url: string
           }
-          path: {
-            petId: bigint
-          }
-          query?: {
-            additionalMetadata?: string
-          }
+          path: UploadFilePath
+          query?: UploadFileQuery
           headers?: never
           contentType?:
             | 'application/json'
@@ -507,12 +408,8 @@ export class PetClient {
           body: {
             file: Blob
           }
-          path: {
-            petId: bigint
-          }
-          query?: {
-            additionalMetadata?: string
-          }
+          path: UploadFilePath
+          query?: UploadFileQuery
           headers?: never
           contentType:
             | 'multipart/form-data'
@@ -522,23 +419,11 @@ export class PetClient {
         },
       ThrowOnError
     >,
-  ): Unwrappable<
-    RequestResult<
-      {
-        '200': ApiResponse
-      },
-      ThrowOnError
-    >
-  > {
+  ): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<
-        {
-          '200': ApiResponse
-        },
-        ThrowOnError
-      >({
+      apiClient<UploadFileResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet/{petId}/uploadImage',
         security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

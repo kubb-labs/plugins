@@ -8,6 +8,14 @@ import type { ApiResponse } from '../../models/ApiResponse'
 import { uploadFile } from '../../clients/pet/uploadFile'
 import { mutationOptions } from '@tanstack/react-query'
 
+type UploadFilePath = {
+  petId: bigint
+}
+
+type UploadFileQuery = {
+  additionalMetadata?: string
+}
+
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
 export function uploadFileMutationOptions<TContext = unknown>(
@@ -21,12 +29,8 @@ export function uploadFileMutationOptions<TContext = unknown>(
         body: {
           url: string
         }
-        path: {
-          petId: bigint
-        }
-        query?: {
-          additionalMetadata?: string
-        }
+        path: UploadFilePath
+        query?: UploadFileQuery
         headers?: never
         contentType?:
           | 'application/json'
@@ -38,12 +42,8 @@ export function uploadFileMutationOptions<TContext = unknown>(
         body: {
           file: Blob
         }
-        path: {
-          petId: bigint
-        }
-        query?: {
-          additionalMetadata?: string
-        }
+        path: UploadFilePath
+        query?: UploadFileQuery
         headers?: never
         contentType:
           | 'multipart/form-data'

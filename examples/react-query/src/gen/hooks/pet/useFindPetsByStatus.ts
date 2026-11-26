@@ -8,37 +8,28 @@ import type { Pet } from '../../models/Pet'
 import { findPetsByStatus } from '../../clients/pet/findPetsByStatus'
 import { queryOptions } from '@tanstack/react-query'
 
-export const findPetsByStatusQueryKey = ({
-  query,
-}: Omit<
-  {
-    body?: never
-    path?: never
-    query?: {
-      status?: 'available' | 'pending' | 'sold'
-    }
-    headers?: never
-  },
-  'headers'
-> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+type FindPetsByStatusOptions = {
+  body?: never
+  path?: never
+  query?: {
+    status?: 'available' | 'pending' | 'sold'
+  }
+  headers?: never
+}
+
+type FindPetsByStatusStatus200 = Pet[] | string
+
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusOptions, 'headers'> = {}) =>
+  [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions(
-  {
-    query,
-  }: {
-    body?: never
-    path?: never
-    query?: {
-      status?: 'available' | 'pending' | 'sold'
-    }
-    headers?: never
-  } = {},
+  { query }: FindPetsByStatusOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByStatusQueryKey({ query })
-  return queryOptions<Pet[] | string, ResponseErrorConfig<unknown>, Pet[] | string, typeof queryKey>({
+  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<unknown>, FindPetsByStatusStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()

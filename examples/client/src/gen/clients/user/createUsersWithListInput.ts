@@ -7,6 +7,19 @@ import type { Options, RequestResult } from '../../../client'
 import type { User } from '../../models/User'
 import { client } from '../../../client'
 
+type CreateUsersWithListInputResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: User
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  default: unknown
+}
+
 /**
  * `POST /user/createWithList`
  * @description Creates list of users with given input array
@@ -22,40 +35,10 @@ export function createUsersWithListInput<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Promise<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: User
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      default: unknown
-    },
-    ThrowOnError
-  >
-> {
+): Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
   const { client: apiClient = client, contentType, ...config } = options
 
-  return apiClient<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: User
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      default: unknown
-    },
-    ThrowOnError
-  >({
+  return apiClient<CreateUsersWithListInputResponses, ThrowOnError>({
     method: 'POST',
     url: '/user/createWithList',
     contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },

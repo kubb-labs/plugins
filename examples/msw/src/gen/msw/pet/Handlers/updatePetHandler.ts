@@ -8,7 +8,9 @@ import type { Pet } from '../../../models/Pet'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 
-export function updatePetHandlerResponse200(data?: Pet | string) {
+type UpdatePetStatus200 = Pet | string
+
+export function updatePetHandlerResponse200(data?: UpdatePetStatus200) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -51,7 +53,7 @@ export function updatePetHandlerResponse405(data?: unknown) {
   })
 }
 
-export function updatePetHandler(data?: (Pet | string) | HttpResponseResolver<Record<string, string>, MswBody<Pet>>, options?: { baseURL?: string }) {
+export function updatePetHandler(data?: UpdatePetStatus200 | HttpResponseResolver<Record<string, string>, MswBody<Pet>>, options?: { baseURL?: string }) {
   return http.put<Record<string, string>, MswBody<Pet>>(`${options?.baseURL ?? 'http://localhost:3000'}/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

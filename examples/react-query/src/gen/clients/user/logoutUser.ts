@@ -6,6 +6,10 @@
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
+type LogoutUserResponses = {
+  default: unknown
+}
+
 /**
  * `GET /user/logout`
  * @summary Logs out current logged in user session
@@ -20,22 +24,15 @@ export function logoutUser<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResult<
-    {
-      default: unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<LogoutUserResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        default: unknown
-      },
-      ThrowOnError
-    >({ method: 'GET', url: '/user/logout', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
+    apiClient<LogoutUserResponses, ThrowOnError>({
+      method: 'GET',
+      url: '/user/logout',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

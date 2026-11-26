@@ -7,6 +7,19 @@ import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { Pet } from '../../models/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
+type FindPetsByStatusResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: Pet[]
+      }
+    | {
+        contentType: 'application/xml'
+        data: string
+      }
+  '400': unknown
+}
+
 /**
  * `GET /pet/findByStatus`
  * @description Multiple status values can be provided with comma separated strings
@@ -24,41 +37,11 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Pet[]
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '400': unknown
-    },
-    ThrowOnError
-  >
-> {
+): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Pet[]
-            }
-          | {
-              contentType: 'application/xml'
-              data: string
-            }
-        '400': unknown
-      },
-      ThrowOnError
-    >({
+    apiClient<FindPetsByStatusResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/findByStatus',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

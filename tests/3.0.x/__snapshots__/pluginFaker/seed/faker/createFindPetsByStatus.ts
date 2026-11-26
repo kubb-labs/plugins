@@ -9,6 +9,10 @@ import { createFindPetsByStatusStatusEnum } from './createFindPetsByStatusStatus
 import { createPet } from './createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
+type FindPetsByStatusStatus200Json = Pet[]
+
+type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | string
+
 faker.seed([42])
 
 export function createFindPetsByStatusQuery<TData extends Partial<({
@@ -26,11 +30,11 @@ export function createFindPetsByStatusQuery<TData extends Partial<({
 /**
  * @description successful operation
  */
-export function createFindPetsByStatusStatus200Json(data?: Partial<(Pet[])>): (Pet[]) {
+export function createFindPetsByStatusStatus200Json(data?: Partial<FindPetsByStatusStatus200Json>): FindPetsByStatusStatus200Json {
   return [
     ...faker.helpers.multiple(() => (createPet())),
     ...(data || []).filter((item) => item !== undefined),
-  ] as (Pet[])
+  ] as FindPetsByStatusStatus200Json
 }
 
 /**
@@ -43,8 +47,8 @@ export function createFindPetsByStatusStatus200Xml(data?: string): string {
 /**
  * @description successful operation
  */
-export function createFindPetsByStatusStatus200(data?: Partial<((Pet[]) | string)>): ((Pet[]) | string) {
-  return (data ?? faker.helpers.arrayElement([createFindPetsByStatusStatus200Json(), createFindPetsByStatusStatus200Xml()])) as ((Pet[]) | string)
+export function createFindPetsByStatusStatus200(data?: Partial<FindPetsByStatusStatus200>): FindPetsByStatusStatus200 {
+  return (data ?? faker.helpers.arrayElement([createFindPetsByStatusStatus200Json(), createFindPetsByStatusStatus200Xml()])) as FindPetsByStatusStatus200
 }
 
 /**
@@ -54,6 +58,6 @@ export function createFindPetsByStatusStatus400() {
   return undefined
 }
 
-export function createFindPetsByStatusResponse(data?: Partial<(((Pet[]) | string))>): (((Pet[]) | string)) {
-  return createFindPetsByStatusStatus200(data) as (((Pet[]) | string))
+export function createFindPetsByStatusResponse(data?: Partial<FindPetsByStatusStatus200>): FindPetsByStatusStatus200 {
+  return createFindPetsByStatusStatus200(data) as FindPetsByStatusStatus200
 }
