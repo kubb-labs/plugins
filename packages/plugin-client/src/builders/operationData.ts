@@ -28,21 +28,18 @@ export type OperationData = {
   baseURL?: string
 }
 
-/**
- * Resolves what the function and SDK generators both print for one operation: its name, its type and schema names, each with
- * its import, and its validator hooks, security, base URL and response headers types.
- */
-export function resolveOperationData({
-  node,
-  ctx,
-  types,
-  custom = false,
-}: {
+export type ResolveOperationDataOptions = {
   node: ast.HttpOperationNode
   ctx: TemplateContext<ContractClientFactory>
   types: OperationTypeSource
   custom?: boolean
-}): OperationData {
+}
+
+/**
+ * Resolves what the function and SDK generators both print for one operation: its name, its type and schema names, each with
+ * its import, and its validator hooks, security, base URL and response headers types.
+ */
+export function resolveOperationData({ node, ctx, types, custom = false }: ResolveOperationDataOptions): OperationData {
   const { validator } = ctx.options
   const library = resolveValidatorLibrary(validator)
   const schemaPlugin = library === 'valibot' ? ctx.getPlugin(pluginValibotName) : library === 'zod' ? ctx.getPlugin(pluginZodName) : null

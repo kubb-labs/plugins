@@ -114,21 +114,18 @@ export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Arra
   return withParentheses ? { type: 'TSParenthesizedType', typeAnnotation: node } : node
 }
 
-/**
- * Creates a TypeScript property signature for object/interface members.
- * Supports optional markers, readonly modifiers, and type annotations.
- */
-export function createPropertySignature({
-  readOnly,
-  name,
-  questionToken,
-  type,
-}: {
+export type CreatePropertySignatureOptions = {
   readOnly?: boolean
   name: string
   questionToken?: boolean
   type?: TsNode
-}): TsNode {
+}
+
+/**
+ * Creates a TypeScript property signature for object/interface members.
+ * Supports optional markers, readonly modifiers, and type annotations.
+ */
+export function createPropertySignature({ readOnly, name, questionToken, type }: CreatePropertySignatureOptions): TsNode {
   return {
     type: 'TSPropertySignature',
     key: propertyName(name),
@@ -178,23 +175,19 @@ function exportNamed(declaration: TsNode, exportKind: 'type' | 'value'): TsNode 
   return { type: 'ExportNamedDeclaration', declaration, specifiers: [], source: null, attributes: [], exportKind }
 }
 
-/**
- * Prints a TypeScript type declaration as either a type alias or interface.
- * Uses interface syntax only when requested and the type is an object literal, and attaches JSDoc comments.
- */
-export function createTypeDeclaration({
-  syntax,
-  isExportable,
-  comments,
-  name,
-  type,
-}: {
+export type CreateTypeDeclarationOptions = {
   syntax: 'type' | 'interface'
   comments: Array<string | undefined>
   isExportable?: boolean
   name: string
   type: TsNode
-}): string {
+}
+
+/**
+ * Prints a TypeScript type declaration as either a type alias or interface.
+ * Uses interface syntax only when requested and the type is an object literal, and attaches JSDoc comments.
+ */
+export function createTypeDeclaration({ syntax, isExportable, comments, name, type }: CreateTypeDeclarationOptions): string {
   const declaration =
     syntax === 'interface' && type.type === 'TSTypeLiteral'
       ? {
@@ -240,27 +233,7 @@ function applyEnumKeyCasing(key: string, keyCasing: 'screamingSnakeCase' | 'snak
   return key
 }
 
-/**
- * Creates a TypeScript enum declaration or equivalent construct in various formats.
- * Returns a tuple of [name declaration, type declaration] - the name declaration may be undefined for certain types.
- *
- * @example
- * ```ts
- * const [name, type] = createEnumDeclaration({
- *   type: 'enum',
- *   name: 'petType',
- *   typeName: 'PetType',
- *   enums: [['cat', 'cat', 'A cat'], ['dog', 'dog']],
- * })
- * ```
- */
-export function createEnumDeclaration({
-  type = 'enum',
-  name,
-  typeName,
-  enums,
-  enumKeyCasing = 'none',
-}: {
+export type CreateEnumDeclarationOptions = {
   /**
    * Choose to use `enum`, `asConst`, `constEnum`, or `literal` for enums.
    * - `enum`: TypeScript enum
@@ -284,7 +257,29 @@ export function createEnumDeclaration({
    * @default 'none'
    */
   enumKeyCasing?: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'
-}): [name: string | undefined, type: string, alias?: string] {
+}
+
+/**
+ * Creates a TypeScript enum declaration or equivalent construct in various formats.
+ * Returns a tuple of [name declaration, type declaration] - the name declaration may be undefined for certain types.
+ *
+ * @example
+ * ```ts
+ * const [name, type] = createEnumDeclaration({
+ *   type: 'enum',
+ *   name: 'petType',
+ *   typeName: 'PetType',
+ *   enums: [['cat', 'cat', 'A cat'], ['dog', 'dog']],
+ * })
+ * ```
+ */
+export function createEnumDeclaration({
+  type = 'enum',
+  name,
+  typeName,
+  enums,
+  enumKeyCasing = 'none',
+}: CreateEnumDeclarationOptions): [name: string | undefined, type: string, alias?: string] {
   // The third entry is the alias body alone, for callers that declare the alias themselves.
   const typeAlias = (annotation: TsNode): [string, string] => [
     createTypeDeclaration({ syntax: 'type', isExportable: true, name: typeName, comments: [], type: annotation }),

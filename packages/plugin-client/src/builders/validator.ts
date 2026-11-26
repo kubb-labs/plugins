@@ -40,20 +40,18 @@ export type ValidatorHooks = {
   importedSchemaNames: Array<string>
 }
 
+export type BuildValidatorHooksOptions = {
+  node: ast.OperationNode
+  validator: ValidatorOptions | undefined
+  schemaResolver: ValidatorResolver | null | undefined
+}
+
 /**
  * Builds the validator-hook references for one operation. Request body and params validation run before the send.
  * Response validation runs on the success body only. Returns `null` references when the matching
  * direction is disabled or the schema is absent.
  */
-export function buildValidatorHooks({
-  node,
-  validator,
-  schemaResolver,
-}: {
-  node: ast.OperationNode
-  validator: ValidatorOptions | undefined
-  schemaResolver: ValidatorResolver | null | undefined
-}): ValidatorHooks {
+export function buildValidatorHooks({ node, validator, schemaResolver }: BuildValidatorHooksOptions): ValidatorHooks {
   const hasRequestBody = Boolean(ast.http.requestBody.getSchema(node))
   const parsesResponse = schemaResolver && resolveResponseValidator(validator)
 

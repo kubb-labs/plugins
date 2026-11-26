@@ -25,6 +25,19 @@ export type GroupedOptionsSignature = {
   generics: Array<string>
 }
 
+export type BuildGroupedOptionsSignatureOptions = {
+  node: ast.OperationNode
+  types: OperationTypeNames
+  returnType: ReturnTypeOption
+  throwOnErrorDefault: boolean
+  /**
+   * Adds the per-call stream options to the `options` type of a `text/event-stream` operation, except for a plain custom
+   * client, whose own `client.stream` returns a `StreamResult` and types its config itself.
+   */
+  eventStream?: boolean
+  authRequired?: boolean
+}
+
 /**
  * Builds the grouped-options signature for one operation: a single `options` object whose `TData`
  * is the `<Name>Options` type, and a `RequestResult` return type keyed to the per-status responses
@@ -41,18 +54,7 @@ export function buildGroupedOptionsSignature({
   throwOnErrorDefault,
   eventStream = false,
   authRequired = false,
-}: {
-  node: ast.OperationNode
-  types: OperationTypeNames
-  returnType: ReturnTypeOption
-  throwOnErrorDefault: boolean
-  /**
-   * Adds the per-call stream options to the `options` type of a `text/event-stream` operation, except for a plain custom
-   * client, whose own `client.stream` returns a `StreamResult` and types its config itself.
-   */
-  eventStream?: boolean
-  authRequired?: boolean
-}): GroupedOptionsSignature {
+}: BuildGroupedOptionsSignatureOptions): GroupedOptionsSignature {
   const optionsName = types.response.options(node)
   const baseType = `${eventStream && returnType !== 'plain' ? 'StreamOptions' : 'Options'}<${optionsName}, ThrowOnError>`
   // `NonNullable` reuses the module's own `auth` type, so a custom `importPath` client needs no extra export.

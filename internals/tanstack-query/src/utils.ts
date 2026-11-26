@@ -27,6 +27,18 @@ export function maybeValueOrGetter(type: string): string {
   return `${type} | (() => ${type})`
 }
 
+export type BuildGroupedRequestParamOptions = {
+  resolver: ResolverTs
+  keys?: ReadonlyArray<RequestGroupKey>
+  memberTypeWrapper?: (type: string) => string
+  /**
+   * Keeps headers optional for query key helpers, including operations with required headers.
+   */
+  optionalHeaders?: boolean
+  /** Binds the variables whole, so destructuring does not drop the chosen media type. */
+  withContentType?: boolean
+}
+
 /**
  * Builds the grouped `{ path, query, body, headers, cookies }` parameter that mirrors the client
  * function signature. Only the groups the operation carries are emitted, typed from the
@@ -37,20 +49,7 @@ export function maybeValueOrGetter(type: string): string {
  * `Options['<group>']` slice and wrapped, used by vue-query to apply
  * `MaybeRefOrGetter` per group.
  */
-export function buildGroupedRequestParam(
-  node: ast.OperationNode,
-  options: {
-    resolver: ResolverTs
-    keys?: ReadonlyArray<RequestGroupKey>
-    memberTypeWrapper?: (type: string) => string
-    /**
-     * Keeps headers optional for query key helpers, including operations with required headers.
-     */
-    optionalHeaders?: boolean
-    /** Binds the variables whole, so destructuring does not drop the chosen media type. */
-    withContentType?: boolean
-  },
-): FunctionParameterNode | null {
+export function buildGroupedRequestParam(node: ast.OperationNode, options: BuildGroupedRequestParamOptions): FunctionParameterNode | null {
   const { resolver, keys = requestGroupOrder, memberTypeWrapper, optionalHeaders = false, withContentType = false } = options
   const groups = ast.http.getRequestGroups(node)
   const names = keys.filter((key) => groups[key])
@@ -108,16 +107,15 @@ export function buildGroupedRequestParam(
   })
 }
 
+export type BuildQueryOptionsParamsOptions = { resolver: ResolverTs; memberTypeWrapper?: (type: string) => string }
+
 /**
  * Builds the shared `({ path, query, body, headers, cookies }, config = {})` parameter list for a
  * TanStack query-options function. The leading parameter mirrors the client signature, and the
  * trailing `config` is the client's `Options` minus the request groups and `throwOnError`, which the
  * hook passes itself. Framework plugins wrap the result when needed, for example vue-query applies `MaybeRefOrGetter`.
  */
-export function buildQueryOptionsParams(
-  node: ast.OperationNode,
-  options: { resolver: ResolverTs; memberTypeWrapper?: (type: string) => string },
-): FunctionParametersNode {
+export function buildQueryOptionsParams(node: ast.OperationNode, options: BuildQueryOptionsParamsOptions): FunctionParametersNode {
   const { resolver, memberTypeWrapper } = options
 
   const groupedParam = buildGroupedRequestParam(node, { resolver, memberTypeWrapper })
@@ -129,6 +127,14 @@ export function buildQueryOptionsParams(
   })
 
   return createFunctionParameters({ params: [groupedParam, configParam].filter((param): param is FunctionParameterNode => param !== null) })
+}
+
+export type BuildClientCallOptions = {
+  clientName: string
+  signal?: boolean
+  unwrapName?: (name: string) => string
+  withContentType?: boolean
+  pageParam?: string
 }
 
 /**
@@ -147,10 +153,7 @@ export function buildQueryOptionsParams(
  * // getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
  * ```
  */
-export function buildClientCall(
-  node: ast.OperationNode,
-  options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string; withContentType?: boolean; pageParam?: string },
-): string {
+export function buildClientCall(node: ast.OperationNode, options: BuildClientCallOptions): string {
   const { clientName, signal = false, unwrapName, withContentType = false, pageParam } = options
   const groups = ast.http.getRequestGroups(node)
   const names = requestGroupOrder.filter((key) => groups[key])
@@ -170,6 +173,8 @@ export function buildClientCall(
   return `${clientName}({ ${args.join(', ')} })`
 }
 
+export type BuildCallResultBodyOptions = { clientReturnType?: ReturnTypeOption; returnType?: ReturnTypeOption }
+
 /**
  * Builds the query/mutation body that resolves a `buildClientCall` expression down to the bare
  * success body. `clientReturnType` mirrors the registered client plugin's own `returnType` option: with
@@ -185,7 +190,7 @@ export function buildClientCall(
  * // return getPetById({ ...config, throwOnError: true }).unwrap()
  * ```
  */
-export function buildCallResultBody(call: string, options: { clientReturnType?: ReturnTypeOption; returnType?: ReturnTypeOption } = {}): string {
+export function buildCallResultBody(call: string, options: BuildCallResultBodyOptions = {}): string {
   const { clientReturnType = 'full', returnType = 'data' } = options
   if (returnType !== 'data' || clientReturnType === 'data') {
     return `return ${call}`
@@ -217,17 +222,15 @@ export type ResolvePageParamTypeOptions = {
   queryParam?: InfiniteConfig['queryParam']
 }
 
+export type BuildResponseTypesOptions = { returnType?: ReturnTypeOption; typedHeaders?: boolean }
+
 /**
  * Builds the `TData` / `TError` type expressions shared by every generated hook, joining the resolved
  * success responses into `TData` and wrapping the error responses in `ResponseErrorConfig<...>`.
  * With `returnType` `'full'`, `TData` is the client's `RequestResult` over the operation's responses record, with the
  * response headers the operation declares.
  */
-export function buildResponseTypes(
-  node: ast.OperationNode,
-  resolver: ResolverTs,
-  options: { returnType?: ReturnTypeOption; typedHeaders?: boolean } = {},
-): ResponseTypes {
+export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs, options: BuildResponseTypesOptions = {}): ResponseTypes {
   const { returnType = 'data', typedHeaders = true } = options
   // The same operation gets typed headers from one client and not from another, so both results are kept.
   return resolver.memo(`responseTypes:${returnType}:${typedHeaders}:${node.method}\0${node.path}`, () => {
@@ -423,27 +426,25 @@ export function hasQueryKeyParams(node: ast.OperationNode): boolean {
   return queryKeyGroupOrder.some((key) => groups[key])
 }
 
+export type BuildQueryKeyParamsOptions = { resolver: PluginTs['resolver']; memberTypeWrapper?: (type: string) => string }
+
 /**
  * Builds query key bindings for path, query, body, and optional headers. Custom transformers
  * can reference `headers` in returned code without changing the default key.
  */
-export function buildQueryKeyParams(
-  node: ast.OperationNode,
-  options: { resolver: PluginTs['resolver']; memberTypeWrapper?: (type: string) => string },
-): FunctionParametersNode {
+export function buildQueryKeyParams(node: ast.OperationNode, options: BuildQueryKeyParamsOptions): FunctionParametersNode {
   const { resolver, memberTypeWrapper } = options
   const groupedParam = buildGroupedRequestParam(node, { resolver, keys: queryKeyGroupOrder, memberTypeWrapper, optionalHeaders: true })
 
   return createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
 }
 
+export type BuildHookParamsOptions = { resolver: ResolverTs; optionsType: string; memberTypeWrapper?: (type: string) => string; withRequest?: boolean }
+
 /**
  * Builds the hook parameter list: the grouped request param (omitted when `withRequest` is `false`) then `options` typed as `optionsType`.
  */
-export function buildHookParams(
-  node: ast.OperationNode,
-  options: { resolver: ResolverTs; optionsType: string; memberTypeWrapper?: (type: string) => string; withRequest?: boolean },
-): FunctionParametersNode {
+export function buildHookParams(node: ast.OperationNode, options: BuildHookParamsOptions): FunctionParametersNode {
   const { resolver, optionsType, memberTypeWrapper, withRequest = true } = options
   const optionsParam = createFunctionParameter({ name: 'options', type: optionsType, default: '{}' })
   const groupedParam = withRequest ? buildGroupedRequestParam(node, { resolver, memberTypeWrapper }) : null

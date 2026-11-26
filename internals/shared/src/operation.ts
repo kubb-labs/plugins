@@ -280,6 +280,8 @@ export type RequestOptionsNameResolver = RequestConfigResolver & {
   }
 }
 
+export type BuildRequestParamsSignatureOptions = { isConfigurable?: boolean }
+
 /**
  * Builds the grouped `{ path, query, body, headers, cookies }` parameter for a generated client
  * function, typed from the operation's `Options` (minus `url`). Only the groups the
@@ -289,7 +291,7 @@ export type RequestOptionsNameResolver = RequestConfigResolver & {
 export function buildRequestParamsSignature(
   node: ast.OperationNode,
   resolver: RequestOptionsNameResolver,
-  options: { isConfigurable?: boolean } = {},
+  options: BuildRequestParamsSignatureOptions = {},
 ): { signature: string; groups: ast.http.RequestGroups; names: Array<(typeof requestGroupOrder)[number]> } {
   const { isConfigurable = true } = options
   const groups = ast.http.getRequestGroups(node)
@@ -645,21 +647,19 @@ type OperationSchemaResolver = OperationTypeNameResolver &
     }
   }
 
+export type BuildOperationSchemaEntriesOptions = {
+  node: ast.HttpOperationNode
+  resolver: OperationSchemaResolver
+  inferred: boolean
+}
+
 /**
  * The schemas a validator plugin writes into the file of an operation, in file order: every parameter, every response
  * and its headers, the success and error unions, the request body, and the parameter groups. `inferred` adds the
  * options object and the per-status record, for callers that take their types from the plugin.
  * A request-direction entry has `direction: 'encode'`. An entry without a schema is one the caller skips.
  */
-export function buildOperationSchemaEntries({
-  node,
-  resolver,
-  inferred,
-}: {
-  node: ast.HttpOperationNode
-  resolver: OperationSchemaResolver
-  inferred: boolean
-}): Array<OperationSchemaEntry> {
+export function buildOperationSchemaEntries({ node, resolver, inferred }: BuildOperationSchemaEntriesOptions): Array<OperationSchemaEntry> {
   const encode = (entry: OperationSchemaEntry): OperationSchemaEntry => ({ ...entry, direction: 'encode' })
   const responseUnion = (responses: Array<ast.ResponseNode>, name: string, fallbackUnknown: boolean): OperationSchemaEntry => ({
     schema: buildResponseUnionSchema({ node, responses, name, resolver, fallbackUnknown }),

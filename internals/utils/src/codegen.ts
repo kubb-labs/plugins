@@ -1,6 +1,24 @@
 import { text } from '@kubb/kit'
 import { isIdentifier } from './reserved.ts'
 
+export type BuildJSDocOptions = {
+  /**
+   * String used to indent each comment line.
+   * @default '   * '
+   */
+  indent?: string
+  /**
+   * String appended after the closing tag.
+   * @default '\n  '
+   */
+  suffix?: string
+  /**
+   * Returned as-is when `comments` is empty.
+   * @default '  '
+   */
+  fallback?: string
+}
+
 /**
  * Builds a JSDoc comment block from an array of lines. Returns `fallback` when there are no
  * comments.
@@ -11,26 +29,7 @@ import { isIdentifier } from './reserved.ts'
  * // '/**\n   * @type string\n   * @example hello\n   *\/\n  '
  * ```
  */
-export function buildJSDoc(
-  comments: Array<string>,
-  options: {
-    /**
-     * String used to indent each comment line.
-     * @default '   * '
-     */
-    indent?: string
-    /**
-     * String appended after the closing tag.
-     * @default '\n  '
-     */
-    suffix?: string
-    /**
-     * Returned as-is when `comments` is empty.
-     * @default '  '
-     */
-    fallback?: string
-  } = {},
-): string {
+export function buildJSDoc(comments: Array<string>, options: BuildJSDocOptions = {}): string {
   const { indent = '   * ', suffix = '\n  ', fallback = '  ' } = options
 
   if (comments.length === 0) return fallback

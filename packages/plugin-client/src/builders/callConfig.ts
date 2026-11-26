@@ -17,6 +17,15 @@ function buildParseAsLiteral(content: Array<ast.ContentNode>): string | null {
   return content.length > 0 && content.every((entry) => entry.schema?.type === 'blob') ? `parseAs: 'blob'` : null
 }
 
+export type BuildCallConfigOptions = {
+  node: ast.HttpOperationNode
+  validatorHooks: ValidatorHooks | null
+  security?: Array<SecurityRequirement>
+  baseURL?: string
+  throwOnErrorDefault: boolean
+  returnType: ReturnTypeOption
+}
+
 /**
  * Builds the call config literal a generated operation forwards to the client, shared by the standalone
  * functions and the SDK methods. The operation's own `baseURL` comes before the `...config` spread, so a per-call one wins. The
@@ -28,21 +37,11 @@ function buildParseAsLiteral(content: Array<ast.ContentNode>): string | null {
  * carries its `eventShape`, which tells the runtime what the `response` validator checks on each event, and `rawData` when
  * the document types each event's `data` as a string, so the runtime keeps it as text.
  */
-export function buildCallConfig({
-  node,
-  validatorHooks,
-  security,
-  baseURL,
-  throwOnErrorDefault,
-  returnType,
-}: {
-  node: ast.HttpOperationNode
-  validatorHooks: ValidatorHooks | null
-  security?: Array<SecurityRequirement>
-  baseURL?: string
-  throwOnErrorDefault: boolean
-  returnType: ReturnTypeOption
-}): { callConfig: string; mergeContentType: boolean; eventStream: boolean } {
+export function buildCallConfig({ node, validatorHooks, security, baseURL, throwOnErrorDefault, returnType }: BuildCallConfigOptions): {
+  callConfig: string
+  mergeContentType: boolean
+  eventStream: boolean
+} {
   const responseStream = getStream(node)
   const stream = responseStream?.shape ?? null
   const content = ast.http.responses.findPrimary(node)?.content ?? []

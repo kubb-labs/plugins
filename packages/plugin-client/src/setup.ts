@@ -49,10 +49,12 @@ export function resolveClientOptions(options: ClientOptions): ClientResolvedOpti
   }
 }
 
+export type SetupClientOptions = { resolved: ClientResolvedOptions; macros?: ClientOptions['macros']; client: string }
+
 /**
  * Wires a client plugin in its `setup`: resolver, macros, client or SDK templates, and the `.kubb/` runtime with the plugin's own `client.ts`.
  */
-export function setupClient({ resolved, macros = [], client }: { resolved: ClientResolvedOptions; macros?: ClientOptions['macros']; client: string }): void {
+export function setupClient({ resolved, macros = [], client }: SetupClientOptions): void {
   const config = useConfig()
 
   setResolver(resolved.resolver)
