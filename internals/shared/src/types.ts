@@ -29,3 +29,18 @@ export interface ResolvedPluginOptions<TResolvedOptions> {
   override: Array<Override<TResolvedOptions>>
   group: Group | null
 }
+
+/**
+ * Which side of a schema a printer writes: `decode` reads input, `encode` writes output.
+ */
+export type Direction = 'encode' | 'decode'
+
+/**
+ * Coerces input before validation: `true` for every primitive, or one flag per kind.
+ */
+export type CoercionOptions = boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }
+
+/**
+ * Generates `is<Name>` and `assert<Name>` guards: `true` for both, or one flag per guard.
+ */
+export type TypeGuardsOptions = boolean | { is?: boolean; assert?: boolean }

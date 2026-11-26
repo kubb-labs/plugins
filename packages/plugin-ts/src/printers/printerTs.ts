@@ -3,7 +3,7 @@ import { createRequire } from 'node:module'
 import { getEnumNames } from '@internals/shared'
 import { createPrinter, Diagnostics, type PrinterFactory } from '@kubb/kit'
 import * as factory from '../factory.ts'
-import type { PluginTs, ResolverTs } from '../types.ts'
+import type { PluginTs, ResolvedEnumOptions, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'
 
 const { isNonNullable } = factory
@@ -77,7 +77,7 @@ export type PrinterTsOptions = {
    * `type` (the output format) and `typeSuffix` (the enum key reference suffix) matter here.
    * `constCasing` and `keyCasing` are ignored.
    */
-  enum: PluginTs['resolvedOptions']['enum']
+  enum: ResolvedEnumOptions
   /**
    * Syntax for generated declarations.
    * - `'type'` generates type aliases

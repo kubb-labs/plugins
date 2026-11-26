@@ -3,6 +3,7 @@ import { type NumericBounds, defaultLiteral, formatDefault, hasInputChecks, nume
 import { buildObject, toRegExpString } from '@internals/utils'
 import { text } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
+import type { Direction } from '@internals/shared/types'
 
 /**
  * Build the Zod schema for a set of literal enum values.
@@ -369,7 +370,7 @@ export function printWithOmit(
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
  * input and a response (decode) schema from its output; `true` keeps `z.infer` for both.
  */
-export function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction: 'encode' | 'decode'): 'infer' | 'input' | 'output' {
+export function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction: Direction): 'infer' | 'input' | 'output' {
   if (inferred !== 'codec') return 'infer'
   return direction === 'encode' ? 'input' : 'output'
 }

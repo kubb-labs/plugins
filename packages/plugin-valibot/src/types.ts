@@ -2,6 +2,7 @@ import type { ast } from '@internals/ast'
 import type { ResolvedPluginOptions } from '@internals/shared/types'
 import type { Exclude, Include, OutputOptions, Override, PluginType, Resolver, ResolverInput } from '@kubb/kit'
 import type { PrinterValibotFactory, PrinterValibotNodes } from './printers/printerValibot.ts'
+import type { CoercionOptions, TypeGuardsOptions } from '@internals/shared/types'
 
 /**
  * The names the plugin gives to generated schemas and their inferred types.
@@ -113,13 +114,13 @@ export type PluginValibotOptions = OutputOptions & {
    *
    * @default false
    */
-  coercion?: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }
+  coercion?: CoercionOptions
   /**
    * Generate an `is*` type guard and an `assert*` function for every component schema.
    *
    * @default false
    */
-  typeGuards?: boolean | { is?: boolean; assert?: boolean }
+  typeGuards?: TypeGuardsOptions
   /**
    * Output form for an OpenAPI `pattern` inside `v.regex(...)`: a regex literal (`'literal'`) or
    * the `RegExp` constructor (`'constructor'`).

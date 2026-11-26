@@ -2,10 +2,10 @@ import { ast } from '@internals/ast'
 import { text } from '@kubb/kit'
 import { getResponseContentTypeInfo, resolveErrorNames, resolveSuccessNames, buildClientOptionType, requestGroupOrder, getStream } from '@internals/shared'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
-import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
+import type { FunctionParameterNode, FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { buildResponseHeadersType, buildResultTypeRef } from '@internals/client'
 import type { ReturnTypeOption } from '@internals/client'
-import type { InfiniteConfig, MutationConfig, PageParamFn, QueryConfig } from './types.ts'
+import type { InfiniteConfig, MemberTypeWrapper, MutationConfig, PageParamFn, QueryConfig } from './types.ts'
 
 export type RequestGroupKey = (typeof requestGroupOrder)[number]
 
@@ -30,7 +30,7 @@ export function maybeValueOrGetter(type: string): string {
 export type BuildGroupedRequestParamOptions = {
   resolver: ResolverTs
   keys?: ReadonlyArray<RequestGroupKey>
-  memberTypeWrapper?: (type: string) => string
+  memberTypeWrapper?: MemberTypeWrapper
   /**
    * Keeps headers optional for query key helpers, including operations with required headers.
    */
@@ -107,7 +107,7 @@ export function buildGroupedRequestParam(node: ast.OperationNode, options: Build
   })
 }
 
-export type BuildQueryOptionsParamsOptions = { resolver: ResolverTs; memberTypeWrapper?: (type: string) => string }
+export type BuildQueryOptionsParamsOptions = { resolver: ResolverTs; memberTypeWrapper?: MemberTypeWrapper }
 
 /**
  * Builds the shared `({ path, query, body, headers, cookies }, config = {})` parameter list for a
@@ -426,7 +426,7 @@ export function hasQueryKeyParams(node: ast.OperationNode): boolean {
   return queryKeyGroupOrder.some((key) => groups[key])
 }
 
-export type BuildQueryKeyParamsOptions = { resolver: PluginTs['resolver']; memberTypeWrapper?: (type: string) => string }
+export type BuildQueryKeyParamsOptions = { resolver: ResolverTs; memberTypeWrapper?: MemberTypeWrapper }
 
 /**
  * Builds query key bindings for path, query, body, and optional headers. Custom transformers
@@ -439,7 +439,7 @@ export function buildQueryKeyParams(node: ast.OperationNode, options: BuildQuery
   return createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
 }
 
-export type BuildHookParamsOptions = { resolver: ResolverTs; optionsType: string; memberTypeWrapper?: (type: string) => string; withRequest?: boolean }
+export type BuildHookParamsOptions = { resolver: ResolverTs; optionsType: string; memberTypeWrapper?: MemberTypeWrapper; withRequest?: boolean }
 
 /**
  * Builds the hook parameter list: the grouped request param (omitted when `withRequest` is `false`) then `options` typed as `optionsType`.

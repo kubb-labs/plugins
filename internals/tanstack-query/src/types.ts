@@ -143,3 +143,8 @@ export type PageParamFn<TPage = any, TParam = any> = (
   pageParam: TParam,
   allPageParams: Array<TParam>,
 ) => TParam | undefined | null
+
+/**
+ * Wraps the type of each request group member, such as `MaybeRefOrGetter<T>` in Vue.
+ */
+export type MemberTypeWrapper = (type: string) => string

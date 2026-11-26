@@ -5,7 +5,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { CallReturnTypeProps, InfiniteConfig } from '../types.ts'
+import type { CallReturnTypeProps, InfiniteConfig, MemberTypeWrapper } from '../types.ts'
 import {
   buildCallResultBody,
   buildClientCall,
@@ -40,7 +40,7 @@ export type InfiniteQueryOptionsProps = {
   /**
    * Wraps each grouped request member type, used by vue-query to accept `MaybeRefOrGetter` values.
    */
-  memberTypeWrapper?: (type: string) => string
+  memberTypeWrapper?: MemberTypeWrapper
   /**
    * Unwraps a request group inside the client call, used by vue-query to emit `toValue(...)`.
    */

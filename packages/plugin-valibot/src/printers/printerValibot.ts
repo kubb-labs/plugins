@@ -36,6 +36,7 @@ import {
   withInputChecks,
 } from '../utils.ts'
 import type { PluginValibot, ResolverValibot } from '../types.ts'
+import type { Direction } from '@internals/shared/types'
 
 /**
  * Partial map of node-type overrides for the Valibot printer, keyed by `SchemaType`. Each function
@@ -70,7 +71,7 @@ export type PrinterValibotOptions = {
    * A handler that returns different output per direction makes the generator emit an
    * `${name}InputSchema` variant for that component.
    */
-  direction?: 'encode' | 'decode'
+  direction?: Direction
   /**
    * Turns a schema name from the spec into the name of its generated const.
    */

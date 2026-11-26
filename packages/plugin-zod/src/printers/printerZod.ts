@@ -13,6 +13,7 @@ import {
 import { applyModifiers, buildObjectShape, lengthConstraints, numberConstraints, patternKeySchema, printWithOmit } from '../utils.ts'
 import type { ObjectShapeContext } from '../utils.ts'
 import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
+import type { Direction } from '@internals/shared/types'
 
 /**
  * Partial map of node-type overrides for the Zod printer.
@@ -104,7 +105,7 @@ export type PrinterZodOptions = {
    * A handler returning different output per direction makes the generator emit an
    * `${name}InputSchema` variant for that component.
    */
-  direction?: 'encode' | 'decode'
+  direction?: Direction
   /**
    * Custom handler map for node type overrides.
    */

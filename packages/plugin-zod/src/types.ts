@@ -3,6 +3,7 @@ import type { PluginOptions, ResolvedPluginOptions } from '@internals/shared/typ
 import type { PluginType, Resolver, ResolverInput } from '@kubb/kit'
 import type { PrinterZodFactory, PrinterZodNodes } from './printers/printerZod.ts'
 import type { PrinterZodMiniFactory, PrinterZodMiniNodes } from './printers/printerZodMini.ts'
+import type { CoercionOptions, TypeGuardsOptions } from '@internals/shared/types'
 
 /**
  * Resolver for Zod that provides naming methods for schema types.
@@ -216,7 +217,7 @@ export type PluginZodOptions = PluginOptions<PluginZodResolvedOptions> & {
    * @default false
    * @see https://zod.dev/?id=coercion-for-primitives
    */
-  coercion?: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }
+  coercion?: CoercionOptions
   /**
    * Validator for `format: uuid` properties.
    * - `'uuid'`: `z.uuid()`. Standard RFC 4122.
@@ -276,7 +277,7 @@ export type PluginZodOptions = PluginOptions<PluginZodResolvedOptions> & {
    * @note Only compatible with Zod v4.6.0 or above.
    * @see https://zod.dev
    */
-  typeGuards?: boolean | { is?: boolean; assert?: boolean }
+  typeGuards?: TypeGuardsOptions
   /**
    * Replace the Zod handler for a specific schema type (`'integer'`, `'date'`, ...).
    * When `mini: true`, overrides target the Zod Mini printer instead.

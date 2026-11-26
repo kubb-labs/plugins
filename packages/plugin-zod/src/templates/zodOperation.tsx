@@ -7,6 +7,7 @@ import type { PluginZod } from '../types.ts'
 import { aliasKind } from '../utils.ts'
 import { collectDirectionalRefNames } from '../printers/printerZod.ts'
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
+import type { Direction } from '@internals/shared/types'
 
 /**
  * Writes one file per operation with the schemas of its parameters, request body and responses.
@@ -36,7 +37,7 @@ export const zodOperation = defineTemplate<PluginZod>({
       schema: ast.SchemaNode | null
       name: string
       keysToOmit?: Array<string> | null
-      direction?: 'encode' | 'decode'
+      direction?: Direction
     }) {
       if (!schema) return null
       siblings.set(name, schema)

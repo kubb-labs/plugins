@@ -1,6 +1,7 @@
 import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
 import { casing, type Resolver } from '@kubb/kit'
+import type { Direction } from './types.ts'
 
 export type ContentTypeInfo = {
   contentTypes: Array<string>
@@ -634,7 +635,7 @@ export function buildResponseUnionSchema({
   return members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
 }
 
-type OperationSchemaEntry = { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null; direction?: 'encode' | 'decode' }
+type OperationSchemaEntry = { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null; direction?: Direction }
 
 type OperationSchemaResolver = OperationTypeNameResolver &
   ResponseStatusNameResolver & {

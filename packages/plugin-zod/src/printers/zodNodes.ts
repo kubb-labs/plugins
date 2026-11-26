@@ -26,6 +26,7 @@ import {
   type patternKeySchema,
   stringFormatCalls,
 } from '../utils.ts'
+import type { Direction } from '@internals/shared/types'
 
 /**
  * The options both Zod printers read in the shared handlers.
@@ -37,7 +38,7 @@ export type ZodNodeOptions = {
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
   resolver?: ResolverZod
   cyclicSchemas?: ReadonlySet<string>
-  direction?: 'encode' | 'decode'
+  direction?: Direction
   nodes?: Partial<Record<ast.SchemaType, unknown>>
 }
 

@@ -2,7 +2,7 @@ import { ast } from '@internals/ast'
 import { jsDocEscape } from '@internals/utils'
 import { text } from '@kubb/kit'
 import { resolveEnumNames } from './components/Enum.tsx'
-import type { PluginTs, ResolverTs } from './types.ts'
+import type { ResolvedEnumOptions, ResolverTs } from './types.ts'
 
 /**
  * Renames inline enum declarations and their uses together.
@@ -16,7 +16,7 @@ export function resolveInlineEnumNames({
   node: ast.SchemaNode
   owner: string
   resolver: ResolverTs
-  enumOptions: PluginTs['resolvedOptions']['enum']
+  enumOptions: ResolvedEnumOptions
 }): ast.SchemaNode {
   return ast.node.transform(node, {
     schema(child) {

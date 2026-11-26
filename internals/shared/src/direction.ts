@@ -1,6 +1,5 @@
 import { ast } from '@internals/ast'
-
-type Direction = 'encode' | 'decode'
+import type { Direction } from './types.ts'
 
 /**
  * Runs the handler of a node once per direction, outside a printer, and reports whether the two outputs differ.

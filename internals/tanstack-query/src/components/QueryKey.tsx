@@ -1,17 +1,17 @@
 import { ast } from '@internals/ast'
 import { text, Url } from '@kubb/kit'
-import type { PluginTs } from '@kubb/plugin-ts'
+import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { KeyVariant, KeyTransformer } from '../types.ts'
+import type { KeyTransformer, KeyVariant, MemberTypeWrapper } from '../types.ts'
 import { buildQueryKeyParams } from '../utils.ts'
 
 export type QueryKeyProps = {
   name: string
   typeName: string
   node: ast.OperationNode
-  tsResolver: PluginTs['resolver']
+  tsResolver: ResolverTs
   transformer: KeyTransformer | null | undefined
   /**
    * @default 'query'
@@ -20,7 +20,7 @@ export type QueryKeyProps = {
   /**
    * Wraps each grouped request member type, used by vue-query for `MaybeRefOrGetter`.
    */
-  memberTypeWrapper?: (type: string) => string
+  memberTypeWrapper?: MemberTypeWrapper
   /**
    * Exports and indexes the `typeName` alias too (default `false`).
    */

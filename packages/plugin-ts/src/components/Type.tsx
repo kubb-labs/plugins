@@ -4,7 +4,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import * as factory from '../factory.ts'
 import { getDeclarationParts } from '../printers/printerTs.ts'
 import type { PrinterTsFactory } from '../printers/printerTs.ts'
-import type { PluginTs, ResolverTs } from '../types.ts'
+import type { ResolvedEnumOptions, ResolverTs } from '../types.ts'
 import { isInlineConstEnum } from '../utils.ts'
 import { Enum, resolveEnumNames } from './Enum.tsx'
 
@@ -13,7 +13,7 @@ export type TypeProps = {
   node: ast.SchemaNode
   /** The plugin's `ctx.printer`, with per-node options from `printer.with(...)`. */
   printer: ast.Printer<PrinterTsFactory>
-  enum: PluginTs['resolvedOptions']['enum']
+  enum: ResolvedEnumOptions
   resolver: ResolverTs
   /**
    * Marks the source inline, so importing files absorb the type. Set by `pluginTs({ operations: 'inline' })`.

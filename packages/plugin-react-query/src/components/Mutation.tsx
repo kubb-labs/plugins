@@ -8,7 +8,7 @@ import { buildHookParams, buildResponseTypes, resolveMutationRequestType } from 
 import type { HookResultProps } from '@internals/tanstack-query'
 import type { ReturnTypeOption } from '@internals/client'
 import type { PluginReactQuery } from '../types.ts'
-import { buildOperationComments as getComments, buildRequestConfigType } from '@internals/shared'
+import { buildOperationComments, buildRequestConfigType } from '@internals/shared'
 import { buildMutationConfigParamsNode } from './MutationOptions.tsx'
 
 export type MutationProps = {
@@ -64,7 +64,7 @@ export function Mutation({
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
-    <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }} generics={['TContext']}>
+    <Function name={name} export params={paramsSignature} JSDoc={{ comments: buildOperationComments(node) }} generics={['TContext']}>
       {`
         const { mutation = {}, client: config = {} } = options ?? {}
         const { client: queryClient, ...mutationOptions } = mutation;
