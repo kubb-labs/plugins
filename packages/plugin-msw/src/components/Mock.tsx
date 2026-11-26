@@ -16,10 +16,16 @@ export type MockProps = {
    */
   responseName?: string
   baseURL: string | null | undefined
+  encoder?: string
   node: ast.HttpOperationNode
 }
 
-export function Mock({ baseURL = '', name, fakerName, responseName, typeName, requestTypeName, node }: MockProps): KubbReactNode {
+function defaultBody(fakerName: string | undefined, example: string | null): string {
+  if (fakerName) return `data ?? ${fakerName}()`
+  return example ? `data === undefined ? ${example} : data` : 'data'
+}
+
+export function Mock({ baseURL = '', name, fakerName, responseName, typeName, requestTypeName, encoder, node }: MockProps): KubbReactNode {
   const method = getMswMethod(node)
   // `http.all` matches every method on the path, so a handler for a method MSW has no helper for lets the others pass through.
   const methodGuard = method === 'all' ? `if (info.request.method !== ${text.quote(node.method)}) return\n\n    ` : ''
@@ -44,10 +50,10 @@ export function Mock({ baseURL = '', name, fakerName, responseName, typeName, re
   const urlLiteral = `\`\${options?.baseURL ?? ${resolveDefaultBaseURL(baseURL)}}${url.replace(/([^/]):/g, '$1\\\\:')}\``
   // Without Faker, the spec's own response example is the default body. An explicit `null` stays a `null` body.
   const example = fakerName ? null : getExampleBody(successResponse)
-  const exampleBody = example ? `data === undefined ? ${example} : data` : 'data'
-  const responseBody = fakerName ? `data ?? ${fakerName}()` : exampleBody
+  const responseBody = defaultBody(fakerName, example)
   // A spec example is not checked against the response type, so it is not passed to the typed helper.
-  const responseStatements = responseName && !example ? `return ${responseName}(${responseBody})` : responseReturn(responseBody, statusCode, successResponse)
+  const responseStatements =
+    responseName && !example ? `return ${responseName}(${responseBody})` : responseReturn(responseBody, statusCode, successResponse, encoder)
 
   return (
     <>

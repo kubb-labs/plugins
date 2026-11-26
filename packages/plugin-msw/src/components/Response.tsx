@@ -7,9 +7,10 @@ export type ResponseProps = {
   typeName: string
   name: string
   response: ast.ResponseNode
+  encoder?: string
 }
 
-export function Response({ name, typeName, response }: ResponseProps): KubbReactNode {
+export function Response({ name, typeName, response, encoder }: ResponseProps): KubbReactNode {
   // Optional, since a handler passes on the `data` it got, which may be left out.
   const params = `data?: ${typeName}`
 
@@ -18,7 +19,7 @@ export function Response({ name, typeName, response }: ResponseProps): KubbReact
   return (
     <Function name={responseName} export params={params}>
       {`
-    ${responseReturn('data', ast.http.status.toCode(response), response)}`}
+    ${responseReturn('data', ast.http.status.toCode(response), response, encoder)}`}
     </Function>
   )
 }

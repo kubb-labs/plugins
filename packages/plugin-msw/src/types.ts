@@ -56,12 +56,27 @@ export type PluginMswOptions = PluginOptions<PluginMswResolvedOptions> & {
    * @default 'data'
    */
   parser?: 'data' | 'faker'
+  /**
+   * Encoders for response bodies, keyed by media type. A response with a matching content type sends `name(data)`.
+   * @example
+   * `{ 'application/vnd.acme.stream+json': { name: 'encodeStream', path: '@acme/runtime' } }`
+   */
+  mediaTypes?: Record<string, MediaTypeEncoder>
+}
+
+/** A function that turns the mocked `data` into a response body, and the module the handler file imports it from. */
+export type MediaTypeEncoder = {
+  /** Exported function name. It gets `data`, or `undefined` when a mock has none, and returns a `Response` body. */
+  name: string
+  /** Import path, written to the handler file as it is. Use a package name or a path alias. */
+  path: string
 }
 
 export type PluginMswResolvedOptions = ResolvedPluginOptions<PluginMswResolvedOptions> & {
   parser: NonNullable<PluginMswOptions['parser']>
   baseURL: PluginMswOptions['baseURL'] | undefined
   handlers: boolean
+  mediaTypes: NonNullable<Options['mediaTypes']>
 }
 
 export type PluginMsw = PluginType<'plugin-msw', PluginMswOptions, PluginMswResolvedOptions, ResolverMsw>

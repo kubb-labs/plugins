@@ -5,6 +5,7 @@ import { isValidVarName, toLiteral } from '@internals/utils'
 import { toResponseContent } from '@internals/shared'
 
 import { text } from '@kubb/kit'
+import type { MediaTypeEncoder } from './types.ts'
 
 // Headers use the `simple` style, so an array or object is sent comma-separated.
 function toSimpleStyle(value: unknown): string {
@@ -51,6 +52,14 @@ function getContentType(response: ast.ResponseNode | null | undefined): string |
   }
 
   return getResponseContentType(response) ?? 'application/json'
+}
+
+/** The `mediaTypes` encoder for the content type a mock of `response` sends, when one is registered. */
+export function getEncoder(response: ast.ResponseNode | null | undefined, mediaTypes: Record<string, MediaTypeEncoder>): MediaTypeEncoder | undefined {
+  const contentType = getContentType(response)
+  if (!contentType) return undefined
+  const base = ast.mediaType.getBase(contentType)
+  return Object.entries(mediaTypes).find(([mediaType]) => ast.mediaType.getBase(mediaType) === base)?.[1]
 }
 
 /**
@@ -104,10 +113,13 @@ function stringify(body: string, response: ast.ResponseNode | null | undefined):
 /**
  * The statements that return a mocked `Response` for `body`. A string body for a response the client reads as text goes
  * out as raw text with that content type, so an XML mock is not sent as a quoted JSON string. Any other body is JSON.
+ * With an `encoder`, the body is whatever that function returns for `body`.
  */
-export function responseReturn(body: string, status: number, response: ast.ResponseNode | null | undefined): string {
+export function responseReturn(body: string, status: number, response: ast.ResponseNode | null | undefined, encoder?: string): string {
   const contentType = getContentType(response)
   const headers = getMockHeaders(response)
+  // No `<string>` type argument: an encoder may return a stream or bytes.
+  if (encoder) return `return ${responseLiteral(`${encoder}(${body})`, status, contentType, headers, '')}`
   // A plain variable such as `data` is checked as it is, an expression such as `data ?? createPet()` is read once.
   const name = isValidVarName(body) ? body : 'body'
   const prelude = name === body ? '' : `const body = ${body}\n    `
@@ -194,8 +206,8 @@ function headersBlock(contentType: string | null, headers: Array<[string, string
 /**
  * The `new HttpResponse<string>(...)` expression a mocked handler returns.
  */
-export function responseLiteral(body: string, status: number, contentType: string | null, headers: Array<[string, string]>): string {
-  return `new HttpResponse<string>(${body}, {
+export function responseLiteral(body: string, status: number, contentType: string | null, headers: Array<[string, string]>, typeArgument = '<string>'): string {
+  return `new HttpResponse${typeArgument}(${body}, {
       status: ${status},${headersBlock(contentType, headers)}
     })`
 }
