@@ -1,6 +1,6 @@
 import { ast } from '@internals/ast'
 import { describe, expect, test } from 'vitest'
-import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from './imports.ts'
+import { createImportAliases, filterUsedImports } from './imports.ts'
 
 const imp = (names: Array<ast.ModuleName>, path: string) => ast.factory.createImport({ names, path })
 const createPet = imp([{ name: 'createPet' }], './pet.ts')
@@ -26,20 +26,16 @@ describe('import utilities', () => {
     expect(filterUsedImports([createPet], 'createPet(data)', ['createPet'])).toStrictEqual([])
   })
 
-  test('aliases conflicting string imports', () => {
+  test('aliases the imports that clash with a local helper and rewrites their calls', () => {
     const store = imp([{ name: 'createStore', alias: 'storeFactory' }], './store.ts')
-    const { imports, aliases } = aliasConflictingImports([imp([{ name: 'createPet' }, { name: 'createUser' }], './api.ts'), store], ['createPet'])
+    const aliases = createImportAliases({ imports: [imp([{ name: 'createPet' }, { name: 'createUser' }], './api.ts'), store], reservedNames: ['createPet'] })
 
-    expect(imports.map((entry) => ast.file.getNames(entry))).toStrictEqual([
+    expect(aliases.imports.map((entry) => ast.file.getNames(entry))).toStrictEqual([
       [{ name: 'createPet', alias: 'createPetSchema' }, { name: 'createUser' }],
       ast.file.getNames(store),
     ])
-    expect(aliases).toStrictEqual(new Map([['createPet', 'createPetSchema']]))
-  })
-
-  test('rewrites aliased import references', () => {
-    expect(rewriteAliasedImports('return { createPet: createPet(data) }', new Map([['createPet', 'createPetSchema']]))).toBe(
-      'return { createPet: createPetSchema(data) }',
+    expect(aliases.rewrite('return { createPet: createPet(data), list: createPetList() }')).toBe(
+      'return { createPet: createPetSchema(data), list: createPetList() }',
     )
   })
 })
