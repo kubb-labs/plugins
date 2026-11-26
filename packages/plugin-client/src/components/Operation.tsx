@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { buildResponseHeadersRef, buildResponseHeadersType, type OperationTypeNames } from '@internals/client'
+import { buildResponseHeadersDeclaration, type OperationTypeNames } from '@internals/client'
 import { buildOperationComments } from '@internals/shared'
 import { Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -62,12 +62,11 @@ export function Operation({
   if (!ast.http.isOperation(node)) return null
 
   const body = buildOperationBody({ node, types, validatorHooks, security, authRequired, baseURL, returnType, throwOnErrorDefault })
-  const headersType = buildResponseHeadersType({ node, types })
-  const headersName = buildResponseHeadersRef({ node, types })
+  const headers = buildResponseHeadersDeclaration({ node, types })
 
   return (
     <>
-      {headersType && headersName && headersName !== headersType && <Type name={headersName}>{headersType}</Type>}
+      {headers && <Type name={headers.name}>{headers.type}</Type>}
       <Function
         name={name}
         export

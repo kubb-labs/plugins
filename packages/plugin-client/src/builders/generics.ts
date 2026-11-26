@@ -23,7 +23,22 @@ export function buildRequestResultGenerics({ node, types }: { node: ast.Operatio
  * `buildResultType({ node, types, returnType: 'data' }) // 'Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>'`
  */
 export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ReturnTypeOption }): string {
-  const name = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
-  const result = buildResultTypeRef(name, types.response.responses(node), buildResponseHeadersRef({ node, types }), ['ThrowOnError'])
+  const result = buildRequestResultTypeRef({ node, types, name: returnType === 'data' ? 'UnwrappedResult' : 'RequestResult' })
   return returnType === 'full' ? `Unwrappable<${result}>` : `Promise<${result}>`
+}
+
+/**
+ * Builds one operation's result type with its arguments, such as
+ * `RequestResultWithHeaders<AddPetResponses, AddPetResponseHeaders, ThrowOnError>`.
+ */
+export function buildRequestResultTypeRef({
+  node,
+  types,
+  name = 'RequestResult',
+}: {
+  node: ast.OperationNode
+  types: OperationTypeNames
+  name?: string
+}): string {
+  return buildResultTypeRef(name, types.response.responses(node), buildResponseHeadersRef({ node, types }), ['ThrowOnError'])
 }

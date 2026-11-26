@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { buildResponseHeadersRef, buildResponseHeadersType, type OperationTypeNames } from '@internals/client'
+import { buildResponseHeadersDeclaration, type OperationTypeNames } from '@internals/client'
 import { buildOperationComments } from '@internals/shared'
 import { buildJSDoc } from '@internals/utils'
 import { Code, Type } from '@kubb/renderer-jsx'
@@ -91,12 +91,7 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
   ].join('\n')
 
   const classCode = `export class ${name} {\n${constructor}\n\n${methods.join('\n\n')}\n}`
-  // Each per-status headers map is declared once above the class, so a method's return type and its call share it.
-  const headersTypes = operations.flatMap(({ node, types }) => {
-    const type = buildResponseHeadersType({ node, types })
-    const headersName = buildResponseHeadersRef({ node, types })
-    return type && headersName && headersName !== type ? [{ name: headersName, type }] : []
-  })
+  const headersTypes = operations.flatMap(({ node, types }) => buildResponseHeadersDeclaration({ node, types }) ?? [])
 
   return (
     <>

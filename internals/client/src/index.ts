@@ -3,6 +3,7 @@ export type { ClientSelector, ResolvedContractClient } from './resolveClient.ts'
 export { resolveClientOperation } from './resolveClientOperation.ts'
 export type { ClientOperation } from './resolveClientOperation.ts'
 export {
+  buildResponseHeadersDeclaration,
   buildResponseHeadersRef,
   buildResponseHeadersType,
   buildResultTypeRef,

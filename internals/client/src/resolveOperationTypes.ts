@@ -49,14 +49,28 @@ export function buildResponseHeadersType({ node, types }: { node: ast.OperationN
 }
 
 /**
- * How a generated signature refers to the per-status headers map: by its `headersMap` name when the resolver has one,
- * otherwise as the map itself. `null` when no response declares headers. With a name, the return type and the client
- * call share one type, so TypeScript does not compare two copies of the same `RequestResult` for every operation.
+ * The per-status headers map a generated file declares once, under its `headersMap` name, so the return type and the
+ * client call share one type and TypeScript does not compare two copies of the same `RequestResult` for every operation.
+ * `null` when no response declares headers or the resolver has no `headersMap`.
+ */
+export function buildResponseHeadersDeclaration({
+  node,
+  types,
+}: {
+  node: ast.OperationNode
+  types: OperationTypeNames
+}): { name: string; type: string } | null {
+  const type = buildResponseHeadersType({ node, types })
+  const name = type ? types.response.headersMap?.(node) : undefined
+  return type && name ? { name, type } : null
+}
+
+/**
+ * How a generated signature refers to the per-status headers map: by its declared name, otherwise as the map itself.
+ * `null` when no response declares headers.
  */
 export function buildResponseHeadersRef({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
-  const type = buildResponseHeadersType({ node, types })
-  if (!type) return null
-  return types.response.headersMap?.(node) ?? type
+  return buildResponseHeadersDeclaration({ node, types })?.name ?? buildResponseHeadersType({ node, types })
 }
 
 /**

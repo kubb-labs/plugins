@@ -2,7 +2,7 @@ import type { ast } from '@internals/ast'
 import { getStream } from '@internals/shared'
 import { buildResponseHeadersRef, buildResponseHeadersType, buildResultTypeRef, resultTypeName, type OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
-import { buildRequestResultGenerics } from './generics.ts'
+import { buildRequestResultGenerics, buildRequestResultTypeRef } from './generics.ts'
 
 export type BuildReturnStatementOptions = {
   node: ast.OperationNode
@@ -31,8 +31,7 @@ export function buildReturnStatement({ node, types, callConfig, returnType, thro
   const call = `apiClient<${buildRequestResultGenerics({ node, types })}>(${callConfig})`
   if (returnType === 'data') return `return unwrapResult(${call}, resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault}))`
   if (returnType === 'plain') return `return ${call}`
-  const result = buildResultTypeRef('RequestResult', types.response.responses(node), buildResponseHeadersRef({ node, types }), ['ThrowOnError'])
-  return `return withUnwrap<${result}>(${call})`
+  return `return withUnwrap<${buildRequestResultTypeRef({ node, types })}>(${call})`
 }
 
 export type EventStreamReturn = { returnType: string; statement: string }
