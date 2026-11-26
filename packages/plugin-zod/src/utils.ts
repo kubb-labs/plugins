@@ -280,7 +280,7 @@ export function getMemberConstraint({
   if (member.primitive === 'array') return lengths({ ...(ast.schema.narrow(member, 'array') ?? {}), regexType }) || undefined
 }
 
-export type PrinterContext = {
+export type ObjectShapeContext = {
   transform: (node: ast.SchemaNode) => string | null
   options: { cyclicSchemas?: ReadonlySet<string>; nodes?: Partial<Record<ast.SchemaType, unknown>> }
 }
@@ -289,7 +289,7 @@ export type PrinterContext = {
  * Builds the `{ key: value, … }` shape shared by the `z.object(...)` and `.extend(...)` renderings.
  */
 export function buildObjectShape(
-  ctx: PrinterContext,
+  ctx: ObjectShapeContext,
   node: ast.SchemaNode,
   renderProperty: (args: {
     name: string

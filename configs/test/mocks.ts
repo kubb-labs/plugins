@@ -68,7 +68,9 @@ function pluginNotFoundError({ pluginName, requiredBy }: { pluginName: string; r
  * Creates a driver for template tests. `getPlugin` and `getResolver` return `options.plugin` and
  * its resolver for any name, and files land in a real file manager.
  */
-export function createMockedPluginDriver(options: { name?: string; plugin?: MockedPlugin; config?: Config } = {}): MockedPluginDriver {
+export type MockedPluginDriverOptions = { name?: string; plugin?: MockedPlugin; config?: Config }
+
+export function createMockedPluginDriver(options: MockedPluginDriverOptions = {}): MockedPluginDriver {
   const config = options.config ?? ({ root: '.', output: { path: './path' } } as Config)
   const { fileManager } = new KubbDriver(config, { hooks: new Hookable<KubbHooks>() })
 
@@ -94,10 +96,12 @@ export type MockedSetupContext<TFactory extends PluginType = PluginType> = KubbP
 /**
  * Creates a `kubb:plugin:setup` context for the plugin `plugin-mock`. `requirePlugin` fails for names `plugins` does not list.
  */
+export type MockedSetupContextOptions<TFactory extends PluginType = PluginType> = { plugins?: Array<string>; options?: TFactory['options'] }
+
 export function createMockedSetupContext<TFactory extends PluginType = PluginType>({
   plugins = [],
   options = {} as TFactory['options'],
-}: { plugins?: Array<string>; options?: TFactory['options'] } = {}): MockedSetupContext<TFactory> {
+}: MockedSetupContextOptions<TFactory> = {}): MockedSetupContext<TFactory> {
   const registered = plugins.map((name) => ({ name }) as unknown as Plugin)
   const ctx = {
     config: { root: '.', output: { path: './gen' }, plugins: registered } as unknown as Config,
@@ -127,8 +131,14 @@ export function registeredTemplates(ctx: MockedSetupContext): Array<Template> {
 /**
  * Creates an adapter whose `parse` returns an empty `InputNode` unless `options.parse` is set.
  */
+export type MockedAdapterOptions<TOptions extends AdapterFactoryOptions = AdapterFactoryOptions> = {
+  name?: TOptions['name']
+  resolvedOptions?: TOptions['resolvedOptions']
+  parse?: Adapter<TOptions>['parse']
+}
+
 export function createMockedAdapter<TOptions extends AdapterFactoryOptions = AdapterFactoryOptions>(
-  options: { name?: TOptions['name']; resolvedOptions?: TOptions['resolvedOptions']; parse?: Adapter<TOptions>['parse'] } = {},
+  options: MockedAdapterOptions<TOptions> = {},
 ): Adapter<TOptions> {
   return {
     name: (options.name ?? 'oas') as TOptions['name'],
@@ -142,13 +152,15 @@ export function createMockedAdapter<TOptions extends AdapterFactoryOptions = Ada
 /**
  * Creates a plugin with the given name, options, resolver and macros.
  */
-export function createMockedPlugin<TOptions extends PluginType = PluginType>(params: {
+export type MockedPluginOptions<TOptions extends PluginType = PluginType> = {
   name: TOptions['name']
   options: TOptions['resolvedOptions']
   resolver?: TOptions['resolver']
   macros?: Array<ast.Macro>
   dependencies?: Array<string>
-}): MockedPlugin<TOptions> {
+}
+
+export function createMockedPlugin<TOptions extends PluginType = PluginType>(params: MockedPluginOptions<TOptions>): MockedPlugin<TOptions> {
   return {
     name: params.name,
     options: params.options,

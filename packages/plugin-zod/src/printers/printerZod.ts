@@ -11,6 +11,7 @@ import {
   variesByDirection as probeDirection,
 } from '@internals/shared'
 import { applyModifiers, buildObjectShape, lengthConstraints, numberConstraints, patternKeySchema, printWithOmit } from '../utils.ts'
+import type { ObjectShapeContext } from '../utils.ts'
 import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
 
 /**
@@ -151,7 +152,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
 /**
  * Builds the `{ key: value, … }` shape for an object node with the chainable modifiers.
  */
-function buildZodObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: ast.SchemaNode): string {
+function buildZodObjectShape(ctx: ObjectShapeContext, node: ast.SchemaNode): string {
   return buildObjectShape(ctx, node, ({ name, value, schema, required, meta, cyclic }) => {
     const body = applyModifiers({
       value,
@@ -175,15 +176,7 @@ function buildZodObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: 
 /**
  * Breaks getter inference cycles without widening recursive refs and arrays to `z.ZodType`.
  */
-function recursiveGetterType({
-  ctx,
-  schema,
-  required,
-}: {
-  ctx: Parameters<typeof buildObjectShape>[0]
-  schema: ast.SchemaNode
-  required?: boolean
-}): string | undefined {
+function recursiveGetterType({ ctx, schema, required }: { ctx: ObjectShapeContext; schema: ast.SchemaNode; required?: boolean }): string | undefined {
   function baseType(schema: ast.SchemaNode): string | undefined {
     if (ctx.options.nodes?.[schema.type]) return undefined
     if (schema.type === ast.schema.types.ref) {

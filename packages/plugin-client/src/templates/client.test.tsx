@@ -5,6 +5,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, rawSources, renderTemplate } from '#mocks'
+import type { MockedPlugin } from '#mocks'
 import { resolverClient } from '../resolver.ts'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
 import { createClientTemplates } from './client.tsx'
@@ -328,7 +329,7 @@ describe('clientGenerator operation', () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: props.name,
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(clientOperation, props.node, {
@@ -351,7 +352,7 @@ describe('clientGenerator with a custom client module', () => {
     const plugin = createMockedPlugin<PluginClient>({ name: 'plugin-client', options, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: 'getPetByIdPlainCustomClientPath',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(customClientOperation, getPetByIdNode, {
@@ -370,7 +371,7 @@ describe('clientGenerator with a custom client module', () => {
     const plugin = createMockedPlugin<PluginClient>({ name: 'plugin-client', options, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: 'getPetByIdFullCustomClientPath',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(customClientOperation, getPetByIdNode, {
@@ -436,7 +437,7 @@ describe('clientGenerator runtime files', () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: 'runtime',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(clientRuntime, nodes, {
@@ -467,7 +468,7 @@ describe('clientGenerator runtime files', () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: 'runtime',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(clientRuntime, [getPetByIdNode], {
@@ -496,7 +497,7 @@ describe('clientGenerator runtime files', () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: 'runtime',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
 
     await renderTemplate(clientRuntime, [getPetByIdNode, uploadFileNode], {
@@ -518,7 +519,7 @@ describe('clientGenerator runtime files', () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: 'runtime',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+      plugin: mockedTsPlugin as unknown as MockedPlugin,
     })
     const node = ast.factory.createOperation({
       operationId: 'getStyled',

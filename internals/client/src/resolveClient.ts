@@ -127,11 +127,13 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
  * On a misconfiguration it throws a config diagnostic tagged with `plugin`, so every consumer
  * fails fast with the same message.
  */
-export function resolveContractClient(options: {
+export type ResolveContractClientOptions = {
   plugin: string
   client: ClientSelector | undefined
   plugins?: ReadonlyArray<unknown>
-}): ResolvedContractClient {
+}
+
+export function resolveContractClient(options: ResolveContractClientOptions): ResolvedContractClient {
   const { plugin, client, plugins = [] } = options
   const pluginNames = plugins.map((plugin) => (plugin as { name?: string }).name).filter((name): name is string => Boolean(name))
   const resolved = resolveClient({ client, pluginNames })

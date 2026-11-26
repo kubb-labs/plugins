@@ -51,7 +51,7 @@ const printer = printerTs({
   arrayType: 'array',
   enum: { type: 'inlineLiteral', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
 })
-function printSchema(schema: ReturnType<typeof buildParams>): string {
+function printSchema(schema: ast.SchemaNode): string {
   const node = printer.transform(schema)
   return node ? print(node) : ''
 }

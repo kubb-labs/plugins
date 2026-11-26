@@ -1,6 +1,6 @@
 import { Diagnostics } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { resolveClient, resolveContractClient } from './resolveClient.ts'
+import { type ResolveContractClientOptions, resolveClient, resolveContractClient } from './resolveClient.ts'
 
 describe('resolveClient', () => {
   test.each(['fetch', 'axios', 'ky', 'client'] as const)('client: %s selects the matching plugin when it is registered', (client) => {
@@ -41,7 +41,7 @@ describe('resolveClient', () => {
 })
 
 describe('resolveContractClient', () => {
-  const resolveError = (options: Parameters<typeof resolveContractClient>[0]) => {
+  const resolveError = (options: ResolveContractClientOptions) => {
     try {
       resolveContractClient(options)
     } catch (error) {

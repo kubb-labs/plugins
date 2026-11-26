@@ -6,7 +6,7 @@ import type { PrinterValibotNodes, PrinterValibotOptions } from './printers/prin
 
 export type LengthConstraints = { min?: number; max?: number; pattern?: string }
 
-export type PrinterContext = { transform: (node: ast.SchemaNode) => string | null; options: PrinterValibotOptions }
+export type ValibotPrinterContext = { transform: (node: ast.SchemaNode) => string | null; options: PrinterValibotOptions }
 
 type ModifierOptions = {
   value: string
@@ -164,7 +164,7 @@ export function unwrapChain(node: ast.SchemaNode, direction: PrinterValibotOptio
   return `${'.wrapped'.repeat(depth)}${inner}${hasMetadata(target) ? '.pipe[0]' : ''}`
 }
 
-export function objectEntries(ctx: PrinterContext, properties: Array<ast.PropertyNode>): Array<string> {
+export function objectEntries(ctx: ValibotPrinterContext, properties: Array<ast.PropertyNode>): Array<string> {
   return properties.map(({ name, schema, required }) => {
     const meta = ast.ref.mergeSchema(schema)
     const value = applyModifiers({
@@ -204,7 +204,7 @@ export function strictMember({ member, node, cyclicSchemas }: { member: string; 
   return isPlainObject && !isWrapped ? `v.strictObject(${member}.entries)` : member
 }
 
-export function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | false {
+export function containsCheck(ctx: ValibotPrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | false {
   if (min === 0 && max === undefined) return false
   const bounds = [`count >= ${min}`, max !== undefined && `count <= ${max}`].filter(Boolean).join(' && ')
   const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
@@ -213,7 +213,7 @@ export function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: Non
 }
 
 // A required `unknown` property means "the key is present", which an object schema accepts as missing, so those keys are checked with `in`.
-function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
+function conditionExpression(ctx: ValibotPrinterContext, schema: ast.SchemaNode | undefined): string {
   if (!schema) return 'true'
   const object = ast.schema.narrow(schema, ast.schema.types.object)
   const keyOnlyNames =
@@ -238,7 +238,7 @@ function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undef
 }
 
 // The `v.check` actions that run on the raw input, before an object schema drops unknown keys or fills in defaults.
-export function inputChecks(ctx: PrinterContext, node: ast.SchemaNode): Array<string> {
+export function inputChecks(ctx: ValibotPrinterContext, node: ast.SchemaNode): Array<string> {
   const { min, max } = node.type === 'object' ? node : {}
   const checks = getChecks(node)
   const keyCheck = checks.find((check) => check.kind === 'propertyNames')

@@ -28,7 +28,7 @@ import {
   numberActions,
   objectEntries,
   pipe,
-  type PrinterContext,
+  type ValibotPrinterContext,
   strictMember,
   stringFormatActions,
   UNKNOWN,
@@ -196,7 +196,10 @@ export const printerValibot = createPrinter<PrinterValibotFactory>((options) => 
   }
 
   // Prints the schema without `keysToOmit`. `v.omit` takes a bare object schema, so each wrapper is peeled off first.
-  function omitKeys(this: PrinterContext, { node, transformed, keysToOmit }: { node: ast.SchemaNode; transformed: string; keysToOmit: Array<string> }): string {
+  function omitKeys(
+    this: ValibotPrinterContext,
+    { node, transformed, keysToOmit }: { node: ast.SchemaNode; transformed: string; keysToOmit: Array<string> },
+  ): string {
     const target = ast.schema.narrow(node, 'ref')?.schema ?? node
     const keys = `[${keysToOmit.map((key) => text.quote(key)).join(', ')}]`
 

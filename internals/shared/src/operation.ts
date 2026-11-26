@@ -143,7 +143,7 @@ type ResponseType = 'blob' | 'text' | 'stream'
 
 export type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | null; stream?: ast.ContentNode['stream'] }
 
-const responseTypes: Partial<Record<NonNullable<ReturnType<typeof ast.mediaType.getKind>>, ResponseType>> = {
+const responseTypes: Partial<Record<ast.mediaType.MediaKind, ResponseType>> = {
   eventStream: 'stream',
   lineStream: 'stream',
   binary: 'blob',
