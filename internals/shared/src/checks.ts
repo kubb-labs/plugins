@@ -4,17 +4,11 @@ import type { TypeGuardsOptions } from './types.ts'
 
 export type ConditionExpressionOptions = {
   schema: ast.SchemaNode | undefined
-  /**
-   * The library's check that `value` matches `schema`, such as `schema.safeParse(value).success`.
-   */
+  /** The library's check that `value` matches `schema`, such as `schema.safeParse(value).success`. */
   matches: (schema: ast.SchemaNode) => string
 }
 
-/**
- * The boolean expression an `if`, `then` or `else` branch tests `value` with. A required `unknown`
- * property means "the key is present", which an object schema accepts as missing, so those keys are
- * checked with `in` and the rest of the schema goes through `matches`.
- */
+/** The test of an `if`, `then` or `else` branch. Required `unknown` properties are checked with `in`, since an object schema accepts them as missing. */
 export function conditionExpression({ schema, matches }: ConditionExpressionOptions): string {
   if (!schema) return 'true'
   const object = ast.schema.narrow(schema, ast.schema.types.object)
@@ -41,9 +35,7 @@ export function conditionExpression({ schema, matches }: ConditionExpressionOpti
 
 export type ContainsCount = { bounds: string; message: string }
 
-/**
- * The count test and error message of a `contains` check, or `null` when `minContains: 0` allows any count.
- */
+/** The count test and error message of a `contains` check, or `null` when `minContains: 0` allows any count. */
 export function getContainsCount({ min = 1, max }: Pick<NonNullable<ast.ArraySchemaNode['contains']>, 'min' | 'max'>): ContainsCount | null {
   if (min === 0 && max === undefined) return null
   return {
@@ -54,9 +46,7 @@ export function getContainsCount({ min = 1, max }: Pick<NonNullable<ast.ArraySch
 
 export type TypeGuards = { is: boolean; assert: boolean }
 
-/**
- * Which guards the `typeGuards` option turns on. An object enables each guard it does not set to `false`.
- */
+/** Which guards the `typeGuards` option turns on. An object enables each guard it does not set to `false`. */
 export function resolveTypeGuards(typeGuards: TypeGuardsOptions | undefined): TypeGuards {
   if (typeof typeGuards === 'object') return { is: typeGuards.is ?? true, assert: typeGuards.assert ?? true }
   return { is: Boolean(typeGuards), assert: Boolean(typeGuards) }
