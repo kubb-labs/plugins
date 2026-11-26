@@ -10,7 +10,6 @@ export type PetEvent = {
   /**
    * @description
    * Format: `date-time`
-   * @type string | undefined
    */
   timestamp?: string
 }

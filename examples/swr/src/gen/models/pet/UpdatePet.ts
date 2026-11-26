@@ -19,19 +19,16 @@ export type UpdatePetStatus405 = unknown
 
 /**
  * @description Update an existent pet in the store
- * @type object
  */
 export type UpdatePetBodyJson = Pet
 
 /**
  * @description Update an existent pet in the store
- * @type object
  */
 export type UpdatePetBodyXml = Pet
 
 /**
  * @description Update an existent pet in the store
- * @type object
  */
 export type UpdatePetBodyFormUrlEncoded = Pet
 

@@ -48,27 +48,23 @@ export type Order = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @description
    * Format: `int64`
    * @example 198772
-   * @type integer | undefined
    */
   petId?: bigint
   /**
    * @description
    * Format: `int32`
    * @example 7
-   * @type integer | undefined
    */
   quantity?: number
   /**
    * @description
    * Format: `date-time`
-   * @type string | undefined
    */
   shipDate?: string
   /**
@@ -89,12 +85,10 @@ export type Category = {
    * @description
    * Format: `int64`
    * @example 1
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @example Dogs
-   * @type string | undefined
    */
   name?: string
 }
@@ -103,7 +97,6 @@ export type Tag = {
   /**
    * @description
    * Format: `int64`
-   * @type integer | undefined
    */
   id?: bigint
   name?: string
@@ -118,12 +111,10 @@ export type Pet = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @example doggie
-   * @type string
    */
   name: string
   category?: Category
@@ -140,12 +131,10 @@ export type AddPetRequest = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @example doggie
-   * @type string
    */
   name: string
   category?: Category
@@ -161,7 +150,6 @@ export type ApiResponse = {
   /**
    * @description
    * Format: `int32`
-   * @type integer | undefined
    */
   code?: number
   type?: string
@@ -172,7 +160,6 @@ export type PetNotFound = {
   /**
    * @description
    * Format: `int32`
-   * @type integer | undefined
    */
   code?: number
   message?: string
@@ -192,19 +179,16 @@ export type UpdatePetStatus405 = unknown
 
 /**
  * @description Update an existent pet in the store
- * @type object
  */
 export type UpdatePetBodyJson = Pet
 
 /**
  * @description Update an existent pet in the store
- * @type object
  */
 export type UpdatePetBodyXml = Pet
 
 /**
  * @description Update an existent pet in the store
- * @type object
  */
 export type UpdatePetBodyFormUrlEncoded = Pet
 
@@ -275,7 +259,6 @@ export type AddPetStatus405 = {
   /**
    * @description
    * Format: `int32`
-   * @type integer | undefined
    */
   code?: number
   message?: string
@@ -283,19 +266,16 @@ export type AddPetStatus405 = {
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
 export type AddPetBodyJson = AddPetRequest
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
 export type AddPetBodyXml = Pet
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
 export type AddPetBodyFormUrlEncoded = Pet
 
@@ -398,17 +378,14 @@ export type FindPetsByStatusResponse = FindPetsByStatusStatus200
 export type FindPetsByTagsQuery = {
   /**
    * @description Tags to filter by
-   * @type array | undefined
    */
   tags?: string[]
   /**
    * @description to request with required page number or pagination
-   * @type string | undefined
    */
   page?: string
   /**
    * @description to request with required page size
-   * @type string | undefined
    */
   pageSize?: string
 }
@@ -451,7 +428,6 @@ export type GetPetByIdPath = {
    * @description ID of pet to return
    *
    * Format: `int64`
-   * @type integer
    */
   petId: bigint
 }
@@ -497,7 +473,6 @@ export type UpdatePetWithFormPath = {
    * @description ID of pet that needs to be updated
    *
    * Format: `int64`
-   * @type integer
    */
   petId: bigint
 }
@@ -505,12 +480,10 @@ export type UpdatePetWithFormPath = {
 export type UpdatePetWithFormQuery = {
   /**
    * @description Name of pet that needs to be updated
-   * @type string | undefined
    */
   name?: string
   /**
    * @description Status of pet that needs to be updated
-   * @type string | undefined
    */
   status?: string
 }
@@ -538,7 +511,6 @@ export type DeletePetPath = {
    * @description Pet id to delete
    *
    * Format: `int64`
-   * @type integer
    */
   petId: bigint
 }
@@ -570,7 +542,6 @@ export type UploadFilePath = {
    * @description ID of pet to update
    *
    * Format: `int64`
-   * @type integer
    */
   petId: bigint
 }
@@ -578,7 +549,6 @@ export type UploadFilePath = {
 export type UploadFileQuery = {
   /**
    * @description Additional Metadata
-   * @type string | undefined
    */
   additionalMetadata?: string
 }
@@ -742,7 +712,6 @@ export type GetOrderByIdPath = {
    * @description ID of order that needs to be fetched
    *
    * Format: `int64`
-   * @type integer
    */
   orderId: bigint
 }
@@ -788,7 +757,6 @@ export type DeleteOrderPath = {
    * @description ID of the order that needs to be deleted
    *
    * Format: `int64`
-   * @type integer
    */
   orderId: bigint
 }

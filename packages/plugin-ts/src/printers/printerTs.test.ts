@@ -826,7 +826,6 @@ describe('printerTs', () => {
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
         "/**
          * @description A well-described type
-         * @type string
          */
         export type Described = string
         "
@@ -871,7 +870,6 @@ describe('printerTs', () => {
          * @description Provides:
          * - \`user_permissions\`, e.g. ["write"]
          * \\@example is text, not a tag
-         * @type string
          */
         export type Described = string
         "

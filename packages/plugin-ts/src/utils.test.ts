@@ -81,7 +81,6 @@ describe('buildParams', () => {
       "{
         /**
          * @description Maximum number of results
-         * @type integer | undefined
          */
         limit?: number;
       }"
@@ -156,7 +155,7 @@ describe('buildPropertyJSDocComments', () => {
   it.each(['number', 'integer', 'bigint'] as const)('emits numeric bounds for %s schemas', (type) => {
     const schema = ast.factory.createSchema({ type, min: 0, max: 30 })
 
-    expect(buildPropertyJSDocComments(schema)).toStrictEqual(['@minimum 0', '@maximum 30', `@type ${type}`])
+    expect(buildPropertyJSDocComments(schema)).toStrictEqual(['@minimum 0', '@maximum 30'])
   })
 
   it('does not emit bounds for unconstrained numeric schemas', () => {
@@ -188,10 +187,9 @@ describe('buildPropertyJSDocComments', () => {
     expect(comments).not.toContain('@description')
   })
 
-  it('leaves the @type tag off a binary schema', () => {
+  it('keeps only the description of a binary schema', () => {
     const blob = ast.factory.createSchema({ type: 'blob', primitive: 'string', description: 'The photo' })
 
-    // `@type string` would contradict the `Blob` type next to it.
     expect(buildPropertyJSDocComments(blob)).toStrictEqual(['@description The photo'])
   })
 
@@ -210,18 +208,10 @@ describe('buildPropertyJSDocComments', () => {
     expect(comments).toContain('@example {"label":"*\\/"}')
   })
 
-  it('omits @type when it would be the only annotation', () => {
-    const schema = ast.factory.createSchema({ type: 'string' })
-    const comments = buildPropertyJSDocComments(schema)
-
-    expect(comments).toStrictEqual([])
-  })
-
-  it('keeps @type when another annotation already justifies the comment', () => {
+  it('never emits @type, since it would repeat the TypeScript type', () => {
     const schema = ast.factory.createSchema({ type: 'string', description: 'A pet name' })
-    const comments = buildPropertyJSDocComments(schema)
 
-    expect(comments).toContain('@type string')
+    expect(buildPropertyJSDocComments(schema)).toStrictEqual(['@description A pet name'])
   })
 })
 

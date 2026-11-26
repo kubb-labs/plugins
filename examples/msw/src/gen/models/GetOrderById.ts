@@ -10,7 +10,6 @@ export type GetOrderByIdPath = {
    * @description ID of order that needs to be fetched
    *
    * Format: `int64`
-   * @type integer
    */
   orderId: bigint
 }

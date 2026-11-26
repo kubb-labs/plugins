@@ -9,7 +9,6 @@ export type CreateOrderStatus201 = OrderSchema
 
 /**
  * @description Order request body
- * @type object | undefined
  */
 export type CreateOrderBody = {
   userId?: string;

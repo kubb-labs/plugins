@@ -8,7 +8,6 @@ export type DeleteOrderPath = {
    * @description ID of the order that needs to be deleted
    *
    * Format: `int64`
-   * @type integer
    */
   orderId: bigint
 }

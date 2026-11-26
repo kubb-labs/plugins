@@ -15,7 +15,6 @@ export type AddFilesBodyJson =
        * @description URL of the image to upload
        *
        * Format: `uri`
-       * @type string
        */
       url: string
     }

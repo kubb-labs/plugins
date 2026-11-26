@@ -12,7 +12,6 @@ export type GetPaymentByIdPath = {
 /**
  * @description A payment for a store order
  * @see http://swagger.io Payment model
- * @type object
  */
 export type GetPaymentByIdStatus200 = Payment
 

@@ -8,7 +8,6 @@ import type { CreatePetsXEXAMPLEEnumKey } from './CreatePetsXEXAMPLEEnum'
 export type CreatePetsPath = {
   /**
    * @description UUID
-   * @type string
    */
   uuid: string
 }
@@ -16,7 +15,6 @@ export type CreatePetsPath = {
 export type CreatePetsQuery = {
   /**
    * @description Offset *\/
-   * @type integer | undefined
    */
   offset?: number
 }
@@ -32,7 +30,6 @@ export type CreatePetsStatus201 = unknown
 
 /**
  * @description Pet not found
- * @type unknown
  */
 export type CreatePetsStatusDefault = unknown
 

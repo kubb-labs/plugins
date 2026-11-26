@@ -64,10 +64,6 @@ export function isInlineConstEnum(node: ast.EnumSchemaNode, enumSchemaNames?: Re
   return ast.schema.is(node, 'const') && !(node.name && enumSchemaNames?.has(node.name))
 }
 
-function isSchemaOptional(schema: ast.SchemaNode): boolean {
-  return Boolean(('optional' in schema && schema.optional) || ('nullish' in schema && schema.nullish))
-}
-
 function formatExample(value: unknown): string {
   if (value === null || typeof value !== 'object') {
     return String(value)
@@ -81,9 +77,9 @@ function formatExample(value: unknown): string {
  * Collects JSDoc annotation strings for a schema node.
  *
  * Only uses official JSDoc tags from https://jsdoc.app/: `@description`, `@deprecated`, `@minimum`, `@maximum`, `@minLength`,
- * `@maxLength`, `@pattern`, `@default`, `@example`, `@see` and `@type`.
+ * `@maxLength`, `@pattern`, `@default`, `@example` and `@see`. No `@type`: it would repeat the TypeScript type next to it.
  */
-export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
+export function buildPropertyJSDocComments(schema: ast.SchemaNode): Array<string | undefined> {
   const meta = ast.ref.mergeSchema(schema)
 
   const isArray = meta?.primitive === 'array'
@@ -119,16 +115,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
     meta?.externalDocs ? `@see ${jsDocEscape([meta.externalDocs.url, meta.externalDocs.description].filter(Boolean).join(' '))}` : null,
   ].filter(Boolean)
 
-  // `@type` merely repeats the TypeScript type already sitting next to the property, so it only
-  // earns its place inside a comment block that exists for another reason. Bare, it would just
-  // add bytes with no information a reader can't already see in the signature.
-  const typeTag =
-    // A binary schema's primitive is `string`, which would contradict its `Blob` type.
-    comments.length && !ast.schema.is(schema, 'binary', { follow: ['ref', 'array'] }) && meta && 'primitive' in meta && meta.primitive
-      ? [`@type ${meta.primitive}`, (optional ?? isSchemaOptional(schema)) ? ' | undefined' : null].filter(Boolean).join('')
-      : null
-
-  return [...comments, typeTag].filter(Boolean)
+  return comments
 }
 
 /**

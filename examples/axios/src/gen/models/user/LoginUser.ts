@@ -6,12 +6,10 @@
 export type LoginUserQuery = {
   /**
    * @description The user name for login
-   * @type string | undefined
    */
   username?: string
   /**
    * @description The password for login in clear text
-   * @type string | undefined
    */
   password?: string
 }
@@ -29,14 +27,12 @@ export type LoginUserStatus200Headers = {
    * @description calls per hour allowed by the user
    *
    * Format: `int32`
-   * @type integer | undefined
    */
   'X-Rate-Limit'?: number
   /**
    * @description date in UTC when token expires
    *
    * Format: `date-time`
-   * @type string | undefined
    */
   'X-Expires-After'?: string
 }

@@ -1,6 +1,5 @@
 /**
  * @deprecated
- * @type object
  */
 export type TagTag = {
   /**
@@ -8,7 +7,6 @@ export type TagTag = {
    * Format: `int64`
    * @deprecated
    * @default 1
-   * @type integer | undefined
    */
   id?: number
   name?: string

@@ -12,12 +12,10 @@ export type Pet = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint;
   /**
    * @example doggie
-   * @type string
    */
   name: string;
   /**
@@ -25,7 +23,6 @@ export type Pet = {
    * @maxLength 42
    * @pattern ^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$
    * @example my_log_destination
-   * @type string | undefined
    */
   log?: string;
   category?: Category;

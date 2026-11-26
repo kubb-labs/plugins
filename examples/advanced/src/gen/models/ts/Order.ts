@@ -8,14 +8,12 @@ export type Order = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: number
   /**
    * @description
    * Format: `int64`
    * @example 198772
-   * @type integer | undefined
    */
   petId?: number
   params?: {
@@ -30,20 +28,17 @@ export type Order = {
    * @description
    * Format: `int32`
    * @example 7
-   * @type integer | undefined
    */
   quantity?: number
   orderType?: OrderOrderTypeEnumKey
   /**
    * @description Order Status
    * @example approved
-   * @type string | undefined
    */
   type?: string
   /**
    * @description
    * Format: `date-time`
-   * @type string | undefined
    */
   shipDate?: string
   /**

@@ -8,17 +8,14 @@ import type { Pet } from '../Pet'
 export type FindPetsByTagsQuery = {
   /**
    * @description Tags to filter by. Tags may contain reserved characters such as `/`, which are sent unencoded.
-   * @type array | undefined
    */
   tags?: string[]
   /**
    * @description to request with required page number or pagination
-   * @type string | undefined
    */
   page?: string
   /**
    * @description to request with required page size
-   * @type string | undefined
    */
   pageSize?: string
 }

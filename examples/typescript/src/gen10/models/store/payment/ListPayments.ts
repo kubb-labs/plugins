@@ -11,7 +11,6 @@ export type ListPaymentsQuery = {
    * @deprecated
    * @example settled
    * @example <caption>Serialized</caption> status=settled
-   * @type string | undefined
    */
   status?: string
   filter?: string
@@ -25,7 +24,6 @@ export type ListPaymentsCookies = {
  * @summary The payments
  * @see getPayment: getPaymentById({ paymentId: $response.body#/0/id })
  * @example [{"id":1,"method":"card","creditCard":"4111","billingAddress":"Main St 1"}]
- * @type array
  */
 export type ListPaymentsStatus2xx = Array<Payment>
 
@@ -35,13 +33,11 @@ export type ListPaymentsStatus2xxHeaders = {
   /**
    * @description Calls left this hour
    * @example 100
-   * @type integer
    */
   'X-Rate-Limit': number
   /**
    * @example abc
    * @example <caption>Serialized</caption> cursor=abc
-   * @type string | undefined
    */
   'X-Next-Page'?: string
 }

@@ -10,7 +10,6 @@ export type UploadFilePath = {
    * @description ID of pet to update
    *
    * Format: `int64`
-   * @type integer
    */
   petId: bigint
 }
@@ -18,7 +17,6 @@ export type UploadFilePath = {
 export type UploadFileQuery = {
   /**
    * @description Additional Metadata
-   * @type string | undefined
    */
   additionalMetadata?: string
 }
@@ -30,7 +28,6 @@ export type UploadFileBodyJson = {
    * @description URL of the image to upload
    *
    * Format: `uri`
-   * @type string
    */
   url: string
 }

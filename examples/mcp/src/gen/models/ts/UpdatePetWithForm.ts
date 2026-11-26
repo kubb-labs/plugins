@@ -8,7 +8,6 @@ export type UpdatePetWithFormPath = {
    * @description ID of pet that needs to be updated
    *
    * Format: `int64`
-   * @type integer
    */
   petId: number
 }
@@ -16,12 +15,10 @@ export type UpdatePetWithFormPath = {
 export type UpdatePetWithFormQuery = {
   /**
    * @description Name of pet that needs to be updated
-   * @type string | undefined
    */
   name?: string
   /**
    * @description Status of pet that needs to be updated
-   * @type string | undefined
    */
   status?: string
 }

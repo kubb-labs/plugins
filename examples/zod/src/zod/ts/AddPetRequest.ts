@@ -19,12 +19,10 @@ export type AddPetRequest = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @example doggie
-   * @type string
    */
   name: string
   category?: Category
@@ -32,7 +30,6 @@ export type AddPetRequest = {
   tags?: Array<Tag>
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
   status?: AddPetRequestStatusEnumKey
 }

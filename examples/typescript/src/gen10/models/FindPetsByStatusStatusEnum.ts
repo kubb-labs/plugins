@@ -6,6 +6,5 @@
 /**
  * @description Status values that need to be considered for filter
  * @default 'available'
- * @type string
  */
 export type FindPetsByStatusStatusEnum = 'available' | 'pending' | 'sold'

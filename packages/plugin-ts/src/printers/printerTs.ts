@@ -379,7 +379,7 @@ export const printerTs = createPrinter<PrinterTsFactory>((options) => {
           const binaryRemark = ast.schema.is(property.schema, 'binary', { follow: ['ref', 'array'] })
             ? '@remarks Pass a `File` to send its filename. A plain `Blob` is sent with the filename `blob`.'
             : undefined
-          const comments = [...buildPropertyJSDocComments(property.schema, optional), binaryRemark]
+          const comments = [...buildPropertyJSDocComments(property.schema), binaryRemark]
 
           return factory.appendJSDocToNode({ node: propertyNode, comments })
         })

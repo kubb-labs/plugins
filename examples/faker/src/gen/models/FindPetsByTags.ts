@@ -8,7 +8,6 @@ import type { Pet } from './Pet'
 export type FindPetsByTagsQuery = {
   /**
    * @description Tags to filter by
-   * @type array | undefined
    */
   tags?: string[]
 }

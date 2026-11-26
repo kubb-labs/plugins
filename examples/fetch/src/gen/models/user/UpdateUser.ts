@@ -8,7 +8,6 @@ import type { User } from '../User'
 export type UpdateUserPath = {
   /**
    * @description name that need to be deleted
-   * @type string
    */
   username: string
 }
@@ -17,19 +16,16 @@ export type UpdateUserStatusDefault = unknown
 
 /**
  * @description Update an existent user in the store
- * @type object | undefined
  */
 export type UpdateUserBodyJson = User | undefined
 
 /**
  * @description Update an existent user in the store
- * @type object | undefined
  */
 export type UpdateUserBodyXml = User | undefined
 
 /**
  * @description Update an existent user in the store
- * @type object | undefined
  */
 export type UpdateUserBodyFormUrlEncoded = User | undefined
 

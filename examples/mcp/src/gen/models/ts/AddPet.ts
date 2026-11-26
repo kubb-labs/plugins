@@ -16,7 +16,6 @@ export type AddPetStatus405 = {
   /**
    * @description
    * Format: `int32`
-   * @type integer | undefined
    */
   code?: number
   message?: string
@@ -24,19 +23,16 @@ export type AddPetStatus405 = {
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
 export type AddPetBodyJson = AddPetRequest
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
 export type AddPetBodyXml = Omit<NonNullable<Pet>, 'id'>
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
 export type AddPetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'id'>
 

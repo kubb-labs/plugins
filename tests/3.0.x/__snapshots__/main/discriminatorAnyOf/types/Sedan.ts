@@ -10,7 +10,6 @@ export type Sedan = Vehicle & {
   type?: TypeEnumKey;
   /**
    * @description Number of seats
-   * @type integer | undefined
    */
   seats?: number;
 }

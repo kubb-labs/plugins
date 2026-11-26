@@ -11,7 +11,6 @@ export type PlaceOrderStatus405 = unknown
 
 /**
  * @description Order description
- * @type object | undefined
  */
 export type PlaceOrderBodyJson = Order | undefined
 

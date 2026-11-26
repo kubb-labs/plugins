@@ -6,7 +6,6 @@
 export type CreatePetsPath = {
   /**
    * @description UUID
-   * @type string
    */
   uuid: string
 }
@@ -14,7 +13,6 @@ export type CreatePetsPath = {
 export type CreatePetsQuery = {
   /**
    * @description Offset
-   * @type integer | undefined
    */
   offset?: number
 }
@@ -30,7 +28,6 @@ export type CreatePetsXEXAMPLEEnumKey = (typeof createPetsXEXAMPLEEnum)[keyof ty
 export type CreatePetsHeaders = {
   /**
    * @description Header parameters
-   * @type string
    */
   'X-EXAMPLE': CreatePetsXEXAMPLEEnumKey
 }
@@ -41,7 +38,6 @@ export type CreatePetsStatusDefault = {
   /**
    * @description
    * Format: `int32`
-   * @type integer | undefined
    */
   code?: number
   message?: string

@@ -8,7 +8,6 @@ import type { PaymentMethodEnum } from './PaymentMethodEnum'
 /**
  * @description A payment for a store order
  * @see http://swagger.io Payment model
- * @type object
  */
 export type Payment = {
   id: number

@@ -16,19 +16,16 @@ export type AddPetStatus405 = unknown
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
 export type AddPetBodyJson = AddPetRequest
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
 export type AddPetBodyXml = Pet
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
 export type AddPetBodyFormUrlEncoded = Pet
 

@@ -16,7 +16,6 @@ export type UpdatePetStatus202 = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: number
 }
@@ -29,19 +28,16 @@ export type UpdatePetStatus405 = unknown
 
 /**
  * @description Update an existent pet in the store
- * @type object
  */
 export type UpdatePetBodyJson = Omit<NonNullable<Pet>, 'id'>
 
 /**
  * @description Update an existent pet in the store
- * @type object
  */
 export type UpdatePetBodyXml = Omit<NonNullable<Pet>, 'id'>
 
 /**
  * @description Update an existent pet in the store
- * @type object
  */
 export type UpdatePetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'id'>
 

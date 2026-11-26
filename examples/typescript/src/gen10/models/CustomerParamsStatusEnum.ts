@@ -6,6 +6,5 @@
 /**
  * @description Order Status
  * @example approved
- * @type string
  */
 export type CustomerParamsStatusEnum = 'placed' | 'approved' | 'delivered'

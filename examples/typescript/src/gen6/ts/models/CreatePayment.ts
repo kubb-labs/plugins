@@ -8,7 +8,6 @@ import type { Payment } from './Payment'
 /**
  * @description A payment for a store order
  * @see http://swagger.io Payment model
- * @type object
  */
 export type CreatePaymentStatus201 = Payment
 
@@ -16,7 +15,6 @@ export type CreatePaymentStatus201 = Payment
  * @description A payment for a store order
  * @example {"id":1,"method":"cash"}
  * @see http://swagger.io Payment model
- * @type object
  */
 export type CreatePaymentBody = Payment
 

@@ -19,19 +19,16 @@ export type Pet = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   parent?: Array<Pet>
   /**
    * @pattern ^[0-9]{1,19}$
    * @example 10
-   * @type string | undefined
    */
   internalId?: string
   /**
    * @example doggie
-   * @type string
    */
   name: string
   category?: Category
@@ -39,7 +36,6 @@ export type Pet = {
   tags?: Array<Tag>
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
   status?: PetStatusEnumKey
 }

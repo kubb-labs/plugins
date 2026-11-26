@@ -6,7 +6,6 @@
 export type GetThingsPath = {
   /**
    * @description UUID
-   * @type string
    */
   uuid: string
 }
@@ -17,14 +16,12 @@ export type GetThingsQuery = {
    * @minimum 1
    * @maximum 100
    * @default 100
-   * @type integer | undefined
    */
   limit?: number
   /**
    * @description Number of things to skip
    * @minimum 0
    * @default 0
-   * @type integer | undefined
    */
   skip?: number
 }
@@ -35,7 +32,6 @@ export type GetThingsStatusDefault = {
   /**
    * @description
    * Format: `int32`
-   * @type integer | undefined
    */
   code?: number
   message?: string

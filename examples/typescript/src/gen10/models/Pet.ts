@@ -22,13 +22,11 @@ export type Pet = (
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   readonly type: PetTypeEnum
   /**
    * @example doggie
-   * @type string
    */
   name: string
   category?: Category

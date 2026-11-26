@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "inputs": {
     "petStore": {
-      "hash": "184b2a3bbba91ba4acc84bf57f62a2af5a0ca80c692202d52a01bd6729290940",
+      "hash": "601afec65b4637c99a9e1d81d3ea0b73e7de27c16b31ccda61011ecbb319d775",
       "sources": ["petStore.yaml"]
     }
   },
@@ -128,8 +128,8 @@
       "output": "db2d9d960907ee988e8888f2023aacfb42143472fafcabc238446a323f2101f7"
     },
     "src/gen/models.ts": {
-      "source": "33064b9a355542487c1d3471a1cf00180df9e880d437309fc51b9860b8e18122",
-      "output": "08a22efaaedfaf349efd4e9e097cc88b2a3625cb8b94776b7f32a44d30307045"
+      "source": "3d59127edf84d2d0feebb990eb510ddce565ef1dfbdc47319cc147233cca08bf",
+      "output": "b94af5667ac6f19e6c9a3edfca6faacaa99b320d3dd6abaa1a70d55e09bf55e2"
     },
     "src/gen/zod.ts": {
       "source": "1900b0e5fdafe3660c56cf44a4fe43aa6e744cfae18ad8d1b77fe18a4b21310f",
