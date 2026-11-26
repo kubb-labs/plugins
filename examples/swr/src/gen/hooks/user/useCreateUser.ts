@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser'
+import type { User } from '../../models/User'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { createUser } from '../../clients/user/createUser'
 
@@ -13,7 +13,40 @@ export const createUserMutationKey = () => [{ url: '/user' }] as const
 
 export type CreateUserMutationKey = ReturnType<typeof createUserMutationKey>
 
-export type CreateUserMutationArg = CreateUserOptions
+export type CreateUserMutationArg =
+  | {
+      body?: User
+      path?: never
+      query?: never
+      headers?: never
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
+    }
+  | {
+      body?: User
+      path?: never
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
+    }
+  | {
+      body?: User
+      path?: never
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
+    }
 
 /**
  * `POST /user`
@@ -22,7 +55,7 @@ export type CreateUserMutationArg = CreateUserOptions
  */
 export function useCreateUser(
   options: {
-    mutation?: SWRMutationConfiguration<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg> & {
+    mutation?: SWRMutationConfiguration<User | string, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg> & {
       throwOnError?: boolean
     }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
@@ -32,7 +65,7 @@ export function useCreateUser(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = createUserMutationKey()
 
-  return useSWRMutation<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
+  return useSWRMutation<User | string, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
       return createUser({ ...config, ...variables, throwOnError: true }).unwrap()

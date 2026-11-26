@@ -5,6 +5,5 @@
 
 /**
  * @description pet status in the store
- * @type string
  */
 export type PetStatusEnum = 'available' | 'pending' | 'sold'

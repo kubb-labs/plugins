@@ -12,7 +12,6 @@ export type ElectricCar = Vehicle & {
    * @description Battery capacity in kWh
    *
    * Format: `float`
-   * @type number | undefined
    */
   batteryCapacity?: number;
 }

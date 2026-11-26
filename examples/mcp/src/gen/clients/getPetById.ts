@@ -4,7 +4,7 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
-import type { GetPetByIdOptions, GetPetByIdResponses } from '../models/ts/GetPetById'
+import type { Pet } from '../models/ts/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
 /**
@@ -13,12 +13,54 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.ku
  * @summary Find pet by ID
  */
 export function getPetById<ThrowOnError extends boolean = true>(
-  options: Options<GetPetByIdOptions, ThrowOnError>,
-): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        petId: number
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Omit<NonNullable<Pet>, 'name'>
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<GetPetByIdResponses, ThrowOnError>({
+    apiClient<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+        '400': unknown
+        '404': unknown
+      },
+      ThrowOnError
+    >({
       method: 'GET',
       url: '/pet/{petId}',
       security: [securitySchemes.api_key, { ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

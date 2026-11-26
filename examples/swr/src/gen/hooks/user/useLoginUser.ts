@@ -5,16 +5,38 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser'
 import type { SWRConfiguration } from 'swr'
 import { loginUser } from '../../clients/user/loginUser'
 
-export const loginUserQueryKey = ({ query }: Omit<LoginUserOptions, 'headers'> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
+export const loginUserQueryKey = ({
+  query,
+}: Omit<
+  {
+    body?: never
+    path?: never
+    query?: {
+      username?: string
+      password?: string
+    }
+    headers?: never
+  },
+  'headers'
+> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
 
 type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
-  { query }: LoginUserOptions = {},
+  {
+    query,
+  }: {
+    body?: never
+    path?: never
+    query?: {
+      username?: string
+      password?: string
+    }
+    headers?: never
+  } = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
@@ -29,9 +51,19 @@ export function loginUserQueryOptions(
  * @summary Logs user into the system
  */
 export function useLoginUser(
-  { query }: LoginUserOptions = {},
+  {
+    query,
+  }: {
+    body?: never
+    path?: never
+    query?: {
+      username?: string
+      password?: string
+    }
+    headers?: never
+  } = {},
   options: {
-    query?: SWRConfiguration<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>>
+    query?: SWRConfiguration<string, ResponseErrorConfig<unknown>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -41,7 +73,7 @@ export function useLoginUser(
 
   const queryKey = loginUserQueryKey({ query })
 
-  return useSWR<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<string, ResponseErrorConfig<unknown>, LoginUserQueryKey | null>(shouldFetch ? queryKey : null, {
     ...loginUserQueryOptions({ query }, config),
     ...(immutable
       ? {

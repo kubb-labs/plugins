@@ -3,10 +3,9 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetWithFormStatus405 } from '../../../models/UpdatePetWithForm'
 import { http, HttpResponse } from 'msw/http'
 
-export function updatePetWithFormHandlerResponse405(data?: UpdatePetWithFormStatus405) {
+export function updatePetWithFormHandlerResponse405(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 405,
   })

@@ -4,23 +4,51 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName'
+import type { User } from '../../models/User'
 import type { MaybeRefOrGetter } from 'vue'
 import { getUserByName } from '../../clients/user/getUserByName'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getUserByNameQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetUserByNameOptions, 'headers'>['path']> }) =>
-  [{ url: '/user/:username', params: path }] as const
+export const getUserByNameQueryKey = ({
+  path,
+}: {
+  path: MaybeRefOrGetter<
+    Omit<
+      {
+        body?: never
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+      },
+      'headers'
+    >['path']
+  >
+}) => [{ url: '/user/:username', params: path }] as const
 
 export type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions(
-  { path }: { path: MaybeRefOrGetter<GetUserByNameOptions['path']> },
+  {
+    path,
+  }: {
+    path: MaybeRefOrGetter<
+      {
+        body?: never
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+      }['path']
+    >
+  },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getUserByNameQueryKey({ path })
-  return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200>({
+  return queryOptions<User | string, ResponseErrorConfig<unknown | unknown>, User | string>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getUserByName({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true }).unwrap()

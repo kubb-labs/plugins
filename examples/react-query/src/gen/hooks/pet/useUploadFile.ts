@@ -4,7 +4,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { UploadFileOptions, UploadFileStatus200 } from '../../models/pet/UploadFile'
+import type { ApiResponse } from '../../models/ApiResponse'
 import { uploadFile } from '../../clients/pet/uploadFile'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -14,7 +14,45 @@ export function uploadFileMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {},
 ) {
   const mutationKey = uploadFileMutationKey()
-  return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
+  return mutationOptions<
+    ApiResponse,
+    ResponseErrorConfig<Error>,
+    | {
+        body: {
+          url: string
+        }
+        path: {
+          petId: bigint
+        }
+        query?: {
+          additionalMetadata?: string
+        }
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body: {
+          file: Blob
+        }
+        path: {
+          petId: bigint
+        }
+        query?: {
+          additionalMetadata?: string
+        }
+        headers?: never
+        contentType:
+          | 'multipart/form-data'
+          | {
+              request: 'multipart/form-data'
+            }
+      },
+    TContext
+  >({
     mutationKey,
     mutationFn: async (variables) => {
       return uploadFile({ ...config, ...variables, throwOnError: true }).unwrap()

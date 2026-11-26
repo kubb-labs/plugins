@@ -4,7 +4,6 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { GetInventoryStatus200 } from '../types/GetInventory'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { withQueryKey } from '../.kubb/withQueryKey'
 import { getInventory } from '../clients/getInventory'
@@ -15,13 +14,17 @@ export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
 export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
-  const queryKey = getInventoryQueryKey()
-  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
-   queryKey,
-   queryFn: async ({ signal }) => {
-      return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
-   },
-  })
+        const queryKey = getInventoryQueryKey()
+        return queryOptions<({
+    [key: string]: number;
+  }), ResponseErrorConfig<Error>, ({
+    [key: string]: number;
+  }), typeof queryKey>({
+         queryKey,
+         queryFn: async ({ signal }) => {
+            return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
+         },
+        })
 }
 
 /**
@@ -29,8 +32,14 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
  * @description Returns a map of status codes to quantities
  * @summary Returns pet inventories by status
  */
-export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventoryQueryKey>(options: {
-  query?: Partial<QueryObserverOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useGetInventory<TData = ({
+  [key: string]: number;
+}), TQueryData = ({
+  [key: string]: number;
+}), TQueryKey extends QueryKey = GetInventoryQueryKey>(options: {
+  query?: Partial<QueryObserverOptions<({
+  [key: string]: number;
+}), ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

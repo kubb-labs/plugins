@@ -324,6 +324,7 @@ const configs = [
       plugins: [
         pluginTs({
           output: { path: './types', barrel: false, mode: 'directory' },
+          operations: 'export',
           macros: [
             {
               name: 'strip-descriptions',

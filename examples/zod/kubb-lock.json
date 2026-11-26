@@ -2,15 +2,15 @@
   "lockfileVersion": 1,
   "inputs": {
     "zod": {
-      "hash": "00db022fceec5d6c4c2c993866cc1616f54a362ab53b9ceba56ec3e0b1b936f5",
+      "hash": "7e2c80605460af4aca38b708f6e39c948ae4fd36200035a06a504ed483216adb",
       "sources": ["petStore.yaml"]
     },
     "zod-mini": {
-      "hash": "71bebf806c0175db0da77652d2c4edd77257ab4e326acfbaae6daca98afd670d",
+      "hash": "780b416d96499c75328a003dee69a783a04512b5225bb1b46dce021909ecd425",
       "sources": ["petStore.yaml"]
     },
     "zod-union": {
-      "hash": "56747a4a34cd726b458622234a3eb0bd1069c59131c573a31ef4f3307f4b8c10",
+      "hash": "bd7f9b3f37bc020a9ad1bf9d9c427c19bdc0dbfbf64b30f4330ccefab5008e89",
       "sources": ["unionWithReadOnly.yaml"]
     }
   },
@@ -143,81 +143,41 @@
       "source": "98295fe0b56c0fe11f08065da9133dffa0c63d9c641423e15b9fbab39b49f85a",
       "output": "22d1e1e8c10599ae26ce40e1fbb531ce5eaaf396be90bfb35e029df81838f4a2"
     },
-    "src/zod/ts/AddPet.ts": {
-      "source": "4115da986cfb70d595d955d3d39e6bee6e070916aab3897c18a1b17744c5bbca",
-      "output": "bf7c56572decc4d98be83e49bb3b9bca978eb23d0b39c8fc69908d84b0157d50"
-    },
     "src/zod/ts/AddPetRequest.ts": {
-      "source": "12c337a0366dd46e4675c79a7cebcc0f186d4cd132203be980e2bc63ab4441aa",
-      "output": "fec4dba8dc2dc2c3c9f058c37319e0414b820c2154e4902629d60cc11ee06784"
+      "source": "2ffb00454734d36e312267c844f50e93991e1afd649dad4355183b1689311f5b",
+      "output": "03adffc1b53c3f37336e1203ac2c843be42552f6fab0ae0ff4ced7ccaf7e5af2"
     },
     "src/zod/ts/ApiResponse.ts": {
-      "source": "a721916427e782b67f2109129132fe0ff63fd18bab53b54e82f3ade9d1425284",
-      "output": "56edf49112ce492e04bab3c363fecea298ed980aae96594227d6aa3346f8be96"
+      "source": "e2496d7f4c20e81090f9219d96b6e2a33150aeab5840f7a1da78e447d6ef387f",
+      "output": "fec766538e1f21374f55072cb104c25e0e706954a5d5aff350cc18cb2824774b"
     },
     "src/zod/ts/Category.ts": {
-      "source": "cbfa6087b7fb2612d436cb2a7d51dbd4a4714ed7ae82e5cd17764f180ca2b228",
-      "output": "29ba0cb111f3069d520f6b290c377e689c08c44578599675b5712b19f9daf4e3"
-    },
-    "src/zod/ts/CreatePets.ts": {
-      "source": "f37103608e8c934f0ee6f978281c8b00067af103f3b5b247e60f3f6948705241",
-      "output": "869e91fae8acaf7a6232e9fa524d444c1fd35821905cc2ca0f8f43eb3d46b225"
-    },
-    "src/zod/ts/DeleteOrder.ts": {
-      "source": "6af4ab3d297365f3036f486e78ac41c7a529646ce735db5785744f00101a0905",
-      "output": "db9917f738f2f36cd7794d25c72e344a2b939c05b38919bd2e797c2335e20c5c"
-    },
-    "src/zod/ts/DeletePet.ts": {
-      "source": "c52bd1854372e79e74c9d39a41a63d226d62236ad276b0d98d45105ef69b28a0",
-      "output": "c24346e2038fc3a6c0a57b153fb7817cf54f767bc737d9355d0f669abbc79f25"
-    },
-    "src/zod/ts/FindPetsByStatus.ts": {
-      "source": "27fe04a6217103dce7314bf9227ecd42a5ffca4ea3e228d4f7f6915bf9233809",
-      "output": "7d3f42d4dd2795b1851648172a863d23cee696760f02b08867e42a3a06f03152"
-    },
-    "src/zod/ts/FindPetsByTags.ts": {
-      "source": "067ea707b6e8219b57c4c65348e51ffbe7b3b6497096896198f3720d8275aa1a",
-      "output": "835478305257b29d7278872078c9f4f2183f0baf52f6ab931bc206db0b9ea7d2"
-    },
-    "src/zod/ts/GetInventory.ts": {
-      "source": "feb424c06e4d4004628e10d7ff82b2b514986555ca62902756e64ef65ad146a6",
-      "output": "f86ed4627cf53f66080ca1545a7024c15cbc8e8871fc66e03df7a69d64be1022"
-    },
-    "src/zod/ts/GetOrderById.ts": {
-      "source": "59af0582a037a51e32910c9d44f75d688e5aee1ff209ba008452284291e332af",
-      "output": "b5c30fe7d6f4d65f6c03bb0cffa0cf1701555c5122e6366a1faea464f6eae00e"
-    },
-    "src/zod/ts/GetPetById.ts": {
-      "source": "bd75b8cae52f1d0b7a71514828ff9a1de3f826c7758c09f9364f61491189e837",
-      "output": "86a527bbb3c5f80d552cd155a8ae4838968f4cad24bf258676d663b1518e3e8d"
-    },
-    "src/zod/ts/GetThings.ts": {
-      "source": "6409d5f743f7fcbe17286d3261f24ded8b391be6b1534de3686c989fc946e60e",
-      "output": "2356f364719689fb08ba983f5f98a12e370b08b2d27bc892d844ad3c1cffe47e"
+      "source": "1154cc4c740d29f3e40e0e9a4d42493407ba069eb3746929e2d0a247363c0404",
+      "output": "fa4f35cdff794251a375ed91fda4a9671540fd7bd546474cce2ce331c012459c"
     },
     "src/zod/ts/Order.ts": {
-      "source": "e5d44270aca73ba327e7d32a29a384e5df96c2562bbf18314a3fe59958c7826c",
-      "output": "0d5c1a86623fbe24b66269701af560f2df6cbe9f520ce41399e7b70d03a0aa0e"
+      "source": "ef646382b71e19fd7b408b610257ab8ca83e27366d8b34e653b6760346ea2d5b",
+      "output": "45f0748964021562a0987c23c274b88d73d0c1bbd50bd5d667d48023871a394a"
     },
     "src/zod/ts/Payment.ts": {
-      "source": "068dba61667dbd3dcf9ba32bb6523272235f8579a16e0c98bfcd5dce25cfa57d",
-      "output": "fb55c19880cd3e26ad6a852fba4eb1130fa14a80a123084283b452f58cc1f0e8"
+      "source": "057bd12131b7f867f34d0e1e80fd34ccc1a2005d1b260364c79612091dfe6300",
+      "output": "d45c4e435bb9a2221968e0967d58389270332ee610621c0eaae3d604a7e27066"
     },
     "src/zod/ts/PaymentError.ts": {
       "source": "1eb2580777b0799fcb8ca35558bcd8563e7ce32204ab0ddf84d4a7e1a6a25294",
       "output": "1fccf8537816492f6c77e39b4c8daab5cc076f99927fe0c1d817f011f018082d"
     },
     "src/zod/ts/Pet.ts": {
-      "source": "7b82437f522ab96ce8a00904bd3615ae60d2a986394309282bc9b64d50ed37f0",
-      "output": "6dcac796e2b4139763f3aa25256e189cd2d618d4b95793539ee80ac574e4affd"
+      "source": "2309a879072389906c0193bccd4ff3566e9db4f0a55acc2f901200cc43bcc848",
+      "output": "975c4a66a54534ef96ff8ffe3432426334944b14418b529566e57724bb09606a"
     },
     "src/zod/ts/PetNotFound.ts": {
-      "source": "1060c86dff67512db4ee63c11af18fbe56d2a78b92b792f91ab0c684298873bb",
-      "output": "6ea77acb15b691cc0c76a34eec40c8d6f8f68e5dbfff2d1b44ca05475559a3ae"
+      "source": "23eca21c9e337279edbc59d1b793286f6047585b06d64f88624549a1b168819a",
+      "output": "db0ba50ac659053218c01d8991c46e1f47facb20b7a47a1605cdc9d5cbf10497"
     },
     "src/zod/ts/PhoneNumber.ts": {
-      "source": "15c771c6ed897221d96438e2e500b7139f509aa8fd4d8a4f5b5fbe0ea92c0eb5",
-      "output": "c3d996b74def3c08b8bccdab12abf637a766431de94dc701761db4d9eb936907"
+      "source": "1a97c430e9ca6ff36215510e323c858f829cee06928f7acf6f064fe7ecb33880",
+      "output": "50b7d58f5f766da57765fc19d4152f02b24e9a75a54ed5b4bbe6f24810e207fc"
     },
     "src/zod/ts/PhoneWithMaxLength.ts": {
       "source": "14e4a8eddb73c09bc807f1e227d8d1c802699530303deb809e2162d8f902af96",
@@ -227,29 +187,9 @@
       "source": "c8ae3b5adf8daad46aa0314df5f234731bc772bc7dfcef8ab2b17abf0d3618a3",
       "output": "4f220cb834855e1051ee64b7b4d37dcbbf46dc04bec03b59005323644e57e3dc"
     },
-    "src/zod/ts/PlaceOrder.ts": {
-      "source": "05cee850379d97589bac08aaf900a7ab701072eed5874cd712eed182e985134e",
-      "output": "cc9702b20af6c0c1f587a4d28e71d1fcb6d79b45d7d6c14d55dfae86b24b044c"
-    },
-    "src/zod/ts/PlaceOrderPatch.ts": {
-      "source": "1c426bc6376e9164926d39dd76ab6241b0a31fae7bd792e3edbbbf82b3410b72",
-      "output": "03fe3eb8b379a456073cccbd23fe7a3a80b56f18e4439c3e94dc9b010a7dd5d8"
-    },
     "src/zod/ts/Tag.ts": {
-      "source": "637fa15ef0f8dcbc07aa082b57cdde633a4ae77c28bbec325afc2828423311b9",
-      "output": "d0a9e7d0cf1a11f330d3315f0a6ede37b7bbc0c4cb3dba8568bc46b7b34a2c20"
-    },
-    "src/zod/ts/UpdatePet.ts": {
-      "source": "969b563707e0ca030fe3c63aaceec31f572d04fac159cde8fb38051562a61ec1",
-      "output": "4b679cb6e9ebdafed0ecc5b539b88a44d03ce7ea1799d079b5b21317305abbe0"
-    },
-    "src/zod/ts/UpdatePetWithForm.ts": {
-      "source": "c6c5039df7f30a46364661e1bff6b24b34c96b1146101dd484c0143d61905eed",
-      "output": "e9371fbf8e5a259a4ab0862292295addfa6ced626a3e476598069704a5c09f89"
-    },
-    "src/zod/ts/UploadFile.ts": {
-      "source": "758f72e6d1e16f6b96e2f0b58c4bfd8c4f3d74157998a3ca4c18a223dc3dab33",
-      "output": "72d167b70ce67475acdff83d3d0259160e1c8e0916b5d00856d1e3f55862546e"
+      "source": "65125492643f16de0b962a470cf59e6419b3981dfccf9543f4392cf151d254cb",
+      "output": "65f54923390dc826df74089d184b1ec6fa57b448716a503b0ab00e12f066e2a3"
     },
     "src/zod/zod/addPetRequestSchema.ts": {
       "source": "327c0073164ba531073c21c43f6bb3763d3d1995d9bd8716c14b0d28be1c60e1",

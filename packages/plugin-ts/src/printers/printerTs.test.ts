@@ -69,6 +69,18 @@ describe('printerTs', () => {
     expect(await formatTS(printer.transform(literalOrString))).toContain('(string & {}) | null')
   })
 
+  it('keeps property examples but leaves them off the declaration', () => {
+    const pet = ast.factory.createSchema({
+      type: 'object',
+      examples: [{ name: 'Rex' }],
+      properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string', examples: ['Rex'] }) })],
+    })
+    const source = printer.with({ name: 'Pet' }).print(pet) ?? ''
+
+    expect(source).toContain('@example Rex')
+    expect(source).not.toContain('@example {"name":"Rex"}')
+  })
+
   it('prints a nullable null member once', async () => {
     const union = ast.factory.createSchema({
       type: 'union',
@@ -826,7 +838,6 @@ describe('printerTs', () => {
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
         "/**
          * @description A well-described type
-         * @type string
          */
         export type Described = string
         "
@@ -871,7 +882,6 @@ describe('printerTs', () => {
          * @description Provides:
          * - \`user_permissions\`, e.g. ["write"]
          * \\@example is text, not a tag
-         * @type string
          */
         export type Described = string
         "

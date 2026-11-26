@@ -13,19 +13,16 @@ export type CreateUserStatusDefault = CreateUserStatusDefaultJson | CreateUserSt
 
 /**
  * @description Created user object
- * @type object | undefined
  */
 export type CreateUserBodyJson = User | undefined
 
 /**
  * @description Created user object
- * @type object | undefined
  */
 export type CreateUserBodyXml = User | undefined
 
 /**
  * @description Created user object
- * @type object | undefined
  */
 export type CreateUserBodyFormUrlEncoded = User | undefined
 

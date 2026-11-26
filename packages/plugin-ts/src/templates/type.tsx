@@ -4,7 +4,7 @@ import { defineTemplate } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import type { PluginTs } from '../types'
-import { buildParams, buildResponseComments, enumTypeName, getExampleValues, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
+import { buildParams, buildResponseComments, enumTypeName, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
 
 /**
  * Built-in template for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -57,7 +57,8 @@ export const typeOperation = defineTemplate<PluginTs>({
   render(node, ctx) {
     const { enum: enumOptions, group, output, operations } = ctx.options
     const { resolver, root } = ctx
-    const inline = operations === 'inline'
+    // A single output file also holds the schemas, so marking it inline would drop them. Operation types stay exported there.
+    const inline = operations === 'inline' && output.mode !== 'file'
 
     const meta = {
       file: ctx.file(node),
@@ -73,13 +74,11 @@ export const typeOperation = defineTemplate<PluginTs>({
       schema,
       name,
       keysToOmit,
-      examples,
       comments,
     }: {
       schema: ast.SchemaNode | null
       name: string
       keysToOmit?: Array<string> | null
-      examples?: Array<ast.ExampleNode>
       comments?: Array<string>
     }) {
       if (!schema) return null
@@ -87,7 +86,7 @@ export const typeOperation = defineTemplate<PluginTs>({
 
       const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
 
-      const schemaPrinter = ctx.printer.with({ name, description: schema.description, examples: getExampleValues(examples, true), comments, keysToOmit })
+      const schemaPrinter = ctx.printer.with({ name, description: schema.description, comments, keysToOmit })
 
       return (
         <>
@@ -106,7 +105,7 @@ export const typeOperation = defineTemplate<PluginTs>({
      * query hooks and `result.data` keep the bare body.
      */
     function buildContentTypeVariants(
-      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null; examples?: Array<ast.ExampleNode> }>,
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
       baseName: string,
       pointer: string | undefined,
       { decorate, comments }: { decorate?: (schema: ast.SchemaNode) => ast.SchemaNode; comments?: Array<string> },
@@ -127,7 +126,6 @@ export const typeOperation = defineTemplate<PluginTs>({
               schema: decorate ? decorate(variant.schema) : variant.schema,
               name: variant.name,
               keysToOmit: variant.keysToOmit,
-              examples: entries.find((entry) => entry.contentType === variant.contentType)?.examples,
             }),
           )}
           {renderSchemaType({ schema: unionSchema, name: baseName, comments })}
@@ -165,7 +163,6 @@ export const typeOperation = defineTemplate<PluginTs>({
           },
           name: resolver.response.body(node),
           keysToOmit: entry.keysToOmit,
-          examples: entry.examples,
         })
       }
       // Multiple content types — generate individual types + union alias
@@ -189,16 +186,23 @@ export const typeOperation = defineTemplate<PluginTs>({
         schema: primary?.schema ? { ...primary.schema, pointer: res.pointer ?? primary.schema.pointer } : ast.factory.createSchema({ type: 'unknown' }),
         name: resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
-        examples: primary?.examples,
         comments: buildResponseComments(res),
       })
     })
 
-    const responseHeaderTypes = node.responses.map((res) =>
-      res.headers?.length
-        ? renderSchemaType({ schema: buildParams({ params: res.headers, serializedExamples: true }), name: resolver.response.headers(node, res.statusCode) })
-        : null,
-    )
+    // Responses that share a header set, such as rate-limit headers on every status code, alias the first one instead of repeating it.
+    const headerTypeNames = new Map<string, string>()
+    const responseHeaderTypes = node.responses.map((res) => {
+      if (!res.headers?.length) return null
+      const name = resolver.response.headers(node, res.statusCode)
+      // Nested schema names carry the status code (`<Op>Status200<Header>`, `<Op>Statusdefault<Header>`), so they are compared without it.
+      const statusPrefix = new RegExp(`"${resolver.response.status(node, res.statusCode).replace(/[$.]/g, '\\$&')}`, 'gi')
+      const key = JSON.stringify(res.headers, (prop, value) => (prop === 'pointer' ? undefined : value)).replace(statusPrefix, '"')
+      const first = headerTypeNames.get(key)
+      if (first) return renderSchemaType({ schema: ast.factory.createSchema({ type: 'ref', name: first }), name })
+      headerTypeNames.set(key, name)
+      return renderSchemaType({ schema: buildParams({ params: res.headers, serializedExamples: true }), name })
+    })
 
     const optionsType = renderSchemaType({
       schema: buildOptionsSchema(node, resolver, { pairContentTypes: true }),

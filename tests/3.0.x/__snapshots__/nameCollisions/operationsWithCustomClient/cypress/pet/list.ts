@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import type { PetListResponse } from '../../types/pet/List'
+import type { Pet } from '../../types/Pet'
 
-export function petList(options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PetListResponse> {
-  return cy.request<PetListResponse>({
+export function petList(options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<Pet> {
+  return cy.request<Pet>({
     method: 'GET',
     url: `/pets/first`,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<PetListResponse>
+  }).then((res) => res.body) as Cypress.Chainable<Pet>
 }

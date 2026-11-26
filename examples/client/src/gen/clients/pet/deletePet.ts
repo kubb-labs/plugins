@@ -4,7 +4,6 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { DeletePetOptions, DeletePetResponses } from '../../models/pet/DeletePet'
 import { client } from '../../../client'
 
 /**
@@ -13,11 +12,35 @@ import { client } from '../../../client'
  * @summary Deletes a pet
  */
 export function deletePet<ThrowOnError extends boolean = true>(
-  options: Options<DeletePetOptions, ThrowOnError>,
-): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        petId: bigint
+      }
+      query?: never
+      headers?: {
+        api_key?: string
+      }
+    },
+    ThrowOnError
+  >,
+): Promise<
+  RequestResult<
+    {
+      '400': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<DeletePetResponses, ThrowOnError>({
+  return apiClient<
+    {
+      '400': unknown
+    },
+    ThrowOnError
+  >({
     method: 'DELETE',
     url: '/pet/{petId}',
     security: [

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById'
+import type { Pet } from '../types/Pet'
 import { createGetPetByIdResponse } from '../faker/createGetPetById'
 import { http, HttpResponse } from 'msw/http'
 
-export function getPetByIdHandlerResponse200(data?: GetPetByIdResponse) {
+export function getPetByIdHandlerResponse200(data?: ((Pet | string))) {
   if (typeof data === 'string') return new HttpResponse<string>(data, {
     status: 200,
     headers: {
@@ -27,19 +27,19 @@ export function getPetByIdHandlerResponse200(data?: GetPetByIdResponse) {
   })
 }
 
-export function getPetByIdHandlerResponse400(data?: GetPetByIdStatus400) {
+export function getPetByIdHandlerResponse400(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
 
-export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
+export function getPetByIdHandlerResponse404(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 404,
   })
 }
 
-export function getPetByIdHandler(data?: GetPetByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
+export function getPetByIdHandler(data?: ((Pet | string)) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
   return http.get(`${options?.baseURL ?? ''}/pet/:petId`, function handler(info) {
       if(typeof data === 'function') return data(info)
 

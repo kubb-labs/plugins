@@ -4,7 +4,7 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { CreateUserOptions, CreateUserResponses } from '../../models/user/CreateUser'
+import type { User } from '../../models/User'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -13,17 +13,74 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @summary Create user
  */
 export function createUser<ThrowOnError extends boolean = true>(
-  options: Options<CreateUserOptions, ThrowOnError> = {},
-): Unwrappable<RequestResult<CreateUserResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body?: User
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: User
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body?: User
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    ThrowOnError
+  > = {},
+): Unwrappable<
+  RequestResult<
+    {
+      default:
+        | {
+            contentType: 'application/json'
+            data: User
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<CreateUserResponses, ThrowOnError>({
-      method: 'POST',
-      url: '/user',
-      contentType: { request: 'application/json' },
-      ...config,
-      throwOnError: resolveThrowOnError(config.throwOnError, true),
-    }),
+    apiClient<
+      {
+        default:
+          | {
+              contentType: 'application/json'
+              data: User
+            }
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+      },
+      ThrowOnError
+    >({ method: 'POST', url: '/user', contentType: { request: 'application/json' }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
   )
 }

@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { PointResponse } from '../types/PointOperation'
+import type { PointGeoJson } from '../types/PointGeoJson'
 import { http, HttpResponse } from 'msw/http'
 
-export function pointHandlerResponse200(data?: PointResponse) {
+export function pointHandlerResponse200(data?: PointGeoJson) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -15,7 +15,7 @@ export function pointHandlerResponse200(data?: PointResponse) {
   })
 }
 
-export function pointHandler(data?: PointResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
+export function pointHandler(data?: PointGeoJson | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
   return http.get(`${options?.baseURL ?? ''}/points/:id`, function handler(info) {
       if(typeof data === 'function') return data(info)
 

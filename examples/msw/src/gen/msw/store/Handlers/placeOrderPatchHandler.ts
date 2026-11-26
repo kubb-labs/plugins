@@ -4,11 +4,11 @@
  */
 
 import type { MswBody } from '../../../.kubb/mswBody'
-import type { PlaceOrderPatchBody, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../../models/PlaceOrderPatch'
+import type { Order } from '../../../models/Order'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 
-export function placeOrderPatchHandlerResponse200(data?: PlaceOrderPatchResponse) {
+export function placeOrderPatchHandlerResponse200(data?: Order) {
   return new HttpResponse<string>(
     JSON.stringify(data, (_key, value) => {
       if (typeof value !== 'bigint') return value
@@ -25,17 +25,14 @@ export function placeOrderPatchHandlerResponse200(data?: PlaceOrderPatchResponse
   )
 }
 
-export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus405) {
+export function placeOrderPatchHandlerResponse405(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 405,
   })
 }
 
-export function placeOrderPatchHandler(
-  data?: PlaceOrderPatchResponse | HttpResponseResolver<Record<string, string>, MswBody<PlaceOrderPatchBody>>,
-  options?: { baseURL?: string },
-) {
-  return http.patch<Record<string, string>, MswBody<PlaceOrderPatchBody>>(`${options?.baseURL ?? 'http://localhost:3000'}/store/order`, function handler(info) {
+export function placeOrderPatchHandler(data?: Order | HttpResponseResolver<Record<string, string>, MswBody<Order>>, options?: { baseURL?: string }) {
+  return http.patch<Record<string, string>, MswBody<Order>>(`${options?.baseURL ?? 'http://localhost:3000'}/store/order`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return placeOrderPatchHandlerResponse200(data)

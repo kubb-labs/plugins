@@ -3,12 +3,19 @@
 * Do not edit manually.
 */
 
-import type { GetConfigIdV20250Options, GetConfigIdV20250Response } from '../../types/GetConfigIdV20250'
+import type { Config } from '../../types/Config'
 
-export function getConfigIdV20250({ path }: GetConfigIdV20250Options, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetConfigIdV20250Response> {
-  return cy.request<GetConfigIdV20250Response>({
+export function getConfigIdV20250({ path }: ({
+  body?: never;
+  path: ({
+  config_id: string;
+});
+  query?: never;
+  headers?: never;
+}), options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<Config> {
+  return cy.request<Config>({
     method: 'GET',
     url: `/config/${path.config_id}`,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<GetConfigIdV20250Response>
+  }).then((res) => res.body) as Cypress.Chainable<Config>
 }

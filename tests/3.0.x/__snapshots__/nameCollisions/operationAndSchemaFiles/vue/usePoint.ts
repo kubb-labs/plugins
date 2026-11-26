@@ -4,20 +4,34 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { PointOptions, PointStatus200 } from '../types/PointOperation'
+import type { PointGeoJson } from '../types/PointGeoJson'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { point } from '../clients/point'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const pointQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<PointOptions, 'headers'>['path']> }) => [{ url: '/points/:id', params: path }] as const
+export const pointQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+}), 'headers'>['path']> }) => [{ url: '/points/:id', params: path }] as const
 
 export type PointQueryKey = ReturnType<typeof pointQueryKey>
 
-export function pointQueryOptions({ path }: { path: MaybeRefOrGetter<PointOptions['path']> }, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+export function pointQueryOptions({ path }: { path: MaybeRefOrGetter<({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+})['path']> }, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = pointQueryKey({ path })
-  return queryOptions<PointStatus200, ResponseErrorConfig<Error>, PointStatus200>({
+  return queryOptions<PointGeoJson, ResponseErrorConfig<Error>, PointGeoJson>({
    queryKey,
    queryFn: async ({ signal }) => {
       return point({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -28,8 +42,15 @@ export function pointQueryOptions({ path }: { path: MaybeRefOrGetter<PointOption
 /**
  * `GET /points/{id}`
  */
-export function usePoint<TData = PointStatus200, TQueryData = PointStatus200, TQueryKey extends QueryKey = PointQueryKey>({ path }: { path: MaybeRefOrGetter<PointOptions['path']> }, options: {
-  query?: Partial<UseQueryOptions<PointStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function usePoint<TData = PointGeoJson, TQueryData = PointGeoJson, TQueryKey extends QueryKey = PointQueryKey>({ path }: { path: MaybeRefOrGetter<({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+})['path']> }, options: {
+  query?: Partial<UseQueryOptions<PointGeoJson, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
@@ -40,7 +61,7 @@ export function usePoint<TData = PointStatus200, TQueryData = PointStatus200, TQ
    ...pointQueryOptions({ path }, config),
    ...resolvedOptions,
    queryKey
-  } as unknown as UseQueryOptions<PointStatus200, ResponseErrorConfig<Error>, TData, PointStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
+  } as unknown as UseQueryOptions<PointGeoJson, ResponseErrorConfig<Error>, TData, PointGeoJson, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
   queryResult.queryKey = queryKey as TQueryKey
 

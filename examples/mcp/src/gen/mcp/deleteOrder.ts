@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import type { DeleteOrderOptions } from '../models/ts/DeleteOrder'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { deleteOrder } from '../clients/deleteOrder'
 
@@ -12,7 +11,19 @@ import { deleteOrder } from '../clients/deleteOrder'
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
  * @summary Delete purchase order by ID
  */
-export async function deleteOrderHandler({ path }: DeleteOrderOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function deleteOrderHandler(
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      orderId: number
+    }
+    query?: never
+    headers?: never
+  },
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await deleteOrder({ path, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

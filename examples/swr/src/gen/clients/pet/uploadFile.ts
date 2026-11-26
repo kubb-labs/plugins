@@ -4,7 +4,7 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/UploadFile'
+import type { ApiResponse } from '../../models/ApiResponse'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
 /**
@@ -12,12 +12,60 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../
  * @summary uploads an image
  */
 export function uploadFile<ThrowOnError extends boolean = true>(
-  options: Options<UploadFileOptions, ThrowOnError>,
-): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body: {
+          url: string
+        }
+        path: {
+          petId: bigint
+        }
+        query?: {
+          additionalMetadata?: string
+        }
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body: {
+          file: Blob
+        }
+        path: {
+          petId: bigint
+        }
+        query?: {
+          additionalMetadata?: string
+        }
+        headers?: never
+        contentType:
+          | 'multipart/form-data'
+          | {
+              request: 'multipart/form-data'
+            }
+      },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      '200': ApiResponse
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<UploadFileResponses, ThrowOnError>({
+    apiClient<
+      {
+        '200': ApiResponse
+      },
+      ThrowOnError
+    >({
       method: 'POST',
       url: '/pet/{petId}/uploadImage',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

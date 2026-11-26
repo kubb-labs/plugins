@@ -4,20 +4,41 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName'
+import type { User } from '../../models/User'
 import { getUserByName } from '../../clients/user/getUserByName'
 import { queryOptions } from '@tanstack/react-query'
 
-export const getUserByNameQueryKey = ({ path }: Omit<GetUserByNameOptions, 'headers'>) => [{ url: '/user/:username', params: path }] as const
+export const getUserByNameQueryKey = ({
+  path,
+}: Omit<
+  {
+    body?: never
+    path: {
+      username: string
+    }
+    query?: never
+    headers?: never
+  },
+  'headers'
+>) => [{ url: '/user/:username', params: path }] as const
 
 type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions(
-  { path }: GetUserByNameOptions,
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      username: string
+    }
+    query?: never
+    headers?: never
+  },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getUserByNameQueryKey({ path })
-  return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200, typeof queryKey>({
+  return queryOptions<User | string, ResponseErrorConfig<unknown | unknown>, User | string, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getUserByName({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()

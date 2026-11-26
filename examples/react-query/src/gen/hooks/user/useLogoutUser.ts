@@ -4,7 +4,6 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { LogoutUserResponse } from '../../models/user/LogoutUser'
 import { logoutUser } from '../../clients/user/logoutUser'
 import { queryOptions } from '@tanstack/react-query'
 
@@ -14,7 +13,7 @@ type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 
 export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = logoutUserQueryKey()
-  return queryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserResponse, typeof queryKey>({
+  return queryOptions<unknown, ResponseErrorConfig<Error>, unknown, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return logoutUser({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()

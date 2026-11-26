@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetOptions } from '../models/ts/UpdatePet'
+import type { Pet } from '../models/ts/Pet'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { updatePet } from '../clients/updatePet'
 
@@ -12,7 +12,47 @@ import { updatePet } from '../clients/updatePet'
  * @description Update an existing pet by Id
  * @summary Update an existing pet
  */
-export async function updatePetHandler({ body }: Pick<UpdatePetOptions, 'body'>, ctx: ServerContext): Promise<CallToolResult> {
+export async function updatePetHandler(
+  {
+    body,
+  }: Pick<
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    'body'
+  >,
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await updatePet({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof updatePet<true>>[0])
 
   return {

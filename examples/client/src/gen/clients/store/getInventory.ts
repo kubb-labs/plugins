@@ -4,7 +4,6 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { GetInventoryOptions, GetInventoryResponses } from '../../models/store/GetInventory'
 import { client } from '../../../client'
 
 /**
@@ -13,11 +12,35 @@ import { client } from '../../../client'
  * @summary Returns pet inventories by status
  */
 export function getInventory<ThrowOnError extends boolean = true>(
-  options: Options<GetInventoryOptions, ThrowOnError> = {},
-): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path?: never
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  > = {},
+): Promise<
+  RequestResult<
+    {
+      '200': {
+        [key: string]: number
+      }
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<GetInventoryResponses, ThrowOnError>({
+  return apiClient<
+    {
+      '200': {
+        [key: string]: number
+      }
+    },
+    ThrowOnError
+  >({
     method: 'GET',
     url: '/store/inventory',
     security: [{ type: 'apiKey', name: 'api_key', in: 'header' }],

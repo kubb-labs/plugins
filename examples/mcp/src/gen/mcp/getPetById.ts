@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import type { GetPetByIdOptions } from '../models/ts/GetPetById'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { getPetById } from '../clients/getPetById'
 
@@ -12,7 +11,19 @@ import { getPetById } from '../clients/getPetById'
  * @description Returns a single pet
  * @summary Find pet by ID
  */
-export async function getPetByIdHandler({ path }: GetPetByIdOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function getPetByIdHandler(
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      petId: number
+    }
+    query?: never
+    headers?: never
+  },
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await getPetById({ path, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

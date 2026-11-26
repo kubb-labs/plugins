@@ -10,12 +10,10 @@ export type Customer = {
    * @description
    * Format: `int64`
    * @example 100000
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @example fehguy
-   * @type string | undefined
    */
   username?: string
   address?: Address[]

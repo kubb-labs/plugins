@@ -3,12 +3,19 @@
 * Do not edit manually.
 */
 
-import type { PointOptions, PointResponse } from '../types/PointOperation'
+import type { PointGeoJson } from '../types/PointGeoJson'
 
-export function point({ path }: PointOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PointResponse> {
-  return cy.request<PointResponse>({
+export function point({ path }: ({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+}), options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PointGeoJson> {
+  return cy.request<PointGeoJson>({
     method: 'GET',
     url: `/points/${path.id}`,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<PointResponse>
+  }).then((res) => res.body) as Cypress.Chainable<PointGeoJson>
 }

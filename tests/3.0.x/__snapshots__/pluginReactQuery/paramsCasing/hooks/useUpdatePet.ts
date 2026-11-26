@@ -4,7 +4,8 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { UpdatePetOptions, UpdatePetStatus200 } from '../types/UpdatePet'
+import type { Pet } from '../types/Pet'
+import type { PetUpdate } from '../types/PetUpdate'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePet } from '../clients/updatePet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -12,31 +13,91 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 
 export function updatePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
-  const mutationKey = updatePetMutationKey()
-  return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetOptions, TContext>({
-    mutationKey,
-    mutationFn: async({ path, query, body, headers }) => {
-      return updatePet({ ...config, path, query, body, headers, throwOnError: true }).unwrap()
-    },
-  })
+        const mutationKey = updatePetMutationKey()
+        return mutationOptions<Pet, ResponseErrorConfig<Error>, ({
+    body: PetUpdate;
+    path: ({
+    pet_id: string;
+  });
+    query?: ({
+    include_deleted?: boolean;
+    request_source?: string;
+  });
+    headers?: ({
+    'X-Request-ID'?: string;
+  });
+  }), TContext>({
+          mutationKey,
+          mutationFn: async({ path, query, body, headers }) => {
+            return updatePet({ ...config, path, query, body, headers, throwOnError: true }).unwrap()
+          },
+        })
 }
 
 /**
  * `POST /pets/{pet_id}`
  */
 export function useUpdatePet<TContext>(options: {
-  mutation?: UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetOptions, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<Pet, ResponseErrorConfig<Error>, ({
+  body: PetUpdate;
+  path: ({
+  pet_id: string;
+});
+  query?: ({
+  include_deleted?: boolean;
+  request_source?: string;
+});
+  headers?: ({
+  'X-Request-ID'?: string;
+});
+}), TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
 } = {}) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation;
-  const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
+          const { mutation = {}, client: config = {} } = options ?? {}
+          const { client: queryClient, ...mutationOptions } = mutation;
+          const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
 
-  const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetOptions, TContext>
+          const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<Pet, ResponseErrorConfig<Error>, ({
+    body: PetUpdate;
+    path: ({
+    pet_id: string;
+  });
+    query?: ({
+    include_deleted?: boolean;
+    request_source?: string;
+  });
+    headers?: ({
+    'X-Request-ID'?: string;
+  });
+  }), TContext>
 
-  return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetOptions, TContext>({
-    ...baseOptions,
-    mutationKey,
-    ...mutationOptions,
-  }, queryClient) as UseMutationResult<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetOptions, TContext>
+          return useMutation<Pet, ResponseErrorConfig<Error>, ({
+    body: PetUpdate;
+    path: ({
+    pet_id: string;
+  });
+    query?: ({
+    include_deleted?: boolean;
+    request_source?: string;
+  });
+    headers?: ({
+    'X-Request-ID'?: string;
+  });
+  }), TContext>({
+            ...baseOptions,
+            mutationKey,
+            ...mutationOptions,
+          }, queryClient) as UseMutationResult<Pet, ResponseErrorConfig<Error>, ({
+    body: PetUpdate;
+    path: ({
+    pet_id: string;
+  });
+    query?: ({
+    include_deleted?: boolean;
+    request_source?: string;
+  });
+    headers?: ({
+    'X-Request-ID'?: string;
+  });
+  }), TContext>
 }

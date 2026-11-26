@@ -3,14 +3,26 @@
 * Do not edit manually.
 */
 
-import type { UpdatePetOptions } from '../types/UpdatePet'
+import type { PetUpdate } from '../types/PetUpdate'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { updatePet } from '../clients/updatePet'
 
 /**
  * `POST /pets/{pet_id}`
  */
-export async function updatePetHandler({ path, query, body, headers }: UpdatePetOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function updatePetHandler({ path, query, body, headers }: ({
+  body: PetUpdate;
+  path: ({
+  pet_id: string;
+});
+  query?: ({
+  include_deleted?: boolean;
+  request_source?: string;
+});
+  headers?: ({
+  'X-Request-ID'?: string;
+});
+}), ctx: ServerContext): Promise<CallToolResult> {
   const res = await updatePet({ path, query, body, headers, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

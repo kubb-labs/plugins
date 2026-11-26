@@ -4,19 +4,34 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { FindPetsByStatusOptions, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../types/FindPetsByStatus'
+import type { FindPetsByStatusStatusEnumKey } from '../../types/FindPetsByStatusStatusEnum'
+import type { Pet } from '../../types/Pet'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { withQueryKey } from '../../.kubb/withQueryKey'
 import { findPetsByStatus } from '../../clients/findPetsByStatus'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusOptions, 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+export const findPetsByStatusQueryKey = ({ query }: Omit<({
+  body?: never;
+  path?: never;
+  query?: ({
+  status?: FindPetsByStatusStatusEnumKey;
+});
+  headers?: never;
+}), 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusOptions = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+export function findPetsByStatusQueryOptions({ query }: ({
+  body?: never;
+  path?: never;
+  query?: ({
+  status?: FindPetsByStatusStatusEnumKey;
+});
+  headers?: never;
+}) = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = findPetsByStatusQueryKey({ query })
-  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
+  return queryOptions<((Pet[]) | string), ResponseErrorConfig<unknown>, ((Pet[]) | string), typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
       return findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -29,8 +44,22 @@ export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusOptions 
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
  */
-export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>({ query }: { query?: FindPetsByStatusOptions['query'] | (() => FindPetsByStatusOptions['query']) } = {}, options: {
-  query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useFindPetsByStatus<TData = ((Pet[]) | string), TQueryData = ((Pet[]) | string), TQueryKey extends QueryKey = FindPetsByStatusQueryKey>({ query }: { query?: ({
+  body?: never;
+  path?: never;
+  query?: ({
+  status?: FindPetsByStatusStatusEnumKey;
+});
+  headers?: never;
+})['query'] | (() => ({
+  body?: never;
+  path?: never;
+  query?: ({
+  status?: FindPetsByStatusStatusEnumKey;
+});
+  headers?: never;
+})['query']) } = {}, options: {
+  query?: Partial<QueryObserverOptions<((Pet[]) | string), ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
@@ -42,7 +71,7 @@ export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryDat
    ...findPetsByStatusQueryOptions(resolvedParams, config),
    ...resolvedOptions,
    queryKey,
-  } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
+  } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<unknown>> & { queryKey: TQueryKey }
 
   return withQueryKey(queryResult, queryKey as TQueryKey)
 }

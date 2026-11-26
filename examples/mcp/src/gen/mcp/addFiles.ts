@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { AddFilesOptions } from '../models/ts/AddFiles'
+import type { Pet } from '../models/ts/Pet'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { addFiles } from '../clients/addFiles'
 
@@ -12,7 +12,38 @@ import { addFiles } from '../clients/addFiles'
  * @description Place a new file in the store
  * @summary Place an file for a pet
  */
-export async function addFilesHandler({ body }: Pick<AddFilesOptions, 'body'> = {}, ctx: ServerContext): Promise<CallToolResult> {
+export async function addFilesHandler(
+  {
+    body,
+  }: Pick<
+    | {
+        body?: {
+          url: string
+        }
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'multipart/form-data'
+          | {
+              request: 'multipart/form-data'
+            }
+      },
+    'body'
+  > = {},
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await addFiles({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof addFiles<true>>[0])
 
   return {

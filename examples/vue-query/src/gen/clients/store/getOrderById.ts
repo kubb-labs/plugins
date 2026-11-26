@@ -4,7 +4,7 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/store/GetOrderById'
+import type { Order } from '../../models/Order'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -13,16 +13,53 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @summary Find purchase order by ID
  */
 export function getOrderById<ThrowOnError extends boolean = true>(
-  options: Options<GetOrderByIdOptions, ThrowOnError>,
-): Unwrappable<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        orderId: bigint
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Order
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<GetOrderByIdResponses, ThrowOnError>({
-      method: 'GET',
-      url: '/store/order/{orderId}',
-      ...config,
-      throwOnError: resolveThrowOnError(config.throwOnError, true),
-    }),
+    apiClient<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Order
+            }
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+        '400': unknown
+        '404': unknown
+      },
+      ThrowOnError
+    >({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
   )
 }

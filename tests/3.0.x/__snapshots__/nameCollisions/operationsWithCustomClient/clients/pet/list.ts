@@ -3,15 +3,24 @@
 * Do not edit manually.
 */
 
-import type { PetListOptions, PetListResponses } from '../../types/pet/List'
+import type { Pet } from '../../types/Pet'
 import type { Options, RequestResult } from '@example/client'
 import { client } from '@example/client'
 
 /**
  * `GET /pets/first`
  */
-export function petList<ThrowOnError extends boolean = true>(options: Options<PetListOptions, ThrowOnError> = {}): Promise<RequestResult<PetListResponses, ThrowOnError>> {
+export function petList<ThrowOnError extends boolean = true>(options: Options<({
+  body?: never;
+  path?: never;
+  query?: never;
+  headers?: never;
+}), ThrowOnError> = {}): Promise<RequestResult<({
+  '200': Pet;
+}), ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<PetListResponses, ThrowOnError>({ method: 'GET', url: '/pets/first', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<({
+    '200': Pet;
+  }), ThrowOnError>({ method: 'GET', url: '/pets/first', ...config, throwOnError: config.throwOnError ?? true })
 }

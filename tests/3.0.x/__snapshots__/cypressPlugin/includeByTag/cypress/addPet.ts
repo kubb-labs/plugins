@@ -3,13 +3,38 @@
 * Do not edit manually.
 */
 
-import type { AddPetOptions, AddPetResponse } from '../types/AddPet'
+import type { AddPetRequest } from '../types/AddPetRequest'
+import type { Pet } from '../types/Pet'
 
-export function addPet({ body }: Pick<AddPetOptions, 'body'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<AddPetResponse> {
-  return cy.request<AddPetResponse>({
+export function addPet({ body }: Pick<({
+  body: AddPetRequest;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType?: 'application/json' | {
+    request: 'application/json';
+  };
+} | {
+  body: Pet;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/xml' | {
+    request: 'application/xml';
+  };
+} | {
+  body: Pet;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/x-www-form-urlencoded' | {
+    request: 'application/x-www-form-urlencoded';
+  };
+}), 'body'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<((Pet | string))> {
+  return cy.request<((Pet | string))>({
     method: 'POST',
     url: `/pet`,
     body,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<AddPetResponse>
+  }).then((res) => res.body) as Cypress.Chainable<((Pet | string))>
 }

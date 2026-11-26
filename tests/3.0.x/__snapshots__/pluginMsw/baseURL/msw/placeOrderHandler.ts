@@ -4,11 +4,11 @@
 */
 
 import type { MswBody } from '../.kubb/mswBody'
-import type { PlaceOrderBody, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder'
+import type { Order } from '../types/Order'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 
-export function placeOrderHandlerResponse200(data?: PlaceOrderResponse) {
+export function placeOrderHandlerResponse200(data?: Order) {
   return new HttpResponse<string>(JSON.stringify(data, (_key, value) => {
     if (typeof value !== 'bigint') return value
     if (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER) throw new TypeError(`Cannot serialize ${value}n as JSON without losing precision.`)
@@ -21,14 +21,14 @@ export function placeOrderHandlerResponse200(data?: PlaceOrderResponse) {
   })
 }
 
-export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
+export function placeOrderHandlerResponse405(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 405,
   })
 }
 
-export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, MswBody<PlaceOrderBody>>, options?: { baseURL?: string }) {
-  return http.post<Record<string, string>, MswBody<PlaceOrderBody>>(`${options?.baseURL ?? "http://localhost:3000"}/store/order`, function handler(info) {
+export function placeOrderHandler(data?: Order | HttpResponseResolver<Record<string, string>, MswBody<Order>>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, MswBody<Order>>(`${options?.baseURL ?? "http://localhost:3000"}/store/order`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return placeOrderHandlerResponse200(data)

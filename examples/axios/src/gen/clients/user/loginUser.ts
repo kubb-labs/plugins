@@ -4,7 +4,6 @@
  */
 
 import type { Options, Unwrappable, RequestResultWithHeaders } from '../../.kubb/client'
-import type { LoginUserOptions, LoginUserResponses, LoginUserStatus200Headers } from '../../models/user/LoginUser'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -12,16 +11,64 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @summary Logs user into the system
  */
 export function loginUser<ThrowOnError extends boolean = true>(
-  options: Options<LoginUserOptions, ThrowOnError> = {},
-): Unwrappable<RequestResultWithHeaders<LoginUserResponses, { '200': LoginUserStatus200Headers }, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path?: never
+      query?: {
+        username?: string
+        password?: string
+      }
+      headers?: never
+    },
+    ThrowOnError
+  > = {},
+): Unwrappable<
+  RequestResultWithHeaders<
+    {
+      '200':
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+        | {
+            contentType: 'application/json'
+            data: string
+          }
+      '400': unknown
+    },
+    {
+      '200': {
+        'X-Rate-Limit'?: number
+        'X-Expires-After'?: string
+      }
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }>({
-      method: 'GET',
-      url: '/user/login',
-      ...config,
-      throwOnError: resolveThrowOnError(config.throwOnError, true),
-    }),
+    apiClient<
+      {
+        '200':
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+          | {
+              contentType: 'application/json'
+              data: string
+            }
+        '400': unknown
+      },
+      ThrowOnError,
+      {
+        '200': {
+          'X-Rate-Limit'?: number
+          'X-Expires-After'?: string
+        }
+      }
+    >({ method: 'GET', url: '/user/login', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
   )
 }

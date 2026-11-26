@@ -7,7 +7,6 @@ export type OrderShippedEvent = {
   id?: string
   /**
    * @minimum 0
-   * @type integer | undefined
    */
   retry?: number
 }

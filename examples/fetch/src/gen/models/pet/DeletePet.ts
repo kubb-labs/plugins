@@ -8,7 +8,6 @@ export interface DeletePetPath {
    * @description Pet id to delete
    *
    * Format: `int64`
-   * @type integer
    */
   petId: bigint
 }

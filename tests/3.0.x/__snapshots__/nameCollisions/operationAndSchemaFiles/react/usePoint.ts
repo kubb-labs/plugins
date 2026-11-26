@@ -4,19 +4,33 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { PointOptions, PointStatus200 } from '../types/PointOperation'
+import type { PointGeoJson } from '../types/PointGeoJson'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { withQueryKey } from '../.kubb/withQueryKey'
 import { point } from '../clients/point'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const pointQueryKey = ({ path }: Omit<PointOptions, 'headers'>) => [{ url: '/points/:id', params: path }] as const
+export const pointQueryKey = ({ path }: Omit<({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+}), 'headers'>) => [{ url: '/points/:id', params: path }] as const
 
 type PointQueryKey = ReturnType<typeof pointQueryKey>
 
-export function pointQueryOptions({ path }: PointOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
+export function pointQueryOptions({ path }: ({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+}), config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = pointQueryKey({ path })
-  return queryOptions<PointStatus200, ResponseErrorConfig<Error>, PointStatus200, typeof queryKey>({
+  return queryOptions<PointGeoJson, ResponseErrorConfig<Error>, PointGeoJson, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
       return point({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -27,8 +41,22 @@ export function pointQueryOptions({ path }: PointOptions, config: Partial<Omit<R
 /**
  * `GET /points/{id}`
  */
-export function usePoint<TData = PointStatus200, TQueryData = PointStatus200, TQueryKey extends QueryKey = PointQueryKey>({ path }: { path: PointOptions['path'] | (() => PointOptions['path']) }, options: {
-  query?: Partial<QueryObserverOptions<PointStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function usePoint<TData = PointGeoJson, TQueryData = PointGeoJson, TQueryKey extends QueryKey = PointQueryKey>({ path }: { path: ({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+})['path'] | (() => ({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+})['path']) }, options: {
+  query?: Partial<QueryObserverOptions<PointGeoJson, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

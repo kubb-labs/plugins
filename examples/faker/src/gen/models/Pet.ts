@@ -35,12 +35,10 @@ export type Pet = (
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @example doggie
-   * @type string
    */
   name: string
   readonly type: PetTypeEnumKey
@@ -49,7 +47,6 @@ export type Pet = (
   tags?: Tag[]
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
   status?: PetStatusEnumKey
 }

@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderBody, PlaceOrderBodyFormUrlEncoded, PlaceOrderBodyJson, PlaceOrderBodyXml, PlaceOrderResponse, PlaceOrderStatus200 } from '../types/PlaceOrder'
+import type { Order } from '../types/Order'
 import { createOrder } from './createOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
@@ -12,8 +12,8 @@ faker.seed([42])
 /**
  * @description successful operation
  */
-export function createPlaceOrderStatus200(data?: Partial<PlaceOrderStatus200>): PlaceOrderStatus200 {
-  return createOrder(data) as PlaceOrderStatus200
+export function createPlaceOrderStatus200(data?: Partial<Order>): Order {
+  return createOrder(data) as Order
 }
 
 /**
@@ -23,22 +23,22 @@ export function createPlaceOrderStatus405() {
   return undefined
 }
 
-export function createPlaceOrderBodyJson(data?: Partial<PlaceOrderBodyJson>): PlaceOrderBodyJson {
-  return createOrder(data) as PlaceOrderBodyJson
+export function createPlaceOrderBodyJson(data?: Partial<Order>): Order {
+  return createOrder(data) as Order
 }
 
-export function createPlaceOrderBodyXml(data?: Partial<PlaceOrderBodyXml>): PlaceOrderBodyXml {
-  return createOrder(data) as PlaceOrderBodyXml
+export function createPlaceOrderBodyXml(data?: Partial<Order>): Order {
+  return createOrder(data) as Order
 }
 
-export function createPlaceOrderBodyFormUrlEncoded(data?: Partial<PlaceOrderBodyFormUrlEncoded>): PlaceOrderBodyFormUrlEncoded {
-  return createOrder(data) as PlaceOrderBodyFormUrlEncoded
+export function createPlaceOrderBodyFormUrlEncoded(data?: Partial<Order>): Order {
+  return createOrder(data) as Order
 }
 
-export function createPlaceOrderBody(data?: Partial<PlaceOrderBody>): PlaceOrderBody {
-  return (typeof data === 'object' && data !== null && !Array.isArray(data) ? faker.helpers.arrayElement([() => createPlaceOrderBodyJson(data as Partial<PlaceOrderBodyJson>), () => createPlaceOrderBodyXml(data as Partial<PlaceOrderBodyXml>), () => createPlaceOrderBodyFormUrlEncoded(data as Partial<PlaceOrderBodyFormUrlEncoded>)])() : data ?? faker.helpers.arrayElement([createPlaceOrderBodyJson(), createPlaceOrderBodyXml(), createPlaceOrderBodyFormUrlEncoded()])) as PlaceOrderBody
+export function createPlaceOrderBody(data?: Partial<Order>): Order {
+  return (typeof data === 'object' && data !== null && !Array.isArray(data) ? faker.helpers.arrayElement([() => createPlaceOrderBodyJson(data as Partial<Order>), () => createPlaceOrderBodyXml(data as Partial<Order>), () => createPlaceOrderBodyFormUrlEncoded(data as Partial<Order>)])() : data ?? faker.helpers.arrayElement([createPlaceOrderBodyJson(), createPlaceOrderBodyXml(), createPlaceOrderBodyFormUrlEncoded()])) as Order
 }
 
-export function createPlaceOrderResponse(data?: Partial<PlaceOrderResponse>): PlaceOrderResponse {
-  return createPlaceOrderStatus200(data) as PlaceOrderResponse
+export function createPlaceOrderResponse(data?: Partial<Order>): Order {
+  return createPlaceOrderStatus200(data) as Order
 }

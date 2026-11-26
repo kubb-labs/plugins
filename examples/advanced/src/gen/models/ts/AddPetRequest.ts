@@ -7,12 +7,10 @@ export type AddPetRequest = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: number
   /**
    * @example doggie
-   * @type string
    */
   name: string
   category?: Category

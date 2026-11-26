@@ -33,7 +33,7 @@ describe('event stream hooks', () => {
           reporters: [],
           storage: fsStorage(),
           plugins: [
-            pluginTs({ output: { path: './types', barrel: false } }),
+            pluginTs({ output: { path: './types', barrel: false }, operations: 'export' }),
             clientPlugin({ output: { path: './clients', barrel: false } }),
             pluginReactQuery({
               output: { path: './react', barrel: false, mode: 'directory' },
@@ -83,7 +83,7 @@ describe('event stream runtime', () => {
           parsers: [parserTs()],
           reporters: [],
           storage: fsStorage(),
-          plugins: [pluginTs({ output: { path: './types', barrel: false } }), pluginFetch({ output: { path: './clients', barrel: false } })],
+          plugins: [pluginTs({ output: { path: './types', barrel: false }, operations: 'export' }), pluginFetch({ output: { path: './clients', barrel: false } })],
         } as Config,
         { hooks: new Hookable<KubbHooks>() },
       ).safeBuild()
@@ -122,7 +122,7 @@ describe('a response that offers JSON or an event stream', () => {
         parsers: [parserTs()],
         reporters: [],
         storage: fsStorage(),
-        plugins: [pluginTs({ output: { path: './types', barrel: false } }), clientPlugin({ output: { path: './clients', barrel: false } })],
+        plugins: [pluginTs({ output: { path: './types', barrel: false }, operations: 'export' }), clientPlugin({ output: { path: './clients', barrel: false } })],
       } as Config,
       { hooks: new Hookable<KubbHooks>() },
     ).safeBuild()
@@ -211,7 +211,7 @@ describe('OpenAPI 3.2 item schemas', () => {
           reporters: [],
           storage: fsStorage(),
           plugins: [
-            pluginTs({ output: { path: './types', barrel: false } }),
+            pluginTs({ output: { path: './types', barrel: false }, operations: 'export' }),
             pluginZod({ output: { path: './zod', barrel: false } }),
             clientPlugin({ output: { path: './clients', barrel: false }, validator: 'zod' }),
           ],

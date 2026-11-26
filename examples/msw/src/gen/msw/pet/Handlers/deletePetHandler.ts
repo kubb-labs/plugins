@@ -3,10 +3,9 @@
  * Do not edit manually.
  */
 
-import type { DeletePetStatus400 } from '../../../models/DeletePet'
 import { http, HttpResponse } from 'msw/http'
 
-export function deletePetHandlerResponse400(data?: DeletePetStatus400) {
+export function deletePetHandlerResponse400(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })

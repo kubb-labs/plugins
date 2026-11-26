@@ -4,11 +4,7 @@
  */
 
 import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder'
-import type { GetInventoryOptions, GetInventoryResponses } from '../../models/store/GetInventory'
-import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/store/GetOrderById'
-import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/PlaceOrder'
-import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch'
+import type { Order } from '../../models/Order'
 import { createClient, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
 export class StoreClient {
@@ -24,12 +20,36 @@ export class StoreClient {
    * @summary Returns pet inventories by status
    */
   public getInventory<ThrowOnError extends boolean = true>(
-    options: Options<GetInventoryOptions, ThrowOnError> = {},
-  ): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
+    options: Options<
+      {
+        body?: never
+        path?: never
+        query?: never
+        headers?: never
+      },
+      ThrowOnError
+    > = {},
+  ): Unwrappable<
+    RequestResult<
+      {
+        '200': {
+          [key: string]: number
+        }
+      },
+      ThrowOnError
+    >
+  > {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<GetInventoryResponses, ThrowOnError>({
+      apiClient<
+        {
+          '200': {
+            [key: string]: number
+          }
+        },
+        ThrowOnError
+      >({
         method: 'GET',
         url: '/store/inventory',
         security: [securitySchemes.api_key],
@@ -45,12 +65,61 @@ export class StoreClient {
    * @summary Place an order for a pet
    */
   public placeOrder<ThrowOnError extends boolean = true>(
-    options: Options<PlaceOrderOptions, ThrowOnError> = {},
-  ): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+    options: Options<
+      | {
+          body?: Order
+          path?: never
+          query?: never
+          headers?: never
+          contentType?:
+            | 'application/json'
+            | {
+                request: 'application/json'
+              }
+        }
+      | {
+          body?: Order
+          path?: never
+          query?: never
+          headers?: never
+          contentType:
+            | 'application/xml'
+            | {
+                request: 'application/xml'
+              }
+        }
+      | {
+          body?: Order
+          path?: never
+          query?: never
+          headers?: never
+          contentType:
+            | 'application/x-www-form-urlencoded'
+            | {
+                request: 'application/x-www-form-urlencoded'
+              }
+        },
+      ThrowOnError
+    > = {},
+  ): Unwrappable<
+    RequestResult<
+      {
+        '200': Order
+        '405': unknown
+      },
+      ThrowOnError
+    >
+  > {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<PlaceOrderResponses, ThrowOnError>({
+      apiClient<
+        {
+          '200': Order
+          '405': unknown
+        },
+        ThrowOnError
+      >({
         method: 'POST',
         url: '/store/order',
         contentType: { request: 'application/json' },
@@ -66,12 +135,61 @@ export class StoreClient {
    * @summary Place an order for a pet with patch
    */
   public placeOrderPatch<ThrowOnError extends boolean = true>(
-    options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},
-  ): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
+    options: Options<
+      | {
+          body?: Order
+          path?: never
+          query?: never
+          headers?: never
+          contentType?:
+            | 'application/json'
+            | {
+                request: 'application/json'
+              }
+        }
+      | {
+          body?: Order
+          path?: never
+          query?: never
+          headers?: never
+          contentType:
+            | 'application/xml'
+            | {
+                request: 'application/xml'
+              }
+        }
+      | {
+          body?: Order
+          path?: never
+          query?: never
+          headers?: never
+          contentType:
+            | 'application/x-www-form-urlencoded'
+            | {
+                request: 'application/x-www-form-urlencoded'
+              }
+        },
+      ThrowOnError
+    > = {},
+  ): Unwrappable<
+    RequestResult<
+      {
+        '200': Order
+        '405': unknown
+      },
+      ThrowOnError
+    >
+  > {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<PlaceOrderPatchResponses, ThrowOnError>({
+      apiClient<
+        {
+          '200': Order
+          '405': unknown
+        },
+        ThrowOnError
+      >({
         method: 'PATCH',
         url: '/store/order',
         contentType: { request: 'application/json' },
@@ -87,17 +205,54 @@ export class StoreClient {
    * @summary Find purchase order by ID
    */
   public getOrderById<ThrowOnError extends boolean = true>(
-    options: Options<GetOrderByIdOptions, ThrowOnError>,
-  ): Unwrappable<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
+    options: Options<
+      {
+        body?: never
+        path: {
+          orderId: bigint
+        }
+        query?: never
+        headers?: never
+      },
+      ThrowOnError
+    >,
+  ): Unwrappable<
+    RequestResult<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Order
+            }
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+        '400': unknown
+        '404': unknown
+      },
+      ThrowOnError
+    >
+  > {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<GetOrderByIdResponses, ThrowOnError>({
-        method: 'GET',
-        url: '/store/order/{orderId}',
-        ...config,
-        throwOnError: resolveThrowOnError(config.throwOnError, true),
-      }),
+      apiClient<
+        {
+          '200':
+            | {
+                contentType: 'application/json'
+                data: Order
+              }
+            | {
+                contentType: 'application/xml'
+                data: string
+              }
+          '400': unknown
+          '404': unknown
+        },
+        ThrowOnError
+      >({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
     )
   }
 
@@ -107,17 +262,36 @@ export class StoreClient {
    * @summary Delete purchase order by ID
    */
   public deleteOrder<ThrowOnError extends boolean = true>(
-    options: Options<DeleteOrderOptions, ThrowOnError>,
-  ): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
+    options: Options<
+      {
+        body?: never
+        path: {
+          orderId: bigint
+        }
+        query?: never
+        headers?: never
+      },
+      ThrowOnError
+    >,
+  ): Unwrappable<
+    RequestResult<
+      {
+        '400': unknown
+        '404': unknown
+      },
+      ThrowOnError
+    >
+  > {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      apiClient<DeleteOrderResponses, ThrowOnError>({
-        method: 'DELETE',
-        url: '/store/order/{orderId}',
-        ...config,
-        throwOnError: resolveThrowOnError(config.throwOnError, true),
-      }),
+      apiClient<
+        {
+          '400': unknown
+          '404': unknown
+        },
+        ThrowOnError
+      >({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
     )
   }
 }

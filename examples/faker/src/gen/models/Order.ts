@@ -16,45 +16,38 @@ export type Order = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @description
    * Format: `int64`
    * @example 198772
-   * @type integer | undefined
    */
   petId?: bigint
   /**
    * @description
    * Format: `int32`
    * @example 7
-   * @type integer | undefined
    */
   quantity?: number
   /**
    * @description
    * Format: `date-time`
-   * @type string | undefined
    */
   shipDateTime?: string
   /**
    * @description
    * Format: `date`
-   * @type string | undefined
    */
   shipDate?: string
   /**
    * @description
    * Format: `time`
-   * @type string | undefined
    */
   shipTime?: string
   /**
    * @description Order Status
    * @example approved
-   * @type string | undefined
    */
   status?: OrderStatusEnumKey
   complete?: boolean

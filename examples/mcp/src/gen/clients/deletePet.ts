@@ -4,7 +4,6 @@
  */
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
-import type { DeletePetOptions, DeletePetResponses } from '../models/ts/DeletePet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
 /**
@@ -13,12 +12,36 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.ku
  * @summary Deletes a pet
  */
 export function deletePet<ThrowOnError extends boolean = true>(
-  options: Options<DeletePetOptions, ThrowOnError>,
-): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        petId: number
+      }
+      query?: never
+      headers?: {
+        api_key?: string
+      }
+    },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      '400': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<DeletePetResponses, ThrowOnError>({
+    apiClient<
+      {
+        '400': unknown
+      },
+      ThrowOnError
+    >({
       method: 'DELETE',
       url: '/pet/{petId}',
       security: [{ ...securitySchemes.petstore_auth, scopes: ['write:pets', 'read:pets'] }],

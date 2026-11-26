@@ -5,8 +5,6 @@
 
 /**
  * @description Order Status
- * @example approved
- * @type string
  */
 export type OrderParamsStatusEnum = 'placed' | 'approved' | 'delivered'
 
@@ -14,15 +12,11 @@ export type OrderStatus = 'accepted'
 
 /**
  * @description HTTP Status
- * @example 200
- * @type number
  */
 export type OrderHttpStatusEnum = 200 | 400 | 500
 
 /**
  * @description Order Status
- * @example approved
- * @type string
  */
 export type CustomerParamsStatusEnum = 'placed' | 'approved' | 'delivered'
 
@@ -30,13 +24,11 @@ export type PetTypeEnum = 'dog' | 'cat'
 
 /**
  * @description pet status in the store
- * @type string
  */
 export type PetStatusEnum = 'available' | 'pending' | 'sold'
 
 /**
  * @description pet status in the store
- * @type string
  */
 export type AddPetRequestStatusEnum = 'available' | 'pending' | 'sold' | 'in store'
 
@@ -45,7 +37,6 @@ export type PaymentMethodEnum = 'card' | 'cash'
 /**
  * @description Status values that need to be considered for filter
  * @default 'available'
- * @type string
  */
 export type FindPetsByStatusStatusEnum = 'available' | 'pending' | 'sold'
 
@@ -56,14 +47,12 @@ export type Order = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @description
    * Format: `int64`
    * @example 198772
-   * @type integer | undefined
    */
   petId?: bigint
   params?: {
@@ -78,13 +67,11 @@ export type Order = {
    * @description
    * Format: `int32`
    * @example 7
-   * @type integer | undefined
    */
   quantity?: number
   /**
    * @description
    * Format: `date-time`
-   * @type string | undefined
    */
   shipDate?: string
   /**
@@ -104,17 +91,14 @@ export type Address = {
   streetNumber?: string
   /**
    * @example Palo Alto
-   * @type string | undefined
    */
   city?: string
   /**
    * @example CA
-   * @type string | undefined
    */
   state?: string
   /**
    * @example 94301
-   * @type string | undefined
    */
   zip?: string
 }
@@ -124,7 +108,6 @@ export type Customer = {
    * @description
    * Format: `int64`
    * @example 100000
-   * @type integer | undefined
    */
   id?: bigint
   params?: {
@@ -137,7 +120,6 @@ export type Customer = {
   }
   /**
    * @example fehguy
-   * @type string | undefined
    */
   username?: string
   address?: Array<Address>
@@ -157,12 +139,10 @@ export type Category = {
    * @description
    * Format: `int64`
    * @example 1
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @example Dogs
-   * @type string | undefined
    */
   name?: string
 }
@@ -171,7 +151,6 @@ export type Tag = {
   /**
    * @description
    * Format: `int64`
-   * @type integer | undefined
    */
   id?: bigint
   name?: string
@@ -180,7 +159,6 @@ export type Tag = {
 export type Dog = {
   /**
    * @minLength 1
-   * @type string | undefined
    */
   readonly type?: string
   bark?: string
@@ -189,7 +167,6 @@ export type Dog = {
 export type Cat = {
   /**
    * @minLength 1
-   * @type string | undefined
    */
   readonly type?: string
   name?: string
@@ -207,13 +184,11 @@ export type Pet = (
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   readonly type: PetTypeEnum
   /**
    * @example doggie
-   * @type string
    */
   name: string
   category?: Category
@@ -236,12 +211,10 @@ export type AddPetRequest = {
    * @description
    * Format: `int64`
    * @example 10
-   * @type integer | undefined
    */
   id?: bigint
   /**
    * @example doggie
-   * @type string
    */
   name: string
   category?: Category
@@ -257,7 +230,6 @@ export type ApiResponse = {
   /**
    * @description
    * Format: `int32`
-   * @type integer | undefined
    */
   code?: number
   type?: string
@@ -267,7 +239,6 @@ export type ApiResponse = {
 /**
  * @description A payment for a store order
  * @see http://swagger.io Payment model
- * @type object
  */
 export type Payment = {
   id: number
@@ -285,7 +256,6 @@ export type PetNotFound = {
   /**
    * @description
    * Format: `int32`
-   * @type integer | undefined
    */
   code?: number
   message?: string
@@ -385,7 +355,6 @@ export type AddPetStatus405 = {
   /**
    * @description
    * Format: `int32`
-   * @type integer | undefined
    */
   code?: number
   message?: string
@@ -393,7 +362,6 @@ export type AddPetStatus405 = {
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
 export type AddPetBodyJson = AddPetRequest
 
@@ -506,17 +474,14 @@ export type FindPetsByStatusResponse = FindPetsByStatusStatus200
 export type FindPetsByTagsQuery = {
   /**
    * @description Tags to filter by
-   * @type array | undefined
    */
   tags?: Array<string>
   /**
    * @description to request with required page number or pagination
-   * @type string | undefined
    */
   page?: string
   /**
    * @description to request with required page size
-   * @type string | undefined
    */
   pageSize?: string
 }
@@ -559,7 +524,6 @@ export type GetPetByIdPath = {
    * @description ID of pet to return
    *
    * Format: `int64`
-   * @type integer
    */
   petId: bigint
 }
@@ -605,7 +569,6 @@ export type UpdatePetWithFormPath = {
    * @description ID of pet that needs to be updated
    *
    * Format: `int64`
-   * @type integer
    */
   petId: bigint
 }
@@ -613,12 +576,10 @@ export type UpdatePetWithFormPath = {
 export type UpdatePetWithFormQuery = {
   /**
    * @description Name of pet that needs to be updated
-   * @type string | undefined
    */
   name?: string
   /**
    * @description Status of pet that needs to be updated
-   * @type string | undefined
    */
   status?: string
 }
@@ -646,7 +607,6 @@ export type DeletePetPath = {
    * @description Pet id to delete
    *
    * Format: `int64`
-   * @type integer
    */
   petId: bigint
 }
@@ -681,7 +641,6 @@ export type UploadFilePath = {
    * @description ID of pet to update
    *
    * Format: `int64`
-   * @type integer
    */
   petId: bigint
 }
@@ -689,7 +648,6 @@ export type UploadFilePath = {
 export type UploadFileQuery = {
   /**
    * @description Additional Metadata
-   * @type string | undefined
    */
   additionalMetadata?: string
 }
@@ -744,7 +702,6 @@ export type PlaceOrderStatus405 = unknown
 
 /**
  * @description Order description
- * @type object | undefined
  */
 export type PlaceOrderBodyJson = Order | undefined
 
@@ -861,7 +818,6 @@ export type GetOrderByIdPath = {
    * @description ID of order that needs to be fetched
    *
    * Format: `int64`
-   * @type integer
    */
   orderId: bigint
 }
@@ -907,7 +863,6 @@ export type DeleteOrderPath = {
    * @description ID of the order that needs to be deleted
    *
    * Format: `int64`
-   * @type integer
    */
   orderId: bigint
 }
@@ -938,7 +893,6 @@ export type ListPaymentsQuery = {
    * @deprecated
    * @example settled
    * @example <caption>Serialized</caption> status=settled
-   * @type string | undefined
    */
   status?: string
   filter?: string
@@ -951,8 +905,6 @@ export type ListPaymentsCookies = {
 /**
  * @summary The payments
  * @see getPayment: getPaymentById({ paymentId: $response.body#/0/id })
- * @example [{"id":1,"method":"card","creditCard":"4111","billingAddress":"Main St 1"}]
- * @type array
  */
 export type ListPaymentsStatus2xx = Array<Payment>
 
@@ -962,13 +914,11 @@ export type ListPaymentsStatus2xxHeaders = {
   /**
    * @description Calls left this hour
    * @example 100
-   * @type integer
    */
   'X-Rate-Limit': number
   /**
    * @example abc
    * @example <caption>Serialized</caption> cursor=abc
-   * @type string | undefined
    */
   'X-Next-Page'?: string
 }
@@ -994,15 +944,12 @@ export type ListPaymentsResponse = ListPaymentsStatus2xx
 /**
  * @description A payment for a store order
  * @see http://swagger.io Payment model
- * @type object
  */
 export type CreatePaymentStatus201 = Payment
 
 /**
  * @description A payment for a store order
- * @example {"id":1,"method":"cash"}
  * @see http://swagger.io Payment model
- * @type object
  */
 export type CreatePaymentBody = Payment
 
@@ -1049,7 +996,6 @@ export type GetPaymentByIdPath = {
 /**
  * @description A payment for a store order
  * @see http://swagger.io Payment model
- * @type object
  */
 export type GetPaymentByIdStatus200 = Payment
 

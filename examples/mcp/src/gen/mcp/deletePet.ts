@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import type { DeletePetOptions } from '../models/ts/DeletePet'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { deletePet } from '../clients/deletePet'
 
@@ -12,7 +11,22 @@ import { deletePet } from '../clients/deletePet'
  * @description delete a pet
  * @summary Deletes a pet
  */
-export async function deletePetHandler({ path, headers }: DeletePetOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function deletePetHandler(
+  {
+    path,
+    headers,
+  }: {
+    body?: never
+    path: {
+      petId: number
+    }
+    query?: never
+    headers?: {
+      api_key?: string
+    }
+  },
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await deletePet({ path, headers, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

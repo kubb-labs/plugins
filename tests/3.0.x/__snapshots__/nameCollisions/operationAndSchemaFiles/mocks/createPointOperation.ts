@@ -3,11 +3,13 @@
 * Do not edit manually.
 */
 
-import type { PointPath, PointResponse, PointStatus200 } from '../types/PointOperation'
+import type { PointGeoJson } from '../types/PointGeoJson'
 import { createPointGeoJson } from './createPointGeoJson'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createPointPath<TData extends Partial<PointPath> = object>(data?: TData) {
+export function createPointPath<TData extends Partial<({
+  id: string;
+})> = object>(data?: TData) {
   const defaultFakeData = {
     id: faker.string.alpha(),
   }
@@ -20,10 +22,10 @@ export function createPointPath<TData extends Partial<PointPath> = object>(data?
 /**
  * @description OK
  */
-export function createPointStatus200(data?: Partial<PointStatus200>): PointStatus200 {
-  return createPointGeoJson(data) as PointStatus200
+export function createPointStatus200(data?: Partial<PointGeoJson>): PointGeoJson {
+  return createPointGeoJson(data) as PointGeoJson
 }
 
-export function createPointResponse(data?: Partial<PointResponse>): PointResponse {
-  return createPointStatus200(data) as PointResponse
+export function createPointResponse(data?: Partial<PointGeoJson>): PointGeoJson {
+  return createPointStatus200(data) as PointGeoJson
 }

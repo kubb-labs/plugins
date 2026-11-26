@@ -4,23 +4,55 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags'
+import type { Pet } from '../../models/Pet'
 import type { MaybeRefOrGetter } from 'vue'
 import { findPetsByTags } from '../../clients/pet/findPetsByTags'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const findPetsByTagsQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<FindPetsByTagsOptions, 'headers'>['query']> } = {}) =>
-  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
+export const findPetsByTagsQueryKey = ({
+  query,
+}: {
+  query?: MaybeRefOrGetter<
+    Omit<
+      {
+        body?: never
+        path?: never
+        query?: {
+          tags?: string[]
+          page?: string
+          pageSize?: string
+        }
+        headers?: never
+      },
+      'headers'
+    >['query']
+  >
+} = {}) => [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
-  { query }: { query?: MaybeRefOrGetter<FindPetsByTagsOptions['query']> } = {},
+  {
+    query,
+  }: {
+    query?: MaybeRefOrGetter<
+      {
+        body?: never
+        path?: never
+        query?: {
+          tags?: string[]
+          page?: string
+          pageSize?: string
+        }
+        headers?: never
+      }['query']
+    >
+  } = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
-  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200>({
+  return queryOptions<Pet[] | string, ResponseErrorConfig<unknown>, Pet[] | string>({
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTags({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true }).unwrap()

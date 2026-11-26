@@ -3,33 +3,60 @@
  * Do not edit manually.
  */
 
-import type { GetInventoryResponse, GetInventoryStatus200, GetInventoryStatus401 } from '../models/GetInventory'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description successful operation
  */
-export function createGetInventoryStatus200(data?: Partial<GetInventoryStatus200>): GetInventoryStatus200 {
+export function createGetInventoryStatus200(
+  data?: Partial<{
+    [key: string]: number
+  }>,
+): {
+  [key: string]: number
+} {
   const defaultFakeData = {}
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as GetInventoryStatus200
+  } as {
+    [key: string]: number
+  }
 }
 
 /**
  * @description unauthorized
  */
-export function createGetInventoryStatus401(data?: Partial<GetInventoryStatus401>): GetInventoryStatus401 {
+export function createGetInventoryStatus401(
+  data?: Partial<{
+    error: 'unauthorized'
+  }>,
+): {
+  error: 'unauthorized'
+} {
   const defaultFakeData = {
-    error: faker.helpers.arrayElement(['unauthorized'] as Array<NonNullable<GetInventoryStatus401>['error']>),
+    error: faker.helpers.arrayElement(['unauthorized'] as Array<
+      NonNullable<{
+        error: 'unauthorized'
+      }>['error']
+    >),
   }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as GetInventoryStatus401
+  } as {
+    error: 'unauthorized'
+  }
 }
 
-export function createGetInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
-  return createGetInventoryStatus200(data) as GetInventoryResponse
+export function createGetInventoryResponse(
+  data?: Partial<{
+    [key: string]: number
+  }>,
+): {
+  [key: string]: number
+} {
+  return createGetInventoryStatus200(data) as {
+    [key: string]: number
+  }
 }

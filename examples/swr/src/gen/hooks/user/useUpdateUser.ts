@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { UpdateUserOptions, UpdateUserResponse } from '../../models/user/UpdateUser'
+import type { User } from '../../models/User'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updateUser } from '../../clients/user/updateUser'
 
@@ -13,7 +13,46 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
 
-export type UpdateUserMutationArg = UpdateUserOptions
+export type UpdateUserMutationArg =
+  | {
+      body?: User
+      path: {
+        username: string
+      }
+      query?: never
+      headers?: never
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
+    }
+  | {
+      body?: User
+      path: {
+        username: string
+      }
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
+    }
+  | {
+      body?: User
+      path: {
+        username: string
+      }
+      query?: never
+      headers?: never
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
+    }
 
 /**
  * `PUT /user/{username}`
@@ -22,9 +61,7 @@ export type UpdateUserMutationArg = UpdateUserOptions
  */
 export function useUpdateUser(
   options: {
-    mutation?: SWRMutationConfiguration<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg> & {
-      throwOnError?: boolean
-    }
+    mutation?: SWRMutationConfiguration<unknown, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg> & { throwOnError?: boolean }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
@@ -32,7 +69,7 @@ export function useUpdateUser(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = updateUserMutationKey()
 
-  return useSWRMutation<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg>(
+  return useSWRMutation<unknown, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
       return updateUser({ ...config, ...variables, throwOnError: true }).unwrap()

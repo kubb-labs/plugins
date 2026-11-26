@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch'
+import type { Order } from '../../models/Order'
 import { client } from '../../../client'
 
 /**
@@ -13,15 +13,58 @@ import { client } from '../../../client'
  * @summary Place an order for a pet with patch
  */
 export function placeOrderPatch<ThrowOnError extends boolean = true>(
-  options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},
-): Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
+  options: Options<
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body?: Order
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    ThrowOnError
+  > = {},
+): Promise<
+  RequestResult<
+    {
+      '200': Order
+      '405': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<PlaceOrderPatchResponses, ThrowOnError>({
-    method: 'PATCH',
-    url: '/store/order',
-    contentType: { request: 'application/json' },
-    ...config,
-    throwOnError: config.throwOnError ?? true,
-  })
+  return apiClient<
+    {
+      '200': Order
+      '405': unknown
+    },
+    ThrowOnError
+  >({ method: 'PATCH', url: '/store/order', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true })
 }

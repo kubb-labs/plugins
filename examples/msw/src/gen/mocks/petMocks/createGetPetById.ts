@@ -3,13 +3,17 @@
  * Do not edit manually.
  */
 
-import type { GetPetByIdPath, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus200Json } from '../../models/GetPetById'
+import type { Pet } from '../../models/Pet'
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 faker.seed([220])
 
-export function createGetPetByIdPath<TData extends Partial<GetPetByIdPath> = object>(data?: TData) {
+export function createGetPetByIdPath<
+  TData extends Partial<{
+    petId: bigint
+  }> = object,
+>(data?: TData) {
   const defaultFakeData = {
     petId: faker.number.bigInt(),
   }
@@ -22,8 +26,8 @@ export function createGetPetByIdPath<TData extends Partial<GetPetByIdPath> = obj
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200Json(data?: Partial<GetPetByIdStatus200Json>): GetPetByIdStatus200Json {
-  return createPet(data) as GetPetByIdStatus200Json
+export function createGetPetByIdStatus200Json(data?: Partial<Pet>): Pet {
+  return createPet(data) as Pet
 }
 
 /**
@@ -36,12 +40,12 @@ export function createGetPetByIdStatus200Xml(data?: string): string {
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200(data?: Partial<GetPetByIdStatus200>): GetPetByIdStatus200 {
+export function createGetPetByIdStatus200(data?: Partial<Pet | string>): Pet | string {
   return (
     typeof data === 'object' && data !== null && !Array.isArray(data)
-      ? faker.helpers.arrayElement([() => createGetPetByIdStatus200Json(data as Partial<GetPetByIdStatus200Json>)])()
+      ? faker.helpers.arrayElement([() => createGetPetByIdStatus200Json(data as Partial<Pet>)])()
       : (data ?? faker.helpers.arrayElement([createGetPetByIdStatus200Json(), createGetPetByIdStatus200Xml()]))
-  ) as GetPetByIdStatus200
+  ) as Pet | string
 }
 
 /**
@@ -58,6 +62,6 @@ export function createGetPetByIdStatus404() {
   return undefined
 }
 
-export function createGetPetByIdResponse(data?: Partial<GetPetByIdResponse>): GetPetByIdResponse {
-  return createGetPetByIdStatus200(data) as GetPetByIdResponse
+export function createGetPetByIdResponse(data?: Partial<Pet | string>): Pet | string {
+  return createGetPetByIdStatus200(data) as Pet | string
 }

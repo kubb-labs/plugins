@@ -3,14 +3,20 @@
 * Do not edit manually.
 */
 
-import type { PointOptions } from '../types/PointOperation'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { point } from '../clients/point'
 
 /**
  * `GET /points/{id}`
  */
-export async function pointHandler({ path }: PointOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function pointHandler({ path }: ({
+  body?: never;
+  path: ({
+  id: string;
+});
+  query?: never;
+  headers?: never;
+}), ctx: ServerContext): Promise<CallToolResult> {
   const res = await point({ path, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

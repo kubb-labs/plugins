@@ -4,7 +4,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { UpdateUserOptions, UpdateUserResponse } from '../../models/user/UpdateUser'
+import type { User } from '../../models/User'
 import { updateUser } from '../../clients/user/updateUser'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -14,7 +14,50 @@ export function updateUserMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {},
 ) {
   const mutationKey = updateUserMutationKey()
-  return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserOptions, TContext>({
+  return mutationOptions<
+    unknown,
+    ResponseErrorConfig<Error>,
+    | {
+        body?: User
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: User
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body?: User
+        path: {
+          username: string
+        }
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    TContext
+  >({
     mutationKey,
     mutationFn: async (variables) => {
       return updateUser({ ...config, ...variables, throwOnError: true }).unwrap()

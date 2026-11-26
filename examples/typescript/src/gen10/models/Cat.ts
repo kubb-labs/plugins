@@ -6,7 +6,6 @@
 export type Cat = {
   /**
    * @minLength 1
-   * @type string | undefined
    */
   readonly type?: string
   name?: string

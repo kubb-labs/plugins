@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByTagsResponse, FindPetsByTagsStatus400 } from '../../../models/FindPetsByTags'
+import type { Pet } from '../../../models/Pet'
 import { http, HttpResponse } from 'msw/http'
 
-export function findPetsByTagsHandlerResponse200(data?: FindPetsByTagsResponse) {
+export function findPetsByTagsHandlerResponse200(data?: Pet[] | string) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -31,14 +31,14 @@ export function findPetsByTagsHandlerResponse200(data?: FindPetsByTagsResponse) 
   )
 }
 
-export function findPetsByTagsHandlerResponse400(data?: FindPetsByTagsStatus400) {
+export function findPetsByTagsHandlerResponse400(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
 
 export function findPetsByTagsHandler(
-  data?: FindPetsByTagsResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?: (Pet[] | string) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.get(`${options?.baseURL ?? 'http://localhost:3000'}/pet/findByTags`, function handler(info) {

@@ -3,10 +3,13 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetWithFormPath, UpdatePetWithFormQuery } from '../models/UpdatePetWithForm'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createUpdatePetWithFormPath<TData extends Partial<UpdatePetWithFormPath> = object>(data?: TData) {
+export function createUpdatePetWithFormPath<
+  TData extends Partial<{
+    petId: bigint
+  }> = object,
+>(data?: TData) {
   const defaultFakeData = {
     petId: faker.number.bigInt(),
   }
@@ -16,7 +19,12 @@ export function createUpdatePetWithFormPath<TData extends Partial<UpdatePetWithF
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createUpdatePetWithFormQuery<TData extends Partial<UpdatePetWithFormQuery> = object>(data?: TData) {
+export function createUpdatePetWithFormQuery<
+  TData extends Partial<{
+    name?: string
+    status?: string
+  }> = object,
+>(data?: TData) {
   const defaultFakeData = {
     name: faker.string.alpha(),
     status: faker.string.alpha(),

@@ -4,7 +4,6 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetInventoryStatus200 } from '../../models/store/GetInventory'
 import { getInventory } from '../../clients/store/getInventory'
 import { queryOptions } from '@tanstack/vue-query'
 
@@ -16,7 +15,15 @@ export function getInventoryQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getInventoryQueryKey()
-  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200>({
+  return queryOptions<
+    {
+      [key: string]: number
+    },
+    ResponseErrorConfig<Error>,
+    {
+      [key: string]: number
+    }
+  >({
     queryKey,
     queryFn: async ({ signal }) => {
       return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()

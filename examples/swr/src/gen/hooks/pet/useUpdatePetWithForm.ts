@@ -5,7 +5,6 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../models/pet/UpdatePetWithForm'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updatePetWithForm } from '../../clients/pet/updatePetWithForm'
 
@@ -13,7 +12,17 @@ export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as co
 
 export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMutationKey>
 
-export type UpdatePetWithFormMutationArg = UpdatePetWithFormOptions
+export type UpdatePetWithFormMutationArg = {
+  body?: never
+  path: {
+    petId: bigint
+  }
+  query?: {
+    name?: string
+    status?: string
+  }
+  headers?: never
+}
 
 /**
  * `POST /pet/{petId}`
@@ -21,12 +30,9 @@ export type UpdatePetWithFormMutationArg = UpdatePetWithFormOptions
  */
 export function useUpdatePetWithForm(
   options: {
-    mutation?: SWRMutationConfiguration<
-      UpdatePetWithFormResponse,
-      ResponseErrorConfig<UpdatePetWithFormStatus405>,
-      UpdatePetWithFormMutationKey | null,
-      UpdatePetWithFormMutationArg
-    > & { throwOnError?: boolean }
+    mutation?: SWRMutationConfiguration<unknown, ResponseErrorConfig<unknown>, UpdatePetWithFormMutationKey | null, UpdatePetWithFormMutationArg> & {
+      throwOnError?: boolean
+    }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
@@ -34,12 +40,7 @@ export function useUpdatePetWithForm(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = updatePetWithFormMutationKey()
 
-  return useSWRMutation<
-    UpdatePetWithFormResponse,
-    ResponseErrorConfig<UpdatePetWithFormStatus405>,
-    UpdatePetWithFormMutationKey | null,
-    UpdatePetWithFormMutationArg
-  >(
+  return useSWRMutation<unknown, ResponseErrorConfig<unknown>, UpdatePetWithFormMutationKey | null, UpdatePetWithFormMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, query } }) => {
       return updatePetWithForm({ ...config, path, query, throwOnError: true }).unwrap()

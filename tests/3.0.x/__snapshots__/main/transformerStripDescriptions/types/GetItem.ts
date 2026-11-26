@@ -9,7 +9,6 @@ export type GetItemPath = {
   /**
    * @description
    * Format: `int64`
-   * @type integer
    */
   id: bigint;
 }

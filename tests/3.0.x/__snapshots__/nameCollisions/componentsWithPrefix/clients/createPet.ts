@@ -4,15 +4,25 @@
 */
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
-import type { ApiCreatePetOptions, ApiCreatePetResponses } from '../types/CreatePet'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { createPetResponseSchema } from '../zod/createPetSchema'
 
 /**
  * `POST /pets`
  */
-export function createPet<ThrowOnError extends boolean = true>(options: Options<ApiCreatePetOptions, ThrowOnError> = {}): Unwrappable<RequestResult<ApiCreatePetResponses, ThrowOnError>> {
+export function createPet<ThrowOnError extends boolean = true>(options: Options<({
+  body?: ({
+  name?: string;
+});
+  path?: never;
+  query?: never;
+  headers?: never;
+}), ThrowOnError> = {}): Unwrappable<RequestResult<({
+  '200': unknown;
+}), ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<ApiCreatePetResponses, ThrowOnError>({ method: 'POST', url: '/pets', contentType: { request: 'application/json' }, ...config, validator: { response: createPetResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap(apiClient<({
+    '200': unknown;
+  }), ThrowOnError>({ method: 'POST', url: '/pets', contentType: { request: 'application/json' }, ...config, validator: { response: createPetResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

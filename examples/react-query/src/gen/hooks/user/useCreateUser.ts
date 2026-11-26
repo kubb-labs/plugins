@@ -4,7 +4,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser'
+import type { User } from '../../models/User'
 import { createUser } from '../../clients/user/createUser'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -14,7 +14,44 @@ export function createUserMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {},
 ) {
   const mutationKey = createUserMutationKey()
-  return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserOptions, TContext>({
+  return mutationOptions<
+    User | string,
+    ResponseErrorConfig<Error>,
+    | {
+        body?: User
+        path?: never
+        query?: never
+        headers?: never
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
+      }
+    | {
+        body?: User
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
+      }
+    | {
+        body?: User
+        path?: never
+        query?: never
+        headers?: never
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
+      },
+    TContext
+  >({
     mutationKey,
     mutationFn: async (variables) => {
       return createUser({ ...config, ...variables, throwOnError: true }).unwrap()

@@ -4,7 +4,6 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder'
 import { client } from '../../../client'
 
 /**
@@ -13,14 +12,33 @@ import { client } from '../../../client'
  * @summary Delete purchase order by ID
  */
 export function deleteOrder<ThrowOnError extends boolean = true>(
-  options: Options<DeleteOrderOptions, ThrowOnError>,
-): Promise<RequestResult<DeleteOrderResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        orderId: bigint
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Promise<
+  RequestResult<
+    {
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<DeleteOrderResponses, ThrowOnError>({
-    method: 'DELETE',
-    url: '/store/order/{orderId}',
-    ...config,
-    throwOnError: config.throwOnError ?? true,
-  })
+  return apiClient<
+    {
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true })
 }

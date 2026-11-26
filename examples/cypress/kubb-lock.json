@@ -2,11 +2,11 @@
   "lockfileVersion": 1,
   "inputs": {
     "src/gen": {
-      "hash": "0c6516520f21f49d021598afc85b860cd7b5a0d5ffffc0a6a98fc7d189fbb44b",
+      "hash": "e5b1df4690b92cd8805d5d597764aa74ecd9fa501c936f3161636c794a422c3c",
       "sources": ["petStore.yaml"]
     },
     "src/gen-v4": {
-      "hash": "3453ebe9465247b986b9f82da342543c5a9c9067a5435428f1c313b3996efa97",
+      "hash": "30ebe6187f034f1e0435ceb3d129471f62f9fba1f8994341eecb7270d5f13a63",
       "sources": ["petStore.yaml"]
     }
   },
@@ -68,8 +68,8 @@
       "output": "f825214249a4d2d141af19c1923c5fc506973453c861caa05d41dcfe8207adb1"
     },
     "src/gen-v4/models.ts": {
-      "source": "367c37906a6e51942c79f8e14088dc66be23b538fa4da5e9ea34d67ac75d2693",
-      "output": "c08972d2bdfbe2ff5e81d3a96c4163608448fd538c2bc0750336029b1afb6a74"
+      "source": "85c899644a83cb1f545eafd33607b3aedc998a5c9b78538190b6081bf18d92de",
+      "output": "f494f88908bec0b397030bfa40aea952c7881fc6e81c7da0b07a95850b4cb3f1"
     },
     "src/gen/cypress/index.ts": {
       "source": "c5bb87ce153d78506313e5de53b014f121e60a5d1b3712a01426288b7f103bb5",
@@ -144,8 +144,8 @@
       "output": "bd29cd90822aab390b9b1bec23cb27ca0529f5574880edc6c71db531c65699f4"
     },
     "src/gen/models.ts": {
-      "source": "367c37906a6e51942c79f8e14088dc66be23b538fa4da5e9ea34d67ac75d2693",
-      "output": "c08972d2bdfbe2ff5e81d3a96c4163608448fd538c2bc0750336029b1afb6a74"
+      "source": "85c899644a83cb1f545eafd33607b3aedc998a5c9b78538190b6081bf18d92de",
+      "output": "f494f88908bec0b397030bfa40aea952c7881fc6e81c7da0b07a95850b4cb3f1"
     }
   }
 }

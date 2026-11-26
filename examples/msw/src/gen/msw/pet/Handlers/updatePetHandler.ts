@@ -4,11 +4,11 @@
  */
 
 import type { MswBody } from '../../../.kubb/mswBody'
-import type { UpdatePetBody, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../../models/UpdatePet'
+import type { Pet } from '../../../models/Pet'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 
-export function updatePetHandlerResponse200(data?: UpdatePetResponse) {
+export function updatePetHandlerResponse200(data?: Pet | string) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -33,29 +33,26 @@ export function updatePetHandlerResponse200(data?: UpdatePetResponse) {
   )
 }
 
-export function updatePetHandlerResponse400(data?: UpdatePetStatus400) {
+export function updatePetHandlerResponse400(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
 
-export function updatePetHandlerResponse404(data?: UpdatePetStatus404) {
+export function updatePetHandlerResponse404(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 404,
   })
 }
 
-export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
+export function updatePetHandlerResponse405(data?: unknown) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 405,
   })
 }
 
-export function updatePetHandler(
-  data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, MswBody<UpdatePetBody>>,
-  options?: { baseURL?: string },
-) {
-  return http.put<Record<string, string>, MswBody<UpdatePetBody>>(`${options?.baseURL ?? 'http://localhost:3000'}/pet`, function handler(info) {
+export function updatePetHandler(data?: (Pet | string) | HttpResponseResolver<Record<string, string>, MswBody<Pet>>, options?: { baseURL?: string }) {
+  return http.put<Record<string, string>, MswBody<Pet>>(`${options?.baseURL ?? 'http://localhost:3000'}/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return updatePetHandlerResponse200(data)

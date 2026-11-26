@@ -4,7 +4,7 @@
 */
 
 import useSWR from 'swr'
-import type { PetListStatus200 } from '../types/pet/List'
+import type { Pet } from '../types/Pet'
 import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { SWRConfiguration } from 'swr'
 import { petList } from '../clients/pet/list'
@@ -25,7 +25,7 @@ export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' |
  * `GET /pets/first`
  */
 export function usePetList(options: {
-  query?: SWRConfiguration<PetListStatus200, ResponseErrorConfig<Error>>,
+  query?: SWRConfiguration<Pet, ResponseErrorConfig<Error>>,
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
   immutable?: boolean
@@ -34,7 +34,7 @@ export function usePetList(options: {
 
   const queryKey = petListQueryKey()
 
-  return useSWR<PetListStatus200, ResponseErrorConfig<Error>, PetListQueryKey | null>(
+  return useSWR<Pet, ResponseErrorConfig<Error>, PetListQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
      ...petListQueryOptions(config),

@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import type { PetCreate2Response } from '../types/PetCreate2'
+import type { Pet } from '../types/Pet'
 
-export function petCreate2(options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PetCreate2Response> {
-  return cy.request<PetCreate2Response>({
+export function petCreate2(options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<Pet> {
+  return cy.request<Pet>({
     method: 'POST',
     url: `/pets/create-second`,
     ...options
-  }).then((res) => res.body) as Cypress.Chainable<PetCreate2Response>
+  }).then((res) => res.body) as Cypress.Chainable<Pet>
 }

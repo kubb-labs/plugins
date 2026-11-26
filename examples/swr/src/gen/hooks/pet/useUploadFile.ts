@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { UploadFileOptions, UploadFileStatus200 } from '../../models/pet/UploadFile'
+import type { ApiResponse } from '../../models/ApiResponse'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { uploadFile } from '../../clients/pet/uploadFile'
 
@@ -13,7 +13,41 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
 
 export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
 
-export type UploadFileMutationArg = UploadFileOptions
+export type UploadFileMutationArg =
+  | {
+      body: {
+        url: string
+      }
+      path: {
+        petId: bigint
+      }
+      query?: {
+        additionalMetadata?: string
+      }
+      headers?: never
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
+    }
+  | {
+      body: {
+        file: Blob
+      }
+      path: {
+        petId: bigint
+      }
+      query?: {
+        additionalMetadata?: string
+      }
+      headers?: never
+      contentType:
+        | 'multipart/form-data'
+        | {
+            request: 'multipart/form-data'
+          }
+    }
 
 /**
  * `POST /pet/{petId}/uploadImage`
@@ -21,7 +55,7 @@ export type UploadFileMutationArg = UploadFileOptions
  */
 export function useUploadFile(
   options: {
-    mutation?: SWRMutationConfiguration<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & {
+    mutation?: SWRMutationConfiguration<ApiResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & {
       throwOnError?: boolean
     }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
@@ -31,7 +65,7 @@ export function useUploadFile(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = uploadFileMutationKey()
 
-  return useSWRMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
+  return useSWRMutation<ApiResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
       return uploadFile({ ...config, ...variables, throwOnError: true }).unwrap()

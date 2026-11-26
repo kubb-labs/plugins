@@ -11,7 +11,6 @@ export type Customer = {
    * @description
    * Format: `int64`
    * @example 100000
-   * @type integer | undefined
    */
   id?: bigint
   params?: {
@@ -24,7 +23,6 @@ export type Customer = {
   }
   /**
    * @example fehguy
-   * @type string | undefined
    */
   username?: string
   address?: Array<Address>

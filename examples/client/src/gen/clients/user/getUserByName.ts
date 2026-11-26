@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../../client'
-import type { GetUserByNameOptions, GetUserByNameResponses } from '../../models/user/GetUserByName'
+import type { User } from '../../models/User'
 import { client } from '../../../client'
 
 /**
@@ -12,9 +12,51 @@ import { client } from '../../../client'
  * @summary Get user by user name
  */
 export function getUserByName<ThrowOnError extends boolean = true>(
-  options: Options<GetUserByNameOptions, ThrowOnError>,
-): Promise<RequestResult<GetUserByNameResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        username: string
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Promise<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: User
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
-  return apiClient<GetUserByNameResponses, ThrowOnError>({ method: 'GET', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true })
+  return apiClient<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: User
+          }
+        | {
+            contentType: 'application/xml'
+            data: string
+          }
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >({ method: 'GET', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true })
 }

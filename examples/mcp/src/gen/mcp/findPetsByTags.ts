@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByTagsOptions } from '../models/ts/FindPetsByTags'
+import type { FindPetsByTagsXEXAMPLEEnumKey } from '../models/ts/FindPetsByTagsXEXAMPLEEnum'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { findPetsByTags } from '../clients/findPetsByTags'
 
@@ -12,7 +12,24 @@ import { findPetsByTags } from '../clients/findPetsByTags'
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
  * @summary Finds Pets by tags
  */
-export async function findPetsByTagsHandler({ query, headers }: FindPetsByTagsOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function findPetsByTagsHandler(
+  {
+    query,
+    headers,
+  }: {
+    body?: never
+    path?: never
+    query?: {
+      tags?: string[]
+      page?: string
+      pageSize?: string
+    }
+    headers: {
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEEnumKey
+    }
+  },
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await findPetsByTags({ query, headers, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

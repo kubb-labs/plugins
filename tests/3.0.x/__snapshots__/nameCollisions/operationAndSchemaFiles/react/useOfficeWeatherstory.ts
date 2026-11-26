@@ -4,7 +4,7 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { OfficeWeatherstoryStatus200 } from '../types/OfficeWeatherstoryOperation'
+import type { OfficeWeatherStory } from '../types/OfficeWeatherStory'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { withQueryKey } from '../.kubb/withQueryKey'
 import { officeWeatherstory } from '../clients/officeWeatherstory'
@@ -16,7 +16,7 @@ type OfficeWeatherstoryQueryKey = ReturnType<typeof officeWeatherstoryQueryKey>
 
 export function officeWeatherstoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = officeWeatherstoryQueryKey()
-  return queryOptions<OfficeWeatherstoryStatus200, ResponseErrorConfig<Error>, OfficeWeatherstoryStatus200, typeof queryKey>({
+  return queryOptions<OfficeWeatherStory, ResponseErrorConfig<Error>, OfficeWeatherStory, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
       return officeWeatherstory({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -27,8 +27,8 @@ export function officeWeatherstoryQueryOptions(config: Partial<Omit<RequestConfi
 /**
  * `GET /stories`
  */
-export function useOfficeWeatherstory<TData = OfficeWeatherstoryStatus200, TQueryData = OfficeWeatherstoryStatus200, TQueryKey extends QueryKey = OfficeWeatherstoryQueryKey>(options: {
-  query?: Partial<QueryObserverOptions<OfficeWeatherstoryStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useOfficeWeatherstory<TData = OfficeWeatherStory, TQueryData = OfficeWeatherStory, TQueryKey extends QueryKey = OfficeWeatherstoryQueryKey>(options: {
+  query?: Partial<QueryObserverOptions<OfficeWeatherStory, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

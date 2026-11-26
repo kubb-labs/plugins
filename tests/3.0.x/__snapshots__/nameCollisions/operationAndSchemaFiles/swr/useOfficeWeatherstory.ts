@@ -5,7 +5,7 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { OfficeWeatherstoryStatus200 } from '../types/OfficeWeatherstoryOperation'
+import type { OfficeWeatherStory } from '../types/OfficeWeatherStory'
 import type { SWRConfiguration } from 'swr'
 import { officeWeatherstory } from '../clients/officeWeatherstory'
 
@@ -25,7 +25,7 @@ export function officeWeatherstoryQueryOptions(config: Partial<Omit<RequestConfi
  * `GET /stories`
  */
 export function useOfficeWeatherstory(options: {
-  query?: SWRConfiguration<OfficeWeatherstoryStatus200, ResponseErrorConfig<Error>>,
+  query?: SWRConfiguration<OfficeWeatherStory, ResponseErrorConfig<Error>>,
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
   immutable?: boolean
@@ -34,7 +34,7 @@ export function useOfficeWeatherstory(options: {
 
   const queryKey = officeWeatherstoryQueryKey()
 
-  return useSWR<OfficeWeatherstoryStatus200, ResponseErrorConfig<Error>, OfficeWeatherstoryQueryKey | null>(
+  return useSWR<OfficeWeatherStory, ResponseErrorConfig<Error>, OfficeWeatherstoryQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
      ...officeWeatherstoryQueryOptions(config),

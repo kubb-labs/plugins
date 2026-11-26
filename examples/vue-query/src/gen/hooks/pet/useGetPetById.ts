@@ -4,23 +4,51 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
+import type { Pet } from '../../models/Pet'
 import type { MaybeRefOrGetter } from 'vue'
 import { getPetById } from '../../clients/pet/getPetById'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getPetByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdOptions, 'headers'>['path']> }) =>
-  [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({
+  path,
+}: {
+  path: MaybeRefOrGetter<
+    Omit<
+      {
+        body?: never
+        path: {
+          petId: bigint
+        }
+        query?: never
+        headers?: never
+      },
+      'headers'
+    >['path']
+  >
+}) => [{ url: '/pet/:petId', params: path }] as const
 
 export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 export function getPetByIdQueryOptions(
-  { path }: { path: MaybeRefOrGetter<GetPetByIdOptions['path']> },
+  {
+    path,
+  }: {
+    path: MaybeRefOrGetter<
+      {
+        body?: never
+        path: {
+          petId: bigint
+        }
+        query?: never
+        headers?: never
+      }['path']
+    >
+  },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
-  return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200>({
+  return queryOptions<Pet | string, ResponseErrorConfig<unknown | unknown>, Pet | string>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetById({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true }).unwrap()

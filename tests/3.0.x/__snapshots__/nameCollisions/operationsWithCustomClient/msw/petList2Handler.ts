@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { PetList2Response } from '../types/PetList2'
+import type { Pet } from '../types/Pet'
 import { http, HttpResponse } from 'msw/http'
 
-export function petList2HandlerResponse200(data?: PetList2Response) {
+export function petList2HandlerResponse200(data?: Pet) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -15,7 +15,7 @@ export function petList2HandlerResponse200(data?: PetList2Response) {
   })
 }
 
-export function petList2Handler(data?: PetList2Response | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
+export function petList2Handler(data?: Pet | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
   return http.get(`${options?.baseURL ?? ''}/pets/second`, function handler(info) {
       if(typeof data === 'function') return data(info)
 

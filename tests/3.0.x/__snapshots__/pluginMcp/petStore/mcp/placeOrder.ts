@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderOptions } from '../types/PlaceOrder'
+import type { Order } from '../types/Order'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { placeOrder } from '../clients/placeOrder'
 
@@ -12,7 +12,31 @@ import { placeOrder } from '../clients/placeOrder'
  * @description Place a new order in the store
  * @summary Place an order for a pet
  */
-export async function placeOrderHandler({ body }: Pick<PlaceOrderOptions, 'body'> = {}, ctx: ServerContext): Promise<CallToolResult> {
+export async function placeOrderHandler({ body }: Pick<({
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType?: 'application/json' | {
+    request: 'application/json';
+  };
+} | {
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/xml' | {
+    request: 'application/xml';
+  };
+} | {
+  body?: Order;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: 'application/x-www-form-urlencoded' | {
+    request: 'application/x-www-form-urlencoded';
+  };
+}), 'body'> = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await placeOrder({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
 
   return {

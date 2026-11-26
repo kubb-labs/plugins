@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { PetCreate2Status200 } from '../types/PetCreate2'
+import type { Pet } from '../types/Pet'
 import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { petCreate2 } from '../clients/petCreate2'
@@ -13,7 +13,7 @@ export const petCreate2MutationKey = () => [{ url: '/pets/create-second' }] as c
 
 export function petCreate2MutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const mutationKey = petCreate2MutationKey()
-  return mutationOptions<PetCreate2Status200, ResponseErrorConfig<Error>, undefined, TContext>({
+  return mutationOptions<Pet, ResponseErrorConfig<Error>, undefined, TContext>({
     mutationKey,
     mutationFn: async(_) => {
       return (await petCreate2({ ...config, throwOnError: true })).data
@@ -25,18 +25,18 @@ export function petCreate2MutationOptions<TContext = unknown>(config: Partial<Om
  * `POST /pets/create-second`
  */
 export function usePetCreate2<TContext>(options: {
-  mutation?: UseMutationOptions<PetCreate2Status200, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<Pet, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions.mutationKey ?? petCreate2MutationKey()
 
-  const baseOptions = petCreate2MutationOptions(config) as UseMutationOptions<PetCreate2Status200, ResponseErrorConfig<Error>, undefined, TContext>
+  const baseOptions = petCreate2MutationOptions(config) as UseMutationOptions<Pet, ResponseErrorConfig<Error>, undefined, TContext>
 
-  return useMutation<PetCreate2Status200, ResponseErrorConfig<Error>, undefined, TContext>({
+  return useMutation<Pet, ResponseErrorConfig<Error>, undefined, TContext>({
     ...baseOptions,
     mutationKey,
     ...mutationOptions,
-  }, queryClient) as UseMutationResult<PetCreate2Status200, ResponseErrorConfig<Error>, undefined, TContext>
+  }, queryClient) as UseMutationResult<Pet, ResponseErrorConfig<Error>, undefined, TContext>
 }
