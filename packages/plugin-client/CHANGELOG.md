@@ -1,5 +1,26 @@
 # @kubb/plugin-client
 
+## 6.7.0
+
+### Minor Changes
+
+- [#1617](https://github.com/kubb-labs/plugins/pull/1617) [`3e41f0d`](https://github.com/kubb-labs/plugins/commit/3e41f0d892098a391a8471971926a642b0ba7f3d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Name each plugin's options types after the plugin, such as `PluginFetchOptions` and `PluginZodResolvedOptions`. The old names keep working until v6:
+  
+  | Package | Deprecated | Use instead |
+  | --- | --- | --- |
+  | `@kubb/plugin-client` | `Options`, `ResolvedOptions` | `PluginClientOptions`, `PluginClientResolvedOptions` |
+  | `@kubb/plugin-axios`, `@kubb/plugin-fetch`, `@kubb/plugin-ky` | `Options` | `PluginAxiosOptions`, `PluginFetchOptions`, `PluginKyOptions` |
+  | `@kubb/plugin-axios`, `@kubb/plugin-fetch`, `@kubb/plugin-ky` | `ResolvedOptions` | `ClientResolvedOptions` |
+  | `@kubb/plugin-react-query`, `@kubb/plugin-swr`, `@kubb/plugin-vue-query` | `Transformer` | `KeyTransformer` |
+
+### Patch Changes
+
+- [#1613](https://github.com/kubb-labs/plugins/pull/1613) [`9d42761`](https://github.com/kubb-labs/plugins/commit/9d42761deac1eb840523ae201db7b4eb4649fcdd) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb `^5.25.1`, which gives an `operationId` that is already taken a `_2`, `_3`, … suffix.
+
+- [#1623](https://github.com/kubb-labs/plugins/pull/1623) [`e7b74b9`](https://github.com/kubb-labs/plugins/commit/e7b74b9137da6c8a42e44ab0a08a93d0e0958f6b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb `^5.27.0`. Inline enums on parameters and response headers now get the `enumSuffix`, so `FindPetsByStatusStatus` becomes `FindPetsByStatusStatusEnum` with the defaults.
+- Updated dependencies [[`9d42761`](https://github.com/kubb-labs/plugins/commit/9d42761deac1eb840523ae201db7b4eb4649fcdd), [`e7b74b9`](https://github.com/kubb-labs/plugins/commit/e7b74b9137da6c8a42e44ab0a08a93d0e0958f6b), [`3e41f0d`](https://github.com/kubb-labs/plugins/commit/3e41f0d892098a391a8471971926a642b0ba7f3d), [`d1043c6`](https://github.com/kubb-labs/plugins/commit/d1043c60c9f36d6a04dc7fa2065c4e514d90c14a)]:
+  - @kubb/plugin-ts@5.7.4
+
 ## 6.6.0
 
 ### Minor Changes
