@@ -5,6 +5,5 @@
 
 /**
  * @description HTTP Status
- * @example 200
  */
 export type OrderHttpStatusEnum = 200 | 400 | 500

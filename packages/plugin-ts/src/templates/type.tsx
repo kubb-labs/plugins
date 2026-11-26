@@ -4,7 +4,7 @@ import { defineTemplate } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import type { PluginTs } from '../types'
-import { buildParams, buildResponseComments, enumTypeName, getExampleValues, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
+import { buildParams, buildResponseComments, enumTypeName, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
 
 /**
  * Built-in template for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -73,13 +73,11 @@ export const typeOperation = defineTemplate<PluginTs>({
       schema,
       name,
       keysToOmit,
-      examples,
       comments,
     }: {
       schema: ast.SchemaNode | null
       name: string
       keysToOmit?: Array<string> | null
-      examples?: Array<ast.ExampleNode>
       comments?: Array<string>
     }) {
       if (!schema) return null
@@ -87,7 +85,7 @@ export const typeOperation = defineTemplate<PluginTs>({
 
       const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
 
-      const schemaPrinter = ctx.printer.with({ name, description: schema.description, examples: getExampleValues(examples, true), comments, keysToOmit })
+      const schemaPrinter = ctx.printer.with({ name, description: schema.description, comments, keysToOmit })
 
       return (
         <>
@@ -106,7 +104,7 @@ export const typeOperation = defineTemplate<PluginTs>({
      * query hooks and `result.data` keep the bare body.
      */
     function buildContentTypeVariants(
-      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null; examples?: Array<ast.ExampleNode> }>,
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
       baseName: string,
       pointer: string | undefined,
       { decorate, comments }: { decorate?: (schema: ast.SchemaNode) => ast.SchemaNode; comments?: Array<string> },
@@ -127,7 +125,6 @@ export const typeOperation = defineTemplate<PluginTs>({
               schema: decorate ? decorate(variant.schema) : variant.schema,
               name: variant.name,
               keysToOmit: variant.keysToOmit,
-              examples: entries.find((entry) => entry.contentType === variant.contentType)?.examples,
             }),
           )}
           {renderSchemaType({ schema: unionSchema, name: baseName, comments })}
@@ -165,7 +162,6 @@ export const typeOperation = defineTemplate<PluginTs>({
           },
           name: resolver.response.body(node),
           keysToOmit: entry.keysToOmit,
-          examples: entry.examples,
         })
       }
       // Multiple content types — generate individual types + union alias
@@ -189,7 +185,6 @@ export const typeOperation = defineTemplate<PluginTs>({
         schema: primary?.schema ? { ...primary.schema, pointer: res.pointer ?? primary.schema.pointer } : ast.factory.createSchema({ type: 'unknown' }),
         name: resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
-        examples: primary?.examples,
         comments: buildResponseComments(res),
       })
     })

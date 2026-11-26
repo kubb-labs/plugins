@@ -23,7 +23,6 @@ export type ListPaymentsCookies = {
 /**
  * @summary The payments
  * @see getPayment: getPaymentById({ paymentId: $response.body#/0/id })
- * @example [{"id":1,"method":"card","creditCard":"4111","billingAddress":"Main St 1"}]
  */
 export type ListPaymentsStatus2xx = Array<Payment>
 

@@ -656,8 +656,8 @@
       "output": "21755e06643fea38f60d1157790a4f2bfff9bec8c7413aee3013d57ed2daf9cd"
     },
     "src/gen/models/ts/Image.ts": {
-      "source": "8bd0e984776361abf2bc2d2bfdbf027f67f8cb5eceab30d9d958b8c8c6536569",
-      "output": "074b468a75b296b29ef327ed517ab5473735414fe657d03543e1b4809cb33c94"
+      "source": "3b63ff7b9d26d521313b6f3aa826289b8b6ef6ef512b71eb947fb524d0637d03",
+      "output": "7040d508bb4e7e1ae2e646bc7c5e4a6bcc328b044493b91ad046d02d096361ec"
     },
     "src/gen/models/ts/Order.ts": {
       "source": "59425ca9ce09feff19d166022eed5c76d74421377549097bd5a859135db5cbc8",

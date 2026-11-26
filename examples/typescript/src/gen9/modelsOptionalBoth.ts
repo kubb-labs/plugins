@@ -5,7 +5,6 @@
 
 /**
  * @description Order Status
- * @example approved
  */
 export type OrderParamsStatusEnum = 'placed' | 'approved' | 'delivered'
 
@@ -13,13 +12,11 @@ export type OrderStatus = 'accepted'
 
 /**
  * @description HTTP Status
- * @example 200
  */
 export type OrderHttpStatusEnum = 200 | 400 | 500
 
 /**
  * @description Order Status
- * @example approved
  */
 export type CustomerParamsStatusEnum = 'placed' | 'approved' | 'delivered'
 
@@ -924,7 +921,6 @@ export type ListPaymentsCookies = {
 /**
  * @summary The payments
  * @see getPayment: getPaymentById({ paymentId: $response.body#/0/id })
- * @example [{"id":1,"method":"card","creditCard":"4111","billingAddress":"Main St 1"}]
  */
 export type ListPaymentsStatus2xx = Array<Payment>
 
@@ -969,7 +965,6 @@ export type CreatePaymentStatus201 = Payment
 
 /**
  * @description A payment for a store order
- * @example {"id":1,"method":"cash"}
  * @see http://swagger.io Payment model
  */
 export type CreatePaymentBody = Payment

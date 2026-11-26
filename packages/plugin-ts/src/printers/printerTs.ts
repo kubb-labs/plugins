@@ -97,10 +97,6 @@ export type PrinterTsOptions = {
    */
   description?: string
   /**
-   * `@example` values for the generated type, such as a media type's `examples`. Replaces the schema's own.
-   */
-  examples?: Array<unknown>
-  /**
    * JSDoc lines put before the schema's own, such as a response's `@summary`.
    */
   comments?: Array<string>
@@ -180,7 +176,7 @@ export function getDeclarationParts(
   printer: { options: PrinterTsOptions; transform: (node: ast.SchemaNode) => factory.TsNode | null },
   node: ast.SchemaNode,
 ): { syntax: 'type' | 'interface'; type: factory.TsNode; comments: Array<string | undefined> } | null {
-  const { syntaxType = 'type', description, examples, comments = [], keysToOmit } = printer.options
+  const { syntaxType = 'type', description, comments = [], keysToOmit } = printer.options
 
   const transformed = printer.transform(node)
   if (!transformed) return null
@@ -199,7 +195,8 @@ export function getDeclarationParts(
   return {
     syntax: isInterface ? 'interface' : 'type',
     type,
-    comments: [...comments, ...buildPropertyJSDocComments({ ...meta, description, examples: examples?.length ? examples : meta.examples })],
+    // A whole-type `@example` is a full payload on one line, unreadable in a hover. Property examples stay.
+    comments: [...comments, ...buildPropertyJSDocComments({ ...meta, description, examples: undefined })],
   }
 }
 

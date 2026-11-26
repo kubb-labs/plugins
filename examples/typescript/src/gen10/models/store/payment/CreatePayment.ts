@@ -13,7 +13,6 @@ export type CreatePaymentStatus201 = Payment
 
 /**
  * @description A payment for a store order
- * @example {"id":1,"method":"cash"}
  * @see http://swagger.io Payment model
  */
 export type CreatePaymentBody = Payment
