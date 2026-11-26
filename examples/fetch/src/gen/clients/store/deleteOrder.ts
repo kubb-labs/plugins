@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
+import type { Options } from '../../.kubb/client'
 import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
@@ -12,9 +12,7 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
  * @summary Delete purchase order by ID
  */
-export function deleteOrder<ThrowOnError extends boolean = true>(
-  options: Options<DeleteOrderOptions, ThrowOnError>,
-): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
+export function deleteOrder<ThrowOnError extends boolean = true>(options: Options<DeleteOrderOptions, ThrowOnError>) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

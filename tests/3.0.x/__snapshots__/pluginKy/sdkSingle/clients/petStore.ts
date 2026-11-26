@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from '../.kubb/client'
+import type { ClientConfig, ClientInstance, Options } from '../.kubb/client'
 import type { AddPetRequest } from '../types/AddPetRequest'
 import type { ApiResponse } from '../types/ApiResponse'
 import type { FindPetsByStatusStatusEnumKey } from '../types/FindPetsByStatusStatusEnum'
@@ -47,16 +47,7 @@ export class PetStore {
   contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
-}), ThrowOnError>): Unwrappable<RequestResult<({
-  '200': {
-    contentType: 'application/json';
-    data: Pet;
-  } | {
-    contentType: 'application/xml';
-    data: string;
-  };
-  '405': unknown;
-}), ThrowOnError>> {
+}), ThrowOnError>) {
     const { client: apiClient = this.client, contentType, ...config } = options
 
     return withUnwrap(apiClient<({
@@ -83,16 +74,7 @@ export class PetStore {
   status?: FindPetsByStatusStatusEnumKey;
 });
   headers?: never;
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '200': {
-    contentType: 'application/json';
-    data: (Pet[]);
-  } | {
-    contentType: 'application/xml';
-    data: string;
-  };
-  '400': unknown;
-}), ThrowOnError>> {
+}), ThrowOnError> = {}) {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(apiClient<({
@@ -119,17 +101,7 @@ export class PetStore {
 });
   query?: never;
   headers?: never;
-}), ThrowOnError>): Unwrappable<RequestResult<({
-  '200': {
-    contentType: 'application/json';
-    data: Pet;
-  } | {
-    contentType: 'application/xml';
-    data: string;
-  };
-  '400': unknown;
-  '404': unknown;
-}), ThrowOnError>> {
+}), ThrowOnError>) {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(apiClient<({
@@ -159,9 +131,7 @@ export class PetStore {
   headers?: ({
   api_key?: string;
 });
-}), ThrowOnError>): Unwrappable<RequestResult<({
-  '400': unknown;
-}), ThrowOnError>> {
+}), ThrowOnError>) {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(apiClient<({
@@ -182,9 +152,7 @@ export class PetStore {
   additionalMetadata?: string;
 });
   headers?: never;
-}), ThrowOnError>): Unwrappable<RequestResult<({
-  '200': ApiResponse;
-}), ThrowOnError>> {
+}), ThrowOnError>) {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(apiClient<({
@@ -202,11 +170,7 @@ export class PetStore {
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '200': ({
-  [key: string]: number;
-});
-}), ThrowOnError>> {
+}), ThrowOnError> = {}) {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(apiClient<({
@@ -245,10 +209,7 @@ export class PetStore {
   contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '200': Order;
-  '405': unknown;
-}), ThrowOnError>> {
+}), ThrowOnError> = {}) {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(apiClient<({

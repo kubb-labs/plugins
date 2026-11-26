@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResultWithHeaders } from '../../.kubb/client'
+import type { Options } from '../../.kubb/client'
 import type { LoginUserOptions, LoginUserResponses, LoginUserStatus200Headers } from '../../models/user/LoginUser'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
@@ -11,9 +11,7 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * `GET /user/login`
  * @summary Logs user into the system
  */
-export function loginUser<ThrowOnError extends boolean = true>(
-  options: Options<LoginUserOptions, ThrowOnError> = {},
-): Unwrappable<RequestResultWithHeaders<LoginUserResponses, { '200': LoginUserStatus200Headers }, ThrowOnError>> {
+export function loginUser<ThrowOnError extends boolean = true>(options: Options<LoginUserOptions, ThrowOnError> = {}) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

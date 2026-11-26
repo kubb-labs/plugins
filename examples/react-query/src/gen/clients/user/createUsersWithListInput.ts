@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
+import type { Options } from '../../.kubb/client'
 import type { User } from '../../models/User'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
@@ -22,23 +22,7 @@ export function createUsersWithListInput<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: User
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      default: unknown
-    },
-    ThrowOnError
-  >
-> {
+) {
   const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
+import type { Options } from '../../.kubb/client'
 import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
@@ -12,9 +12,7 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @description Place a new order in the store with patch
  * @summary Place an order for a pet with patch
  */
-export function placeOrderPatch<ThrowOnError extends boolean = true>(
-  options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},
-): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
+export function placeOrderPatch<ThrowOnError extends boolean = true>(options: Options<PlaceOrderPatchOptions, ThrowOnError> = {}) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

@@ -1,4 +1,4 @@
-import type { Options, Unwrappable, RequestResultWithHeaders } from '../../../.kubb/client'
+import type { Options } from '../../../.kubb/client'
 import type { Payment } from '../../../models/ts/Payment'
 import type { PaymentError } from '../../../models/ts/PaymentError'
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
@@ -25,21 +25,7 @@ export function listPayments<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResultWithHeaders<
-    {
-      '2xx': Array<Payment>
-      '4xx': PaymentError
-    },
-    {
-      '2xx': {
-        'X-Rate-Limit': number
-        'X-Next-Page'?: string
-      }
-    },
-    ThrowOnError
-  >
-> {
+) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

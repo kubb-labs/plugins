@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
+import type { Options } from '../.kubb/client'
 import type { AddPetOptions, AddPetResponses } from '../models'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
@@ -12,9 +12,7 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.ku
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
  */
-export function addPet<ThrowOnError extends boolean = true>(
-  options: Options<AddPetOptions, ThrowOnError>,
-): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
+export function addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>) {
   const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(

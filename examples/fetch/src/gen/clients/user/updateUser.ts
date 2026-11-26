@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
+import type { Options } from '../../.kubb/client'
 import type { UpdateUserOptions, UpdateUserResponses } from '../../models/user/UpdateUser'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
@@ -12,9 +12,7 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @description This can only be done by the logged in user.
  * @summary Update user
  */
-export function updateUser<ThrowOnError extends boolean = true>(
-  options: Options<UpdateUserOptions, ThrowOnError>,
-): Unwrappable<RequestResult<UpdateUserResponses, ThrowOnError>> {
+export function updateUser<ThrowOnError extends boolean = true>(options: Options<UpdateUserOptions, ThrowOnError>) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import path from 'node:path'
 import { getStream, namedFile } from '@internals/shared'
-import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
+import { type OperationTypeSource, resolveOperationTypes } from '@internals/client'
 import { ensureValidVarName } from '@internals/utils'
 import { code, defineTemplate, Diagnostics } from '@kubb/kit'
 import type { FileTarget, Template, TemplateContext } from '@kubb/kit'
@@ -98,9 +98,6 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
       const renderClassFile = ({ name: className, file, operations: ops }: Pick<SdkController, 'name' | 'file' | 'operations'>) => {
         const typeImports = code.join(ops.flatMap((op) => op.typeNames)).imports
         const schemaImports = code.join(ops.flatMap((op) => op.schemaNames)).imports
-        const resultOps = ops.filter((op) => !getStream(op.node)?.shape)
-        const typedHeaders = (op: OperationData) => op.headerTypeNames.length > 0
-        const resultName = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
 
         return (
           <File key={file.path} {...file}>
@@ -117,9 +114,6 @@ export function createSdkTemplate<TFactory extends ContractClientFactory>({ temp
                     'ClientConfig',
                     'ClientInstance',
                     'Options',
-                    ...(returnType === 'data' ? [] : ['Unwrappable']),
-                    ...(resultOps.some((op) => !typedHeaders(op)) ? [resultName] : []),
-                    ...(resultOps.some(typedHeaders) ? [resultTypeName(resultName, true)] : []),
                     ...ops.filter((op) => getStream(op.node)?.shape).flatMap((op) => buildEventStreamImports({ node: op.node, types: op.types, returnType })),
                   ]),
                   (name) => ({ name, space: 'type' as const }),

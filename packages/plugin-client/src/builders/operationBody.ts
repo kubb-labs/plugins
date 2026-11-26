@@ -32,7 +32,7 @@ export function buildOperationBody({
   baseURL,
   returnType,
   throwOnErrorDefault,
-}: BuildOperationBodyOptions): { generics: Array<string>; paramsSignature: string; returnType: string; statement: string; mergeContentType: boolean } {
+}: BuildOperationBodyOptions): { generics: Array<string>; paramsSignature: string; returnType?: string; statement: string; mergeContentType: boolean } {
   const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, baseURL, throwOnErrorDefault, returnType })
   const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault, eventStream, authRequired })
   const stream = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, throwOnErrorDefault }) : null
@@ -40,7 +40,9 @@ export function buildOperationBody({
   return {
     generics: signature.generics,
     paramsSignature: signature.paramsSignature,
-    returnType: stream?.returnType ?? signature.returnType,
+    // The call already carries the full result type, so the bundled runtime's return type is inferred instead of written twice.
+    // A custom client (`'plain'`) keeps it, since it is the contract that client has to meet.
+    returnType: returnType === 'plain' ? (stream?.returnType ?? signature.returnType) : undefined,
     statement: stream?.statement ?? buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault }),
     mergeContentType,
   }

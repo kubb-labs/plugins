@@ -1,6 +1,6 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, Unwrappable, RequestResult } from './.kubb/client'
+import type { Options } from './.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from './FindPetsByTags'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from './.kubb/client'
 
@@ -9,7 +9,7 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from './.kub
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
   options: Options<FindPetsByTagsOptions, ThrowOnError> & { auth: NonNullable<Options<FindPetsByTagsOptions, ThrowOnError>['auth']> },
-): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

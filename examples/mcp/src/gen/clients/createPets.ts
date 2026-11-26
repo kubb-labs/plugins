@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
+import type { Options } from '../.kubb/client'
 import type { CreatePetsXEXAMPLEEnumKey } from '../models/ts/CreatePetsXEXAMPLEEnum'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
@@ -30,15 +30,7 @@ export function createPets<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '201': unknown
-      default: unknown
-    },
-    ThrowOnError
-  >
-> {
+) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

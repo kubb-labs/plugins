@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
+import type { Options } from '../.kubb/client'
 import type { PutEventOptionsSchemaType, PutEventResponsesSchemaType } from '../zod/putEventSchema'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { putEventResponseSchema, putEventStatus409Schema } from '../zod/putEventSchema'
@@ -11,7 +11,7 @@ import { putEventResponseSchema, putEventStatus409Schema } from '../zod/putEvent
 /**
  * `PUT /events/{day}`
  */
-export function putEvent<ThrowOnError extends boolean = true>(options: Options<PutEventOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PutEventResponsesSchemaType, ThrowOnError>> {
+export function putEvent<ThrowOnError extends boolean = true>(options: Options<PutEventOptionsSchemaType, ThrowOnError>) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(apiClient<PutEventResponsesSchemaType, ThrowOnError>({ method: 'PUT', url: '/events/{day}', contentType: { request: 'application/json' }, ...config, validator: { response: putEventResponseSchema, error: { 409: putEventStatus409Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))

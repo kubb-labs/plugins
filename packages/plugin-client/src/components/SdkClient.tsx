@@ -42,7 +42,7 @@ export function buildSdkMethod({
     : 'const { client: apiClient = this.client, ...config } = options'
   const methodBody = [destructure, '', body.statement].map((line) => (line ? `    ${line}` : '')).join('\n')
 
-  return `${jsdoc}  public ${name}${generics}(${body.paramsSignature}): ${body.returnType} {\n${methodBody}\n  }`
+  return `${jsdoc}  public ${name}${generics}(${body.paramsSignature})${body.returnType ? `: ${body.returnType}` : ''} {\n${methodBody}\n  }`
 }
 
 export type SdkClientOperation = {

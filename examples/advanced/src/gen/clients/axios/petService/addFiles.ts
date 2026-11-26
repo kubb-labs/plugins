@@ -1,4 +1,4 @@
-import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
+import type { Options } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 
@@ -35,15 +35,7 @@ export function addFiles<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200': Omit<NonNullable<Pet>, 'name'>
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

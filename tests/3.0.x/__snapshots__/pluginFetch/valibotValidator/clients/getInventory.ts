@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
+import type { Options } from '../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 import { getInventoryResponseSchema } from '../valibot/getInventorySchema'
 
@@ -17,11 +17,7 @@ export function getInventory<ThrowOnError extends boolean = true>(options: Optio
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '200': ({
-  [key: string]: number;
-});
-}), ThrowOnError>> {
+}), ThrowOnError> = {}) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(apiClient<({

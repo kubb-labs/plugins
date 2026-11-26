@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
+import type { Options } from '../.kubb/client'
 import type { PointGeoJson } from '../types/PointGeoJson'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { pointResponseSchema } from '../zod/pointOperationSchema'
@@ -18,9 +18,7 @@ export function point<ThrowOnError extends boolean = true>(options: Options<({
 });
   query?: never;
   headers?: never;
-}), ThrowOnError>): Unwrappable<RequestResult<({
-  '200': PointGeoJson;
-}), ThrowOnError>> {
+}), ThrowOnError>) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(apiClient<({

@@ -1,4 +1,4 @@
-import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
+import type { Options } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { updatePetResponseSchema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema } from '../../../zod/pet/updatePetSchema'
@@ -45,28 +45,7 @@ export function updatePet<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Omit<NonNullable<Pet>, 'name'>
-          }
-        | {
-            contentType: 'application/xml'
-            data: string
-          }
-      '202': {
-        id?: number
-      }
-      '400': unknown
-      '404': unknown
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+) {
   const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(

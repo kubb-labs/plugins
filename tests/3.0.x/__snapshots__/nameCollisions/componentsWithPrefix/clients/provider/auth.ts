@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
+import type { Options } from '../../.kubb/client'
 import type { ApiProviderAuthError } from '../../types/ProviderAuthError'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 import { providerAuthResponseSchema, providerAuthStatus400Schema } from '../../zod/provider/authSchema'
@@ -16,9 +16,7 @@ export function providerAuth<ThrowOnError extends boolean = true>(options: Optio
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '400': ApiProviderAuthError;
-}), ThrowOnError>> {
+}), ThrowOnError> = {}) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(apiClient<({

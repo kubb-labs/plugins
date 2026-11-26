@@ -64,8 +64,8 @@ export function createClientTemplates<TFactory extends ContractClientFactory>({ 
 
         const clientTypeImports = stream
           ? buildEventStreamImports({ node, types, returnType })
-          : { plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType].map(
-              (name) => (name.endsWith('Result') ? resultTypeName(name, headerTypeNames.length > 0) : name),
+          : { plain: ['Options', 'RequestResult'], data: ['Options'], full: ['Options'] }[returnType].map((name) =>
+              name.endsWith('Result') ? resultTypeName(name, headerTypeNames.length > 0) : name,
             )
 
         return (

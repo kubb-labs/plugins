@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
+import type { Options } from '../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { createPetResponseSchema } from '../zod/createPetSchema'
 
@@ -17,9 +17,7 @@ export function createPet<ThrowOnError extends boolean = true>(options: Options<
   path?: never;
   query?: never;
   headers?: never;
-}), ThrowOnError> = {}): Unwrappable<RequestResult<({
-  '200': unknown;
-}), ThrowOnError>> {
+}), ThrowOnError> = {}) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(apiClient<({

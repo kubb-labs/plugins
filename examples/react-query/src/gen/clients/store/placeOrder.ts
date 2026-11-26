@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
+import type { Options } from '../../.kubb/client'
 import type { Order } from '../../models/Order'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
@@ -49,15 +49,7 @@ export function placeOrder<ThrowOnError extends boolean = true>(
       },
     ThrowOnError
   > = {},
-): Unwrappable<
-  RequestResult<
-    {
-      '200': Order
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

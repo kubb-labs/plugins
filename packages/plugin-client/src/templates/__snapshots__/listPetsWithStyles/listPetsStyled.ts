@@ -1,15 +1,13 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, Unwrappable, RequestResult } from './.kubb/client'
+import type { Options } from './.kubb/client'
 import type { ListPetsStyledOptions, ListPetsStyledResponses } from './ListPetsStyled'
 import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 /**
  * `GET /pets/{petId}`
  */
-export function listPetsStyled<ThrowOnError extends boolean = true>(
-  options: Options<ListPetsStyledOptions, ThrowOnError>,
-): Unwrappable<RequestResult<ListPetsStyledResponses, ThrowOnError>> {
+export function listPetsStyled<ThrowOnError extends boolean = true>(options: Options<ListPetsStyledOptions, ThrowOnError>) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

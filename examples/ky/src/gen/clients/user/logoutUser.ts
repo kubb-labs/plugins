@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
+import type { Options } from '../../.kubb/client'
 import type { LogoutUserOptions, LogoutUserResponses } from '../../models/user/LogoutUser'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
@@ -11,9 +11,7 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * `GET /user/logout`
  * @summary Logs out current logged in user session
  */
-export function logoutUser<ThrowOnError extends boolean = true>(
-  options: Options<LogoutUserOptions, ThrowOnError> = {},
-): Unwrappable<RequestResult<LogoutUserResponses, ThrowOnError>> {
+export function logoutUser<ThrowOnError extends boolean = true>(options: Options<LogoutUserOptions, ThrowOnError> = {}) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

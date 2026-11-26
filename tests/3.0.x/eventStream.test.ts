@@ -52,7 +52,7 @@ describe('event stream hooks', () => {
 
       for (const operation of ['streamGet', 'streamPost']) {
         const client = await fs.readFile(path.join(output, 'clients', `${operation}.ts`), 'utf8')
-        expect(client).toContain('StreamResult<')
+        expect(client).toContain('apiClient.stream<')
       }
 
       for (const dir of ['react', 'vue', 'swr']) {
@@ -141,7 +141,7 @@ describe('a response that offers JSON or an event stream', () => {
       expect(await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
 
       const client = await fs.readFile(path.join(output, 'clients', 'listChanges.ts'), 'utf8')
-      expect(client).toContain('RequestResult<ListChangesResponses')
+      expect(client).toContain('apiClient<ListChangesResponses')
       expect(client).toContain("contentType: { response: 'text/event-stream' }")
 
       // The event stream variant comes back as the unread body, so the record types its `data` as the stream.
@@ -228,18 +228,17 @@ describe('OpenAPI 3.2 item schemas', () => {
 
       // The runtime validates each item with the response validator, by the event shape the call carries.
       const chat = await fs.readFile(path.join(output, 'clients', 'streamChat.ts'), 'utf8')
-      expect(chat).toContain('Unwrappable<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>>')
+      expect(chat).toContain('apiClient.stream<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>(')
       expect(chat).toContain("eventShape: 'event'")
       expect(chat).toMatch(/validator: \{[^}]*response:/)
       expect(chat).not.toMatch(/\) as \w/)
 
       const ticks = await fs.readFile(path.join(output, 'clients', 'streamTicks.ts'), 'utf8')
-      expect(ticks).toContain('Unwrappable<StreamResult<StreamTicksResponses, ThrowOnError>>')
+      expect(ticks).toContain('apiClient.stream<StreamTicksResponses, ThrowOnError>(')
       expect(ticks).toContain("eventShape: 'data'")
 
       // JSON Lines streams one LogEntry per line, validated per line.
       const logs = await fs.readFile(path.join(output, 'clients', 'streamLogs.ts'), 'utf8')
-      expect(logs).toContain('Unwrappable<StreamResult<StreamLogsResponses, ThrowOnError, SuccessOf<StreamLogsResponses>>>')
       expect(logs).toContain('apiClient.stream<StreamLogsResponses, ThrowOnError, SuccessOf<StreamLogsResponses>>(')
       expect(logs).toContain("contentType: { response: 'application/jsonl' }")
       expect(logs).not.toContain('eventShape')

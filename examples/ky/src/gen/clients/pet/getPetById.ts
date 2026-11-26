@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
+import type { Options } from '../../.kubb/client'
 import type { GetPetByIdOptions, GetPetByIdResponses } from '../../models/pet/GetPetById'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
@@ -12,9 +12,7 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../
  * @description Returns a single pet
  * @summary Find pet by ID
  */
-export function getPetById<ThrowOnError extends boolean = true>(
-  options: Options<GetPetByIdOptions, ThrowOnError>,
-): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+export function getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptions, ThrowOnError>) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

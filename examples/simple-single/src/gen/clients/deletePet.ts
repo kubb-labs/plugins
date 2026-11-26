@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
+import type { Options } from '../.kubb/client'
 import type { DeletePetOptions, DeletePetResponses } from '../models'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
@@ -12,9 +12,7 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.ku
  * @description delete a pet
  * @summary Deletes a pet
  */
-export function deletePet<ThrowOnError extends boolean = true>(
-  options: Options<DeletePetOptions, ThrowOnError>,
-): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
+export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptions, ThrowOnError>) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

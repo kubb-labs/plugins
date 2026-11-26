@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
+import type { Options } from '../../.kubb/client'
 import type { DeleteUserOptions, DeleteUserResponses } from '../../models/user/DeleteUser'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
@@ -12,9 +12,7 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * @description This can only be done by the logged in user.
  * @summary Delete user
  */
-export function deleteUser<ThrowOnError extends boolean = true>(
-  options: Options<DeleteUserOptions, ThrowOnError>,
-): Unwrappable<RequestResult<DeleteUserResponses, ThrowOnError>> {
+export function deleteUser<ThrowOnError extends boolean = true>(options: Options<DeleteUserOptions, ThrowOnError>) {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

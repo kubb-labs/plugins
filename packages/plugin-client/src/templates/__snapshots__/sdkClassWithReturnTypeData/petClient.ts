@@ -1,6 +1,6 @@
 /* eslint-disable no-alert, no-console */
 
-import type { ClientConfig, ClientInstance, Options, UnwrappedResult } from './.kubb/client'
+import type { ClientConfig, ClientInstance, Options } from './.kubb/client'
 import type { DeletePetOptions, DeletePetResponses } from './DeletePet'
 import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
 import { createClient, unwrapResult, resolveThrowOnError } from './.kubb/client'
@@ -15,9 +15,7 @@ export class PetClient {
   /**
    * `GET /pet/{petId}`
    */
-  public getPetById<ThrowOnError extends boolean = true>(
-    options: Options<GetPetByIdOptions, ThrowOnError>,
-  ): Promise<UnwrappedResult<GetPetByIdResponses, ThrowOnError>> {
+  public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptions, ThrowOnError>) {
     const { client: apiClient = this.client, ...config } = options
 
     return unwrapResult(
@@ -34,9 +32,7 @@ export class PetClient {
   /**
    * `DELETE /pet/{petId}`
    */
-  public deletePet<ThrowOnError extends boolean = true>(
-    options: Options<DeletePetOptions, ThrowOnError>,
-  ): Promise<UnwrappedResult<DeletePetResponses, ThrowOnError>> {
+  public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptions, ThrowOnError>) {
     const { client: apiClient = this.client, ...config } = options
 
     return unwrapResult(
