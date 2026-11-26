@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { ClientConfig, ClientInstance, Options } from '../.kubb/client'
+import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetInventoryOptionsSchemaType, GetInventoryResponsesSchemaType } from '../zod/getInventorySchema'
 import type { PlaceOrderOptionsSchemaType, PlaceOrderResponsesSchemaType } from '../zod/placeOrderSchema'
 import { createClient, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
@@ -22,7 +22,7 @@ export class StoreClient {
    * @description Returns a map of status codes to quantities
    * @summary Returns pet inventories by status
    */
-    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptionsSchemaType, ThrowOnError> = {}) {
+    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(apiClient<GetInventoryResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [securitySchemes.api_key], ...config, validator: { response: getInventoryResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
@@ -33,7 +33,7 @@ export class StoreClient {
    * @description Place a new order in the store
    * @summary Place an order for a pet
    */
-    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError> = {}) {
+    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(apiClient<PlaceOrderResponsesSchemaType, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { response: placeOrderResponseSchema, error: { 405: placeOrderStatus405Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))

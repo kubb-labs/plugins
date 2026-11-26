@@ -1,4 +1,4 @@
-import type { StreamOptions } from '../../../.kubb/client'
+import type { StreamOptions, Unwrappable, StreamResult } from '../../../.kubb/client'
 import type { PetEvent } from '../../../models/ts/PetEvent'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 
@@ -19,7 +19,14 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-) {
+): Unwrappable<
+  StreamResult<
+    {
+      '200': PetEvent
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

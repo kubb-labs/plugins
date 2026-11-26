@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -23,7 +23,15 @@ export function deleteUser<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-) {
+): Unwrappable<
+  RequestResult<
+    {
+      '400': unknown
+      '404': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

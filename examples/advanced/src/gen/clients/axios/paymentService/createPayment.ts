@@ -1,4 +1,4 @@
-import type { Options } from '../../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { Payment } from '../../../models/ts/Payment'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../../.kubb/client'
 import { createPaymentResponseSchema } from '../../../zod/store/payment/createPaymentSchema'
@@ -17,7 +17,14 @@ export function createPayment<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-) {
+): Unwrappable<
+  RequestResult<
+    {
+      '201': Payment
+    },
+    ThrowOnError
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

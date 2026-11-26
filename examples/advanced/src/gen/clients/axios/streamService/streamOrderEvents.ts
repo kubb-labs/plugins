@@ -1,4 +1,4 @@
-import type { StreamOptions, SuccessOf, TypedEvent } from '../../../.kubb/client'
+import type { StreamOptions, Unwrappable, StreamResult, SuccessOf, TypedEvent } from '../../../.kubb/client'
 import type { OrderEvent } from '../../../models/ts/OrderEvent'
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 
@@ -19,7 +19,19 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-) {
+): Unwrappable<
+  StreamResult<
+    {
+      '200': OrderEvent
+    },
+    ThrowOnError,
+    TypedEvent<
+      SuccessOf<{
+        '200': OrderEvent
+      }>
+    >
+  >
+> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

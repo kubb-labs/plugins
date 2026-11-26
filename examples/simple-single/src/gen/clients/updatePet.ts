@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { UpdatePetOptions, UpdatePetResponses } from '../models'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.kubb/client'
 
@@ -12,7 +12,9 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../.ku
  * @description Update an existing pet by Id
  * @summary Update an existing pet
  */
-export function updatePet<ThrowOnError extends boolean = true>(options: Options<UpdatePetOptions, ThrowOnError>) {
+export function updatePet<ThrowOnError extends boolean = true>(
+  options: Options<UpdatePetOptions, ThrowOnError>,
+): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(

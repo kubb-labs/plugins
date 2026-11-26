@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { ClientConfig, ClientInstance, Options } from '../../.kubb/client'
+import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { Order } from '../../models/Order'
 import { createClient, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
@@ -29,7 +29,16 @@ export class StoreClient {
       },
       ThrowOnError
     > = {},
-  ) {
+  ): Unwrappable<
+    RequestResult<
+      {
+        '200': {
+          [key: string]: number
+        }
+      },
+      ThrowOnError
+    >
+  > {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
@@ -92,7 +101,15 @@ export class StoreClient {
         },
       ThrowOnError
     > = {},
-  ) {
+  ): Unwrappable<
+    RequestResult<
+      {
+        '200': Order
+        '405': unknown
+      },
+      ThrowOnError
+    >
+  > {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
@@ -154,7 +171,15 @@ export class StoreClient {
         },
       ThrowOnError
     > = {},
-  ) {
+  ): Unwrappable<
+    RequestResult<
+      {
+        '200': Order
+        '405': unknown
+      },
+      ThrowOnError
+    >
+  > {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
@@ -191,7 +216,24 @@ export class StoreClient {
       },
       ThrowOnError
     >,
-  ) {
+  ): Unwrappable<
+    RequestResult<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Order
+            }
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+        '400': unknown
+        '404': unknown
+      },
+      ThrowOnError
+    >
+  > {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
@@ -231,7 +273,15 @@ export class StoreClient {
       },
       ThrowOnError
     >,
-  ) {
+  ): Unwrappable<
+    RequestResult<
+      {
+        '400': unknown
+        '404': unknown
+      },
+      ThrowOnError
+    >
+  > {
     const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(

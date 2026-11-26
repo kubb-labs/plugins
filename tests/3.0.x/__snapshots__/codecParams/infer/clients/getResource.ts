@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetResourceOptionsSchemaType, GetResourceResponsesSchemaType } from '../zod/getResourceSchema'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { getResourceResponseSchema } from '../zod/getResourceSchema'
@@ -11,7 +11,7 @@ import { getResourceResponseSchema } from '../zod/getResourceSchema'
 /**
  * `GET /resources/{resource}`
  */
-export function getResource<ThrowOnError extends boolean = true>(options: Options<GetResourceOptionsSchemaType, ThrowOnError>) {
+export function getResource<ThrowOnError extends boolean = true>(options: Options<GetResourceOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(apiClient<GetResourceResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/resources/{resource}', ...config, validator: { response: getResourceResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))

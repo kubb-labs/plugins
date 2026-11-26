@@ -74,9 +74,11 @@ export type BuildEventStreamImportsOptions = {
 export function buildEventStreamImports({ node, types, returnType }: BuildEventStreamImportsOptions): Array<string> {
   const shape = getStream(node)?.shape ?? 'data'
   const headers = buildResponseHeadersType({ node, types }) !== null
-  const result = { plain: ['Options', 'StreamResult'], full: ['StreamOptions'], data: ['StreamOptions'] }[returnType].map((name) =>
-    name.endsWith('Result') ? resultTypeName(name, headers) : name,
-  )
+  const result = {
+    plain: ['Options', 'StreamResult'],
+    full: ['StreamOptions', 'Unwrappable', 'StreamResult'],
+    data: ['StreamOptions', 'UnwrappedStreamResult'],
+  }[returnType].map((name) => (name.endsWith('Result') ? resultTypeName(name, headers) : name))
   const item = { event: ['SuccessOf', 'TypedEvent'], data: headers ? ['SuccessOf', 'ServerSentEvent'] : [], line: ['SuccessOf'] }[shape]
   return [...result, ...item]
 }

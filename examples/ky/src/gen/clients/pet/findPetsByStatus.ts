@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../../models/pet/FindPetsByStatus'
 import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
@@ -12,7 +12,9 @@ import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
  */
-export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}) {
+export function findPetsByStatus<ThrowOnError extends boolean = true>(
+  options: Options<FindPetsByStatusOptions, ThrowOnError> = {},
+): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(

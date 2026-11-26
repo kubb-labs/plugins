@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../models'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
@@ -12,7 +12,9 @@ import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
  * @summary Find purchase order by ID
  */
-export function getOrderById<ThrowOnError extends boolean = true>(options: Options<GetOrderByIdOptions, ThrowOnError>) {
+export function getOrderById<ThrowOnError extends boolean = true>(
+  options: Options<GetOrderByIdOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
