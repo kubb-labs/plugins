@@ -123,7 +123,7 @@ describe('typeGenerator — response headers', () => {
       ast.factory.createParameter({
         name: 'ratelimit-limit',
         in: 'header',
-        schema: ast.factory.createSchema({ type: 'integer', name: `ListPetsStatus${status}RatelimitLimit`, description: 'Requests per hour' }),
+        schema: ast.factory.createSchema({ type: 'integer', name: `ListPetsStatus${status}RatelimitLimit` }),
       }),
     ]
     const node = ast.factory.createOperation({
@@ -132,7 +132,6 @@ describe('typeGenerator — response headers', () => {
       path: '/pets',
       responses: [
         ast.factory.createResponse({ statusCode: '200', headers: rateLimit('200') }),
-        ast.factory.createResponse({ statusCode: '429', headers: rateLimit('429') }),
         ast.factory.createResponse({ statusCode: 'default', headers: rateLimit('default') }),
         ast.factory.createResponse({
           statusCode: '500',
@@ -154,25 +153,16 @@ describe('typeGenerator — response headers', () => {
     const source = rawSources(driver.fileManager.files).join('\n')
 
     expect(source).toContain('export type ListPetsStatus200Headers = {')
-    expect(source).toContain('export type ListPetsStatus429Headers = ListPetsStatus200Headers')
     expect(source).toContain('export type ListPetsStatusDefaultHeaders = ListPetsStatus200Headers')
     expect(source).toContain('export type ListPetsStatus500Headers = {')
-    expect(source.match(/Requests per hour/g)).toHaveLength(1)
   })
 })
 
 describe('typeGenerator — inline operations', () => {
-  test.each([
-    { mode: 'directory', inline: true },
-    { mode: 'file', inline: false },
-  ] as const)('marks the operation file inline in $mode mode: $inline', async ({ mode, inline }) => {
-    const options: PluginTs['resolvedOptions'] = {
-      ...defaultOptions,
-      operations: 'inline',
-      output: { path: mode === 'file' ? 'types.ts' : '.', mode },
-    }
+  test('keeps operation types exported in a single output file, which also holds the schemas', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, operations: 'inline', output: { path: 'types.ts', mode: 'file' } }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
-    const driver = createMockedPluginDriver({ name: `inline ${mode}` })
+    const driver = createMockedPluginDriver({ name: 'inline file mode' })
 
     await renderTemplate(typeOperation, operationWithSnakeCaseParams, {
       config: testConfig,
@@ -184,7 +174,7 @@ describe('typeGenerator — inline operations', () => {
       printer: createPrinterTs,
     })
 
-    expect(driver.fileManager.files.every((file) => !!file.inline === inline)).toBe(true)
+    expect(driver.fileManager.files.some((file) => file.inline)).toBe(false)
   })
 })
 

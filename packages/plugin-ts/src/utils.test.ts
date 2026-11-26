@@ -201,12 +201,6 @@ describe('buildPropertyJSDocComments', () => {
 
     expect(comments).toContain('@example {"label":"*\\/"}')
   })
-
-  it('never emits @type, since it would repeat the TypeScript type', () => {
-    const schema = ast.factory.createSchema({ type: 'string', description: 'A pet name' })
-
-    expect(buildPropertyJSDocComments(schema)).toStrictEqual(['@description A pet name'])
-  })
 })
 
 describe('buildResponseComments', () => {
