@@ -1,7 +1,7 @@
 import { resolveOperationName } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { casing, createResolver } from '@kubb/kit'
-import type { PluginContractClient, ResolverClient } from './types.ts'
+import type { PluginContractClient, ResolverClient } from '../types.ts'
 
 /**
  * Default resolver shared by the client plugins. Functions use safe camelCase identifiers and

@@ -2,11 +2,11 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { addMacro, addTemplate, injectFile, Resolver, setResolver, useConfig } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './builders/validatorOptions.ts'
+import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './builders/validatorLibrary.ts'
 import { createClientTemplates } from './templates/client.tsx'
 import { createSdkTemplate } from './templates/sdk.tsx'
 import { defaultMacros } from './macros.ts'
-import { resolverClient } from './resolver.ts'
+import { resolverClient } from './resolvers/resolverClient.ts'
 import type { ClientOptions, ClientResolvedOptions, ContractClientFactory, ResolverClient } from './types.ts'
 
 // Resolved from a file directly in `src/`, so the same `../templates/` path works from `dist/`.

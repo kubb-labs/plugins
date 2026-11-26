@@ -4,7 +4,7 @@ import { operationKey, type RefName, type TemplateContext } from '@kubb/kit'
 import type { ContractClientFactory } from '../types.ts'
 import { getOperationSecurity, isAuthRequired, type SecurityRequirement } from './security.ts'
 import { buildValidatorHooks, type ValidatorHooks } from './validator.ts'
-import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './validatorOptions.ts'
+import { pluginValibotName, pluginZodName, resolveValidatorLibrary } from './validatorLibrary.ts'
 
 export type OperationData = {
   node: ast.HttpOperationNode

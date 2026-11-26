@@ -7,7 +7,7 @@ import {
   resolveResponseValidator,
   resolveValidatorLibrary,
   type ValidatorResolver,
-} from './validatorOptions.ts'
+} from './validatorLibrary.ts'
 
 /**
  * The per-call validator references a generated function wires into its request config. Each hook is

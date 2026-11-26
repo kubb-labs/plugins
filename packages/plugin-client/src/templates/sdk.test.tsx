@@ -6,7 +6,7 @@ import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderTemplate } from '#mocks'
 import type { MockedPlugin } from '#mocks'
-import { resolverClient } from '../resolver.ts'
+import { resolverClient } from '../resolvers/resolverClient.ts'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
 import { createSdkTemplate } from './sdk.tsx'
 
