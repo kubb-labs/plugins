@@ -1,4 +1,5 @@
 import { ast } from '@internals/ast'
+import { resolveTypeGuards } from '@internals/shared'
 import { Const, Function, Schema, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PrinterZodFactory } from '../printers/printerZod.ts'
@@ -118,8 +119,9 @@ export function Zod({
   const toValue = (output: string) => (shouldCompile ? (isStrict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output)
 
   const targetType = inferTypeName ?? `z.infer<typeof ${name}>`
-  const shouldGenerateIs = isName && (typeof typeGuards === 'object' ? (typeGuards.is ?? true) : Boolean(typeGuards))
-  const shouldGenerateAssert = assertName && (typeof typeGuards === 'object' ? (typeGuards.assert ?? true) : Boolean(typeGuards))
+  const guards = resolveTypeGuards(typeGuards)
+  const shouldGenerateIs = isName && guards.is
+  const shouldGenerateAssert = assertName && guards.assert
 
   return (
     <Schema node={node} printer={printer}>

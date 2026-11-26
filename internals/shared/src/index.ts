@@ -1,3 +1,5 @@
+export { conditionExpression, getContainsCount, resolveTypeGuards } from './checks.ts'
+export type { ConditionExpressionOptions, ContainsCount, TypeGuards } from './checks.ts'
 export { createSchemaResolver } from './schemaResolver.ts'
 export { collectDirectionalRefNames, containsDirectionalNode, variesByDirection } from './direction.ts'
 export {

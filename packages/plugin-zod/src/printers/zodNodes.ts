@@ -3,7 +3,9 @@ import { buildList } from '@internals/utils'
 import { text } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
+  conditionExpression,
   getChecks,
+  getContainsCount,
   getObjectKind,
   isComposedObject,
   hasInputChecks,
@@ -477,38 +479,16 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 
 type ZodCheckContext = { transform: (node: ast.SchemaNode) => string | null }
 
-function containsCheck(ctx: ZodCheckContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
-  if (min === 0 && max === undefined) return null
-  const countBounds = [`count >= ${min}`, max !== undefined && `count <= ${max}`].filter(Boolean).join(' && ')
-  const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
+function containsCheck(ctx: ZodCheckContext, { schema, min, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
+  const count = getContainsCount({ min, max })
+  if (!count) return null
   const itemSchema = ctx.transform(schema) ?? 'z.unknown()'
 
-  return `(items) => { const count = items.filter((item) => ${itemSchema}.safeParse(item).success).length; return ${countBounds} }, { message: ${text.quote(message)} }`
+  return `(items) => { const count = items.filter((item) => ${itemSchema}.safeParse(item).success).length; return ${count.bounds} }, { message: ${text.quote(count.message)} }`
 }
 
-// A required `unknown` property means "the key is present", which a Zod object would accept as missing, so those keys are checked with `in`.
-function conditionExpression(ctx: ZodCheckContext, schema: ast.SchemaNode | undefined): string {
-  if (!schema) return 'true'
-  const object = ast.schema.narrow(schema, ast.schema.types.object)
-  const keyOnlyNames =
-    object?.properties.filter((property) => property.required && property.schema.type === ast.schema.types.unknown).map((property) => property.name) ?? []
-  const restSchema = object ? { ...object, properties: object.properties.filter((property) => !keyOnlyNames.includes(property.name)) } : schema
-  // An object with no properties left still means "is an object", so only a key check stands alone.
-  const isOnlyKeys =
-    keyOnlyNames.length > 0 &&
-    restSchema.type === 'object' &&
-    restSchema.properties.length === 0 &&
-    restSchema.additionalProperties === undefined &&
-    !restSchema.patternProperties &&
-    !restSchema.propertyNames &&
-    !hasInputChecks(restSchema)
-
-  return [
-    keyOnlyNames.length > 0 && `typeof value === "object" && value !== null && ${JSON.stringify(keyOnlyNames)}.every((key) => key in value)`,
-    !isOnlyKeys && `${ctx.transform(restSchema) ?? 'z.unknown()'}.safeParse(value).success`,
-  ]
-    .filter(Boolean)
-    .join(' && ')
+function zodCondition(ctx: ZodCheckContext, schema: ast.SchemaNode | undefined): string {
+  return conditionExpression({ schema, matches: (rest) => `${ctx.transform(rest) ?? 'z.unknown()'}.safeParse(value).success` })
 }
 
 type Handler<TOptions extends ZodNodeOptions, K extends ast.SchemaType> = (
@@ -533,7 +513,7 @@ export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.Prin
         keySchema: keyCheck ? this.transform(keyCheck.schema) : undefined,
         conditionals: (node.conditionals ?? []).map(
           (entry) =>
-            `z.refine((value) => (${conditionExpression(this, entry.if)} ? ${conditionExpression(this, entry.then)} : ${conditionExpression(this, entry.else)}), { message: "Value does not meet a conditional schema" })`,
+            `z.refine((value) => (${zodCondition(this, entry.if)} ? ${zodCondition(this, entry.then)} : ${zodCondition(this, entry.else)}), { message: "Value does not meet a conditional schema" })`,
         ),
       })
     }

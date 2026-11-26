@@ -1,5 +1,5 @@
 import { ast } from '@internals/ast'
-import { defaultLiteral, formatDefault, getChecks, type NumericBounds, numericLiteral } from '@internals/shared'
+import { conditionExpression, defaultLiteral, formatDefault, getChecks, getContainsCount, type NumericBounds, numericLiteral } from '@internals/shared'
 import { objectKey, toRegExpString } from '@internals/utils'
 import { text } from '@kubb/kit'
 import type { PrinterValibotNodes, PrinterValibotOptions } from './printers/printerValibot.ts'
@@ -215,37 +215,15 @@ export function strictMember({ member, node, cyclicSchemas }: { member: string; 
   return isPlainObject && !isWrapped ? `v.strictObject(${member}.entries)` : member
 }
 
-export function containsCheck(ctx: ValibotPrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | false {
-  if (min === 0 && max === undefined) return false
-  const bounds = [`count >= ${min}`, max !== undefined && `count <= ${max}`].filter(Boolean).join(' && ')
-  const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
+export function containsCheck(ctx: ValibotPrinterContext, { schema, min, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | false {
+  const count = getContainsCount({ min, max })
+  if (!count) return false
 
-  return `v.check((items) => { const count = items.filter((item) => v.is(${ctx.transform(schema) ?? UNKNOWN}, item)).length; return ${bounds} }, ${JSON.stringify(message)})`
+  return `v.check((items) => { const count = items.filter((item) => v.is(${ctx.transform(schema) ?? UNKNOWN}, item)).length; return ${count.bounds} }, ${JSON.stringify(count.message)})`
 }
 
-// A required `unknown` property means "the key is present", which an object schema accepts as missing, so those keys are checked with `in`.
-function conditionExpression(ctx: ValibotPrinterContext, schema: ast.SchemaNode | undefined): string {
-  if (!schema) return 'true'
-  const object = ast.schema.narrow(schema, ast.schema.types.object)
-  const keyOnlyNames =
-    object?.properties.filter((property) => property.required && property.schema.type === ast.schema.types.unknown).map((property) => property.name) ?? []
-  const restSchema = object ? { ...object, properties: object.properties.filter((property) => !keyOnlyNames.includes(property.name)) } : schema
-  // An object with no properties left still means "is an object", so only a key check stands alone.
-  const isOnlyKeys =
-    keyOnlyNames.length > 0 &&
-    restSchema.type === 'object' &&
-    restSchema.properties.length === 0 &&
-    restSchema.additionalProperties === undefined &&
-    !restSchema.patternProperties &&
-    !restSchema.propertyNames &&
-    !hasChecks(restSchema)
-
-  return [
-    keyOnlyNames.length > 0 && `typeof value === "object" && value !== null && ${JSON.stringify(keyOnlyNames)}.every((key) => key in value)`,
-    !isOnlyKeys && `v.is(${ctx.transform(restSchema) ?? UNKNOWN}, value)`,
-  ]
-    .filter(Boolean)
-    .join(' && ')
+function valibotCondition(ctx: ValibotPrinterContext, schema: ast.SchemaNode | undefined): string {
+  return conditionExpression({ schema, matches: (rest) => `v.is(${ctx.transform(rest) ?? UNKNOWN}, value)` })
 }
 
 // The `v.check` actions that run on the raw input, before an object schema drops unknown keys or fills in defaults.
@@ -269,7 +247,7 @@ export function inputChecks(ctx: ValibotPrinterContext, node: ast.SchemaNode): A
     patternKeys && `v.check((value) => ${NOT_OBJECT} || Object.keys(value).every((key) => ${patternKeys}), "Object keys must be declared or match a pattern")`,
     ...(node.conditionals ?? []).map(
       (entry) =>
-        `v.check((value) => (${conditionExpression(ctx, entry.if)} ? ${conditionExpression(ctx, entry.then)} : ${conditionExpression(ctx, entry.else)}), "Value does not meet a conditional schema")`,
+        `v.check((value) => (${valibotCondition(ctx, entry.if)} ? ${valibotCondition(ctx, entry.then)} : ${valibotCondition(ctx, entry.else)}), "Value does not meet a conditional schema")`,
     ),
   ].filter((check): check is string => Boolean(check))
 }
