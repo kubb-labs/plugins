@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.13.2
+
+### Patch Changes
+
+- [#1624](https://github.com/kubb-labs/plugins/pull/1624) [`30e01bf`](https://github.com/kubb-labs/plugins/commit/30e01bf75d7dfe7376a8325409278e8c39429ff0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb `^5.27.1`, which aliases an inlined import that clashes with a name the file already uses.
+
 ## 5.13.1
 
 ### Patch Changes
