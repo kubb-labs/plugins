@@ -1,7 +1,7 @@
 import { ast } from '@internals/ast'
 import { getPerContentTypeName, resolveContentTypeVariants, toResponseContent } from '@internals/shared'
 import { jsDocEscape } from '@internals/utils'
-import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
+import { createImportAliases, filterUsedImports } from '../utils/imports.ts'
 import { defineTemplate } from '@kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
 import { File, Function, Raw } from '@kubb/renderer-jsx'
@@ -202,8 +202,9 @@ export const fakerOperation = defineTemplate<PluginFaker>({
       const printerInstance = ctx.printer.with({ schemaName: name, typeName, nestedInObject: !!keysToOmit?.length })
       const fakerText = printerInstance.print(schema) ?? 'undefined'
       const usedImports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)
-      const { imports, aliases } = aliasConflictingImports(usedImports, localHelperNames)
-      const rewrittenFakerText = rewriteAliasedImports(fakerText, aliases)
+      const importAliases = createImportAliases({ imports: usedImports, reservedNames: localHelperNames })
+      const { imports } = importAliases
+      const rewrittenFakerText = importAliases.rewrite(fakerText)
       const typeReference = resolveTypeReference({
         node: schema,
         canOverride,
