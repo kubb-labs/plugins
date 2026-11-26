@@ -25,9 +25,7 @@ export type KeyTransformerProps = { node: ast.OperationNode; casing: ParamsCasin
  */
 export type KeyTransformer = (props: KeyTransformerProps) => Array<unknown>
 
-/**
- * @deprecated Use `KeyTransformer`. Removed in v6.
- */
+/** @deprecated Use `KeyTransformer`. Removed in v6. */
 export type Transformer = KeyTransformer
 
 /**
@@ -144,7 +142,5 @@ export type PageParamFn<TPage = any, TParam = any> = (
   allPageParams: Array<TParam>,
 ) => TParam | undefined | null
 
-/**
- * Wraps the type of each request group member, such as `MaybeRefOrGetter<T>` in Vue.
- */
+/** Wraps the type of each request group member, such as `MaybeRefOrGetter<T>` in Vue. */
 export type MemberTypeWrapper = (type: string) => string

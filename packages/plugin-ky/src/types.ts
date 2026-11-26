@@ -21,12 +21,8 @@ declare global {
   }
 }
 
-/**
- * @deprecated Use `PluginKyOptions`. Removed in v6.
- */
+/** @deprecated Use `PluginKyOptions`. Removed in v6. */
 export type Options = PluginKyOptions
 
-/**
- * @deprecated Use `ClientResolvedOptions`. Removed in v6.
- */
+/** @deprecated Use `ClientResolvedOptions`. Removed in v6. */
 export type ResolvedOptions = ClientResolvedOptions

@@ -21,12 +21,8 @@ declare global {
   }
 }
 
-/**
- * @deprecated Use `PluginAxiosOptions`. Removed in v6.
- */
+/** @deprecated Use `PluginAxiosOptions`. Removed in v6. */
 export type Options = PluginAxiosOptions
 
-/**
- * @deprecated Use `ClientResolvedOptions`. Removed in v6.
- */
+/** @deprecated Use `ClientResolvedOptions`. Removed in v6. */
 export type ResolvedOptions = ClientResolvedOptions

@@ -67,12 +67,8 @@ declare global {
   }
 }
 
-/**
- * @deprecated Use `PluginClientOptions`. Removed in v6.
- */
+/** @deprecated Use `PluginClientOptions`. Removed in v6. */
 export type Options = PluginClientOptions
 
-/**
- * @deprecated Use `PluginClientResolvedOptions`. Removed in v6.
- */
+/** @deprecated Use `PluginClientResolvedOptions`. Removed in v6. */
 export type ResolvedOptions = PluginClientResolvedOptions

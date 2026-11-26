@@ -21,12 +21,8 @@ declare global {
   }
 }
 
-/**
- * @deprecated Use `PluginFetchOptions`. Removed in v6.
- */
+/** @deprecated Use `PluginFetchOptions`. Removed in v6. */
 export type Options = PluginFetchOptions
 
-/**
- * @deprecated Use `ClientResolvedOptions`. Removed in v6.
- */
+/** @deprecated Use `ClientResolvedOptions`. Removed in v6. */
 export type ResolvedOptions = ClientResolvedOptions
