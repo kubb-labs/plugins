@@ -1,5 +1,11 @@
 # @kubb/plugin-ts
 
+## 6.0.2
+
+### Patch Changes
+
+- [#1632](https://github.com/kubb-labs/plugins/pull/1632) [`1c61e5f`](https://github.com/kubb-labs/plugins/commit/1c61e5f7f65f233eeac130e3dd6d88e6d26f9280) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - The `operations` option in `kubb-extension.json` now has its `path`. Without it, the Kubb registry rejected the manifest and left `@kubb/plugin-ts` out of the extension catalog on kubb.dev.
+
 ## 6.0.1
 
 ### Patch Changes
