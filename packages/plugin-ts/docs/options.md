@@ -257,7 +257,7 @@ Writes one file per operation with its aliases and aggregates, such as `export t
 :::
 
 :::field{name="'inline'"}
-Writes only the schema types. Plugins that use them, such as clients and MSW handlers, print the operation types inline, such as `Options<{ body: Order; path?: never; query?: never; headers?: never }>`. An enum declared inside an operation becomes a literal union. With a single output file, such as `output: { path: 'types.ts' }`, operation types stay exported, since that file also holds the schemas.
+Writes only the schema types. Plugins that use them, such as clients and MSW handlers, print the operation types inline, such as `Options<{ body: Order; path?: never; query?: never; headers?: never }>`. An enum declared inside an operation becomes a literal union. With a single output file (`output: { path: 'types.ts' }`), operation types stay exported, because that file also holds the schemas.
 :::
 
 ::
