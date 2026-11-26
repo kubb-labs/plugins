@@ -114,6 +114,53 @@ describe('typeGenerator — response alias', () => {
   })
 })
 
+describe('typeGenerator — response headers', () => {
+  test('aliases a header set that an earlier status code already declared', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'shared headers' })
+    const rateLimit = (status: string) => [
+      ast.factory.createParameter({
+        name: 'ratelimit-limit',
+        in: 'header',
+        schema: ast.factory.createSchema({ type: 'integer', name: `ListPetsStatus${status}RatelimitLimit`, description: 'Requests per hour' }),
+      }),
+    ]
+    const node = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pets',
+      responses: [
+        ast.factory.createResponse({ statusCode: '200', headers: rateLimit('200') }),
+        ast.factory.createResponse({ statusCode: '429', headers: rateLimit('429') }),
+        ast.factory.createResponse({ statusCode: 'default', headers: rateLimit('default') }),
+        ast.factory.createResponse({
+          statusCode: '500',
+          headers: [ast.factory.createParameter({ name: 'retry-after', in: 'header', schema: ast.factory.createSchema({ type: 'integer' }) })],
+        }),
+      ],
+    })
+
+    await renderTemplate(typeOperation, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+
+    expect(source).toContain('export type ListPetsStatus200Headers = {')
+    expect(source).toContain('export type ListPetsStatus429Headers = ListPetsStatus200Headers')
+    expect(source).toContain('export type ListPetsStatusDefaultHeaders = ListPetsStatus200Headers')
+    expect(source).toContain('export type ListPetsStatus500Headers = {')
+    expect(source.match(/Requests per hour/g)).toHaveLength(1)
+  })
+})
+
 describe('typeGenerator — custom resolver', () => {
   test('uses name consistently for imported schema refs', async () => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions }

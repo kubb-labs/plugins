@@ -194,11 +194,19 @@ export const typeOperation = defineTemplate<PluginTs>({
       })
     })
 
-    const responseHeaderTypes = node.responses.map((res) =>
-      res.headers?.length
-        ? renderSchemaType({ schema: buildParams({ params: res.headers, serializedExamples: true }), name: resolver.response.headers(node, res.statusCode) })
-        : null,
-    )
+    // Responses that share a header set, such as rate-limit headers on every status code, alias the first one instead of repeating it.
+    const headerTypeNames = new Map<string, string>()
+    const responseHeaderTypes = node.responses.map((res) => {
+      if (!res.headers?.length) return null
+      const name = resolver.response.headers(node, res.statusCode)
+      // Nested schema names carry the status code (`<Op>Status200<Header>`, `<Op>Statusdefault<Header>`), so they are compared without it.
+      const statusPrefix = new RegExp(`"${resolver.response.status(node, res.statusCode).replace(/[$.]/g, '\\$&')}`, 'gi')
+      const key = JSON.stringify(res.headers, (prop, value) => (prop === 'pointer' ? undefined : value)).replace(statusPrefix, '"')
+      const first = headerTypeNames.get(key)
+      if (first) return renderSchemaType({ schema: ast.factory.createSchema({ type: 'ref', name: first }), name })
+      headerTypeNames.set(key, name)
+      return renderSchemaType({ schema: buildParams({ params: res.headers, serializedExamples: true }), name })
+    })
 
     const optionsType = renderSchemaType({
       schema: buildOptionsSchema(node, resolver, { pairContentTypes: true }),
