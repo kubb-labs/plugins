@@ -900,6 +900,58 @@ describe('typeGenerator — const (single-value enum)', () => {
   })
 })
 
+describe('typeGenerator — enums inside `not`', () => {
+  const stateProperty = (schema: ast.SchemaNode) => ast.factory.createProperty({ name: 'state', schema })
+  const negatedEnum = ast.factory.createSchema({ type: 'enum', name: 'StateMarker', primitive: 'string', enumValues: ['internal', 'hidden'] })
+
+  async function render(schema: ast.SchemaNode) {
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'negated enum' })
+
+    await renderTemplate(typeSchema, schema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverTs,
+      printer: createPrinterTs,
+    })
+
+    return rawSources(driver.fileManager.files).join('\n')
+  }
+
+  const negation = ast.factory.createSchema({
+    type: 'not',
+    members: [ast.factory.createSchema({ type: 'object', properties: [ast.factory.createProperty({ name: 'state', required: true, schema: negatedEnum })] })],
+  })
+
+  test('skips an enum declared only inside `not`', async () => {
+    const schema = ast.factory.createSchema({
+      type: 'intersection',
+      name: 'Restricted',
+      members: [ast.factory.createSchema({ type: 'object', properties: [stateProperty(ast.factory.createSchema({ type: 'string' }))] }), negation],
+    })
+
+    const source = await render(schema)
+
+    expect(source).toContain('export type Restricted')
+    expect(source).not.toContain('stateMarker')
+  })
+
+  test('keeps an enum that also appears outside `not`', async () => {
+    const schema = ast.factory.createSchema({
+      type: 'intersection',
+      name: 'Restricted',
+      members: [ast.factory.createSchema({ type: 'object', properties: [stateProperty(negatedEnum)] }), negation],
+    })
+
+    const source = await render(schema)
+
+    expect(source).toContain('export const stateMarker')
+  })
+})
+
 describe('typeGenerator — enumType — empty string value', () => {
   const emptyStringEnumSchema = ast.factory.createSchema({
     type: 'enum',
