@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "inputs": {
     "src/gen": {
-      "hash": "1c3b85c271b9682a6d539c34791c81677d005813baae4cd88218632deb2c43dd",
+      "hash": "775107145a82843b64bf5aa34532dce54e131a91ecf464ccd2fcbf6b205dc3b1",
       "sources": ["petStore.yaml"]
     }
   },
