@@ -1,5 +1,13 @@
 # @kubb/plugin-faker
 
+## 5.6.6
+
+### Patch Changes
+
+- [#1635](https://github.com/kubb-labs/plugins/pull/1635) [`f302643`](https://github.com/kubb-labs/plugins/commit/f30264342b768658939e1b7be2ebf27678d13871) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use Kubb 5.28.2. An `allOf` with more than one `pattern` now keeps all of them, so a value must match every pattern.
+- Updated dependencies [[`f302643`](https://github.com/kubb-labs/plugins/commit/f30264342b768658939e1b7be2ebf27678d13871)]:
+  - @kubb/plugin-ts@6.0.3
+
 ## 5.6.5
 
 ### Patch Changes
